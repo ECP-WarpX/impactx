@@ -1,6 +1,6 @@
 # ImpactX
 
-ImpactX: the next generation of the IMPACT code
+ImpactX: the next generation of the [IMPACT-Z](https://github.com/impact-lbl/IMPACT-Z) code
 
 ## Developer Environment
 
@@ -11,7 +11,6 @@ Pick *one* of the methods below:
 
 ```bash
 brew update
-brew tap openpmd/openpmd
 brew install adios2      # for openPMD
 brew install ccache
 brew install cmake
@@ -43,8 +42,6 @@ spack add hdf5          # for openPMD
 spack add mpi
 spack add pkgconfig     # for fftw
 # optional:
-# spack add python
-# spack add py-pip
 # spack add cuda
 spack install
 ```
@@ -75,7 +72,7 @@ cd impactx
 # find dependencies & configure
 cmake -S . -B build
 
-# compile, here we use four threads
+# compile
 cmake --build build -j 4
 ```
 
@@ -92,11 +89,19 @@ ccmake build
 or by adding arguments with `-D<OPTION>=<VALUE>` to the first CMake call, e.g.:
 
 ```bash
-cmake -S . -B build -DImpactX_COMPUTE=CUDA -DWarpX_MPI=OFF
+cmake -S . -B build -DImpactX_COMPUTE=CUDA -DImpactX_MPI=OFF
 ```
 
-## Running
+## Run
 
 An executable ImpactX binary with the current compile-time options encoded in its file name will be created in `build/bin/`.
 
 Additionally, a symbolic link named `impactx` can be found in that directory, which points to the last built ImpactX executable.
+
+## Acknowledgements
+
+TODO: LDRD et al.
+
+## License
+
+TODO
