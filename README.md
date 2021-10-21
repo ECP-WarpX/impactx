@@ -32,10 +32,18 @@ Pick *one* of the methods below:
 
 ### Perlmutter (NERSC)
 
-### Cori (NERSC)
+### Cori KNL (NERSC)
 
 ```bash
+module swap craype-haswell craype-mic-knl
+module swap PrgEnv-intel PrgEnv-gnu
+module load cmake/3.21.3
+module load cray-hdf5-parallel/1.10.5.2
+module load cray-fftw/3.3.8.4
+module load cray-python/3.7.3.2
 ```
+
+(after build, run via `srun -C knl -N 1 -t 30 -q debug ./impactX`)
 
 ### Homebrew (macOS)
 
