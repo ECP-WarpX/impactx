@@ -25,9 +25,9 @@ jobs:
           -DCMAKE_VERBOSE_MAKEFILE=ON
         cmake --build build -j 2
 
-        cd build/bin
-
     - name: run ImpactX
       run: |
+        cd build/bin
+
         export OMP_NUM_THREADS=2
         ./impactX
