@@ -1,6 +1,6 @@
 # ImpactX
 
-[![Code Status development](https://dev.azure.com/ECP-WarpX/impactx/_apis/build/status/ECP-WarpX.impactx?branchName=development)](https://dev.azure.com/ECP-WarpX/impactx/_build/latest?definitionId=1&branchName=development)  
+[![CI Status](https://github.com/ECP-WarpX/impactx/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/ECP-WarpX/impactx/actions/workflows/ubuntu.yml)  
 [![Supported Platforms](https://img.shields.io/badge/platforms-linux%20|%20osx%20|%20win-blue)](https://impactx.readthedocs.io/en/latest/install/users.html)
 [![GitHub commits since last release](https://img.shields.io/github/commits-since/ECP-WarpX/impactx/latest/development.svg)](https://github.com/ECP-WarpX/impactx/compare/development)
 [![Development Status](https://img.shields.io/badge/development%20status-pre--alpha-orange.svg)]()
