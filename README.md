@@ -15,6 +15,10 @@ ImpactX: the next generation of the [IMPACT-Z](https://github.com/impact-lbl/IMP
 TODO: In order to learn how to install and run the code, please see the online documentation:
 https://impactx.readthedocs.io
 
+* AMReX Doxygen: https://amrex-codes.github.io/amrex/doxygen/
+* ImpactX Doxygen: ... TODO
+* WarpX Doxygen: ... TODO
+
 ## Contributing
 
 [![AMReX](https://img.shields.io/static/v1?label="runs%20on"&message="AMReX"&color="blueviolet")](https://amrex-codes.github.io/)
@@ -25,6 +29,13 @@ Our workflow is described in [CONTRIBUTING.rst](CONTRIBUTING.rst).
 
 Please prepare you local development environment as follows.
 Pick *one* of the methods below:
+
+### Perlmutter (NERSC)
+
+### Cori (NERSC)
+
+```bash
+```
 
 ### Homebrew (macOS)
 
@@ -81,7 +92,7 @@ conda activate impactx-dev
 Before you start, you will need a copy of the ImpactX source code:
 
 ```bash
-git clone https://github.com/ECP-WarpX/impactx.git
+git clone git@github.com:ECP-WarpX/impactx.git
 cd impactx
 ```
 
