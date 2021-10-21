@@ -32,7 +32,47 @@ Pick *one* of the methods below:
 
 ### Perlmutter (NERSC)
 
+```bash
+ssh perlmutter-p1.nersc.gov
+```
+```bash
+module load cmake/git-20210830  # 3.22-dev
+module swap PrgEnv-nvidia PrgEnv-gnu
+module swap gcc gcc/9.3.0
+module load cuda
+module load cray-hdf5-parallel/1.12.0.7
+
+# GPU-aware MPI
+export MPICH_GPU_SUPPORT_ENABLED=1
+
+# optimize CUDA compilation for A100
+export AMREX_CUDA_ARCH=8.0
+
+# compiler environment hints
+export CC=$(which gcc)
+export CXX=$(which g++)
+export FC=$(which gfortran)
+export CUDACXX=$(which nvcc)
+export CUDAHOSTCXX=$(which g++)
+```
+
+```bash
+# configure
+cmake -S . -B build_perlmutter -DImpactX_COMPUTE=CUDA
+
+# compile
+cmake --build build_perlmutter -j 10
+
+# run
+cd build_perlmutter/bin
+srun -N 1 --ntasks-per-node=4 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ./impactX
+```
+
 ### Cori KNL (NERSC)
+
+```bash
+ssh cori.nersc.gov
+```
 
 ```bash
 module swap craype-haswell craype-mic-knl
@@ -43,7 +83,17 @@ module load cray-fftw/3.3.8.4
 module load cray-python/3.7.3.2
 ```
 
-(after build, run via `srun -C knl -N 1 -t 30 -q debug ./impactX`)
+```bash
+# configure
+cmake -S . -B build_cori
+
+# compile
+cmake --build build_cori -j 8
+
+# run
+cd build_cori/bin
+srun -C knl -N 1 -t 30 -q debug ./impactX
+```
 
 ### Homebrew (macOS)
 
