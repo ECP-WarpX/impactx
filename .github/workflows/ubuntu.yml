@@ -1,0 +1,31 @@
+name: 🐧 OpenMP
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.head_ref }}-ubuntu
+  cancel-in-progress: true
+
+jobs:
+  build_gcc:
+    name: GCC w/ MPI
+    runs-on: ubuntu-20.04
+    if: github.event.pull_request.draft == false
+    env:
+      CMAKE_GENERATOR: Ninja
+    #  CXXFLAGS: "-Werror"
+    steps:
+    - uses: actions/checkout@v2
+    - name: install dependencies
+      run: |
+        .github/workflows/dependencies/gcc.sh
+    - name: build ImpactX
+      run: |
+        cmake -S . -B build            \
+          -DCMAKE_VERBOSE_MAKEFILE=ON
+        cmake --build build -j 2
+
+        cd build/bin
+
+        export OMP_NUM_THREADS=2
+        ./impactx
