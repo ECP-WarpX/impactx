@@ -10,6 +10,17 @@
 
 ImpactX: the next generation of the [IMPACT-Z](https://github.com/impact-lbl/IMPACT-Z) code
 
+## Documentation
+
+TODO: In order to learn how to install and run the code, please see the online documentation:
+https://impactx.readthedocs.io
+
+## Contributing
+
+[![AMReX](https://img.shields.io/static/v1?label="runs%20on"&message="AMReX"&color="blueviolet")](https://amrex-codes.github.io/)
+
+Our workflow is described in [CONTRIBUTING.rst](CONTRIBUTING.rst).
+
 ## Developer Environment
 
 Please prepare you local development environment as follows.
