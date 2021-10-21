@@ -1,32 +1,51 @@
-# Prerequisites
-*.d
+build/
+Backtrace.*
+*.vth
+*.sw[opqrs]
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+####################
+# AMReX data files #
+####################
+plt*
+chk*
 
-# Precompiled Headers
-*.gch
-*.pch
+##########
+# Python #
+##########
+*.pyc
+__pycache__
+dist/
+*.egg-info/
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+##########
+# Sphinx #
+##########
+docs/doxyhtml/
+docs/doxyxml/
+docs/source/_static/
 
-# Fortran module files
-*.mod
-*.smod
+####################
+# Package Managers #
+####################
+# anonymous Spack environments
+# https://spack.readthedocs.io/en/latest/environments.html#anonymous-environments
+.spack-env/
+spack.lock
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+#######
+# IDE #
+#######
+.idea/
+cmake-build-*/
+.kdev?/
+*.kdev?
 
-# Executables
-*.exe
-*.out
-*.app
+# File-based project format:
+*.iws
+
+######
+# OS #
+######
+.DS_Store
+.AppleDouble
+.LSOverride
