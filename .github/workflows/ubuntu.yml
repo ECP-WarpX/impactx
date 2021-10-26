@@ -30,4 +30,4 @@ jobs:
         cd build/bin
 
         export OMP_NUM_THREADS=2
-        ./impactX
+        ./impactx

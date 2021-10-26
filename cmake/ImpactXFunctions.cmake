@@ -159,7 +159,7 @@ function(set_ImpactX_binary_name)
         list(APPEND ImpactX_bin_names shared)
     endif()
     foreach(tgt IN LISTS _ALL_TARGETS)
-        set_target_properties(${tgt} PROPERTIES OUTPUT_NAME "impactX")
+        set_target_properties(${tgt} PROPERTIES OUTPUT_NAME "impactx")
 
         if(ImpactX_MPI)
             set_property(TARGET ${tgt} APPEND_STRING PROPERTY OUTPUT_NAME ".MPI")
@@ -198,7 +198,7 @@ function(set_ImpactX_binary_name)
         add_custom_command(TARGET app POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E create_symlink
                 $<TARGET_FILE_NAME:app>
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/impactX
+                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/impactx
         )
     endif()
     if(ImpactX_LIB)
@@ -210,7 +210,7 @@ function(set_ImpactX_binary_name)
         add_custom_command(TARGET shared POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E create_symlink
                 $<TARGET_FILE_NAME:shared>
-                $<TARGET_FILE_DIR:shared>/libImpactX.${lib_suffix}.${mod_ext}
+                $<TARGET_FILE_DIR:shared>/libimpactx.${mod_ext}
         )
     endif()
 endfunction()

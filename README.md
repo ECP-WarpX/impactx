@@ -65,7 +65,7 @@ cmake --build build_perlmutter -j 10
 
 # run
 cd build_perlmutter/bin
-srun -N 1 --ntasks-per-node=4 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ./impactX
+srun -N 1 --ntasks-per-node=4 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ./impactx
 ```
 
 ### Cori KNL (NERSC)
@@ -92,7 +92,7 @@ cmake --build build_cori -j 8
 
 # run
 cd build_cori/bin
-srun -C knl -N 1 -t 30 -q debug ./impactX
+srun -C knl -N 1 -t 30 -q debug ./impactx
 ```
 
 ### Homebrew (macOS)
