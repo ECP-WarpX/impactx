@@ -1,12 +1,12 @@
 # ImpactX
 
-[![CI Status](https://github.com/ECP-WarpX/impactx/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/ECP-WarpX/impactx/actions/workflows/ubuntu.yml)  
+[![CI Status](https://github.com/ECP-WarpX/impactx/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/ECP-WarpX/impactx/actions/workflows/ubuntu.yml)
+[![License ImpactX](https://img.shields.io/badge/license-BSD--3--Clause--LBNL-blue.svg)](https://spdx.org/licenses/BSD-3-Clause-LBNL.html)  
 [![Supported Platforms](https://img.shields.io/badge/platforms-linux%20|%20osx%20|%20win-blue)](https://impactx.readthedocs.io/en/latest/install/users.html)
 [![GitHub commits since last release](https://img.shields.io/github/commits-since/ECP-WarpX/impactx/latest/development.svg)](https://github.com/ECP-WarpX/impactx/compare/development)
 [![Development Status](https://img.shields.io/badge/development%20status-pre--alpha-orange.svg)]()
 [![Language: C++14](https://img.shields.io/badge/language-C%2B%2B14-orange.svg)](https://isocpp.org/)
-[![Language: Python](https://img.shields.io/badge/language-Python-orange.svg)](https://python.org/)  
-[![License ImpactX](https://img.shields.io/badge/license-BSD--3--Clause--LBNL-blue.svg)](https://spdx.org/licenses/BSD-3-Clause-LBNL.html)
+[![Language: Python](https://img.shields.io/badge/language-Python-orange.svg)](https://python.org/)
 
 ImpactX: the next generation of the [IMPACT-Z](https://github.com/impact-lbl/IMPACT-Z) code
 
@@ -15,9 +15,9 @@ ImpactX: the next generation of the [IMPACT-Z](https://github.com/impact-lbl/IMP
 TODO: In order to learn how to install and run the code, please see the online documentation:
 https://impactx.readthedocs.io
 
-* AMReX Doxygen: https://amrex-codes.github.io/amrex/doxygen/
+* AMReX Doxygen: https://amrex-codes.github.io/amrex/doxygen
 * ImpactX Doxygen: ... TODO
-* WarpX Doxygen: ... TODO
+* WarpX Doxygen: https://warpx.readthedocs.io/en/latest/_static/doxyhtml
 
 ## Contributing
 
