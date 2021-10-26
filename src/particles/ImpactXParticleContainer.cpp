@@ -58,17 +58,17 @@ namespace impactx
             p.pos(2) = z[i];
             // write position, creating cpu id, and particle id
             pinned_tile.push_back(p);
-
-            // write Real attributes (SoA) to particle initialized zero
-            DefineAndReturnParticleTile(0, 0, 0);
-
-            pinned_tile.push_back_real(RealSoA::px, np, 0.0);
-            pinned_tile.push_back_real(RealSoA::py, np, 0.0);
-            pinned_tile.push_back_real(RealSoA::pz, np, 0.0);
-            pinned_tile.push_back_real(RealSoA::t, np, 0.0);
-            pinned_tile.push_back_real(RealSoA::q_m, np, 0.0);
-            pinned_tile.push_back_real(RealSoA::w, np, 0.0);
         }
+
+        // write Real attributes (SoA) to particle initialized zero
+        DefineAndReturnParticleTile(0, 0, 0);
+
+        pinned_tile.push_back_real(RealSoA::ux, np, 0.0);
+        pinned_tile.push_back_real(RealSoA::uy, np, 0.0);
+        pinned_tile.push_back_real(RealSoA::t, np, 0.0);
+        pinned_tile.push_back_real(RealSoA::pt, np, 0.0);
+        pinned_tile.push_back_real(RealSoA::q_m, np, 0.0);
+        pinned_tile.push_back_real(RealSoA::w, np, 0.0);
 
         /* Redistributes particles to their respective tiles (spatial bucket
          * sort per box over MPI ranks)
