@@ -20,6 +20,9 @@ dist/
 ##########
 # Sphinx #
 ##########
+docs/amrex-doxygen-web.tag.xml
+docs/warpx-doxygen-web.tag.xml
+docs/impactx-doxygen-web.tag.xml
 docs/doxyhtml/
 docs/doxyxml/
 docs/source/_static/
