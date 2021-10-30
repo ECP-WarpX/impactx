@@ -1,0 +1,14 @@
+# Copyright 2019 Axel Huebl, Maxence Thevenet
+#
+# This file is part of WarpX.
+#
+# License: BSD-3-Clause-LBNL
+
+sphinx_rtd_theme>=0.3.1
+recommonmark
+sphinx>=2.0
+# docutils 0.17 breaks HTML tags & RTD theme
+# https://github.com/sphinx-doc/sphinx/issues/9001
+docutils<=0.16
+pygments
+breathe
