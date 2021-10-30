@@ -55,6 +55,9 @@ namespace impactx
         //! amrex iterator for particle boxes
         using iterator = amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>;
 
+        //! amrex constant iterator for particle boxes (read-only)
+        using const_iterator = amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>;
+
         //! Construct a new particle container
         ImpactXParticleContainer (amrex::AmrCore* amr_core);
 
