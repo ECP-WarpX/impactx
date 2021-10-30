@@ -1,6 +1,7 @@
 # ImpactX
 
 [![CI Status](https://github.com/ECP-WarpX/impactx/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/ECP-WarpX/impactx/actions/workflows/ubuntu.yml)
+[![Documentation Status](https://readthedocs.org/projects/impactx/badge/?version=latest)](https://impactx.readthedocs.io)
 [![License ImpactX](https://img.shields.io/badge/license-BSD--3--Clause--LBNL-blue.svg)](https://spdx.org/licenses/BSD-3-Clause-LBNL.html)  
 [![Supported Platforms](https://img.shields.io/badge/platforms-linux%20|%20osx%20|%20win-blue)](https://impactx.readthedocs.io/en/latest/install/users.html)
 [![Development Status](https://img.shields.io/badge/development%20status-pre--alpha-orange.svg)]()
@@ -11,7 +12,7 @@ ImpactX: the next generation of the [IMPACT-Z](https://github.com/impact-lbl/IMP
 
 ## Documentation
 
-TODO: In order to learn how to install and run the code, please see the online documentation:
+In order to learn how to install and run the code, please see the online documentation:
 https://impactx.readthedocs.io
 
 * ImpactX Doxygen: https://impactx.readthedocs.io/en/latest/_static/doxyhtml
