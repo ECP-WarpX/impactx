@@ -4,6 +4,6 @@
 #
 # License: BSD-3-Clause-LBNL
 
-requirements_file: Docs/requirements.txt
+requirements_file: docs/requirements.txt
 
 formats:
