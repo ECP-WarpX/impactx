@@ -50,8 +50,9 @@ namespace impactx
      * This class stores particles, distributed over MPI ranks.
      */
     class ImpactXParticleContainer
-        : public amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>
+        : public amrex::ParticleContainer<0, 0, RealSoA::nattribs>
     {
+    public:
         //! amrex iterator for particle boxes
         using iterator = amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>;
 

@@ -7,8 +7,9 @@
 #ifndef IMPACT_X_H
 #define IMPACT_X_H
 
-#include <AMReX_AmrCore.H>
+#include "particles/ImpactXParticleContainer.H"
 
+#include <AMReX_AmrCore.H>
 
 namespace impactx
 {
@@ -27,8 +28,14 @@ namespace impactx
         : public amrex::AmrCore
     {
       public:
-        ImpactX () = default;
+        ImpactX (amrex::Geometry const& geom, amrex::AmrInfo const& amr_info);
         ~ImpactX () = default;
+        ImpactX (ImpactX const&) = delete;
+        ImpactX (ImpactX &&) = delete;
+        void operator= (ImpactX const&) = delete;
+        void operator= (ImpactX &&) = delete;
+
+        void initData ();
 
       private:
         //! Tag cells for refinement.  TagBoxArray tags is built on level lev grids.
@@ -53,6 +60,7 @@ namespace impactx
         //! Delete level data
         void ClearLevel (int lev) override;
 
+        std::unique_ptr<ImpactXParticleContainer> mypc;
     };
 
 } // namespace impactx

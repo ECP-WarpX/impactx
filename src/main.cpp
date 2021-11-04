@@ -10,6 +10,7 @@
 #include <AMReX_BLProfiler.H>
 #include <AMReX_ParallelDescriptor.H>
 
+#include <memory>
 
 int main(int argc, char* argv[])
 {
@@ -27,9 +28,19 @@ int main(int argc, char* argv[])
     );
 
     BL_PROFILE_VAR("main()", pmain);
-    //{
-    //    impactx::ImpactX impactX;
-    //}
+    {
+        amrex::AmrInfo amr_info;
+        const int nprocs = amrex::ParallelDescriptor::NProcs();
+        const amrex::IntVect high_end = amr_info.blocking_factor[0]
+            * amrex::IntVect(AMREX_D_DECL(nprocs,1,1)) - amrex::IntVect(1);
+        amrex::Box domain(amrex::IntVect(0), high_end); // Domain index space
+        amrex::RealBox rb({AMREX_D_DECL(0.,0.,0.)}, {AMREX_D_DECL(1.,1.,1.)});// Domain physical size
+        amrex::Array<int,AMREX_SPACEDIM> is_periodic{AMREX_D_DECL(0,0,0)};
+        amrex::Geometry geom(domain, rb, amrex::CoordSys::cartesian, is_periodic);
+        auto impactX = std::make_unique<impactx::ImpactX>(geom, amr_info);
+
+        impactX->initData();
+    }
     BL_PROFILE_VAR_STOP(pmain);
 
     amrex::Finalize();

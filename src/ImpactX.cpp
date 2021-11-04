@@ -21,6 +21,21 @@ namespace impactx
         pp_amrex.add("abort_on_out_of_gpu_memory", abort_on_out_of_gpu_memory);
     }
 
+    ImpactX::ImpactX (amrex::Geometry const& geom, amrex::AmrInfo const& amr_info)
+        : AmrCore(geom, amr_info),
+          mypc(std::make_unique<ImpactXParticleContainer>(this))
+    {
+    }
+
+    void ImpactX::initData ()
+    {
+        AmrCore::InitFromScratch(0.0);
+        amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;;
+
+        mypc->AddNParticles(0, {0.0}, {0.2}, {0.4});
+        amrex::Print() << "# of particles: " << mypc->TotalNumberOfParticles() << std::endl;
+    }
+
     //! Tag cells for refinement.  TagBoxArray tags is built on level lev grids.
     void ImpactX::ErrorEst (int lev, amrex::TagBoxArray& tags, amrex::Real time, int ngrow)
     {
@@ -32,7 +47,7 @@ namespace impactx
     void ImpactX::MakeNewLevelFromScratch (int lev, amrex::Real time, const amrex::BoxArray& ba,
                                           const amrex::DistributionMapping& dm)
     {
-        // todo
+        // todo data_mf.define(ba, dm, 1, 0);
     }
 
     //! Make a new level using provided BoxArray and DistributionMapping and fill
@@ -40,6 +55,7 @@ namespace impactx
     void ImpactX::MakeNewLevelFromCoarse (int lev, amrex::Real time, const amrex::BoxArray& ba,
                                          const amrex::DistributionMapping& dm)
     {
+        amrex::Print() << "MakeNewLevelFromCoarse" << std::endl;
         // todo
     }
 
@@ -57,4 +73,3 @@ namespace impactx
         // todo
     }
 } // namespace impactx
-
