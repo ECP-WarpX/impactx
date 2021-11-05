@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
         auto impactX = std::make_unique<impactx::ImpactX>(geom, amr_info);
 
         impactX->initData();
-        impactX->evolve();
+        impactX->evolve( /* num_steps = */ 10);
     }
     BL_PROFILE_VAR_STOP(pmain);
 

@@ -49,8 +49,11 @@ namespace impactx
         /** Initialize particle containers and MultiFabs (fields) */
         void initData ();
 
-        /** Run the main simulation loop */
-        void evolve ();
+        /** Run the main simulation loop for a number of steps
+         *
+         * @param num_steps number of steps to evolve
+         */
+        void evolve (int num_steps);
 
       private:
         //! Tag cells for refinement.  TagBoxArray tags is built on level lev grids.

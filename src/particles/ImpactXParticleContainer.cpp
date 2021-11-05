@@ -15,7 +15,7 @@
 namespace impactx
 {
     ImpactXParticleContainer::ImpactXParticleContainer (amrex::AmrCore* amr_core)
-        : amrex::ParticleContainer<0, 0, RealSoA::nattribs>(amr_core->GetParGDB())
+        : amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
     {
        SetParticleSize();
     }
