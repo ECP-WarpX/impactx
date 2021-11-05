@@ -30,9 +30,17 @@ namespace impactx
         : public amrex::AmrCore
     {
       public:
-        ImpactX () = delete;
-        ImpactX (amrex::Geometry const& geom, amrex::AmrInfo const& amr_info);
+        /** Construct an ImpactX simulation object
+         *
+         * @param simulation_geometry the geometry (topology) of the simulation
+         * @param amr_info contains information on mesh-refinement and box/grid blocks
+         */
+        ImpactX (amrex::Geometry const& simulation_geometry, amrex::AmrInfo const& amr_info);
+
         ~ImpactX () = default;
+
+        // removed constructors/assignments
+        ImpactX () = delete;
         ImpactX (ImpactX const&) = delete;
         ImpactX (ImpactX &&) = delete;
         void operator= (ImpactX const&) = delete;

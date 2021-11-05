@@ -6,6 +6,7 @@
  */
 #include "ImpactX.H"
 
+#include <AMReX.H>
 #include <AMReX_ParmParse.H>
 
 namespace impactx
@@ -21,8 +22,8 @@ namespace impactx
         pp_amrex.add("abort_on_out_of_gpu_memory", abort_on_out_of_gpu_memory);
     }
 
-    ImpactX::ImpactX (amrex::Geometry const& geom, amrex::AmrInfo const& amr_info)
-        : AmrCore(geom, amr_info),
+    ImpactX::ImpactX (amrex::Geometry const& simulation_geometry, amrex::AmrInfo const& amr_info)
+        : AmrCore(simulation_geometry, amr_info),
           mypc(std::make_unique<ImpactXParticleContainer>(this))
     {
     }
@@ -36,41 +37,61 @@ namespace impactx
         amrex::Print() << "# of particles: " << mypc->TotalNumberOfParticles() << std::endl;
     }
 
-    //! Tag cells for refinement.  TagBoxArray tags is built on level lev grids.
+    /** Tag cells for refinement.  TagBoxArray tags is built on level lev grids.
+     *
+     * @todo this function is not (yet) implemented.
+     */
     void ImpactX::ErrorEst (int lev, amrex::TagBoxArray& tags, amrex::Real time, int ngrow)
     {
         // todo
+        amrex::ignore_unused(lev, tags, time, ngrow);
     }
 
-    //! Make a new level from scratch using provided BoxArray and DistributionMapping.
-    //! Only used during initialization.
+    /** Make a new level from scratch using provided BoxArray and DistributionMapping.
+     *
+     * Only used during initialization.
+     *
+     * @todo this function is not (yet) implemented.
+     */
     void ImpactX::MakeNewLevelFromScratch (int lev, amrex::Real time, const amrex::BoxArray& ba,
                                           const amrex::DistributionMapping& dm)
     {
         // todo data_mf.define(ba, dm, 1, 0);
+        amrex::ignore_unused(lev, time, ba, dm);
     }
 
-    //! Make a new level using provided BoxArray and DistributionMapping and fill
-    //  with interpolated coarse level data.
+    /** Make a new level using provided BoxArray and DistributionMapping and fill
+     *  with interpolated coarse level data.
+     *
+     * @todo this function is not (yet) implemented.
+     */
     void ImpactX::MakeNewLevelFromCoarse (int lev, amrex::Real time, const amrex::BoxArray& ba,
                                          const amrex::DistributionMapping& dm)
     {
-        amrex::Print() << "MakeNewLevelFromCoarse" << std::endl;
         // todo
+        amrex::ignore_unused(lev, time, ba, dm);
     }
 
-    //! Remake an existing level using provided BoxArray and DistributionMapping
-    //  and fill with existing fine and coarse data.
+    /** Remake an existing level using provided BoxArray and DistributionMapping
+     *  and fill with existing fine and coarse data.
+     *
+     * @todo this function is not (yet) implemented.
+     */
     void ImpactX::RemakeLevel (int lev, amrex::Real time, const amrex::BoxArray& ba,
                               const amrex::DistributionMapping& dm)
     {
         // todo
+        amrex::ignore_unused(lev, time, ba, dm);
     }
 
-    //! Delete level data
+    /** Delete level data
+     *
+     * @todo this function is not (yet) implemented.
+     */
     void ImpactX::ClearLevel (int lev)
     {
         // todo
+        amrex::ignore_unused(lev);
     }
 
     void ImpactX::evolve ()
