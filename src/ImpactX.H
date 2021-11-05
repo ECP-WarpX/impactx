@@ -11,6 +11,8 @@
 
 #include <AMReX_AmrCore.H>
 
+#include <memory>
+
 namespace impactx
 {
     /** Overwrite defaults in AMReX Inputs
@@ -28,6 +30,7 @@ namespace impactx
         : public amrex::AmrCore
     {
       public:
+        ImpactX () = delete;
         ImpactX (amrex::Geometry const& geom, amrex::AmrInfo const& amr_info);
         ~ImpactX () = default;
         ImpactX (ImpactX const&) = delete;
@@ -35,7 +38,11 @@ namespace impactx
         void operator= (ImpactX const&) = delete;
         void operator= (ImpactX &&) = delete;
 
+        /** Initialize particle containers and MultiFabs (fields) */
         void initData ();
+
+        /** Run the main simulation loop */
+        void evolve ();
 
       private:
         //! Tag cells for refinement.  TagBoxArray tags is built on level lev grids.
@@ -60,6 +67,7 @@ namespace impactx
         //! Delete level data
         void ClearLevel (int lev) override;
 
+        /** these are the physical/beam particles of the simulation */
         std::unique_ptr<ImpactXParticleContainer> mypc;
     };
 
