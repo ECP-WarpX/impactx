@@ -7,6 +7,7 @@
 #include "ImpactXParticleContainer.H"
 
 #include <AMReX_AmrCore.H>
+#include <AMReX_AmrParGDB.H>
 #include <AMReX_ParallelDescriptor.H>
 #include <AMReX_ParticleTile.H>
 
@@ -14,7 +15,7 @@
 namespace impactx
 {
     ImpactXParticleContainer::ImpactXParticleContainer (amrex::AmrCore* amr_core)
-        // TODO!! : amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
+        : amrex::ParticleContainer<0, 0, RealSoA::nattribs>(amr_core->GetParGDB())
     {
        SetParticleSize();
     }
@@ -78,7 +79,7 @@ namespace impactx
         particle_tile.resize(new_np);
         amrex::copyParticles(
                 particle_tile, pinned_tile, 0, old_np, pinned_tile.numParticles());
-        Redistribute();
+//        Redistribute();
 
     }
 } // namespace impactx
