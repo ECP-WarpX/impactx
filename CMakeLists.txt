@@ -129,7 +129,7 @@ endif()
 
 # own headers
 target_include_directories(ImpactX PUBLIC
-    $<BUILD_INTERFACE:${ImpactX_SOURCE_DIR}/Source>
+    $<BUILD_INTERFACE:${ImpactX_SOURCE_DIR}/src>
 )
 
 # if we include <AMReX_buildInfo.H> we will need to call:
