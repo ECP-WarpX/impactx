@@ -1,0 +1,35 @@
+# Copyright 2021 Axel Huebl
+#
+# This file is part of ImpactX.
+#
+# License: BSD-3-Clause-LBNL
+
+name: 📜 Source
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.head_ref }}-source
+  cancel-in-progress: true
+
+jobs:
+  style:
+
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Non-ASCII characters
+      run: .github/workflows/source/hasNonASCII
+
+    - name: TABs
+      run: .github/workflows/source/hasTabs
+
+    - name: End-of-Line whitespaces
+      run: .github/workflows/source/hasEOLwhiteSpace
+
+    - name: Doxygen
+      run: |
+        sudo apt-get install -y --no-install-recommends doxygen
+        .github/workflows/source/doxygen
