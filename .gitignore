@@ -1,4 +1,5 @@
 build/
+build_cori/
 Backtrace.*
 *.vth
 *.sw[opqrs]
