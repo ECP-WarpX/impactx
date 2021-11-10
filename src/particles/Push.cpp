@@ -17,7 +17,7 @@ namespace impactx
         using namespace amrex::literals; // for _rt and _prt
 
         // loop over refinement levels
-        int const nLevel = 0;
+        int const nLevel = 1;
         for (int lev = 0; lev < nLevel; ++lev)
         {
             // get simulation geometry information
@@ -56,8 +56,25 @@ namespace impactx
 
                     // advance position
                     amrex::ParticleReal const dt = 1.0_prt;
-                    p.pos(0) = x + ux * dt;
+                    amrex::ParticleReal const F_x = 0.1_prt;
+                    p.pos(0) = x + ux * dt + F_x;
                 });
+
+                // print out particles (this hack works only on CPU and on GPUs with
+                // unified memory access)
+                for (int i=0; i < np; ++i)
+                {
+                    // access AoS data such as positions and cpu/id
+                    PType const& p = aos_ptr[i];
+                    auto const id = p.id();
+                    auto const cpu = p.cpu();
+                    auto const pos = p.pos();
+
+                    amrex::AllPrint()
+                              << "Particle created at rank=" << cpu
+                              << " (pid=" << id << ") is now at: "
+                              << pos << "\n";
+                };
             } // end loop over all particle boxes
         } // env mesh-refinement level loop
     }

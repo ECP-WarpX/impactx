@@ -104,12 +104,15 @@ namespace impactx
         for (int step = 0; step < num_steps; ++step)
         {
             BL_PROFILE("ImpactX::evolve::step");
+            amrex::Print() << " ++++ Starting step=" << step << "\n";
 
             // push all particles
             Push(*mypc);
 
             // do more stuff in the step
             //...
+
+            amrex::Print() << "\n";
 
         } // end step loop
     }
