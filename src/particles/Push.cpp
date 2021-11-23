@@ -55,18 +55,19 @@ namespace impactx
                     amrex::ParticleReal const t = p.pos(2);
 
                     // acces SoA Real data
-                    amrex::ParticleReal const px = part_ux[i];
-                    amrex::ParticleReal const py = part_uy[i];
+                    amrex::ParticleReal const px = part_px[i];
+                    amrex::ParticleReal const py = part_py[i];
                     amrex::ParticleReal const pt = part_pt[i];
 
                    // intermediate values
+                    amrex::ParticleReal const betgam = 2.0;
                     amrex::ParticleReal const betgam2 = pow(betgam,2);
 
                     // advance position and momentum (drift)
                     p.pos(0) = x + ds * px;
-                    part_ux[i] = px;
+                    part_px[i] = px;
                     p.pos(1) = y + ds * py;
-                    part_uy[i] = py;
+                    part_py[i] = py;
                     p.pos(2) = t + (ds/betgam2) * pt;
                     part_pt[i] = pt;                    
 
