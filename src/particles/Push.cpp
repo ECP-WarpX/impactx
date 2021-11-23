@@ -6,6 +6,8 @@
  */
 #include "Push.H"
 
+#include "elements/Drift.H"
+
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_REAL.H>       // for ParticleReal
 
@@ -43,34 +45,21 @@ namespace impactx
                 amrex::ParticleReal* const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
                 // ...
                 amrex::ParticleReal const ds = 0.1; // Segment length in m.
-                
+
                 // loop over particles in the box
                 const int np = pti.numParticles();
                 amrex::ParallelFor( np, [=] AMREX_GPU_DEVICE (long i)
                 {
                     // access AoS data such as positions and cpu/id
                     PType& p = aos_ptr[i];
-                    amrex::ParticleReal const x = p.pos(0);
-                    amrex::ParticleReal const y = p.pos(1);
-                    amrex::ParticleReal const t = p.pos(2);
 
-                    // acces SoA Real data
-                    amrex::ParticleReal const px = part_px[i];
-                    amrex::ParticleReal const py = part_py[i];
-                    amrex::ParticleReal const pt = part_pt[i];
+                    // access SoA Real data
+                    amrex::ParticleReal & px = part_px[i];
+                    amrex::ParticleReal & py = part_py[i];
+                    amrex::ParticleReal & pt = part_pt[i];
 
-                   // intermediate values
-                    amrex::ParticleReal const betgam = 2.0;
-                    amrex::ParticleReal const betgam2 = pow(betgam,2);
-
-                    // advance position and momentum (drift)
-                    p.pos(0) = x + ds * px;
-                    part_px[i] = px;
-                    p.pos(1) = y + ds * py;
-                    part_py[i] = py;
-                    p.pos(2) = t + (ds/betgam2) * pt;
-                    part_pt[i] = pt;                    
-
+                    Drift drift(ds);
+                    drift(p, px, py, pt);
                 });
 
                 // print out particles (this hack works only on CPU and on GPUs with
