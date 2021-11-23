@@ -8,6 +8,7 @@
 
 #include "elements/Drift.H"
 #include "elements/Quad.H"
+#include "elements/Sbend.H"
 
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_REAL.H>       // for ParticleReal
@@ -47,7 +48,8 @@ namespace impactx
                 // ...
 
                 amrex::ParticleReal const ds = 0.1; // Segment length in m.
-                amrex::ParticleReal const k = 1.0; // quadrupole strength in 1/m
+                amrex::ParticleReal const k = 1.0; // quadrupole strength in 1/m.
+                amrex::ParticleReal const rc = 1.0; // bend radius in m.
 
                 // loop over particles in the box
                 const int np = pti.numParticles();
@@ -66,6 +68,10 @@ namespace impactx
 
                     Quad quad(ds, k);
                     quad(p, px, py, pt);
+
+                    Sbend sbend(ds, rc);
+                    sbend(p, px, py, pt);
+
                 });
 
                 // print out particles (this hack works only on CPU and on GPUs with
