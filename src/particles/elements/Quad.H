@@ -4,8 +4,8 @@
  *
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_DRIFT_H
-#define IMPACTX_DRIFT_H
+#ifndef IMPACTX_QUAD_H
+#define IMPACTX_QUAD_H
 
 #include "particles/ImpactXParticleContainer.H"
 
@@ -14,16 +14,17 @@
 
 namespace impactx
 {
-    struct Drift
+    struct Quad
     {
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** A drift
+        /** A Quadrupole magnet
          *
          * @param ds Segment length in m.
+         * @param k  quadrupole strength in 1/m
          */
-        Drift( amrex::ParticleReal const ds )
-        : m_ds(ds)
+        Quad( amrex::ParticleReal const ds, amrex::ParticleReal const k )
+        : m_ds(ds), m_k(k)
         {
         }
 
@@ -51,18 +52,23 @@ namespace impactx
             amrex::ParticleReal const betgam2 = pow(betgam, 2);
 
             // advance position and momentum (drift)
-            p.pos(0) = x + m_ds * px;
+            p.pos(0) = cos(m_k*m_ds)*x + sin(m_k*m_ds)/m_k*px;
             // px = px;
-            p.pos(1) = y + m_ds * py;
-            // py = py;
-            p.pos(2) = t + (m_ds/betgam2) * pt;
+            px = -m_k*sin(m_k*m_ds)*x + cos(m_k*m_ds)*px;
+
+            p.pos(1) = cosh(m_k*m_ds)*y + sinh(m_k*m_ds)/m_k*py;
+            py = m_k*sinh(m_k*m_ds)*y + cosh(m_k*m_ds)*py;
+
+            p.pos(2) = t + (m_ds/betgam2)*pt;
             // pt = pt;
+
         }
 
     private:
-        amrex::ParticleReal m_ds;
+        amrex::ParticleReal m_ds; //! segment length in m
+        amrex::ParticleReal m_k; //! quadrupole strength in 1/m
     };
 
 } // namespace impactx
 
-#endif // IMPACTX_DRIFT_H
+#endif // IMPACTX_QUAD_H

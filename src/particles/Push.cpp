@@ -7,6 +7,7 @@
 #include "Push.H"
 
 #include "elements/Drift.H"
+#include "elements/Quad.H"
 
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_REAL.H>       // for ParticleReal
@@ -44,7 +45,9 @@ namespace impactx
                 amrex::ParticleReal* const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
                 amrex::ParticleReal* const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
                 // ...
+
                 amrex::ParticleReal const ds = 0.1; // Segment length in m.
+                amrex::ParticleReal const k = 1.0; // quadrupole strength in 1/m
 
                 // loop over particles in the box
                 const int np = pti.numParticles();
@@ -60,6 +63,9 @@ namespace impactx
 
                     Drift drift(ds);
                     drift(p, px, py, pt);
+
+                    Quad quad(ds, k);
+                    quad(p, px, py, pt);
                 });
 
                 // print out particles (this hack works only on CPU and on GPUs with
