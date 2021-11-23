@@ -11,6 +11,8 @@
 
 #include <AMReX_REAL.H>
 
+#include <cmath>
+
 
 namespace impactx
 {
