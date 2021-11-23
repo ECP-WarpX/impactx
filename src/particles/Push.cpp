@@ -38,9 +38,12 @@ namespace impactx
 
                 // preparing access to particle data: SoA of Reals
                 auto& soa_real = pti.GetStructOfArrays().GetRealData();
-                amrex::ParticleReal* const AMREX_RESTRICT part_ux = soa_real[RealSoA::ux].dataPtr();
+                amrex::ParticleReal* const AMREX_RESTRICT part_px = soa_real[RealSoA::ux].dataPtr();
+                amrex::ParticleReal* const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
+                amrex::ParticleReal* const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
                 // ...
-
+                amrex::ParticleReal const ds = 0.1; // Segment length in m.
+                
                 // loop over particles in the box
                 const int np = pti.numParticles();
                 amrex::ParallelFor( np, [=] AMREX_GPU_DEVICE (long i)
@@ -48,16 +51,25 @@ namespace impactx
                     // access AoS data such as positions and cpu/id
                     PType& p = aos_ptr[i];
                     amrex::ParticleReal const x = p.pos(0);
-                    //amrex::ParticleReal const y = p.pos(1);
-                    //amrex::ParticleReal const z = p.pos(2);
+                    amrex::ParticleReal const y = p.pos(1);
+                    amrex::ParticleReal const t = p.pos(2);
 
                     // acces SoA Real data
-                    amrex::ParticleReal const ux = part_ux[i];
+                    amrex::ParticleReal const px = part_ux[i];
+                    amrex::ParticleReal const py = part_uy[i];
+                    amrex::ParticleReal const pt = part_pt[i];
 
-                    // advance position
-                    amrex::ParticleReal const dt = 1.0_prt;
-                    amrex::ParticleReal const F_x = 0.1_prt;
-                    p.pos(0) = x + ux * dt + F_x;
+                   // intermediate values
+                    amrex::ParticleReal const betgam2 = pow(betgam,2);
+
+                    // advance position and momentum (drift)
+                    p.pos(0) = x + ds * px;
+                    part_ux[i] = px;
+                    p.pos(1) = y + ds * py;
+                    part_uy[i] = py;
+                    p.pos(2) = t + (ds/betgam2) * pt;
+                    part_pt[i] = pt;                    
+
                 });
 
                 // print out particles (this hack works only on CPU and on GPUs with
