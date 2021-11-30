@@ -8,7 +8,7 @@
 
 #include <AMReX_AmrCore.H>
 #include <AMReX_AmrParGDB.H>
-#include <AMReX_ParallelDescriptor.H>
+#include <AMReX_amrex::ParallelDescriptor.H>
 #include <AMReX_ParticleTile.H>
 
 
@@ -53,7 +53,7 @@ namespace impactx
         {
             ParticleType p;
             p.id() = ParticleType::NextID();
-            p.cpu() = amrex::ParallelDescriptor::MyProc();
+            p.cpu() = amrex::amrex::ParallelDescriptor::MyProc();
             p.pos(0) = x[i];
             p.pos(1) = y[i];
             p.pos(2) = z[i];
@@ -84,19 +84,19 @@ namespace impactx
     }
 
     void
-    ImpactXParticleContainer::MeanAndStdPositions(
+    ImpactXParticleContainer::MeanAndStdPositions (
         amrex::ParticleReal& x_mean, amrex::ParticleReal& x_std,
         amrex::ParticleReal& y_mean, amrex::ParticleReal& y_std,
         amrex::ParticleReal& z_mean, amrex::ParticleReal& z_std )
     {
-        amrex::ParticleReal sum_w, sum_x, sum_x2, sum_y, sum_y2, sum_z, sum_z2;
+        amrex::ParticleReal sum_x, sum_x2, sum_y, sum_y2, sum_z, sum_z2, sum_w;
 
         using PType = ImpactXParticleContainer::SuperParticleType;
 
-        amrex::ReduceOps<ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum> reduce_ops;
-        auto r = amrex::ParticleReduce<amrex::ReduceData<ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal>>(
+        amrex::ReduceOps<amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum> reduce_ops;
+        auto r = amrex::ParticleReduce<amrex::ReduceData<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>>(
             *this,
-            [=] AMREX_GPU_DEVICE(const PType& p) noexcept -> amrex::GpuTuple<ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal>
+            [=] AMREX_GPU_DEVICE(const PType& p) noexcept -> amrex::GpuTuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>
             {
                 amrex::ParticleReal x = p.pos(0);
                 amrex::ParticleReal y = p.pos(1);
@@ -115,13 +115,13 @@ namespace impactx
         sum_z2 = amrex::get<5>(r);
         sum_w = amrex::get<6>(r);
 
-        ParallelDescriptor::ReduceRealSum(sum_x);
-        ParallelDescriptor::ReduceRealSum(sum_x2);
-        ParallelDescriptor::ReduceRealSum(sum_y);
-        ParallelDescriptor::ReduceRealSum(sum_y2);
-        ParallelDescriptor::ReduceRealSum(sum_z);
-        ParallelDescriptor::ReduceRealSum(sum_z2);
-        ParallelDescriptor::ReduceLongSum(sum_w);
+        amrex::ParallelDescriptor::ReduceRealSum(sum_x);
+        amrex::ParallelDescriptor::ReduceRealSum(sum_x2);
+        amrex::ParallelDescriptor::ReduceRealSum(sum_y);
+        amrex::ParallelDescriptor::ReduceRealSum(sum_y2);
+        amrex::ParallelDescriptor::ReduceRealSum(sum_z);
+        amrex::ParallelDescriptor::ReduceRealSum(sum_z2);
+        amrex::ParallelDescriptor::ReduceLongSum(sum_w);
 
         x_mean = sum_x/sum_w;
         x_std = sum_x2/sum_w - x_mean*x_mean;

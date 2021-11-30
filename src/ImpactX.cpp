@@ -99,9 +99,16 @@ namespace impactx
 
     /** Resize the mesh, based on the extent of the bunch of particle
     */
-    //void ImpactX::ResizeMesh () {
-        // Get the particles' mean and RMS in each direction
-    //}
+    void ImpactX::ResizeMesh () {
+        // Extract the mean and RMS size of the particle positions
+        amrex::ParticleReal x_mean, x_std, y_mean, y_std, z_mean, z_std;
+        mypc->MeanAndStdPositions(x_mean, x_std, y_mean, y_std, z_mean, z_std);
+        // Resize the domain size
+        amrex::RealBox rb(
+            {x_mean-3*x_std, y_mean-3*y_std, z_mean-3*z_std}, // Low bound
+            {x_mean+3*x_std, y_mean+3*y_std, z_mean+3*z_std}); // High bound
+        amrex::Geometry::ResetDefaultProbDomain(rb);
+    }
 
     void ImpactX::evolve (int num_steps)
     {

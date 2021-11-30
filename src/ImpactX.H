@@ -84,6 +84,9 @@ namespace impactx
         //! Delete level data
         void ClearLevel (int lev) override;
 
+        // Resize the mesh, based on the extent of the bunch of particle
+        void ResizeMesh ();
+
         /** these are the physical/beam particles of the simulation */
         std::unique_ptr<ImpactXParticleContainer> m_particle_container;
 
