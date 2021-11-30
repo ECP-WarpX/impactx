@@ -108,6 +108,11 @@ namespace impactx
             {x_mean-3*x_std, y_mean-3*y_std, z_mean-3*z_std}, // Low bound
             {x_mean+3*x_std, y_mean+3*y_std, z_mean+3*z_std}); // High bound
         amrex::Geometry::ResetDefaultProbDomain(rb);
+        for (int lev = 0; lev <= max_level; ++lev) {
+            amrex::Geometry g = Geom(lev);
+            g.ProbDomain(rb);
+            amrex::AmrMesh::SetGeometry(lev, g);
+        }
     }
 
     void ImpactX::evolve (int num_steps)
