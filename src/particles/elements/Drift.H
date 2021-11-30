@@ -29,7 +29,7 @@ namespace impactx
         {
         }
 
-        /** ...
+        /** This is a drift functor, so that a variable of this type can be used like a drift function.
          *
          * @param p Particle AoS data for positions and cpu/id
          * @param px particle momentum in x
