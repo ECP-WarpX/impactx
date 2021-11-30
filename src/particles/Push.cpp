@@ -6,6 +6,10 @@
  */
 #include "Push.H"
 
+#include "elements/Drift.H"
+#include "elements/Quad.H"
+#include "elements/Sbend.H"
+
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_REAL.H>       // for ParticleReal
 
@@ -38,8 +42,14 @@ namespace impactx
 
                 // preparing access to particle data: SoA of Reals
                 auto& soa_real = pti.GetStructOfArrays().GetRealData();
-                amrex::ParticleReal* const AMREX_RESTRICT part_ux = soa_real[RealSoA::ux].dataPtr();
+                amrex::ParticleReal* const AMREX_RESTRICT part_px = soa_real[RealSoA::ux].dataPtr();
+                amrex::ParticleReal* const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
+                amrex::ParticleReal* const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
                 // ...
+
+                amrex::ParticleReal const ds = 0.1; // Segment length in m.
+                amrex::ParticleReal const k = 1.0; // quadrupole strength in 1/m.
+                amrex::ParticleReal const rc = 1.0; // bend radius in m.
 
                 // loop over particles in the box
                 const int np = pti.numParticles();
@@ -47,17 +57,21 @@ namespace impactx
                 {
                     // access AoS data such as positions and cpu/id
                     PType& p = aos_ptr[i];
-                    amrex::ParticleReal const x = p.pos(0);
-                    //amrex::ParticleReal const y = p.pos(1);
-                    //amrex::ParticleReal const z = p.pos(2);
 
-                    // acces SoA Real data
-                    amrex::ParticleReal const ux = part_ux[i];
+                    // access SoA Real data
+                    amrex::ParticleReal & px = part_px[i];
+                    amrex::ParticleReal & py = part_py[i];
+                    amrex::ParticleReal & pt = part_pt[i];
 
-                    // advance position
-                    amrex::ParticleReal const dt = 1.0_prt;
-                    amrex::ParticleReal const F_x = 0.1_prt;
-                    p.pos(0) = x + ux * dt + F_x;
+                    Drift drift(ds);
+                    drift(p, px, py, pt);
+
+                    Quad quad(ds, k);
+                    quad(p, px, py, pt);
+
+                    Sbend sbend(ds, rc);
+                    sbend(p, px, py, pt);
+
                 });
 
                 // print out particles (this hack works only on CPU and on GPUs with
