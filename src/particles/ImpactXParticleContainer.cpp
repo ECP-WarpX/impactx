@@ -8,7 +8,7 @@
 
 #include <AMReX_AmrCore.H>
 #include <AMReX_AmrParGDB.H>
-#include <AMReX_amrex::ParallelDescriptor.H>
+#include <AMReX_ParallelDescriptor.H>
 #include <AMReX_ParticleTile.H>
 
 
@@ -53,7 +53,7 @@ namespace impactx
         {
             ParticleType p;
             p.id() = ParticleType::NextID();
-            p.cpu() = amrex::amrex::ParallelDescriptor::MyProc();
+            p.cpu() = amrex::ParallelDescriptor::MyProc();
             p.pos(0) = x[i];
             p.pos(1) = y[i];
             p.pos(2) = z[i];
@@ -121,7 +121,7 @@ namespace impactx
         amrex::ParallelDescriptor::ReduceRealSum(sum_y2);
         amrex::ParallelDescriptor::ReduceRealSum(sum_z);
         amrex::ParallelDescriptor::ReduceRealSum(sum_z2);
-        amrex::ParallelDescriptor::ReduceLongSum(sum_w);
+        amrex::ParallelDescriptor::ReduceRealSum(sum_w);
 
         x_mean = sum_x/sum_w;
         x_std = sum_x2/sum_w - x_mean*x_mean;
