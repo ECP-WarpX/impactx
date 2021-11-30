@@ -97,6 +97,12 @@ namespace impactx
         amrex::ignore_unused(lev);
     }
 
+    /** Resize the mesh, based on the extent of the bunch of particle
+    */
+    //void ImpactX::ResizeMesh () {
+        // Get the particles' mean and RMS in each direction
+    //}
+
     void ImpactX::evolve (int num_steps)
     {
         BL_PROFILE("ImpactX::evolve");
@@ -105,6 +111,13 @@ namespace impactx
         {
             BL_PROFILE("ImpactX::evolve::step");
             amrex::Print() << " ++++ Starting step=" << step << "\n";
+
+            // Note: The following operation assume that
+            // the particles are in x, y, z coordinates.
+            // Resize the mesh, based on `mypc` extent
+            // ResizeMesh();
+            // Redistribute particles in the new mesh
+            mypc->Redistribute();
 
             // push all particles
             Push(*m_particle_container, m_lattice);

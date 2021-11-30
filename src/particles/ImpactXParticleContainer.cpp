@@ -82,4 +82,53 @@ namespace impactx
 //        Redistribute();
 
     }
+
+    void
+    ImpactXParticleContainer::MeanAndStdPositions(
+        amrex::ParticleReal& x_mean, amrex::ParticleReal& x_std,
+        amrex::ParticleReal& y_mean, amrex::ParticleReal& y_std,
+        amrex::ParticleReal& z_mean, amrex::ParticleReal& z_std )
+    {
+        amrex::ParticleReal sum_w, sum_x, sum_x2, sum_y, sum_y2, sum_z, sum_z2;
+
+        using PType = ImpactXParticleContainer::SuperParticleType;
+
+        amrex::ReduceOps<ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum> reduce_ops;
+        auto r = amrex::ParticleReduce<amrex::ReduceData<ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal>>(
+            *this,
+            [=] AMREX_GPU_DEVICE(const PType& p) noexcept -> amrex::GpuTuple<ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal>
+            {
+                amrex::ParticleReal x = p.pos(0);
+                amrex::ParticleReal y = p.pos(1);
+                amrex::ParticleReal z = p.pos(2);
+                amrex::ParticleReal w = p.rdata(RealSoA::w);
+
+                return {x, x*x, y, y*y, z, z*z, w};
+            },
+            reduce_ops);
+
+        sum_x = amrex::get<0>(r);
+        sum_x2 = amrex::get<1>(r);
+        sum_y = amrex::get<2>(r);
+        sum_y2 = amrex::get<3>(r);
+        sum_z = amrex::get<4>(r);
+        sum_z2 = amrex::get<5>(r);
+        sum_w = amrex::get<6>(r);
+
+        ParallelDescriptor::ReduceRealSum(sum_x);
+        ParallelDescriptor::ReduceRealSum(sum_x2);
+        ParallelDescriptor::ReduceRealSum(sum_y);
+        ParallelDescriptor::ReduceRealSum(sum_y2);
+        ParallelDescriptor::ReduceRealSum(sum_z);
+        ParallelDescriptor::ReduceRealSum(sum_z2);
+        ParallelDescriptor::ReduceLongSum(sum_w);
+
+        x_mean = sum_x/sum_w;
+        x_std = sum_x2/sum_w - x_mean*x_mean;
+        y_mean = sum_y/sum_w;
+        y_std = sum_y2/sum_w - y_mean*y_mean;
+        z_mean = sum_z/sum_w;
+        z_std = sum_z2/sum_w - z_mean*z_mean;
+    }
+
 } // namespace impactx

@@ -83,6 +83,14 @@ namespace impactx
                        amrex::Vector<amrex::ParticleReal> const & y,
                        amrex::Vector<amrex::ParticleReal> const & z);
 
+        /** Compute the mean and RMS of the particle position in each dimension
+        */
+        void
+        ImpactXParticleContainer::MeanAndStdPositions(
+           amrex::ParticleReal& x_mean, amrex::ParticleReal& x_std,
+           amrex::ParticleReal& y_mean, amrex::ParticleReal& y_std,
+           amrex::ParticleReal& z_mean, amrex::ParticleReal& z_std );
+
     }; // ImpactXParticleContainer
 
 } // namespace impactx
