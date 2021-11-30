@@ -150,7 +150,7 @@ add_subdirectory(src)
 
 # C++ properties: at least a C++14 capable compiler is needed
 foreach(ImpactX_tgt IN LISTS _ALL_TARGETS)
-    target_compile_features(${ImpactX_tgt} PUBLIC cxx_std_14)
+    target_compile_features(${ImpactX_tgt} PUBLIC cxx_std_17)
 endforeach()
 set_target_properties(${_ALL_TARGETS} PROPERTIES
     CXX_EXTENSIONS OFF
@@ -185,7 +185,7 @@ if(ImpactX_COMPUTE STREQUAL CUDA)
     endforeach()
     if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.17)
         foreach(ImpactX_tgt IN LISTS _ALL_TARGETS)
-            target_compile_features(${ImpactX_tgt} PUBLIC cuda_std_14)
+            target_compile_features(${ImpactX_tgt} PUBLIC cuda_std_17)
         endforeach()
         set_target_properties(${_ALL_TARGETS} PROPERTIES
             CUDA_EXTENSIONS OFF
