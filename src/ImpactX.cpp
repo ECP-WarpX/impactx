@@ -127,7 +127,7 @@ namespace impactx
             // Note: The following operation assume that
             // the particles are in x, y, z coordinates.
             // Resize the mesh, based on `mypc` extent
-            // ResizeMesh();
+            ResizeMesh();
             // Redistribute particles in the new mesh
             mypc->Redistribute();
 
