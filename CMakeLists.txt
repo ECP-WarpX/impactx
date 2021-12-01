@@ -254,7 +254,7 @@ if(ImpactX_LIB)
     endif()
     install(CODE "file(CREATE_LINK
         $<TARGET_FILE_NAME:shared>
-        ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/libImpactX.${mod_ext}
+        ${CMAKE_INSTALL_LIBDIR}/libImpactX.${mod_ext}
         COPY_ON_ERROR SYMBOLIC)")
 endif()
 
