@@ -9,9 +9,13 @@
 
 #include "particles/ImpactXParticleContainer.H"
 
+#include "particles/elements/Drift.H"
+
 #include <AMReX_AmrCore.H>
 
 #include <memory>
+
+#include <list>
 
 namespace impactx
 {
@@ -49,6 +53,9 @@ namespace impactx
         /** Initialize particle containers and MultiFabs (fields) */
         void initData ();
 
+        /** Initialize the list of lattice elements */
+        void initElements ();
+
         /** Run the main simulation loop for a number of steps
          *
          * @param num_steps number of steps to evolve
@@ -80,6 +87,9 @@ namespace impactx
 
         /** these are the physical/beam particles of the simulation */
         std::unique_ptr<ImpactXParticleContainer> mypc;
+
+        /** these are elements defining the lattice */
+        std::list<Drift> myelements;
     };
 
 } // namespace impactx

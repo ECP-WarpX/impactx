@@ -117,4 +117,18 @@ namespace impactx
         } // end step loop
     }
 
+    void ImpactX::initElements ()
+    {
+        // initialize element sequence
+        myelements = { };
+        
+        // add elements
+        Drift drift1(1.0);
+        Drift drift2(0.5);
+        myelements.push_back(drift1);
+        myelements.push_back(drift2);
+        
+        amrex::Print() << "Initialized element list" << std::endl;
+    }
+
 } // namespace impactx
