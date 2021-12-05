@@ -7,7 +7,7 @@
 #ifndef IMPACT_X_H
 #define IMPACT_X_H
 
-#include "particles/elements/Drift.H"
+#include "particles/elements/All.H"
 #include "particles/ImpactXParticleContainer.H"
 
 #include <AMReX_AmrCore.H>
@@ -88,7 +88,7 @@ namespace impactx
         std::unique_ptr<ImpactXParticleContainer> mypc;
 
         /** these are elements defining the lattice */
-        std::list<Drift> myelements;
+        std::list<KnownElements> myelements;
     };
 
 } // namespace impactx

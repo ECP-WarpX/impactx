@@ -123,8 +123,13 @@ namespace impactx
         myelements.clear();
 
         // add elements
-        myelements.emplace_back(Drift(1.0));
+        //   FODO cell
+        myelements.emplace_back(Quad(1.0, 4.0));
         myelements.emplace_back(Drift(0.5));
+        myelements.emplace_back(Quad(1.0, 4.0));
+        myelements.emplace_back(Drift(0.5));
+        //   a bending magnet
+        myelements.emplace_back(Sbend(0.5, 2.0));
 
         amrex::Print() << "Initialized element list" << std::endl;
     }
