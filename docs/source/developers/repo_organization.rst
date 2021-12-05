@@ -114,4 +114,3 @@ Usage: in ``SimpleUsage.H``
    /* stuff */
    std::unique_ptr<MyClass> p_my_class;
    /* stuff */
-
