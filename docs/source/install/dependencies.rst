@@ -9,17 +9,15 @@ Please see installation instructions below.
 - a mature `C++17 <https://en.wikipedia.org/wiki/C%2B%2B17>`__ compiler, e.g., GCC 7, Clang 6, NVCC 11.0, MSVC 19.15 or newer
 - `CMake 3.15.0+ <https://cmake.org>`__
 - `Git 2.18+ <https://git-scm.com>`__
-- `AMReX <https://amrex-codes.github.io>`__: we automatically download and compile a copy of AMReX
-- `WarpX <https://github.com/ECP-WarpX/warpx>`__: we automatically download and compile a copy of PICSAR
+- `AMReX <https://amrex-codes.github.io>`__: we automatically download and compile a copy
+- `WarpX <https://github.com/ECP-WarpX/warpx>`__: we automatically download and compile a copy
 
 Optional dependencies include:
 
 - `MPI 3.0+ <https://www.mpi-forum.org/docs/>`__: for multi-node and/or multi-GPU execution
-- `CUDA Toolkit 9.0+ <https://developer.nvidia.com/cuda-downloads>`__: for Nvidia GPU support (see `matching host-compilers <https://gist.github.com/ax3l/9489132>`_)
-- `OpenMP 3.1+ <https://www.openmp.org>`__: for threaded CPU execution (currently not fully accelerated)
-- `FFTW3 <http://www.fftw.org>`_: for spectral solver (PSATD) support
-- `BLAS++ <https://bitbucket.org/icl/blaspp>`_ and `LAPACK++ <https://bitbucket.org/icl/lapackpp>`_: for spectral solver (PSATD) support in RZ geometry
-- `Boost 1.66.0+ <https://www.boost.org/>`__: for QED lookup tables generation support
+- `CUDA Toolkit 11.0+ <https://developer.nvidia.com/cuda-downloads>`__: for Nvidia GPU support (see `matching host-compilers <https://gist.github.com/ax3l/9489132>`_)
+- `OpenMP 3.1+ <https://www.openmp.org>`__: for threaded CPU execution
+- `FFTW3 <http://www.fftw.org>`_: for spectral solver support
 - `openPMD-api 0.14.2+ <https://github.com/openPMD/openPMD-api>`__: we automatically download and compile a copy of openPMD-api for openPMD I/O support
 
   - see `optional I/O backends <https://github.com/openPMD/openPMD-api#dependencies>`__
@@ -40,19 +38,21 @@ Spack (macOS/Linux)
    spack env create impactx-dev
    spack env activate impactx-dev
    spack add adios2        # for openPMD
-   spack add blaspp        # for PSATD in RZ
    spack add ccache
    spack add cmake
-   spack add fftw          # for PSATD
+   spack add fftw
    spack add hdf5          # for openPMD
-   spack add lapackpp      # for PSATD in RZ
    spack add mpi
-   spack add openpmd-api   # for openPMD
    spack add pkgconfig     # for fftw
+
+   # OpenMP support on macOS
+   [[ $OSTYPE == 'darwin'* ]] && spack add llvm-openmp
+
    # optional:
+   # spack add cuda
    # spack add python
    # spack add py-pip
-   # spack add cuda
+
    spack install
 
 (in new terminals, re-activate the environment with ``spack env activate impactx-dev`` again)
@@ -61,7 +61,7 @@ If you also want to run runtime tests and added Python (``spack add python`` and
 
 .. code-block:: bash
 
-   python -m pip install matplotlib==3.2.2 yt scipy numpy openpmd-api
+   python -m pip install matplotlib yt scipy numpy openpmd-api
 
 
 Brew (macOS/Linux)
@@ -70,31 +70,15 @@ Brew (macOS/Linux)
 .. code-block:: bash
 
    brew update
-   brew tap openpmd/openpmd
    brew install adios2      # for openPMD
    brew install ccache
    brew install cmake
-   brew install fftw        # for PSATD
+   brew install fftw
    brew install git
    brew install hdf5-mpi    # for openPMD
-   brew install libomp
+   brew install libomp      # for OpenMP
    brew install pkg-config  # for fftw
    brew install open-mpi
-   brew install openblas    # for PSATD in RZ
-   brew install openpmd-api # for openPMD
-
-If you also want to compile with PSATD in RZ, you need to manually install BLAS++ and LAPACK++:
-
-.. code-block:: bash
-
-   sudo mkdir -p /usr/local/bin/
-   sudo curl -L -o /usr/local/bin/cmake-easyinstall https://git.io/JvLxY
-   sudo chmod a+x /usr/local/bin/cmake-easyinstall
-
-   cmake-easyinstall --prefix=/usr/local git+https://bitbucket.org/icl/blaspp.git \
-       -Duse_openmp=OFF -Dbuild_tests=OFF -DCMAKE_VERBOSE_MAKEFILE=ON
-   cmake-easyinstall --prefix=/usr/local git+https://bitbucket.org/icl/lapackpp.git \
-       -Duse_cmake_find_lapack=ON -Dbuild_tests=OFF -DCMAKE_VERBOSE_MAKEFILE=ON
 
 
 Conda (Linux/macOS/Windows)
@@ -104,7 +88,7 @@ Without MPI:
 
 .. code-block:: bash
 
-   conda create -n impactx-dev -c conda-forge blaspp ccache cmake compilers git lapackpp openpmd-api python numpy scipy yt fftw matplotlib mamba ninja
+   conda create -n impactx-dev -c conda-forge ccache cmake compilers git openpmd-api python numpy scipy yt fftw matplotlib mamba ninja
    conda activate impactx-dev
 
    # compile ImpactX with -DImpactX_MPI=OFF
@@ -113,7 +97,7 @@ With MPI (only Linux/macOS):
 
 .. code-block:: bash
 
-   conda create -n impactx-dev -c conda-forge blaspp ccache cmake compilers git lapackpp openpmd-api=*=mpi_openmpi* python numpy scipy yt fftw=*=mpi_openmpi* matplotlib mamba ninja openmpi
+   conda create -n impactx-dev -c conda-forge ccache cmake compilers git openpmd-api=*=mpi_openmpi* python numpy scipy yt fftw=*=mpi_openmpi* matplotlib mamba ninja openmpi
    conda activate impactx-dev
 
 

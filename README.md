@@ -129,8 +129,15 @@ spack add fftw
 spack add hdf5          # for openPMD
 spack add mpi
 spack add pkgconfig     # for fftw
+
+# OpenMP support on macOS
+[[ $OSTYPE == 'darwin'* ]] && spack add llvm-openmp
+
 # optional:
 # spack add cuda
+# spack add python
+# spack add py-pip
+
 spack install
 ```
 
