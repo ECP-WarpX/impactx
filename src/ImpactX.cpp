@@ -27,7 +27,7 @@ namespace impactx
 
     ImpactX::ImpactX (amrex::Geometry const& simulation_geometry, amrex::AmrInfo const& amr_info)
         : AmrCore(simulation_geometry, amr_info),
-          mypc(std::make_unique<ImpactXParticleContainer>(this))
+          m_particle_container(std::make_unique<ImpactXParticleContainer>(this))
     {
     }
 
@@ -36,8 +36,8 @@ namespace impactx
         AmrCore::InitFromScratch(0.0);
         amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;;
 
-        mypc->AddNParticles(0, {0.0}, {0.2}, {0.4});
-        amrex::Print() << "# of particles: " << mypc->TotalNumberOfParticles() << std::endl;
+        m_particle_container->AddNParticles(0, {0.0}, {0.2}, {0.4});
+        amrex::Print() << "# of particles: " << m_particle_container->TotalNumberOfParticles() << std::endl;
     }
 
     /** Tag cells for refinement.  TagBoxArray tags is built on level lev grids.
@@ -107,7 +107,7 @@ namespace impactx
             amrex::Print() << " ++++ Starting step=" << step << "\n";
 
             // push all particles
-            Push(*mypc, myelements);
+            Push(*m_particle_container, m_lattice);
 
             // do more stuff in the step
             //...
@@ -120,16 +120,16 @@ namespace impactx
     void ImpactX::initElements ()
     {
         // make sure the element sequence is empty
-        myelements.clear();
+        m_lattice.clear();
 
         // add elements
         //   FODO cell
-        myelements.emplace_back(Quad(1.0, 4.0));
-        myelements.emplace_back(Drift(0.5));
-        myelements.emplace_back(Quad(1.0, 4.0));
-        myelements.emplace_back(Drift(0.5));
+        m_lattice.emplace_back(Quad(1.0, 4.0));
+        m_lattice.emplace_back(Drift(0.5));
+        m_lattice.emplace_back(Quad(1.0, 4.0));
+        m_lattice.emplace_back(Drift(0.5));
         //   a bending magnet
-        myelements.emplace_back(Sbend(0.5, 2.0));
+        m_lattice.emplace_back(Sbend(0.5, 2.0));
 
         amrex::Print() << "Initialized element list" << std::endl;
     }

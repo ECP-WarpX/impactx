@@ -18,7 +18,7 @@ namespace detail
      *
      * Note: we usually would just write a C++ lambda below in ParallelFor. But, due to restrictions
      * in NVCC as of 11.0.2, we cannot write a lambda in a lambda as we also std::visit the element
-     * types of our beamline_element list.
+     * types of our lattice elements list.
      *    error #3206-D: An extended __device__ lambda cannot be defined inside a generic lambda expression("operator()").
      * Thus, we fall back to writing a C++ functor here, instead of nesting two lambdas.
      *
@@ -77,7 +77,7 @@ namespace detail
 } // namespace detail
 
     void Push (ImpactXParticleContainer & pc,
-               std::list<KnownElements> const & beamline_elements)
+               std::list<KnownElements> const & lattice)
     {
         using namespace amrex::literals; // for _rt and _prt
 
@@ -110,7 +110,7 @@ namespace detail
                 // ...
 
                 // loop over all beamline elements
-                for (auto & element_variant : beamline_elements) {
+                for (auto & element_variant : lattice) {
                     // here we just access the element by its respective type
                     std::visit([=](auto&& element) {
                         detail::PushSingleParticle<decltype(element)> const pushSingleParticle(

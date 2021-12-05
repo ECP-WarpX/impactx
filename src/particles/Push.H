@@ -18,10 +18,10 @@ namespace impactx
     /** Push particles
      *
      * @param pc container of the particles to push
-     * @param beamline_elements elements to push the particles through
+     * @param lattice elements to push the particles through
      */
     void Push (ImpactXParticleContainer & pc,
-               std::list<KnownElements> const & beamline_elements);
+               std::list<KnownElements> const & lattice);
 
 } // namespace impactx
 

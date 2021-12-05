@@ -85,10 +85,10 @@ namespace impactx
         void ClearLevel (int lev) override;
 
         /** these are the physical/beam particles of the simulation */
-        std::unique_ptr<ImpactXParticleContainer> mypc;
+        std::unique_ptr<ImpactXParticleContainer> m_particle_container;
 
         /** these are elements defining the lattice */
-        std::list<KnownElements> myelements;
+        std::list<KnownElements> m_lattice;
     };
 
 } // namespace impactx
