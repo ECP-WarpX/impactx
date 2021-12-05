@@ -107,7 +107,7 @@ namespace impactx
             amrex::Print() << " ++++ Starting step=" << step << "\n";
 
             // push all particles
-            Push(*mypc);
+            Push(*mypc, myelements);
 
             // do more stuff in the step
             //...

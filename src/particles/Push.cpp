@@ -6,17 +6,14 @@
  */
 #include "Push.H"
 
-#include "elements/Drift.H"
-#include "elements/Quad.H"
-#include "elements/Sbend.H"
-
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_REAL.H>       // for ParticleReal
 
 
 namespace impactx
 {
-    void Push (ImpactXParticleContainer & pc)
+    void Push (ImpactXParticleContainer & pc,
+               std::list<KnownElements> const & beamline_elements)
     {
         using namespace amrex::literals; // for _rt and _prt
 
@@ -31,6 +28,7 @@ namespace impactx
             // loop over all particle boxes
             using ParIt = ImpactXParticleContainer::iterator;
             for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
+                const int np = pti.numParticles();
                 //const auto t_lev = pti.GetLevel();
                 //const auto index = pti.GetPairIndex();
                 // ...
@@ -47,32 +45,25 @@ namespace impactx
                 amrex::ParticleReal* const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
                 // ...
 
-                amrex::ParticleReal const ds = 0.1; // Segment length in m.
-                amrex::ParticleReal const k = 1.0; // quadrupole strength in 1/m.
-                amrex::ParticleReal const rc = 1.0; // bend radius in m.
+                // loop over all beamline elements
+                for (auto & element_variant : beamline_elements) {
+                    // here we just access the element by its respective type
+                    std::visit([=](auto&& element) {
+                        // loop over particles in the box
+                        amrex::ParallelFor( np, [=] AMREX_GPU_DEVICE (long i)
+                        {
+                            // access AoS data such as positions and cpu/id
+                            PType& p = aos_ptr[i];
 
-                // loop over particles in the box
-                const int np = pti.numParticles();
-                amrex::ParallelFor( np, [=] AMREX_GPU_DEVICE (long i)
-                {
-                    // access AoS data such as positions and cpu/id
-                    PType& p = aos_ptr[i];
+                            // access SoA Real data
+                            amrex::ParticleReal & px = part_px[i];
+                            amrex::ParticleReal & py = part_py[i];
+                            amrex::ParticleReal & pt = part_pt[i];
 
-                    // access SoA Real data
-                    amrex::ParticleReal & px = part_px[i];
-                    amrex::ParticleReal & py = part_py[i];
-                    amrex::ParticleReal & pt = part_pt[i];
-
-                    Drift drift(ds);
-                    drift(p, px, py, pt);
-
-                    Quad quad(ds, k);
-                    quad(p, px, py, pt);
-
-                    Sbend sbend(ds, rc);
-                    sbend(p, px, py, pt);
-
-                });
+                            element(p, px, py, pt);
+                        });
+                    }, element_variant);
+                }; // end loop over all beamline elements
 
                 // print out particles (this hack works only on CPU and on GPUs with
                 // unified memory access)
