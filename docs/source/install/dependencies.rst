@@ -6,7 +6,7 @@ Dependencies
 ImpactX depends on the following popular third party software.
 Please see installation instructions below.
 
-- a mature `C++14 <https://en.wikipedia.org/wiki/C%2B%2B14>`__ compiler: e.g. GCC 5, Clang 3.6 or newer
+- a mature `C++17 <https://en.wikipedia.org/wiki/C%2B%2B17>`__ compiler, e.g., GCC 7, Clang 6, NVCC 11.0, MSVC 19.15 or newer
 - `CMake 3.15.0+ <https://cmake.org>`__
 - `Git 2.18+ <https://git-scm.com>`__
 - `AMReX <https://amrex-codes.github.io>`__: we automatically download and compile a copy of AMReX

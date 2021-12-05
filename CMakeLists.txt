@@ -148,7 +148,7 @@ unset(_BUILDINFO_SRC)
 # add sources
 add_subdirectory(src)
 
-# C++ properties: at least a C++14 capable compiler is needed
+# C++ properties: at least a C++17 capable compiler is needed
 foreach(ImpactX_tgt IN LISTS _ALL_TARGETS)
     target_compile_features(${ImpactX_tgt} PUBLIC cxx_std_17)
 endforeach()
