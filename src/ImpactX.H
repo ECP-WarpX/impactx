@@ -7,15 +7,14 @@
 #ifndef IMPACT_X_H
 #define IMPACT_X_H
 
-#include "particles/ImpactXParticleContainer.H"
-
 #include "particles/elements/Drift.H"
+#include "particles/ImpactXParticleContainer.H"
 
 #include <AMReX_AmrCore.H>
 
+#include <list>
 #include <memory>
 
-#include <list>
 
 namespace impactx
 {

@@ -119,14 +119,12 @@ namespace impactx
 
     void ImpactX::initElements ()
     {
-        // initialize element sequence
-        myelements = { };
+        // make sure the element sequence is empty
+        myelements.clear();
 
         // add elements
-        Drift drift1(1.0);
-        Drift drift2(0.5);
-        myelements.push_back(drift1);
-        myelements.push_back(drift2);
+        myelements.emplace_back(Drift(1.0));
+        myelements.emplace_back(Drift(0.5));
 
         amrex::Print() << "Initialized element list" << std::endl;
     }
