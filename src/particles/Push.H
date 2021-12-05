@@ -7,7 +7,10 @@
 #ifndef IMPACTX_PUSH_H
 #define IMPACTX_PUSH_H
 
+#include "elements/All.H"
 #include "particles/ImpactXParticleContainer.H"
+
+#include <list>
 
 
 namespace impactx
@@ -15,8 +18,10 @@ namespace impactx
     /** Push particles
      *
      * @param pc container of the particles to push
+     * @param beamline_elements elements to push the particles through
      */
-    void Push (ImpactXParticleContainer & pc);
+    void Push (ImpactXParticleContainer & pc,
+               std::list<KnownElements> const & beamline_elements);
 
 } // namespace impactx
 

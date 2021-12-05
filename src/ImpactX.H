@@ -7,11 +7,14 @@
 #ifndef IMPACT_X_H
 #define IMPACT_X_H
 
+#include "particles/elements/All.H"
 #include "particles/ImpactXParticleContainer.H"
 
 #include <AMReX_AmrCore.H>
 
+#include <list>
 #include <memory>
+
 
 namespace impactx
 {
@@ -49,6 +52,9 @@ namespace impactx
         /** Initialize particle containers and MultiFabs (fields) */
         void initData ();
 
+        /** Initialize the list of lattice elements */
+        void initElements ();
+
         /** Run the main simulation loop for a number of steps
          *
          * @param num_steps number of steps to evolve
@@ -80,6 +86,9 @@ namespace impactx
 
         /** these are the physical/beam particles of the simulation */
         std::unique_ptr<ImpactXParticleContainer> mypc;
+
+        /** these are elements defining the lattice */
+        std::list<KnownElements> myelements;
     };
 
 } // namespace impactx

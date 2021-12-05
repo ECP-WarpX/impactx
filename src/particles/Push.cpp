@@ -6,17 +6,78 @@
  */
 #include "Push.H"
 
-#include "elements/Drift.H"
-#include "elements/Quad.H"
-#include "elements/Sbend.H"
-
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_REAL.H>       // for ParticleReal
 
 
 namespace impactx
 {
-    void Push (ImpactXParticleContainer & pc)
+namespace detail
+{
+    /** Push a single particle through an element
+     *
+     * Note: we usually would just write a C++ lambda below in ParallelFor. But, due to restrictions
+     * in NVCC as of 11.0.2, we cannot write a lambda in a lambda as we also std::visit the element
+     * types of our beamline_element list.
+     *    error #3206-D: An extended __device__ lambda cannot be defined inside a generic lambda expression("operator()").
+     * Thus, we fall back to writing a C++ functor here, instead of nesting two lambdas.
+     *
+     * @tparam T_Element This can be a \see Drift, \see Quad, \see Sbend, etc.
+     */
+    template <typename T_Element>
+    struct PushSingleParticle
+    {
+        using PType = ImpactXParticleContainer::ParticleType;
+
+        /** Constructor taking in pointers to particle data
+         *
+         * @param element the beamline element to push through
+         * @param aos_ptr the array-of-struct with position and ids
+         * @param part_px the array to the particle momentum (x)
+         * @param part_py the array to the particle momentum (y)
+         * @param part_pt the array to the particle momentum (t)
+         */
+        PushSingleParticle (T_Element element,
+                            PType* aos_ptr,
+                            amrex::ParticleReal* part_px,
+                            amrex::ParticleReal* part_py,
+                            amrex::ParticleReal* part_pt)
+            : m_element(element), m_aos_ptr(aos_ptr),
+              m_part_px(part_px), m_part_py(part_py), m_part_pt(part_pt)
+        {
+        }
+
+        PushSingleParticle () = delete;
+        PushSingleParticle (PushSingleParticle const &) = default;
+        PushSingleParticle (PushSingleParticle &&) = default;
+        ~PushSingleParticle () = default;
+
+        AMREX_GPU_DEVICE AMREX_FORCE_INLINE
+        void
+        operator() (long i) const
+        {
+            // access AoS data such as positions and cpu/id
+            PType& p = m_aos_ptr[i];
+
+            // access SoA Real data
+            amrex::ParticleReal & px = m_part_px[i];
+            amrex::ParticleReal & py = m_part_py[i];
+            amrex::ParticleReal & pt = m_part_pt[i];
+
+            m_element(p, px, py, pt);
+        }
+
+    private:
+        T_Element const m_element;
+        PType* const AMREX_RESTRICT m_aos_ptr;
+        amrex::ParticleReal* const AMREX_RESTRICT m_part_px;
+        amrex::ParticleReal* const AMREX_RESTRICT m_part_py;
+        amrex::ParticleReal* const AMREX_RESTRICT m_part_pt;
+    };
+} // namespace detail
+
+    void Push (ImpactXParticleContainer & pc,
+               std::list<KnownElements> const & beamline_elements)
     {
         using namespace amrex::literals; // for _rt and _prt
 
@@ -31,6 +92,7 @@ namespace impactx
             // loop over all particle boxes
             using ParIt = ImpactXParticleContainer::iterator;
             for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
+                const int np = pti.numParticles();
                 //const auto t_lev = pti.GetLevel();
                 //const auto index = pti.GetPairIndex();
                 // ...
@@ -47,32 +109,17 @@ namespace impactx
                 amrex::ParticleReal* const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
                 // ...
 
-                amrex::ParticleReal const ds = 0.1; // Segment length in m.
-                amrex::ParticleReal const k = 1.0; // quadrupole strength in 1/m.
-                amrex::ParticleReal const rc = 1.0; // bend radius in m.
+                // loop over all beamline elements
+                for (auto & element_variant : beamline_elements) {
+                    // here we just access the element by its respective type
+                    std::visit([=](auto&& element) {
+                        detail::PushSingleParticle<decltype(element)> const pushSingleParticle(
+                            element, aos_ptr, part_px, part_py, part_pt);
 
-                // loop over particles in the box
-                const int np = pti.numParticles();
-                amrex::ParallelFor( np, [=] AMREX_GPU_DEVICE (long i)
-                {
-                    // access AoS data such as positions and cpu/id
-                    PType& p = aos_ptr[i];
-
-                    // access SoA Real data
-                    amrex::ParticleReal & px = part_px[i];
-                    amrex::ParticleReal & py = part_py[i];
-                    amrex::ParticleReal & pt = part_pt[i];
-
-                    Drift drift(ds);
-                    drift(p, px, py, pt);
-
-                    Quad quad(ds, k);
-                    quad(p, px, py, pt);
-
-                    Sbend sbend(ds, rc);
-                    sbend(p, px, py, pt);
-
-                });
+                        // loop over particles in the box
+                        amrex::ParallelFor(np, pushSingleParticle);
+                    }, element_variant);
+                }; // end loop over all beamline elements
 
                 // print out particles (this hack works only on CPU and on GPUs with
                 // unified memory access)

@@ -107,7 +107,7 @@ namespace impactx
             amrex::Print() << " ++++ Starting step=" << step << "\n";
 
             // push all particles
-            Push(*mypc);
+            Push(*mypc, myelements);
 
             // do more stuff in the step
             //...
@@ -115,6 +115,23 @@ namespace impactx
             amrex::Print() << "\n";
 
         } // end step loop
+    }
+
+    void ImpactX::initElements ()
+    {
+        // make sure the element sequence is empty
+        myelements.clear();
+
+        // add elements
+        //   FODO cell
+        myelements.emplace_back(Quad(1.0, 4.0));
+        myelements.emplace_back(Drift(0.5));
+        myelements.emplace_back(Quad(1.0, 4.0));
+        myelements.emplace_back(Drift(0.5));
+        //   a bending magnet
+        myelements.emplace_back(Sbend(0.5, 2.0));
+
+        amrex::Print() << "Initialized element list" << std::endl;
     }
 
 } // namespace impactx
