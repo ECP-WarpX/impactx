@@ -17,10 +17,13 @@ namespace detail
     /** Push a single particle through an element
      *
      * Note: we usually would just write a C++ lambda below in ParallelFor. But, due to restrictions
-     * in NVCC as of 11.0.2, we cannot write a lambda in a lambda as we also std::visit the element
+     * in NVCC as of 11.5, we cannot write a lambda in a lambda as we also std::visit the element
      * types of our lattice elements list.
      *    error #3206-D: An extended __device__ lambda cannot be defined inside a generic lambda expression("operator()").
      * Thus, we fall back to writing a C++ functor here, instead of nesting two lambdas.
+     *
+     * Nvidia bug report: 3458976
+     * Minimal demonstrator: https://cuda.godbolt.org/z/39e4q53Ye
      *
      * @tparam T_Element This can be a \see Drift, \see Quad, \see Sbend, etc.
      */
