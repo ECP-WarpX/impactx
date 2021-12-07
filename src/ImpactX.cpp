@@ -100,7 +100,7 @@ namespace impactx
     /** Resize the mesh, based on the extent of the bunch of particle
     */
     void ImpactX::ResizeMesh () {
-        // Extract the mean and RMS size of the particle positions
+        // Extract the min and max of the particle positions
         amrex::ParticleReal x_min, x_max, y_min, y_max, z_min, z_max;
         m_particle_container->MinAndMaxPositions(x_min, x_max, y_min, y_max, z_min, z_max);
         // Resize the domain size
