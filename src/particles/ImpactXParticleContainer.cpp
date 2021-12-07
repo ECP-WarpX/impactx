@@ -84,51 +84,36 @@ namespace impactx
     }
 
     void
-    ImpactXParticleContainer::MeanAndStdPositions (
-        amrex::ParticleReal& x_mean, amrex::ParticleReal& x_std,
-        amrex::ParticleReal& y_mean, amrex::ParticleReal& y_std,
-        amrex::ParticleReal& z_mean, amrex::ParticleReal& z_std )
+    ImpactXParticleContainer::MinAndMaxPositions (
+        amrex::ParticleReal& x_min, amrex::ParticleReal& x_max,
+        amrex::ParticleReal& y_min, amrex::ParticleReal& y_max,
+        amrex::ParticleReal& z_min, amrex::ParticleReal& z_max )
     {
-        amrex::ParticleReal sum_x, sum_x2, sum_y, sum_y2, sum_z, sum_z2, sum_w;
-
         using PType = ImpactXParticleContainer::SuperParticleType;
 
-        amrex::ReduceOps<amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum> reduce_ops;
-        auto r = amrex::ParticleReduce<amrex::ReduceData<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>>(
-            *this,
-            [=] AMREX_GPU_DEVICE(const PType& p) noexcept -> amrex::GpuTuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>
-            {
-                amrex::ParticleReal x = p.pos(0);
-                amrex::ParticleReal y = p.pos(1);
-                amrex::ParticleReal z = p.pos(2);
-                amrex::ParticleReal w = p.rdata(RealSoA::w);
+        x_min = ReduceMin( *this,
+        [=] AMREX_GPU_HOST_DEVICE (const PType& p){ return p.pos(0); });
+        amrex::ParallelDescriptor::ReduceRealMin(x_min);
 
-                return {x, x*x, y, y*y, z, z*z, w};
-            },
-            reduce_ops);
+        y_min = ReduceMin( *this,
+        [=] AMREX_GPU_HOST_DEVICE (const PType& p){ return p.pos(1); });
+        amrex::ParallelDescriptor::ReduceRealMin(y_min);
 
-        sum_x = amrex::get<0>(r);
-        sum_x2 = amrex::get<1>(r);
-        sum_y = amrex::get<2>(r);
-        sum_y2 = amrex::get<3>(r);
-        sum_z = amrex::get<4>(r);
-        sum_z2 = amrex::get<5>(r);
-        sum_w = amrex::get<6>(r);
+        z_min = ReduceMin( *this,
+        [=] AMREX_GPU_HOST_DEVICE (const PType& p){ return p.pos(2); });
+        amrex::ParallelDescriptor::ReduceRealMin(z_min);
 
-        amrex::ParallelDescriptor::ReduceRealSum(sum_x);
-        amrex::ParallelDescriptor::ReduceRealSum(sum_x2);
-        amrex::ParallelDescriptor::ReduceRealSum(sum_y);
-        amrex::ParallelDescriptor::ReduceRealSum(sum_y2);
-        amrex::ParallelDescriptor::ReduceRealSum(sum_z);
-        amrex::ParallelDescriptor::ReduceRealSum(sum_z2);
-        amrex::ParallelDescriptor::ReduceRealSum(sum_w);
+        x_max = ReduceMax( *this,
+        [=] AMREX_GPU_HOST_DEVICE (const PType& p){ return p.pos(0); });
+        amrex::ParallelDescriptor::ReduceRealMax(x_max);
 
-        x_mean = sum_x/sum_w;
-        x_std = sum_x2/sum_w - x_mean*x_mean;
-        y_mean = sum_y/sum_w;
-        y_std = sum_y2/sum_w - y_mean*y_mean;
-        z_mean = sum_z/sum_w;
-        z_std = sum_z2/sum_w - z_mean*z_mean;
+        y_max = ReduceMax( *this,
+        [=] AMREX_GPU_HOST_DEVICE (const PType& p){ return p.pos(1); });
+        amrex::ParallelDescriptor::ReduceRealMax(y_max);
+
+        z_max = ReduceMax( *this,
+        [=] AMREX_GPU_HOST_DEVICE (const PType& p){ return p.pos(2); });
+        amrex::ParallelDescriptor::ReduceRealMax(z_max);
     }
 
 } // namespace impactx

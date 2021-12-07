@@ -83,13 +83,13 @@ namespace impactx
                        amrex::Vector<amrex::ParticleReal> const & y,
                        amrex::Vector<amrex::ParticleReal> const & z);
 
-        /** Compute the mean and RMS of the particle position in each dimension
+        /** Compute the min and max of the particle position in each dimension
         */
         void
-        MeanAndStdPositions (
-           amrex::ParticleReal& x_mean, amrex::ParticleReal& x_std,
-           amrex::ParticleReal& y_mean, amrex::ParticleReal& y_std,
-           amrex::ParticleReal& z_mean, amrex::ParticleReal& z_std );
+        MinAndMaxPositions (
+           amrex::ParticleReal& x_min, amrex::ParticleReal& x_max,
+           amrex::ParticleReal& y_min, amrex::ParticleReal& y_max,
+           amrex::ParticleReal& z_min, amrex::ParticleReal& z_max );
 
     }; // ImpactXParticleContainer
 
