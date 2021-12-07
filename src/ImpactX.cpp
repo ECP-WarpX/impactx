@@ -102,7 +102,7 @@ namespace impactx
     void ImpactX::ResizeMesh () {
         // Extract the mean and RMS size of the particle positions
         amrex::ParticleReal x_min, x_max, y_min, y_max, z_min, z_max;
-        mypc->MinAndMaxPositions(x_min, x_max, y_min, y_max, z_min, z_max);
+        m_particle_container->MinAndMaxPositions(x_min, x_max, y_min, y_max, z_min, z_max);
         // Resize the domain size
         // The box is expanded slightly beyond the min and max of particles.
         // This controlled by the variable `frac` below.
@@ -129,10 +129,10 @@ namespace impactx
 
             // Note: The following operation assume that
             // the particles are in x, y, z coordinates.
-            // Resize the mesh, based on `mypc` extent
+            // Resize the mesh, based on `m_particle_container` extent
             ResizeMesh();
             // Redistribute particles in the new mesh
-            mypc->Redistribute();
+            m_particle_container->Redistribute();
 
             // push all particles
             Push(*m_particle_container, m_lattice);
