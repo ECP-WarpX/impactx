@@ -91,28 +91,30 @@ namespace impactx
     {
         using PType = ImpactXParticleContainer::SuperParticleType;
 
-        x_min = ReduceMin( *this,
-        [=] AMREX_GPU_HOST_DEVICE (const PType& p){ return p.pos(0); });
+        amrex::ReduceOps<amrex::ReduceOpMin, amrex::ReduceOpMin, amrex::ReduceOpMin, amrex::ReduceOpMax, amrex::ReduceOpMax, amrex::ReduceOpMax> reduce_ops;
+        auto r = amrex::ParticleReduce<amrex::ReduceData<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>>(
+            *this,
+            [=] AMREX_GPU_DEVICE(const PType& p) noexcept -> amrex::GpuTuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>
+            {
+                amrex::ParticleReal x = p.pos(0);
+                amrex::ParticleReal y = p.pos(1);
+                amrex::ParticleReal z = p.pos(2);
+                return {x, y, z, x, y, z};
+            },
+            reduce_ops);
+
+        x_min = amrex::get<0>(r);
+        y_min = amrex::get<1>(r);
+        z_min = amrex::get<2>(r);
+        x_max = amrex::get<3>(r);
+        y_max = amrex::get<4>(r);
+        z_max = amrex::get<5>(r);
+
         amrex::ParallelDescriptor::ReduceRealMin(x_min);
-
-        y_min = ReduceMin( *this,
-        [=] AMREX_GPU_HOST_DEVICE (const PType& p){ return p.pos(1); });
         amrex::ParallelDescriptor::ReduceRealMin(y_min);
-
-        z_min = ReduceMin( *this,
-        [=] AMREX_GPU_HOST_DEVICE (const PType& p){ return p.pos(2); });
         amrex::ParallelDescriptor::ReduceRealMin(z_min);
-
-        x_max = ReduceMax( *this,
-        [=] AMREX_GPU_HOST_DEVICE (const PType& p){ return p.pos(0); });
         amrex::ParallelDescriptor::ReduceRealMax(x_max);
-
-        y_max = ReduceMax( *this,
-        [=] AMREX_GPU_HOST_DEVICE (const PType& p){ return p.pos(1); });
         amrex::ParallelDescriptor::ReduceRealMax(y_max);
-
-        z_max = ReduceMax( *this,
-        [=] AMREX_GPU_HOST_DEVICE (const PType& p){ return p.pos(2); });
         amrex::ParallelDescriptor::ReduceRealMax(z_max);
     }
 
