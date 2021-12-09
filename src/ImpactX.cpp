@@ -126,17 +126,29 @@ namespace impactx
         amrex::ParmParse pp_lattice("lattice");
         std::vector<std::string> lattice_elements;
         pp_lattice.queryarr("elements", lattice_elements);
-
+        // Loop through lattice elements
         for (std::string element_name : lattice_elements) {
-            amrex::Print() << element_name << std::endl;
+            // Check the element type
+            amrex::ParmParse pp_element(element_name);
+            std::string element_type;
+            pp_element.query("type", element_type);
+            // Initialize the corresponding element according to its type
+            if (element_type == "quad") {
+                amrex::Real ds, k;
+                pp_element.query("ds", ds);
+                pp_element.query("k", k);
+                m_lattice.emplace_back( Quad(ds, k) );
+            } else if (element_type == "drift") {
+                amrex::Real ds;
+                pp_element.query("ds", ds);
+                m_lattice.emplace_back( Drift(ds) );
+            } else {
+                amrex::Abort("Unknown element type.");
+                // TODO: Print type and element name
+            }
         }
 
         // add elements
-        //   FODO cell
-        m_lattice.emplace_back(Quad(1.0, 4.0));
-        m_lattice.emplace_back(Drift(0.5));
-        m_lattice.emplace_back(Quad(1.0, 4.0));
-        m_lattice.emplace_back(Drift(0.5));
         //   a bending magnet
         m_lattice.emplace_back(Sbend(0.5, 2.0));
 
