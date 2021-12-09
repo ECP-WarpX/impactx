@@ -72,6 +72,31 @@ Domain Boundary Conditions
 
    TODO :-)
 
+Lattice elements
+----------------
+
+* ``lattice.elements`` (`list of strings`) optional (default: no elements)
+    A list of names (one name per lattice element), in the order that they
+    appear in the lattice.
+
+* ``<element_name>.type`` (`string`)
+    Indicates the element type for this lattice element. This should be one of:
+
+        * ``drift`` for free drift. This requires this additional parameter:
+
+            * ``<element_name>.ds`` (`float`, in meters) the segment length
+
+        * ``quad`` for a quadrupole. This requires these additional parameters:
+
+            * ``<element_name>.ds`` (`float`, in meters) the segment length
+
+            * ``<element_name>.k`` (`float`, in inverse meters) the quadrupole strength
+
+        * ``sbend`` for a bending magnet. This requires these additional parameters:
+
+            * ``<element_name>.ds`` (`float`, in meters) the segment length
+
+            * ``<element_name>.rc`` (`float`, in meters) the bend radius
 
 .. _running-cpp-parameters-parallelization:
 
