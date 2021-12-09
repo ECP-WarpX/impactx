@@ -122,6 +122,15 @@ namespace impactx
         // make sure the element sequence is empty
         m_lattice.clear();
 
+        // Parse the lattice elements
+        amrex::ParmParse pp_lattice("lattice");
+        std::vector<std::string> lattice_elements;
+        pp_lattice.queryarr("elements", lattice_elements);
+
+        for (std::string element_name : lattice_elements) {
+            amrex::Print() << element_name << std::endl;
+        }
+
         // add elements
         //   FODO cell
         m_lattice.emplace_back(Quad(1.0, 4.0));
