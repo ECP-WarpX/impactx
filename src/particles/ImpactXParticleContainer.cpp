@@ -83,11 +83,11 @@ namespace impactx
 
     }
 
-    void
-    ImpactXParticleContainer::MinAndMaxPositions (
-        amrex::ParticleReal& x_min, amrex::ParticleReal& x_max,
-        amrex::ParticleReal& y_min, amrex::ParticleReal& y_max,
-        amrex::ParticleReal& z_min, amrex::ParticleReal& z_max )
+    std::tuple<
+            amrex::ParticleReal, amrex::ParticleReal,
+            amrex::ParticleReal, amrex::ParticleReal,
+            amrex::ParticleReal, amrex::ParticleReal>
+    ImpactXParticleContainer::MinAndMaxPositions ()
     {
         using PType = ImpactXParticleContainer::SuperParticleType;
 
@@ -116,6 +116,7 @@ namespace impactx
         amrex::ParallelDescriptor::ReduceRealMax(x_max);
         amrex::ParallelDescriptor::ReduceRealMax(y_max);
         amrex::ParallelDescriptor::ReduceRealMax(z_max);
+        return {x_min, x_max, y_min, y_max, z_min, z_max};
     }
 
 } // namespace impactx

@@ -97,12 +97,9 @@ namespace impactx
         amrex::ignore_unused(lev);
     }
 
-    /** Resize the mesh, based on the extent of the bunch of particle
-    */
     void ImpactX::ResizeMesh () {
         // Extract the min and max of the particle positions
-        amrex::ParticleReal x_min, x_max, y_min, y_max, z_min, z_max;
-        m_particle_container->MinAndMaxPositions(x_min, x_max, y_min, y_max, z_min, z_max);
+        auto const [x_min, x_max, y_min, y_max, z_min, z_max] = m_particle_container->MinAndMaxPositions();
         // Resize the domain size
         // The box is expanded slightly beyond the min and max of particles.
         // This controlled by the variable `frac` below.
