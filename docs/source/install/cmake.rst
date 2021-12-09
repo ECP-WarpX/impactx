@@ -93,10 +93,14 @@ By default, the most important dependencies of ImpactX are automatically downloa
 CMake Option                  Default & Values                               Description
 ============================= ============================================== ===========================================================
 ``CCACHE_PROGRAM``            First found ``ccache`` executable.             Set to ``-DCCACHE_PROGRAM=NO`` to disable CCache.
-``ImpactX_amrex_src``           *None*                                         Path to AMReX source directory (preferred if set)
-``ImpactX_amrex_repo``          ``https://github.com/AMReX-Codes/amrex.git``   Repository URI to pull and build AMReX from
-``ImpactX_amrex_branch``        *we set and maintain a compatible commit*      Repository branch for ``ImpactX_amrex_repo``
-``ImpactX_amrex_internal``      **ON**/OFF                                     Needs a pre-installed AMReX library if set to ``OFF``
+``ImpactX_ablastr_src``       *None*                                         Path to ABLASTR source directory (preferred if set)
+``ImpactX_ablastr_repo``      ``https://github.com/ECP-WarpX/WarpX.git``     Repository URI to pull and build ABLASTR from
+``ImpactX_ablastr_branch``    *we set and maintain a compatible commit*      Repository branch for ``ImpactX_ablastr_repo``
+``ImpactX_ablastr_internal``  **ON**/OFF                                     Needs a pre-installed ABLASTR library if set to ``OFF``
+``ImpactX_amrex_src``         *None*                                         Path to AMReX source directory (preferred if set)
+``ImpactX_amrex_repo``        ``https://github.com/AMReX-Codes/amrex.git``   Repository URI to pull and build AMReX from
+``ImpactX_amrex_branch``      *we set and maintain a compatible commit*      Repository branch for ``ImpactX_amrex_repo``
+``ImpactX_amrex_internal``    **ON**/OFF                                     Needs a pre-installed AMReX library if set to ``OFF``
 ============================= ============================================== ===========================================================
 
 For example, one can also build against a local AMReX copy.
@@ -105,6 +109,8 @@ Relative paths are also supported, e.g. ``-DImpactX_amrex_src=../amrex``.
 
 Or build against an AMReX feature branch of a colleague.
 Assuming your colleague pushed AMReX to ``https://github.com/WeiqunZhang/amrex/`` in a branch ``new-feature`` then pass to ``cmake`` the arguments: ``-DImpactX_amrex_repo=https://github.com/WeiqunZhang/amrex.git -DImpactX_amrex_branch=new-feature``.
+
+If you want to develop against local versions of ABLASTR (from WarpX) and AMReX at the same time, pass for instance ``-DImpactX_ablastr_src=$HOME/src/warpx -DImpactX_amrex_src=$HOME/src/amrex``.
 
 You can speed up the install further if you pre-install these dependencies, e.g. with a package manager.
 Set ``-DImpactX_<dependency-name>_internal=OFF`` and add installation prefix of the dependency to the environment variable `CMAKE_PREFIX_PATH <https://cmake.org/cmake/help/latest/envvar/CMAKE_PREFIX_PATH.html>`__.
