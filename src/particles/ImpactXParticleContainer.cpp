@@ -91,6 +91,7 @@ namespace impactx
     {
         using PType = ImpactXParticleContainer::SuperParticleType;
 
+        // Get min and max for the local rank
         amrex::ReduceOps<amrex::ReduceOpMin, amrex::ReduceOpMin, amrex::ReduceOpMin, amrex::ReduceOpMax, amrex::ReduceOpMax, amrex::ReduceOpMax> reduce_ops;
         auto r = amrex::ParticleReduce<amrex::ReduceData<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>>(
             *this,
@@ -103,20 +104,21 @@ namespace impactx
             },
             reduce_ops);
 
-        x_min = amrex::get<0>(r);
-        y_min = amrex::get<1>(r);
-        z_min = amrex::get<2>(r);
-        x_max = amrex::get<3>(r);
-        y_max = amrex::get<4>(r);
-        z_max = amrex::get<5>(r);
+        // Get min and max across all ranks
+        std::vector<amrex::ParticleReal> xyz_min = {
+            amrex::get<0>(r),
+            amrex::get<1>(r),
+            amrex::get<2>(r)
+        };
+        amrex::ParallelDescriptor::ReduceRealMin(xyz_min.data(), xyz_min.size());
+        std::vector<amrex::ParticleReal> xyz_max = {
+            amrex::get<3>(r),
+            amrex::get<4>(r),
+            amrex::get<5>(r)
+        };
+        amrex::ParallelDescriptor::ReduceRealMax(xyz_max.data(), xyz_max.size());
 
-        amrex::ParallelDescriptor::ReduceRealMin(x_min);
-        amrex::ParallelDescriptor::ReduceRealMin(y_min);
-        amrex::ParallelDescriptor::ReduceRealMin(z_min);
-        amrex::ParallelDescriptor::ReduceRealMax(x_max);
-        amrex::ParallelDescriptor::ReduceRealMax(y_max);
-        amrex::ParallelDescriptor::ReduceRealMax(z_max);
-        return {x_min, x_max, y_min, y_max, z_min, z_max};
+        return {xyz_min[0], xyz_min[1], xyz_min[2], xyz_max[0], xyz_max[1], xyz_max[2]};
     }
 
 } // namespace impactx
