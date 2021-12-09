@@ -149,8 +149,7 @@ namespace impactx
                 pp_element.get("rc", rc);
                 m_lattice.emplace_back( Sbend(ds, rc) );
             } else {
-                amrex::Abort("Unknown element type.");
-                // TODO: Print type and element name
+                amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }
         }
 
