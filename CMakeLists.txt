@@ -97,11 +97,7 @@ option(ImpactX_IPO "Compile ImpactX with interprocedural optimization (will take
 #   ABLASTR in turn builds AMReX from source (default) or finds an existing
 #     install
 include(${ImpactX_SOURCE_DIR}/cmake/dependencies/ABLASTR.cmake)
-make_third_party_includes_system(WarpX::ablastr ablastr)
-
-# openPMD
-#   builds openPMD-api from source (default) or finds an existing install
-include(${ImpactX_SOURCE_DIR}/cmake/dependencies/openPMD.cmake)
+impactx_make_third_party_includes_system(WarpX::ablastr ablastr)
 
 
 # Targets #####################################################################
@@ -169,8 +165,7 @@ if(ImpactX_IPO)
 endif()
 
 # link dependencies
-#target_link_libraries(ImpactX PUBLIC ImpactX::thirdparty::ablastr)
-target_link_libraries(ImpactX PUBLIC WarpX::ablastr)
+target_link_libraries(ImpactX PUBLIC ImpactX::thirdparty::ablastr)
 
 if(ImpactX_OPENPMD)
     target_compile_definitions(ImpactX PUBLIC ImpactX_USE_OPENPMD)
