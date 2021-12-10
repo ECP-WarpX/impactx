@@ -97,6 +97,24 @@ namespace impactx
         amrex::ignore_unused(lev);
     }
 
+    void ImpactX::ResizeMesh () {
+        // Extract the min and max of the particle positions
+        auto const [x_min, x_max, y_min, y_max, z_min, z_max] = m_particle_container->MinAndMaxPositions();
+        // Resize the domain size
+        // The box is expanded slightly beyond the min and max of particles.
+        // This controlled by the variable `frac` below.
+        const amrex::Real frac=0.1;
+        amrex::RealBox rb(
+            {x_min-frac*(x_max-x_min), y_min-frac*(y_max-y_min), z_min-frac*(z_max-z_min)}, // Low bound
+            {x_max+frac*(x_max-x_min), y_max+frac*(y_max-y_min), z_max+frac*(z_max-z_min)}); // High bound
+        amrex::Geometry::ResetDefaultProbDomain(rb);
+        for (int lev = 0; lev <= max_level; ++lev) {
+            amrex::Geometry g = Geom(lev);
+            g.ProbDomain(rb);
+            amrex::AmrMesh::SetGeometry(lev, g);
+        }
+    }
+
     void ImpactX::evolve (int num_steps)
     {
         BL_PROFILE("ImpactX::evolve");
@@ -105,6 +123,13 @@ namespace impactx
         {
             BL_PROFILE("ImpactX::evolve::step");
             amrex::Print() << " ++++ Starting step=" << step << "\n";
+
+            // Note: The following operation assume that
+            // the particles are in x, y, z coordinates.
+            // Resize the mesh, based on `m_particle_container` extent
+            ResizeMesh();
+            // Redistribute particles in the new mesh
+            m_particle_container->Redistribute();
 
             // push all particles
             Push(*m_particle_container, m_lattice);

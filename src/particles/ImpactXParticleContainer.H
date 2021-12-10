@@ -14,6 +14,8 @@
 
 #include <AMReX_Vector.H>
 
+#include <tuple>
+
 
 namespace impactx
 {
@@ -82,6 +84,16 @@ namespace impactx
                        amrex::Vector<amrex::ParticleReal> const & x,
                        amrex::Vector<amrex::ParticleReal> const & y,
                        amrex::Vector<amrex::ParticleReal> const & z);
+
+        /** Compute the min and max of the particle position in each dimension
+        *
+        * @returns x_min, x_max, y_min, y_max, z_min, z_max
+        */
+        std::tuple<
+            amrex::ParticleReal, amrex::ParticleReal,
+            amrex::ParticleReal, amrex::ParticleReal,
+            amrex::ParticleReal, amrex::ParticleReal>
+        MinAndMaxPositions ();
 
     }; // ImpactXParticleContainer
 
