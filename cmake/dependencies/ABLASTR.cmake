@@ -99,12 +99,10 @@ set(ImpactX_ablastr_src ""
     "Local path to ABLASTR source directory (preferred if set)")
 
 # Git fetcher
-#set(ImpactX_ablastr_repo "https://github.com/ECP-WarpX/WarpX/warpx.git"
-set(ImpactX_ablastr_repo "https://github.com/ax3l/warpx.git"
+set(ImpactX_ablastr_repo "https://github.com/ECP-WarpX/WarpX.git"
     CACHE STRING
     "Repository URI to pull and build ABLASTR from if(ImpactX_ablastr_internal)")
-#set(ImpactX_ablastr_branch "21.12"
-set(ImpactX_ablastr_branch "topic-ablastr"
+set(ImpactX_ablastr_branch "7cd660b5061dd76240d8377fed3d2466aeaa346d"
     CACHE STRING
     "Repository branch for ImpactX_ablastr_repo if(ImpactX_ablastr_internal)")
 
