@@ -4,13 +4,16 @@
  *
  * License: BSD-3-Clause-LBNL
  */
+#include <vector>
+#include <string>
+
 #include "ImpactX.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
 
 #include <AMReX.H>
+#include <AMReX_REAL.H>
 #include <AMReX_ParmParse.H>
-
 
 namespace impactx
 {
@@ -153,7 +156,7 @@ namespace impactx
         pp_lattice.queryarr("elements", lattice_elements);
 
         // Loop through lattice elements
-        for (std::string element_name : lattice_elements) {
+        for (std::string const element_name : lattice_elements) {
             // Check the element type
             amrex::ParmParse pp_element(element_name);
             std::string element_type;

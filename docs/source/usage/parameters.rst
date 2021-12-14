@@ -72,7 +72,7 @@ Domain Boundary Conditions
 
    TODO :-)
 
-Lattice elements
+Lattice Elements
 ----------------
 
 * ``lattice.elements`` (`list of strings`) optional (default: no elements)
