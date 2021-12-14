@@ -95,6 +95,16 @@ namespace impactx
             amrex::ParticleReal, amrex::ParticleReal>
         MinAndMaxPositions ();
 
+        /** Compute the mean and std of the particle position in each dimension
+        *
+        * @returns x_mean, x_std, y_mean, y_std, z_mean, z_std
+        */
+        std::tuple<
+                amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal>
+        ImpactXParticleContainer::MeanAndStdPositions ();
+
     }; // ImpactXParticleContainer
 
 } // namespace impactx

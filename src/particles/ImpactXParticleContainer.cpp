@@ -121,4 +121,49 @@ namespace impactx
         return {xyz_min[0], xyz_min[1], xyz_min[2], xyz_max[0], xyz_max[1], xyz_max[2]};
     }
 
+    std::tuple<
+            amrex::ParticleReal, amrex::ParticleReal,
+            amrex::ParticleReal, amrex::ParticleReal,
+            amrex::ParticleReal, amrex::ParticleReal>
+    ImpactXParticleContainer::MeanAndStdPositions ()
+    {
+        using PType = ImpactXParticleContainer::SuperParticleType;
+
+        amrex::ReduceOps<ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum> reduce_ops;
+        auto r = amrex::ParticleReduce<amrex::ReduceData<ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal>>(
+            *this,
+            [=] AMREX_GPU_DEVICE(const PType& p) noexcept -> amrex::GpuTuple<ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal>
+            {
+                amrex::ParticleReal x = p.pos(0);
+                amrex::ParticleReal y = p.pos(1);
+                amrex::ParticleReal z = p.pos(2);
+                amrex::ParticleReal w = p.rdata(RealSoA::w);
+
+                return {x, x*x, y, y*y, z, z*z, w};
+            },
+            reduce_ops);
+
+        // Reduce across MPI ranks
+        std::vector<amrex::ParticleReal> data_vector = {
+            amrex::get<0>(r),
+            amrex::get<1>(r),
+            amrex::get<2>(r),
+            amrex::get<3>(r);
+            amrex::get<4>(r);
+            amrex::get<5>(r);
+            amrex::get<6>(r);
+        };
+        ParallelDescriptor::ReduceRealSum(data_vector.data(), data_vector.size());
+
+        amrex::ParticleReal w_sum = data_vector[6];
+        amrex::ParticleReal x_mean = data_vector[0]/w_sum;
+        amrex::ParticleReal x_std = data_vector[1]/w_sum- x_mean*x_mean;
+        amrex::ParticleReal y_mean = data_vector[2]/w_sum;
+        amrex::ParticleReal y_std = data_vector[3]/w_sum- x_mean*x_mean;
+        amrex::ParticleReal z_mean = data_vector[4]/w_sum;
+        amrex::ParticleReal z_std = data_vector[5]/w_sum- x_mean*x_mean;
+
+        return {x_mean, x_std, y_mean, y_std, z_mean, z_std};
+    }
+
 } // namespace impactx
