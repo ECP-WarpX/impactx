@@ -82,4 +82,43 @@ namespace impactx
 //        Redistribute();
 
     }
+
+    std::tuple<
+            amrex::ParticleReal, amrex::ParticleReal,
+            amrex::ParticleReal, amrex::ParticleReal,
+            amrex::ParticleReal, amrex::ParticleReal>
+    ImpactXParticleContainer::MinAndMaxPositions ()
+    {
+        using PType = ImpactXParticleContainer::SuperParticleType;
+
+        // Get min and max for the local rank
+        amrex::ReduceOps<amrex::ReduceOpMin, amrex::ReduceOpMin, amrex::ReduceOpMin, amrex::ReduceOpMax, amrex::ReduceOpMax, amrex::ReduceOpMax> reduce_ops;
+        auto r = amrex::ParticleReduce<amrex::ReduceData<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>>(
+            *this,
+            [=] AMREX_GPU_DEVICE(const PType& p) noexcept -> amrex::GpuTuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>
+            {
+                amrex::ParticleReal x = p.pos(0);
+                amrex::ParticleReal y = p.pos(1);
+                amrex::ParticleReal z = p.pos(2);
+                return {x, y, z, x, y, z};
+            },
+            reduce_ops);
+
+        // Get min and max across all ranks
+        std::vector<amrex::ParticleReal> xyz_min = {
+            amrex::get<0>(r),
+            amrex::get<1>(r),
+            amrex::get<2>(r)
+        };
+        amrex::ParallelDescriptor::ReduceRealMin(xyz_min.data(), xyz_min.size());
+        std::vector<amrex::ParticleReal> xyz_max = {
+            amrex::get<3>(r),
+            amrex::get<4>(r),
+            amrex::get<5>(r)
+        };
+        amrex::ParallelDescriptor::ReduceRealMax(xyz_max.data(), xyz_max.size());
+
+        return {xyz_min[0], xyz_min[1], xyz_min[2], xyz_max[0], xyz_max[1], xyz_max[2]};
+    }
+
 } // namespace impactx

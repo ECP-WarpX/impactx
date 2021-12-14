@@ -27,8 +27,9 @@ int main(int argc, char* argv[])
         impactx::overwrite_amrex_parser_defaults
     );
 
-    BL_PROFILE_VAR("main()", pmain);
     {
+        BL_PROFILE_VAR("main()", pmain);
+
         amrex::AmrInfo amr_info;
         const int nprocs = amrex::ParallelDescriptor::NProcs();
         const amrex::IntVect high_end = amr_info.blocking_factor[0]
@@ -42,8 +43,9 @@ int main(int argc, char* argv[])
         impactX->initData();
         impactX->initElements();
         impactX->evolve( /* num_steps = */ 10);
+
+        BL_PROFILE_VAR_STOP(pmain);
     }
-    BL_PROFILE_VAR_STOP(pmain);
 
     amrex::Finalize();
 #if defined(AMREX_USE_MPI)

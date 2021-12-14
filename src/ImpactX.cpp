@@ -9,7 +9,11 @@
 #include "particles/Push.H"
 
 #include <AMReX.H>
+#include <AMReX_REAL.H>
 #include <AMReX_ParmParse.H>
+
+#include <string>
+#include <vector>
 
 
 namespace impactx
@@ -97,6 +101,24 @@ namespace impactx
         amrex::ignore_unused(lev);
     }
 
+    void ImpactX::ResizeMesh () {
+        // Extract the min and max of the particle positions
+        auto const [x_min, x_max, y_min, y_max, z_min, z_max] = m_particle_container->MinAndMaxPositions();
+        // Resize the domain size
+        // The box is expanded slightly beyond the min and max of particles.
+        // This controlled by the variable `frac` below.
+        const amrex::Real frac=0.1;
+        amrex::RealBox rb(
+            {x_min-frac*(x_max-x_min), y_min-frac*(y_max-y_min), z_min-frac*(z_max-z_min)}, // Low bound
+            {x_max+frac*(x_max-x_min), y_max+frac*(y_max-y_min), z_max+frac*(z_max-z_min)}); // High bound
+        amrex::Geometry::ResetDefaultProbDomain(rb);
+        for (int lev = 0; lev <= max_level; ++lev) {
+            amrex::Geometry g = Geom(lev);
+            g.ProbDomain(rb);
+            amrex::AmrMesh::SetGeometry(lev, g);
+        }
+    }
+
     void ImpactX::evolve (int num_steps)
     {
         BL_PROFILE("ImpactX::evolve");
@@ -105,6 +127,13 @@ namespace impactx
         {
             BL_PROFILE("ImpactX::evolve::step");
             amrex::Print() << " ++++ Starting step=" << step << "\n";
+
+            // Note: The following operation assume that
+            // the particles are in x, y, z coordinates.
+            // Resize the mesh, based on `m_particle_container` extent
+            ResizeMesh();
+            // Redistribute particles in the new mesh
+            m_particle_container->Redistribute();
 
             // push all particles
             Push(*m_particle_container, m_lattice);
@@ -122,14 +151,36 @@ namespace impactx
         // make sure the element sequence is empty
         m_lattice.clear();
 
-        // add elements
-        //   FODO cell
-        m_lattice.emplace_back(Quad(1.0, 4.0));
-        m_lattice.emplace_back(Drift(0.5));
-        m_lattice.emplace_back(Quad(1.0, 4.0));
-        m_lattice.emplace_back(Drift(0.5));
-        //   a bending magnet
-        m_lattice.emplace_back(Sbend(0.5, 2.0));
+        // Parse the lattice elements
+        amrex::ParmParse pp_lattice("lattice");
+        std::vector<std::string> lattice_elements;
+        pp_lattice.queryarr("elements", lattice_elements);
+
+        // Loop through lattice elements
+        for (std::string const element_name : lattice_elements) {
+            // Check the element type
+            amrex::ParmParse pp_element(element_name);
+            std::string element_type;
+            pp_element.get("type", element_type);
+            // Initialize the corresponding element according to its type
+            if (element_type == "quad") {
+                amrex::Real ds, k;
+                pp_element.get("ds", ds);
+                pp_element.get("k", k);
+                m_lattice.emplace_back( Quad(ds, k) );
+            } else if (element_type == "drift") {
+                amrex::Real ds;
+                pp_element.get("ds", ds);
+                m_lattice.emplace_back( Drift(ds) );
+            } else if (element_type == "sbend") {
+                amrex::Real ds, rc;
+                pp_element.get("ds", ds);
+                pp_element.get("rc", rc);
+                m_lattice.emplace_back( Sbend(ds, rc) );
+            } else {
+                amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
+            }
+        }
 
         amrex::Print() << "Initialized element list" << std::endl;
     }

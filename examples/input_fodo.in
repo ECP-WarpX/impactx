@@ -1,0 +1,19 @@
+lattice.elements = quad1 drift1 quad2 drift2 sbend1
+
+quad1.type = quad
+quad1.ds = 1.0
+quad1.k = 4.0
+
+drift1.type = drift
+drift1.ds = 0.5
+
+quad2.type = quad
+quad2.ds = 1.0
+quad2.k = 4.0
+
+drift2.type = drift
+drift2.ds = 0.5
+
+sbend1.type = sbend
+sbend1.ds = 0.5
+sbend1.rc = 2.0

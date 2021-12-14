@@ -27,7 +27,5 @@ jobs:
 
     - name: run ImpactX
       run: |
-        cd build/bin
-
         export OMP_NUM_THREADS=2
-        ./impactx
+        build/bin/impactx examples/input_fodo.in

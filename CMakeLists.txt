@@ -26,6 +26,13 @@ endif()
 #endif()
 
 
+# C++ Standard in Superbuilds #################################################
+#
+# This is the easiest way to push up a C++17 requirement for AMReX and
+# openPMD-api until they increase their requirement.
+set_cxx17_superbuild()
+
+
 # CCache Support ##############################################################
 #
 # this is an optional tool that stores compiled object files; allows fast
@@ -68,6 +75,7 @@ endif()
 option(ImpactX_MPI_THREAD_MULTIPLE "MPI thread-multiple support, i.e. for async_io" ON)
 mark_as_advanced(ImpactX_MPI_THREAD_MULTIPLE)
 
+option(ImpactX_ablastr_internal                  "Download & build ABLASTR" ON)
 option(ImpactX_amrex_internal                    "Download & build AMReX" ON)
 
 # change the default build type to Release (or RelWithDebInfo) instead of Debug
@@ -84,18 +92,12 @@ option(ImpactX_IPO "Compile ImpactX with interprocedural optimization (will take
 # Dependencies ################################################################
 #
 
-# AMReX
-#   builds AMReX from source (default) or finds an existing install
-include(${ImpactX_SOURCE_DIR}/cmake/dependencies/AMReX.cmake)
-#   suppress warnings in AMReX headers (use -isystem instead of -I)
-make_third_party_includes_system(AMReX::amrex AMReX)
-
 # ABLASTR
-# TODO
-
-# openPMD
-#   builds openPMD-api from source (default) or finds an existing install
-include(${ImpactX_SOURCE_DIR}/cmake/dependencies/openPMD.cmake)
+#   builds ABLASTR from source (default) or finds an existing install
+#   ABLASTR in turn builds AMReX from source (default) or finds an existing
+#     install
+include(${ImpactX_SOURCE_DIR}/cmake/dependencies/ABLASTR.cmake)
+impactx_make_third_party_includes_system(WarpX::ablastr ablastr)
 
 
 # Targets #####################################################################
@@ -163,7 +165,7 @@ if(ImpactX_IPO)
 endif()
 
 # link dependencies
-target_link_libraries(ImpactX PUBLIC ImpactX::thirdparty::AMReX)
+target_link_libraries(ImpactX PUBLIC ImpactX::thirdparty::ablastr)
 
 if(ImpactX_OPENPMD)
     target_compile_definitions(ImpactX PUBLIC ImpactX_USE_OPENPMD)
@@ -252,7 +254,7 @@ if(ImpactX_LIB)
     else()
         set(mod_ext "so")
     endif()
-    if(IS_ABSOLUTE CMAKE_INSTALL_LIBDIR)
+    if(IS_ABSOLUTE ${CMAKE_INSTALL_LIBDIR})
         set(ABS_INSTALL_LIB_DIR ${CMAKE_INSTALL_LIBDIR})
     else()
         set(ABS_INSTALL_LIB_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
