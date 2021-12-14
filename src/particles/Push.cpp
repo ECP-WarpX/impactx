@@ -55,6 +55,10 @@ namespace detail
         PushSingleParticle (PushSingleParticle &&) = default;
         ~PushSingleParticle () = default;
 
+        /** Push a single particle through an element
+         *
+         * @param i particle index in the current box
+         */
         AMREX_GPU_DEVICE AMREX_FORCE_INLINE
         void
         operator() (long i) const

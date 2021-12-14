@@ -26,6 +26,13 @@ endif()
 #endif()
 
 
+# C++ Standard in Superbuilds #################################################
+#
+# This is the easiest way to push up a C++17 requirement for AMReX and
+# openPMD-api until they increase their requirement.
+set_cxx17_superbuild()
+
+
 # CCache Support ##############################################################
 #
 # this is an optional tool that stores compiled object files; allows fast
@@ -252,7 +259,7 @@ if(ImpactX_LIB)
     else()
         set(mod_ext "so")
     endif()
-    if(IS_ABSOLUTE CMAKE_INSTALL_LIBDIR)
+    if(IS_ABSOLUTE ${CMAKE_INSTALL_LIBDIR})
         set(ABS_INSTALL_LIB_DIR ${CMAKE_INSTALL_LIBDIR})
     else()
         set(ABS_INSTALL_LIB_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
