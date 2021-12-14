@@ -4,9 +4,6 @@
  *
  * License: BSD-3-Clause-LBNL
  */
-#include <vector>
-#include <string>
-
 #include "ImpactX.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
@@ -14,6 +11,10 @@
 #include <AMReX.H>
 #include <AMReX_REAL.H>
 #include <AMReX_ParmParse.H>
+
+#include <string>
+#include <vector>
+
 
 namespace impactx
 {
