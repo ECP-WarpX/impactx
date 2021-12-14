@@ -103,7 +103,7 @@ namespace impactx
                 amrex::ParticleReal, amrex::ParticleReal,
                 amrex::ParticleReal, amrex::ParticleReal,
                 amrex::ParticleReal, amrex::ParticleReal>
-        ImpactXParticleContainer::MeanAndStdPositions ();
+        MeanAndStdPositions ();
 
     }; // ImpactXParticleContainer
 

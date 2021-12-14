@@ -129,10 +129,10 @@ namespace impactx
     {
         using PType = ImpactXParticleContainer::SuperParticleType;
 
-        amrex::ReduceOps<ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum, ReduceOpSum> reduce_ops;
-        auto r = amrex::ParticleReduce<amrex::ReduceData<ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal>>(
+        amrex::ReduceOps<amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum> reduce_ops;
+        auto r = amrex::ParticleReduce<amrex::ReduceData<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>>(
             *this,
-            [=] AMREX_GPU_DEVICE(const PType& p) noexcept -> amrex::GpuTuple<ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal, ParticleReal>
+            [=] AMREX_GPU_DEVICE(const PType& p) noexcept -> amrex::GpuTuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>
             {
                 amrex::ParticleReal x = p.pos(0);
                 amrex::ParticleReal y = p.pos(1);
@@ -148,12 +148,12 @@ namespace impactx
             amrex::get<0>(r),
             amrex::get<1>(r),
             amrex::get<2>(r),
-            amrex::get<3>(r);
-            amrex::get<4>(r);
-            amrex::get<5>(r);
-            amrex::get<6>(r);
+            amrex::get<3>(r),
+            amrex::get<4>(r),
+            amrex::get<5>(r),
+            amrex::get<6>(r)
         };
-        ParallelDescriptor::ReduceRealSum(data_vector.data(), data_vector.size());
+        amrex::ParallelDescriptor::ReduceRealSum(data_vector.data(), data_vector.size());
 
         amrex::ParticleReal w_sum = data_vector[6];
         amrex::ParticleReal x_mean = data_vector[0]/w_sum;
