@@ -208,7 +208,7 @@ namespace impactx
 
         std:: string distribution_type;  //Beam distribution type
         pp_dist.get("distribution",distribution_type);
- 
+
         amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;
         amrex::Print() << "Bunch charge (C): " << bunch_charge << std::endl;
         amrex::Print() << "Particle type: " << particle_type << std::endl;
@@ -224,7 +224,7 @@ namespace impactx
         }
 
         amrex::Print() << "Initialized beam distribution parameters" << std::endl;
-    } 
+    }
 
 
 } // namespace impactx
