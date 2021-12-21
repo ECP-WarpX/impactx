@@ -65,7 +65,7 @@ cmake --build build_perlmutter -j 10
 
 # run
 cd build_perlmutter/bin
-srun -N 1 --ntasks-per-node=4 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ./impactx
+srun -N 1 --ntasks-per-node=4 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ./impactx ../../examples/input_fodo.in
 ```
 
 ### Cori KNL (NERSC)
@@ -92,7 +92,7 @@ cmake --build build_cori -j 8
 
 # run
 cd build_cori/bin
-srun -C knl -N 1 -t 30 -q debug ./impactx
+srun -C knl -N 1 -t 30 -q debug ./impactx ../../examples/input_fodo.in
 ```
 
 ### Homebrew (macOS)
@@ -192,6 +192,40 @@ cmake -S . -B build -DImpactX_COMPUTE=CUDA -DImpactX_MPI=OFF
 An executable ImpactX binary with the current compile-time options encoded in its file name will be created in `build/bin/`.
 
 Additionally, a symbolic link named `impactx` can be found in that directory, which points to the last built ImpactX executable.
+
+The command-line syntax for this executable is:
+```console
+Usage: impactx <inputs-file> [some.overwritten.option=value]...
+
+Mandatory arguments (remove the <>):
+  inputs-file     the path to an input file; can be relative to the current
+                  working directory or absolute.
+                  Example: input_fodo.in
+
+Optional arguments (remove the []):
+  options         this can overwrite any line in an inputs-file
+                  Example: quad1.ds=0.5 sbend1.rc=1.5
+
+Examples:
+  In the current working directory, there is a file "input_fodo.in" and the
+  "impactx" executable.
+  The line to execute would look like this:
+    ./impactx input_fodo.in
+
+  In the current working directory, there is a file "input_fodo.in" and the
+  executable "impactx" is in a directory that is listed in the "PATH"
+  environment variable.
+  The line to execute would look like this:
+    impactx input_fodo.in
+
+  In the current working directory, there is a file "input_fodo.in" and the
+  "impactx" executable. We want to voerwrite the segment length of the beamline
+  element "quad1" that is already defined in it. We also want to change the
+  radius of curvature of the bending magnet "sbend1" to a different value than
+  in the file "input_fodo.in".
+  The line to execute would look like this:
+    ./impactx input_fodo.in quad1.ds=0.5 sbend1.rc=1.5
+```
 
 ## Acknowledgements
 
