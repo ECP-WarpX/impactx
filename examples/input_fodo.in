@@ -1,3 +1,10 @@
+beam.npart = 10000
+beam.units = static
+beam.energy = 2.0e3
+beam.charge = 100.0e-12
+beam.particle = electron
+beam.distribution = gauss6d
+
 lattice.elements = quad1 drift1 quad2 drift2 sbend1
 
 quad1.type = quad
