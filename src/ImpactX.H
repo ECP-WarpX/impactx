@@ -55,6 +55,9 @@ namespace impactx
         /** Initialize the list of lattice elements */
         void initElements ();
 
+        /** Initialize the beam distribution parameters */
+        void initDist ();
+
         /** Run the main simulation loop for a number of steps
          *
          * @param num_steps number of steps to evolve
