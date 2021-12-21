@@ -191,23 +191,23 @@ namespace impactx
         // Parse the beam distribution parameters
         amrex::ParmParse pp_dist("beam");
 
-        amrex::Real energy = 0.0;   //Beam kinetic energy (MeV)
+        amrex::Real energy = 0.0;  // Beam kinetic energy (MeV)
         pp_dist.get("energy", energy);
 
-        amrex::Real bunch_charge = 0.0;   //Bunch charge (C)
+        amrex::Real bunch_charge = 0.0;  // Bunch charge (C)
         pp_dist.get("charge", bunch_charge);
 
-        std:: string particle_type;  //Particle type
-        pp_dist.get("particle",particle_type);
+        std::string particle_type;  // Particle type
+        pp_dist.get("particle", particle_type);
 
-        int npart = 1;  //Number of simulation particles
+        int npart = 1;  // Number of simulation particles
         pp_dist.get("npart", npart);
 
-        std:: string unit_type;  //System of units
+        std::string unit_type;  // System of units
         pp_dist.get("units", unit_type);
 
-        std:: string distribution_type;  //Beam distribution type
-        pp_dist.get("distribution",distribution_type);
+        std::string distribution_type;  // Beam distribution type
+        pp_dist.get("distribution", distribution_type);
 
         amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;
         amrex::Print() << "Bunch charge (C): " << bunch_charge << std::endl;
@@ -220,7 +220,7 @@ namespace impactx
         } else if (unit_type == "dynamic") {
             amrex::Print() << "Dynamic units" << std::endl;
         } else {
-                amrex::Abort("Unknown units (static/dynamic): " + unit_type);
+            amrex::Abort("Unknown units (static/dynamic): " + unit_type);
         }
 
         amrex::Print() << "Initialized beam distribution parameters" << std::endl;
