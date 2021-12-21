@@ -102,7 +102,7 @@ set(ImpactX_ablastr_src ""
 set(ImpactX_ablastr_repo "https://github.com/ECP-WarpX/WarpX.git"
     CACHE STRING
     "Repository URI to pull and build ABLASTR from if(ImpactX_ablastr_internal)")
-set(ImpactX_ablastr_branch "7cd660b5061dd76240d8377fed3d2466aeaa346d"
+set(ImpactX_ablastr_branch "2a24ba13c214b3e4345529deecf627d6d113004e"
     CACHE STRING
     "Repository branch for ImpactX_ablastr_repo if(ImpactX_ablastr_internal)")
 
