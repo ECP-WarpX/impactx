@@ -17,7 +17,6 @@
 #include <vector>
 #include <math.h>
 
-
 namespace impactx
 {
     void
@@ -230,8 +229,8 @@ namespace impactx
 
     //return 1 particle coordinates sampling from a 6D Waterbag distribution
     //with mean = 0, std = 1.
-    void ImpactX::initWaterbag (amrex::Real &x,amrex::Real &y,amrx::Real &t,
-	               amrex::Real &px,amrex::Real &py,amrx::Real &pt)
+    void ImpactX::Waterbag (amrex::Real &x,amrex::Real &y,amrex::Real &t,
+	               amrex::Real &px,amrex::Real &py,amrex::Real &pt)
     {
         amrex::Real r1=0.0, r2=0.0, r3=0.0;  
         amrex::Real x1=0.0, x2=0.0, x3=0.0;  

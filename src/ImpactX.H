@@ -58,6 +58,9 @@ namespace impactx
         /** Initialize the beam distribution parameters */
         void initDist ();
 
+	void Waterbag (amrex::Real &x,amrex::Real &y,amrex::Real &t,
+                       amrex::Real &px,amrex::Real &py,amrex::Real &pt);
+
         /** Run the main simulation loop for a number of steps
          *
          * @param num_steps number of steps to evolve
