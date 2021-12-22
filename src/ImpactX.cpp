@@ -11,9 +11,11 @@
 #include <AMReX.H>
 #include <AMReX_REAL.H>
 #include <AMReX_ParmParse.H>
+#include <AMReX_Utility.H>
 
 #include <string>
 #include <vector>
+#include <math.h>
 
 
 namespace impactx
@@ -226,5 +228,31 @@ namespace impactx
         amrex::Print() << "Initialized beam distribution parameters" << std::endl;
     }
 
+    //return 1 particle coordinates sampling from a 6D Waterbag distribution
+    //with mean = 0, std = 1.
+    void ImpactX::initWaterbag (amrex::Real &x,amrex::Real &y,amrx::Real &t,
+	               amrex::Real &px,amrex::Real &py,amrx::Real &pt)
+    {
+        amrex::Real r1=0.0, r2=0.0, r3=0.0;  
+        amrex::Real x1=0.0, x2=0.0, x3=0.0;  
+	amrex::RandomEngine engine;
+	
+        for(;;)
+        {
+          r1 = 2*amrex::Random(engine)-1.0; 
+          r2 = 2*amrex::Random(engine)-1.0; 
+          r3 = 2*amrex::Random(engine)-1.0; 
+          x1 = 2*amrex::Random(engine)-1.0; 
+          x2 = 2*amrex::Random(engine)-1.0; 
+          x3 = 2*amrex::Random(engine)-1.0; 
+          if(r1*r1+r2*r2+r3*r3+x1*x1+x2*x2+x3*x3<1.0) break;
+	}
+        x = sqrt(8.0)*r1;
+        y = sqrt(8.0)*r2;
+        t = sqrt(8.0)*r3;
+        px = sqrt(8.0)*x1;
+        py = sqrt(8.0)*x2;
+        pt = sqrt(8.0)*x3;
+    }
 
 } // namespace impactx
