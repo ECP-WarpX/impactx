@@ -65,13 +65,13 @@ namespace impactx
                ptdf = -sqrt(argd);
             } else {
                cout << "invalid ptd arg: " << argd << endl;
-               ptdf = -1.0;
+               ptdf = -1.0_prt;
             }
-            if (arg > 0.0) {
+            if (arg > 0.0_prt) {
                ptf = -sqrt(arg);
             } else {
                cout << "invalid pt arg: " << arg << endl;
-               ptf = -1.0;
+               ptf = -1.0_prt;
             }
 
            // transform position and momentum (z2t)
