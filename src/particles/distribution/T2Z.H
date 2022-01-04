@@ -43,6 +43,8 @@ namespace impactx
                 amrex::ParticleReal & py,
                 amrex::ParticleReal & pt) const {
 
+            using namespace amrex::literals;
+
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(0);
             amrex::ParticleReal const y = p.pos(1);
