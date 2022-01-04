@@ -61,7 +61,7 @@ namespace impactx
             arg = 1.0 + pow(pzd+pt,2) + pow(px,2) + pow(py,2);
 
             // check for validity of arguments
-            if (argd > 0.0) {
+            if (argd > 0.0_prt) {
                ptdf = -sqrt(argd);
             } else {
                cout << "invalid ptd arg: " << argd << endl;
