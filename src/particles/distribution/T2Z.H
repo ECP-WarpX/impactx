@@ -16,6 +16,8 @@
 
 namespace impactx
 {
+namespace distribution
+{
     struct T2Z
     {
         using PType = ImpactXParticleContainer::ParticleType;
