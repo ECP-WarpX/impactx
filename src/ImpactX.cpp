@@ -229,22 +229,24 @@ namespace impactx
 
     //return 1 particle coordinates sampling from a 6D Waterbag distribution
     //with mean = 0, std = 1.
-    void ImpactX::Waterbag (amrex::Real &x,amrex::Real &y,amrex::Real &t,
-                   amrex::Real &px,amrex::Real &py,amrex::Real &pt)
+    void ImpactX::Waterbag (amrex::ParticleReal &x,amrex::ParticleReal &y, amrex::ParticleReal &t,
+                            amrex::ParticleReal &px, amrex::ParticleReal &py, amrex::ParticleReal &pt)
     {
-        amrex::Real r1=0.0, r2=0.0, r3=0.0;
-        amrex::Real x1=0.0, x2=0.0, x3=0.0;
-    amrex::RandomEngine engine;
+        using namespace amrex::literals;
+
+        amrex::ParticleReal r1=0.0, r2=0.0, r3=0.0;
+        amrex::ParticleReal x1=0.0, x2=0.0, x3=0.0;
+        amrex::RandomEngine engine;
 
         for(;;)
         {
-          r1 = 2*amrex::Random(engine)-1.0;
-          r2 = 2*amrex::Random(engine)-1.0;
-          r3 = 2*amrex::Random(engine)-1.0;
-          x1 = 2*amrex::Random(engine)-1.0;
-          x2 = 2*amrex::Random(engine)-1.0;
-          x3 = 2*amrex::Random(engine)-1.0;
-          if(r1*r1+r2*r2+r3*r3+x1*x1+x2*x2+x3*x3<1.0) break;
+          r1 = 2_prt * amrex::Random(engine) - 1.0_prt;
+          r2 = 2_prt * amrex::Random(engine) - 1.0_prt;
+          r3 = 2_prt * amrex::Random(engine) - 1.0_prt;
+          x1 = 2_prt * amrex::Random(engine) - 1.0_prt;
+          x2 = 2_prt * amrex::Random(engine) - 1.0_prt;
+          x3 = 2_prt * amrex::Random(engine) - 1.0_prt;
+          if(r1*r1+r2*r2+r3*r3+x1*x1+x2*x2+x3*x3<1.0_prt) break;
     }
         x = sqrt(8.0)*r1;
         y = sqrt(8.0)*r2;
