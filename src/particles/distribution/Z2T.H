@@ -16,6 +16,8 @@
 
 namespace impactx
 {
+namespace distribution
+{
     struct Z2T
     {
         using PType = ImpactXParticleContainer::ParticleType;
@@ -87,6 +89,7 @@ namespace impactx
         amrex::ParticleReal m_ptd;
     };
 
+} // namespace distribution
 } // namespace impactx
 
 #endif // IMPACTX_Z2T_H
