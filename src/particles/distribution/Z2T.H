@@ -56,8 +56,8 @@ namespace impactx
             amrex::ParticleReal const argd;
 
             // arguments for pzd and pz
-            argd = -1.0 + pow(m_ptd,2);
-            arg = -1.0 + pow(m_ptd+pt,2) - pow(px,2) - pow(py,2);
+            argd = -1.0_prt + pow(m_ptd, 2);
+            arg = -1.0_prt + pow(m_ptd+pt, 2) - pow(px, 2) - pow(py, 2);
 
             // check for validity of arguments
             if (argd > 0.0) {
