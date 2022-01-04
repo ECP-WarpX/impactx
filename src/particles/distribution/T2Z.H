@@ -90,6 +90,7 @@ namespace distribution
         amrex::ParticleReal m_pzd;
     };
 
+} // namespace distribution
 } // namespace impactx
 
 #endif // IMPACTX_T2Z_H
