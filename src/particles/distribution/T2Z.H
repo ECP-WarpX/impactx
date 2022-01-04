@@ -24,7 +24,7 @@ namespace distribution
 
         /** A T-to-Z transformation
          *
-         * @param pzd: Design value of pz/mc = beta*gamma.
+         * @param pzd Design value of pz/mc = beta*gamma.
          */
         T2Z( amrex::ParticleReal const pzd )
         : m_pzd(pzd)
@@ -55,12 +55,10 @@ namespace distribution
             // intermediate values (universal for all elements - needs tracking for RF elements)
             amrex::ParticleReal const ptf;
             amrex::ParticleReal const ptdf;
-            amrex::ParticleReal const arg;
-            amrex::ParticleReal const argd;
 
             // arguments for ptd and pt
-            argd = 1.0_prt + pow(pzd, 2);
-            arg = 1.0_prt + pow(pzd+pt, 2) + pow(px, 2) + pow(py, 2);
+            amrex::ParticleReal const argd = 1.0_prt + pow(pzd, 2);
+            amrex::ParticleReal const arg = 1.0_prt + pow(pzd+pt, 2) + pow(px, 2) + pow(py, 2);
 
             // check for validity of arguments
             if (argd > 0.0_prt) {
