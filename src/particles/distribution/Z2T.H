@@ -60,17 +60,17 @@ namespace impactx
             arg = -1.0_prt + pow(m_ptd+pt, 2) - pow(px, 2) - pow(py, 2);
 
             // check for validity of arguments
-            if (argd > 0.0) {
+            if (argd > 0.0_prt) {
                pzd = sqrt(argd);
             } else {
                cout << "invalid pzd arg: " << argd << endl;
-               pzd = 0.0;
+               pzd = 0.0_prt;
             }
-            if (arg > 0.0) {
+            if (arg > 0.0_prt) {
                pz = sqrt(arg);
             } else {
                cout << "invalid pz arg: " << arg << endl;
-               pz = 0.0;
+               pz = 0.0_prt;
             }
 
            // transform position and momentum (z2t)
