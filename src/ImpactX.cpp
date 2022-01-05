@@ -139,8 +139,9 @@ namespace impactx
             // Note: The following operation assume that
             // the particles are in x, y, z coordinates.
             // Resize the mesh, based on `m_particle_container` extent
-            //   TODO: this is broken (fails in Debug mode)
-            //ResizeMesh();
+            if (m_particle_container.TotalNumberOfParticles(false,false) > 0) {
+                ResizeMesh();
+            }
 
             // Redistribute particles in the new mesh in x, y, z
             //m_particle_container->Redistribute();  // extra overload/arguments?
