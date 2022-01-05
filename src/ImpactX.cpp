@@ -112,7 +112,7 @@ namespace impactx
             {x_min-frac*(x_max-x_min), y_min-frac*(y_max-y_min), z_min-frac*(z_max-z_min)}, // Low bound
             {x_max+frac*(x_max-x_min), y_max+frac*(y_max-y_min), z_max+frac*(z_max-z_min)}); // High bound
         amrex::Geometry::ResetDefaultProbDomain(rb);
-        for (int lev = 0; lev <= max_level; ++lev) {
+        for (int lev = 0; lev <= this->max_level; ++lev) {
             amrex::Geometry g = Geom(lev);
             g.ProbDomain(rb);
             amrex::AmrMesh::SetGeometry(lev, g);
