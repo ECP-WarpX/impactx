@@ -4,8 +4,8 @@
  *
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_T2Z_H
-#define IMPACTX_T2Z_H
+#ifndef IMPACTX_Z2T_H
+#define IMPACTX_Z2T_H
 
 #include "particles/ImpactXParticleContainer.H"
 
@@ -18,18 +18,18 @@
 
 namespace impactx
 {
-namespace distribution
+namespace transformation
 {
-    struct T2Z
+    struct Z2T
     {
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** A T-to-Z transformation
+        /** A Z-to-T transformation
          *
-         * @param pzd Design value of pz/mc = beta*gamma.
+         * @param ptd Design value of pt/mc2 = -gamma.
          */
-        T2Z( amrex::ParticleReal const pzd )
-        : m_pzd(pzd)
+        Z2T( amrex::ParticleReal const ptd )
+        : m_ptd(ptd)
         {
         }
 
@@ -54,33 +54,32 @@ namespace distribution
             amrex::ParticleReal const y = p.pos(1);
             amrex::ParticleReal const t = p.pos(2);
 
-            // arguments for ptd and pt
-            amrex::ParticleReal const argd = 1.0_prt + pow(pzd, 2);
-            amrex::ParticleReal const arg = 1.0_prt + pow(pzd+pt, 2) + pow(px, 2) + pow(py, 2);
+            // arguments for pzd and pz
+            amrex::ParticleReal const argd = -1.0_prt + pow(m_ptd, 2);
+            amrex::ParticleReal const arg = -1.0_prt + pow(m_ptd+pt, 2) - pow(px, 2) - pow(py, 2);
 
             // check for validity of arguments
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(argd > 0.0_prt, "invalid ptd arg (<=0)");
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pt arg (<=0)");
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(argd > 0.0_prt, "invalid pzd arg (<=0)");
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pz arg (<=0)");
 
-            // transform position and momentum (t2z)
+            // transform position and momentum (z2t)
             //   (universal for all elements - needs tracking for RF elements)
-            amrex::ParticleReal const ptdf = argd > 0.0_prt ? -sqrt(argd) : -1.0_prt;
-            amrex::ParticleReal const ptf = arg > 0.0_prt ? -sqrt(arg) : -1.0_prt;
+            amrex::ParticleReal const pzd = argd > 0.0_prt ? sqrt(argd) : 0.0_prt;
+            amrex::ParticleReal const pz = arg > 0.0_prt ? sqrt(arg) : 0.0_prt;
 
-            p.pos(0) = x - px*t/(m_pzd+pt);
+            p.pos(0) = x + px*t/(m_ptd+pt);
             // px = px;
-            p.pos(1) = y - py*t/(m_pzd+pt);
+            p.pos(1) = y + py*t/(m_ptd+pt);
             // py = py;
-            p.pos(2) = ptf*t/(m_pzd+pt);  // This now represents t.
-            pt = ptf - ptd;               // This now represents pt.
-
+            p.pos(2) = pz*t/(m_ptd+pt);  // This now represents z.
+            pt = pz - pzd;                     // This now represents pz.
         }
 
     private:
-        amrex::ParticleReal m_pzd;
+        amrex::ParticleReal m_ptd;
     };
 
-} // namespace distribution
+} // namespace transformation
 } // namespace impactx
 
-#endif // IMPACTX_T2Z_H
+#endif // IMPACTX_Z2T_H
