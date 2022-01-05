@@ -7,6 +7,7 @@
 #include "ImpactX.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
+#include "particles/transformation/CoordinateTransformation.H"
 
 #include <AMReX.H>
 #include <AMReX_REAL.H>
@@ -128,15 +129,30 @@ namespace impactx
             BL_PROFILE("ImpactX::evolve::step");
             amrex::Print() << " ++++ Starting step=" << step << "\n";
 
+            // transform from x',y',t to x,y,z
+            //    TODO: replace hard-coded values with options/parameters
+            amrex::ParticleReal const pzd = 5.0;  // Design value of pz/mc = beta*gamma
+            transformation::CoordinateTransformation(*m_particle_container,
+                                                     transformation::Direction::T2Z,
+                                                     pzd);
+
             // Note: The following operation assume that
             // the particles are in x, y, z coordinates.
             // Resize the mesh, based on `m_particle_container` extent
             ResizeMesh();
+
             // Redistribute particles in the new mesh
             m_particle_container->Redistribute();
 
             // push all particles
             Push(*m_particle_container, m_lattice);
+
+            // transform from x,y,z to x',y',t
+            //    TODO: replace hard-coded values with options/parameters
+            amrex::ParticleReal const ptd = 5.0;  // Design value of pt/mc2 = -gamma.
+            transformation::CoordinateTransformation(*m_particle_container,
+                                                     transformation::Direction::Z2T,
+                                                     ptd);
 
             // do more stuff in the step
             //...
