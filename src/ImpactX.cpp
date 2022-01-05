@@ -141,11 +141,14 @@ namespace impactx
             // Resize the mesh, based on `m_particle_container` extent
             ResizeMesh();
 
-            // Redistribute particles in the new mesh
-            m_particle_container->Redistribute();
+            // Redistribute particles in the new mesh in x, y, z
+            //m_particle_container->Redistribute();  // extra overload/arguments?
 
-            // push all particles
-            Push(*m_particle_container, m_lattice);
+            // charge deposition on level 0
+            //m_particle_container->DepositCharge(*m_rho.at(0));
+
+            // poisson solve in x,y,z
+            //   TODO
 
             // transform from x,y,z to x',y',t
             //    TODO: replace hard-coded values with options/parameters
@@ -154,9 +157,15 @@ namespace impactx
                                                      transformation::Direction::Z2T,
                                                      ptd);
 
-            // do more stuff in the step
-            //...
+            // Redistribute particles in x',y',t
+            //   TODO
+            //m_particle_container->Redistribute();  // extra overload/arguments?
 
+            // push all particles with external maps
+            //   TODO: push also with space charge fields (incl. a gather)
+            Push(*m_particle_container, m_lattice);
+
+            // just prints an empty newline at the end of the step
             amrex::Print() << "\n";
 
         } // end step loop
