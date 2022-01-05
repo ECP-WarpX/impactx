@@ -139,7 +139,7 @@ namespace impactx
             // Note: The following operation assume that
             // the particles are in x, y, z coordinates.
             // Resize the mesh, based on `m_particle_container` extent
-            if (m_particle_container.TotalNumberOfParticles(false,false) > 0) {
+            if (m_particle_container->TotalNumberOfParticles(false,false) > 0) {
                 ResizeMesh();
             }
 
