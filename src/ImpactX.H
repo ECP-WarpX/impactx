@@ -97,6 +97,9 @@ namespace impactx
         /** these are the physical/beam particles of the simulation */
         std::unique_ptr<ImpactXParticleContainer> m_particle_container;
 
+        /** charge per level */
+        amrex::Vector< std::unique_ptr<amrex::MultiFab> > m_rho;
+
         /** these are elements defining the lattice */
         std::list<KnownElements> m_lattice;
     };

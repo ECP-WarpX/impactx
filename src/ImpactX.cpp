@@ -65,8 +65,26 @@ namespace impactx
     void ImpactX::MakeNewLevelFromScratch (int lev, amrex::Real time, const amrex::BoxArray& ba,
                                           const amrex::DistributionMapping& dm)
     {
-        // todo data_mf.define(ba, dm, 1, 0);
-        amrex::ignore_unused(lev, time, ba, dm);
+        // todo m_rho.define(ba, dm, 1, 0);
+        amrex::ignore_unused(time, ba, dm);
+
+        // set human-readable tag for each MultiFab
+        auto const tag = [lev]( std::string tagname ) {
+            tagname.append("[l=").append(std::to_string(lev)).append("]");
+            return amrex::MFInfo().SetTag(std::move(tagname));
+        };
+
+        // charge (rho) mesh
+        amrex::BoxArray cba = ba;
+        // for MR levels:
+        //cba.coarsen(refRatio(lev - 1));
+
+        auto const rho_nodal_flag = amrex::IntVect::TheNodeVector(); // TODO: clarify if nodal or cell-centered
+        int const ncomp = 1;
+        int const ngRho = 3; // TODO: hard-coded, needs to be resized depending on shape
+
+        m_rho.emplace_back(std::make_unique<amrex::MultiFab>(
+            amrex::convert(cba, rho_nodal_flag), dm, ncomp, ngRho, tag("rho")));
     }
 
     /** Make a new level using provided BoxArray and DistributionMapping and fill
@@ -99,8 +117,7 @@ namespace impactx
      */
     void ImpactX::ClearLevel (int lev)
     {
-        // todo
-        amrex::ignore_unused(lev);
+        m_rho[lev].reset();
     }
 
     void ImpactX::ResizeMesh () {
@@ -150,7 +167,7 @@ namespace impactx
                 //m_particle_container->Redistribute();  // extra overload/arguments?
 
                 // charge deposition on level 0
-                //m_particle_container->DepositCharge(*m_rho.at(0));
+                m_particle_container->DepositCharge(*m_rho.at(0));
 
                 // poisson solve in x,y,z
                 //   TODO

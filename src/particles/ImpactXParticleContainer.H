@@ -157,9 +157,13 @@ namespace impactx
         MeanAndStdPositions ();
 
 
-        /* ... */
+        /** Deposit the charge of the particles onto a grid
+         *
+         * @param rho charge grid to deposit on
+         * @param icomp component in rho to store into
+         */
         void
-        DepositCharge (ImpactXParticleContainer & pc, amrex::MultiFab* rho, int icomp);
+        DepositCharge (amrex::MultiFab & rho, int icomp = 0);
 
       private:
 

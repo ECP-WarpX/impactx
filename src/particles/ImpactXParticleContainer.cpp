@@ -139,76 +139,82 @@ namespace impactx
     }
 
     void
-    DepositCharge (ImpactXParticleContainer & pc, amrex::MultiFab* rho, int icomp) // ImpactXParticleContainer & pc)
+    ImpactXParticleContainer::DepositCharge (amrex::MultiFab & rho, int icomp)
     {
         // loop over refinement levels
-        int const nLevel = pc.maxLevel();
-        for (int lev = 0; lev < nLevel; ++lev) {
+        int const nLevel = this->maxLevel();
+        for (int lev = 0; lev <= nLevel; ++lev) {
+            // Reset the rho array if reset is True
+            rho.setVal(0., icomp, 1, rho.nGrowVect());
+
             // get simulation geometry information
             //const amrex::Geometry& gm = this->Geom(lev);
             //const auto prob_lo = gm.ProbLo();
 
-            amrex::FArrayBox local_rho_fab;
+            // Loop over particle tiles and deposit charge on each level
+#ifdef AMREX_USE_OMP
+#pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
+#endif
+            {
+                amrex::FArrayBox local_rho_fab;
 
-            // loop over all particle boxes
-            using ParIt = ImpactXParticleContainer::iterator;
-            for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
-                const int np = pti.numParticles();
-                //const auto t_lev = pti.GetLevel();
-                //const auto index = pti.GetPairIndex();
-                // ...
+                using ParIt = ImpactXParticleContainer::iterator;
+                for (ParIt pti(*this, lev); pti.isValid(); ++pti) {
+                    const int np = pti.numParticles();
+                    //const auto t_lev = pti.GetLevel();
+                    //const auto index = pti.GetPairIndex();
+                    // ...
 
-                // preparing access to particle data: SoA of Reals
-                auto &soa_real = pti.GetStructOfArrays().GetRealData();
-                //amrex::ParticleReal *const AMREX_RESTRICT wp = soa_real[RealSoA::w];
-                auto wp = soa_real[RealSoA::w];
-                int const * const AMREX_RESTRICT ion_lev = nullptr;
+                    // preparing access to particle data: SoA of Reals
+                    auto &soa_real = pti.GetStructOfArrays().GetRealData();
+                    //amrex::ParticleReal *const AMREX_RESTRICT wp = soa_real[RealSoA::w];
+                    auto wp = soa_real[RealSoA::w];
+                    int const * const AMREX_RESTRICT ion_lev = nullptr;
 
-                // DepositCharge(pti, wp, ion_lev, rho[lev].get(), icomp, 0, np, thread_num, lev, lev);
+                    auto const ref_ratio = amrex::IntVect(AMREX_D_DECL(1, 1, 1));
+                    amrex::Box const tilebox = pti.tilebox();
 
-                amrex::IntVect ref_ratio = amrex::IntVect(AMREX_D_DECL(1, 1, 1));
-                amrex::Box tilebox = pti.tilebox();
+                    // TODO: physical lower corner of the current box
+                    amrex::Geometry const &gm = this->Geom(lev);
+                    amrex::RealBox const grid_box{tilebox, gm.CellSize(), gm.ProbLo()};
+                    amrex::Real const * const xyzmin_ptr = grid_box.lo();
+                    std::array<amrex::Real, 3> const xyzmin = {xyzmin_ptr[0], xyzmin_ptr[1], xyzmin_ptr[2]};
 
-                // TODO: physical lower corner of the current box
-                amrex::Geometry const &gm = pc.Geom(lev);
-                amrex::RealBox const grid_box{tilebox, gm.CellSize(), gm.ProbLo()};
-                amrex::Real const * const xyzmin_ptr = grid_box.lo();
-                std::array<amrex::Real, 3> const xyzmin = {xyzmin_ptr[0], xyzmin_ptr[1], xyzmin_ptr[2]};
+                    // pointer to costs data
+                    //amrex::LayoutData<amrex::Real>* costs = WarpX::getCosts(lev);
+                    //amrex::Real* cost = costs ? &((*costs)[pti.index()]) : nullptr;
+                    amrex::Real * const cost = nullptr;
 
-                // pointer to costs data
-                //amrex::LayoutData<amrex::Real>* costs = WarpX::getCosts(lev);
-                //amrex::Real* cost = costs ? &((*costs)[pti.index()]) : nullptr;
-                amrex::Real *cost = nullptr;
+                    // used for MR when we want to deposit for a subset of the particles on the level in the
+                    // current box; with offset, we start at a later particle index
+                    long const offset = 0;
+                    long const np_to_depose = np;
+                    int const depos_lev = lev;
 
-                // used for MR when we want to deposit for a subset of the particles on the level in the
-                // current box; with offset, we start at a later particle index
-                const long offset = 0;
-                const long np_to_depose = np;
-                int depos_lev = lev;
+                    amrex::ParticleReal const charge = 1.0; // fixme
 
-                amrex::ParticleReal const charge = 1.0; // fixme
+                    auto const[nox, noy, noz] = std::array<int, 3>{2, 2, 2};
+                    auto const ng_rho = amrex::IntVect{nox + 1, noy + 1, noz + 1};
 
-                auto const[nox, noy, noz] = std::array<int, 3>{2, 2, 2};
-                auto const ng_rho = amrex::IntVect{nox + 1, noy + 1, noz + 1};
+                    std::array<amrex::Real, 3> const &dx = {gm.CellSize(0), gm.CellSize(1), gm.CellSize(2)};
 
-                const std::array<amrex::Real, 3> &dx = {1., 1., 1.};
+                    // number of components to deposit
+                    int const nc = 1;
 
-                // number of components to deposit
-                const int nc = 1;
+                    int const n_rz_azimuthal_modes = 0;
+                    long const load_balance_costs_update_algo = 0;
 
-                const int n_rz_azimuthal_modes = 0;
-                const long load_balance_costs_update_algo = 0;
+                    // call amrex::Gpu::synchronize() for tiny profiler regions
+                    bool const do_device_synchronize = true;
 
-                // call amrex::Gpu::synchronize() for tiny profiler regions
-                const bool do_device_synchronize = true;
-
-                ablastr::particles::deposit_charge<ImpactXParticleContainer>
-                        (pti, wp, ion_lev, rho, icomp, nc, offset, np_to_depose,
-                         local_rho_fab, lev, depos_lev, charge,
-                         nox, noy, noz, ng_rho, dx, xyzmin, ref_ratio,
-                         cost, n_rz_azimuthal_modes,
-                         load_balance_costs_update_algo,
-                         do_device_synchronize);
+                    ablastr::particles::deposit_charge<ImpactXParticleContainer>
+                            (pti, wp, ion_lev, &rho, icomp, nc, offset, np_to_depose,
+                             local_rho_fab, lev, depos_lev, charge,
+                             nox, noy, noz, ng_rho, dx, xyzmin, ref_ratio,
+                             cost, n_rz_azimuthal_modes,
+                             load_balance_costs_update_algo,
+                             do_device_synchronize);
+                }
             }
         }
     }
