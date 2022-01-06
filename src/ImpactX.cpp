@@ -136,20 +136,24 @@ namespace impactx
                                                      transformation::Direction::T2Z,
                                                      pzd);
 
-            // Note: The following operation assume that
-            // the particles are in x, y, z coordinates.
-            // Resize the mesh, based on `m_particle_container` extent
-            //   TODO: this is broken (fails in Debug mode)
-            //ResizeMesh();
+            // Space-charge calculation: turn off if there is only 1 particle
+            if (m_particle_container->TotalNumberOfParticles(false,false) > 1) {
 
-            // Redistribute particles in the new mesh in x, y, z
-            //m_particle_container->Redistribute();  // extra overload/arguments?
+                // Note: The following operation assume that
+                // the particles are in x, y, z coordinates.
 
-            // charge deposition on level 0
-            //m_particle_container->DepositCharge(*m_rho.at(0));
+                // Resize the mesh, based on `m_particle_container` extent
+                ResizeMesh();
 
-            // poisson solve in x,y,z
-            //   TODO
+                // Redistribute particles in the new mesh in x, y, z
+                //m_particle_container->Redistribute();  // extra overload/arguments?
+
+                // charge deposition on level 0
+                //m_particle_container->DepositCharge(*m_rho.at(0));
+
+                // poisson solve in x,y,z
+                //   TODO
+            }
 
             // transform from x,y,z to x',y',t
             //    TODO: replace hard-coded values with options/parameters
