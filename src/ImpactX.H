@@ -87,7 +87,11 @@ namespace impactx
         //! Delete level data
         void ClearLevel (int lev) override;
 
-        //! Resize the mesh, based on the extent of the bunch of particle
+        /** Resize the mesh, based on the extent of the bunch of particle
+         *
+         * This only changes thes physical extent of the mesh, but not the
+         * number of grid cells.
+         */
         void ResizeMesh ();
 
         /** these are the physical/beam particles of the simulation */

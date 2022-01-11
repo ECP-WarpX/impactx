@@ -22,6 +22,7 @@ jobs:
     - name: build ImpactX
       run: |
         cmake -S . -B build            \
+          -DCMAKE_BUILD_TYPE=Debug     \
           -DCMAKE_VERBOSE_MAKEFILE=ON
         cmake --build build -j 2
 
