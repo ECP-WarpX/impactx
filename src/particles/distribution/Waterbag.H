@@ -26,7 +26,7 @@ namespace distribution
          */
         Waterbag() = default;
 
-//	Waterbag( amrex::ParticleReal const sigx, amrex::ParticleReal const sigpx )
+//    Waterbag( amrex::ParticleReal const sigx, amrex::ParticleReal const sigpx )
 //        : m_sigx(sigx), m_sigpx(sigpx)
 //        {
 //        }
@@ -58,37 +58,37 @@ namespace distribution
             amrex::ParticleReal pi,ln1,norm,u1,u2;
             amrex::ParticleReal g1,g2,g3,g4,g5,g6;
 
-	    pi = 3.14159265358979_prt
-            u1 = amrex::Random(engine); 
+        pi = 3.14159265358979_prt
+            u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-	    ln1 = sqrt(-2_prt*log(u1));
-	    g1 = ln1*cos(2_prt*pi*u2);
-	    g2 = ln1*sin(2_prt*pi*u2);
-            u1 = amrex::Random(engine); 
+        ln1 = sqrt(-2_prt*log(u1));
+        g1 = ln1*cos(2_prt*pi*u2);
+        g2 = ln1*sin(2_prt*pi*u2);
+            u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-	    ln1 = sqrt(-2_prt*log(u1));
-	    g3 = ln1*cos(2_prt*pi*u2);
-	    g4 = ln1*sin(2_prt*pi*u2);
-            u1 = amrex::Random(engine); 
+        ln1 = sqrt(-2_prt*log(u1));
+        g3 = ln1*cos(2_prt*pi*u2);
+        g4 = ln1*sin(2_prt*pi*u2);
+            u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-	    ln1 = sqrt(-2_prt*log(u1));
-	    g5 = ln1*cos(2_prt*pi*u2);
-	    g6 = ln1*sin(2_prt*pi*u2);
-	    norm = sqrt(g1*g1+g2*g2+g3*g3+g4*g4+g5*g5+g6*g6);
-	    g1 /= norm;
-	    g2 /= norm;
-	    g3 /= norm;
-	    g4 /= norm;
-	    g5 /= norm;
-	    g6 /= norm;
+        ln1 = sqrt(-2_prt*log(u1));
+        g5 = ln1*cos(2_prt*pi*u2);
+        g6 = ln1*sin(2_prt*pi*u2);
+        norm = sqrt(g1*g1+g2*g2+g3*g3+g4*g4+g5*g5+g6*g6);
+        g1 /= norm;
+        g2 /= norm;
+        g3 /= norm;
+        g4 /= norm;
+        g5 /= norm;
+        g6 /= norm;
             u1 = sqrt(8_prt)*amrex::Random(engine);
             u2 = pow(u1,1_prt/6_prt);
-	    x = g1*u2;
-	    y = g2*u2;
-	    t = g3*u2;
-	    px = g4*u2;
-	    py = g5*u2;
-	    pt = g6*u2;
+        x = g1*u2;
+        y = g2*u2;
+        t = g3*u2;
+        px = g4*u2;
+        py = g5*u2;
+        pt = g6*u2;
         }
     };
 
