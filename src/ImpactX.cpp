@@ -104,7 +104,7 @@ namespace impactx
 
     void ImpactX::ResizeMesh () {
         // Extract the min and max of the particle positions
-        auto const [x_min, x_max, y_min, y_max, z_min, z_max] = m_particle_container->MinAndMaxPositions();
+        auto const [x_min, y_min, z_min, x_max, y_max, z_max] = m_particle_container->MinAndMaxPositions();
         // Resize the domain size
         // The box is expanded slightly beyond the min and max of particles.
         // This controlled by the variable `frac` below.
