@@ -153,6 +153,10 @@ namespace impactx
 
                 // poisson solve in x,y,z
                 //   TODO
+
+                // gather and space-charge push in x,y,z , assuming the space-charge
+                // field is the same before/after transformation
+                //   TODO
             }
 
             // transform from x,y,z to x',y',t
@@ -162,12 +166,17 @@ namespace impactx
                                                      transformation::Direction::Z2T,
                                                      ptd);
 
+            // for later: original Impact implementation as an option
             // Redistribute particles in x',y',t
-            //   TODO
-            //m_particle_container->Redistribute();  // extra overload/arguments?
+            //   TODO: only needed if we want to gather and push space charge
+            //         in x',y',t
+            //   TODO: change geometry beforehand according to transformation
+            //m_particle_container->Redistribute();
+            //
+            // in original Impact, we gather and space-charge push in x',y',t ,
+            // assuming that the distribution did not change
 
             // push all particles with external maps
-            //   TODO: push also with space charge fields (incl. a gather)
             Push(*m_particle_container, m_lattice);
 
             // just prints an empty newline at the end of the step
