@@ -8,6 +8,7 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
 #include "particles/transformation/CoordinateTransformation.H"
+#include "particles/distribution/Waterbag.H"
 
 #include <AMReX.H>
 #include <AMReX_REAL.H>
@@ -15,7 +16,6 @@
 
 #include <string>
 #include <vector>
-
 
 namespace impactx
 {
@@ -238,6 +238,51 @@ namespace impactx
 
         std::string distribution_type;  // Beam distribution type
         pp_dist.get("distribution", distribution_type);
+
+        if(distribution_type == "waterbag"){
+          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
+          amrex::ParticleReal muxpx,muypy,mutpt;
+          pp_dist.get("sigmaX", sigx);
+          pp_dist.get("sigmaY", sigy);
+          pp_dist.get("sigmaT", sigt);
+          pp_dist.get("sigmaPx", sigpx);
+          pp_dist.get("sigmaPy", sigpy);
+          pp_dist.get("sigmaPt", sigpt);
+          pp_dist.get("muxpx", muxpx);
+          pp_dist.get("muypy", muypy);
+          pp_dist.get("mutpt", mutpt);
+
+          impactx::distribution::Waterbag waterbag(sigx,sigy,sigt,sigpx,sigpy,sigpt,muxpx,muypy,mutpt);
+
+          amrex::Vector<amrex::ParticleReal> x, y, t;
+          amrex::Vector<amrex::ParticleReal> px, py, pt;
+          amrex::RandomEngine rng;
+
+          if (amrex::ParallelDescriptor::IOProcessor()) {
+              x.reserve(npart);
+              y.reserve(npart);
+              t.reserve(npart);
+              px.reserve(npart);
+              py.reserve(npart);
+              pt.reserve(npart);
+
+              for(amrex::Long i = 0; i < npart; ++i) {
+                  amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
+                  waterbag(ix, iy, it, ipx, ipy, ipt, rng);
+                  x.push_back(ix);
+                  y.push_back(iy);
+                  t.push_back(it);
+                  px.push_back(ipx);
+                  py.push_back(ipy);
+                  pt.push_back(ipt);
+              }
+          }
+
+          int const lev = 0;
+          //m_particle_container->AddNParticles(lev, x, y, t, px, py, pt);
+          m_particle_container->AddNParticles(lev, x, y, t);
+
+        }
 
         amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;
         amrex::Print() << "Bunch charge (C): " << bunch_charge << std::endl;
