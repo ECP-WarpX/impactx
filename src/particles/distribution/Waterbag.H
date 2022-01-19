@@ -89,7 +89,7 @@ namespace distribution
             g5 /= norm;
             g6 /= norm;
             u1 = amrex::Random(engine);
-            u2 = sqrt(8_prt)*pow(u1,1_prt/6_prt);
+            u2 = sqrt(8_prt)*pow(u1,1_prt/6);
             x = g1*u2;
             y = g2*u2;
             t = g3*u2;

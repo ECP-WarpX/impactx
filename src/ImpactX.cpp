@@ -252,11 +252,13 @@ namespace impactx
           pp_dist.get("muypy", muypy);
           pp_dist.get("mutpt", mutpt);
 
-          impactx::distribution::Waterbag waterbag(sigx,sigy,sigt,sigpx,sigpy,sigpt,muxpx,muypy,mutpt);
+          impactx::distribution::Waterbag waterbag(sigx,sigy,sigt,sigpx,
+                                 sigpy,sigpt,muxpx,muypy,mutpt);
 
           amrex::Vector<amrex::ParticleReal> x, y, t;
           amrex::Vector<amrex::ParticleReal> px, py, pt;
           amrex::RandomEngine rng;
+          amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
 
           if (amrex::ParallelDescriptor::IOProcessor()) {
               x.reserve(npart);
@@ -267,7 +269,7 @@ namespace impactx
               pt.reserve(npart);
 
               for(amrex::Long i = 0; i < npart; ++i) {
-                  amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
+
                   waterbag(ix, iy, it, ipx, ipy, ipt, rng);
                   x.push_back(ix);
                   y.push_back(iy);
