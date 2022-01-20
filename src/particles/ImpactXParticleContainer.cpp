@@ -72,9 +72,9 @@ namespace impactx
         pinned_tile.push_back_real(RealSoA::ux, np, 0.0);
         pinned_tile.push_back_real(RealSoA::uy, np, 0.0);
         pinned_tile.push_back_real(RealSoA::pt, np, 0.0);
-	pinned_tile.push_back_real(RealSoA::ux, px.cbegin(), px.cend());
-	pinned_tile.push_back_real(RealSoA::uy, py.cbegin(), py.cend());
-	pinned_tile.push_back_real(RealSoA::pt, pz.cbegin(), pz.cend());
+    pinned_tile.push_back_real(RealSoA::ux, px.cbegin(), px.cend());
+    pinned_tile.push_back_real(RealSoA::uy, py.cbegin(), py.cend());
+    pinned_tile.push_back_real(RealSoA::pt, pz.cbegin(), pz.cend());
 
         //the following should be updated
         pinned_tile.push_back_real(RealSoA::t, np, 0.0);
