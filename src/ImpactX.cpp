@@ -41,7 +41,14 @@ namespace impactx
         AmrCore::InitFromScratch(0.0);
         amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;;
 
-        m_particle_container->AddNParticles(0, {0.0}, {0.2}, {0.4});
+        m_particle_container->AddNParticles(0, { 0.2}, { 0.2}, { 0.0});
+        m_particle_container->AddNParticles(0, {-0.2}, { 0.2}, { 0.0});
+        m_particle_container->AddNParticles(0, { 0.2}, {-0.2}, { 0.0});
+        m_particle_container->AddNParticles(0, {-0.2}, {-0.2}, { 0.0});
+        m_particle_container->AddNParticles(0, { 0.2}, { 0.2}, { 0.4});
+        m_particle_container->AddNParticles(0, {-0.2}, { 0.2}, { 0.4});
+        m_particle_container->AddNParticles(0, { 0.2}, {-0.2}, { 0.4});
+        m_particle_container->AddNParticles(0, {-0.2}, {-0.2}, { 0.4});
         amrex::Print() << "# of particles: " << m_particle_container->TotalNumberOfParticles() << std::endl;
     }
 
@@ -104,7 +111,7 @@ namespace impactx
 
     void ImpactX::ResizeMesh () {
         // Extract the min and max of the particle positions
-        auto const [x_min, x_max, y_min, y_max, z_min, z_max] = m_particle_container->MinAndMaxPositions();
+        auto const [x_min, y_min, z_min, x_max, y_max, z_max] = m_particle_container->MinAndMaxPositions();
         // Resize the domain size
         // The box is expanded slightly beyond the min and max of particles.
         // This controlled by the variable `frac` below.
@@ -153,6 +160,10 @@ namespace impactx
 
                 // poisson solve in x,y,z
                 //   TODO
+
+                // gather and space-charge push in x,y,z , assuming the space-charge
+                // field is the same before/after transformation
+                //   TODO
             }
 
             // transform from x,y,z to x',y',t
@@ -162,12 +173,17 @@ namespace impactx
                                                      transformation::Direction::Z2T,
                                                      ptd);
 
+            // for later: original Impact implementation as an option
             // Redistribute particles in x',y',t
-            //   TODO
-            //m_particle_container->Redistribute();  // extra overload/arguments?
+            //   TODO: only needed if we want to gather and push space charge
+            //         in x',y',t
+            //   TODO: change geometry beforehand according to transformation
+            //m_particle_container->Redistribute();
+            //
+            // in original Impact, we gather and space-charge push in x',y',t ,
+            // assuming that the distribution did not change
 
             // push all particles with external maps
-            //   TODO: push also with space charge fields (incl. a gather)
             Push(*m_particle_container, m_lattice);
 
             // just prints an empty newline at the end of the step
