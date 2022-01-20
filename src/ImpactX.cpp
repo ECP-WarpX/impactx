@@ -281,8 +281,7 @@ namespace impactx
           }
 
           int const lev = 0;
-          //m_particle_container->AddNParticles(lev, x, y, t, px, py, pt);
-          m_particle_container->AddNParticles(lev, x, y, t);
+          m_particle_container->AddNParticles(lev, x, y, t, px, py, pt);
 
         }
 
