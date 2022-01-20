@@ -39,16 +39,16 @@ namespace impactx
     void ImpactX::initData ()
     {
         AmrCore::InitFromScratch(0.0);
-        amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;;
+        amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
 
-        m_particle_container->AddNParticles(0, { 0.2}, { 0.2}, { 0.0});
-        m_particle_container->AddNParticles(0, {-0.2}, { 0.2}, { 0.0});
-        m_particle_container->AddNParticles(0, { 0.2}, {-0.2}, { 0.0});
-        m_particle_container->AddNParticles(0, {-0.2}, {-0.2}, { 0.0});
-        m_particle_container->AddNParticles(0, { 0.2}, { 0.2}, { 0.4});
-        m_particle_container->AddNParticles(0, {-0.2}, { 0.2}, { 0.4});
-        m_particle_container->AddNParticles(0, { 0.2}, {-0.2}, { 0.4});
-        m_particle_container->AddNParticles(0, {-0.2}, {-0.2}, { 0.4});
+        m_particle_container->AddNParticles(0, { 0.2}, { 0.2}, { 0.0}, {0.0}, {0.0}, {0.0});
+        m_particle_container->AddNParticles(0, {-0.2}, { 0.2}, { 0.0}, { 0.0}, {0.0}, {0.0});
+        m_particle_container->AddNParticles(0, { 0.2}, {-0.2}, { 0.0}, { 0.0}, {0.0}, {0.0});
+        m_particle_container->AddNParticles(0, {-0.2}, {-0.2}, { 0.0}, { 0.0}, {0.0}, {0.0});
+        m_particle_container->AddNParticles(0, { 0.2}, { 0.2}, { 0.4}, { 0.0}, {0.0}, {0.0});
+        m_particle_container->AddNParticles(0, {-0.2}, { 0.2}, { 0.4}, { 0.0}, {0.0}, {0.0});
+        m_particle_container->AddNParticles(0, { 0.2}, {-0.2}, { 0.4}, { 0.0}, {0.0}, {0.0});
+        m_particle_container->AddNParticles(0, {-0.2}, {-0.2}, { 0.4}, { 0.0}, {0.0}, {0.0});
         amrex::Print() << "# of particles: " << m_particle_container->TotalNumberOfParticles() << std::endl;
     }
 
