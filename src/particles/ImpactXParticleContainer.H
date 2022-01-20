@@ -78,6 +78,9 @@ namespace impactx
          * @param x positions in x
          * @param y positions in y
          * @param z positions in z
+         * @param px momentum in x
+         * @param py momentum in y
+         * @param pz momentum in z
          */
         void
         AddNParticles (int lev,
