@@ -22,18 +22,18 @@ namespace distribution
         /** A Waterbag distribution
          *
          * Return sampling from a 6D Waterbag distribution.
-    	 *
-    	 * @param m_sigmaX,m_sigmaY,m_sigmaT for zero correlation, these are the related
-	     *                                   RMS sizes (length); ...
+         *
+         * @param m_sigmaX,m_sigmaY,m_sigmaT for zero correlation, these are the related
+         *                                   RMS sizes (length); ...
          * @param m_sigmaPx,m_sigmaPy,m_sigmaPz RMS momentum
-    	 * @param m_muxpx,m_muypy,m_mutpt correlation length-momentum
+         * @param m_muxpx,m_muypy,m_mutpt correlation length-momentum
          */
          Waterbag(amrex::ParticleReal const sigx, amrex::ParticleReal const sigy,
-	     amrex::ParticleReal const sigt,amrex::ParticleReal const sigpx,
-	     amrex::ParticleReal const sigpy,amrex::ParticleReal const sigpt,
-	     amrex::ParticleReal const muxpx=0.0, amrex::ParticleReal const muypy=0.0,
-	     amrex::ParticleReal const mutpt=0.0
-	     )
+         amrex::ParticleReal const sigt,amrex::ParticleReal const sigpx,
+         amrex::ParticleReal const sigpy,amrex::ParticleReal const sigpt,
+         amrex::ParticleReal const muxpx=0.0, amrex::ParticleReal const muypy=0.0,
+         amrex::ParticleReal const mutpt=0.0
+         )
           : m_sigmaX(sigx),m_sigmaY(sigy),m_sigmaT(sigt),m_sigmaPx(sigpx),m_sigmaPy(sigpy),
             m_sigmaPt(sigpt),m_muxpx(muxpx),m_muypy(muypy),m_mutpt(mutpt)
           {
