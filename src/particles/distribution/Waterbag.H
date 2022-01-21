@@ -114,8 +114,8 @@ namespace distribution
             pt = a2;
         }
     private:
-        amrex::ParticleReal m_sigmaX,m_sigmaY,m_sigmaT; //related RMS sizes (length)
-        amrex::ParticleReal m_sigmaPx,m_sigmaPy,m_sigmaPt; //RMS momentum
+        amrex::ParticleReal m_sigmaX,m_sigmaY,m_sigmaT; //! related RMS sizes (length)
+        amrex::ParticleReal m_sigmaPx,m_sigmaPy,m_sigmaPt; //! RMS momentum
         amrex::ParticleReal m_muxpx,m_muypy,m_mutpt; //! correlation length-momentum
     };
 
