@@ -23,10 +23,10 @@ namespace distribution
          *
          * Return sampling from a 6D Waterbag distribution.
          *
-         * @param m_sigmaX,m_sigmaY,m_sigmaT for zero correlation, these are the related
+         * @param sigx,sigy,sigt for zero correlation, these are the related
          *                                   RMS sizes (length); ...
-         * @param m_sigmaPx,m_sigmaPy,m_sigmaPz RMS momentum
-         * @param m_muxpx,m_muypy,m_mutpt correlation length-momentum
+         * @param sigpx,sigpy,sigpt RMS momentum
+         * @param muxpx,muypy,mutpt correlation length-momentum
          */
          Waterbag(amrex::ParticleReal const sigx, amrex::ParticleReal const sigy,
          amrex::ParticleReal const sigt,amrex::ParticleReal const sigpx,
