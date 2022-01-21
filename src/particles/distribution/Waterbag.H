@@ -61,11 +61,11 @@ namespace distribution
 
             using namespace amrex::literals;
 
-            amrex::ParticleReal pi,ln1,norm,u1,u2;
+            amrex::ParticleReal ln1,norm,u1,u2;
             amrex::ParticleReal g1,g2,g3,g4,g5,g6;
             amrex::ParticleReal root,a1,a2;
 
-            pi = 3.14159265358979_prt;
+            constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
             ln1 = sqrt(-2_prt*log(u1));
