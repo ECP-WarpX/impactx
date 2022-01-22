@@ -80,7 +80,7 @@ Initial Beam Distributions
 
             * ``<distribution>.sigx`` (`float`, in meters) rms X
             * ``<distribution>.sigy`` (`float`, in meters) rms Y
-            * ``<distribution>.sigt`` (`float`, in radian) rms time difference T
+            * ``<distribution>.sigt`` (`float`, in radian) rms normalized time difference T
             * ``<distribution>.sigpx`` (`float`, in momentum) rms Px
             * ``<distribution>.sigpy`` (`float`, in momentum) rms Py
             * ``<distribution>.sigpt`` (`float`, in energy deviation) rms Pt
