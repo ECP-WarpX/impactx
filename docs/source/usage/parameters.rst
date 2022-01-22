@@ -11,10 +11,10 @@ Input Parameters
 Overall simulation parameters
 -----------------------------
 
-* ``max_step`` (`integer`)
+* ``max_step`` (``integer``)
     The number of PIC cycles to perform.
 
-* ``stop_time`` (`float`; in seconds)
+* ``stop_time`` (``float``; in seconds)
     The maximum physical time of the simulation. Can be provided instead of ``max_step``. If both
     ``max_step`` and ``stop_time`` are provided, both criteria are used and the simulation stops
     when the first criterion is hit.
@@ -31,10 +31,10 @@ Overall simulation parameters
 Setting up the field mesh
 -------------------------
 
-* ``amr.n_cell`` (`2 integers in 2D`, `3 integers in 3D`)
+* ``amr.n_cell`` (2 integers in 2D, 3 integers in 3D)
     The number of grid points along each direction (on the **coarsest level**)
 
-* ``amr.max_level`` (`integer`, default: ``0``)
+* ``amr.max_level`` (``integer``, default: ``0``)
     When using mesh refinement, the number of refinement levels that will be used.
 
     Use 0 in order to disable mesh refinement.
@@ -46,17 +46,17 @@ Setting up the field mesh
 
     Note: in development; currently, ``2`` is supported.
 
-* ``amr.ref_ratio_vect`` (`3 integers for x,y,z per refined level`)
+* ``amr.ref_ratio_vect`` (3 integers for x,y,z per refined level)
     When using mesh refinement, this can be used to set the refinement ratio per direction and level, relative to the previous level.
 
     Example: for three levels, a value of ``2 2 4 8 8 16`` refines the first level by 2-fold in x and y and 4-fold in z compared to the coarsest level (level 0/mother grid); compared to the first level, the second level is refined 8-fold in x and y and 16-fold in z.
 
     Note: in development; currently allowed value: ``2 2 2``.
 
-* ``geometry.coord_sys`` (`integer`) optional (default `0`)
+* ``geometry.coord_sys`` (``integer``) optional (default ``0``)
     Coordinate system used by the simulation. 0 for Cartesian, 1 for cylindrical.
 
-* ``geometry.prob_lo`` and ``geometry.prob_hi`` (`2 floats in 2D`, `3 floats in 3D`; in meters)
+* ``geometry.prob_lo`` and ``geometry.prob_hi`` (2 floats in 2D, 3 floats in 3D; in meters)
     The extent of the full simulation box. This box is rectangular, and thus its
     extent is given here by the coordinates of the lower corner (``geometry.prob_lo``) and
     upper corner (``geometry.prob_hi``). The first axis of the coordinates is x
@@ -98,35 +98,35 @@ Initial Beam Distributions
 Lattice Elements
 ----------------
 
-* ``lattice.elements`` (`list of strings`) optional (default: no elements)
+* ``lattice.elements`` (``list of strings``) optional (default: no elements)
     A list of names (one name per lattice element), in the order that they
     appear in the lattice.
 
-* ``<element_name>.type`` (`string`)
+* ``<element_name>.type`` (``string``)
     Indicates the element type for this lattice element. This should be one of:
 
         * ``drift`` for free drift. This requires this additional parameter:
 
-            * ``<element_name>.ds`` (`float`, in meters) the segment length
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
 
         * ``quad`` for a quadrupole. This requires these additional parameters:
 
-            * ``<element_name>.ds`` (`float`, in meters) the segment length
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
 
-            * ``<element_name>.k`` (`float`, in inverse meters) the quadrupole strength
+            * ``<element_name>.k`` (``float``, in inverse meters) the quadrupole strength
 
         * ``sbend`` for a bending magnet. This requires these additional parameters:
 
-            * ``<element_name>.ds`` (`float`, in meters) the segment length
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
 
-            * ``<element_name>.rc`` (`float`, in meters) the bend radius
+            * ``<element_name>.rc`` (``float``, in meters) the bend radius
 
 .. _running-cpp-parameters-parallelization:
 
 Distribution across MPI ranks and parallelization
 -------------------------------------------------
 
-* ``amr.max_grid_size`` (`integer`) optional (default `128`)
+* ``amr.max_grid_size`` (``integer``) optional (default ``128`)
     Maximum allowable size of each **subdomain**
     (expressed in number of grid points, in each direction).
     Each subdomain has its own ghost cells, and can be handled by a
@@ -195,7 +195,8 @@ For example:
 Coordinates
 ^^^^^^^^^^^
 
-Besides, for profiles that depend on spatial coordinates (the plasma momentum distribution or the laser field, see below `Particle initialization` and `Laser initialization`), the parser will interpret some variables as spatial coordinates. These are specified in the input parameter, i.e., ``density_function(x,y,z)`` and ``field_function(X,Y,t)``.
+Besides, for profiles that depend on spatial coordinates (the plasma momentum distribution or the laser field, see below ``Particle initialization`` and ``Laser initialization``), the parser will interpret some variables as spatial coordinates.
+These are specified in the input parameter, i.e., ``density_function(x,y,z)`` and ``field_function(X,Y,t)``.
 
 The parser reads python-style expressions between double quotes, for instance
 ``"a0*x**2 * (1-y*1.e2) * (x>0)"`` is a valid expression where ``a0`` is a
