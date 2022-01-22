@@ -72,21 +72,28 @@ Domain Boundary Conditions
 
    TODO :-)
 
+
+.. _running-cpp-parameters-particle:
+
 Initial Beam Distributions
-----------------
-* ``<distribution>.type`` (`string`)
+--------------------------
+
+* ``<distribution>.type`` (``string``)
     Indicates the initial distribution type. This should be one of:
         * ``waterbag`` for initial Waterbag distribution. It requires additional parameter:
 
-            * ``<distribution>.sigx`` (`float`, in meters) rms X
-            * ``<distribution>.sigy`` (`float`, in meters) rms Y
-            * ``<distribution>.sigt`` (`float`, in radian) rms normalized time difference T
-            * ``<distribution>.sigpx`` (`float`, in momentum) rms Px
-            * ``<distribution>.sigpy`` (`float`, in momentum) rms Py
-            * ``<distribution>.sigpt`` (`float`, in energy deviation) rms Pt
-            * ``<distribution>.muxpx`` (`float`, dimensionless) correlation X-Px
-            * ``<distribution>.muypy`` (`float`, dimensionless) correlation Y-Py
-            * ``<distribution>.mutpt`` (`float`, dimensionless) correlation T-Pt
+            * ``<distribution>.sigx`` (``float``, in meters) rms X
+            * ``<distribution>.sigy`` (``float``, in meters) rms Y
+            * ``<distribution>.sigt`` (``float``, in radian) rms normalized time difference T
+            * ``<distribution>.sigpx`` (``float``, in momentum) rms Px
+            * ``<distribution>.sigpy`` (``float``, in momentum) rms Py
+            * ``<distribution>.sigpt`` (``float``, in energy deviation) rms Pt
+            * ``<distribution>.muxpx`` (``float``, dimensionless) correlation X-Px
+            * ``<distribution>.muypy`` (``float``, dimensionless) correlation Y-Py
+            * ``<distribution>.mutpt`` (``float``, dimensionless) correlation T-Pt
+
+
+.. _running-cpp-parameters-lattice:
 
 Lattice Elements
 ----------------
@@ -196,15 +203,6 @@ user-defined constant (see above) and ``x`` and ``y`` are spatial coordinates. T
 ``(x>0)`` is ``1`` where ``x>0`` and ``0`` where ``x<=0``. It allows the user to
 define functions by intervals.
 Alternatively the expression above can be written as ``if(x>0, a0*x**2 * (1-y*1.e2), 0)``.
-
-.. _running-cpp-parameters-particle:
-
-Particle initialization
------------------------
-
-.. note::
-
-   TODO :-)
 
 
 .. _running-cpp-parameters-numerics:
