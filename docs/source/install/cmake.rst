@@ -156,6 +156,6 @@ Additionally, a `symbolic link <https://en.wikipedia.org/wiki/Symbolic_link>`_ n
 Python Bindings
 ---------------
 
-.. todo:
+.. note::
 
-   Coming soon :-)
+   TODO: Coming soon :-)

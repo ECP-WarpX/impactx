@@ -7,6 +7,8 @@
 #include "ImpactX.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
+#include "particles/transformation/CoordinateTransformation.H"
+#include "particles/distribution/Waterbag.H"
 
 #include <AMReX.H>
 #include <AMReX_REAL.H>
@@ -14,7 +16,6 @@
 
 #include <string>
 #include <vector>
-
 
 namespace impactx
 {
@@ -38,9 +39,9 @@ namespace impactx
     void ImpactX::initData ()
     {
         AmrCore::InitFromScratch(0.0);
-        amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;;
+        amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
 
-        m_particle_container->AddNParticles(0, {0.0}, {0.2}, {0.4});
+        this->initDist();
         amrex::Print() << "# of particles: " << m_particle_container->TotalNumberOfParticles() << std::endl;
     }
 
@@ -103,7 +104,7 @@ namespace impactx
 
     void ImpactX::ResizeMesh () {
         // Extract the min and max of the particle positions
-        auto const [x_min, x_max, y_min, y_max, z_min, z_max] = m_particle_container->MinAndMaxPositions();
+        auto const [x_min, y_min, z_min, x_max, y_max, z_max] = m_particle_container->MinAndMaxPositions();
         // Resize the domain size
         // The box is expanded slightly beyond the min and max of particles.
         // This controlled by the variable `frac` below.
@@ -112,7 +113,7 @@ namespace impactx
             {x_min-frac*(x_max-x_min), y_min-frac*(y_max-y_min), z_min-frac*(z_max-z_min)}, // Low bound
             {x_max+frac*(x_max-x_min), y_max+frac*(y_max-y_min), z_max+frac*(z_max-z_min)}); // High bound
         amrex::Geometry::ResetDefaultProbDomain(rb);
-        for (int lev = 0; lev <= max_level; ++lev) {
+        for (int lev = 0; lev <= this->max_level; ++lev) {
             amrex::Geometry g = Geom(lev);
             g.ProbDomain(rb);
             amrex::AmrMesh::SetGeometry(lev, g);
@@ -128,19 +129,57 @@ namespace impactx
             BL_PROFILE("ImpactX::evolve::step");
             amrex::Print() << " ++++ Starting step=" << step << "\n";
 
-            // Note: The following operation assume that
-            // the particles are in x, y, z coordinates.
-            // Resize the mesh, based on `m_particle_container` extent
-            ResizeMesh();
-            // Redistribute particles in the new mesh
-            m_particle_container->Redistribute();
+            // transform from x',y',t to x,y,z
+            //    TODO: replace hard-coded values with options/parameters
+            amrex::ParticleReal const pzd = 5.0;  // Design value of pz/mc = beta*gamma
+            transformation::CoordinateTransformation(*m_particle_container,
+                                                     transformation::Direction::T2Z,
+                                                     pzd);
 
-            // push all particles
+            // Space-charge calculation: turn off if there is only 1 particle
+            if (m_particle_container->TotalNumberOfParticles(false,false) > 1) {
+
+                // Note: The following operation assume that
+                // the particles are in x, y, z coordinates.
+
+                // Resize the mesh, based on `m_particle_container` extent
+                ResizeMesh();
+
+                // Redistribute particles in the new mesh in x, y, z
+                //m_particle_container->Redistribute();  // extra overload/arguments?
+
+                // charge deposition on level 0
+                //m_particle_container->DepositCharge(*m_rho.at(0));
+
+                // poisson solve in x,y,z
+                //   TODO
+
+                // gather and space-charge push in x,y,z , assuming the space-charge
+                // field is the same before/after transformation
+                //   TODO
+            }
+
+            // transform from x,y,z to x',y',t
+            //    TODO: replace hard-coded values with options/parameters
+            amrex::ParticleReal const ptd = 5.0;  // Design value of pt/mc2 = -gamma.
+            transformation::CoordinateTransformation(*m_particle_container,
+                                                     transformation::Direction::Z2T,
+                                                     ptd);
+
+            // for later: original Impact implementation as an option
+            // Redistribute particles in x',y',t
+            //   TODO: only needed if we want to gather and push space charge
+            //         in x',y',t
+            //   TODO: change geometry beforehand according to transformation
+            //m_particle_container->Redistribute();
+            //
+            // in original Impact, we gather and space-charge push in x',y',t ,
+            // assuming that the distribution did not change
+
+            // push all particles with external maps
             Push(*m_particle_container, m_lattice);
 
-            // do more stuff in the step
-            //...
-
+            // just prints an empty newline at the end of the step
             amrex::Print() << "\n";
 
         } // end step loop
@@ -208,6 +247,52 @@ namespace impactx
 
         std::string distribution_type;  // Beam distribution type
         pp_dist.get("distribution", distribution_type);
+
+        if(distribution_type == "waterbag"){
+          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
+          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
+          pp_dist.get("sigmaX", sigx);
+          pp_dist.get("sigmaY", sigy);
+          pp_dist.get("sigmaT", sigt);
+          pp_dist.get("sigmaPx", sigpx);
+          pp_dist.get("sigmaPy", sigpy);
+          pp_dist.get("sigmaPt", sigpt);
+          pp_dist.query("muxpx", muxpx);
+          pp_dist.query("muypy", muypy);
+          pp_dist.query("mutpt", mutpt);
+
+          impactx::distribution::Waterbag waterbag(sigx,sigy,sigt,sigpx,
+                                 sigpy,sigpt,muxpx,muypy,mutpt);
+
+          amrex::Vector<amrex::ParticleReal> x, y, t;
+          amrex::Vector<amrex::ParticleReal> px, py, pt;
+          amrex::RandomEngine rng;
+          amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
+
+          if (amrex::ParallelDescriptor::IOProcessor()) {
+              x.reserve(npart);
+              y.reserve(npart);
+              t.reserve(npart);
+              px.reserve(npart);
+              py.reserve(npart);
+              pt.reserve(npart);
+
+              for(amrex::Long i = 0; i < npart; ++i) {
+
+                  waterbag(ix, iy, it, ipx, ipy, ipt, rng);
+                  x.push_back(ix);
+                  y.push_back(iy);
+                  t.push_back(it);
+                  px.push_back(ipx);
+                  py.push_back(ipy);
+                  pt.push_back(ipt);
+              }
+          }
+
+          int const lev = 0;
+          m_particle_container->AddNParticles(lev, x, y, t, px, py, pt);
+
+        }
 
         amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;
         amrex::Print() << "Bunch charge (C): " << bunch_charge << std::endl;

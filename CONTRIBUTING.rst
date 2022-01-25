@@ -113,7 +113,7 @@ Periodically commit your changes with
 The commit message (between quotation marks) is super important in order to follow the developments during code-review and identify bugs.
 A typical format is:
 
-.. code-block::
+.. code-block:: text
 
    This is a short, 40-character title
 
@@ -234,6 +234,6 @@ Style and conventions
 
 - ``#include`` directives in C++ have a distinct order to avoid bugs, see :ref:`the ImpactX repo structure <developers-repo-structure>` for details
 
-- For all new code, we should avoid relying on ``using namespace amrex;`` and all amrex types should be prefixed with `amrex::`.
+- For all new code, we should avoid relying on ``using namespace amrex;`` and all amrex types should be prefixed with ``amrex::``.
   Inside limited scopes, AMReX type literals can be included with ``using namespace amrex::literals;``.
   Ideally, old code should be modified accordingly.

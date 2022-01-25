@@ -3,7 +3,16 @@ beam.units = static
 beam.energy = 2.0e3
 beam.charge = 100.0e-12
 beam.particle = electron
-beam.distribution = gauss6d
+beam.distribution = waterbag
+beam.sigmaX = 1.0e-6
+beam.sigmaY = 1.0e-6
+beam.sigmaT = 1.0e-6
+beam.sigmaPx = 0.0
+beam.sigmaPy = 0.0
+beam.sigmaPt = 0.0
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
 
 lattice.elements = quad1 drift1 quad2 drift2 sbend1
 

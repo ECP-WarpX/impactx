@@ -50,7 +50,7 @@ For instance, the following line will get the Doxygen documentation for ``Impact
 Building the documentation
 --------------------------
 
-To build the documentation on your local computer, you will need to install Doxygen as well as the Python module `breathe`.
+To build the documentation on your local computer, you will need to install Doxygen as well as the Python module ``breathe``.
 First, change into ``docs/`` and install the Python requirements:
 
 .. code-block:: sh

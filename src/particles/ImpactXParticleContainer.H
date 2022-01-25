@@ -78,12 +78,18 @@ namespace impactx
          * @param x positions in x
          * @param y positions in y
          * @param z positions in z
+         * @param px momentum in x
+         * @param py momentum in y
+         * @param pz momentum in z
          */
         void
         AddNParticles (int lev,
                        amrex::Vector<amrex::ParticleReal> const & x,
                        amrex::Vector<amrex::ParticleReal> const & y,
-                       amrex::Vector<amrex::ParticleReal> const & z);
+                       amrex::Vector<amrex::ParticleReal> const & z,
+                       amrex::Vector<amrex::ParticleReal> const & px,
+                       amrex::Vector<amrex::ParticleReal> const & py,
+                       amrex::Vector<amrex::ParticleReal> const & pz);
 
         /** Compute the min and max of the particle position in each dimension
          *
