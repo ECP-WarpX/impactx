@@ -286,6 +286,9 @@ namespace impactx
                   px.push_back(ipx);
                   py.push_back(ipy);
                   pt.push_back(ipt);
+                  amrex::PrintToFile("particles.txt") << ix << " " << iy << " ";
+                  amrex::PrintToFile("particles.txt") << it << " " << ipx << " ";
+                  amrex::PrintToFile("particles.txt") << ipy << " " << ipt << " " << std::endl;
               }
           }
 
