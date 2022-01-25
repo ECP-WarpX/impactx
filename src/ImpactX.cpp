@@ -8,6 +8,7 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
 #include "particles/transformation/CoordinateTransformation.H"
+#include "particles/distribution/Waterbag.H"
 
 #include <AMReX.H>
 #include <AMReX_REAL.H>
@@ -15,7 +16,6 @@
 
 #include <string>
 #include <vector>
-
 
 namespace impactx
 {
@@ -39,16 +39,9 @@ namespace impactx
     void ImpactX::initData ()
     {
         AmrCore::InitFromScratch(0.0);
-        amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;;
+        amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
 
-        m_particle_container->AddNParticles(0, { 0.2}, { 0.2}, { 0.0});
-        m_particle_container->AddNParticles(0, {-0.2}, { 0.2}, { 0.0});
-        m_particle_container->AddNParticles(0, { 0.2}, {-0.2}, { 0.0});
-        m_particle_container->AddNParticles(0, {-0.2}, {-0.2}, { 0.0});
-        m_particle_container->AddNParticles(0, { 0.2}, { 0.2}, { 0.4});
-        m_particle_container->AddNParticles(0, {-0.2}, { 0.2}, { 0.4});
-        m_particle_container->AddNParticles(0, { 0.2}, {-0.2}, { 0.4});
-        m_particle_container->AddNParticles(0, {-0.2}, {-0.2}, { 0.4});
+        this->initDist();
         amrex::Print() << "# of particles: " << m_particle_container->TotalNumberOfParticles() << std::endl;
     }
 
@@ -254,6 +247,52 @@ namespace impactx
 
         std::string distribution_type;  // Beam distribution type
         pp_dist.get("distribution", distribution_type);
+
+        if(distribution_type == "waterbag"){
+          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
+          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
+          pp_dist.get("sigmaX", sigx);
+          pp_dist.get("sigmaY", sigy);
+          pp_dist.get("sigmaT", sigt);
+          pp_dist.get("sigmaPx", sigpx);
+          pp_dist.get("sigmaPy", sigpy);
+          pp_dist.get("sigmaPt", sigpt);
+          pp_dist.query("muxpx", muxpx);
+          pp_dist.query("muypy", muypy);
+          pp_dist.query("mutpt", mutpt);
+
+          impactx::distribution::Waterbag waterbag(sigx,sigy,sigt,sigpx,
+                                 sigpy,sigpt,muxpx,muypy,mutpt);
+
+          amrex::Vector<amrex::ParticleReal> x, y, t;
+          amrex::Vector<amrex::ParticleReal> px, py, pt;
+          amrex::RandomEngine rng;
+          amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
+
+          if (amrex::ParallelDescriptor::IOProcessor()) {
+              x.reserve(npart);
+              y.reserve(npart);
+              t.reserve(npart);
+              px.reserve(npart);
+              py.reserve(npart);
+              pt.reserve(npart);
+
+              for(amrex::Long i = 0; i < npart; ++i) {
+
+                  waterbag(ix, iy, it, ipx, ipy, ipt, rng);
+                  x.push_back(ix);
+                  y.push_back(iy);
+                  t.push_back(it);
+                  px.push_back(ipx);
+                  py.push_back(ipy);
+                  pt.push_back(ipt);
+              }
+          }
+
+          int const lev = 0;
+          m_particle_container->AddNParticles(lev, x, y, t, px, py, pt);
+
+        }
 
         amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;
         amrex::Print() << "Bunch charge (C): " << bunch_charge << std::endl;
