@@ -29,7 +29,9 @@ namespace impactx
                                              amrex::Vector<amrex::ParticleReal> const & z,
                                              amrex::Vector<amrex::ParticleReal> const & px,
                                              amrex::Vector<amrex::ParticleReal> const & py,
-                                             amrex::Vector<amrex::ParticleReal> const & pz)
+                                             amrex::Vector<amrex::ParticleReal> const & pz,
+                                             amrex::ParticleReal const & qm,
+                                             amrex::ParticleReal const & bchchg)
     {
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(lev == 0, "AddNParticles: only lev=0 is supported yet.");
         AMREX_ALWAYS_ASSERT(x.size() == y.size());
@@ -75,11 +77,11 @@ namespace impactx
         pinned_tile.push_back_real(RealSoA::ux, *px.cbegin(), *px.cend());
         pinned_tile.push_back_real(RealSoA::uy, *py.cbegin(), *py.cend());
         pinned_tile.push_back_real(RealSoA::pt, *pz.cbegin(), *pz.cend());
+        pinned_tile.push_back_real(RealSoA::q_m, np, qm);
+        pinned_tile.push_back_real(RealSoA::w, np, bchchg/np);
 
         //the following should be updated
         pinned_tile.push_back_real(RealSoA::t, np, 0.0);
-        pinned_tile.push_back_real(RealSoA::q_m, np, 0.0);
-        pinned_tile.push_back_real(RealSoA::w, np, 1.0/np);
 
         /* Redistributes particles to their respective tiles (spatial bucket
          * sort per box over MPI ranks)

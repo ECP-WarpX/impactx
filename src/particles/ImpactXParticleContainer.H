@@ -81,6 +81,8 @@ namespace impactx
          * @param px momentum in x
          * @param py momentum in y
          * @param pz momentum in z
+         * @param qm charge over mass in 1/eV
+         * @param bchchg total charge within a bunch in C
          */
         void
         AddNParticles (int lev,
@@ -89,7 +91,9 @@ namespace impactx
                        amrex::Vector<amrex::ParticleReal> const & z,
                        amrex::Vector<amrex::ParticleReal> const & px,
                        amrex::Vector<amrex::ParticleReal> const & py,
-                       amrex::Vector<amrex::ParticleReal> const & pz);
+                       amrex::Vector<amrex::ParticleReal> const & pz,
+                       amrex::ParticleReal const & qm,
+                       amrex::ParticleReal const & bchchg);
 
         /** Compute the min and max of the particle position in each dimension
          *

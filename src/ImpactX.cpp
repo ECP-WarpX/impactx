@@ -230,14 +230,24 @@ namespace impactx
         // Parse the beam distribution parameters
         amrex::ParmParse pp_dist("beam");
 
-        amrex::Real energy = 0.0;  // Beam kinetic energy (MeV)
+        amrex::ParticleReal energy = 0.0;  // Beam kinetic energy (MeV)
         pp_dist.get("energy", energy);
 
-        amrex::Real bunch_charge = 0.0;  // Bunch charge (C)
+        amrex::ParticleReal bunch_charge = 0.0;  // Bunch charge (C)
         pp_dist.get("charge", bunch_charge);
 
         std::string particle_type;  // Particle type
         pp_dist.get("particle", particle_type);
+
+        amrex::ParticleReal qm = 0.0; //charge/mass ratio
+        if(particle_type == "electron"){
+          qm = -1.0/0.511005e6;
+        } else if(particle_type == "proton"){
+          qm = 1.0/938.27208816e6;
+        }
+        else {
+          qm = 0.0;
+        }
 
         int npart = 1;  // Number of simulation particles
         pp_dist.get("npart", npart);
@@ -290,7 +300,8 @@ namespace impactx
           }
 
           int const lev = 0;
-          m_particle_container->AddNParticles(lev, x, y, t, px, py, pt);
+          m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
+                                              qm, bunch_charge);
 
         }
 
