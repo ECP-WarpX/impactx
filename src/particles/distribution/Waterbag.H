@@ -67,7 +67,7 @@ namespace distribution
 
             constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
-//    Generate six standard normal random variables using Box-Muller:
+            // Generate six standard normal random variables using Box-Muller:
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
             ln1 = sqrt(-2_prt*log(u1));
@@ -84,7 +84,7 @@ namespace distribution
             g5 = ln1*cos(2_prt*pi*u2);
             g6 = ln1*sin(2_prt*pi*u2);
 
-//     Normalize to produce uniform samples on the unit sphere:
+            // Normalize to produce uniform samples on the unit sphere:
             norm = sqrt(g1*g1+g2*g2+g3*g3+g4*g4+g5*g5+g6*g6);
             g1 /= norm;
             g2 /= norm;
@@ -93,7 +93,7 @@ namespace distribution
             g5 /= norm;
             g6 /= norm;
 
-//     Scale to produce uniform samples in a ball (unit variance):
+            // Scale to produce uniform samples in a ball (unit variance):
             u1 = amrex::Random(engine);
             u2 = sqrt(8_prt)*pow(u1,1_prt/6);
             x = g1*u2;
@@ -103,7 +103,7 @@ namespace distribution
             py = g5*u2;
             pt = g6*u2;
 
-//     Transform to produce the desired second moments/correlations:
+            // Transform to produce the desired second moments/correlations:
             root = sqrt(1.0_prt-m_muxpx*m_muxpx);
             a1 = m_sigmaX*x/root;
             a2 = m_sigmaPx*(-m_muxpx*x/root+px);
