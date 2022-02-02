@@ -294,6 +294,24 @@ namespace impactx
 
         }
 
+
+        amrex::ParticleReal massE, r_x, r_y, r_t, r_px, r_py, r_pt;
+
+        if (particle_type == "electron") {
+            massE = 0.510998950;
+        } else if (particle_type == "proton") {
+            massE = 938.27208816;
+        } else {
+            massE = 0.510998950;
+        }
+        r_x = 0.0;
+        r_y = 0.0;
+        r_t = 0.0;
+        r_px = 0.0;
+        r_py = 0.0;
+        r_pt = -energy/massE - 1.0;
+        m_particle_container->AddRefParticle(r_x, r_y, r_t, r_px, r_py, r_pt);
+
         amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;
         amrex::Print() << "Bunch charge (C): " << bunch_charge << std::endl;
         amrex::Print() << "Particle type: " << particle_type << std::endl;

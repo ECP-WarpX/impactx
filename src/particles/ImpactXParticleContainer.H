@@ -47,6 +47,20 @@ namespace impactx
         };
     };
 
+    /** This struct indexes the reference particle attributes
+     *  stored in ImpactXParticleContainer
+     */
+    struct RefPart
+    {
+            amrex::ParticleReal x;  ///< horizontal position x, in meters
+            amrex::ParticleReal y;  ///< vertical position y, in meters
+            amrex::ParticleReal t;  ///< arrival time * c in meters
+            amrex::ParticleReal px; ///< momentum in x, normalized to proper velocity
+            amrex::ParticleReal py; ///< momentum in y, normalized to proper velocity
+            amrex::ParticleReal pt; ///< energy deviation, normalized by rest energy
+    };
+
+
     /** Beam Particles in ImpactX
      *
      * This class stores particles, distributed over MPI ranks.
@@ -91,6 +105,16 @@ namespace impactx
                        amrex::Vector<amrex::ParticleReal> const & py,
                        amrex::Vector<amrex::ParticleReal> const & pz);
 
+        void
+        AddRefParticle (
+                       amrex::ParticleReal & x,
+                       amrex::ParticleReal & y,
+                       amrex::ParticleReal & t,
+                       amrex::ParticleReal & px,
+                       amrex::ParticleReal & py,
+                       amrex::ParticleReal & pt);
+
+
         /** Compute the min and max of the particle position in each dimension
          *
          * @returns x_min, x_max, y_min, y_max, z_min, z_max
@@ -110,6 +134,8 @@ namespace impactx
                 amrex::ParticleReal, amrex::ParticleReal,
                 amrex::ParticleReal, amrex::ParticleReal>
         MeanAndStdPositions ();
+
+        private: RefPart m_refpart;
 
     }; // ImpactXParticleContainer
 
