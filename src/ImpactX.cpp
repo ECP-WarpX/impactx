@@ -13,6 +13,7 @@
 #include <AMReX.H>
 #include <AMReX_REAL.H>
 #include <AMReX_ParmParse.H>
+#include <AMReX_Print.H>
 
 #include <string>
 #include <vector>
