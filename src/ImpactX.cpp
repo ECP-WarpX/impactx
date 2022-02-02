@@ -13,6 +13,7 @@
 #include <AMReX.H>
 #include <AMReX_REAL.H>
 #include <AMReX_ParmParse.H>
+#include <AMReX_Print.H>
 
 #include <string>
 #include <vector>
@@ -286,6 +287,9 @@ namespace impactx
                   px.push_back(ipx);
                   py.push_back(ipy);
                   pt.push_back(ipt);
+                  amrex::PrintToFile("initial_beam.txt") << ix << " " << iy << " ";
+                  amrex::PrintToFile("initial_beam.txt") << it << " " << ipx << " ";
+                  amrex::PrintToFile("initial_beam.txt") << ipy << " " << ipt << " " << std::endl;
               }
           }
 
