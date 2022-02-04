@@ -93,6 +93,12 @@ namespace impactx
 
     }
 
+    void
+    ImpactXParticleContainer::SetRefParticle (RefPart const refpart)
+    {
+        m_refpart = refpart;
+    }
+
     std::tuple<
             amrex::ParticleReal, amrex::ParticleReal,
             amrex::ParticleReal, amrex::ParticleReal,

@@ -227,6 +227,7 @@ namespace impactx
 
     void ImpactX::initDist ()
     {
+        using namespace amrex::literals;
 
         // Parse the beam distribution parameters
         amrex::ParmParse pp_dist("beam");
@@ -298,6 +299,23 @@ namespace impactx
 
         }
 
+        // reference particle
+        amrex::ParticleReal massE;  // MeV
+        if (particle_type == "electron") {
+            massE = 0.510998950;
+        } else if (particle_type == "proton") {
+            massE = 938.27208816;
+        }
+        RefPart refPart;
+        refPart.x = 0.0;
+        refPart.y = 0.0;
+        refPart.t = 0.0;
+        refPart.px = 0.0;
+        refPart.py = 0.0;
+        refPart.pt = -energy/massE - 1.0_prt;
+        m_particle_container->SetRefParticle(refPart);
+
+        // print information on the initialized beam
         amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;
         amrex::Print() << "Bunch charge (C): " << bunch_charge << std::endl;
         amrex::Print() << "Particle type: " << particle_type << std::endl;
