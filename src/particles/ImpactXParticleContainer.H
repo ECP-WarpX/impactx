@@ -107,6 +107,8 @@ namespace impactx
         void
         SetRefParticle (RefPart const refpart);
 
+        RefPart
+        CallRefParticle ();
 
         /** Compute the min and max of the particle position in each dimension
          *

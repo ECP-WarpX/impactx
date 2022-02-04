@@ -99,6 +99,12 @@ namespace impactx
         m_refpart = refpart;
     }
 
+    RefPart
+    ImpactXParticleContainer::CallRefParticle ()
+    {
+        return m_refpart;
+    }
+
     std::tuple<
             amrex::ParticleReal, amrex::ParticleReal,
             amrex::ParticleReal, amrex::ParticleReal,

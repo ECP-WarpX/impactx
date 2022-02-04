@@ -44,9 +44,11 @@ namespace detail
                             PType* aos_ptr,
                             amrex::ParticleReal* part_px,
                             amrex::ParticleReal* part_py,
-                            amrex::ParticleReal* part_pt)
+                            amrex::ParticleReal* part_pt,
+                            RefPart ref_part)
             : m_element(element), m_aos_ptr(aos_ptr),
-              m_part_px(part_px), m_part_py(part_py), m_part_pt(part_pt)
+              m_part_px(part_px), m_part_py(part_py), m_part_pt(part_pt),
+              m_ref_part(ref_part)
         {
         }
 
@@ -71,7 +73,11 @@ namespace detail
             amrex::ParticleReal & py = m_part_py[i];
             amrex::ParticleReal & pt = m_part_pt[i];
 
+            //amrex::Print() << "Reference particle pt: " << m_ref_part.pt << std::endl;            
+
+            // push through element;
             m_element(p, px, py, pt);
+
         }
 
     private:
@@ -80,6 +86,7 @@ namespace detail
         amrex::ParticleReal* const AMREX_RESTRICT m_part_px;
         amrex::ParticleReal* const AMREX_RESTRICT m_part_py;
         amrex::ParticleReal* const AMREX_RESTRICT m_part_pt;
+        RefPart const m_ref_part;
     };
 } // namespace detail
 
@@ -115,13 +122,17 @@ namespace detail
                 amrex::ParticleReal* const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
                 amrex::ParticleReal* const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
                 // ...
-
+                
+                // preparing to access reference particle data: RefPart
+                RefPart ref_part;
+                ref_part = pc.CallRefParticle();
+                
                 // loop over all beamline elements
                 for (auto & element_variant : lattice) {
                     // here we just access the element by its respective type
                     std::visit([=](auto&& element) {
                         detail::PushSingleParticle<decltype(element)> const pushSingleParticle(
-                            element, aos_ptr, part_px, part_py, part_pt);
+                            element, aos_ptr, part_px, part_py, part_pt, ref_part);
 
                         // loop over particles in the box
                         amrex::ParallelFor(np, pushSingleParticle);
