@@ -52,14 +52,13 @@ namespace impactx
      */
     struct RefPart
     {
-            amrex::ParticleReal x;  ///< horizontal position x, in meters
-            amrex::ParticleReal y;  ///< vertical position y, in meters
-            amrex::ParticleReal t;  ///< arrival time * c in meters
-            amrex::ParticleReal px; ///< momentum in x, normalized to proper velocity
-            amrex::ParticleReal py; ///< momentum in y, normalized to proper velocity
-            amrex::ParticleReal pt; ///< energy deviation, normalized by rest energy
+        amrex::ParticleReal x = 0.0;  ///< horizontal position x, in meters
+        amrex::ParticleReal y = 0.0;  ///< vertical position y, in meters
+        amrex::ParticleReal t = 0.0;  ///< arrival time * c in meters
+        amrex::ParticleReal px = 0.0; ///< momentum in x, normalized to proper velocity
+        amrex::ParticleReal py = 0.0; ///< momentum in y, normalized to proper velocity
+        amrex::ParticleReal pt = 0.0; ///< energy deviation, normalized by rest energy
     };
-
 
     /** Beam Particles in ImpactX
      *
@@ -106,13 +105,7 @@ namespace impactx
                        amrex::Vector<amrex::ParticleReal> const & pz);
 
         void
-        AddRefParticle (
-                       amrex::ParticleReal & x,
-                       amrex::ParticleReal & y,
-                       amrex::ParticleReal & t,
-                       amrex::ParticleReal & px,
-                       amrex::ParticleReal & py,
-                       amrex::ParticleReal & pt);
+        SetRefParticle (RefPart const refpart);
 
 
         /** Compute the min and max of the particle position in each dimension
@@ -135,7 +128,10 @@ namespace impactx
                 amrex::ParticleReal, amrex::ParticleReal>
         MeanAndStdPositions ();
 
-        private: RefPart m_refpart;
+      private:
+
+        //! the reference particle for the beam in the particle container
+        RefPart m_refpart;
 
     }; // ImpactXParticleContainer
 
