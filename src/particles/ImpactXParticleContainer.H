@@ -93,7 +93,7 @@ namespace impactx
 
         /** Compute the min and max of the particle position in each dimension
          *
-         * @returns x_min, x_max, y_min, y_max, z_min, z_max
+         * @returns x_min, y_min, z_min, x_max, y_max, z_max
          */
         std::tuple<
             amrex::ParticleReal, amrex::ParticleReal,
