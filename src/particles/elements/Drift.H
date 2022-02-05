@@ -19,6 +19,7 @@ namespace impactx
     struct Drift
     {
         using PType = ImpactXParticleContainer::ParticleType;
+//        using RType = ImpactXParticleContainer::RefPart;
 
         /** A drift
          *
@@ -41,16 +42,17 @@ namespace impactx
                 PType& p,
                 amrex::ParticleReal & px,
                 amrex::ParticleReal & py,
-                amrex::ParticleReal & pt) const {
+                amrex::ParticleReal & pt,
+                RefPart const refpart) const {
 
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(0);
             amrex::ParticleReal const y = p.pos(1);
             amrex::ParticleReal const t = p.pos(2);
 
-            // intermediate values (universal for all elements - needs tracking for RF elements)
-            amrex::ParticleReal const betgam = 2.0; // todo: make this an input parameter (reference energy -> reference betagam)
-            amrex::ParticleReal const betgam2 = pow(betgam, 2);
+            // access reference particle values to find beta*gamma^2
+            amrex::ParticleReal const pt_ref = refpart.pt;
+            amrex::ParticleReal const betgam2 = pow(pt_ref, 2)-1.0;            
 
             // advance position and momentum (drift)
             p.pos(0) = x + m_ds * px;

@@ -76,7 +76,7 @@ namespace detail
             //amrex::Print() << "Reference particle pt: " << m_ref_part.pt << std::endl;            
 
             // push through element;
-            m_element(p, px, py, pt);
+            m_element(p, px, py, pt, m_ref_part);
 
         }
 
