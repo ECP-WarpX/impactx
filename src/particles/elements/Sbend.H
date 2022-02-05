@@ -25,7 +25,7 @@ namespace impactx
          * @param ds Segment length in m.
          * @param rc Radius of curvature in m.
          */
-        Sbend( amrex::ParticleReal const ds, amrex::ParticleReal const rc )
+        Sbend( amrex::ParticleReal const ds, amrex::ParticleReal const rc)
         : m_ds(ds), m_rc(rc)
         {
         }

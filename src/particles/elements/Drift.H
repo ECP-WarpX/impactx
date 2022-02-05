@@ -19,7 +19,6 @@ namespace impactx
     struct Drift
     {
         using PType = ImpactXParticleContainer::ParticleType;
-//        using RType = ImpactXParticleContainer::RefPart;
 
         /** A drift
          *
