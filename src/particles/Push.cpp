@@ -39,6 +39,7 @@ namespace detail
          * @param part_px the array to the particle momentum (x)
          * @param part_py the array to the particle momentum (y)
          * @param part_pt the array to the particle momentum (t)
+         * @param ref_part the struct containing the reference particle
          */
         PushSingleParticle (T_Element element,
                             PType* aos_ptr,
