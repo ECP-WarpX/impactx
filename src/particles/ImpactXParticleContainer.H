@@ -104,9 +104,9 @@ namespace impactx
                        amrex::Vector<amrex::ParticleReal> const & py,
                        amrex::Vector<amrex::ParticleReal> const & pz);
 
-        /** Set initial reference particle attributes
+        /** Set reference particle attributes
          *
-         * @param refpart initial reference particle
+         * @param refpart reference particle
          */
         void
         SetRefParticle (RefPart const refpart);
