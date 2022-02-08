@@ -100,7 +100,7 @@ namespace impactx
     }
 
     RefPart
-    ImpactXParticleContainer::CallRefParticle ()
+    ImpactXParticleContainer::GetRefParticle ()
     {
         return m_refpart;
     }
