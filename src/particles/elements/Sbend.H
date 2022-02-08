@@ -59,7 +59,7 @@ namespace impactx
             amrex::ParticleReal const theta = m_ds/m_rc;
 
             // advance position and momentum (sector bend)
-            p.pos(0) = cos(theta)*x + m_rc*sin(theta)*px 
+            p.pos(0) = cos(theta)*x + m_rc*sin(theta)*px
                      - (m_rc/bet)*(1.0_prt - cos(theta))*pt;
             px = -sin(theta)/m_rc*x + cos(theta)*px - sin(theta)/bet*pt;
 
