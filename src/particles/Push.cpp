@@ -125,7 +125,7 @@ namespace detail
 
                 // preparing to access reference particle data: RefPart
                 RefPart ref_part;
-                ref_part = pc.CallRefParticle();
+                ref_part = pc.GetRefParticle();
 
                 // loop over all beamline elements
                 for (auto & element_variant : lattice) {
