@@ -52,7 +52,7 @@ namespace impactx
 
             // access reference particle values to find beta*gamma^2
             amrex::ParticleReal const pt_ref = refpart.pt;
-            amrex::ParticleReal const betgam2 = pow(pt_ref, 2)-1.0;
+            amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
 
             // advance position and momentum (drift)
             p.pos(0) = cos(m_k*m_ds)*x + sin(m_k*m_ds)/m_k*px;
