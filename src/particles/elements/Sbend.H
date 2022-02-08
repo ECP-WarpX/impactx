@@ -53,7 +53,7 @@ namespace impactx
             // access reference particle values to find beta*gamma^2
             amrex::ParticleReal const pt_ref = refpart.pt;
             amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
-            amrex::ParticleReal const bet = sqrt(betgam2/(1.0+betgam2));
+            amrex::ParticleReal const bet = sqrt(betgam2/(1.0_prt + betgam2));
             amrex::ParticleReal const theta = m_ds/m_rc;
 
             // advance position and momentum (sector bend)
