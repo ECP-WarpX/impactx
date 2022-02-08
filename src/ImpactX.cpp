@@ -243,7 +243,7 @@ namespace impactx
 
         amrex::ParticleReal qm = 0.0; //charge/mass ratio
         if(particle_type == "electron"){
-          qm = -1.0/0.511005e6;
+          qm = -1.0/0.510998950e6;
         } else if(particle_type == "proton"){
           qm = 1.0/938.27208816e6;
         }

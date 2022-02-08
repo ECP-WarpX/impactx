@@ -80,9 +80,6 @@ namespace impactx
         pinned_tile.push_back_real(RealSoA::q_m, np, qm);
         pinned_tile.push_back_real(RealSoA::w, np, bchchg/np);
 
-        //the following should be updated
-        pinned_tile.push_back_real(RealSoA::t, np, 0.0);
-
         /* Redistributes particles to their respective tiles (spatial bucket
          * sort per box over MPI ranks)
          */

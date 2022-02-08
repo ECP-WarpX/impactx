@@ -28,7 +28,6 @@ namespace impactx
         {
             ux,  ///< momentum in x, normalized to proper velocity
             uy,  ///< momentum in y, normalized to proper velocity
-            t,   ///< phase in arrival time * 2pi * reference frequency, radians
             pt,  ///< kinetic energy deviation, (E0-E)/mc^2
             q_m, ///< charge to mass ratio, in q_e/m_e (?)
             w,   ///< particle weight, unitless
