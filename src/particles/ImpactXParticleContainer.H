@@ -19,6 +19,23 @@
 
 namespace impactx
 {
+    /** AMReX pre-defined Real attributes
+     *
+     * These are the AMReX pre-defined struct indexes for the Real attributes
+     * stored in an AoS in ImpactXParticleContainer. We document this here,
+     * because we change the meaning of these "positions" depending on the
+     * coordinate system we are currently in.
+     */
+    struct RealAoS
+    {
+        enum
+        {
+            x,  ///< position in x, meters  OR  ...
+            y,  ///< position in y, meters  OR  ...
+            z,  ///< position in z, meters  OR  phase "t" in arrival time * 2pi * reference frequency, radians
+        };
+    };
+
     /** This struct indexes the additional Real attributes
      *  stored in an SoA in ImpactXParticleContainer
      */
