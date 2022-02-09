@@ -104,9 +104,19 @@ namespace impactx
                        amrex::Vector<amrex::ParticleReal> const & py,
                        amrex::Vector<amrex::ParticleReal> const & pz);
 
+        /** Set reference particle attributes
+         *
+         * @param refpart reference particle
+         */
         void
         SetRefParticle (RefPart const refpart);
 
+        /** Get reference particle attributes
+         *
+         * @returns refpart
+         */
+        RefPart
+        GetRefParticle () const;
 
         /** Compute the min and max of the particle position in each dimension
          *

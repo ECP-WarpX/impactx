@@ -305,6 +305,8 @@ namespace impactx
             massE = 0.510998950;
         } else if (particle_type == "proton") {
             massE = 938.27208816;
+        } else {
+            massE = 0.510998950;  // default to electron
         }
         RefPart refPart;
         refPart.x = 0.0;
