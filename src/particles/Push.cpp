@@ -74,9 +74,7 @@ namespace detail
             amrex::ParticleReal & py = m_part_py[i];
             amrex::ParticleReal & pt = m_part_pt[i];
 
-            //amrex::Print() << "Reference particle pt: " << m_ref_part.pt << std::endl;
-
-            // push through element;
+            // push through element
             m_element(p, px, py, pt, m_ref_part);
 
         }
