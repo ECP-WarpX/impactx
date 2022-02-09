@@ -9,6 +9,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 
+#include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
 
 #include <cmath>
@@ -39,10 +40,10 @@ namespace impactx
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& p,
-                amrex::ParticleReal & px,
-                amrex::ParticleReal & py,
-                amrex::ParticleReal & pt,
+                PType& AMREX_RESTRICT p,
+                amrex::ParticleReal & AMREX_RESTRICT px,
+                amrex::ParticleReal & AMREX_RESTRICT py,
+                amrex::ParticleReal & AMREX_RESTRICT pt,
                 RefPart const refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt

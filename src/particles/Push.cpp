@@ -42,10 +42,10 @@ namespace detail
          * @param ref_part the struct containing the reference particle
          */
         PushSingleParticle (T_Element element,
-                            PType* aos_ptr,
-                            amrex::ParticleReal* part_px,
-                            amrex::ParticleReal* part_py,
-                            amrex::ParticleReal* part_pt,
+                            PType* AMREX_RESTRICT aos_ptr,
+                            amrex::ParticleReal* AMREX_RESTRICT part_px,
+                            amrex::ParticleReal* AMREX_RESTRICT part_py,
+                            amrex::ParticleReal* AMREX_RESTRICT part_pt,
                             RefPart ref_part)
             : m_element(element), m_aos_ptr(aos_ptr),
               m_part_px(part_px), m_part_py(part_py), m_part_pt(part_pt),
@@ -67,12 +67,12 @@ namespace detail
         operator() (long i) const
         {
             // access AoS data such as positions and cpu/id
-            PType& p = m_aos_ptr[i];
+            PType& AMREX_RESTRICT p = m_aos_ptr[i];
 
             // access SoA Real data
-            amrex::ParticleReal & px = m_part_px[i];
-            amrex::ParticleReal & py = m_part_py[i];
-            amrex::ParticleReal & pt = m_part_pt[i];
+            amrex::ParticleReal & AMREX_RESTRICT px = m_part_px[i];
+            amrex::ParticleReal & AMREX_RESTRICT py = m_part_py[i];
+            amrex::ParticleReal & AMREX_RESTRICT pt = m_part_pt[i];
 
             // push through element
             m_element(p, px, py, pt, m_ref_part);
