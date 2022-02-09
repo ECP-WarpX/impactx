@@ -30,9 +30,9 @@ namespace impactx
     {
         enum
         {
-            x,  ///< position in x, meters  OR  ...
-            y,  ///< position in y, meters  OR  ...
-            z,  ///< position in z, meters  OR  phase "t" in arrival time * 2pi * reference frequency, radians
+            x,  ///< position in x [m] (at fixed t OR fixed z)
+            y,  ///< position in y [m] (at fixed t OR fixed z)
+            z,  ///< position in z [m] (at fixed t) OR time-of-flight ct [m] (at fixed z)
         };
     };
 
