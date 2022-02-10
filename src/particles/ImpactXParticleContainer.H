@@ -135,6 +135,11 @@ namespace impactx
         RefPart
         GetRefParticle () const;
 
+        /** Get particle shape
+         */
+        int
+        GetParticleShape () const { return m_particle_shape; }
+
         /** Compute the min and max of the particle position in each dimension
          *
          * @returns x_min, y_min, z_min, x_max, y_max, z_max
@@ -144,7 +149,6 @@ namespace impactx
             amrex::ParticleReal, amrex::ParticleReal,
             amrex::ParticleReal, amrex::ParticleReal>
         MinAndMaxPositions ();
-
 
         /** Compute the mean and std of the particle position in each dimension
          *
@@ -156,8 +160,10 @@ namespace impactx
                 amrex::ParticleReal, amrex::ParticleReal>
         MeanAndStdPositions ();
 
-
         /** Deposit the charge of the particles onto a grid
+         *
+         * This resets the values in rho to zero and then deposits the particle
+         * charge.
          *
          * @param rho charge grid to deposit on
          * @param icomp component in rho to store into

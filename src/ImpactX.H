@@ -14,6 +14,7 @@
 
 #include <list>
 #include <memory>
+#include <unordered_map>
 
 
 namespace impactx
@@ -98,7 +99,7 @@ namespace impactx
         std::unique_ptr<ImpactXParticleContainer> m_particle_container;
 
         /** charge per level */
-        amrex::Vector< std::unique_ptr<amrex::MultiFab> > m_rho;
+        std::unordered_map<int, amrex::MultiFab> m_rho;
 
         /** these are elements defining the lattice */
         std::list<KnownElements> m_lattice;
