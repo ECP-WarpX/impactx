@@ -8,9 +8,11 @@
 
 #include <ablastr/particles/ParticleMoments.H>
 
+#include <AMReX.H>
 #include <AMReX_AmrCore.H>
 #include <AMReX_AmrParGDB.H>
 #include <AMReX_ParallelDescriptor.H>
+#include <AMReX_ParmParse.H>
 #include <AMReX_ParticleTile.H>
 
 
@@ -19,7 +21,15 @@ namespace impactx
     ImpactXParticleContainer::ImpactXParticleContainer (amrex::AmrCore* amr_core)
         : amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
     {
-       SetParticleSize();
+        SetParticleSize();
+
+        // particle shapes
+        amrex::ParmParse pp_algo("algo");
+        pp_algo.get("particle_shape", m_particle_shape);
+        if (m_particle_shape < 1 || m_particle_shape > 3)
+        {
+            amrex::Abort("algo.particle_shape can be only 1, 2, or 3");
+        }
     }
 
     void

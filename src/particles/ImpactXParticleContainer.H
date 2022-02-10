@@ -160,6 +160,9 @@ namespace impactx
         //! the reference particle for the beam in the particle container
         RefPart m_refpart;
 
+        //! the particle shape
+        int m_particle_shape = 0;
+
     }; // ImpactXParticleContainer
 
 } // namespace impactx
