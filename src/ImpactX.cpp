@@ -185,7 +185,7 @@ namespace impactx
             amrex::Print() << "\n";
 
         } // end step loop
-        
+
         // print final particle distribution to file
         diagnostics::DiagnosticOutput(*m_particle_container,
                       diagnostics::OutputType::PrintParticles);
