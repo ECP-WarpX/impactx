@@ -9,6 +9,7 @@
 #include "particles/Push.H"
 #include "particles/transformation/CoordinateTransformation.H"
 #include "particles/distribution/Waterbag.H"
+#include "particles/diagnostics/DiagnosticOutput.H"
 
 #include <AMReX.H>
 #include <AMReX_REAL.H>
@@ -184,6 +185,11 @@ namespace impactx
             amrex::Print() << "\n";
 
         } // end step loop
+        
+        // print final particle distribution to file
+        diagnostics::DiagnosticOutput(*m_particle_container,
+                      diagnostics::OutputType::PrintParticles);
+
     }
 
     void ImpactX::initElements ()
