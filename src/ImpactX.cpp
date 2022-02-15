@@ -79,11 +79,12 @@ namespace impactx
         //cba.coarsen(refRatio(lev - 1));
 
         auto const rho_nodal_flag = amrex::IntVect::TheNodeVector();
-        int const ncomp = 1;
-        int const ngRho = m_particle_container->GetParticleShape() + 1;
+        int const num_components_rho = 1;
+        // as in WarpX: this is likely too large and something like shape/2+1 would do.
+        int const num_guards_rho = m_particle_container->GetParticleShape() + 1;
 
         m_rho.emplace(lev,
-                      amrex::MultiFab{amrex::convert(cba, rho_nodal_flag), dm, ncomp, ngRho, tag("rho")});
+                      amrex::MultiFab{amrex::convert(cba, rho_nodal_flag), dm, num_components_rho, num_guards_rho, tag("rho")});
     }
 
     /** Make a new level using provided BoxArray and DistributionMapping and fill
@@ -165,8 +166,8 @@ namespace impactx
                 // Redistribute particles in the new mesh in x, y, z
                 //m_particle_container->Redistribute();  // extra overload/arguments?
 
-                // charge deposition on level 0
-                m_particle_container->DepositCharge(m_rho.at(0));
+                // charge deposition
+                m_particle_container->DepositCharge(m_rho, this->refRatio());
 
                 // poisson solve in x,y,z
                 //   TODO

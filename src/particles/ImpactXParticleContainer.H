@@ -7,14 +7,17 @@
 #ifndef IMPACTX_PARTICLE_CONTAINER_H
 #define IMPACTX_PARTICLE_CONTAINER_H
 
-#include <AMReX_BaseFwd.H>
 #include <AMReX_AmrCoreFwd.H>
+#include <AMReX_BaseFwd.H>
+#include <AMReX_MultiFab.H>
 #include <AMReX_ParIter.H>
 #include <AMReX_Particles.H>
 
+#include <AMReX_IntVect.H>
 #include <AMReX_Vector.H>
 
 #include <tuple>
+#include <unordered_map>
 
 
 namespace impactx
@@ -165,11 +168,12 @@ namespace impactx
          * This resets the values in rho to zero and then deposits the particle
          * charge.
          *
-         * @param rho charge grid to deposit on
-         * @param icomp component in rho to store into
+         * @param rho charge grid per level to deposit on
+         * @param ref_ratio mesh refinement ratios between levels
          */
         void
-        DepositCharge (amrex::MultiFab & rho, int icomp = 0);
+        DepositCharge (std::unordered_map<int, amrex::MultiFab> & rho,
+                       amrex::Vector<amrex::IntVect> const & ref_ratio);
 
       private:
 
