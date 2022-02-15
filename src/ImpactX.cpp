@@ -80,8 +80,7 @@ namespace impactx
 
         auto const rho_nodal_flag = amrex::IntVect::TheNodeVector();
         int const num_components_rho = 1;
-        // as in WarpX: this is likely too large and something like shape/2+1 would do.
-        int const num_guards_rho = m_particle_container->GetParticleShape() + 1;
+        int const num_guards_rho = m_particle_container->GetParticleShape()/2 + 1;
 
         m_rho.emplace(lev,
                       amrex::MultiFab{amrex::convert(cba, rho_nodal_flag), dm, num_components_rho, num_guards_rho, tag("rho")});
