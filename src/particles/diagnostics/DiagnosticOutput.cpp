@@ -51,12 +51,6 @@ namespace diagnostics {
                 for (int i=0; i < np; ++i)
                 {
 
-                       // access AoS data such as positions and cpu/id
-//                       PType const& p = aos_ptr[i];
-//                       auto const id = p.id();
-//                       auto const cpu = p.cpu();
-//                       auto const pos = p.pos();
-
                         // access AoS data such as positions and cpu/id
                         PType const& p = aos_ptr[i];
                         amrex::ParticleReal const x = p.pos(0);
