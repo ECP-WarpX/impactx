@@ -78,9 +78,17 @@ namespace impactx
         // for MR levels (TODO):
         //cba.coarsen(refRatio(lev - 1));
 
+        // staggering and number of charge components in the field
         auto const rho_nodal_flag = amrex::IntVect::TheNodeVector();
         int const num_components_rho = 1;
-        int const num_guards_rho = m_particle_container->GetParticleShape()/2 + 1;
+
+        // guard cells for charge deposition
+        int const particle_shape = m_particle_container->GetParticleShape();
+        int num_guards_rho = 0;
+        if (particle_shape % 2 == 0)  // even shape orders
+            num_guards_rho = particle_shape / 2 + 1;
+        else  // odd shape orders
+            num_guards_rho = (particle_shape + 1) / 2;
 
         m_rho.emplace(lev,
                       amrex::MultiFab{amrex::convert(cba, rho_nodal_flag), dm, num_components_rho, num_guards_rho, tag("rho")});
