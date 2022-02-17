@@ -188,7 +188,7 @@ namespace impactx
 
         // print final particle distribution to file
         diagnostics::DiagnosticOutput(*m_particle_container,
-                      diagnostics::OutputType::PrintParticles);
+                                      diagnostics::OutputType::PrintParticles);
 
     }
 

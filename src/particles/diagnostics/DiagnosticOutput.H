@@ -1,4 +1,4 @@
-/* Copyright 2021 Axel Huebl, Chad Mitchell
+/* Copyright 2021-2022 Axel Huebl, Chad Mitchell
  *
  * This file is part of ImpactX.
  *
@@ -10,9 +10,7 @@
 #include "particles/ImpactXParticleContainer.H"
 
 
-namespace impactx
-{
-namespace diagnostics
+namespace impactx::diagnostics
 {
     /** Type of beam diagnostic output
      */
@@ -26,10 +24,9 @@ namespace diagnostics
      * @param pc container of the particles use for diagnostics
      * @param otype the type of output to produce
      */
-    void DiagnosticOutput(ImpactXParticleContainer &pc,
-                                  OutputType const & otype);
+    void DiagnosticOutput (ImpactXParticleContainer const & pc,
+                           OutputType const otype);
 
-} // namespace diagnostics
-} // namespace impactx
+} // namespace impactx::diagnostics
 
 #endif // IMPACTX_DIAGNOSTIC_OUTPUT_H
