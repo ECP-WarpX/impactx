@@ -49,7 +49,9 @@ namespace impactx
                     int const * const AMREX_RESTRICT ion_lev = nullptr;
 
                     // physical lower corner of the current box
-                    amrex::Box const tilebox = pti.tilebox();
+                    //   Note that this includes guard cells since it is after tilebox.grow
+                    amrex::Box tilebox = pti.tilebox();
+                    tilebox.grow(rho_at_level.nGrowVect());
                     amrex::RealBox const grid_box{tilebox, gm.CellSize(), gm.ProbLo()};
                     amrex::Real const * const AMREX_RESTRICT xyzmin_ptr = grid_box.lo();
                     std::array<amrex::Real, 3> const xyzmin = {xyzmin_ptr[0], xyzmin_ptr[1], xyzmin_ptr[2]};
