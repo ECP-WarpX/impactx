@@ -9,6 +9,7 @@
 #include "particles/Push.H"
 #include "particles/transformation/CoordinateTransformation.H"
 #include "particles/distribution/Waterbag.H"
+#include "particles/diagnostics/DiagnosticOutput.H"
 
 #include <AMReX.H>
 #include <AMReX_REAL.H>
@@ -184,6 +185,11 @@ namespace impactx
             amrex::Print() << "\n";
 
         } // end step loop
+
+        // print final particle distribution to file
+        diagnostics::DiagnosticOutput(*m_particle_container,
+                                      diagnostics::OutputType::PrintParticles);
+
     }
 
     void ImpactX::initElements ()
@@ -279,6 +285,9 @@ namespace impactx
               py.reserve(npart);
               pt.reserve(npart);
 
+              // write file header
+              amrex::PrintToFile("initial_beam.txt") << "#x y t px py pt\n";
+
               for(amrex::Long i = 0; i < npart; ++i) {
 
                   waterbag(ix, iy, it, ipx, ipy, ipt, rng);
@@ -290,7 +299,7 @@ namespace impactx
                   pt.push_back(ipt);
                   amrex::PrintToFile("initial_beam.txt") << ix << " " << iy << " ";
                   amrex::PrintToFile("initial_beam.txt") << it << " " << ipx << " ";
-                  amrex::PrintToFile("initial_beam.txt") << ipy << " " << ipt << " " << std::endl;
+                  amrex::PrintToFile("initial_beam.txt") << ipy << " " << ipt << "\n";
               }
           }
 

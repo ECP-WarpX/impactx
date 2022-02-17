@@ -137,22 +137,6 @@ namespace detail
                         amrex::ParallelFor(np, pushSingleParticle);
                     }, element_variant);
                 }; // end loop over all beamline elements
-
-                // print out particles (this hack works only on CPU and on GPUs with
-                // unified memory access)
-                for (int i=0; i < np; ++i)
-                {
-                    // access AoS data such as positions and cpu/id
-                    PType const& p = aos_ptr[i];
-                    auto const id = p.id();
-                    auto const cpu = p.cpu();
-                    auto const pos = p.pos();
-
-                    amrex::AllPrint()
-                              << "Particle created at rank=" << cpu
-                              << " (pid=" << id << ") is now at: "
-                              << pos << "\n";
-                };
             } // end loop over all particle boxes
         } // env mesh-refinement level loop
     }
