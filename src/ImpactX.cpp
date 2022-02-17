@@ -285,6 +285,9 @@ namespace impactx
               py.reserve(npart);
               pt.reserve(npart);
 
+              // write file header
+              amrex::PrintToFile("initial_beam.txt") << "#x y t px py pt\n";
+
               for(amrex::Long i = 0; i < npart; ++i) {
 
                   waterbag(ix, iy, it, ipx, ipy, ipt, rng);
@@ -296,7 +299,7 @@ namespace impactx
                   pt.push_back(ipt);
                   amrex::PrintToFile("initial_beam.txt") << ix << " " << iy << " ";
                   amrex::PrintToFile("initial_beam.txt") << it << " " << ipx << " ";
-                  amrex::PrintToFile("initial_beam.txt") << ipy << " " << ipt << " " << std::endl;
+                  amrex::PrintToFile("initial_beam.txt") << ipy << " " << ipt << "\n";
               }
           }
 

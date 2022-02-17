@@ -10,9 +10,6 @@
 #include <AMReX_REAL.H>       // for ParticleReal
 #include <AMReX_Print.H>      // for PrintToFile
 
-#include <ostream>
-
-
 namespace impactx::diagnostics
 {
     void DiagnosticOutput (ImpactXParticleContainer const & pc,
@@ -26,6 +23,9 @@ namespace impactx::diagnostics
         // copy device-to-host
         bool const local = true;
         tmp.copyParticles(pc, local);
+
+        // write file header
+        amrex::PrintToFile("output_beam.txt") << "#x y t px py pt\n";
 
         // loop over refinement levels
         int const nLevel = tmp.maxLevel() + 1;
@@ -66,7 +66,7 @@ namespace impactx::diagnostics
                         // write particle data to file
                         amrex::PrintToFile("output_beam.txt") << x << " " << y << " ";
                         amrex::PrintToFile("output_beam.txt") << t << " " << px << " ";
-                        amrex::PrintToFile("output_beam.txt") << py << " " << pt << " " << std::endl;
+                        amrex::PrintToFile("output_beam.txt") << py << " " << pt << "\n";
                     } // i=0...np
                 } // if( otype == OutputType::PrintParticles)
             } // end loop over all particle boxes
