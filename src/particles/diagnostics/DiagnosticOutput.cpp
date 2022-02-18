@@ -64,9 +64,9 @@ namespace impactx::diagnostics
                         amrex::ParticleReal const pt = part_pt[i];
 
                         // write particle data to file
-                        amrex::PrintToFile("diags/output_beam.txt") << x << " " << y << " ";
-                        amrex::PrintToFile("diags/output_beam.txt") << t << " " << px << " ";
-                        amrex::PrintToFile("diags/output_beam.txt") << py << " " << pt << "\n";
+                        amrex::PrintToFile("diags/output_beam.txt")
+                            << x << " " << y << " "<< t << " "
+                            << px << " " << py << " " << pt << "\n";
                     } // i=0...np
                 } // if( otype == OutputType::PrintParticles)
             } // end loop over all particle boxes

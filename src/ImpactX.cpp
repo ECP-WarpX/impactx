@@ -301,9 +301,9 @@ namespace impactx
                   px.push_back(ipx);
                   py.push_back(ipy);
                   pt.push_back(ipt);
-                  amrex::PrintToFile("diags/initial_beam.txt") << ix << " " << iy << " ";
-                  amrex::PrintToFile("diags/initial_beam.txt") << it << " " << ipx << " ";
-                  amrex::PrintToFile("diags/initial_beam.txt") << ipy << " " << ipt << "\n";
+                  amrex::PrintToFile("diags/initial_beam.txt")
+                      << ix << " " << iy << " " << it << " "
+                      << ipx << " " << ipy << " " << ipt << "\n";
               }
           }
 
