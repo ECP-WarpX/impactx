@@ -14,6 +14,7 @@
 
 #include <list>
 #include <memory>
+#include <unordered_map>
 
 
 namespace impactx
@@ -96,6 +97,9 @@ namespace impactx
 
         /** these are the physical/beam particles of the simulation */
         std::unique_ptr<ImpactXParticleContainer> m_particle_container;
+
+        /** charge per level */
+        std::unordered_map<int, amrex::MultiFab> m_rho;
 
         /** these are elements defining the lattice */
         std::list<KnownElements> m_lattice;

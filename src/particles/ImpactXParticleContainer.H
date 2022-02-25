@@ -7,14 +7,17 @@
 #ifndef IMPACTX_PARTICLE_CONTAINER_H
 #define IMPACTX_PARTICLE_CONTAINER_H
 
-#include <AMReX_BaseFwd.H>
 #include <AMReX_AmrCoreFwd.H>
+#include <AMReX_BaseFwd.H>
+#include <AMReX_MultiFab.H>
 #include <AMReX_ParIter.H>
 #include <AMReX_Particles.H>
 
+#include <AMReX_IntVect.H>
 #include <AMReX_Vector.H>
 
 #include <tuple>
+#include <unordered_map>
 
 
 namespace impactx
@@ -135,6 +138,11 @@ namespace impactx
         RefPart
         GetRefParticle () const;
 
+        /** Get particle shape
+         */
+        int
+        GetParticleShape () const { return m_particle_shape; }
+
         /** Compute the min and max of the particle position in each dimension
          *
          * @returns x_min, y_min, z_min, x_max, y_max, z_max
@@ -154,6 +162,18 @@ namespace impactx
                 amrex::ParticleReal, amrex::ParticleReal,
                 amrex::ParticleReal, amrex::ParticleReal>
         MeanAndStdPositions ();
+
+        /** Deposit the charge of the particles onto a grid
+         *
+         * This resets the values in rho to zero and then deposits the particle
+         * charge.
+         *
+         * @param rho charge grid per level to deposit on
+         * @param ref_ratio mesh refinement ratios between levels
+         */
+        void
+        DepositCharge (std::unordered_map<int, amrex::MultiFab> & rho,
+                       amrex::Vector<amrex::IntVect> const & ref_ratio);
 
       private:
 
