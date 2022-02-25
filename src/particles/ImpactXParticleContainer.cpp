@@ -44,6 +44,10 @@ namespace impactx
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(lev == 0, "AddNParticles: only lev=0 is supported yet.");
         AMREX_ALWAYS_ASSERT(x.size() == y.size());
         AMREX_ALWAYS_ASSERT(x.size() == z.size());
+        AMREX_ALWAYS_ASSERT(x.size() == px.size());
+        AMREX_ALWAYS_ASSERT(x.size() == py.size());
+        AMREX_ALWAYS_ASSERT(x.size() == pz.size());
+
 
         // number of particles to add
         int const np = x.size();
@@ -79,12 +83,9 @@ namespace impactx
         // write Real attributes (SoA) to particle initialized zero
         DefineAndReturnParticleTile(0, 0, 0);
 
-        pinned_tile.push_back_real(RealSoA::ux, np, 0.0);
-        pinned_tile.push_back_real(RealSoA::uy, np, 0.0);
-        pinned_tile.push_back_real(RealSoA::pt, np, 0.0);
-        pinned_tile.push_back_real(RealSoA::ux, *px.cbegin(), *px.cend());
-        pinned_tile.push_back_real(RealSoA::uy, *py.cbegin(), *py.cend());
-        pinned_tile.push_back_real(RealSoA::pt, *pz.cbegin(), *pz.cend());
+        pinned_tile.push_back_real(RealSoA::ux, &(*px.cbegin()), &(*px.cend()));
+        pinned_tile.push_back_real(RealSoA::uy, &(*py.cbegin()), &(*py.cend()));
+        pinned_tile.push_back_real(RealSoA::pt, &(*pz.cbegin()), &(*pz.cend()));
 
         //the following should be updated
         pinned_tile.push_back_real(RealSoA::t, np, 0.0);
