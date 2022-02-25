@@ -8,9 +8,11 @@
 
 #include <ablastr/particles/ParticleMoments.H>
 
+#include <AMReX.H>
 #include <AMReX_AmrCore.H>
 #include <AMReX_AmrParGDB.H>
 #include <AMReX_ParallelDescriptor.H>
+#include <AMReX_ParmParse.H>
 #include <AMReX_ParticleTile.H>
 
 
@@ -19,7 +21,15 @@ namespace impactx
     ImpactXParticleContainer::ImpactXParticleContainer (amrex::AmrCore* amr_core)
         : amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
     {
-       SetParticleSize();
+        SetParticleSize();
+
+        // particle shapes
+        amrex::ParmParse pp_algo("algo");
+        pp_algo.get("particle_shape", m_particle_shape);
+        if (m_particle_shape < 1 || m_particle_shape > 3)
+        {
+            amrex::Abort("algo.particle_shape can be only 1, 2, or 3");
+        }
     }
 
     void
@@ -36,6 +46,10 @@ namespace impactx
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(lev == 0, "AddNParticles: only lev=0 is supported yet.");
         AMREX_ALWAYS_ASSERT(x.size() == y.size());
         AMREX_ALWAYS_ASSERT(x.size() == z.size());
+        AMREX_ALWAYS_ASSERT(x.size() == px.size());
+        AMREX_ALWAYS_ASSERT(x.size() == py.size());
+        AMREX_ALWAYS_ASSERT(x.size() == pz.size());
+
 
         // number of particles to add
         int const np = x.size();
@@ -71,12 +85,9 @@ namespace impactx
         // write Real attributes (SoA) to particle initialized zero
         DefineAndReturnParticleTile(0, 0, 0);
 
-        pinned_tile.push_back_real(RealSoA::ux, np, 0.0);
-        pinned_tile.push_back_real(RealSoA::uy, np, 0.0);
-        pinned_tile.push_back_real(RealSoA::pt, np, 0.0);
-        pinned_tile.push_back_real(RealSoA::ux, *px.cbegin(), *px.cend());
-        pinned_tile.push_back_real(RealSoA::uy, *py.cbegin(), *py.cend());
-        pinned_tile.push_back_real(RealSoA::pt, *pz.cbegin(), *pz.cend());
+        pinned_tile.push_back_real(RealSoA::ux, &(*px.cbegin()), &(*px.cend()));
+        pinned_tile.push_back_real(RealSoA::uy, &(*py.cbegin()), &(*py.cend()));
+        pinned_tile.push_back_real(RealSoA::pt, &(*pz.cbegin()), &(*pz.cend()));
         pinned_tile.push_back_real(RealSoA::q_m, np, qm);
         pinned_tile.push_back_real(RealSoA::w, np, bchchg/np);
 
@@ -96,6 +107,12 @@ namespace impactx
     ImpactXParticleContainer::SetRefParticle (RefPart const refpart)
     {
         m_refpart = refpart;
+    }
+
+    RefPart
+    ImpactXParticleContainer::GetRefParticle () const
+    {
+        return m_refpart;
     }
 
     std::tuple<

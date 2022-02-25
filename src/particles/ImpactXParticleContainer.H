@@ -7,18 +7,38 @@
 #ifndef IMPACTX_PARTICLE_CONTAINER_H
 #define IMPACTX_PARTICLE_CONTAINER_H
 
-#include <AMReX_BaseFwd.H>
 #include <AMReX_AmrCoreFwd.H>
+#include <AMReX_BaseFwd.H>
+#include <AMReX_MultiFab.H>
 #include <AMReX_ParIter.H>
 #include <AMReX_Particles.H>
 
+#include <AMReX_IntVect.H>
 #include <AMReX_Vector.H>
 
 #include <tuple>
+#include <unordered_map>
 
 
 namespace impactx
 {
+    /** AMReX pre-defined Real attributes
+     *
+     * These are the AMReX pre-defined struct indexes for the Real attributes
+     * stored in an AoS in ImpactXParticleContainer. We document this here,
+     * because we change the meaning of these "positions" depending on the
+     * coordinate system we are currently in.
+     */
+    struct RealAoS
+    {
+        enum
+        {
+            x,  ///< position in x [m] (at fixed t OR fixed z)
+            y,  ///< position in y [m] (at fixed t OR fixed z)
+            z,  ///< position in z [m] (at fixed t) OR time-of-flight ct [m] (at fixed z)
+        };
+    };
+
     /** This struct indexes the additional Real attributes
      *  stored in an SoA in ImpactXParticleContainer
      */
@@ -107,9 +127,24 @@ namespace impactx
                        amrex::ParticleReal const & qm,
                        amrex::ParticleReal const & bchchg);
 
+        /** Set reference particle attributes
+         *
+         * @param refpart reference particle
+         */
         void
         SetRefParticle (RefPart const refpart);
 
+        /** Get reference particle attributes
+         *
+         * @returns refpart
+         */
+        RefPart
+        GetRefParticle () const;
+
+        /** Get particle shape
+         */
+        int
+        GetParticleShape () const { return m_particle_shape; }
 
         /** Compute the min and max of the particle position in each dimension
          *
@@ -131,10 +166,25 @@ namespace impactx
                 amrex::ParticleReal, amrex::ParticleReal>
         MeanAndStdPositions ();
 
+        /** Deposit the charge of the particles onto a grid
+         *
+         * This resets the values in rho to zero and then deposits the particle
+         * charge.
+         *
+         * @param rho charge grid per level to deposit on
+         * @param ref_ratio mesh refinement ratios between levels
+         */
+        void
+        DepositCharge (std::unordered_map<int, amrex::MultiFab> & rho,
+                       amrex::Vector<amrex::IntVect> const & ref_ratio);
+
       private:
 
         //! the reference particle for the beam in the particle container
         RefPart m_refpart;
+
+        //! the particle shape
+        int m_particle_shape = 0;
 
     }; // ImpactXParticleContainer
 

@@ -39,14 +39,17 @@ namespace detail
          * @param part_px the array to the particle momentum (x)
          * @param part_py the array to the particle momentum (y)
          * @param part_pt the array to the particle momentum (t)
+         * @param ref_part the struct containing the reference particle
          */
         PushSingleParticle (T_Element element,
-                            PType* aos_ptr,
-                            amrex::ParticleReal* part_px,
-                            amrex::ParticleReal* part_py,
-                            amrex::ParticleReal* part_pt)
+                            PType* AMREX_RESTRICT aos_ptr,
+                            amrex::ParticleReal* AMREX_RESTRICT part_px,
+                            amrex::ParticleReal* AMREX_RESTRICT part_py,
+                            amrex::ParticleReal* AMREX_RESTRICT part_pt,
+                            RefPart ref_part)
             : m_element(element), m_aos_ptr(aos_ptr),
-              m_part_px(part_px), m_part_py(part_py), m_part_pt(part_pt)
+              m_part_px(part_px), m_part_py(part_py), m_part_pt(part_pt),
+              m_ref_part(ref_part)
         {
         }
 
@@ -64,14 +67,16 @@ namespace detail
         operator() (long i) const
         {
             // access AoS data such as positions and cpu/id
-            PType& p = m_aos_ptr[i];
+            PType& AMREX_RESTRICT p = m_aos_ptr[i];
 
             // access SoA Real data
-            amrex::ParticleReal & px = m_part_px[i];
-            amrex::ParticleReal & py = m_part_py[i];
-            amrex::ParticleReal & pt = m_part_pt[i];
+            amrex::ParticleReal & AMREX_RESTRICT px = m_part_px[i];
+            amrex::ParticleReal & AMREX_RESTRICT py = m_part_py[i];
+            amrex::ParticleReal & AMREX_RESTRICT pt = m_part_pt[i];
 
-            m_element(p, px, py, pt);
+            // push through element
+            m_element(p, px, py, pt, m_ref_part);
+
         }
 
     private:
@@ -80,6 +85,7 @@ namespace detail
         amrex::ParticleReal* const AMREX_RESTRICT m_part_px;
         amrex::ParticleReal* const AMREX_RESTRICT m_part_py;
         amrex::ParticleReal* const AMREX_RESTRICT m_part_pt;
+        RefPart const m_ref_part;
     };
 } // namespace detail
 
@@ -116,33 +122,21 @@ namespace detail
                 amrex::ParticleReal* const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
                 // ...
 
+                // preparing to access reference particle data: RefPart
+                RefPart ref_part;
+                ref_part = pc.GetRefParticle();
+
                 // loop over all beamline elements
                 for (auto & element_variant : lattice) {
                     // here we just access the element by its respective type
                     std::visit([=](auto&& element) {
                         detail::PushSingleParticle<decltype(element)> const pushSingleParticle(
-                            element, aos_ptr, part_px, part_py, part_pt);
+                            element, aos_ptr, part_px, part_py, part_pt, ref_part);
 
                         // loop over particles in the box
                         amrex::ParallelFor(np, pushSingleParticle);
                     }, element_variant);
                 }; // end loop over all beamline elements
-
-                // print out particles (this hack works only on CPU and on GPUs with
-                // unified memory access)
-                for (int i=0; i < np; ++i)
-                {
-                    // access AoS data such as positions and cpu/id
-                    PType const& p = aos_ptr[i];
-                    auto const id = p.id();
-                    auto const cpu = p.cpu();
-                    auto const pos = p.pos();
-
-                    amrex::AllPrint()
-                              << "Particle created at rank=" << cpu
-                              << " (pid=" << id << ") is now at: "
-                              << pos << "\n";
-                };
             } // end loop over all particle boxes
         } // env mesh-refinement level loop
     }

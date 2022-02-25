@@ -9,11 +9,13 @@
 #include "particles/Push.H"
 #include "particles/transformation/CoordinateTransformation.H"
 #include "particles/distribution/Waterbag.H"
+#include "particles/diagnostics/DiagnosticOutput.H"
 
 #include <AMReX.H>
 #include <AMReX_REAL.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_Print.H>
+#include <AMReX_Utility.H>
 
 #include <string>
 #include <vector>
@@ -42,6 +44,9 @@ namespace impactx
         AmrCore::InitFromScratch(0.0);
         amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
 
+        // move old diagnostics out of the way
+        amrex::UtilCreateCleanDirectory("diags", true);
+
         this->initDist();
         amrex::Print() << "# of particles: " << m_particle_container->TotalNumberOfParticles() << std::endl;
     }
@@ -65,8 +70,33 @@ namespace impactx
     void ImpactX::MakeNewLevelFromScratch (int lev, amrex::Real time, const amrex::BoxArray& ba,
                                           const amrex::DistributionMapping& dm)
     {
-        // todo data_mf.define(ba, dm, 1, 0);
-        amrex::ignore_unused(lev, time, ba, dm);
+        amrex::ignore_unused(time, ba, dm);
+
+        // set human-readable tag for each MultiFab
+        auto const tag = [lev]( std::string tagname ) {
+            tagname.append("[l=").append(std::to_string(lev)).append("]");
+            return amrex::MFInfo().SetTag(std::move(tagname));
+        };
+
+        // charge (rho) mesh
+        amrex::BoxArray cba = ba;
+        // for MR levels (TODO):
+        //cba.coarsen(refRatio(lev - 1));
+
+        // staggering and number of charge components in the field
+        auto const rho_nodal_flag = amrex::IntVect::TheNodeVector();
+        int const num_components_rho = 1;
+
+        // guard cells for charge deposition
+        int const particle_shape = m_particle_container->GetParticleShape();
+        int num_guards_rho = 0;
+        if (particle_shape % 2 == 0)  // even shape orders
+            num_guards_rho = particle_shape / 2 + 1;
+        else  // odd shape orders
+            num_guards_rho = (particle_shape + 1) / 2;
+
+        m_rho.emplace(lev,
+                      amrex::MultiFab{amrex::convert(cba, rho_nodal_flag), dm, num_components_rho, num_guards_rho, tag("rho")});
     }
 
     /** Make a new level using provided BoxArray and DistributionMapping and fill
@@ -99,8 +129,7 @@ namespace impactx
      */
     void ImpactX::ClearLevel (int lev)
     {
-        // todo
-        amrex::ignore_unused(lev);
+        m_rho.erase(lev);
     }
 
     void ImpactX::ResizeMesh () {
@@ -149,8 +178,8 @@ namespace impactx
                 // Redistribute particles in the new mesh in x, y, z
                 //m_particle_container->Redistribute();  // extra overload/arguments?
 
-                // charge deposition on level 0
-                //m_particle_container->DepositCharge(*m_rho.at(0));
+                // charge deposition
+                m_particle_container->DepositCharge(m_rho, this->refRatio());
 
                 // poisson solve in x,y,z
                 //   TODO
@@ -184,6 +213,11 @@ namespace impactx
             amrex::Print() << "\n";
 
         } // end step loop
+
+        // print final particle distribution to file
+        diagnostics::DiagnosticOutput(*m_particle_container,
+                                      diagnostics::OutputType::PrintParticles);
+
     }
 
     void ImpactX::initElements ()
@@ -289,6 +323,9 @@ namespace impactx
               py.reserve(npart);
               pt.reserve(npart);
 
+              // write file header
+              amrex::PrintToFile("diags/initial_beam.txt") << "#x y t px py pt\n";
+
               for(amrex::Long i = 0; i < npart; ++i) {
 
                   waterbag(ix, iy, it, ipx, ipy, ipt, rng);
@@ -298,9 +335,9 @@ namespace impactx
                   px.push_back(ipx);
                   py.push_back(ipy);
                   pt.push_back(ipt);
-                  amrex::PrintToFile("initial_beam.txt") << ix << " " << iy << " ";
-                  amrex::PrintToFile("initial_beam.txt") << it << " " << ipx << " ";
-                  amrex::PrintToFile("initial_beam.txt") << ipy << " " << ipt << " " << std::endl;
+                  amrex::PrintToFile("diags/initial_beam.txt")
+                      << ix << " " << iy << " " << it << " "
+                      << ipx << " " << ipy << " " << ipt << "\n";
               }
           }
 
@@ -316,6 +353,8 @@ namespace impactx
             massE = 0.510998950;
         } else if (particle_type == "proton") {
             massE = 938.27208816;
+        } else {
+            massE = 0.510998950;  // default to electron
         }
         RefPart refPart;
         refPart.x = 0.0;

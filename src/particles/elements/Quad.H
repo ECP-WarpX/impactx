@@ -9,6 +9,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 
+#include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
 
 #include <cmath>
@@ -36,22 +37,26 @@ namespace impactx
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& p,
-                amrex::ParticleReal & px,
-                amrex::ParticleReal & py,
-                amrex::ParticleReal & pt) const {
+                PType& AMREX_RESTRICT p,
+                amrex::ParticleReal & AMREX_RESTRICT px,
+                amrex::ParticleReal & AMREX_RESTRICT py,
+                amrex::ParticleReal & AMREX_RESTRICT pt,
+                RefPart const refpart) const {
+
+            using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(0);
             amrex::ParticleReal const y = p.pos(1);
             amrex::ParticleReal const t = p.pos(2);
 
-            // intermediate values (universal for all elements - needs tracking for RF elements)
-            amrex::ParticleReal const betgam = 2.0; // todo: make this an input parameter (reference energy -> reference betagam)
-            amrex::ParticleReal const betgam2 = pow(betgam, 2);
+            // access reference particle values to find beta*gamma^2
+            amrex::ParticleReal const pt_ref = refpart.pt;
+            amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
 
             // advance position and momentum (drift)
             p.pos(0) = cos(m_k*m_ds)*x + sin(m_k*m_ds)/m_k*px;
