@@ -15,6 +15,7 @@
 #include <AMReX_REAL.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_Print.H>
+#include <AMReX_Utility.H>
 
 #include <string>
 #include <vector>
@@ -42,6 +43,9 @@ namespace impactx
     {
         AmrCore::InitFromScratch(0.0);
         amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
+
+        // move old diagnostics out of the way
+        amrex::UtilCreateCleanDirectory("diags", true);
 
         this->initDist();
         amrex::Print() << "# of particles: " << m_particle_container->TotalNumberOfParticles() << std::endl;
@@ -286,7 +290,7 @@ namespace impactx
               pt.reserve(npart);
 
               // write file header
-              amrex::PrintToFile("initial_beam.txt") << "#x y t px py pt\n";
+              amrex::PrintToFile("diags/initial_beam.txt") << "#x y t px py pt\n";
 
               for(amrex::Long i = 0; i < npart; ++i) {
 
@@ -297,9 +301,9 @@ namespace impactx
                   px.push_back(ipx);
                   py.push_back(ipy);
                   pt.push_back(ipt);
-                  amrex::PrintToFile("initial_beam.txt") << ix << " " << iy << " ";
-                  amrex::PrintToFile("initial_beam.txt") << it << " " << ipx << " ";
-                  amrex::PrintToFile("initial_beam.txt") << ipy << " " << ipt << "\n";
+                  amrex::PrintToFile("diags/initial_beam.txt")
+                      << ix << " " << iy << " " << it << " "
+                      << ipx << " " << ipy << " " << ipt << "\n";
               }
           }
 
