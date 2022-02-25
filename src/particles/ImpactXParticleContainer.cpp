@@ -83,9 +83,9 @@ namespace impactx
         // write Real attributes (SoA) to particle initialized zero
         DefineAndReturnParticleTile(0, 0, 0);
 
-        pinned_tile.push_back_real(RealSoA::ux, *px.cbegin(), *px.cend());
-        pinned_tile.push_back_real(RealSoA::uy, *py.cbegin(), *py.cend());
-        pinned_tile.push_back_real(RealSoA::pt, *pz.cbegin(), *pz.cend());
+        pinned_tile.push_back_real(RealSoA::ux, &(*px.cbegin()), &(*px.cend()));
+        pinned_tile.push_back_real(RealSoA::uy, &(*py.cbegin()), &(*py.cend()));
+        pinned_tile.push_back_real(RealSoA::pt, &(*pz.cbegin()), &(*pz.cend()));
 
         //the following should be updated
         pinned_tile.push_back_real(RealSoA::t, np, 0.0);
