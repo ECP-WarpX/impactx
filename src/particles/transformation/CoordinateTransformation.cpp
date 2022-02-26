@@ -23,7 +23,7 @@ namespace transformation {
         // preparing to access reference particle data: RefPart
         RefPart ref_part;
         ref_part = pc.GetRefParticle();
-        amrex::ParticleReal const pd = ref_part.pt;  // Design value of pt/mc2 = -gamma  
+        amrex::ParticleReal const pd = ref_part.pt;  // Design value of pt/mc2 = -gamma
         amrex::Print() << "Ref pt = " << pd;
 
         // loop over refinement levels
