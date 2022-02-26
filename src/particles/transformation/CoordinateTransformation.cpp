@@ -17,9 +17,14 @@ namespace impactx
 {
 namespace transformation {
     void CoordinateTransformation(ImpactXParticleContainer &pc,
-                                  Direction const &direction,
-                                  amrex::ParticleReal const pd) {
+                                  Direction const &direction) {
         using namespace amrex::literals; // for _rt and _prt
+
+        // preparing to access reference particle data: RefPart
+        RefPart ref_part;
+        ref_part = pc.GetRefParticle();
+        amrex::ParticleReal const pd = ref_part.pt;  // Design value of pt/mc2 = -gamma  
+        amrex::Print() << "Ref pt = " << pd;
 
         // loop over refinement levels
         int const nLevel = pc.maxLevel();
@@ -40,8 +45,9 @@ namespace transformation {
                 amrex::ParticleReal *const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
                 amrex::ParticleReal *const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
 
+
                 if( direction == Direction::T2Z) {
-                    amrex::ParticleReal const pzd = pd;  // Design value of pz/mc = beta*gamma
+                    amrex::ParticleReal const pzd = sqrt(pow(pd,2)-1.0);  // Design value of pz/mc = beta*gamma
                     T2Z t2z(pzd);
                     amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE(long i) {
                         // access AoS data such as positions and cpu/id
@@ -51,6 +57,7 @@ namespace transformation {
                         amrex::ParticleReal &px = part_px[i];
                         amrex::ParticleReal &py = part_py[i];
                         amrex::ParticleReal &pt = part_pt[i];
+
 
                         t2z(p, px, py, pt);
                     });

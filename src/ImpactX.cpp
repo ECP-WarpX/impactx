@@ -160,11 +160,8 @@ namespace impactx
             amrex::Print() << " ++++ Starting step=" << step << "\n";
 
             // transform from x',y',t to x,y,z
-            //    TODO: replace hard-coded values with options/parameters
-            amrex::ParticleReal const pzd = 5.0;  // Design value of pz/mc = beta*gamma
             transformation::CoordinateTransformation(*m_particle_container,
-                                                     transformation::Direction::T2Z,
-                                                     pzd);
+                                                     transformation::Direction::T2Z);
 
             // Space-charge calculation: turn off if there is only 1 particle
             if (m_particle_container->TotalNumberOfParticles(false,false) > 1) {
@@ -190,11 +187,8 @@ namespace impactx
             }
 
             // transform from x,y,z to x',y',t
-            //    TODO: replace hard-coded values with options/parameters
-            amrex::ParticleReal const ptd = 5.0;  // Design value of pt/mc2 = -gamma.
             transformation::CoordinateTransformation(*m_particle_container,
-                                                     transformation::Direction::Z2T,
-                                                     ptd);
+                                                     transformation::Direction::Z2T);
 
             // for later: original Impact implementation as an option
             // Redistribute particles in x',y',t

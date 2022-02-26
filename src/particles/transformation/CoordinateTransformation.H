@@ -26,12 +26,9 @@ namespace transformation
      *
      * @param pc container of the particles to push
      * @param direction the direction (Z to T or vice versa)
-     * @param pd design value of pz/mc = beta*gamma (for T2Z) or design value
-     *           of pt/mc2 = -gamma (Z2T)
      */
     void CoordinateTransformation(ImpactXParticleContainer &pc,
-                                  Direction const & direction,
-                                  amrex::ParticleReal const pd);
+                                  Direction const & direction);
 
 } // namespace transformation
 } // namespace impactx
