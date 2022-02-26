@@ -1,0 +1,41 @@
+name: 🐧 HIP
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.head_ref }}-hip
+  cancel-in-progress: true
+
+jobs:
+  build_hip:
+    name: HIP
+    runs-on: ubuntu-20.04
+    env:
+      CXXFLAGS: "-Werror -Wno-deprecated-declarations -Wno-error=pass-failed"
+      CMAKE_GENERATOR: Ninja
+    if: github.event.pull_request.draft == false
+    steps:
+    - uses: actions/checkout@v2
+    - name: install dependencies
+      shell: bash
+      run: .github/workflows/dependencies/hip.sh
+    - name: build ImpactX
+      shell: bash
+      run: |
+        source /etc/profile.d/rocm.sh
+        hipcc --version
+        which clang
+        which clang++
+        export CXX=$(which clang++)
+        export CC=$(which clang)
+
+        # "mpic++ --showme" forgets open-pal in Ubuntu 20.04 + OpenMPI 4.0.3
+        #   https://bugs.launchpad.net/ubuntu/+source/openmpi/+bug/1941786
+        #   https://github.com/open-mpi/ompi/issues/9317
+        export LDFLAGS="-lopen-pal"
+
+        cmake -S . -B build \
+          -DCMAKE_VERBOSE_MAKEFILE=ON \
+          -DAMReX_AMD_ARCH=gfx900     \
+          -DImpactX_COMPUTE=HIP
+        cmake --build build -j 2
