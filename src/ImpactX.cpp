@@ -231,7 +231,7 @@ namespace impactx
         pp_lattice.queryarr("elements", lattice_elements);
 
         // Loop through lattice elements
-        for (std::string const element_name : lattice_elements) {
+        for (std::string const & element_name : lattice_elements) {
             // Check the element type
             amrex::ParmParse pp_element(element_name);
             std::string element_type;
