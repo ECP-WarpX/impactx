@@ -309,30 +309,34 @@ namespace impactx
           amrex::RandomEngine rng;
           amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
 
-          if (amrex::ParallelDescriptor::IOProcessor()) {
-              x.reserve(npart);
-              y.reserve(npart);
-              t.reserve(npart);
-              px.reserve(npart);
-              py.reserve(npart);
-              pt.reserve(npart);
+          int myproc = amrex::ParallelDescriptor::MyProc();
+          int nprocs = amrex::ParallelDescriptor::NProcs();
+          int navg = npart / nprocs;
+          int nleft = npart - navg * nprocs;
+          int npart_this_proc = (myproc < nleft) ? navg+1 : navg;
 
-              // write file header
-              amrex::PrintToFile("diags/initial_beam.txt") << "#x y t px py pt\n";
+          x.reserve(npart_this_proc);
+          y.reserve(npart_this_proc);
+          t.reserve(npart_this_proc);
+          px.reserve(npart_this_proc);
+          py.reserve(npart_this_proc);
+          pt.reserve(npart_this_proc);
 
-              for(amrex::Long i = 0; i < npart; ++i) {
+          // write file header
+          amrex::PrintToFile("diags/initial_beam.txt") << "#x y t px py pt\n";
 
-                  waterbag(ix, iy, it, ipx, ipy, ipt, rng);
-                  x.push_back(ix);
-                  y.push_back(iy);
-                  t.push_back(it);
-                  px.push_back(ipx);
-                  py.push_back(ipy);
-                  pt.push_back(ipt);
-                  amrex::PrintToFile("diags/initial_beam.txt")
-                      << ix << " " << iy << " " << it << " "
-                      << ipx << " " << ipy << " " << ipt << "\n";
-              }
+          for(amrex::Long i = 0; i < npart_this_proc; ++i) {
+
+              waterbag(ix, iy, it, ipx, ipy, ipt, rng);
+              x.push_back(ix);
+              y.push_back(iy);
+              t.push_back(it);
+              px.push_back(ipx);
+              py.push_back(ipy);
+              pt.push_back(ipt);
+              amrex::PrintToFile("diags/initial_beam.txt")
+                  << ix << " " << iy << " " << it << " "
+                  << ipx << " " << ipy << " " << ipt << "\n";
           }
 
           int const lev = 0;
