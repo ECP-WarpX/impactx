@@ -64,7 +64,7 @@ namespace impactx
             // compute phase advance per unit length in s (in rad/m)
             amrex::ParticleReal const omega = sqrt(abs(m_k));
 
-            if(m_k > 0.0) {     
+            if(m_k > 0.0) {
                // advance position and momentum (focusing quad)
                p.pos(0) = cos(omega*m_ds)*x + sin(omega*m_ds)/omega*px;
                px = -omega*sin(omega*m_ds)*x + cos(omega*m_ds)*px;
