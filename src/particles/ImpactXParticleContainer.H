@@ -48,7 +48,6 @@ namespace impactx
         {
             ux,  ///< momentum in x, normalized to proper velocity
             uy,  ///< momentum in y, normalized to proper velocity
-            t,   ///< phase in arrival time * 2pi * reference frequency, radians
             pt,  ///< kinetic energy deviation, (E0-E)/mc^2
             q_m, ///< charge to mass ratio, in q_e/m_e (?)
             w,   ///< particle weight, unitless
@@ -114,6 +113,8 @@ namespace impactx
          * @param px momentum in x
          * @param py momentum in y
          * @param pz momentum in z
+         * @param qm charge over mass in 1/eV
+         * @param bchchg total charge within a bunch in C
          */
         void
         AddNParticles (int lev,
@@ -122,7 +123,9 @@ namespace impactx
                        amrex::Vector<amrex::ParticleReal> const & z,
                        amrex::Vector<amrex::ParticleReal> const & px,
                        amrex::Vector<amrex::ParticleReal> const & py,
-                       amrex::Vector<amrex::ParticleReal> const & pz);
+                       amrex::Vector<amrex::ParticleReal> const & pz,
+                       amrex::ParticleReal const & qm,
+                       amrex::ParticleReal const & bchchg);
 
         /** Set reference particle attributes
          *
