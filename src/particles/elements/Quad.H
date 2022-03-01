@@ -58,17 +58,29 @@ namespace impactx
             amrex::ParticleReal const pt_ref = refpart.pt;
             amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
 
-            // advance position and momentum (drift)
-            p.pos(0) = cos(m_k*m_ds)*x + sin(m_k*m_ds)/m_k*px;
-            // px = px;
-            px = -m_k*sin(m_k*m_ds)*x + cos(m_k*m_ds)*px;
+            amrex::ParticleReal const omega = sqrt(abs(m_k));
 
-            p.pos(1) = cosh(m_k*m_ds)*y + sinh(m_k*m_ds)/m_k*py;
-            py = m_k*sinh(m_k*m_ds)*y + cosh(m_k*m_ds)*py;
+            if(m_k > 0.0) {     
+               // advance position and momentum (focusing quad)
+               p.pos(0) = cos(omega*m_ds)*x + sin(omega*m_ds)/omega*px;
+               px = -omega*sin(omega*m_ds)*x + cos(omega*m_ds)*px;
 
-            p.pos(2) = t + (m_ds/betgam2)*pt;
-            // pt = pt;
+               p.pos(1) = cosh(omega*m_ds)*y + sinh(omega*m_ds)/omega*py;
+               py = omega*sinh(omega*m_ds)*y + cosh(omega*m_ds)*py;
 
+               p.pos(2) = t + (m_ds/betgam2)*pt;
+               // pt = pt;
+            } else {
+               // advance position and momentum (defocusing quad)
+               p.pos(0) = cosh(omega*m_ds)*x + sinh(omega*m_ds)/omega*px;
+               px = omega*sinh(omega*m_ds)*x + cosh(omega*m_ds)*px;
+
+               p.pos(1) = cos(omega*m_ds)*y + sin(omega*m_ds)/omega*py;
+               py = -omega*sin(omega*m_ds)*y + cos(omega*m_ds)*py;
+
+               p.pos(2) = t + (m_ds/betgam2)*pt;
+               // pt = pt;
+            }
         }
 
     private:
