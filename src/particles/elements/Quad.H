@@ -24,7 +24,10 @@ namespace impactx
         /** A Quadrupole magnet
          *
          * @param ds Segment length in m.
-         * @param k  quadrupole strength in 1/m
+         * @param k  Quadrupole strength in m^(-2) (MADX convention)
+         *           = (gradient in T/m) / (rigidity in T-m)
+         *           k > 0 horizontal focusing
+         *           k < 0 horizontal defocusing
          */
         Quad( amrex::ParticleReal const ds, amrex::ParticleReal const k )
         : m_ds(ds), m_k(k)
@@ -58,6 +61,7 @@ namespace impactx
             amrex::ParticleReal const pt_ref = refpart.pt;
             amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
 
+            // compute phase advance per unit length in s (in rad/m)
             amrex::ParticleReal const omega = sqrt(abs(m_k));
 
             if(m_k > 0.0) {     
