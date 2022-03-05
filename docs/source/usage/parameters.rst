@@ -124,6 +124,18 @@ Lattice Elements
 
             * ``<element_name>.rc`` (``float``, in meters) the bend radius
 
+        * ``dipedge`` for dipole edge focusing. This requires these additional parameters:
+
+            * ``<element_name>.psi`` (``float``, in radians) the pole face
+              rotation angle
+
+            * ``<element_name>.rc`` (``float``, in meters) the bend radius
+
+            * ``<element_name>.g`` (``float``, in meters) the gap size
+
+            * ``<element_name>.K2`` (``float``, dimensionless) normalized
+              field integral for fringe field
+
 .. _running-cpp-parameters-parallelization:
 
 Distribution across MPI ranks and parallelization

@@ -9,16 +9,13 @@ beam.particle = electron
 beam.distribution = waterbag
 beam.sigmaX = 2.2951017632e-5
 beam.sigmaY = 1.3084093142e-5
-#beam.sigmaT = 5.5555553e-8
-beam.sigmaT = 6.00800897618671048624845e-8
+beam.sigmaT = 5.5555553e-8
 beam.sigmaPx = 1.598353425e-6
 beam.sigmaPy = 2.803697378e-6
-#beam.sigmaPt = 2.000000000e-6
-beam.sigmaPt = 2.1628993476497387730437553e-6
+beam.sigmaPt = 2.000000000e-6
 beam.muxpx = 0.933345606203060
 beam.muypy = 0.933345606203060
-#beam.mutpt = 0.999999961419755
-beam.mutpt = 0.999999954815784
+beam.mutpt = 0.999999961419755
 
 
 ###############################################################################
