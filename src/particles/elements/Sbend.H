@@ -54,6 +54,11 @@ namespace impactx
             amrex::ParticleReal const y = p.pos(1);
             amrex::ParticleReal const t = p.pos(2);
 
+            // initialize output values of momenta
+            amrex::ParticleReal pxout = px;
+            amrex::ParticleReal pyout = py;
+            amrex::ParticleReal ptout = pt;
+
             // access reference particle values to find beta*gamma^2
             amrex::ParticleReal const pt_ref = refpart.pt;
             amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
@@ -61,16 +66,26 @@ namespace impactx
             amrex::ParticleReal const theta = m_ds/m_rc;
 
             // advance position and momentum (sector bend)
+
             p.pos(0) = cos(theta)*x + m_rc*sin(theta)*px
                      - (m_rc/bet)*(1.0_prt - cos(theta))*pt;
-            px = -sin(theta)/m_rc*x + cos(theta)*px - sin(theta)/bet*pt;
+
+            pxout = -sin(theta)/m_rc*x + cos(theta)*px - sin(theta)/bet*pt;
 
             p.pos(1) = y + m_rc*theta*py;
-            // py = py;
+
+            // pyout = py;
 
             p.pos(2) = sin(theta)/bet*x + m_rc/bet*(1.0_prt - cos(theta))*px + t
                      + m_rc*(-theta+sin(theta)/(bet*bet))*pt;
-            // pt = pt;
+
+            // ptout = pt;
+
+            // assign updated momenta
+            px = pxout;
+            py = pyout;
+            pt = ptout;
+
         }
 
     private:

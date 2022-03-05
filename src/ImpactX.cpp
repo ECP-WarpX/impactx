@@ -245,6 +245,13 @@ namespace impactx
                 pp_element.get("ds", ds);
                 pp_element.get("rc", rc);
                 m_lattice.emplace_back( Sbend(ds, rc) );
+            } else if (element_type == "dipedge") {
+                amrex::Real psi, rc, g, K2;
+                pp_element.get("psi", psi);
+                pp_element.get("rc", rc);
+                pp_element.get("g", g);
+                pp_element.get("K2", K2);
+                m_lattice.emplace_back( DipEdge(psi, rc, g, K2) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }
