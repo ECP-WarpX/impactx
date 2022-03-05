@@ -26,14 +26,14 @@ lattice.elements = sbend1 dipedge1 drift1 dipedge2 sbend2 drift2 sbend2
                    dipedge2 drift1 dipedge1 sbend1 drift3
 
 sbend1.type = sbend
-sbend1.ds = 0.50037       #projected length 0.5 m, angle 2.77 deg
+sbend1.ds = 0.50037       # projected length 0.5 m, angle 2.77 deg
 sbend1.rc = -10.35
 
 drift1.type = drift
-drift1.ds = 5.0058489435  #projected length 5 m
+drift1.ds = 5.0058489435  # projected length 5 m
 
 sbend2.type = sbend
-sbend2.ds = 0.50037       #projected length 0.5 m, angle 2.77 deg
+sbend2.ds = 0.50037       # projected length 0.5 m, angle 2.77 deg
 sbend2.rc = 10.35
 
 drift2.type = drift
@@ -42,14 +42,14 @@ drift2.ds = 1.0
 drift3.type = drift
 drift3.ds = 2.0
 
-dipedge1.type = dipedge   #dipole edge focusing
-dipedge1.psi = -0.048345620280243 
+dipedge1.type = dipedge   # dipole edge focusing
+dipedge1.psi = -0.048345620280243
 dipedge1.rc = -10.35
 dipedge1.g = 0.0
 dipedge1.K2 = 0.0
 
 dipedge2.type = dipedge
-dipedge2.psi = 0.048345620280243 
+dipedge2.psi = 0.048345620280243
 dipedge2.rc = 10.35
 dipedge2.g = 0.0
 dipedge2.K2 = 0.0

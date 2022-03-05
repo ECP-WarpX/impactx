@@ -1,4 +1,4 @@
-/* Copyright 2021 Chad Mitchell, Axel Huebl
+/* Copyright 2021-2022 Chad Mitchell, Axel Huebl
  *
  * This file is part of ImpactX.
  *
@@ -29,7 +29,7 @@ namespace impactx
          * @param K2 Fringe field integral (unitless).
          */
         DipEdge( amrex::ParticleReal const psi, amrex::ParticleReal const rc, amrex::ParticleReal const
-		g, amrex::ParticleReal const K2)
+        g, amrex::ParticleReal const K2)
         : m_psi(psi), m_rc(rc), m_g(g), m_K2(K2)
         {
         }
@@ -41,7 +41,7 @@ namespace impactx
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
-         * @param refpart reference particle
+         * @param refpart reference particle (unused)
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
@@ -49,14 +49,13 @@ namespace impactx
                 amrex::ParticleReal & AMREX_RESTRICT px,
                 amrex::ParticleReal & AMREX_RESTRICT py,
                 amrex::ParticleReal & AMREX_RESTRICT pt,
-                RefPart const refpart) const {
+                [[maybe_unused]] RefPart const refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(0);
             amrex::ParticleReal const y = p.pos(1);
-            amrex::ParticleReal const t = p.pos(2);
 
             // access reference particle values if needed
 
@@ -73,7 +72,6 @@ namespace impactx
             // apply edge focusing
             px = px + R21*x;
             py = py + R43*y;
-
         }
 
     private:
