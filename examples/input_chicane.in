@@ -46,13 +46,13 @@ drift3.type = drift
 drift3.ds = 2.0
 
 dipedge1.type = dipedge   #dipole edge focusing
-dipedge1.psi = -0.048345620280243 
+dipedge1.psi = -0.048345620280243
 dipedge1.rc = -10.35
 dipedge1.g = 0.0
 dipedge1.K2 = 0.0
 
 dipedge2.type = dipedge
-dipedge2.psi = 0.048345620280243 
+dipedge2.psi = 0.048345620280243
 dipedge2.rc = 10.35
 dipedge2.g = 0.0
 dipedge2.K2 = 0.0
