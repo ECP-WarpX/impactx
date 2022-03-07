@@ -40,7 +40,7 @@ namespace impactx
          * @param p Particle AoS data for positions and cpu/id
          * @param px particle momentum in x
          * @param py particle momentum in y
-         * @param pt particle momentum in t
+         * @param pt particle momentum in t (unchanged)
          * @param refpart reference particle (unused)
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
