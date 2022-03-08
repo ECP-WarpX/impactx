@@ -44,6 +44,8 @@ jobs:
 
     - name: run ImpactX
       run: |
+        ctest --test-dir build --output-on-failure
+
         build/bin/impactx examples/input_fodo.in algo.particle_shape = 1 || \
         { cat Backtrace.0.0; exit 1; }
         build/bin/impactx examples/input_fodo.in algo.particle_shape = 2 || \

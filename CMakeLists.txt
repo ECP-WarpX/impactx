@@ -86,7 +86,7 @@ set_default_build_type("Release")
 option(ImpactX_IPO "Compile ImpactX with interprocedural optimization (will take more time)" OFF)
 
 # this defined the variable BUILD_TESTING which is ON by default
-#include(CTest)
+include(CTest)
 
 
 # Dependencies ################################################################
@@ -281,12 +281,27 @@ endif()
 
 # Tests #######################################################################
 #
+if(BUILD_TESTING)
+    enable_testing()
 
-#if(BUILD_TESTING)
-#    enable_testing()
-#
-#    add_test(...)
-#endif()
+    # FODO cell
+    add_test(NAME FODO.run
+             COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/fodo/input_fodo.in
+             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+    )
+    add_test(NAME FODO.analysis
+             COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/analysis_fodo.py
+             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+    )
+    set_tests_properties(FODO.analysis PROPERTIES DEPENDS "FODO.run")
+
+    # Chicane
+    # FODO cell example
+    add_test(NAME chicane.run
+             COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/chicane/input_chicane.in
+             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+    )
+endif()
 
 
 # Status Summary for Build Options ############################################
