@@ -3,7 +3,10 @@
 Testing
 =======
 
-In order to run all tests of ImpactX, first :ref:`build ImpactX from source <install-developers>`.
+Preparation
+-----------
+
+Prepare for running tests of ImpactX by :ref:`buildind ImpactX from source <install-developers>`.
 
 In order to run our tests, you need to have a few :ref:`Python packages installed <install-dependencies>`:
 
@@ -12,13 +15,18 @@ In order to run our tests, you need to have a few :ref:`Python packages installe
    python3 -m pip install -U pip setuptools wheel
    python3 -m pip install -r requirements.txt
 
+Run
+---
+
 You can run all our tests with:
 
 .. code-block:: sh
 
    ctest --test-dir build --output-on-failure
 
-Further options:
+Further Options
+---------------
+
 * help: ``ctest --test-dir build --help``
 * list all tests: ``ctest --test-dir build -N``
 * only run tests that have "FODO" in their name: ``ctest --test-dir build -R FODO``
