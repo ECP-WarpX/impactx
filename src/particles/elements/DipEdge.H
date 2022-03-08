@@ -23,6 +23,13 @@ namespace impactx
 
         /** Edge focusing associated with bend entry or exit
          *
+         * This model assumes a first-order effect of nonzero gap.
+         * Here we use the linear fringe field map, given to first order in g/rc (gap / radius of curvature).
+         *
+         * References:
+         *   K. L. Brown, SLAC Report No. 75 (1982).
+         *   K. Hwang and S. Y. Lee, PRAB 18, 122401 (2015).
+         *
          * @param psi Pole face angle in rad.
          * @param rc Radius of curvature in m.
          * @param g Gap parameter in m.
@@ -60,8 +67,8 @@ namespace impactx
             // access reference particle values if needed
 
             // edge focusing matrix elements (zero gap)
-            amrex::ParticleReal R21 = tan(m_psi)/m_rc;
-            amrex::ParticleReal R43 = -tan(m_psi)/m_rc;
+            amrex::ParticleReal const R21 = tan(m_psi)/m_rc;
+            amrex::ParticleReal R43 = -R21;
             amrex::ParticleReal vf = 0;
 
             // first-order effect of nonzero gap
