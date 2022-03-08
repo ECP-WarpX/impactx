@@ -296,7 +296,6 @@ if(BUILD_TESTING)
     set_tests_properties(FODO.analysis PROPERTIES DEPENDS "FODO.run")
 
     # Chicane
-    # FODO cell example
     add_test(NAME chicane.run
              COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/chicane/input_chicane.in
              WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
