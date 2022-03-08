@@ -46,9 +46,9 @@ jobs:
       run: |
         ctest --test-dir build --output-on-failure
 
-        build/bin/impactx examples/input_fodo.in algo.particle_shape = 1 || \
+        build/bin/impactx examples/fodo/input_fodo.in algo.particle_shape = 1 || \
         { cat Backtrace.0.0; exit 1; }
-        build/bin/impactx examples/input_fodo.in algo.particle_shape = 2 || \
+        build/bin/impactx examples/fodo/input_fodo.in algo.particle_shape = 2 || \
         { cat Backtrace.0.0; exit 1; }
-        build/bin/impactx examples/input_fodo.in algo.particle_shape = 3 || \
+        build/bin/impactx examples/fodo/input_fodo.in algo.particle_shape = 3 || \
         { cat Backtrace.0.0; exit 1; }
