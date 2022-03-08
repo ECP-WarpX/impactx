@@ -66,8 +66,8 @@ namespace impactx
 
             // first-order effect of nonzero gap
             vf = (1.0_prt + pow(sin(m_psi),2))/(pow(cos(m_psi),3));
-            vf = vf * m_g * m_K2/(pow(m_rc,2));
-            R43 = R43 + vf;
+            vf *= m_g * m_K2/(pow(m_rc,2));
+            R43 += vf;
 
             // apply edge focusing
             px = px + R21*x;
