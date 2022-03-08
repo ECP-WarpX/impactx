@@ -64,27 +64,38 @@ namespace impactx
             // compute phase advance per unit length in s (in rad/m)
             amrex::ParticleReal const omega = sqrt(abs(m_k));
 
+            // intialize output values of momenta
+            amrex::ParticleReal pxout = px;
+            amrex::ParticleReal pyout = py;
+            amrex::ParticleReal ptout = pt;
+
             if(m_k > 0.0) {
                // advance position and momentum (focusing quad)
                p.pos(0) = cos(omega*m_ds)*x + sin(omega*m_ds)/omega*px;
-               px = -omega*sin(omega*m_ds)*x + cos(omega*m_ds)*px;
+               pxout = -omega*sin(omega*m_ds)*x + cos(omega*m_ds)*px;
 
                p.pos(1) = cosh(omega*m_ds)*y + sinh(omega*m_ds)/omega*py;
-               py = omega*sinh(omega*m_ds)*y + cosh(omega*m_ds)*py;
+               pyout = omega*sinh(omega*m_ds)*y + cosh(omega*m_ds)*py;
 
                p.pos(2) = t + (m_ds/betgam2)*pt;
-               // pt = pt;
+               // ptout = pt;
             } else {
                // advance position and momentum (defocusing quad)
                p.pos(0) = cosh(omega*m_ds)*x + sinh(omega*m_ds)/omega*px;
-               px = omega*sinh(omega*m_ds)*x + cosh(omega*m_ds)*px;
+               pxout = omega*sinh(omega*m_ds)*x + cosh(omega*m_ds)*px;
 
                p.pos(1) = cos(omega*m_ds)*y + sin(omega*m_ds)/omega*py;
-               py = -omega*sin(omega*m_ds)*y + cos(omega*m_ds)*py;
+               pyout = -omega*sin(omega*m_ds)*y + cos(omega*m_ds)*py;
 
                p.pos(2) = t + (m_ds/betgam2)*pt;
-               // pt = pt;
+               // ptout = pt;
             }
+
+            // assign updated momenta
+            px = pxout;
+            py = pyout;
+            pt = ptout;
+
         }
 
     private:
