@@ -141,7 +141,7 @@ Lattice Elements
 Distribution across MPI ranks and parallelization
 -------------------------------------------------
 
-* ``amr.max_grid_size`` (``integer``) optional (default ``128`)
+* ``amr.max_grid_size`` (``integer``) optional (default ``128``)
     Maximum allowable size of each **subdomain**
     (expressed in number of grid points, in each direction).
     Each subdomain has its own ghost cells, and can be handled by a
