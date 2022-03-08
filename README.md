@@ -137,16 +137,19 @@ spack add pkgconfig     # for fftw
 # spack add cuda
 # spack add python
 # spack add py-pip
+# spack add py-pandas
+# spack add py-numpy
+# spack add py-scipy
 
 spack install
 ```
 
 (in new terminals, re-activate the environment with `spack env activate impactx-dev` again)
 
-### Conda (Windows)
+### Conda (Linux/macOS/Windows)
 
 ```bash
-conda create -n impactx-dev -c conda-forge adios2 ccache cmake compilers git hdf5 fftw matplotlib ninja
+conda create -n impactx-dev -c conda-forge adios2 ccache cmake compilers git hdf5 fftw matplotlib ninja numpy pandas scipy
 conda activate impactx-dev
 
 # compile with -DImpactX_MPI=OFF
@@ -227,13 +230,32 @@ Examples:
     ./impactx input_fodo.in quad1.ds=0.5 sbend1.rc=1.5
 ```
 
+## Test
+
+In order to run our tests, you need to have a few Python packages installed:
+```console
+python3 -m pip install -U pip setuptools wheel
+python3 -m pip install -r requirements.txt
+```
+
+You can run all our tests with:
+
+```console
+ctest --test-dir build --output-on-failure
+```
+
+Further options:
+* help: `ctest --test-dir build --help`
+* list all tests: `ctest --test-dir build -N`
+* only run tests that have "FODO" in their name: `ctest --test-dir build -R FODO`
+
 ## Acknowledgements
 
 This work was supported by the Laboratory Directed Research and Development Program of Lawrence Berkeley National Laboratory under U.S. Department of Energy Contract No. DE-AC02-05CH11231.
 
 ## License
 
-Copyright (c) 2021, The Regents of the University of California, through Lawrence Berkeley National Laboratory (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights reserved.
+Copyright (c) 2021-2022, The Regents of the University of California, through Lawrence Berkeley National Laboratory (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights reserved.
 
 If you have questions about your rights to use or distribute this software, please contact Berkeley Lab's Intellectual Property Office at IPO@lbl.gov.
 

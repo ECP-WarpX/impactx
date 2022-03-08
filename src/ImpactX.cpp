@@ -325,7 +325,7 @@ namespace impactx
               pt.reserve(npart);
 
               // write file header
-              amrex::PrintToFile("diags/initial_beam.txt") << "#x y t px py pt\n";
+              amrex::PrintToFile("diags/initial_beam.txt") << "x y t px py pt\n";
 
               for(amrex::Long i = 0; i < npart; ++i) {
 

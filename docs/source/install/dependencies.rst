@@ -52,6 +52,10 @@ Spack (macOS/Linux)
    # spack add cuda
    # spack add python
    # spack add py-pip
+   # spack add py-pip
+   # spack add py-pandas
+   # spack add py-numpy
+   # spack add py-scipy
 
    spack install
 
@@ -61,7 +65,7 @@ If you also want to run runtime tests and added Python (``spack add python`` and
 
 .. code-block:: bash
 
-   python -m pip install matplotlib yt scipy numpy openpmd-api
+   python3 -m pip install matplotlib yt scipy numpy openpmd-api
 
 
 Brew (macOS/Linux)
@@ -79,6 +83,8 @@ Brew (macOS/Linux)
    brew install libomp      # for OpenMP
    brew install pkg-config  # for fftw
    brew install open-mpi
+   brew install python
+   python3 -m pip install matplotlib yt scipy numpy openpmd-api
 
 
 Conda (Linux/macOS/Windows)
@@ -88,7 +94,7 @@ Without MPI:
 
 .. code-block:: bash
 
-   conda create -n impactx-dev -c conda-forge ccache cmake compilers git openpmd-api python numpy scipy yt fftw matplotlib mamba ninja
+   conda create -n impactx-dev -c conda-forge ccache cmake compilers git openpmd-api python numpy scipy yt fftw matplotlib mamba ninja numpy pandas scipy
    conda activate impactx-dev
 
    # compile ImpactX with -DImpactX_MPI=OFF
@@ -97,7 +103,7 @@ With MPI (only Linux/macOS):
 
 .. code-block:: bash
 
-   conda create -n impactx-dev -c conda-forge ccache cmake compilers git openpmd-api=*=mpi_openmpi* python numpy scipy yt fftw=*=mpi_openmpi* matplotlib mamba ninja openmpi
+   conda create -n impactx-dev -c conda-forge ccache cmake compilers git openpmd-api=*=mpi_openmpi* python numpy scipy yt fftw=*=mpi_openmpi* matplotlib mamba ninja numpy pandas scipy openmpi
    conda activate impactx-dev
 
 
@@ -107,4 +113,4 @@ Apt (Debian/Ubuntu)
 .. code-block:: bash
 
    sudo apt update
-   sudo apt install build-essential ccache cmake g++ git libfftw3-mpi-dev libfftw3-dev libhdf5-openmpi-dev libopenmpi-dev pkg-config python3 python3-matplotlib python3-numpy python3-scipy
+   sudo apt install build-essential ccache cmake g++ git libfftw3-mpi-dev libfftw3-dev libhdf5-openmpi-dev libopenmpi-dev pkg-config python3 python3-matplotlib python3-numpy python3-pandas python3-scipy

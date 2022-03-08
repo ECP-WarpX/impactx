@@ -17,4 +17,9 @@ sudo apt-get install -y \
     libopenmpi-dev      \
     ninja-build         \
     pkg-config          \
+    python3             \
+    python3-pip         \
     wget
+
+python3 -m pip install -U pip setuptools wheel
+python3 -m pip install -r requirements.txt
