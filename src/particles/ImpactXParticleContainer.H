@@ -49,7 +49,7 @@ namespace impactx
             ux,  ///< momentum in x, normalized to proper velocity
             uy,  ///< momentum in y, normalized to proper velocity
             pt,  ///< kinetic energy deviation, (E0-E)/mc^2
-            q_m, ///< charge to mass ratio, in q_e/m_e (?)
+            m_qm, ///< charge to mass ratio, in q_e/m_e (q_e/eV)
             w,   ///< particle weight, unitless
             nattribs ///< the number of attributes above (always last)
         };
@@ -113,7 +113,7 @@ namespace impactx
          * @param px momentum in x
          * @param py momentum in y
          * @param pz momentum in z
-         * @param qm charge over mass in 1/eV
+         * @param m_qm charge over mass in 1/eV
          * @param bchchg total charge within a bunch in C
          */
         void

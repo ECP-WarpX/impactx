@@ -88,7 +88,7 @@ namespace impactx
         pinned_tile.push_back_real(RealSoA::ux, &(*px.cbegin()), &(*px.cend()));
         pinned_tile.push_back_real(RealSoA::uy, &(*py.cbegin()), &(*py.cend()));
         pinned_tile.push_back_real(RealSoA::pt, &(*pz.cbegin()), &(*pz.cend()));
-        pinned_tile.push_back_real(RealSoA::q_m, np, qm);
+        pinned_tile.push_back_real(RealSoA::m_qm, np, qm);
         amrex::ParticleReal const q_e = 1.60217662e-19;
         pinned_tile.push_back_real(RealSoA::w, np, bchchg/q_e/np);
 

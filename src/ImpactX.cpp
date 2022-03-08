@@ -269,7 +269,7 @@ namespace impactx
         std::string particle_type;  // Particle type
         pp_dist.get("particle", particle_type);
 
-        amrex::ParticleReal qm = 0.0; //charge/mass ratio
+        amrex::ParticleReal qm = 0.0; //charge/mass ratio (q_e/eV)
         if(particle_type == "electron"){
           qm = -1.0/0.510998950e6;
         } else if(particle_type == "proton"){
