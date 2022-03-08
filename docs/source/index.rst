@@ -99,6 +99,7 @@ Development
    :hidden:
 
    developers/contributing
+   developers/testing
    developers/documentation
    developers/repo_organization
    developers/implementation
