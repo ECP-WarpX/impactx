@@ -25,7 +25,7 @@ namespace impactx::diagnostics
         tmp.copyParticles(pc, local);
 
         // write file header
-        amrex::PrintToFile("diags/output_beam.txt") << "#x y t px py pt\n";
+        amrex::PrintToFile("diags/output_beam.txt") << "x y t px py pt\n";
 
         // loop over refinement levels
         int const nLevel = tmp.maxLevel() + 1;
