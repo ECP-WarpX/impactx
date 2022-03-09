@@ -113,7 +113,7 @@ namespace impactx
          * @param px momentum in x
          * @param py momentum in y
          * @param pz momentum in z
-         * @param m_qm charge over mass in 1/eV
+         * @param qm charge over mass in 1/eV
          * @param bchchg total charge within a bunch in C
          */
         void
