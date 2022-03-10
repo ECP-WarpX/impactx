@@ -35,15 +35,36 @@ Pick *one* of the methods below:
 ```bash
 ssh perlmutter-p1.nersc.gov
 ```
+
+Now ``cd`` to your ImpactX source directory.
+
 ```bash
-module load cmake/git-20210830  # 3.22-dev
+module load cmake/3.22.0
 module swap PrgEnv-nvidia PrgEnv-gnu
-module swap gcc gcc/9.3.0
-module load cuda
+module load cudatoolkit
 module load cray-hdf5-parallel/1.12.0.7
+
+# Python
+module load cray-python/3.9.4.2
+if [ -d "$HOME/sw/perlmutter/venvs/impactx" ]
+then
+  source $HOME/sw/perlmutter/venvs/impactx/bin/activate
+else
+  python3 -m pip install --user --upgrade pip
+  python3 -m pip install --user virtualenv
+  python3 -m venv $HOME/sw/perlmutter/venvs/impactx
+  source $HOME/sw/perlmutter/venvs/impactx/bin/activate
+
+  python3 -m pip install --upgrade pip
+  MPICC="cc -target-accel=nvidia80 -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
+  python3 -m pip install -r requirements.txt
+fi
 
 # GPU-aware MPI
 export MPICH_GPU_SUPPORT_ENABLED=1
+
+# necessary to use CUDA-Aware MPI and run a job
+export CRAY_ACCEL_TARGET=nvidia80
 
 # optimize CUDA compilation for A100
 export AMREX_CUDA_ARCH=8.0
@@ -63,9 +84,12 @@ cmake -S . -B build_perlmutter -DImpactX_COMPUTE=CUDA
 # compile
 cmake --build build_perlmutter -j 10
 
+# test
+srun -N 1 --ntasks-per-node=4 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ctest --test-dir build_perlmutter --output-on-failure
+
 # run
 cd build_perlmutter/bin
-srun -N 1 --ntasks-per-node=4 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ./impactx ../../examples/input_fodo.in
+srun -N 1 --ntasks-per-node=4 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ./impactx ../../examples/fodo/input_fodo.in
 ```
 
 ### Cori KNL (NERSC)
@@ -74,13 +98,30 @@ srun -N 1 --ntasks-per-node=4 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_
 ssh cori.nersc.gov
 ```
 
+Now ``cd`` to your ImpactX source directory.
+
 ```bash
 module swap craype-haswell craype-mic-knl
 module swap PrgEnv-intel PrgEnv-gnu
 module load cmake/3.21.3
 module load cray-hdf5-parallel/1.10.5.2
 module load cray-fftw/3.3.8.4
+
+# Python
 module load cray-python/3.7.3.2
+if [ -d "$HOME/sw/knl/venvs/impactx" ]
+then
+  source $HOME/sw/knl/venvs/impactx/bin/activate
+else
+  python3 -m pip install --user --upgrade pip
+  python3 -m pip install --user virtualenv
+  python3 -m venv $HOME/sw/knl/venvs/impactx
+  source $HOME/sw/knl/venvs/impactx/bin/activate
+
+  python3 -m pip install --upgrade pip
+  MPICC="cc -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
+  python3 -m pip install -r requirements.txt
+fi
 ```
 
 ```bash
@@ -90,9 +131,12 @@ cmake -S . -B build_cori
 # compile
 cmake --build build_cori -j 8
 
+# test
+srun -C knl -N 1 -t 30 -q debug ctest --test-dir build_cori --output-on-failure
+
 # run
 cd build_cori/bin
-srun -C knl -N 1 -t 30 -q debug ./impactx ../../examples/input_fodo.in
+srun -C knl -N 1 -t 30 -q debug ./impactx ../../examples/fodo/input_fodo.in
 ```
 
 ### Homebrew (macOS)
