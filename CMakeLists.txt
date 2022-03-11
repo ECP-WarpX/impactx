@@ -139,6 +139,7 @@ endif()
 # own headers
 target_include_directories(ImpactX PUBLIC
     $<BUILD_INTERFACE:${ImpactX_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${ImpactX_BINARY_DIR}/src>
 )
 
 # if we include <AMReX_buildInfo.H> we will need to call:
@@ -202,9 +203,6 @@ set_ImpactX_binary_name()
 
 # Defines #####################################################################
 #
-get_source_version(ImpactX ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_definitions(ImpactX PUBLIC ImpactX_GIT_VERSION="${ImpactX_GIT_VERSION}")
-
 if(ImpactX_OPENPMD)
     target_compile_definitions(ImpactX PUBLIC ImpactX_USE_OPENPMD)
 endif()
@@ -217,6 +215,13 @@ set_cxx_warnings()
 
 # Generate Configuration and .pc Files ########################################
 #
+get_source_version(ImpactX ${ImpactX_SOURCE_DIR})
+configure_file(
+    ${ImpactX_SOURCE_DIR}/src/ImpactXVersion.H.in
+    ${ImpactX_BINARY_DIR}/src/ImpactXVersion.H
+    @ONLY
+)
+
 # these files are used if ImpactX is installed and picked up by a downstream
 # project (not needed yet)
 
