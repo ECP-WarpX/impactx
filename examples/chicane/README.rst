@@ -6,9 +6,8 @@ Chicane
 Berlin-Zeuthen magnetic bunch compression chicane:
 https://www.desy.de/csr/
 
-All parameters can be found online.  A 5 GeV electron bunch with normalized
-transverse rms emittance of 1 um undergoes longitudinal compression by
-a factor of 10 in a standard 4-bend chicane.
+All parameters can be found online.
+A 5 GeV electron bunch with normalized transverse rms emittance of 1 um undergoes longitudinal compression by a factor of 10 in a standard 4-bend chicane.
 
 The emittances should be preserved, and the rms pulse length should
 decrease by the compression factor (10).
