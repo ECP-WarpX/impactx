@@ -1,0 +1,18 @@
+/* Copyright 2022 Axel Huebl
+ *
+ * This file is part of ImpactX.
+ *
+ * License: BSD-3-Clause-LBNL
+ */
+#ifndef IMPACTX_VERSION_H_
+#define IMPACTX_VERSION_H_
+
+#ifndef IMPACTX_VERSION
+#   define IMPACTX_VERSION "@ImpactX_VERSION@"
+#endif
+
+#ifndef IMPACTX_GIT_VERSION
+#   define IMPACTX_GIT_VERSION "@ImpactX_GIT_VERSION@"
+#endif
+
+#endif // IMPACTX_VERSION_H_
