@@ -7,11 +7,10 @@ Stable FODO cell with a zero-current phase advance of 67.8 degrees.
 
 The matched Twiss parameters at entry are:
 
-horizontal beta = 2.82161941 m
-horizontal alpha = -1.59050035
-
-vertical beta = 2.82161941 m
-vertical alpha = 1.59050035
+* :math:`\beta_\mathrm{x} = 2.82161941` m
+* :math:`\alpha_\mathrm{x} = -1.59050035`
+* :math:`\beta_\mathrm{y} = 2.82161941` m
+* :math:`\alpha_\mathrm{y} = 1.59050035`
 
 We use a 2 GeV proton beam with initial unnormalized rms emittance of 2 nm.
 
