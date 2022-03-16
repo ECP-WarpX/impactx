@@ -252,6 +252,13 @@ namespace impactx
                 pp_element.get("g", g);
                 pp_element.get("K2", K2);
                 m_lattice.emplace_back( DipEdge(psi, rc, g, K2) );
+            } else if (element_type == "constf") {
+                amrex::Real ds, kx, ky, kt;
+                pp_element.get("ds", ds);
+                pp_element.get("kx", kx);
+                pp_element.get("ky", ky);
+                pp_element.get("kt", kt);
+                m_lattice.emplace_back( ConstF(ds, kx, ky, kt) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }
