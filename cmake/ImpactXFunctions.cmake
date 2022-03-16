@@ -107,6 +107,7 @@ macro(set_default_build_type default_build_type)
     endif()
 endmacro()
 
+
 # Set CXX
 # Note: this is a bit legacy and one should use CMake TOOLCHAINS instead.
 #
@@ -154,6 +155,7 @@ function(enable_IPO all_targets_list)
         message(FATAL_ERROR "Interprocedural optimization is not available, set ImpactX_IPO=OFF")
     endif()
 endfunction()
+
 
 # Take an <imported_target> and expose it as INTERFACE target with
 # ImpactX::thirdparty::<propagated_name> naming and SYSTEM includes.
