@@ -166,6 +166,7 @@ if(ImpactX_IPO)
 endif()
 
 # link dependencies
+#     note: only PUBLIC because ImpactX is an OBJECT collection
 target_link_libraries(ImpactX PUBLIC ImpactX::thirdparty::ablastr)
 
 if(ImpactX_OPENPMD)
