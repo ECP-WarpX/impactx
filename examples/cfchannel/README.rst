@@ -12,7 +12,7 @@ The matched Twiss parameters at entry are:
 * :math:`\beta_\mathrm{y} = 1.0` m
 * :math:`\alpha_\mathrm{y} = 0.0`
 
-We use a 2 GeV proton beam with initial unnormalized rms emittance of 1 um. 
+We use a 2 GeV proton beam with initial unnormalized rms emittance of 1 um.
 The longitudinal beam parameters are chosen so that the bunch has radial
 symmetry when viewed in the beam rest frame.
 
