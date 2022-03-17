@@ -1,7 +1,7 @@
 .. _examples-cfchannel:
 
 Constant Focusing Channel
-==========================
+=========================
 
 Stationary beam in a constant focusing channel (without space charge).
 
@@ -24,5 +24,4 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 
 .. literalinclude:: input_cfchannel.in
    :language: ini
-   :caption: You can copy this file from
-``examples/cfchannel/input_cfchannel.in``.
+   :caption: You can copy this file from ``examples/cfchannel/input_cfchannel.in``.
