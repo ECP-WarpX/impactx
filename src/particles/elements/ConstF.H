@@ -1,4 +1,4 @@
-/* Copyright 2021 Chad Mitchell, Axel Huebl
+/* Copyright 2022 Chad Mitchell, Axel Huebl
  *
  * This file is part of ImpactX.
  *
