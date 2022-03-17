@@ -36,13 +36,13 @@ We use the following modules and environments on the system (``$HOME/knl_impactx
 
    module swap craype-haswell craype-mic-knl
    module swap PrgEnv-intel PrgEnv-gnu
-   module load cmake/3.21.3
+   module load cmake/3.22.1
    module load cray-hdf5-parallel/1.10.5.2
-   module load cray-fftw/3.3.8.4
-   module load cray-python/3.7.3.2
+   module load cray-fftw/3.3.8.10
+   module load cray-python/3.9.7.1
 
    export PKG_CONFIG_PATH=$FFTW_DIR/pkgconfig:$PKG_CONFIG_PATH
-   export CMAKE_PREFIX_PATH=$HOME/sw/adios2-2.7.1-knl-install:$CMAKE_PREFIX_PATH
+   export CMAKE_PREFIX_PATH=$HOME/sw/knl/adios2-2.7.1-install:$CMAKE_PREFIX_PATH
 
    if [ -d "$HOME/sw/knl/venvs/impactx" ]
    then
@@ -75,13 +75,13 @@ We use the following modules and environments on the system (``$HOME/haswell_imp
 .. code-block:: bash
 
    module swap PrgEnv-intel PrgEnv-gnu
-   module load cmake/3.21.3
+   module load cmake/3.22.1
    module load cray-hdf5-parallel/1.10.5.2
-   module load cray-fftw/3.3.8.4
-   module load cray-python/3.7.3.2
+   module load cray-fftw/3.3.8.10
+   module load cray-python/3.9.7.1
 
    export PKG_CONFIG_PATH=$FFTW_DIR/pkgconfig:$PKG_CONFIG_PATH
-   export CMAKE_PREFIX_PATH=$HOME/sw/adios2-2.7.1-haswell-install:$CMAKE_PREFIX_PATH
+   export CMAKE_PREFIX_PATH=$HOME/sw/haswell/adios2-2.7.1-install:$CMAKE_PREFIX_PATH
 
    if [ -d "$HOME/sw/haswell/venvs/impactx" ]
    then
@@ -117,10 +117,10 @@ We use the following modules and environments on the system (``$HOME/gpu_impactx
    module load modules
    module load cgpu
    module load esslurm
-   module load gcc/8.3.0 cuda/11.4.0 cmake/3.21.3
+   module load gcc/8.3.0 cuda/11.4.0 cmake/3.22.1
    module load openmpi
 
-   export CMAKE_PREFIX_PATH=$HOME/sw/adios2-2.7.1-gpu-install:$CMAKE_PREFIX_PATH
+   export CMAKE_PREFIX_PATH=$HOME/sw/cori_gpu/adios2-2.7.1-install:$CMAKE_PREFIX_PATH
 
    if [ -d "$HOME/sw/cori_gpu/venvs/impactx" ]
    then
