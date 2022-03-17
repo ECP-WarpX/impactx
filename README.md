@@ -103,12 +103,12 @@ Now ``cd`` to your ImpactX source directory.
 ```bash
 module swap craype-haswell craype-mic-knl
 module swap PrgEnv-intel PrgEnv-gnu
-module load cmake/3.21.3
+module load cmake/3.22.1
 module load cray-hdf5-parallel/1.10.5.2
-module load cray-fftw/3.3.8.4
+module load cray-fftw/3.3.8.10
 
 # Python
-module load cray-python/3.7.3.2
+module load cray-python/3.9.7.1
 if [ -d "$HOME/sw/knl/venvs/impactx" ]
 then
   source $HOME/sw/knl/venvs/impactx/bin/activate
@@ -122,20 +122,24 @@ else
   MPICC="cc -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
   python3 -m pip install -r requirements.txt
 fi
+
+# tune exactly for KNL sub-architecture
+export CXXFLAGS="-march=knl"
+export CFLAGS="-march=knl"
 ```
 
 ```bash
 # configure
-cmake -S . -B build_cori
+cmake -S . -B build_knl
 
 # compile
-cmake --build build_cori -j 8
+cmake --build build_knl -j 8
 
 # test
-srun -C knl -N 1 -t 30 -q debug ctest --test-dir build_cori --output-on-failure
+srun -C knl -N 1 -t 30 -q debug ctest --test-dir build_knl --output-on-failure
 
 # run
-cd build_cori/bin
+cd build_knl/bin
 srun -C knl -N 1 -t 30 -q debug ./impactx ../../examples/fodo/input_fodo.in
 ```
 
