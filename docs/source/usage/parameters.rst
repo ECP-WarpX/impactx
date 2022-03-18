@@ -136,6 +136,19 @@ Lattice Elements
             * ``<element_name>.K2`` (``float``, dimensionless) normalized
               field integral for fringe field
 
+        * ``constf`` for a constant focusing element. This requires these additional parameters:
+
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
+
+            * ``<element_name>.kx`` (``float``, in 1/meters) the horizontal
+              focusing strength
+
+            * ``<element_name>.ky`` (``float``, in 1/meters) the vertical
+              focusing strength
+
+            * ``<element_name>.kt`` (``float``, in 1/meters) the
+              longitudinal focusing strength
+
 .. _running-cpp-parameters-parallelization:
 
 Distribution across MPI ranks and parallelization

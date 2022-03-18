@@ -24,3 +24,17 @@ add_test(NAME chicane.analysis
 )
 
 set_tests_properties(chicane.analysis PROPERTIES DEPENDS "chicane.run")
+
+
+# Constant Focusing Channel ###################################################
+#
+add_test(NAME cfchannel.run
+         COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/cfchannel/input_cfchannel.in
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+add_test(NAME cfchannel.analysis
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/cfchannel/analysis_cfchannel.py
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+
+set_tests_properties(cfchannel.analysis PROPERTIES DEPENDS "cfchannel.run")
