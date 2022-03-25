@@ -24,7 +24,7 @@ namespace distribution
          * Return sampling from a 6D Kurth distribution.
          *
          * R. Kurth, Quarterly of Applied Mathematics vol. 32, pp. 325-329 (1978)
-         * C. Mitchell, K. Hwang and R. D. Ryne, IPAC2021, WEPAB248 (2021)         
+         * C. Mitchell, K. Hwang and R. D. Ryne, IPAC2021, WEPAB248 (2021)
          *
          * @param sigx,sigy,sigt for zero correlation, these are the related
          *                                   RMS sizes (in meters)
