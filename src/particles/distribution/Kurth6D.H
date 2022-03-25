@@ -71,12 +71,12 @@ namespace distribution
             constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
             // Random samples used to define (x,y,z):
-            v = amrex::Random(engine); 
+            v = amrex::Random(engine);
             costheta = amrex::Random(engine);
-            costheta = 2_prt*(costheta-0.5_prt); 
+            costheta = 2_prt*(costheta-0.5_prt);
             sintheta = sqrt(1_prt-pow(costheta,2));
             phi = amrex::Random(engine);
-            phi = 2_prt*pi*phi; 
+            phi = 2_prt*pi*phi;
 
             // Transformations for (x,y,t):
             r = pow(v,1_prt/3_prt);
@@ -86,18 +86,18 @@ namespace distribution
 
             // Random samples used to define L:
             L = amrex::Random(engine);
-            L = r*sqrt(L);  
+            L = r*sqrt(L);
 
             // Random samples used to define pr:
             alpha = amrex::Random(engine);
-            alpha = pi*alpha; 
+            alpha = pi*alpha;
             pmax = 1_prt - pow(L/r,2) - pow(r,2) + pow(L,2);
             pmax = sqrt(pmax);
-            pr = pmax*cos(alpha); 
+            pr = pmax*cos(alpha);
 
             // Random samples used to define ptangent:
             beta = amrex::Random(engine);
-            beta = 2_prt*pi*beta; 
+            beta = 2_prt*pi*beta;
             p1 = L/r*cos(beta);  // This is phi component
             p2 = L/r*sin(beta);  // This is theta component
 
