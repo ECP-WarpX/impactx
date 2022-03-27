@@ -17,7 +17,9 @@ This is a work-in-progress list of physical assumptions implemented in the numer
 Tracking and Lattice Optics
 """""""""""""""""""""""""""
 
-* **velocity spread:** when solving space-charge effects, we assume that the relative spread of velocities of particles in the beam is negligible compared to the velocity of the reference particle
+* **tracking through lattice optics:** is treated through linear order with respect to the reference particle
+
+  * **velocity spread:** the above linearization implies that, when solving space-charge effects, we assume that the relative spread of velocities of particles in the beam is negligible compared to the velocity of the reference particle
 
 
 Space Charge (Poisson Solver)
