@@ -24,7 +24,7 @@ namespace distribution
          * Return sampling from a 6D Waterbag distribution.
          *
          * @param sigx,sigy,sigt for zero correlation, these are the related
-         *                                   RMS sizes (in meters);
+         *                                   RMS sizes (in meters)
          * @param sigpx,sigpy,sigpt RMS momentum
          * @param muxpx,muypy,mutpt correlation length-momentum
          */
