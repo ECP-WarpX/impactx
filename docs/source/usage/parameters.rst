@@ -95,6 +95,18 @@ Initial Beam Distributions
         * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
+    * ``kurth6d`` for initial 6D Kurth distribution.
+      With additional parameters:
+
+        * ``<distribution>.sigx`` (``float``, in meters) rms X
+        * ``<distribution>.sigy`` (``float``, in meters) rms Y
+        * ``<distribution>.sigt`` (``float``, in radian) rms normalized time difference T
+        * ``<distribution>.sigpx`` (``float``, in momentum) rms Px
+        * ``<distribution>.sigpy`` (``float``, in momentum) rms Py
+        * ``<distribution>.sigpt`` (``float``, in energy deviation) rms Pt
+        * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
+        * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
+        * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
 .. _running-cpp-parameters-lattice:
 

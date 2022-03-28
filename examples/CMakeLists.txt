@@ -38,3 +38,16 @@ add_test(NAME cfchannel.analysis
 )
 
 set_tests_properties(cfchannel.analysis PROPERTIES DEPENDS "cfchannel.run")
+
+# Kurth Distribution Test ###################################################
+#
+add_test(NAME kurth.run
+         COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/kurth/input_kurth.in
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+add_test(NAME kurth.analysis
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/kurth/analysis_kurth.py
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+
+set_tests_properties(kurth.analysis PROPERTIES DEPENDS "kurth.run")
