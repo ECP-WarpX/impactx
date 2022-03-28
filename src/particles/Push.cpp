@@ -95,8 +95,8 @@ namespace detail
         using namespace amrex::literals; // for _rt and _prt
 
         // loop over refinement levels
-        int const nLevel = pc.maxLevel() + 1;
-        for (int lev = 0; lev < nLevel; ++lev)
+        int const nLevel = pc.finestLevel();
+        for (int lev = 0; lev <= nLevel; ++lev)
         {
             // get simulation geometry information
             //const amrex::Geometry& gm = this->Geom(lev);

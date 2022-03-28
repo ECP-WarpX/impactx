@@ -24,7 +24,7 @@ namespace impactx
         amrex::Vector<amrex::IntVect> const & ref_ratio)
     {
         // loop over refinement levels
-        int const nLevel = this->maxLevel();
+        int const nLevel = this->finestLevel();
         for (int lev = 0; lev <= nLevel; ++lev) {
             amrex::MultiFab & rho_at_level = rho.at(lev);
             // reset the values in rho to zero

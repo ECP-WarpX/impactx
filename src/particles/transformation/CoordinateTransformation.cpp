@@ -27,8 +27,8 @@ namespace transformation {
         amrex::ParticleReal const pd = ref_part.pt;  // Design value of pt/mc2 = -gamma
 
         // loop over refinement levels
-        int const nLevel = pc.maxLevel();
-        for (int lev = 0; lev < nLevel; ++lev) {
+        int const nLevel = pc.finestLevel();
+        for (int lev = 0; lev <= nLevel; ++lev) {
             // loop over all particle boxes
             using ParIt = ImpactXParticleContainer::iterator;
             for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
