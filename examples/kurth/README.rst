@@ -1,7 +1,7 @@
 .. _examples-kurth:
 
 Kurth Distribution in a Constant Focusing Channel
-==================================================
+=================================================
 
 Stationary Kurth distribution in a constant focusing channel (without space charge).
 
