@@ -9,10 +9,10 @@ beam.particle = proton
 beam.distribution = waterbag
 beam.sigmaX = 1.0e-3
 beam.sigmaY = 1.0e-3
-beam.sigmaT = 3.193278430343e-4
+beam.sigmaT = 3.369701494258956e-4
 beam.sigmaPx = 1.0e-3
 beam.sigmaPy = 1.0e-3
-beam.sigmaPt = 3.131577849579e-3
+beam.sigmaPt = 2.9676219145931020e-3
 beam.muxpx = 0.0
 beam.muypy = 0.0
 beam.mutpt = 0.0
@@ -28,8 +28,7 @@ constf1.type = constf
 constf1.ds = 2.0
 constf1.kx = 1.0
 constf1.ky = 1.0
-constf1.kt = 9.806779827973229
-
+constf1.kt = 1.0
 
 ###############################################################################
 # Algorithms
