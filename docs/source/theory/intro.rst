@@ -25,4 +25,4 @@ Tracking and Lattice Optics
 Space Charge (Poisson Solver)
 """""""""""""""""""""""""""""
 
-* **electrostatic in the bunch frame:** we assume there are no retardation effects
+* **electrostatic in the bunch frame:** we assume there are no retardation effects and we solve the Poisson equation in the bunch frame
