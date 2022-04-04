@@ -25,11 +25,11 @@ namespace impactx::diagnostics
         tmp.copyParticles(pc, local);
 
         // write file header
-        amrex::PrintToFile("diags/output_beam.txt") << "#x y t px py pt\n";
+        amrex::PrintToFile("diags/output_beam.txt") << "x y t px py pt\n";
 
         // loop over refinement levels
-        int const nLevel = tmp.maxLevel() + 1;
-        for (int lev = 0; lev < nLevel; ++lev)
+        int const nLevel = tmp.finestLevel();
+        for (int lev = 0; lev <= nLevel; ++lev)
         {
             // loop over all particle boxes
             using ParIt = typename decltype(tmp)::ParConstIterType;

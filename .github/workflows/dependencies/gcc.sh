@@ -11,9 +11,15 @@ sudo apt-get -qqq update
 sudo apt-get install -y \
     build-essential     \
     ca-certificates     \
+    ccache              \
     cmake               \
     gnupg               \
     libopenmpi-dev      \
     ninja-build         \
     pkg-config          \
+    python3             \
+    python3-pip         \
     wget
+
+python3 -m pip install -U pip setuptools wheel
+python3 -m pip install -r requirements.txt

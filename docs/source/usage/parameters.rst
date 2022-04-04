@@ -95,6 +95,18 @@ Initial Beam Distributions
         * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
+    * ``kurth6d`` for initial 6D Kurth distribution.
+      With additional parameters:
+
+        * ``<distribution>.sigx`` (``float``, in meters) rms X
+        * ``<distribution>.sigy`` (``float``, in meters) rms Y
+        * ``<distribution>.sigt`` (``float``, in radian) rms normalized time difference T
+        * ``<distribution>.sigpx`` (``float``, in momentum) rms Px
+        * ``<distribution>.sigpy`` (``float``, in momentum) rms Py
+        * ``<distribution>.sigpt`` (``float``, in energy deviation) rms Pt
+        * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
+        * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
+        * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
 .. _running-cpp-parameters-lattice:
 
@@ -124,12 +136,37 @@ Lattice Elements
 
             * ``<element_name>.rc`` (``float``, in meters) the bend radius
 
+        * ``dipedge`` for dipole edge focusing. This requires these additional parameters:
+
+            * ``<element_name>.psi`` (``float``, in radians) the pole face
+              rotation angle
+
+            * ``<element_name>.rc`` (``float``, in meters) the bend radius
+
+            * ``<element_name>.g`` (``float``, in meters) the gap size
+
+            * ``<element_name>.K2`` (``float``, dimensionless) normalized
+              field integral for fringe field
+
+        * ``constf`` for a constant focusing element. This requires these additional parameters:
+
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
+
+            * ``<element_name>.kx`` (``float``, in 1/meters) the horizontal
+              focusing strength
+
+            * ``<element_name>.ky`` (``float``, in 1/meters) the vertical
+              focusing strength
+
+            * ``<element_name>.kt`` (``float``, in 1/meters) the
+              longitudinal focusing strength
+
 .. _running-cpp-parameters-parallelization:
 
 Distribution across MPI ranks and parallelization
 -------------------------------------------------
 
-* ``amr.max_grid_size`` (``integer``) optional (default ``128`)
+* ``amr.max_grid_size`` (``integer``) optional (default ``128``)
     Maximum allowable size of each **subdomain**
     (expressed in number of grid points, in each direction).
     Each subdomain has its own ghost cells, and can be handled by a

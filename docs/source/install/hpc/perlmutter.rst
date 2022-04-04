@@ -39,24 +39,33 @@ We use the following modules and environments on the system (``$HOME/perlmutter_
    export proj=<yourProject>  # LBNL/AMP: m3906_g
 
    # required dependencies
-   module load cmake/git-20210830  # 3.22-dev
+   module load cmake/3.22.0
    module swap PrgEnv-nvidia PrgEnv-gnu
-   module swap gcc gcc/9.3.0
-   module load cuda
+   module load cudatoolkit
+   module load cray-hdf5-parallel/1.12.0.7
 
    # optional: just an additional text editor
    # module load nano  # TODO: request from support
 
-   # optional: Python, ...
-   # TODO
+   # Python
+   module load cray-python/3.9.4.2
+   if [ -d "$HOME/sw/perlmutter/venvs/impactx" ]
+   then
+       source $HOME/sw/perlmutter/venvs/impactx/bin/activate
+   fi
 
-   # optional: an alias to request an interactive node for two hours
-   function getNode() {
-       salloc -N 1 --ntasks-per-node=4 -t 2:00:00 -C gpu -c 32 -G 4 -A $proj
-   }
+   # an alias to request an interactive batch node for one hour
+   #   for parallel execution, start on the batch node: srun <command>
+   alias getNode="salloc -N 1 --ntasks-per-node=4 -t 1:00:00 -q interactive -C gpu --gpu-bind=single:1 -c 32 -G 4 -A $proj"
+   # an alias to run a command on a batch node for up to 30min
+   #   usage: runNode <command>
+   alias runNode="srun -N 1 --ntasks-per-node=4 -t 0:30:00 -q interactive -C gpu --gpu-bind=single:1 -c 32 -G 4 -A $proj"
 
    # GPU-aware MPI
    export MPICH_GPU_SUPPORT_ENABLED=1
+
+   # necessary to use CUDA-Aware MPI and run a job
+   export CRAY_ACCEL_TARGET=nvidia80
 
    # optimize CUDA compilation for A100
    export AMREX_CUDA_ARCH=8.0
@@ -75,6 +84,21 @@ We recommend to store the above lines in a file, such as ``$HOME/perlmutter_impa
 
    source $HOME/perlmutter_impactx.profile
 
+For Python workflows & tests, also install a virtual environment:
+
+.. code-block:: bash
+
+   # establish Python dependencies
+   python3 -m pip install --user --upgrade pip
+   python3 -m pip install --user virtualenv
+
+   python3 -m venv $HOME/sw/perlmutter/venvs/impactx
+   source $HOME/sw/perlmutter/venvs/impactx/bin/activate
+
+   python3 -m pip install --upgrade pip
+   MPICC="cc -target-accel=nvidia80 -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
+   python3 -m pip install -r $HOME/src/impactx/requirements.txt
+
 Then, ``cd`` into the directory ``$HOME/src/impactx`` and use the following commands to compile:
 
 .. code-block:: bash
@@ -84,6 +108,12 @@ Then, ``cd`` into the directory ``$HOME/src/impactx`` and use the following comm
 
    cmake -S . -B build -DImpactX_OPENPMD=ON -DImpactX_COMPUTE=CUDA
    cmake --build build -j 32
+
+To run all tests, do:
+
+.. code-block:: bash
+
+   srun -N 1 --ntasks-per-node=4 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ctest --test-dir build_perlmutter --output-on-failure
 
 The general :ref:`cmake compile-time options <building-cmake>` apply as usual.
 

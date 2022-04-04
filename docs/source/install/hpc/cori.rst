@@ -36,17 +36,17 @@ We use the following modules and environments on the system (``$HOME/knl_impactx
 
    module swap craype-haswell craype-mic-knl
    module swap PrgEnv-intel PrgEnv-gnu
-   module load cmake/3.21.3
+   module load cmake/3.22.1
    module load cray-hdf5-parallel/1.10.5.2
-   module load cray-fftw/3.3.8.4
-   module load cray-python/3.7.3.2
+   module load cray-fftw/3.3.8.10
+   module load cray-python/3.9.7.1
 
    export PKG_CONFIG_PATH=$FFTW_DIR/pkgconfig:$PKG_CONFIG_PATH
-   export CMAKE_PREFIX_PATH=$HOME/sw/adios2-2.7.1-knl-install:$CMAKE_PREFIX_PATH
+   export CMAKE_PREFIX_PATH=$HOME/sw/knl/adios2-2.7.1-install:$CMAKE_PREFIX_PATH
 
-   if [ -d "$HOME/sw/venvs/knl_impactx" ]
+   if [ -d "$HOME/sw/knl/venvs/impactx" ]
    then
-     source $HOME/sw/venvs/knl_impactx/bin/activate
+     source $HOME/sw/knl/venvs/impactx/bin/activate
    fi
 
    export CXXFLAGS="-march=knl"
@@ -60,11 +60,12 @@ For PICMI and Python workflows, also install a virtual environment:
    python3 -m pip install --user --upgrade pip
    python3 -m pip install --user virtualenv
 
-   python3 -m venv $HOME/sw/venvs/knl_impactx
-   source $HOME/sw/venvs/knl_impactx/bin/activate
+   python3 -m venv $HOME/sw/knl/venvs/impactx
+   source $HOME/sw/knl/venvs/impactx/bin/activate
 
    python3 -m pip install --upgrade pip
    MPICC="cc -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
+   python3 -m pip install -r $HOME/src/impactx/requirements.txt
 
 Haswell
 ^^^^^^^
@@ -74,17 +75,17 @@ We use the following modules and environments on the system (``$HOME/haswell_imp
 .. code-block:: bash
 
    module swap PrgEnv-intel PrgEnv-gnu
-   module load cmake/3.21.3
+   module load cmake/3.22.1
    module load cray-hdf5-parallel/1.10.5.2
-   module load cray-fftw/3.3.8.4
-   module load cray-python/3.7.3.2
+   module load cray-fftw/3.3.8.10
+   module load cray-python/3.9.7.1
 
    export PKG_CONFIG_PATH=$FFTW_DIR/pkgconfig:$PKG_CONFIG_PATH
-   export CMAKE_PREFIX_PATH=$HOME/sw/adios2-2.7.1-haswell-install:$CMAKE_PREFIX_PATH
+   export CMAKE_PREFIX_PATH=$HOME/sw/haswell/adios2-2.7.1-install:$CMAKE_PREFIX_PATH
 
-   if [ -d "$HOME/sw/venvs/haswell_impactx" ]
+   if [ -d "$HOME/sw/haswell/venvs/impactx" ]
    then
-     source $HOME/sw/venvs/haswell_impactx/bin/activate
+     source $HOME/sw/haswell/venvs/impactx/bin/activate
    fi
 
 For PICMI and Python workflows, also install a virtual environment:
@@ -95,11 +96,12 @@ For PICMI and Python workflows, also install a virtual environment:
    python3 -m pip install --user --upgrade pip
    python3 -m pip install --user virtualenv
 
-   python3 -m venv $HOME/sw/venvs/haswell_impactx
-   source $HOME/sw/venvs/haswell_impactx/bin/activate
+   python3 -m venv $HOME/sw/haswell/venvs/impactx
+   source $HOME/sw/haswell/venvs/impactx/bin/activate
 
    python3 -m pip install --upgrade pip
    MPICC="cc -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
+   python3 -m pip install -r $HOME/src/impactx/requirements.txt
 
 GPU (V100)
 ^^^^^^^^^^
@@ -115,14 +117,14 @@ We use the following modules and environments on the system (``$HOME/gpu_impactx
    module load modules
    module load cgpu
    module load esslurm
-   module load gcc/8.3.0 cuda/11.4.0 cmake/3.21.3
+   module load gcc/8.3.0 cuda/11.4.0 cmake/3.22.1
    module load openmpi
 
-   export CMAKE_PREFIX_PATH=$HOME/sw/adios2-2.7.1-gpu-install:$CMAKE_PREFIX_PATH
+   export CMAKE_PREFIX_PATH=$HOME/sw/cori_gpu/adios2-2.7.1-install:$CMAKE_PREFIX_PATH
 
-   if [ -d "$HOME/sw/venvs/gpu_impactx" ]
+   if [ -d "$HOME/sw/cori_gpu/venvs/impactx" ]
    then
-     source $HOME/sw/venvs/gpu_impactx/bin/activate
+     source $HOME/sw/cori_gpu/venvs/impactx/bin/activate
    fi
 
    # compiler environment hints
@@ -149,11 +151,12 @@ For PICMI and Python workflows, also install a virtual environment:
    python3 -m pip install --user --upgrade pip
    python3 -m pip install --user virtualenv
 
-   python3 -m venv $HOME/sw/venvs/gpu_impactx
-   source $HOME/sw/venvs/gpu_impactx/bin/activate
+   python3 -m venv $HOME/sw/cori_gpu/venvs/impactx
+   source $HOME/sw/cori_gpu/venvs/impactx/bin/activate
 
    python3 -m pip install --upgrade pip
    python3 -m pip install -U --no-cache-dir -v mpi4py
+   python3 -m pip install -r $HOME/src/impactx/requirements.txt
 
 Building ImpactX
 ----------------
@@ -191,6 +194,18 @@ Then, ``cd`` into the directory ``$HOME/src/impactx`` and use the following comm
    #                       append if you target GPUs:    -DImpactX_COMPUTE=CUDA
    cmake -S . -B build -DImpactX_OPENPMD=ON -DImpactX_DIMS=3
    cmake --build build -j 16
+
+
+.. _building-cori-tests:
+
+Testing
+-------
+
+To run all tests (here on KNL), do:
+
+.. code-block:: bash
+
+   srun -C knl -N 1 -t 30 -q debug ctest --test-dir build --output-on-failure
 
 
 .. _running-cpp-cori:

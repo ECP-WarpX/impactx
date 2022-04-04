@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 
         impactX->initData();
         impactX->initElements();
-        impactX->evolve( /* num_steps = */ 10);
+        impactX->evolve( /* num_steps = */ 1);
 
         BL_PROFILE_VAR_STOP(pmain);
     }

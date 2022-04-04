@@ -31,9 +31,9 @@ macro(find_ablastr)
             #list(APPEND CMAKE_MODULE_PATH "${WarpX_amrex_src}/Tools/CMake")
             if(ImpactX_COMPUTE STREQUAL CUDA)
                 enable_language(CUDA)
-                # ABLASTR 21.06+ supports CUDA_ARCHITECTURES
+                # AMReX 21.06+ supports CUDA_ARCHITECTURES
                 #if(CMAKE_VERSION VERSION_LESS 3.20)
-                #    include(ABLASTR_SetupCUDA)
+                #    include(AMReX_SetupCUDA)
                 #endif()
             endif()
             add_subdirectory(${ImpactX_ablastr_src} _deps/localablastr-build/)
@@ -85,7 +85,7 @@ macro(find_ablastr)
         set(COMPONENT_DIM 3D)
         set(COMPONENT_PRECISION ${ImpactX_PRECISION} P${ImpactX_PRECISION})
 
-        find_package(ABLASTR 21.12 CONFIG REQUIRED COMPONENTS ${COMPONENT_DIM})
+        find_package(ABLASTR 22.03 CONFIG REQUIRED COMPONENTS ${COMPONENT_DIM})
         message(STATUS "ABLASTR: Found version '${ABLASTR_VERSION}'")
     endif()
 endmacro()
@@ -102,7 +102,7 @@ set(ImpactX_ablastr_src ""
 set(ImpactX_ablastr_repo "https://github.com/ECP-WarpX/WarpX.git"
     CACHE STRING
     "Repository URI to pull and build ABLASTR from if(ImpactX_ablastr_internal)")
-set(ImpactX_ablastr_branch "278f3cd3db8889219e468699a8475d664ac5f2d3"
+set(ImpactX_ablastr_branch "1522807862c32d6b60e829fb9409fccadcf21e46"
     CACHE STRING
     "Repository branch for ImpactX_ablastr_repo if(ImpactX_ablastr_internal)")
 

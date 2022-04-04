@@ -1,11 +1,11 @@
-/* Copyright 2021 Ji Qiang, Axel Huebl
+/* Copyright 2022 Chad Mitchell, Axel Huebl
  *
  * This file is part of ImpactX.
  *
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_DISTRIBUTION_WATERBAG
-#define IMPACTX_DISTRIBUTION_WATERBAG
+#ifndef IMPACTX_DISTRIBUTION_KURTH6D
+#define IMPACTX_DISTRIBUTION_KURTH6D
 
 #include <AMReX_Random.H>
 #include <AMReX_REAL.H>
@@ -17,18 +17,21 @@ namespace impactx
 {
 namespace distribution
 {
-    struct Waterbag
+    struct Kurth6D
     {
-        /** A Waterbag distribution
+        /** A 6D Kurth distribution
          *
-         * Return sampling from a 6D Waterbag distribution.
+         * Return sampling from a 6D Kurth distribution.
+         *
+         * R. Kurth, Quarterly of Applied Mathematics vol. 32, pp. 325-329 (1978)
+         * C. Mitchell, K. Hwang and R. D. Ryne, IPAC2021, WEPAB248 (2021)
          *
          * @param sigx,sigy,sigt for zero correlation, these are the related
          *                                   RMS sizes (in meters)
          * @param sigpx,sigpy,sigpt RMS momentum
          * @param muxpx,muypy,mutpt correlation length-momentum
          */
-         Waterbag(amrex::ParticleReal const sigx, amrex::ParticleReal const sigy,
+         Kurth6D(amrex::ParticleReal const sigx, amrex::ParticleReal const sigy,
          amrex::ParticleReal const sigt,amrex::ParticleReal const sigpx,
          amrex::ParticleReal const sigpy,amrex::ParticleReal const sigpt,
          amrex::ParticleReal const muxpx=0.0, amrex::ParticleReal const muypy=0.0,
@@ -61,47 +64,56 @@ namespace distribution
 
             using namespace amrex::literals;
 
-            amrex::ParticleReal ln1,norm,u1,u2;
-            amrex::ParticleReal g1,g2,g3,g4,g5,g6;
+            amrex::ParticleReal v,costheta,sintheta,phi,r;
+            amrex::ParticleReal L,alpha,pmax,pr,beta,p1,p2;
             amrex::ParticleReal root,a1,a2;
 
             constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
-            // Generate six standard normal random variables using Box-Muller:
-            u1 = amrex::Random(engine);
-            u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            g1 = ln1*cos(2_prt*pi*u2);
-            g2 = ln1*sin(2_prt*pi*u2);
-            u1 = amrex::Random(engine);
-            u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            g3 = ln1*cos(2_prt*pi*u2);
-            g4 = ln1*sin(2_prt*pi*u2);
-            u1 = amrex::Random(engine);
-            u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            g5 = ln1*cos(2_prt*pi*u2);
-            g6 = ln1*sin(2_prt*pi*u2);
+            // Random samples used to define (x,y,z):
+            v = amrex::Random(engine);
+            costheta = amrex::Random(engine);
+            costheta = 2_prt*(costheta-0.5_prt);
+            sintheta = sqrt(1_prt-pow(costheta,2));
+            phi = amrex::Random(engine);
+            phi = 2_prt*pi*phi;
 
-            // Normalize to produce uniform samples on the unit sphere:
-            norm = sqrt(g1*g1+g2*g2+g3*g3+g4*g4+g5*g5+g6*g6);
-            g1 /= norm;
-            g2 /= norm;
-            g3 /= norm;
-            g4 /= norm;
-            g5 /= norm;
-            g6 /= norm;
+            // Transformations for (x,y,t):
+            r = pow(v,1_prt/3_prt);
+            x = r*sintheta*cos(phi);
+            y = r*sintheta*sin(phi);
+            t = r*costheta;
 
-            // Scale to produce uniform samples in a ball (unit variance):
-            u1 = amrex::Random(engine);
-            u2 = sqrt(8_prt)*pow(u1,1_prt/6);
-            x = g1*u2;
-            y = g2*u2;
-            t = g3*u2;
-            px = g4*u2;
-            py = g5*u2;
-            pt = g6*u2;
+            // Random samples used to define L:
+            L = amrex::Random(engine);
+            L = r*sqrt(L);
+
+            // Random samples used to define pr:
+            alpha = amrex::Random(engine);
+            alpha = pi*alpha;
+            pmax = 1_prt - pow(L/r,2) - pow(r,2) + pow(L,2);
+            pmax = sqrt(pmax);
+            pr = pmax*cos(alpha);
+
+            // Random samples used to define ptangent:
+            beta = amrex::Random(engine);
+            beta = 2_prt*pi*beta;
+            p1 = L/r*cos(beta);  // This is phi component
+            p2 = L/r*sin(beta);  // This is theta component
+
+            // Transformation from spherical to Cartesian coord.:
+            px = pr*sintheta*cos(phi) + p2*costheta*cos(phi) - p1*sin(phi);
+            py = pr*sintheta*sin(phi) + p2*costheta*sin(phi) + p1*cos(phi);
+            pt = pr*costheta - p2*sintheta;
+
+            // Scale to produce the identity covariance matrix:
+            amrex::ParticleReal c = sqrt(5.0_prt);
+            x = c*x;
+            y = c*y;
+            t = c*t;
+            px = c*px;
+            py = c*py;
+            pt = c*pt;
 
             // Transform to produce the desired second moments/correlations:
             root = sqrt(1.0_prt-m_muxpx*m_muxpx);
@@ -129,4 +141,4 @@ namespace distribution
 } // namespace distribution
 } // namespace impactx
 
-#endif // IMPACTX_DISTRIBUTION_WATERBAG
+#endif // IMPACTX_DISTRIBUTION_KURTH6D

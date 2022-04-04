@@ -1,11 +1,11 @@
-/* Copyright 2021 Chad Mitchell, Axel Huebl
+/* Copyright 2022 Chad Mitchell, Axel Huebl
  *
  * This file is part of ImpactX.
  *
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_QUAD_H
-#define IMPACTX_QUAD_H
+#ifndef IMPACTX_CONSTF_H
+#define IMPACTX_CONSTF_H
 
 #include "particles/ImpactXParticleContainer.H"
 
@@ -17,24 +17,26 @@
 
 namespace impactx
 {
-    struct Quad
+    struct ConstF
     {
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** A Quadrupole magnet
+        /** A linear Constant Focusing element
          *
          * @param ds Segment length in m.
-         * @param k  Quadrupole strength in m^(-2) (MADX convention)
-         *           = (gradient in T/m) / (rigidity in T-m)
-         *           k > 0 horizontal focusing
-         *           k < 0 horizontal defocusing
+         * @param kx Focusing strength for x in 1/m.
+         * @param ky Focusing strength for y in 1/m.
+         * @param kt Focusing strength for t in 1/m.
+         *
          */
-        Quad( amrex::ParticleReal const ds, amrex::ParticleReal const k )
-        : m_ds(ds), m_k(k)
+        ConstF( amrex::ParticleReal const ds, amrex::ParticleReal const kx,
+                amrex::ParticleReal const ky, amrex::ParticleReal const kt )
+        : m_ds(ds), m_kx(kx), m_ky(ky), m_kt(kt)
         {
         }
 
-        /** This is a quad functor, so that a variable of this type can be used like a quad function.
+        /** This is a constf functor, so that a variable of this type can be used like a
+         *  constf function.
          *
          * @param p Particle AoS data for positions and cpu/id
          * @param px particle momentum in x
@@ -61,35 +63,20 @@ namespace impactx
             amrex::ParticleReal const pt_ref = refpart.pt;
             amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
 
-            // compute phase advance per unit length in s (in rad/m)
-            amrex::ParticleReal const omega = sqrt(abs(m_k));
-
             // intialize output values of momenta
             amrex::ParticleReal pxout = px;
             amrex::ParticleReal pyout = py;
             amrex::ParticleReal ptout = pt;
 
-            if(m_k > 0.0) {
-               // advance position and momentum (focusing quad)
-               p.pos(0) = cos(omega*m_ds)*x + sin(omega*m_ds)/omega*px;
-               pxout = -omega*sin(omega*m_ds)*x + cos(omega*m_ds)*px;
+            // advance position and momentum
+            p.pos(0) = cos(m_kx*m_ds)*x + sin(m_kx*m_ds)/m_kx*px;
+            pxout = -m_kx*sin(m_kx*m_ds)*x + cos(m_kx*m_ds)*px;
 
-               p.pos(1) = cosh(omega*m_ds)*y + sinh(omega*m_ds)/omega*py;
-               pyout = omega*sinh(omega*m_ds)*y + cosh(omega*m_ds)*py;
+            p.pos(1) = cos(m_ky*m_ds)*y + sin(m_ky*m_ds)/m_ky*py;
+            pyout = -m_ky*sin(m_ky*m_ds)*y + cos(m_ky*m_ds)*py;
 
-               p.pos(2) = t + (m_ds/betgam2)*pt;
-               // ptout = pt;
-            } else {
-               // advance position and momentum (defocusing quad)
-               p.pos(0) = cosh(omega*m_ds)*x + sinh(omega*m_ds)/omega*px;
-               pxout = omega*sinh(omega*m_ds)*x + cosh(omega*m_ds)*px;
-
-               p.pos(1) = cos(omega*m_ds)*y + sin(omega*m_ds)/omega*py;
-               pyout = -omega*sin(omega*m_ds)*y + cos(omega*m_ds)*py;
-
-               p.pos(2) = t + (m_ds/betgam2)*pt;
-               // ptout = pt;
-            }
+            p.pos(2) = cos(m_kt*m_ds)*t + sin(m_kt*m_ds)/(betgam2*m_kt)*pt;
+            ptout = -(m_kt*betgam2)*sin(m_kt*m_ds)*t + cos(m_kt*m_ds)*pt;
 
             // assign updated momenta
             px = pxout;
@@ -100,9 +87,12 @@ namespace impactx
 
     private:
         amrex::ParticleReal m_ds; //! segment length in m
-        amrex::ParticleReal m_k; //! quadrupole strength in 1/m
+        amrex::ParticleReal m_kx; //! focusing x strength in 1/m
+        amrex::ParticleReal m_ky; //! focusing y strength in 1/m
+        amrex::ParticleReal m_kt; //! focusing t strength in 1/m
+
     };
 
 } // namespace impactx
 
-#endif // IMPACTX_QUAD_H
+#endif // IMPACTX_CONSTF_H

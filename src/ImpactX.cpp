@@ -9,6 +9,7 @@
 #include "particles/Push.H"
 #include "particles/transformation/CoordinateTransformation.H"
 #include "particles/distribution/Waterbag.H"
+#include "particles/distribution/Kurth6D.H"
 #include "particles/diagnostics/DiagnosticOutput.H"
 
 #include <AMReX.H>
@@ -245,6 +246,20 @@ namespace impactx
                 pp_element.get("ds", ds);
                 pp_element.get("rc", rc);
                 m_lattice.emplace_back( Sbend(ds, rc) );
+            } else if (element_type == "dipedge") {
+                amrex::Real psi, rc, g, K2;
+                pp_element.get("psi", psi);
+                pp_element.get("rc", rc);
+                pp_element.get("g", g);
+                pp_element.get("K2", K2);
+                m_lattice.emplace_back( DipEdge(psi, rc, g, K2) );
+            } else if (element_type == "constf") {
+                amrex::Real ds, kx, ky, kt;
+                pp_element.get("ds", ds);
+                pp_element.get("kx", kx);
+                pp_element.get("ky", ky);
+                pp_element.get("kt", kt);
+                m_lattice.emplace_back( ConstF(ds, kx, ky, kt) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }
@@ -269,7 +284,7 @@ namespace impactx
         std::string particle_type;  // Particle type
         pp_dist.get("particle", particle_type);
 
-        amrex::ParticleReal qm = 0.0; //charge/mass ratio
+        amrex::ParticleReal qm = 0.0; //charge/mass ratio (q_e/eV)
         if(particle_type == "electron"){
           qm = -1.0/0.510998950e6;
         } else if(particle_type == "proton"){
@@ -323,7 +338,7 @@ namespace impactx
           pt.reserve(npart_this_proc);
 
           // write file header
-          amrex::PrintToFile("diags/initial_beam.txt") << "#x y t px py pt\n";
+          amrex::PrintToFile("diags/initial_beam.txt") << "x y t px py pt\n";
 
           for(amrex::Long i = 0; i < npart_this_proc; ++i) {
 
@@ -343,7 +358,61 @@ namespace impactx
           m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
                                               qm, bunch_charge);
 
+        } else if (distribution_type == "kurth6d") {
+          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
+          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
+          pp_dist.get("sigmaX", sigx);
+          pp_dist.get("sigmaY", sigy);
+          pp_dist.get("sigmaT", sigt);
+          pp_dist.get("sigmaPx", sigpx);
+          pp_dist.get("sigmaPy", sigpy);
+          pp_dist.get("sigmaPt", sigpt);
+          pp_dist.query("muxpx", muxpx);
+          pp_dist.query("muypy", muypy);
+          pp_dist.query("mutpt", mutpt);
+
+          impactx::distribution::Kurth6D Kurth6D(sigx,sigy,sigt,sigpx,
+                                 sigpy,sigpt,muxpx,muypy,mutpt);
+
+          amrex::Vector<amrex::ParticleReal> x, y, t;
+          amrex::Vector<amrex::ParticleReal> px, py, pt;
+          amrex::RandomEngine rng;
+          amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
+
+          if (amrex::ParallelDescriptor::IOProcessor()) {
+              x.reserve(npart);
+              y.reserve(npart);
+              t.reserve(npart);
+              px.reserve(npart);
+              py.reserve(npart);
+              pt.reserve(npart);
+
+              // write file header
+              amrex::PrintToFile("diags/initial_beam.txt") << "x y t px py pt\n";
+
+              for(amrex::Long i = 0; i < npart; ++i) {
+
+                  Kurth6D(ix, iy, it, ipx, ipy, ipt, rng);
+                  x.push_back(ix);
+                  y.push_back(iy);
+                  t.push_back(it);
+                  px.push_back(ipx);
+                  py.push_back(ipy);
+                  pt.push_back(ipt);
+                  amrex::PrintToFile("diags/initial_beam.txt")
+                      << ix << " " << iy << " " << it << " "
+                      << ipx << " " << ipy << " " << ipt << "\n";
+              }
+          }
+
+          int const lev = 0;
+          m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
+                                              qm, bunch_charge);
+
+        } else {
+            amrex::Abort("Unknown distribution: " + distribution_type);
         }
+
 
         // reference particle
         amrex::ParticleReal massE;  // MeV
