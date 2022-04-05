@@ -80,7 +80,7 @@ namespace distribution
             beta = 2_prt*pi*beta;
             p = sqrt(1_prt-pow(r,2));
             px = p*cos(beta);
-            py = p*sin(beta); 
+            py = p*sin(beta);
 
             // Sample and transform to define (t,pt):
             t = amrex::Random(engine);
