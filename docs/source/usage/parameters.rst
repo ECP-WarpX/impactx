@@ -121,7 +121,7 @@ Initial Beam Distributions
         * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
-    * ``kvdist`` for initial K-V distribution in the transverse plane. 
+    * ``kvdist`` for initial K-V distribution in the transverse plane.
       The distribution is uniform in t and Gaussian in pt.
       With additional parameters:
 
