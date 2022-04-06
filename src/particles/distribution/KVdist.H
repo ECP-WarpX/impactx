@@ -80,7 +80,7 @@ namespace distribution
             beta = 2_prt*pi*beta;
             p = sqrt(1_prt-pow(r,2));
             px = p*cos(beta);
-            py = p*sin(beta); 
+            py = p*sin(beta);
 
             // Sample and transform to define (t,pt):
             t = amrex::Random(engine);
@@ -97,7 +97,7 @@ namespace distribution
             t = c*t;
             px = 2_prt*px;
             py = 2_prt*py;
-            pt = pt;
+            // pt = pt;
 
             // Transform to produce the desired second moments/correlations:
             root = sqrt(1.0_prt-m_muxpx*m_muxpx);
