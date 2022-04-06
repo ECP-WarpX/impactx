@@ -97,7 +97,7 @@ namespace distribution
             t = c*t;
             px = 2_prt*px;
             py = 2_prt*py;
-            pt = pt;
+            // pt = pt;
 
             // Transform to produce the desired second moments/correlations:
             root = sqrt(1.0_prt-m_muxpx*m_muxpx);
