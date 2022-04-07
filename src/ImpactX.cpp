@@ -10,6 +10,8 @@
 #include "particles/transformation/CoordinateTransformation.H"
 #include "particles/distribution/Waterbag.H"
 #include "particles/distribution/Kurth6D.H"
+#include "particles/distribution/Gaussian.H"
+#include "particles/distribution/KVdist.H"
 #include "particles/diagnostics/DiagnosticOutput.H"
 
 #include <AMReX.H>
@@ -389,6 +391,108 @@ namespace impactx
               for(amrex::Long i = 0; i < npart; ++i) {
 
                   Kurth6D(ix, iy, it, ipx, ipy, ipt, rng);
+                  x.push_back(ix);
+                  y.push_back(iy);
+                  t.push_back(it);
+                  px.push_back(ipx);
+                  py.push_back(ipy);
+                  pt.push_back(ipt);
+                  amrex::PrintToFile("diags/initial_beam.txt")
+                      << ix << " " << iy << " " << it << " "
+                      << ipx << " " << ipy << " " << ipt << "\n";
+              }
+          }
+
+          int const lev = 0;
+          m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
+                                              qm, bunch_charge);
+
+        } else if (distribution_type == "gaussian") {
+          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
+          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
+          pp_dist.get("sigmaX", sigx);
+          pp_dist.get("sigmaY", sigy);
+          pp_dist.get("sigmaT", sigt);
+          pp_dist.get("sigmaPx", sigpx);
+          pp_dist.get("sigmaPy", sigpy);
+          pp_dist.get("sigmaPt", sigpt);
+          pp_dist.query("muxpx", muxpx);
+          pp_dist.query("muypy", muypy);
+          pp_dist.query("mutpt", mutpt);
+
+          impactx::distribution::Gaussian Gaussian(sigx,sigy,sigt,sigpx,
+                                 sigpy,sigpt,muxpx,muypy,mutpt);
+
+          amrex::Vector<amrex::ParticleReal> x, y, t;
+          amrex::Vector<amrex::ParticleReal> px, py, pt;
+          amrex::RandomEngine rng;
+          amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
+
+          if (amrex::ParallelDescriptor::IOProcessor()) {
+              x.reserve(npart);
+              y.reserve(npart);
+              t.reserve(npart);
+              px.reserve(npart);
+              py.reserve(npart);
+              pt.reserve(npart);
+
+              // write file header
+              amrex::PrintToFile("diags/initial_beam.txt") << "x y t px py pt\n";
+
+              for(amrex::Long i = 0; i < npart; ++i) {
+
+                  Gaussian(ix, iy, it, ipx, ipy, ipt, rng);
+                  x.push_back(ix);
+                  y.push_back(iy);
+                  t.push_back(it);
+                  px.push_back(ipx);
+                  py.push_back(ipy);
+                  pt.push_back(ipt);
+                  amrex::PrintToFile("diags/initial_beam.txt")
+                      << ix << " " << iy << " " << it << " "
+                      << ipx << " " << ipy << " " << ipt << "\n";
+              }
+          }
+
+          int const lev = 0;
+          m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
+                                              qm, bunch_charge);
+
+        } else if (distribution_type == "kvdist") {
+          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
+          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
+          pp_dist.get("sigmaX", sigx);
+          pp_dist.get("sigmaY", sigy);
+          pp_dist.get("sigmaT", sigt);
+          pp_dist.get("sigmaPx", sigpx);
+          pp_dist.get("sigmaPy", sigpy);
+          pp_dist.get("sigmaPt", sigpt);
+          pp_dist.query("muxpx", muxpx);
+          pp_dist.query("muypy", muypy);
+          pp_dist.query("mutpt", mutpt);
+
+          impactx::distribution::KVdist KVdist(sigx,sigy,sigt,sigpx,
+                                 sigpy,sigpt,muxpx,muypy,mutpt);
+
+          amrex::Vector<amrex::ParticleReal> x, y, t;
+          amrex::Vector<amrex::ParticleReal> px, py, pt;
+          amrex::RandomEngine rng;
+          amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
+
+          if (amrex::ParallelDescriptor::IOProcessor()) {
+              x.reserve(npart);
+              y.reserve(npart);
+              t.reserve(npart);
+              px.reserve(npart);
+              py.reserve(npart);
+              pt.reserve(npart);
+
+              // write file header
+              amrex::PrintToFile("diags/initial_beam.txt") << "x y t px py pt\n";
+
+              for(amrex::Long i = 0; i < npart; ++i) {
+
+                  KVdist(ix, iy, it, ipx, ipy, ipt, rng);
                   x.push_back(ix);
                   y.push_back(iy);
                   t.push_back(it);
