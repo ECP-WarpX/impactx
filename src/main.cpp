@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
         argv,
         build_parm_parse,
         MPI_COMM_WORLD,
-        impactx::overwrite_amrex_parser_defaults
+        impactx::initialization::overwrite_amrex_parser_defaults
     );
 
     {

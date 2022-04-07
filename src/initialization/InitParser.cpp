@@ -8,7 +8,7 @@
 
 #include <AMReX_ParmParse.H>
 
-namespace impactx
+namespace impactx::initialization
 {
     void
     overwrite_amrex_parser_defaults ()

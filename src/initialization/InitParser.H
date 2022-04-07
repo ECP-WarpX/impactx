@@ -8,7 +8,7 @@
 #define IMPACT_INIT_PARSER_H
 
 
-namespace impactx
+namespace impactx::initialization
 {
     /** Overwrite defaults in AMReX Inputs
      *
