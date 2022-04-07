@@ -8,6 +8,7 @@ target_sources(ImpactX
     ImpactX.cpp
 )
 
+add_subdirectory(initialization)
 add_subdirectory(particles)
 
 ###############################################################################
