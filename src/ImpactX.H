@@ -19,13 +19,6 @@
 
 namespace impactx
 {
-    /** Overwrite defaults in AMReX Inputs
-     *
-     * This overwrites defaults in amrex::ParamParse for inputs.
-     */
-    void
-    overwrite_amrex_parser_defaults();
-
     /** An ImpactX simulation
      *
      * This is the central ImpactX simulation class

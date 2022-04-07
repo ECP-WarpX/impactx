@@ -5,6 +5,7 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "ImpactX.H"
+#include "initialization/InitParser.H"
 
 #include <AMReX.H>
 #include <AMReX_BLProfiler.H>
