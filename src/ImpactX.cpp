@@ -413,6 +413,8 @@ namespace impactx
             amrex::Abort("Unknown distribution: " + distribution_type);
         }
 
+        this->ResizeMesh();
+        m_particle_container->Redistribute();
 
         // reference particle
         amrex::ParticleReal massE;  // MeV

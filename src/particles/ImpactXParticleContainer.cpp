@@ -102,8 +102,6 @@ namespace impactx
         particle_tile.resize(new_np);
         amrex::copyParticles(
                 particle_tile, pinned_tile, 0, old_np, pinned_tile.numParticles());
-
-        Redistribute();
     }
 
     void
