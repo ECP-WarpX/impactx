@@ -39,6 +39,11 @@ namespace impactx
     {
         BL_PROFILE("ImpactX::evolve");
 
+        // print initial particle distribution to file
+        diagnostics::DiagnosticOutput(*m_particle_container,
+                                      diagnostics::OutputType::PrintParticles,
+                                      "diags/initial_beam.txt");
+
         for (int step = 0; step < num_steps; ++step)
         {
             BL_PROFILE("ImpactX::evolve::step");
@@ -95,7 +100,8 @@ namespace impactx
 
         // print final particle distribution to file
         diagnostics::DiagnosticOutput(*m_particle_container,
-                                      diagnostics::OutputType::PrintParticles);
+                                      diagnostics::OutputType::PrintParticles,
+                                      "diags/output_beam.txt");
 
     }
 } // namespace impactx

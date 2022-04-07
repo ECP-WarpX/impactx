@@ -13,7 +13,8 @@
 namespace impactx::diagnostics
 {
     void DiagnosticOutput (ImpactXParticleContainer const & pc,
-                           OutputType const otype)
+                           OutputType const otype,
+                           std::string file_name)
     {
         using namespace amrex::literals; // for _rt and _prt
 
@@ -25,7 +26,7 @@ namespace impactx::diagnostics
         tmp.copyParticles(pc, local);
 
         // write file header
-        amrex::PrintToFile("diags/output_beam.txt") << "x y t px py pt\n";
+        amrex::PrintToFile(file_name) << "x y t px py pt\n";
 
         // loop over refinement levels
         int const nLevel = tmp.finestLevel();
@@ -64,7 +65,7 @@ namespace impactx::diagnostics
                         amrex::ParticleReal const pt = part_pt[i];
 
                         // write particle data to file
-                        amrex::PrintToFile("diags/output_beam.txt")
+                        amrex::PrintToFile(file_name)
                             << x << " " << y << " "<< t << " "
                             << px << " " << py << " " << pt << "\n";
                     } // i=0...np

@@ -85,11 +85,7 @@ namespace impactx
               py.reserve(npart);
               pt.reserve(npart);
 
-              // write file header
-              amrex::PrintToFile("diags/initial_beam.txt") << "x y t px py pt\n";
-
               for(amrex::Long i = 0; i < npart; ++i) {
-
                   waterbag(ix, iy, it, ipx, ipy, ipt, rng);
                   x.push_back(ix);
                   y.push_back(iy);
@@ -97,9 +93,6 @@ namespace impactx
                   px.push_back(ipx);
                   py.push_back(ipy);
                   pt.push_back(ipt);
-                  amrex::PrintToFile("diags/initial_beam.txt")
-                      << ix << " " << iy << " " << it << " "
-                      << ipx << " " << ipy << " " << ipt << "\n";
               }
           }
 
@@ -136,11 +129,7 @@ namespace impactx
               py.reserve(npart);
               pt.reserve(npart);
 
-              // write file header
-              amrex::PrintToFile("diags/initial_beam.txt") << "x y t px py pt\n";
-
               for(amrex::Long i = 0; i < npart; ++i) {
-
                   Kurth6D(ix, iy, it, ipx, ipy, ipt, rng);
                   x.push_back(ix);
                   y.push_back(iy);
@@ -148,9 +137,6 @@ namespace impactx
                   px.push_back(ipx);
                   py.push_back(ipy);
                   pt.push_back(ipt);
-                  amrex::PrintToFile("diags/initial_beam.txt")
-                      << ix << " " << iy << " " << it << " "
-                      << ipx << " " << ipy << " " << ipt << "\n";
               }
           }
 
@@ -187,11 +173,7 @@ namespace impactx
               py.reserve(npart);
               pt.reserve(npart);
 
-              // write file header
-              amrex::PrintToFile("diags/initial_beam.txt") << "x y t px py pt\n";
-
               for(amrex::Long i = 0; i < npart; ++i) {
-
                   Gaussian(ix, iy, it, ipx, ipy, ipt, rng);
                   x.push_back(ix);
                   y.push_back(iy);
@@ -199,9 +181,6 @@ namespace impactx
                   px.push_back(ipx);
                   py.push_back(ipy);
                   pt.push_back(ipt);
-                  amrex::PrintToFile("diags/initial_beam.txt")
-                      << ix << " " << iy << " " << it << " "
-                      << ipx << " " << ipy << " " << ipt << "\n";
               }
           }
 
@@ -238,11 +217,7 @@ namespace impactx
               py.reserve(npart);
               pt.reserve(npart);
 
-              // write file header
-              amrex::PrintToFile("diags/initial_beam.txt") << "x y t px py pt\n";
-
               for(amrex::Long i = 0; i < npart; ++i) {
-
                   KVdist(ix, iy, it, ipx, ipy, ipt, rng);
                   x.push_back(ix);
                   y.push_back(iy);
@@ -250,9 +225,6 @@ namespace impactx
                   px.push_back(ipx);
                   py.push_back(ipy);
                   pt.push_back(ipt);
-                  amrex::PrintToFile("diags/initial_beam.txt")
-                      << ix << " " << iy << " " << it << " "
-                      << ipx << " " << ipy << " " << ipt << "\n";
               }
           }
 
