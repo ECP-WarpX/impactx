@@ -19,6 +19,57 @@
 #include <string>
 
 
+namespace
+{
+    /** Generate and add n particles to a particle container
+     *
+     * @tparam T_Distribution distribution function to draw from (type)
+     * @param pc a particle container to add particles to
+     * @param qm charge/mass ratio (q_e/eV)
+     * @param bunch_charge bunch charge (C)
+     * @param distr distribution function to draw from (object)
+     * @param npart number of particles to draw
+     */
+    template <typename T_Distribution>
+    void
+    generate_add_particles (
+        impactx::ImpactXParticleContainer & pc,
+        amrex::ParticleReal qm,
+        amrex::ParticleReal bunch_charge,
+        T_Distribution & distr,
+        int npart
+    )
+    {
+        amrex::Vector<amrex::ParticleReal> x, y, t;
+        amrex::Vector<amrex::ParticleReal> px, py, pt;
+        amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
+        amrex::RandomEngine rng;
+
+        if (amrex::ParallelDescriptor::IOProcessor()) {
+            x.reserve(npart);
+            y.reserve(npart);
+            t.reserve(npart);
+            px.reserve(npart);
+            py.reserve(npart);
+            pt.reserve(npart);
+
+            for(amrex::Long i = 0; i < npart; ++i) {
+                distr(ix, iy, it, ipx, ipy, ipt, rng);
+                x.push_back(ix);
+                y.push_back(iy);
+                t.push_back(it);
+                px.push_back(ipx);
+                py.push_back(ipy);
+                pt.push_back(ipt);
+            }
+        }
+
+        int const lev = 0;
+        pc.AddNParticles(lev, x, y, t, px, py, pt,
+                         qm, bunch_charge);
+    }
+}
+
 namespace impactx
 {
     void ImpactX::initDist ()
@@ -37,14 +88,14 @@ namespace impactx
         std::string particle_type;  // Particle type
         pp_dist.get("particle", particle_type);
 
-        amrex::ParticleReal qm = 0.0; //charge/mass ratio (q_e/eV)
-        if(particle_type == "electron"){
-          qm = -1.0/0.510998950e6;
-        } else if(particle_type == "proton"){
-          qm = 1.0/938.27208816e6;
+        amrex::ParticleReal qm = 0.0; // charge/mass ratio (q_e/eV)
+        if(particle_type == "electron") {
+            qm = -1.0/0.510998950e6;
+        } else if(particle_type == "proton") {
+            qm = 1.0/938.27208816e6;
         }
         else {
-          qm = 0.0;
+            qm = 0.0;
         }
 
         int npart = 1;  // Number of simulation particles
@@ -69,36 +120,12 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          impactx::distribution::Waterbag waterbag(sigx,sigy,sigt,sigpx,
-                                 sigpy,sigpt,muxpx,muypy,mutpt);
+          impactx::distribution::Waterbag waterbag(
+              sigx, sigy, sigt,
+              sigpx, sigpy, sigpt,
+              muxpx, muypy, mutpt);
 
-          amrex::Vector<amrex::ParticleReal> x, y, t;
-          amrex::Vector<amrex::ParticleReal> px, py, pt;
-          amrex::RandomEngine rng;
-          amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
-
-          if (amrex::ParallelDescriptor::IOProcessor()) {
-              x.reserve(npart);
-              y.reserve(npart);
-              t.reserve(npart);
-              px.reserve(npart);
-              py.reserve(npart);
-              pt.reserve(npart);
-
-              for(amrex::Long i = 0; i < npart; ++i) {
-                  waterbag(ix, iy, it, ipx, ipy, ipt, rng);
-                  x.push_back(ix);
-                  y.push_back(iy);
-                  t.push_back(it);
-                  px.push_back(ipx);
-                  py.push_back(ipy);
-                  pt.push_back(ipt);
-              }
-          }
-
-          int const lev = 0;
-          m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
-                                              qm, bunch_charge);
+          generate_add_particles(*m_particle_container, qm, bunch_charge, waterbag, npart);
 
         } else if (distribution_type == "kurth6d") {
           amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
@@ -113,36 +140,12 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          impactx::distribution::Kurth6D Kurth6D(sigx,sigy,sigt,sigpx,
-                                 sigpy,sigpt,muxpx,muypy,mutpt);
+          impactx::distribution::Kurth6D kurth6D(
+            sigx, sigy, sigt,
+            sigpx, sigpy, sigpt,
+            muxpx, muypy, mutpt);
 
-          amrex::Vector<amrex::ParticleReal> x, y, t;
-          amrex::Vector<amrex::ParticleReal> px, py, pt;
-          amrex::RandomEngine rng;
-          amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
-
-          if (amrex::ParallelDescriptor::IOProcessor()) {
-              x.reserve(npart);
-              y.reserve(npart);
-              t.reserve(npart);
-              px.reserve(npart);
-              py.reserve(npart);
-              pt.reserve(npart);
-
-              for(amrex::Long i = 0; i < npart; ++i) {
-                  Kurth6D(ix, iy, it, ipx, ipy, ipt, rng);
-                  x.push_back(ix);
-                  y.push_back(iy);
-                  t.push_back(it);
-                  px.push_back(ipx);
-                  py.push_back(ipy);
-                  pt.push_back(ipt);
-              }
-          }
-
-          int const lev = 0;
-          m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
-                                              qm, bunch_charge);
+          generate_add_particles(*m_particle_container, qm, bunch_charge, kurth6D, npart);
 
         } else if (distribution_type == "gaussian") {
           amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
@@ -157,36 +160,12 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          impactx::distribution::Gaussian Gaussian(sigx,sigy,sigt,sigpx,
-                                 sigpy,sigpt,muxpx,muypy,mutpt);
+          impactx::distribution::Gaussian gaussian(
+            sigx, sigy, sigt,
+            sigpx, sigpy, sigpt,
+            muxpx, muypy, mutpt);
 
-          amrex::Vector<amrex::ParticleReal> x, y, t;
-          amrex::Vector<amrex::ParticleReal> px, py, pt;
-          amrex::RandomEngine rng;
-          amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
-
-          if (amrex::ParallelDescriptor::IOProcessor()) {
-              x.reserve(npart);
-              y.reserve(npart);
-              t.reserve(npart);
-              px.reserve(npart);
-              py.reserve(npart);
-              pt.reserve(npart);
-
-              for(amrex::Long i = 0; i < npart; ++i) {
-                  Gaussian(ix, iy, it, ipx, ipy, ipt, rng);
-                  x.push_back(ix);
-                  y.push_back(iy);
-                  t.push_back(it);
-                  px.push_back(ipx);
-                  py.push_back(ipy);
-                  pt.push_back(ipt);
-              }
-          }
-
-          int const lev = 0;
-          m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
-                                              qm, bunch_charge);
+          generate_add_particles(*m_particle_container, qm, bunch_charge, gaussian, npart);
 
         } else if (distribution_type == "kvdist") {
           amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
@@ -201,36 +180,12 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          impactx::distribution::KVdist KVdist(sigx,sigy,sigt,sigpx,
-                                 sigpy,sigpt,muxpx,muypy,mutpt);
+          impactx::distribution::KVdist kvDist(
+            sigx, sigy, sigt,
+            sigpx, sigpy, sigpt,
+            muxpx, muypy, mutpt);
 
-          amrex::Vector<amrex::ParticleReal> x, y, t;
-          amrex::Vector<amrex::ParticleReal> px, py, pt;
-          amrex::RandomEngine rng;
-          amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
-
-          if (amrex::ParallelDescriptor::IOProcessor()) {
-              x.reserve(npart);
-              y.reserve(npart);
-              t.reserve(npart);
-              px.reserve(npart);
-              py.reserve(npart);
-              pt.reserve(npart);
-
-              for(amrex::Long i = 0; i < npart; ++i) {
-                  KVdist(ix, iy, it, ipx, ipy, ipt, rng);
-                  x.push_back(ix);
-                  y.push_back(iy);
-                  t.push_back(it);
-                  px.push_back(ipx);
-                  py.push_back(ipy);
-                  pt.push_back(ipt);
-              }
-          }
-
-          int const lev = 0;
-          m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
-                                              qm, bunch_charge);
+          generate_add_particles(*m_particle_container, qm, bunch_charge, kvDist, npart);
 
         } else {
             amrex::Abort("Unknown distribution: " + distribution_type);
