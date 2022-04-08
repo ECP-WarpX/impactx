@@ -123,10 +123,10 @@ set(ImpactX_ablastr_branch "1522807862c32d6b60e829fb9409fccadcf21e46"
     "Repository branch for ImpactX_ablastr_repo if(ImpactX_ablastr_internal)")
 
 # AMReX is transitively pulled through ABLASTR
-set(ImpactX_amrex_repo ""
+set(ImpactX_amrex_repo "https://github.com/AMReX-Codes/amrex.git"
     CACHE STRING
     "Repository URI to pull and build AMReX from if(ImpactX_amrex_internal)")
-set(ImpactX_amrex_branch ""
+set(ImpactX_amrex_branch "84a1f7d0715b2a2f33338304bbdfc7a7e018a2b6"
     CACHE STRING
     "Repository branch for ImpactX_amrex_repo if(ImpactX_amrex_internal)")
 
