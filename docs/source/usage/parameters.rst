@@ -108,6 +108,33 @@ Initial Beam Distributions
         * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
+    * ``gaussian`` for initial 6D Gaussian (normal) distribution.
+      With additional parameters:
+
+        * ``<distribution>.sigx`` (``float``, in meters) rms X
+        * ``<distribution>.sigy`` (``float``, in meters) rms Y
+        * ``<distribution>.sigt`` (``float``, in radian) rms normalized time difference T
+        * ``<distribution>.sigpx`` (``float``, in momentum) rms Px
+        * ``<distribution>.sigpy`` (``float``, in momentum) rms Py
+        * ``<distribution>.sigpt`` (``float``, in energy deviation) rms Pt
+        * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
+        * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
+        * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
+
+    * ``kvdist`` for initial K-V distribution in the transverse plane.
+      The distribution is uniform in t and Gaussian in pt.
+      With additional parameters:
+
+        * ``<distribution>.sigx`` (``float``, in meters) rms X
+        * ``<distribution>.sigy`` (``float``, in meters) rms Y
+        * ``<distribution>.sigt`` (``float``, in radian) rms normalized time difference T
+        * ``<distribution>.sigpx`` (``float``, in momentum) rms Px
+        * ``<distribution>.sigpy`` (``float``, in momentum) rms Py
+        * ``<distribution>.sigpt`` (``float``, in energy deviation) rms Pt
+        * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
+        * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
+        * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
+
 .. _running-cpp-parameters-lattice:
 
 Lattice Elements

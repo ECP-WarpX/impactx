@@ -8,12 +8,28 @@ macro(find_ablastr)
         include(FetchContent)
     endif()
 
+    # transitive control for AMReX superbuild
+    set(WarpX_amrex_internal ${ImpactX_amrex_internal} CACHE BOOL
+        "Download & build AMReX" FORCE)
     if(ImpactX_amrex_src)
         set(WarpX_amrex_src ${ImpactX_amrex_src} CACHE PATH
             "Local path to AMReX source directory (preferred if set)" FORCE)
         list(APPEND CMAKE_MODULE_PATH "${WarpX_amrex_src}/Tools/CMake")
+    elseif(ImpactX_amrex_internal)
+        if(ImpactX_amrex_repo)
+            set(WarpX_amrex_repo ${ImpactX_amrex_repo} CACHE STRING
+                "Repository URI to pull and build AMReX from if(ImpactX_amrex_internal)" FORCE)
+        endif()
+        if(ImpactX_amrex_branch)
+            set(WarpX_amrex_branch ${ImpactX_amrex_branch} CACHE STRING
+                "Repository branch for ImpactX_amrex_repo if(ImpactX_amrex_internal)" FORCE)
+        endif()
     endif()
 
+    # transitive control for openPMD/FFT/PICSAR superbuild
+    # TODO (future)
+
+    # ABLASTR superbuild
     if(ImpactX_ablastr_internal OR ImpactX_ablastr_src)
         set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
@@ -105,5 +121,13 @@ set(ImpactX_ablastr_repo "https://github.com/ECP-WarpX/WarpX.git"
 set(ImpactX_ablastr_branch "1522807862c32d6b60e829fb9409fccadcf21e46"
     CACHE STRING
     "Repository branch for ImpactX_ablastr_repo if(ImpactX_ablastr_internal)")
+
+# AMReX is transitively pulled through ABLASTR
+set(ImpactX_amrex_repo ""
+    CACHE STRING
+    "Repository URI to pull and build AMReX from if(ImpactX_amrex_internal)")
+set(ImpactX_amrex_branch ""
+    CACHE STRING
+    "Repository branch for ImpactX_amrex_repo if(ImpactX_amrex_internal)")
 
 find_ablastr()
