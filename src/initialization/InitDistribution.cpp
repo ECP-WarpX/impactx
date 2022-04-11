@@ -45,23 +45,31 @@ namespace
         amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
         amrex::RandomEngine rng;
 
-        if (amrex::ParallelDescriptor::IOProcessor()) {
-            x.reserve(npart);
-            y.reserve(npart);
-            t.reserve(npart);
-            px.reserve(npart);
-            py.reserve(npart);
-            pt.reserve(npart);
+        // Logic: We initialize 1/Nth of particles, independent of their
+        // position, per MPI rank. We then measure the distribution's spatial
+        // extent, create a grid, resize it to fit the beam, and then
+        // redistribute particles so that they reside on the correct MPI rank.
+        int myproc = amrex::ParallelDescriptor::MyProc();
+        int nprocs = amrex::ParallelDescriptor::NProcs();
+        int navg = npart / nprocs;
+        int nleft = npart - navg * nprocs;
+        int npart_this_proc = (myproc < nleft) ? navg+1 : navg;
 
-            for(amrex::Long i = 0; i < npart; ++i) {
-                distr(ix, iy, it, ipx, ipy, ipt, rng);
-                x.push_back(ix);
-                y.push_back(iy);
-                t.push_back(it);
-                px.push_back(ipx);
-                py.push_back(ipy);
-                pt.push_back(ipt);
-            }
+        x.reserve(npart_this_proc);
+        y.reserve(npart_this_proc);
+        t.reserve(npart_this_proc);
+        px.reserve(npart_this_proc);
+        py.reserve(npart_this_proc);
+        pt.reserve(npart_this_proc);
+
+        for (amrex::Long i = 0; i < npart_this_proc; ++i) {
+            distr(ix, iy, it, ipx, ipy, ipt, rng);
+            x.push_back(ix);
+            y.push_back(iy);
+            t.push_back(it);
+            px.push_back(ipx);
+            py.push_back(ipy);
+            pt.push_back(ipt);
         }
 
         int const lev = 0;
@@ -191,6 +199,11 @@ namespace impactx
             amrex::Abort("Unknown distribution: " + distribution_type);
         }
 
+        // Resize the mesh to fit the spatial extent of the beam and then
+        // redistribute particles, so they reside on the MPI rank that is
+        // responsible for the respective spatial particle position.
+        this->ResizeMesh();
+        m_particle_container->Redistribute();
 
         // reference particle
         amrex::ParticleReal massE;  // MeV

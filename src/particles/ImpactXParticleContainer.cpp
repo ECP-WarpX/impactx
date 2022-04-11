@@ -43,6 +43,8 @@ namespace impactx
                                              amrex::ParticleReal const & qm,
                                              amrex::ParticleReal const & bchchg)
     {
+        BL_PROFILE("ImpactX::AddNParticles");
+
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(lev == 0, "AddNParticles: only lev=0 is supported yet.");
         AMREX_ALWAYS_ASSERT(x.size() == y.size());
         AMREX_ALWAYS_ASSERT(x.size() == z.size());
@@ -100,8 +102,6 @@ namespace impactx
         particle_tile.resize(new_np);
         amrex::copyParticles(
                 particle_tile, pinned_tile, 0, old_np, pinned_tile.numParticles());
-//        Redistribute(); // TODO
-
     }
 
     void
