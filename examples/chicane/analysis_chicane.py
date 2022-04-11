@@ -5,6 +5,8 @@
 # License: BSD-3-Clause-LBNL
 #
 
+import glob
+
 import numpy as np
 import pandas as pd
 from scipy.stats import moment
@@ -35,9 +37,27 @@ def get_moments(beam):
         emittance_x, emittance_y, emittance_t)
 
 
+def read_all_files(file_pattern):
+    """Read in all CSV files from each MPI rank (and potentially OpenMP
+    thread). Concatenate into one Pandas dataframe.
+
+    Returns
+    -------
+    pandas.DataFrame
+    """
+    return pd.concat(
+        (
+            pd.read_csv(filename, delimiter=r"\s+")
+            for filename in glob.glob(file_pattern)
+        ),
+        axis=0,
+        ignore_index=True,
+    )
+
+
 # initial/final beam on rank zero
-initial = pd.read_csv("diags/initial_beam.txt.0.0", delimiter=r"\s+")
-final = pd.read_csv("diags/output_beam.txt.0.0", delimiter=r"\s+")
+initial = read_all_files("diags/initial_beam.txt.*")
+final = read_all_files("diags/output_beam.txt.*")
 
 # compare number of particles
 num_particles = 10000
