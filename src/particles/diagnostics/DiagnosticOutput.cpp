@@ -26,67 +26,52 @@ namespace impactx::diagnostics
         bool const local = true;
         tmp.copyParticles(pc, local);
 
-        // write file header, flush and close file
-        {
-            amrex::PrintToFile(file_name) << "x y t px py pt\n";
-        }
+        // write file header per MPI RANK
+        amrex::AllPrintToFile(file_name) << "x y t px py pt\n";
 
-        const int MyProc = amrex::ParallelDescriptor::MyProc();
+        // loop over refinement levels
+        int const nLevel = tmp.finestLevel();
+        for (int lev = 0; lev <= nLevel; ++lev) {
+            // loop over all particle boxes
+            using ParIt = typename decltype(tmp)::ParConstIterType;
+            for (ParIt pti(tmp, lev); pti.isValid(); ++pti) {
+                const int np = pti.numParticles();
 
-        for (int proc = 0; proc < amrex::ParallelDescriptor::NProcs(); proc++) {
-            // note: this is the same logic as in amrex::ParticleContainer::WriteAsciiFile
-            //   this is intended only for small tests where IO performance is not
-            //   a concern. The implementation here serializes IO, under the assumption
-            //   that MPI-sync (Barrier) is the same as parallel FS sync;
-            //   generally, it is not.
-            amrex::ParallelDescriptor::Barrier();
+                // preparing access to particle data: AoS
+                using PType = ImpactXParticleContainer::ParticleType;
+                auto const &aos = pti.GetArrayOfStructs();
+                PType const *const AMREX_RESTRICT aos_ptr = aos().dataPtr();
 
-            if (MyProc == proc) {
-                // loop over refinement levels
-                int const nLevel = tmp.finestLevel();
-                for (int lev = 0; lev <= nLevel; ++lev) {
-                    // loop over all particle boxes
-                    using ParIt = typename decltype(tmp)::ParConstIterType;
-                    for (ParIt pti(tmp, lev); pti.isValid(); ++pti) {
-                        const int np = pti.numParticles();
+                // preparing access to particle data: SoA of Reals
+                auto &soa_real = pti.GetStructOfArrays().GetRealData();
+                amrex::ParticleReal const *const AMREX_RESTRICT part_px = soa_real[RealSoA::ux].dataPtr();
+                amrex::ParticleReal const *const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
+                amrex::ParticleReal const *const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
 
-                        // preparing access to particle data: AoS
-                        using PType = ImpactXParticleContainer::ParticleType;
-                        auto const &aos = pti.GetArrayOfStructs();
-                        PType const *const AMREX_RESTRICT aos_ptr = aos().dataPtr();
+                if (otype == OutputType::PrintParticles) {
+                    // print out particles (this hack works only on CPU and on GPUs with
+                    // unified memory access)
+                    for (int i = 0; i < np; ++i) {
 
-                        // preparing access to particle data: SoA of Reals
-                        auto &soa_real = pti.GetStructOfArrays().GetRealData();
-                        amrex::ParticleReal const *const AMREX_RESTRICT part_px = soa_real[RealSoA::ux].dataPtr();
-                        amrex::ParticleReal const *const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
-                        amrex::ParticleReal const *const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
+                        // access AoS data such as positions and cpu/id
+                        PType const &p = aos_ptr[i];
+                        amrex::ParticleReal const x = p.pos(0);
+                        amrex::ParticleReal const y = p.pos(1);
+                        amrex::ParticleReal const t = p.pos(2);
 
-                        if (otype == OutputType::PrintParticles) {
-                            // print out particles (this hack works only on CPU and on GPUs with
-                            // unified memory access)
-                            for (int i = 0; i < np; ++i) {
+                        // access SoA Real data
+                        amrex::ParticleReal const px = part_px[i];
+                        amrex::ParticleReal const py = part_py[i];
+                        amrex::ParticleReal const pt = part_pt[i];
 
-                                // access AoS data such as positions and cpu/id
-                                PType const &p = aos_ptr[i];
-                                amrex::ParticleReal const x = p.pos(0);
-                                amrex::ParticleReal const y = p.pos(1);
-                                amrex::ParticleReal const t = p.pos(2);
-
-                                // access SoA Real data
-                                amrex::ParticleReal const px = part_px[i];
-                                amrex::ParticleReal const py = part_py[i];
-                                amrex::ParticleReal const pt = part_pt[i];
-
-                                // write particle data to file
-                                amrex::AllPrintToFile(file_name)
-                                        << x << " " << y << " " << t << " "
-                                        << px << " " << py << " " << pt << "\n";
-                            } // i=0...np
-                        } // if( otype == OutputType::PrintParticles)
-                    } // end loop over all particle boxes
-                } // env mesh-refinement level loop
-            } // current MPI rank that writes
-        } // serial MPI rank loop
+                        // write particle data to file
+                        amrex::AllPrintToFile(file_name)
+                                << x << " " << y << " " << t << " "
+                                << px << " " << py << " " << pt << "\n";
+                    } // i=0...np
+                } // if( otype == OutputType::PrintParticles)
+            } // end loop over all particle boxes
+        } // env mesh-refinement level loop
     }
 
 } // namespace impactx::diagnostics
