@@ -45,6 +45,10 @@ namespace
         amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
         amrex::RandomEngine rng;
 
+        // Logic: We initialize 1/Nth of particles, independent of their
+        // position, per MPI rank. We then measure the distribution's spatial
+        // extent, create a grid, resize it to fit the beam, and then
+        // redistribute particles so that they reside on the correct MPI rank.
         int myproc = amrex::ParallelDescriptor::MyProc();
         int nprocs = amrex::ParallelDescriptor::NProcs();
         int navg = npart / nprocs;
@@ -195,6 +199,9 @@ namespace impactx
             amrex::Abort("Unknown distribution: " + distribution_type);
         }
 
+        // Resize the mesh to fit the spatial extent of the beam and then
+        // redistribute particles, so they reside on the MPI rank that is
+        // responsible for the respective spatial particle position.
         this->ResizeMesh();
         m_particle_container->Redistribute();
 

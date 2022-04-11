@@ -102,5 +102,6 @@ namespace impactx
         diagnostics::DiagnosticOutput(*m_particle_container,
                                       diagnostics::OutputType::PrintParticles,
                                       "diags/output_beam.txt");
+
     }
 } // namespace impactx
