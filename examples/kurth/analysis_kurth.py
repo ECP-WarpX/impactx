@@ -39,7 +39,7 @@ def get_moments(beam):
 
 def read_all_files(file_pattern):
     """Read in all CSV files from each MPI rank (and potentially OpenMP
-    thread. Concatinate into one Pandas dataframe.
+    thread). Concatenate into one Pandas dataframe.
 
     Returns
     -------
