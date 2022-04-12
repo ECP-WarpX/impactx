@@ -91,3 +91,31 @@ add_test(NAME kurth.analysis
 )
 
 set_tests_properties(kurth.analysis PROPERTIES DEPENDS "kurth.run")
+
+
+# 6D Gaussian Distribution Test ###################################################
+#
+add_test(NAME gaussian.run
+         COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/distgen/input_gaussian.in
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+add_test(NAME gaussian.analysis
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/distgen/analysis_gaussian.py
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+
+set_tests_properties(gaussian.analysis PROPERTIES DEPENDS "gaussian.run")
+
+
+# K-V Distribution Test ############################################################
+#
+add_test(NAME kvdist.run
+         COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/distgen/input_kvdist.in
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+add_test(NAME kvdist.analysis
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/distgen/analysis_kvdist.py
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+
+set_tests_properties(kvdist.analysis PROPERTIES DEPENDS "kvdist.run")
