@@ -133,4 +133,3 @@ add_test(NAME FODO_RF.analysis
 )
 
 set_tests_properties(FODO_RF.analysis PROPERTIES DEPENDS "FODO_RF.run")
-
