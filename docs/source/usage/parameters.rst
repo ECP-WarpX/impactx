@@ -188,6 +188,14 @@ Lattice Elements
             * ``<element_name>.kt`` (``float``, in 1/meters) the
               longitudinal focusing strength
 
+        * ``shortrf`` for a short RF (bunching) cavity element. This requires these additional parameters:
+
+            * ``<element_name>.V`` (``float``, dimensionless) normalized
+              maximum voltage drop
+
+            * ``<element_name>.k`` (``float``, in 1/meters) the RF
+              wavenumber
+
 .. _running-cpp-parameters-parallelization:
 
 Distribution across MPI ranks and parallelization
