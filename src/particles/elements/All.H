@@ -12,13 +12,15 @@
 #include "Quad.H"
 #include "DipEdge.H"
 #include "ConstF.H"
+#include "ShortRF.H"
 
 #include <variant>
 
 
 namespace impactx
 {
-    using KnownElements = std::variant<Drift, Sbend, Quad, DipEdge, ConstF>;
+    using KnownElements = std::variant<Drift, Sbend, Quad, DipEdge, ConstF,
+                                       ShortRF>;
 
 } // namespace impactx
 

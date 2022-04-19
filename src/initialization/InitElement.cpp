@@ -63,6 +63,11 @@ namespace impactx
                 pp_element.get("ky", ky);
                 pp_element.get("kt", kt);
                 m_lattice.emplace_back( ConstF(ds, kx, ky, kt) );
+            } else if (element_type == "shortrf") {
+                amrex::Real V, k;
+                pp_element.get("V", V);
+                pp_element.get("k", k);
+                m_lattice.emplace_back( ShortRF(V, k) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }

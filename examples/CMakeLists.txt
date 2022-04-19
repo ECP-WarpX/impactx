@@ -119,3 +119,17 @@ add_test(NAME kvdist.analysis
 )
 
 set_tests_properties(kvdist.analysis PROPERTIES DEPENDS "kvdist.run")
+
+
+# FODO Cell with RF ###################################################################
+#
+add_test(NAME FODO_RF.run
+         COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/fodo_rf/input_fodo_rf.in
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+add_test(NAME FODO_RF.analysis
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo_rf/analysis_fodo_rf.py
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+
+set_tests_properties(FODO_RF.analysis PROPERTIES DEPENDS "FODO_RF.run")
