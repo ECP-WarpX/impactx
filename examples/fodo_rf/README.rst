@@ -1,7 +1,7 @@
 .. _examples-fodo:
 
 FODO Cell with RF
-===================
+=================
 
 Stable FODO cell with short RF (buncher) cavities added for
 longitudinal focusing.  The phase advance in all three phase planes is
