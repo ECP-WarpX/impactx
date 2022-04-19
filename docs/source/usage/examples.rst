@@ -12,6 +12,7 @@ This section allows you to **download input files** that correspond to different
    examples/chicane/README.rst
    examples/cfchannel/README.rst
    examples/kurth/README.rst
+   examples/fodo_rf/README.rst
 
 
 Test Cases / Benchmarks
