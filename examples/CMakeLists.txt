@@ -133,3 +133,17 @@ add_test(NAME FODO_RF.analysis
 )
 
 set_tests_properties(FODO_RF.analysis PROPERTIES DEPENDS "FODO_RF.run")
+
+
+# 4D Kurth Distribution Test ############################################################
+#
+add_test(NAME kurth4d.run
+         COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/distgen/input_kurth4d.in
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+add_test(NAME kurth4d.analysis
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/distgen/analysis_kurth4d.py
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+
+set_tests_properties(kurth4d.analysis PROPERTIES DEPENDS "kurth4d.run")
