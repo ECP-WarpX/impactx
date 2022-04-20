@@ -11,6 +11,7 @@
 #include "particles/distribution/Gaussian.H"
 #include "particles/distribution/KVdist.H"
 #include "particles/distribution/Kurth4D.H"
+#include "particles/distribution/Semigaussian.H"
 
 #include <AMReX.H>
 #include <AMReX_REAL.H>
@@ -215,7 +216,25 @@ namespace impactx
             muxpx, muypy, mutpt);
 
           generate_add_particles(*m_particle_container, qm, bunch_charge, kurth4D, npart);
+        } else if (distribution_type == "semigaussian") {
+          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
+          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
+          pp_dist.get("sigmaX", sigx);
+          pp_dist.get("sigmaY", sigy);
+          pp_dist.get("sigmaT", sigt);
+          pp_dist.get("sigmaPx", sigpx);
+          pp_dist.get("sigmaPy", sigpy);
+          pp_dist.get("sigmaPt", sigpt);
+          pp_dist.query("muxpx", muxpx);
+          pp_dist.query("muypy", muypy);
+          pp_dist.query("mutpt", mutpt);
 
+          impactx::distribution::Semigaussian semigaussian(
+            sigx, sigy, sigt,
+            sigpx, sigpy, sigpt,
+            muxpx, muypy, mutpt);
+
+          generate_add_particles(*m_particle_container, qm, bunch_charge, semigaussian, npart);
         } else {
             amrex::Abort("Unknown distribution: " + distribution_type);
         }

@@ -147,3 +147,17 @@ add_test(NAME kurth4d.analysis
 )
 
 set_tests_properties(kurth4d.analysis PROPERTIES DEPENDS "kurth4d.run")
+
+
+# Semi-Gaussian Distribution Test ############################################################
+#
+add_test(NAME semigaussian.run
+         COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/distgen/input_semigaussian.in
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+add_test(NAME semigaussian.analysis
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/distgen/analysis_semigaussian.py
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+
+set_tests_properties(semigaussian.analysis PROPERTIES DEPENDS "semigaussian.run")
