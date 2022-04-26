@@ -183,7 +183,10 @@ Lattice Elements
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
-            * ``<element_name>.k`` (``float``, in inverse meters) the quadrupole strength
+            * ``<element_name>.k`` (``float``, in inverse meters squared) the quadrupole strength
+                    = (magnetic field gradient in T/m) / (magnetic rigidity in T-m)
+                    k > 0 horizontal focusing
+                    k < 0 horizontal defocusing
 
         * ``sbend`` for a bending magnet. This requires these additional parameters:
 
@@ -218,11 +221,11 @@ Lattice Elements
 
         * ``shortrf`` for a short RF (bunching) cavity element. This requires these additional parameters:
 
-            * ``<element_name>.V`` (``float``, dimensionless) normalized
-              maximum voltage drop
+            * ``<element_name>.V`` (``float``, dimensionless) normalized voltage drop across the cavity
+                    = (maximum voltage drop in Volts) / (speed of light in m/s * magnetic rigidity in T-m)
 
-            * ``<element_name>.k`` (``float``, in 1/meters) the RF
-              wavenumber
+            * ``<element_name>.k`` (``float``, in 1/meters) the RF wavenumber
+                    = 2*pi/(RF wavelength in m)
 
 .. _running-cpp-parameters-parallelization:
 
