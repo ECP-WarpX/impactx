@@ -1,0 +1,45 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.energy = 2.0e3
+beam.charge = 0.0
+beam.particle = electron
+beam.distribution = waterbag
+beam.sigmaX = 4.0e-3
+beam.sigmaY = 4.0e-3
+beam.sigmaT = 1.0e-3
+beam.sigmaPx = 3.0e-4
+beam.sigmaPy = 3.0e-4
+beam.sigmaPt = 2.0e-3
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+
+lattice.elements = thin_quadrupole thin_sextupole thin_octupole
+
+thin_quadrupole.type = multipole
+thin_quadrupole.multipole = 2      //Thin quadrupole
+thin_quadrupole.k_normal = 3.0
+thin_quadrupole.k_skew = 0.0
+
+thin_sextupole.type = multipole
+thin_sextupole.multipole = 3      //Thin sextupole
+thin_sextupole.k_normal = 100.0
+thin_sextupole.k_skew = -50.0
+
+thin_octupole.type = multipole
+thin_octupole.multipole = 4     //Thin octupole
+thin_octupole.k_normal = 65.0
+thin_octupole.k_skew = 6.0
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2

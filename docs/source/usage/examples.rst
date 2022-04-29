@@ -13,6 +13,7 @@ This section allows you to **download input files** that correspond to different
    examples/cfchannel/README.rst
    examples/kurth/README.rst
    examples/fodo_rf/README.rst
+   examples/multipole/README.rst
 
 
 Test Cases / Benchmarks
