@@ -23,13 +23,14 @@ namespace impactx
 
         /** A general thin multipole element
          *
-         * @param m multipole index (m=1 dipole, m=2 quadrupole, m=3 sextupole etc.)
+         * @param multipole index m (m=1 dipole, m=2 quadrupole, m=3 sextupole etc.)
          * @param K_normal Integrated normal multipole coefficient (1/meter^m)
          * @param K_skew Integrated skew multipole coefficient (1/meter^m)
          *
          */
-        Multipole( int const multipole, amrex::ParticleReal const
-                   K_normal, amrex::ParticleReal const K_skew )
+        Multipole( int const multipole,
+                   amrex::ParticleReal const K_normal,
+                   amrex::ParticleReal const K_skew )
         : m_multipole(multipole), m_Kn(K_normal), m_Ks(K_skew)
         {
         }
