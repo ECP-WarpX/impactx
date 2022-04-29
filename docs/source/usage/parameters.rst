@@ -185,8 +185,9 @@ Lattice Elements
 
             * ``<element_name>.k`` (``float``, in inverse meters squared) the quadrupole strength
                     = (magnetic field gradient in T/m) / (magnetic rigidity in T-m)
-                    k > 0 horizontal focusing
-                    k < 0 horizontal defocusing
+
+              * k > 0 horizontal focusing
+              * k < 0 horizontal defocusing
 
         * ``sbend`` for a bending magnet. This requires these additional parameters:
 
