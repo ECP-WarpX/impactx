@@ -68,6 +68,13 @@ namespace impactx
                 pp_element.get("V", V);
                 pp_element.get("k", k);
                 m_lattice.emplace_back( ShortRF(V, k) );
+            } else if (element_type == "multipole") {
+                int m;
+                amrex::Real k_normal, k_skew;
+                pp_element.get("multipole", m);
+                pp_element.get("k_normal", k_normal);
+                pp_element.get("k_skew", k_skew);
+                m_lattice.emplace_back( Multipole(m, k_normal, k_skew) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }
