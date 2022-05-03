@@ -42,13 +42,13 @@ We use the following modules and environments on the system (``$HOME/perlmutter_
    module load cmake/3.22.0
    module swap PrgEnv-nvidia PrgEnv-gnu
    module load cudatoolkit
-   module load cray-hdf5-parallel/1.12.0.7
+   module load cray-hdf5-parallel/1.12.1.1
 
    # optional: just an additional text editor
    # module load nano  # TODO: request from support
 
    # Python
-   module load cray-python/3.9.4.2
+   module load cray-python/3.9.7.1
    if [ -d "$HOME/sw/perlmutter/venvs/impactx" ]
    then
        source $HOME/sw/perlmutter/venvs/impactx/bin/activate
@@ -71,11 +71,11 @@ We use the following modules and environments on the system (``$HOME/perlmutter_
    export AMREX_CUDA_ARCH=8.0
 
    # compiler environment hints
-   export CC=$(which gcc)
-   export CXX=$(which g++)
-   export FC=$(which gfortran)
+   export CC=cc
+   export CXX=CC
+   export FC=ftn
    export CUDACXX=$(which nvcc)
-   export CUDAHOSTCXX=$(which g++)
+   export CUDAHOSTCXX=CC
 
 
 We recommend to store the above lines in a file, such as ``$HOME/perlmutter_impactx.profile``, and load it into your shell after a login:
