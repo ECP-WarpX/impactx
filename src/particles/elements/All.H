@@ -14,6 +14,7 @@
 #include "ConstF.H"
 #include "ShortRF.H"
 #include "Multipole.H"
+#include "NonlinearLens.H"
 
 #include <variant>
 
@@ -21,7 +22,7 @@
 namespace impactx
 {
     using KnownElements = std::variant<Drift, Sbend, Quad, DipEdge, ConstF,
-                                       ShortRF, Multipole>;
+                                       ShortRF, Multipole, NonlinearLens>;
 
 } // namespace impactx
 

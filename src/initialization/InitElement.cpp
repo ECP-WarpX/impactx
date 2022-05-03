@@ -75,6 +75,11 @@ namespace impactx
                 pp_element.get("k_normal", k_normal);
                 pp_element.get("k_skew", k_skew);
                 m_lattice.emplace_back( Multipole(m, k_normal, k_skew) );
+            } else if (element_type == "nonlinear_lens") {
+                amrex::Real knll, cnll;
+                pp_element.get("knll", knll);
+                pp_element.get("cnll", cnll);
+                m_lattice.emplace_back( NonlinearLens(knll, cnll) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }

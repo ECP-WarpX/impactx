@@ -238,6 +238,14 @@ Lattice Elements
 
             * ``<element_name>.k_skew`` (``float``, in 1/meters^m) integrated skew multipole strength (MAD-X convention)
 
+        * ``nonlinear_lens`` for a thin IOTA nonlinear lens element. This requires these additional parameters:
+
+            * ``<element_name>.knll`` (``float``, in meters) integrated strength of the lens segment (MAD-X convention)
+                   = dimensionless lens strength * c parameter**2 * length / Twiss beta
+
+            * ``<element_name>.cnll`` (``float``, in meters) distance of the singularities from the origin (MAD-X convention)
+                   = c parameter * sqrt(Twiss beta)
+
 
 .. _running-cpp-parameters-parallelization:
 
