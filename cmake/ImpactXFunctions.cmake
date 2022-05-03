@@ -63,6 +63,12 @@ macro(set_default_build_dirs)
                 CACHE PATH "Build directory for binaries")
         mark_as_advanced(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
     endif()
+    if(NOT CMAKE_PYTHON_OUTPUT_DIRECTORY)
+        set(CMAKE_PYTHON_OUTPUT_DIRECTORY
+            "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages"
+            CACHE PATH "Build directory for python modules"
+        )
+    endif()
 endmacro()
 
 
@@ -83,6 +89,20 @@ macro(set_default_install_dirs)
             endif()
             mark_as_advanced(CMAKE_INSTALL_CMAKEDIR)
         endif()
+
+        # Python install and build output dirs
+        if(WIN32)
+            set(CMAKE_INSTALL_PYTHONDIR_DEFAULT
+                "${CMAKE_INSTALL_LIBDIR}/site-packages"
+            )
+        else()
+            set(CMAKE_INSTALL_PYTHONDIR_DEFAULT
+                "${CMAKE_INSTALL_LIBDIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages"
+            )
+        endif()
+        set(CMAKE_INSTALL_PYTHONDIR "${CMAKE_INSTALL_PYTHONDIR_DEFAULT}"
+            CACHE STRING "Location for installed python package"
+        )
     endif()
 endmacro()
 
@@ -237,10 +257,10 @@ function(set_ImpactX_binary_name)
         else()
             set(mod_ext "so")
         endif()
-        add_custom_command(TARGET shared POST_BUILD
+        add_custom_command(TARGET lib POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E create_symlink
-                $<TARGET_FILE_NAME:shared>
-                $<TARGET_FILE_DIR:shared>/libimpactx.${mod_ext}
+                $<TARGET_FILE_NAME:lib>
+                $<TARGET_FILE_DIR:lib>/libimpactx.${mod_ext}
         )
     endif()
 endfunction()
@@ -315,7 +335,7 @@ function(ImpactX_print_summary)
     message("        lib: ${CMAKE_INSTALL_LIBDIR}")
     message("    include: ${CMAKE_INSTALL_INCLUDEDIR}")
     message("      cmake: ${CMAKE_INSTALL_CMAKEDIR}")
-    if(ImpactX_HAVE_PYTHON)
+    if(ImpactX_PYTHON)
         message("     python: ${CMAKE_INSTALL_PYTHONDIR}")
     endif()
     message("")
@@ -345,6 +365,7 @@ function(ImpactX_print_summary)
         message("    MPI (thread multiple): ${ImpactX_MPI_THREAD_MULTIPLE}")
     endif()
     message("    PRECISION: ${ImpactX_PRECISION}")
+    message("    PYTHON: ${ImpactX_PYTHON}")
     message("    OPENPMD: ${ImpactX_OPENPMD}")
     #message("    SENSEI: ${ImpactX_SENSEI}")
     message("")
