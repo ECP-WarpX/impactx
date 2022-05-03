@@ -83,7 +83,7 @@ namespace impactx
             amrex::GpuComplex carcsin = im1*zeta + croot;
             carcsin = -im1*amrex::log(carcsin);
 
-            // compute complex function F'(zeta)            
+            // compute complex function F'(zeta)
             amrex::GpuComplex dF = zeta/amrex::pow(croot,2);
             dF = dF + carcsin/amrex::pow(croot,3);
 
