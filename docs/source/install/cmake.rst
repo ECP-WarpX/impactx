@@ -66,6 +66,39 @@ or by adding arguments with ``-D<OPTION>=<VALUE>`` to the first CMake call, e.g.
 
    cmake -S . -B build -DImpactX_COMPUTE=CUDA
 
+
+Compile including Python Bindings
+---------------------------------
+
+.. note::
+
+   Preparation: make sure you work with up-to-date Python tooling.
+
+   .. code-block:: bash
+
+      python3 -m pip install -U pip setuptools wheel
+
+For PICMI Python bindings, add a configure option and call our ``pip_install`` *CMake target*:
+
+.. code-block:: bash
+
+   # find dependencies & configure
+   cmake -S . -B build -DImpactX_PYTHON=ON
+
+   # build and then call "python3 -m pip install ..."
+   cmake --build build --target pip_install -j 4
+
+**That's it!**
+*TODO:* You can now :ref:`run a first 3D PICMI script <usage-picmi>` from our :ref:`examples <usage-examples>`.
+
+Developers could now change the ImpactX source code and then call the build line again to refresh the Python installation.
+
+.. tip::
+
+   If you do *not* develop with :ref:`a user-level package manager <install-dependencies>`, e.g., because you rely on a HPC system's environment modules, then consider to set up a virtual environment via `Python venv <https://docs.python.org/3/library/venv.html>`__.
+   Otherwise, without a virtual environment, you likely need to add the CMake option ``-DPYINSTALLOPTIONS="--user"``.
+
+
 Build Options
 -------------
 
@@ -79,10 +112,12 @@ CMake Option                    Default & Values                             Des
 ``ImpactX_APP``                 **ON**/OFF                                   Build the ImpactX executable application
 ``ImpactX_COMPUTE``             NOACC/**OMP**/CUDA/SYCL/HIP                  On-node, accelerated computing backend
 ``ImpactX_IPO``                 ON/**OFF**                                   Compile ImpactX with interprocedural optimization (aka LTO)
-``ImpactX_LIB``                 ON/**OFF**                                   Build ImpactX as a shared library
+``ImpactX_LIB``                 ON/**OFF**                                   Build ImpactX as a library (shared or static)
 ``ImpactX_MPI``                 **ON**/OFF                                   Multi-node support (message-passing)
 ``ImpactX_MPI_THREAD_MULTIPLE`` **ON**/OFF                                   MPI thread-multiple support, i.e. for ``async_io``
 ``ImpactX_PRECISION``           SINGLE/**DOUBLE**                            Floating point precision (single/double)
+``ImpactX_PYTHON``              ON/**OFF**                                   Python bindings
+``Python_EXECUTABLE``           (newest found)                               Path to Python executable
 =============================== ============================================ ===========================================================
 
 ImpactX can be configured in further detail with options from AMReX, which are `documented in the AMReX manual <https://amrex-codes.github.io/amrex/docs_html/BuildingAMReX.html#customization-options>`_.
@@ -102,6 +137,10 @@ CMake Option                  Default & Values                               Des
 ``ImpactX_amrex_repo``        ``https://github.com/AMReX-Codes/amrex.git``   Repository URI to pull and build AMReX from
 ``ImpactX_amrex_branch``      *we set and maintain a compatible commit*      Repository branch for ``ImpactX_amrex_repo``
 ``ImpactX_amrex_internal``    **ON**/OFF                                     Needs a pre-installed AMReX library if set to ``OFF``
+``ImpactX_pyamrex_src``       *None*                                         Path to AMReX source directory (preferred if set)
+``ImpactX_pyamrex_repo``      ``https://github.com/AMReX-Codes/pyamrex.git`` Repository URI to pull and build pyAMReX from
+``ImpactX_pyamrex_branch``    *we set and maintain a compatible commit*      Repository branch for ``ImpactX_pyamrex_repo``
+``ImpactX_pyamrex_internal``  **ON**/OFF                                     Needs a pre-installed pyAMReX module if set to ``OFF``
 ============================= ============================================== ===========================================================
 
 For example, one can also build against a local AMReX copy.
@@ -119,6 +158,7 @@ Please see the :ref:`introduction to CMake <building-cmake-intro>` if this sound
 
 If you re-compile often, consider installing the `Ninja <https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages>`__ build system.
 Pass ``-G Ninja`` to the CMake configuration call to speed up parallel compiles.
+
 
 Configure your compiler
 -----------------------
