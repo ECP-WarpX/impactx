@@ -33,6 +33,12 @@ namespace impactx
                    amrex::ParticleReal const K_skew )
         : m_multipole(multipole), m_Kn(K_normal), m_Ks(K_skew)
         {
+            // compute factorial of multipole index
+            int const m = m_multipole - 1;
+            m_mfactorial = 1;
+            for( int n = 1; n < m + 1; n = n + 1 ) {
+               m_mfactorial *= n;
+            }
         }
 
         /** This is a multipole functor, so that a variable of this type can be used like a
@@ -54,6 +60,9 @@ namespace impactx
 
             using namespace amrex::literals; // for _rt and _prt
 
+            // a complex type with two amrex::ParticleReal
+            using Complex = amrex::GpuComplex<amrex::ParticleReal>;
+
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(0);
             amrex::ParticleReal const y = p.pos(1);
@@ -69,21 +78,15 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // assign complex position and complex multipole strength
-            amrex::GpuComplex zeta(x,y);
-            amrex::GpuComplex alpha(m_Kn,m_Ks);
-
-            // compute factorial of multipole index
-            int m = m_multipole - 1;
-            int mfactorial = 1;
-            for( int n = 1; n < m + 1; n = n + 1 ) {
-               mfactorial *= n;
-            }
+            Complex const zeta(x, y);
+            Complex const alpha(m_Kn, m_Ks);
 
             // compute complex momentum kick
-            amrex::GpuComplex kick = amrex::pow(zeta,m);
+            int const m = m_multipole - 1;
+            Complex kick = amrex::pow(zeta, m);
             kick *= alpha;
-            amrex::ParticleReal dpx = -1.0_prt*kick.m_real/mfactorial;
-            amrex::ParticleReal dpy = kick.m_imag/mfactorial;
+            amrex::ParticleReal const dpx = -1.0_prt*kick.m_real/m_mfactorial;
+            amrex::ParticleReal const dpy = kick.m_imag/m_mfactorial;
 
             // advance position and momentum
             p.pos(0) = x;
@@ -104,6 +107,7 @@ namespace impactx
 
     private:
         int m_multipole; //! multipole index
+        int m_mfactorial; //! factorial of multipole index
         amrex::ParticleReal m_Kn; //! integrated normal multipole coefficient
         amrex::ParticleReal m_Ks; //! integrated skew multipole coefficient
 
