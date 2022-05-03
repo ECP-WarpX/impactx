@@ -161,3 +161,16 @@ add_test(NAME semigaussian.analysis
 )
 
 set_tests_properties(semigaussian.analysis PROPERTIES DEPENDS "semigaussian.run")
+
+# Chain of Multipoles Test ############################################################
+#
+add_test(NAME multipole.run
+         COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/multipole/input_multipole.in
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+add_test(NAME multipole.analysis
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/multipole/analysis_multipole.py
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+
+set_tests_properties(multipole.analysis PROPERTIES DEPENDS "multipole.run")

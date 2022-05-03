@@ -13,6 +13,7 @@
 #include "DipEdge.H"
 #include "ConstF.H"
 #include "ShortRF.H"
+#include "Multipole.H"
 
 #include <variant>
 
@@ -20,7 +21,7 @@
 namespace impactx
 {
     using KnownElements = std::variant<Drift, Sbend, Quad, DipEdge, ConstF,
-                                       ShortRF>;
+                                       ShortRF, Multipole>;
 
 } // namespace impactx
 
