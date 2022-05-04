@@ -83,11 +83,11 @@ namespace impactx
             croot = amrex::sqrt(croot);
 
             // compute carcsin = arcsin(zeta)
-            amrex::GpuComplex carcsin = im1*zeta + croot;
+            Complex carcsin = im1*zeta + croot;
             carcsin = -im1*amrex::log(carcsin);
 
             // compute complex function F'(zeta)
-            amrex::GpuComplex dF = zeta/amrex::pow(croot,2);
+            Complex dF = zeta/amrex::pow(croot, 2);
             dF = dF + carcsin/amrex::pow(croot,3);
 
             // compute momentum kick
