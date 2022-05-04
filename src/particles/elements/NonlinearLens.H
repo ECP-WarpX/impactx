@@ -73,9 +73,9 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // assign complex position zeta = x + iy
-            amrex::GpuComplex zeta(x,y);
-            amrex::GpuComplex re1(1.0,0.0);
-            amrex::GpuComplex im1(0.0,1.0);
+            Complex zeta(x, y);
+            Complex re1(1.0_prt, 0.0_prt);
+            Complex im1(0.0_prt, 1.0_prt);
 
             // compute croot = sqrt(1-zeta**2)
             amrex::GpuComplex croot = amrex::pow(zeta,2);
