@@ -78,7 +78,7 @@ namespace impactx
             Complex im1(0.0_prt, 1.0_prt);
 
             // compute croot = sqrt(1-zeta**2)
-            amrex::GpuComplex croot = amrex::pow(zeta,2);
+            Complex croot = amrex::pow(zeta, 2);
             croot = re1 - croot;
             croot = amrex::sqrt(croot);
 
