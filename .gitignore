@@ -13,6 +13,7 @@ chk*
 ##########
 # Python #
 ##########
+_tmppythonbuild/
 *.pyc
 __pycache__
 dist/
