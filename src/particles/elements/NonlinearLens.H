@@ -21,7 +21,9 @@ namespace impactx
     {
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** A thin lens associated with a single short segment of the
+        /** Single short segment of the nonlinear magnetic insert element
+         *
+         *  A thin lens associated with a single short segment of the
          *  nonlinear magnetic insert described by V. Danilov and
          *  S. Nagaitsev, PRSTAB 13, 084002 (2010), Sect. V.A.  This
          *  element appears in MAD-X as type NLLENS.
@@ -36,8 +38,8 @@ namespace impactx
         {
         }
 
-        /** This is a nonlinear lens functor, so that a variable of this type can be used like a
-         *  nonlinear lens function.
+        /** This is a nonlinear lens functor, so that a variable of this type
+         *  can be used like a nonlinear lens function.
          *
          * @param p Particle AoS data for positions and cpu/id
          * @param px particle momentum in x
