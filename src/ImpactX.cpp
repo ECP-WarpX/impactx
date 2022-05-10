@@ -5,22 +5,34 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "ImpactX.H"
+#include "initialization/InitOneBoxPerRank.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
 #include "particles/transformation/CoordinateTransformation.H"
 #include "particles/diagnostics/DiagnosticOutput.H"
 
 #include <AMReX.H>
+#include <AMReX_AmrParGDB.H>
 #include <AMReX_Print.H>
 #include <AMReX_Utility.H>
+
+#include <memory>
 
 
 namespace impactx
 {
-    ImpactX::ImpactX (amrex::Geometry const& simulation_geometry, amrex::AmrInfo const& amr_info)
-        : AmrCore(simulation_geometry, amr_info),
+    ImpactX::ImpactX ()
+        : AmrCore(),
           m_particle_container(std::make_unique<ImpactXParticleContainer>(this))
     {
+        AmrMesh::operator=(AmrMesh(initialization::one_box_per_rank()));
+        //AmrCore::InitAmrCore();
+        m_gdb = std::make_unique<amrex::AmrParGDB>(this);
+
+        // todo: if amr.n_cells is provided, overwrite/redefine AmrCore object
+
+        // todo: if charge deposition and/or space charge are requested, require
+        //       amr.n_cells from user inputs
     }
 
     void ImpactX::initGrids ()

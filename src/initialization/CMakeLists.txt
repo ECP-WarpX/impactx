@@ -3,5 +3,6 @@ target_sources(ImpactX
     InitDistribution.cpp
     InitElement.cpp
     InitMeshRefinement.cpp
+    InitOneBoxPerRank.cpp
     InitParser.cpp
 )

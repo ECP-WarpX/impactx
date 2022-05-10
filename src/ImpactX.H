@@ -14,6 +14,7 @@
 
 #include <list>
 #include <memory>
+#include <tuple>
 #include <unordered_map>
 
 
@@ -28,16 +29,12 @@ namespace impactx
     {
       public:
         /** Construct an ImpactX simulation object
-         *
-         * @param simulation_geometry the geometry (topology) of the simulation
-         * @param amr_info contains information on mesh-refinement and box/grid blocks
          */
-        ImpactX (amrex::Geometry const& simulation_geometry, amrex::AmrInfo const& amr_info);
+        ImpactX ();
 
         ~ImpactX () = default;
 
         // removed constructors/assignments
-        ImpactX () = delete;
         ImpactX (ImpactX const&) = delete;
         ImpactX (ImpactX &&) = delete;
         void operator= (ImpactX const&) = delete;
