@@ -82,7 +82,7 @@ namespace
 
 namespace impactx
 {
-    void ImpactX::initDist ()
+    void ImpactX::initBeamDistributionFromInputs ()
     {
         using namespace amrex::literals;
 
@@ -279,5 +279,6 @@ namespace impactx
         }
 
         amrex::Print() << "Initialized beam distribution parameters" << std::endl;
+        amrex::Print() << "# of particles: " << m_particle_container->TotalNumberOfParticles() << std::endl;
     }
 } // namespace impactx

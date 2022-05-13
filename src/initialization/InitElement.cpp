@@ -18,7 +18,7 @@
 
 namespace impactx
 {
-    void ImpactX::initElements ()
+    void ImpactX::initLatticeElementsFromInputs ()
     {
         // make sure the element sequence is empty
         m_lattice.clear();

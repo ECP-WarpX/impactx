@@ -43,14 +43,26 @@ namespace impactx
         void operator= (ImpactX const&) = delete;
         void operator= (ImpactX &&) = delete;
 
-        /** Initialize particle containers and MultiFabs (fields) */
-        void initData ();
+        /** Initialize AMReX blocks/grids
+         *
+         * This must come first, before particle beams and lattice elements are
+         * initialized.
+         */
+        void initGrids ();
 
-        /** Initialize the list of lattice elements */
-        void initElements ();
+        /** Initialize the particle beam distribution
+         *
+         * This clears and initialized the particle beam from input file and
+         * command-line options, as parsed by amrex::ParmParse.
+         */
+        void initBeamDistributionFromInputs ();
 
-        /** Initialize the beam distribution parameters */
-        void initDist ();
+        /** Initialize the list of lattice elements
+         *
+         * This clears and initialized the accelerator lattice elements from
+         * input file and command-line options, as parsed by amrex::ParmParse.
+         */
+        void initLatticeElementsFromInputs ();
 
         /** Run the main simulation loop for a number of steps
          *
