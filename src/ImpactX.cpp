@@ -23,16 +23,13 @@ namespace impactx
     {
     }
 
-    void ImpactX::initData ()
+    void ImpactX::initGrids ()
     {
         AmrCore::InitFromScratch(0.0);
         amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
 
         // move old diagnostics out of the way
         amrex::UtilCreateCleanDirectory("diags", true);
-
-        this->initDist();
-        amrex::Print() << "# of particles: " << m_particle_container->TotalNumberOfParticles() << std::endl;
     }
 
     void ImpactX::evolve (int num_steps)

@@ -41,8 +41,9 @@ int main(int argc, char* argv[])
         amrex::Geometry geom(domain, rb, amrex::CoordSys::cartesian, is_periodic);
         auto impactX = std::make_unique<impactx::ImpactX>(geom, amr_info);
 
-        impactX->initData();
-        impactX->initElements();
+        impactX->initGrids();
+        impactX->initBeamDistributionFromInputs();
+        impactX->initLatticeElementsFromInputs();
         impactX->evolve( /* num_steps = */ 1);
 
         BL_PROFILE_VAR_STOP(pmain);
