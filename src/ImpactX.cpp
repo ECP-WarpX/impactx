@@ -22,8 +22,7 @@
 namespace impactx
 {
     ImpactX::ImpactX ()
-        : AmrCore(),
-          m_particle_container(std::make_unique<ImpactXParticleContainer>(this))
+        : AmrCore()
     {
         AmrMesh::operator=(AmrMesh(initialization::one_box_per_rank()));
         //AmrCore::InitAmrCore();
@@ -33,6 +32,9 @@ namespace impactx
 
         // todo: if charge deposition and/or space charge are requested, require
         //       amr.n_cells from user inputs
+
+        // construct particle container after AmrCore is initialized
+        m_particle_container = std::make_unique<ImpactXParticleContainer>(this);
     }
 
     void ImpactX::initGrids ()
