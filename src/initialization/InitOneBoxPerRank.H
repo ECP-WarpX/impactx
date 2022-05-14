@@ -7,10 +7,7 @@
 #ifndef IMPACT_INIT_ONE_BOX_PER_RANK_H
 #define IMPACT_INIT_ONE_BOX_PER_RANK_H
 
-#include <AMReX_Geometry.H>
-#include <AMReX_AmrCore.H>
-
-#include <tuple>
+#include "AmrCoreData.H"
 
 
 namespace impactx::initialization
@@ -23,8 +20,7 @@ namespace impactx::initialization
      * @return simulation_geometry the geometry (topology) of the simulation;
      *         amr_info contains information on mesh-refinement and box/grid blocks
      */
-    //std::tuple< amrex::Geometry, amrex::AmrInfo >
-    amrex::AmrMesh
+    AmrCoreData
     one_box_per_rank ();
 
 } // namespace impactx::initialization

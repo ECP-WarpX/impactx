@@ -13,6 +13,8 @@
 
 #if defined(AMREX_USE_MPI)
 #   include <mpi.h>
+#else
+#   include <AMReX_ccse-mpi.H>
 #endif
 
 

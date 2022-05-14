@@ -4,10 +4,8 @@
  *
  * License: BSD-3-Clause-LBNL
  */
-#include "ImpactX.H"
-#include "particles/elements/All.H"
+#include "InitOneBoxPerRank.H"
 
-#include <AMReX_AmrMesh.H>
 #include <AMReX_Array.H>
 #include <AMReX_Box.H>
 #include <AMReX_CoordSys.H>
@@ -20,7 +18,7 @@
 
 namespace impactx::initialization
 {
-    amrex::AmrMesh
+    AmrCoreData
     one_box_per_rank ()
     {
         amrex::AmrInfo amr_info;

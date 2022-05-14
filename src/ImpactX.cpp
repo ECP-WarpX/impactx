@@ -17,24 +17,19 @@
 #include <AMReX_Utility.H>
 
 #include <memory>
+#include <utility>
 
 
 namespace impactx
 {
     ImpactX::ImpactX ()
-        : AmrCore()
+        : AmrCore(std::move(initialization::one_box_per_rank())),
+          m_particle_container(std::make_unique<ImpactXParticleContainer>(this))
     {
-        AmrMesh::operator=(AmrMesh(initialization::one_box_per_rank()));
-        //AmrCore::InitAmrCore();
-        m_gdb = std::make_unique<amrex::AmrParGDB>(this);
-
         // todo: if amr.n_cells is provided, overwrite/redefine AmrCore object
 
         // todo: if charge deposition and/or space charge are requested, require
         //       amr.n_cells from user inputs
-
-        // construct particle container after AmrCore is initialized
-        m_particle_container = std::make_unique<ImpactXParticleContainer>(this);
     }
 
     void ImpactX::initGrids ()
