@@ -17,13 +17,12 @@
 #include <AMReX_Utility.H>
 
 #include <memory>
-#include <utility>
 
 
 namespace impactx
 {
     ImpactX::ImpactX ()
-        : AmrCore(std::move(initialization::one_box_per_rank())),
+        : AmrCore(initialization::one_box_per_rank()),
           m_particle_container(std::make_unique<ImpactXParticleContainer>(this))
     {
         // todo: if amr.n_cells is provided, overwrite/redefine AmrCore object
