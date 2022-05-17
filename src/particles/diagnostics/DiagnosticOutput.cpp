@@ -5,6 +5,7 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "DiagnosticOutput.H"
+#include "Invariants.H"
 
 #include <ablastr/particles/IndexHandling.H>
 
@@ -74,6 +75,35 @@ namespace impactx::diagnostics
                                 << px << " " << py << " " << pt << "\n";
                     } // i=0...np
                 } // if( otype == OutputType::PrintParticles)
+                if (otype == OutputType::PrintInvariants) {
+
+                    amrex::ParticleReal const alpha = 0.0;
+                    amrex::ParticleReal const beta = 1.0;
+                    amrex::ParticleReal const tn = 0.4;
+                    amrex::ParticleReal const cn = 0.01;
+                    Invariants Invariants(alpha,beta,tn,cn);
+
+                    // print out particles (this hack works only on CPU and on GPUs with
+                    // unified memory access)
+                    for (int i = 0; i < np; ++i) {
+
+                        // access AoS data such as positions and cpu/id
+                        PType const &p = aos_ptr[i];
+                        amrex::ParticleReal const x = p.pos(0);
+                        amrex::ParticleReal const y = p.pos(1);
+
+                        // access SoA Real data
+                        amrex::ParticleReal const px = part_px[i];
+                        amrex::ParticleReal const py = part_py[i];
+
+                        // write particle invariant data to file
+                        invariants_out HI_out;
+                        HI_out = Invariants(x, y, px, py);
+                        amrex::AllPrintToFile(file_name)
+                                << HI_out.H << " " << HI_out.I << "\n";
+
+                    } // i=0...np
+                } // if( otype == OutputType::PrintInvariants)
             } // end loop over all particle boxes
         } // env mesh-refinement level loop
     }

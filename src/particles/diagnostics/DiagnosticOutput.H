@@ -18,7 +18,8 @@ namespace impactx::diagnostics
      */
     enum class OutputType
     {
-        PrintParticles ///< ASCII diagnostics, for small tests only
+        PrintParticles, ///< ASCII diagnostics, for small tests only
+        PrintInvariants ///< Also as above
     };
 
     /** ASCII output diagnostics associated with the beam.
