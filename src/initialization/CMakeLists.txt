@@ -1,7 +1,9 @@
 target_sources(ImpactX
   PRIVATE
+    AmrCoreData.cpp
     InitDistribution.cpp
     InitElement.cpp
     InitMeshRefinement.cpp
+    InitOneBoxPerRank.cpp
     InitParser.cpp
 )

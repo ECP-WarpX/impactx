@@ -1,4 +1,4 @@
-/* Copyright 2021 Axel Huebl, Chad Mitchell, Ji Qiang
+/* Copyright 2021-2022 Axel Huebl, Chad Mitchell, Ji Qiang
  *
  * This file is part of ImpactX.
  *
@@ -11,7 +11,12 @@
 #include <AMReX_BLProfiler.H>
 #include <AMReX_ParallelDescriptor.H>
 
-#include <memory>
+#if defined(AMREX_USE_MPI)
+#   include <mpi.h>
+#else
+#   include <AMReX_ccse-mpi.H>
+#endif
+
 
 int main(int argc, char* argv[])
 {
@@ -28,26 +33,15 @@ int main(int argc, char* argv[])
         impactx::initialization::overwrite_amrex_parser_defaults
     );
 
+    BL_PROFILE_VAR("main()", pmain);
     {
-        BL_PROFILE_VAR("main()", pmain);
-
-        amrex::AmrInfo amr_info;
-        const int nprocs = amrex::ParallelDescriptor::NProcs();
-        const amrex::IntVect high_end = amr_info.blocking_factor[0]
-            * amrex::IntVect(AMREX_D_DECL(nprocs,1,1)) - amrex::IntVect(1);
-        amrex::Box domain(amrex::IntVect(0), high_end); // Domain index space
-        amrex::RealBox rb({AMREX_D_DECL(0.,0.,0.)}, {AMREX_D_DECL(1.,1.,1.)});// Domain physical size
-        amrex::Array<int,AMREX_SPACEDIM> is_periodic{AMREX_D_DECL(0,0,0)};
-        amrex::Geometry geom(domain, rb, amrex::CoordSys::cartesian, is_periodic);
-        auto impactX = std::make_unique<impactx::ImpactX>(geom, amr_info);
-
-        impactX->initGrids();
-        impactX->initBeamDistributionFromInputs();
-        impactX->initLatticeElementsFromInputs();
-        impactX->evolve( /* num_steps = */ 1);
-
-        BL_PROFILE_VAR_STOP(pmain);
+        impactx::ImpactX impactX;
+        impactX.initGrids();
+        impactX.initBeamDistributionFromInputs();
+        impactX.initLatticeElementsFromInputs();
+        impactX.evolve( /* num_steps = */ 1);
     }
+    BL_PROFILE_VAR_STOP(pmain);
 
     amrex::Finalize();
 #if defined(AMREX_USE_MPI)
