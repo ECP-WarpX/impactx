@@ -6,6 +6,8 @@
  */
 #include "DiagnosticOutput.H"
 
+#include <ablastr/particles/IndexHandling.H>
+
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_ParallelDescriptor.H>  // for ParallelDescriptor
 #include <AMReX_REAL.H>       // for ParticleReal
@@ -27,7 +29,7 @@ namespace impactx::diagnostics
         tmp.copyParticles(pc, local);
 
         // write file header per MPI RANK
-        amrex::AllPrintToFile(file_name) << "x y t px py pt\n";
+        amrex::AllPrintToFile(file_name) << "id x y t px py pt\n";
 
         // loop over refinement levels
         int const nLevel = tmp.finestLevel();
@@ -58,6 +60,7 @@ namespace impactx::diagnostics
                         amrex::ParticleReal const x = p.pos(0);
                         amrex::ParticleReal const y = p.pos(1);
                         amrex::ParticleReal const t = p.pos(2);
+                        uint64_t const global_id = ablastr::particles::localIDtoGlobal(p.id(), p.cpu());
 
                         // access SoA Real data
                         amrex::ParticleReal const px = part_px[i];
@@ -66,6 +69,7 @@ namespace impactx::diagnostics
 
                         // write particle data to file
                         amrex::AllPrintToFile(file_name)
+                                << global_id << " "
                                 << x << " " << y << " " << t << " "
                                 << px << " " << py << " " << pt << "\n";
                     } // i=0...np
