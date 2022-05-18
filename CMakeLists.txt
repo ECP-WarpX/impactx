@@ -78,6 +78,7 @@ mark_as_advanced(ImpactX_MPI_THREAD_MULTIPLE)
 
 option(ImpactX_ablastr_internal                  "Download & build ABLASTR" ON)
 option(ImpactX_amrex_internal                    "Download & build AMReX" ON)
+option(ImpactX_pyamrex_internal                  "Download & build pyAMReX" ON)
 
 set(pyImpactX_VERSION_INFO "" CACHE STRING
     "PEP-440 conformant version (set by distutils)")
@@ -158,6 +159,8 @@ endif()
 
 # build Python module (this is always a shared library)
 if(ImpactX_PYTHON)
+    include(${ImpactX_SOURCE_DIR}/cmake/dependencies/pyAMReX.cmake)
+
     add_library(pyImpactX MODULE src/python/pyImpactX.cpp)
     add_library(ImpactX::pyImpactX ALIAS pyImpactX)
     target_link_libraries(pyImpactX PUBLIC lib)
@@ -358,8 +361,17 @@ if(ImpactX_PYTHON)
     set(PYINSTALLOPTIONS "" CACHE STRING
         "Additional parameters to pass to `pip install`")
 
+    # add a prefix to custom targets so we do not collide if used as a subproject
+    if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+        set(_ImpactX_CUSTOM_TARGET_PREFIX_DEFAULT "")
+    else()
+        set(_ImpactX_CUSTOM_TARGET_PREFIX_DEFAULT "impactx_")
+    endif()
+    set(ImpactX_CUSTOM_TARGET_PREFIX "${_ImpactX_CUSTOM_TARGET_PREFIX_DEFAULT}"
+        CACHE STRING "Prefix for custom targets")
+
     # build the wheel by re-using the lib library we build
-    add_custom_target(pip_wheel
+    add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel
         ${CMAKE_COMMAND} -E rm -f "impactx*.whl"
         COMMAND
             ${CMAKE_COMMAND} -E env PYIMPACTX_LIBDIR=$<TARGET_FILE_DIR:pyImpactX>
@@ -371,7 +383,7 @@ if(ImpactX_PYTHON)
     )
 
     # this will also upgrade/downgrade dependencies, e.g., when the version of numpy changes
-    add_custom_target(pip_install_requirements
+    add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_requirements
         ${Python_EXECUTABLE} -m pip install ${PYINSTALLOPTIONS} -r "${ImpactX_SOURCE_DIR}/requirements.txt"
         WORKING_DIRECTORY
             ${ImpactX_BINARY_DIR}
@@ -380,13 +392,13 @@ if(ImpactX_PYTHON)
     # We force-install because in development, it is likely that the version of
     # the package does not change, but the code did change. We need --no-deps,
     # because otherwise pip would also force reinstall all dependencies.
-    add_custom_target(pip_install
+    add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_install
         ${CMAKE_COMMAND} -E env IMPACTX_MPI=${ImpactX_MPI}
             ${Python_EXECUTABLE} -m pip install --force-reinstall --no-deps ${PYINSTALLOPTIONS} "impactx*.whl"
         WORKING_DIRECTORY
             ${ImpactX_BINARY_DIR}
         DEPENDS
-            pyImpactX pip_wheel pip_install_requirements
+            pyImpactX ${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel ${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_requirements pyamrex_pip_install
     )
 endif()
 

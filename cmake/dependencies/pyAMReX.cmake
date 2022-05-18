@@ -1,56 +1,56 @@
-function(find_pybind11)
-    if(pyAMReX_pybind11_src)
-        message(STATUS "Compiling local pybind11 ...")
-        message(STATUS "pybind11 source path: ${pyAMReX_pybind11_src}")
-    elseif(pyAMReX_pybind11_internal)
-        message(STATUS "Downloading pybind11 ...")
-        message(STATUS "pybind11 repository: ${pyAMReX_pybind11_repo} (${pyAMReX_pybind11_branch})")
+function(find_pyamrex)
+    if(ImpactX_pyamrex_src)
+        message(STATUS "Compiling local pyAMReX ...")
+        message(STATUS "pyAMReX source path: ${ImpactX_pyamrex_src}")
+    elseif(ImpactX_pyamrex_internal)
+        message(STATUS "Downloading pyAMReX ...")
+        message(STATUS "pyAMReX repository: ${ImpactX_pyamrex_repo} (${ImpactX_pyamrex_branch})")
         include(FetchContent)
     endif()
-    if(pyAMReX_pybind11_internal OR pyAMReX_pybind11_src)
+    if(ImpactX_pyamrex_internal OR ImpactX_pyamrex_src)
         set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
-        if(pyAMReX_pybind11_src)
-            add_subdirectory(${pyAMReX_pybind11_src} _deps/localpybind11-build/)
+        if(ImpactX_pyamrex_src)
+            add_subdirectory(${ImpactX_pyamrex_src} _deps/localpyamrex-build/)
         else()
-            FetchContent_Declare(fetchedpybind11
-                GIT_REPOSITORY ${pyAMReX_pybind11_repo}
-                GIT_TAG        ${pyAMReX_pybind11_branch}
+            FetchContent_Declare(fetchedpyamrex
+                GIT_REPOSITORY ${ImpactX_pyamrex_repo}
+                GIT_TAG        ${ImpactX_pyamrex_branch}
                 BUILD_IN_SOURCE 0
             )
-            FetchContent_GetProperties(fetchedpybind11)
+            FetchContent_GetProperties(fetchedpyamrex)
 
-            if(NOT fetchedpybind11_POPULATED)
-                FetchContent_Populate(fetchedpybind11)
-                add_subdirectory(${fetchedpybind11_SOURCE_DIR} ${fetchedpybind11_BINARY_DIR})
+            if(NOT fetchedpyamrex_POPULATED)
+                FetchContent_Populate(fetchedpyamrex)
+                add_subdirectory(${fetchedpyamrex_SOURCE_DIR} ${fetchedpyamrex_BINARY_DIR})
             endif()
 
             # advanced fetch options
             mark_as_advanced(FETCHCONTENT_BASE_DIR)
             mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
             mark_as_advanced(FETCHCONTENT_QUIET)
-            mark_as_advanced(FETCHCONTENT_SOURCE_DIR_FETCHEDpybind11)
+            mark_as_advanced(FETCHCONTENT_SOURCE_DIR_FETCHEDpyamrex)
             mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
-            mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED_FETCHEDpybind11)
+            mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED_FETCHEDpyamrex)
         endif()
     else()
-        find_package(pybind11 2.9.1 CONFIG REQUIRED)
-        message(STATUS "pybind11: Found version '${pybind11_VERSION}'")
+        find_package(pyAMReX 21.02 CONFIG REQUIRED)
+        message(STATUS "pyAMReX: Found version '${pyamrex_VERSION}'")
     endif()
 endfunction()
 
 # local source-tree
-set(pyAMReX_pybind11_src ""
+set(ImpactX_pyamrex_src ""
     CACHE PATH
-    "Local path to pybind11 source directory (preferred if set)")
+    "Local path to pyAMReX source directory (preferred if set)")
 
 # Git fetcher
-option(pyAMReX_pybind11_internal "Download & build pybind11" ON)
-set(pyAMReX_pybind11_repo "https://github.com/pybind/pybind11.git"
+option(ImpactX_pyamrex_internal "Download & build pyAMReX" ON)
+set(ImpactX_pyamrex_repo "https://github.com/AMReX-Codes/pyamrex.git"
     CACHE STRING
-    "Repository URI to pull and build pybind11 from if(pyAMReX_pybind11_internal)")
-set(pyAMReX_pybind11_branch "v2.9.1"
+    "Repository URI to pull and build pyamrex from if(ImpactX_pyamrex_internal)")
+set(ImpactX_pyamrex_branch "development"
     CACHE STRING
-    "Repository branch for pyAMReX_pybind11_repo if(pyAMReX_pybind11_internal)")
+    "Repository branch for ImpactX_pyamrex_repo if(ImpactX_pyamrex_internal)")
 
-find_pybind11()
+find_pyamrex()
