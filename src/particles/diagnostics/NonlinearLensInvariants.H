@@ -15,22 +15,29 @@
 
 #include <cmath>
 
-namespace impactx
+namespace impactx::diagnostics
 {
-    struct invariants_out {
-        amrex::ParticleReal H;
-        amrex::ParticleReal I;
-    };
-
-    struct Invariants
+    /** Compute invariants within the nonlinear magnetic insert element
+     *
+     *  Invariants associated with a single short segment of the
+     *  nonlinear magnetic insert described by V. Danilov and
+     *  S. Nagaitsev, PRSTAB 13, 084002 (2010), Sect. V.A.
+     */
+    struct NonlinearLensInvariants
     {
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** Compute invariants within the nonlinear magnetic insert element
+        /** Independent coordinates
          *
-         *  Invariants associated with a single short segment of the
-         *  nonlinear magnetic insert described by V. Danilov and
-         *  S. Nagaitsev, PRSTAB 13, 084002 (2010), Sect. V.A.
+         * Independent coordinates that are tracked as invariants of motion.
+         */
+        struct Data {
+            amrex::ParticleReal H; ///< first generalized coordinate
+            amrex::ParticleReal I; ///< second generalized coordinate
+        };
+
+        /** Initialize the parameters for the invariants based on the beam
+         *  distribution and parameters of the nonlinear insert element
          *
          * @param alpha - Twiss alpha for the bare lattice
          * @param beta - Twiss beta for the bare lattice (m)
@@ -38,10 +45,11 @@ namespace impactx
          * @param cn - scale parameter of the nonlinear insert (m^[1/2])
          *
          */
-        Invariants( amrex::ParticleReal const alpha,
-                   amrex::ParticleReal const beta,
-                   amrex::ParticleReal const tn,
-                   amrex::ParticleReal const cn )
+        NonlinearLensInvariants(
+            amrex::ParticleReal const alpha,
+            amrex::ParticleReal const beta,
+            amrex::ParticleReal const tn,
+            amrex::ParticleReal const cn )
         : m_alpha(alpha), m_beta(beta), m_tn(tn), m_cn(cn)
         {
         }
@@ -54,14 +62,13 @@ namespace impactx
          * @param px particle momentum in x
          * @param py particle momentum in y
          */
-
-
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        invariants_out operator() (
+        Data operator() (
                 amrex::ParticleReal const x,
                 amrex::ParticleReal const y,
                 amrex::ParticleReal const px,
-                amrex::ParticleReal const py ) {
+                amrex::ParticleReal const py ) const
+        {
 
             using namespace amrex::literals; // for _rt and _prt
 
@@ -107,10 +114,7 @@ namespace impactx
                  + m_tn*Hinv;
             Iinv = pow(Jz,2) + pow(pxn,2) + pow(xn,2) + m_tn*Iinv;
 
-            invariants_out HI_out;
-            HI_out.H = Hinv;
-            HI_out.I = Iinv;
-            return HI_out;
+            return {Hinv, Iinv};
 
         }
 

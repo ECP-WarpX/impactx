@@ -19,7 +19,7 @@ namespace impactx::diagnostics
     enum class OutputType
     {
         PrintParticles, ///< ASCII diagnostics, for small tests only
-        PrintInvariants ///< Also as above
+        PrintNonlinearLensInvariants ///< ASCII diagnostics for the IOTA nonlinear lens, for small tests only
     };
 
     /** ASCII output diagnostics associated with the beam.

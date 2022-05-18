@@ -5,7 +5,7 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "DiagnosticOutput.H"
-#include "Invariants.H"
+#include "NonlinearLensInvariants.H"
 
 #include <ablastr/particles/IndexHandling.H>
 
@@ -30,7 +30,11 @@ namespace impactx::diagnostics
         tmp.copyParticles(pc, local);
 
         // write file header per MPI RANK
-        amrex::AllPrintToFile(file_name) << "id x y t px py pt\n";
+        if (otype == OutputType::PrintParticles) {
+            amrex::AllPrintToFile(file_name) << "id x y t px py pt\n";
+        } else if (otype == OutputType::PrintNonlinearLensInvariants) {
+            amrex::AllPrintToFile(file_name) << "id H I\n";
+        }
 
         // loop over refinement levels
         int const nLevel = tmp.finestLevel();
@@ -75,13 +79,13 @@ namespace impactx::diagnostics
                                 << px << " " << py << " " << pt << "\n";
                     } // i=0...np
                 } // if( otype == OutputType::PrintParticles)
-                if (otype == OutputType::PrintInvariants) {
+                else if (otype == OutputType::PrintNonlinearLensInvariants) {
 
                     amrex::ParticleReal const alpha = 0.0;
                     amrex::ParticleReal const beta = 1.0;
                     amrex::ParticleReal const tn = 0.4;
                     amrex::ParticleReal const cn = 0.01;
-                    Invariants Invariants(alpha,beta,tn,cn);
+                    NonlinearLensInvariants const nonlinear_lens_invariants(alpha, beta, tn, cn);
 
                     // print out particles (this hack works only on CPU and on GPUs with
                     // unified memory access)
@@ -91,15 +95,19 @@ namespace impactx::diagnostics
                         PType const &p = aos_ptr[i];
                         amrex::ParticleReal const x = p.pos(0);
                         amrex::ParticleReal const y = p.pos(1);
+                        uint64_t const global_id = ablastr::particles::localIDtoGlobal(p.id(), p.cpu());
 
                         // access SoA Real data
                         amrex::ParticleReal const px = part_px[i];
                         amrex::ParticleReal const py = part_py[i];
 
+                        // calculate invariants of motion
+                        NonlinearLensInvariants::Data const HI_out =
+                            nonlinear_lens_invariants(x, y, px, py);
+
                         // write particle invariant data to file
-                        invariants_out HI_out;
-                        HI_out = Invariants(x, y, px, py);
                         amrex::AllPrintToFile(file_name)
+                                << global_id << " "
                                 << HI_out.H << " " << HI_out.I << "\n";
 
                     } // i=0...np
