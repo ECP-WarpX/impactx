@@ -108,5 +108,10 @@ namespace impactx
                                       diagnostics::OutputType::PrintParticles,
                                       "diags/output_beam.txt");
 
+        // print the two invariants H and I
+        diagnostics::DiagnosticOutput(*m_particle_container,
+                                      diagnostics::OutputType::PrintNonlinearLensInvariants,
+                                      "diags/output_nonlinear_lens_invariants.txt");
+
     }
 } // namespace impactx
