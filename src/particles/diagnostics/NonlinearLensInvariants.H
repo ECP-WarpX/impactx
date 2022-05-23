@@ -33,7 +33,7 @@ namespace impactx::diagnostics
          * in the IOTA nonlinear magnetic insert.
          */
         struct Data {
-            amrex::ParticleReal H; ///< first phase space function (Hamiltonian) 
+            amrex::ParticleReal H; ///< first phase space function (Hamiltonian)
             amrex::ParticleReal I; ///< second phase space function ("second invariant")
         };
 
