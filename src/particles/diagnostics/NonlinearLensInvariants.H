@@ -27,13 +27,14 @@ namespace impactx::diagnostics
     {
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** Independent coordinates
+        /** Two independent phase space functions in involution
          *
-         * Independent coordinates that are tracked as invariants of motion.
+         * Independent functions that are tracked as invariants of motion
+         * in the IOTA nonlinear magnetic insert.
          */
         struct Data {
-            amrex::ParticleReal H; ///< first generalized coordinate
-            amrex::ParticleReal I; ///< second generalized coordinate
+            amrex::ParticleReal H; ///< first phase space function (Hamiltonian) 
+            amrex::ParticleReal I; ///< second phase space function ("second invariant")
         };
 
         /** Initialize the parameters for the invariants based on the beam
