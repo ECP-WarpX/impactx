@@ -11,8 +11,8 @@
 
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_ParallelDescriptor.H>  // for ParallelDescriptor
-#include <AMReX_REAL.H>       // for ParticleReal
 #include <AMReX_ParmParse.H>  // for ParmParse
+#include <AMReX_REAL.H>       // for ParticleReal
 #include <AMReX_Print.H>      // for PrintToFile
 
 namespace impactx::diagnostics
