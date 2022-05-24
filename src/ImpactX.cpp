@@ -49,6 +49,11 @@ namespace impactx
                                       diagnostics::OutputType::PrintParticles,
                                       "diags/initial_beam.txt");
 
+        // print the initial values of the two invariants H and I
+        diagnostics::DiagnosticOutput(*m_particle_container,
+                                      diagnostics::OutputType::PrintNonlinearLensInvariants,
+                                      "diags/initial_nonlinear_lens_invariants.txt");
+
         for (int step = 0; step < num_steps; ++step)
         {
             BL_PROFILE("ImpactX::evolve::step");
@@ -108,7 +113,7 @@ namespace impactx
                                       diagnostics::OutputType::PrintParticles,
                                       "diags/output_beam.txt");
 
-        // print the two invariants H and I
+        // print the final values of the two invariants H and I
         diagnostics::DiagnosticOutput(*m_particle_container,
                                       diagnostics::OutputType::PrintNonlinearLensInvariants,
                                       "diags/output_nonlinear_lens_invariants.txt");

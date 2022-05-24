@@ -12,6 +12,7 @@
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_ParallelDescriptor.H>  // for ParallelDescriptor
 #include <AMReX_REAL.H>       // for ParticleReal
+#include <AMReX_ParmParse.H> // for ParmParse
 #include <AMReX_Print.H>      // for PrintToFile
 
 namespace impactx::diagnostics
@@ -81,10 +82,23 @@ namespace impactx::diagnostics
                 } // if( otype == OutputType::PrintParticles)
                 else if (otype == OutputType::PrintNonlinearLensInvariants) {
 
-                    amrex::ParticleReal const alpha = 0.0;
-                    amrex::ParticleReal const beta = 1.0;
-                    amrex::ParticleReal const tn = 0.4;
-                    amrex::ParticleReal const cn = 0.01;
+                    using namespace amrex::literals;
+
+                    // Parse the diagnostic parameters
+                    amrex::ParmParse pp_dist("diag");
+
+                    amrex::ParticleReal alpha = 0.0;
+                    pp_dist.query("alpha", alpha);
+                    
+                    amrex::ParticleReal beta = 1.0;
+                    pp_dist.query("beta", beta);
+                    
+                    amrex::ParticleReal tn = 0.4;
+                    pp_dist.query("tn", tn);
+                    
+                    amrex::ParticleReal cn = 0.01;
+                    pp_dist.query("cn", cn);
+
                     NonlinearLensInvariants const nonlinear_lens_invariants(alpha, beta, tn, cn);
 
                     // print out particles (this hack works only on CPU and on GPUs with
