@@ -1,7 +1,7 @@
 .. _examples-iotalens:
 
-A nonlinear focusing channel based on the IOTA nonlinear lens.
-====================================
+A nonlinear focusing channel based on the IOTA nonlinear lens
+=============================================================
 
 A constant focusing channel with nonlinear focusing, using a string of thin
 IOTA nonlinear lens elements alternating with constant focusing elements.
