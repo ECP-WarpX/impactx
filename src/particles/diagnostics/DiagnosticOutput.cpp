@@ -89,13 +89,13 @@ namespace impactx::diagnostics
 
                     amrex::ParticleReal alpha = 0.0;
                     pp_dist.query("alpha", alpha);
-                    
+
                     amrex::ParticleReal beta = 1.0;
                     pp_dist.query("beta", beta);
-                    
+
                     amrex::ParticleReal tn = 0.4;
                     pp_dist.query("tn", tn);
-                    
+
                     amrex::ParticleReal cn = 0.01;
                     pp_dist.query("cn", cn);
 

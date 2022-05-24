@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import moment
 
+
 def get_moments(beam):
     """Calculate mean and std dev of functions defining the IOTA invariants
 

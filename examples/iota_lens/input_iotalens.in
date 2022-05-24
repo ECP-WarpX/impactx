@@ -27,7 +27,7 @@ lattice.elements = const_end nllens const nllens const nllens const nllens const
                    const_end
 
 nllens.type = nonlinear_lens
-nllens.knll = 2.0e-7   
+nllens.knll = 2.0e-7
 nllens.cnll = 0.01
 
 const_end.type = constf
