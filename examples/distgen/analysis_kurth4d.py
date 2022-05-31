@@ -52,7 +52,7 @@ def read_all_files(file_pattern):
         ),
         axis=0,
         ignore_index=True,
-    )
+    ).set_index('id')
 
 
 # initial/final beam on rank zero
