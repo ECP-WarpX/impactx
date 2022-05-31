@@ -348,6 +348,19 @@ Numerics and algorithms
 Diagnostics and output
 ----------------------
 
+Diagnostics related to integrable optics in the IOTA nonlinear magnetic insert element:
+
+* ``diag.alpha`` (``float``, unitless) Twiss alpha of the bare linear lattice at the location of output for the nonlinear
+    IOTA invariants H and I.  Horizontal and vertical values must be equal.
+
+* ``diag.beta`` (``float``, meters) Twiss beta of the bare linear lattice at the location of output for the nonlinear
+    IOTA invariants H and I.  Horizontal and vertical values must be equal.
+
+* ``diag.tn`` (``float``, unitless) dimensionless strength of the IOTA nonlinear magnetic insert element used for computing H and I.
+
+* ``diag.cn`` (``float``, meters^(1/2)) scale factor of the IOTA nonlinear magnetic insert element used for computing H and I. 
+
+
 .. _running-cpp-parameters-diagnostics-insitu:
 
 In-situ visualization
