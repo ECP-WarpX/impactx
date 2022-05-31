@@ -358,7 +358,7 @@ Diagnostics related to integrable optics in the IOTA nonlinear magnetic insert e
 
 * ``diag.tn`` (``float``, unitless) dimensionless strength of the IOTA nonlinear magnetic insert element used for computing H and I.
 
-* ``diag.cn`` (``float``, meters^(1/2)) scale factor of the IOTA nonlinear magnetic insert element used for computing H and I. 
+* ``diag.cn`` (``float``, meters^(1/2)) scale factor of the IOTA nonlinear magnetic insert element used for computing H and I.
 
 
 .. _running-cpp-parameters-diagnostics-insitu:
