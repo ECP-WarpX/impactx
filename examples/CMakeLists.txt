@@ -174,3 +174,16 @@ add_test(NAME multipole.analysis
 )
 
 set_tests_properties(multipole.analysis PROPERTIES DEPENDS "multipole.run")
+
+# IOTA Nonlinear Focusing Channel Test ############################################################
+#
+add_test(NAME iotalens.run
+         COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/iota_lens/input_iotalens.in
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+add_test(NAME iotalens.analysis
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/iota_lens/analysis_iotalens.py
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+
+set_tests_properties(iotalens.analysis PROPERTIES DEPENDS "iotalens.run")

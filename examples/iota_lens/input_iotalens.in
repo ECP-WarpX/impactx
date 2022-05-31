@@ -1,0 +1,58 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.energy = 2.5
+beam.charge = 0.0
+beam.particle = proton
+beam.distribution = waterbag
+beam.sigmaX = 4.0e-3
+beam.sigmaY = 4.0e-3
+beam.sigmaT = 1.0e-3
+beam.sigmaPx = 3.0e-4
+beam.sigmaPy = 3.0e-4
+beam.sigmaPt = 0.0
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+
+lattice.elements = const_end nllens const nllens const nllens const nllens const
+                   nllens const nllens const nllens const nllens const nllens const nllens
+                   const_end
+
+nllens.type = nonlinear_lens
+nllens.knll = 2.0e-7
+nllens.cnll = 0.01
+
+const_end.type = constf
+const_end.ds = 0.0025
+const_end.kx = 1.0
+const_end.ky = 1.0
+const_end.kt = 1.0e-12
+
+const.type = constf
+const.ds = 0.005
+const.kx = 1.0
+const.ky = 1.0
+const.kt = 1.0e-12
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.alpha = 0.0
+diag.beta = 1.0
+diag.tn = 0.4
+diag.cn = 0.01
