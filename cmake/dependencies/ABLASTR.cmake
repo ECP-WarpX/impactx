@@ -40,6 +40,7 @@ macro(find_ablastr)
         set(WarpX_COMPUTE ${ImpactX_COMPUTE} CACHE INTERNAL "" FORCE)
         set(WarpX_OPENPMD ${ImpactX_OPENPMD} CACHE INTERNAL "" FORCE)
         set(WarpX_PRECISION ${ImpactX_PRECISION} CACHE INTERNAL "" FORCE)
+        set(WarpX_MPI ${ImpactX_MPI} CACHE INTERNAL "" FORCE)
         set(WarpX_MPI_THREAD_MULTIPLE ${ImpactX_MPI_THREAD_MULTIPLE} CACHE INTERNAL "" FORCE)
         set(WarpX_IPO ${ImpactX_IPO} CACHE INTERNAL "" FORCE)
 
@@ -49,6 +50,12 @@ macro(find_ablastr)
                 "Build AMReX with position independent code")
             set(ABLASTR_POSITION_INDEPENDENT_CODE ON CACHE INTERNAL
                 "Build ABLASTR with position independent code")
+
+            # WE NEED AMReX AS SHARED LIB, OTHERWISE WE CANNOT SHARE ITS GLOBALS
+            # BETWEEN MULTIPLE PYTHON MODULES
+            # TODO this is likely an export/symbol hiding issue that we could
+            #      alleviate later on
+            set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
         endif()
 
         if(ImpactX_ablastr_src)
@@ -106,6 +113,7 @@ macro(find_ablastr)
     else()
         message(STATUS "Searching for pre-installed ABLASTR ...")
         message(FATAL_ERROR "Not yet supported!")
+        # TODO: MPI control
         set(COMPONENT_DIM 3D)
         set(COMPONENT_PRECISION ${ImpactX_PRECISION} P${ImpactX_PRECISION})
 

@@ -7,6 +7,32 @@ function(find_pyamrex)
         message(STATUS "pyAMReX repository: ${ImpactX_pyamrex_repo} (${ImpactX_pyamrex_branch})")
         include(FetchContent)
     endif()
+
+    # transitive control for AMReX & pybind11 superbuild
+    #   note: if we do superbuilds, we want the same AMReX commit for
+    #           AMReX->ABLASTR->ImpactX and
+    #           AMReX->pyAMReX->pyImpactX
+    #   note: this is performed after we did the transitive logic control in
+    #         ABLASTR.cmake
+    set(pyAMReX_amrex_internal ${ImpactX_amrex_internal} CACHE BOOL
+        "Download & build AMReX" FORCE)
+    set(pyAMReX_pybind11_internal ${ImpactX_pybind11_internal} CACHE BOOL
+        "Download & build AMReX" FORCE)
+
+    if(ImpactX_amrex_src)
+        set(pyAMReX_amrex_src ${ImpactX_amrex_src} CACHE PATH
+            "Local path to AMReX source directory (preferred if set)" FORCE)
+    elseif(ImpactX_amrex_internal)
+        if(ImpactX_amrex_repo)
+            set(pyAMReX_amrex_repo ${ImpactX_amrex_repo} CACHE STRING
+                "Repository URI to pull and build AMReX from if(ImpactX_amrex_internal)" FORCE)
+        endif()
+        if(ImpactX_amrex_branch)
+            set(pyAMReX_amrex_branch ${ImpactX_amrex_branch} CACHE STRING
+                "Repository branch for ImpactX_amrex_repo if(ImpactX_amrex_internal)" FORCE)
+        endif()
+    endif()
+
     if(ImpactX_pyamrex_internal OR ImpactX_pyamrex_src)
         set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
@@ -33,7 +59,8 @@ function(find_pyamrex)
             mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
             mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED_FETCHEDpyamrex)
         endif()
-    else()
+    elseif(NOT ImpactX_pyamrex_internal)
+        # TODO: MPI control
         find_package(pyAMReX 21.02 CONFIG REQUIRED)
         message(STATUS "pyAMReX: Found version '${pyamrex_VERSION}'")
     endif()

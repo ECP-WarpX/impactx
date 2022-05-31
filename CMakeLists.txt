@@ -44,10 +44,10 @@ set_ccache()
 # Output Directories ##########################################################
 #
 # temporary build directories
-set_default_build_dirs()
+impactx_set_default_build_dirs()
 
-# install directories
-set_default_install_dirs()
+# default installation directories (w/o Python)
+impactx_set_default_install_dirs()
 
 
 # Options and Variants ########################################################
@@ -108,13 +108,16 @@ impactx_make_third_party_includes_system(WarpX::ablastr ablastr)
 if(ImpactX_PYTHON)
     find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 
+    # default installation directories: Python
+    impactx_set_default_install_dirs_python()
+
     # pybind11
     #   builds pybind11 from git (default), form local source or
     #   finds an existing install
     include(${ImpactX_SOURCE_DIR}/cmake/dependencies/pybind11.cmake)
 
     # pyAMReX
-    # TODO
+    include(${ImpactX_SOURCE_DIR}/cmake/dependencies/pyAMReX.cmake)
 endif()
 
 
@@ -159,8 +162,6 @@ endif()
 
 # build Python module (this is always a shared library)
 if(ImpactX_PYTHON)
-    include(${ImpactX_SOURCE_DIR}/cmake/dependencies/pyAMReX.cmake)
-
     add_library(pyImpactX MODULE src/python/pyImpactX.cpp)
     add_library(ImpactX::pyImpactX ALIAS pyImpactX)
     target_link_libraries(pyImpactX PUBLIC lib)
@@ -261,7 +262,7 @@ if(ImpactX_COMPUTE STREQUAL CUDA)
 endif()
 
 # fancy binary name for build variants
-set_ImpactX_binary_name()
+impactx_set_binary_name()
 
 
 # Defines #####################################################################
@@ -302,6 +303,7 @@ configure_file(
 
 # Installs ####################################################################
 #
+
 # headers, libraries and executables
 set(ImpactX_INSTALL_TARGET_NAMES)
 if(ImpactX_APP)
@@ -345,13 +347,13 @@ endif()
 #install(EXPORT ImpactXTargets
 #    FILE ImpactXTargets.cmake
 #    NAMESPACE ImpactX::
-#    DESTINATION ${CMAKE_INSTALL_CMAKEDIR}
+#    DESTINATION ${ImpactX_INSTALL_CMAKEDIR}
 #)
 #install(
 #    FILES
 #        ${ImpactX_BINARY_DIR}/ImpactXConfig.cmake
 #        ${ImpactX_BINARY_DIR}/ImpactXConfigVersion.cmake
-#    DESTINATION ${CMAKE_INSTALL_CMAKEDIR}
+#    DESTINATION ${ImpactX_INSTALL_CMAKEDIR}
 #)
 
 
@@ -389,6 +391,13 @@ if(ImpactX_PYTHON)
             ${ImpactX_BINARY_DIR}
     )
 
+    # if we do a superbuild, make sure we install pyAMReX via its custom install
+    # target
+    set(_EXTRA_INSTALL_DEPENDS)
+    if(ImpactX_pyamrex_internal OR ImpactX_pyamrex_src)
+        set(_EXTRA_INSTALL_DEPENDS pyamrex_pip_install)
+    endif()
+
     # We force-install because in development, it is likely that the version of
     # the package does not change, but the code did change. We need --no-deps,
     # because otherwise pip would also force reinstall all dependencies.
@@ -398,7 +407,9 @@ if(ImpactX_PYTHON)
         WORKING_DIRECTORY
             ${ImpactX_BINARY_DIR}
         DEPENDS
-            pyImpactX ${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel ${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_requirements pyamrex_pip_install
+            pyImpactX
+            ${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel ${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_requirements
+            ${_EXTRA_INSTALL_DEPENDS}
     )
 endif()
 
@@ -428,4 +439,4 @@ endif()
 
 # Status Summary for Build Options ############################################
 #
-ImpactX_print_summary()
+impactx_print_summary()

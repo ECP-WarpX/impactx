@@ -47,7 +47,7 @@ endmacro()
 # the defaults in CMake are sub-ideal for historic reasons, lets make them more
 # Unix-ish and portable.
 #
-macro(set_default_build_dirs)
+macro(impactx_set_default_build_dirs)
     if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
         set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
                 CACHE PATH "Build directory for archives")
@@ -76,11 +76,11 @@ endmacro()
 # the defaults in CMake are sub-ideal for historic reasons, lets make them more
 # Unix-ish and portable.
 #
-macro(set_default_install_dirs)
+macro(impactx_set_default_install_dirs)
     if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
         include(GNUInstallDirs)
         if(NOT CMAKE_INSTALL_CMAKEDIR)
-            set(CMAKE_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/ImpactX"
+            set(CMAKE_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake"
                     CACHE PATH "CMake config package location for installed targets")
             if(WIN32)
                 set(CMAKE_INSTALL_LIBDIR Lib
@@ -89,20 +89,37 @@ macro(set_default_install_dirs)
             endif()
             mark_as_advanced(CMAKE_INSTALL_CMAKEDIR)
         endif()
+    endif()
 
+    if(WIN32)
+        set(ImpactX_INSTALL_CMAKEDIR "${CMAKE_INSTALL_CMAKEDIR}")
+    else()
+        set(ImpactX_INSTALL_CMAKEDIR "${CMAKE_INSTALL_CMAKEDIR}/ImpactX")
+    endif()
+endmacro()
+
+
+# set names and paths for Python modules
+# this needs to be slightly delayed until we found Python and know its
+# major and minor version number
+#
+macro(impactx_set_default_install_dirs_python)
+    if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
         # Python install and build output dirs
-        if(WIN32)
-            set(CMAKE_INSTALL_PYTHONDIR_DEFAULT
-                "${CMAKE_INSTALL_LIBDIR}/site-packages"
-            )
-        else()
-            set(CMAKE_INSTALL_PYTHONDIR_DEFAULT
-                "${CMAKE_INSTALL_LIBDIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages"
+        if(NOT CMAKE_INSTALL_PYTHONDIR)
+            if(WIN32)
+                set(CMAKE_INSTALL_PYTHONDIR_DEFAULT
+                    "${CMAKE_INSTALL_LIBDIR}/site-packages"
+                )
+            else()
+                set(CMAKE_INSTALL_PYTHONDIR_DEFAULT
+                    "${CMAKE_INSTALL_LIBDIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages"
+                )
+            endif()
+            set(CMAKE_INSTALL_PYTHONDIR "${CMAKE_INSTALL_PYTHONDIR_DEFAULT}"
+                CACHE STRING "Location for installed python package"
             )
         endif()
-        set(CMAKE_INSTALL_PYTHONDIR "${CMAKE_INSTALL_PYTHONDIR_DEFAULT}"
-            CACHE STRING "Location for installed python package"
-        )
     endif()
 endmacro()
 
@@ -200,7 +217,7 @@ endfunction()
 # Set a feature-based binary name for the ImpactX executable and create a generic
 # ImpactX symlink to it. Only sets options relevant for users (see summary).
 #
-function(set_ImpactX_binary_name)
+function(impactx_set_binary_name)
     set(ImpactX_bin_names)
     if(ImpactX_APP)
         list(APPEND ImpactX_bin_names app)
@@ -321,7 +338,7 @@ endfunction ()
 
 # Prints a summary of ImpactX options at the end of the CMake configuration
 #
-function(ImpactX_print_summary)
+function(impactx_print_summary)
     message("")
     message("ImpactX build configuration:")
     message("  Version: ${ImpactX_VERSION} (${ImpactX_GIT_VERSION})")
@@ -334,7 +351,7 @@ function(ImpactX_print_summary)
     message("        bin: ${CMAKE_INSTALL_BINDIR}")
     message("        lib: ${CMAKE_INSTALL_LIBDIR}")
     message("    include: ${CMAKE_INSTALL_INCLUDEDIR}")
-    message("      cmake: ${CMAKE_INSTALL_CMAKEDIR}")
+    message("      cmake: ${ImpactX_INSTALL_CMAKEDIR}")
     if(ImpactX_PYTHON)
         message("     python: ${CMAKE_INSTALL_PYTHONDIR}")
     endif()
