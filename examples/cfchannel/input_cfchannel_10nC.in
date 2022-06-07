@@ -4,15 +4,15 @@
 beam.npart = 10000
 beam.units = static
 beam.energy = 2.0e3
-beam.charge = 1.0e-9
+beam.charge = 1.0e-8
 beam.particle = proton
-beam.distribution = kurth6d
-beam.sigmaX = 1.0e-3
-beam.sigmaY = 1.0e-3
-beam.sigmaT = 3.369701494258956e-4
-beam.sigmaPx = 1.0e-3
-beam.sigmaPy = 1.0e-3
-beam.sigmaPt = 2.9676219145931020e-3
+beam.distribution = waterbag
+beam.sigmaX = 1.2154443728379865788e-3
+beam.sigmaY = 1.2154443728379865788e-3
+beam.sigmaT = 4.0956844276541331005e-4
+beam.sigmaPx = 8.2274435782286157175e-4
+beam.sigmaPy = 8.2274435782286157175e-4
+beam.sigmaPt = 2.4415943602685364584e-3
 
 
 ###############################################################################
@@ -31,7 +31,7 @@ constf1.kt = 1.0
 # Algorithms
 ###############################################################################
 algo.particle_shape = 2
-algo.space_charge = false
+algo.space_charge = true
 
 amr.n_cell = 40 40 32
 geometry.prob_relative = 1.0

@@ -180,6 +180,16 @@ add_impactx_test(cfchannel
     OFF  # no plot script yet
 )
 
+# Constant Focusing Channel with Space Charge #################################
+#
+add_impactx_test(cfchannel_spacecharge
+    examples/cfchannel/input_cfchannel_10nC.in
+      OFF  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/cfchannel/analysis_cfchannel_10nC.py
+    OFF  # no plot script yet
+)
+
 # Python: Constant Focusing Channel ###########################################
 #
 add_impactx_test(cfchannel.py
@@ -340,7 +350,6 @@ add_impactx_test(iotalattice.MPI
     OFF  # no plot script yet
 )
 
-
 # Python: IOTA Linear Lattice Test ############################################
 #
 add_impactx_test(iotalattice.py.MPI
@@ -348,5 +357,34 @@ add_impactx_test(iotalattice.py.MPI
       ON   # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/iota_lattice/analysis_iotalattice.py
+    OFF  # no plot script yet
+)
+
+# Kurth Beam in a Periodic Channel Test ###################################################
+#
+# w/o space charge
+add_impactx_test(kurth_periodic
+    examples/kurth/input_kurth_periodic.in
+      OFF  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/kurth/analysis_kurth_periodic.py
+    OFF  # no plot script yet
+)
+
+# w/ space charge
+add_impactx_test(kurth_10nC_periodic
+    examples/kurth/input_kurth_10nC_periodic.in
+      OFF  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/kurth/analysis_kurth_10nC_periodic.py
+    OFF  # no plot script yet
+)
+
+# w/ space charge
+add_impactx_test(kurth_10nC
+    examples/kurth/input_kurth_10nC.in
+      OFF  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/kurth/analysis_kurth_10nC.py
     OFF  # no plot script yet
 )
