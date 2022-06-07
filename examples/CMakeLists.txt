@@ -894,3 +894,21 @@ add_impactx_test(fodo_tune.py
     examples/fodo_tune/analysis_fodo_tune.py
     OFF  # no plot script yet
 )
+
+# Optimize Triplet ###########################################################
+#
+# w/o space charge
+add_impactx_test(triplet
+    examples/optimize_triplet/input_triplet.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/optimize_triplet/analysis_triplet.py
+    OFF  # no plot script yet
+)
+add_impactx_test(triplet.py
+    examples/optimize_triplet/run_triplet.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/optimize_triplet/analysis_triplet.py
+    OFF  # no plot script yet
+)

@@ -1,0 +1,57 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.kin_energy = 2.0e3
+beam.charge = 100.0e-12
+beam.particle = electron
+beam.distribution = waterbag_from_cs
+beam.alphaX = 2.0
+beam.alphaY = -2.0
+beam.alphaT = 0.0
+beam.betaX = 40.0
+beam.betaY = 40.0
+beam.betaT = 1.0
+beam.emittX = 5.0e-09
+beam.emittY = 5.0e-09
+beam.emittT = 1.0e-09
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.periods = 1
+lattice.elements = monitor drift1 quad1 drift2 quad2 drift2 quad1 drift1 monitor
+lattice.nslice = 10
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+drift1.type = drift
+drift1.ds = 2.7
+
+quad1.type = quad
+quad1.ds = 0.1
+quad1.k = -3.5
+
+drift2.type = drift
+drift2.ds = 1.4
+
+quad2.type = quad
+quad2.ds = 0.2
+quad2.k = 2.75
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+
+#amr.n_cell = 56 56 48
+#geometry.prob_relative = 1.0
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = false
