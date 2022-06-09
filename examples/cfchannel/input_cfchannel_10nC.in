@@ -1,0 +1,36 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.energy = 2.0e3
+beam.charge = 1.0e-8
+beam.particle = proton
+beam.distribution = waterbag
+beam.sigmaX = 1.2154443728379865788e-3
+beam.sigmaY = 1.2154443728379865788e-3
+beam.sigmaT = 4.0956844276541331005e-4
+beam.sigmaPx = 8.2274435782286157175e-4
+beam.sigmaPy = 8.2274435782286157175e-4
+beam.sigmaPt = 2.4415943602685364584e-3
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+
+lattice.elements = constf1
+
+constf1.type = constf
+constf1.ds = 2.0
+constf1.kx = 1.0
+constf1.ky = 1.0
+constf1.kt = 1.0
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
