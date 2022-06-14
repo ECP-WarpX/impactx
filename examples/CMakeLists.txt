@@ -187,3 +187,18 @@ add_test(NAME iotalens.analysis
 )
 
 set_tests_properties(iotalens.analysis PROPERTIES DEPENDS "iotalens.run")
+
+
+# Kurth Beam in a Periodic Channel Test ###################################################
+#
+add_test(NAME kurth_periodic.run
+         COMMAND $<TARGET_FILE:app>${ImpactX_SOURCE_DIR}/examples/kurth/input_kurth_periodic.in
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+add_test(NAME kurth_periodic.analysis
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/kurth/analysis_kurth_periodic.py
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
+
+set_tests_properties(kurth_periodic.analysis PROPERTIES DEPENDS "kurth_periodic.run")
+
