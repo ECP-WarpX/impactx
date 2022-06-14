@@ -201,4 +201,3 @@ add_test(NAME kurth_periodic.analysis
 )
 
 set_tests_properties(kurth_periodic.analysis PROPERTIES DEPENDS "kurth_periodic.run")
-
