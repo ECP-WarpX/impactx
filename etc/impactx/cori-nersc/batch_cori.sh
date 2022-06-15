@@ -2,7 +2,7 @@
 
 # Copyright 2019 Maxence Thevenet
 #
-# This file is part of WarpX.
+# This file is part of ImpactX.
 #
 # License: BSD-3-Clause-LBNL
 
@@ -14,8 +14,8 @@
 #SBATCH -S 4
 #SBATCH -J <job name>
 #SBATCH -A <allocation ID>
-#SBATCH -e WarpX.e%j
-#SBATCH -o WarpX.o%j
+#SBATCH -e ImpactX.e%j
+#SBATCH -o ImpactX.o%j
 
 export OMP_PLACES=threads
 export OMP_PROC_BIND=spread
@@ -28,18 +28,18 @@ export CORI_NCORES_PER_NODE=64
 
 # Typically use 8 MPI ranks per node without hyperthreading,
 # i.e., OMP_NUM_THREADS=8
-export WARPX_NMPI_PER_NODE=8
-export WARPX_HYPERTHREAD_LEVEL=1
+export IMPACTX_NMPI_PER_NODE=8
+export IMPACTX_HYPERTHREAD_LEVEL=1
 
 # Compute OMP_NUM_THREADS and the thread count (-c option)
 export CORI_NHYPERTHREADS_MAX=$(( ${CORI_MAX_HYPETHREAD_LEVEL} * ${CORI_NCORES_PER_NODE} ))
-export WARPX_NTHREADS_PER_NODE=$(( ${WARPX_HYPERTHREAD_LEVEL} * ${CORI_NCORES_PER_NODE} ))
-export OMP_NUM_THREADS=$(( ${WARPX_NTHREADS_PER_NODE} / ${WARPX_NMPI_PER_NODE} ))
-export WARPX_THREAD_COUNT=$(( ${CORI_NHYPERTHREADS_MAX} / ${WARPX_NMPI_PER_NODE} ))
+export IMPACTX_NTHREADS_PER_NODE=$(( ${IMPACTX_HYPERTHREAD_LEVEL} * ${CORI_NCORES_PER_NODE} ))
+export OMP_NUM_THREADS=$(( ${IMPACTX_NTHREADS_PER_NODE} / ${IMPACTX_NMPI_PER_NODE} ))
+export IMPACTX_THREAD_COUNT=$(( ${CORI_NHYPERTHREADS_MAX} / ${IMPACTX_NMPI_PER_NODE} ))
 
 # for async_io support: (optional)
 export MPICH_MAX_THREAD_SAFETY=multiple
 
-srun --cpu_bind=cores -n $(( ${SLURM_JOB_NUM_NODES} * ${WARPX_NMPI_PER_NODE} )) -c ${WARPX_THREAD_COUNT} \
+srun --cpu_bind=cores -n $(( ${SLURM_JOB_NUM_NODES} * ${IMPACTX_NMPI_PER_NODE} )) -c ${IMPACTX_THREAD_COUNT} \
   <path/to/executable> <input file> \
   > output.txt
