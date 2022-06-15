@@ -1,7 +1,7 @@
 #!/bin/bash -l
 
 # Copyright 2021 Axel Huebl
-# This file is part of WarpX.
+# This file is part of ImpactX.
 # License: BSD-3-Clause-LBNL
 #
 # Ref:
@@ -23,12 +23,12 @@
 #SBATCH --tasks-per-node=8
 # request all logical (virtual) cores per quarter-socket
 #SBATCH --cpus-per-task=10
-#SBATCH -e WarpX.e%j
-#SBATCH -o WarpX.o%j
+#SBATCH -e ImpactX.e%j
+#SBATCH -o ImpactX.o%j
 
 
 # each Cori GPU node has 2 sockets of Intel Xeon Gold 6148 ('Skylake') @ 2.40 GHz
-export WARPX_NMPI_PER_NODE=8
+export IMPACTX_NMPI_PER_NODE=8
 
 # each MPI rank per half-socket has 10 physical cores
 #   or 20 logical (virtual) cores
@@ -49,6 +49,6 @@ export MPICH_MAX_THREAD_SAFETY=multiple
 EXE="<path/to/executable>"
 
 srun --cpu_bind=cores --gpus-per-task=1 --gpu-bind=map_gpu:0,1,2,3,4,5,6,7 \
-  -n $(( ${SLURM_JOB_NUM_NODES} * ${WARPX_NMPI_PER_NODE} )) \
+  -n $(( ${SLURM_JOB_NUM_NODES} * ${IMPACTX_NMPI_PER_NODE} )) \
   ${EXE} <input file> \
   > output.txt
