@@ -3,6 +3,12 @@
 
 #include <ImpactX.H>
 #include <AMReX.H>
+#include <AMReX_ParmParse.H>
+
+#if defined(AMREX_DEBUG) || defined(DEBUG)
+#   include <cstdio>
+#endif
+
 
 namespace py = pybind11;
 using namespace impactx;
@@ -16,6 +22,27 @@ void init_ImpactX(py::module& m)
     py::class_<ImpactX, amrex::AmrCore>(m, "ImpactX")
         .def(py::init<>())
 
+        // TODO: not yet working to add runtime files; work in AMReX needed
+        .def("load_inputs_file",
+            [](ImpactX const & /* ix */, std::string const filename) {
+#if defined(AMREX_DEBUG) || defined(DEBUG)
+                // note: only in debug, since this is costly for the file
+                // system for highly parallel simulations with MPI
+                // possible improvement:
+                // - rank 0 tests file & broadcasts existance/failure
+                bool inputs_file_exists = false;
+                if (FILE *fp = fopen(filename.c_str(), "r")) {
+                    fclose(fp);
+                    inputs_file_exists = true;
+                }
+                AMREX_ALWAYS_ASSERT_WITH_MESSAGE(inputs_file_exists,
+                    "load_inputs_file: invalid filename");
+#endif
+
+                // TODO: needs https://github.com/AMReX-Codes/amrex/pull/2842
+                //amrex::ParmParse pp;
+                //pp.addfile(filename);
+            })
         .def("init_grids", &ImpactX::initGrids)
         .def("init_beam_distribution_from_inputs", &ImpactX::initBeamDistributionFromInputs)
         .def("init_lattice_elements_from_inputs", &ImpactX::initLatticeElementsFromInputs)
