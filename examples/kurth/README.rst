@@ -20,3 +20,29 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 .. literalinclude:: input_kurth.in
    :language: ini
    :caption: You can copy this file from ``examples/kurth/input_kurth.in``.
+
+
+
+.. _examples-kurth-10nC:
+
+Kurth Distribution in a Constant Focusing Channel with Space Charge
+===================================================================
+
+Stationary Kurth distribution in a constant focusing channel with space charge.
+
+The distribution is radially symmetric in (x,y,t) space, and matched to a
+radially symmetric constant linear focusing.
+
+We use a 2 GeV proton beam with initial unnormalized rms emittance of 1 um
+in all three phase planes.  The bunch charge is set to 10 nC, corresponding
+to a transverse tune depression ratio of 0.67.
+
+The particle distribution should remain unchanged, to within the level expected due to numerical particle noise.
+This fact is independent of the length of the channel.  This is tested using the second moments of the distribution.
+
+In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`
+
+
+.. literalinclude:: input_kurth_10nC.in
+   :language: ini
+   :caption: You can copy this file from ``examples/kurth/input_kurth_10nC.in``.
