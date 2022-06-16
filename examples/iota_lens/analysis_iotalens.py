@@ -96,20 +96,20 @@ beam_joined = final.join(
     rsuffix='_initial'
 )
 # add new columns: dH and dI
-beam_joined['dH'] = beam_joined["H_initial"] - beam_joined["H_final"]
-beam_joined['dI'] = beam_joined["I_initial"] - beam_joined["I_final"]
+beam_joined['dH'] = (beam_joined["H_initial"] - beam_joined["H_final"]).abs()
+beam_joined['dI'] = (beam_joined["I_initial"] - beam_joined["I_final"]).abs()
 #print(beam_joined)
 
 # particle-wise comparison of H & I initial to final
-atol = 0.076
+atol = 2.0e-3
 rtol = 1.0  # large number
 print()
 print(f"  atol={atol} (ignored: rtol~={rtol})")
 
-print(f"  dH_min={beam_joined['dH'].min()}, dH_max={beam_joined['dH'].max()}")
+print(f"  dH_max={beam_joined['dH'].max()}")
 assert np.allclose(beam_joined['dH'], 0.0, rtol=rtol, atol=atol)
 
-atol = 0.151
+atol = 3.0e-3
 print(f"  atol={atol} (ignored: rtol~={rtol})")
-print(f"  dI_min={beam_joined['dI'].min()}, dI_max={beam_joined['dI'].max()}")
+print(f"  dI_max={beam_joined['dI'].max()}")
 assert np.allclose(beam_joined['dI'], 0.0, rtol=rtol, atol=atol)
