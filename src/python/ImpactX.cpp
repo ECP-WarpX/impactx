@@ -22,7 +22,6 @@ void init_ImpactX(py::module& m)
     py::class_<ImpactX, amrex::AmrCore>(m, "ImpactX")
         .def(py::init<>())
 
-        // TODO: not yet working to add runtime files; work in AMReX needed
         .def("load_inputs_file",
             [](ImpactX const & /* ix */, std::string const filename) {
 #if defined(AMREX_DEBUG) || defined(DEBUG)
@@ -40,8 +39,7 @@ void init_ImpactX(py::module& m)
 #endif
 
                 // TODO: needs https://github.com/AMReX-Codes/amrex/pull/2842
-                //amrex::ParmParse pp;
-                //pp.addfile(filename);
+                amrex::ParmParse::addfile(filename);
             })
         .def("init_grids", &ImpactX::initGrids)
         .def("init_beam_distribution_from_inputs", &ImpactX::initBeamDistributionFromInputs)
