@@ -96,8 +96,8 @@ beam_joined = final.join(
     rsuffix='_initial'
 )
 # add new columns: dH and dI
-beam_joined['dH'] = abs(beam_joined["H_initial"] - beam_joined["H_final"])
-beam_joined['dI'] = abs(beam_joined["I_initial"] - beam_joined["I_final"])
+beam_joined['dH'] = (beam_joined["H_initial"] - beam_joined["H_final"]).abs()
+beam_joined['dI'] = (beam_joined["I_initial"] - beam_joined["I_final"]).abs()
 #print(beam_joined)
 
 # particle-wise comparison of H & I initial to final
