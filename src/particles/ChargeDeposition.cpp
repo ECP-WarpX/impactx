@@ -77,7 +77,8 @@ namespace impactx
                     ablastr::particles::deposit_charge<ImpactXParticleContainer>
                             (pti, wp, charge, ion_lev, &rho_at_level,
                              local_rho_fab,
-                             m_particle_shape, dx, xyzmin, n_rz_azimuthal_modes);
+                             m_particle_shape.value(),
+                             dx, xyzmin, n_rz_azimuthal_modes);
                 }
             }
         }

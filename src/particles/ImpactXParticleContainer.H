@@ -19,6 +19,7 @@
 #include <AMReX_IntVect.H>
 #include <AMReX_Vector.H>
 
+#include <optional>
 #include <tuple>
 #include <unordered_map>
 
@@ -147,7 +148,15 @@ namespace impactx
         /** Get particle shape
          */
         int
-        GetParticleShape () const { return m_particle_shape; }
+        GetParticleShape () const { return m_particle_shape.value(); }
+
+        /** Set Particle Shape from amrex::ParmParse inputs
+         *
+         * Note: this can only be called once. All later calls are a logic error.
+         * The reason for that is that subsequent calls would need to change
+         * the guard size of all our MultiFabs, which is not implemented.
+         */
+        void SetParticleShape ();
 
         /** Compute the min and max of the particle position in each dimension
          *
@@ -187,7 +196,7 @@ namespace impactx
         RefPart m_refpart;
 
         //! the particle shape
-        int m_particle_shape = 0;
+        std::optional<int> m_particle_shape;
 
     }; // ImpactXParticleContainer
 

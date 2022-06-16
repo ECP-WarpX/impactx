@@ -94,7 +94,7 @@ namespace impactx
 
         /** Resize the mesh, based on the extent of the bunch of particle
          *
-         * This only changes thes physical extent of the mesh, but not the
+         * This only changes the physical extent of the mesh, but not the
          * number of grid cells.
          */
         void ResizeMesh ();

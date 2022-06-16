@@ -36,6 +36,11 @@ namespace impactx
 
     void ImpactX::initGrids ()
     {
+        // this is the earliest point that we need to know the particle shape,
+        // so that we can initialize the guard size of our MultiFabs
+        m_particle_container->SetParticleShape();
+
+        // init blocks / grids & MultiFabs
         AmrCore::InitFromScratch(0.0);
         amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
 

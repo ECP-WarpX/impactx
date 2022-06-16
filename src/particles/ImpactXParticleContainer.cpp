@@ -18,6 +18,8 @@
 #include <AMReX_ParmParse.H>
 #include <AMReX_ParticleTile.H>
 
+#include <stdexcept>
+
 
 namespace impactx
 {
@@ -25,13 +27,22 @@ namespace impactx
         : amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
     {
         SetParticleSize();
+    }
 
-        // particle shapes
-        amrex::ParmParse pp_algo("algo");
-        pp_algo.get("particle_shape", m_particle_shape);
-        if (m_particle_shape < 1 || m_particle_shape > 3)
+    void ImpactXParticleContainer::SetParticleShape ()
+    {
+        if (m_particle_shape.has_value()) {
+            throw std::logic_error(
+                "ImpactXParticleContainer::SetParticleShape This was already called before and cannot be changed.");
+        } else
         {
-            amrex::Abort("algo.particle_shape can be only 1, 2, or 3");
+            amrex::ParmParse pp_algo("algo");
+            int v = 0;
+            pp_algo.get("particle_shape", v);
+            m_particle_shape = v;
+            if (m_particle_shape.value() < 1 || m_particle_shape.value() > 3) {
+                amrex::Abort("algo.particle_shape can be only 1, 2, or 3");
+            }
         }
     }
 
@@ -54,7 +65,6 @@ namespace impactx
         AMREX_ALWAYS_ASSERT(x.size() == px.size());
         AMREX_ALWAYS_ASSERT(x.size() == py.size());
         AMREX_ALWAYS_ASSERT(x.size() == pz.size());
-
 
         // number of particles to add
         int const np = x.size();
