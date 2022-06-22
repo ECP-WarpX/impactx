@@ -1,5 +1,9 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+/* Copyright 2021-2022 The ImpactX Community
+ *
+ * Authors: Axel Huebl
+ * License: BSD-3-Clause-LBNL
+ */
+#include "pyImpactX.H"
 
 #include <ImpactX.H>
 #include <AMReX.H>
@@ -19,6 +23,12 @@ namespace {
 
 void init_ImpactX(py::module& m)
 {
+    /*
+    py::bind_map<
+        std::unordered_map<int, amrex::MultiFab>
+    >(m, "MultiFabPerLevel");
+    */
+
     py::class_<ImpactX, amrex::AmrCore>(m, "ImpactX")
         .def(py::init<>())
 
@@ -28,7 +38,7 @@ void init_ImpactX(py::module& m)
                 // note: only in debug, since this is costly for the file
                 // system for highly parallel simulations with MPI
                 // possible improvement:
-                // - rank 0 tests file & broadcasts existance/failure
+                // - rank 0 tests file & broadcasts existence/failure
                 bool inputs_file_exists = false;
                 if (FILE *fp = fopen(filename.c_str(), "r")) {
                     fclose(fp);
@@ -38,13 +48,27 @@ void init_ImpactX(py::module& m)
                     "load_inputs_file: invalid filename");
 #endif
 
-                // TODO: needs https://github.com/AMReX-Codes/amrex/pull/2842
                 amrex::ParmParse::addfile(filename);
+            })
+        .def("set_particle_shape",
+            [](ImpactX & ix, int const order) {
+                AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ix.m_particle_container,
+                    "particle container not initialized");
+                // todo: why does that not work?
+                //ix.m_particle_container->SetParticleShape(order);
+
+                amrex::ParmParse pp_ago("algo");
+                pp_ago.add("particle_shape", order);
             })
         .def("init_grids", &ImpactX::initGrids)
         .def("init_beam_distribution_from_inputs", &ImpactX::initBeamDistributionFromInputs)
         .def("init_lattice_elements_from_inputs", &ImpactX::initLatticeElementsFromInputs)
         .def("evolve", &ImpactX::evolve, py::arg("num_steps"))
+
+        //.def_property("particle_container", &ImpactX::m_particle_container)
+        //.def_readwrite("rho", &ImpactX::m_rho)
+        .def_readwrite("lattice", &ImpactX::m_lattice)
+        //.def_readwrite("lattice", &ImpactX::m_lattice_test)
     ;
 
     py::class_<Config>(m, "Config")

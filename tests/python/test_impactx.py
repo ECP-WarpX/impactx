@@ -1,21 +1,56 @@
 # -*- coding: utf-8 -*-
 
-import impactx
+from impactx import ImpactX, elements
 
 
-def test_impactx():
+def aasdtest_impactx_fodo_file():
     """
     This tests an equivalent to main.cpp in C++
     """
-    impactX = impactx.ImpactX()
+    impactX = ImpactX()
 
-    impactX.init_grids()
-
-    # TODO: not yet working to add runtime files; work in AMReX needed
-    # needs https://github.com/AMReX-Codes/amrex/pull/2842
     impactX.load_inputs_file("examples/fodo/input_fodo.in")
 
+    impactX.init_grids()
     impactX.init_beam_distribution_from_inputs()
     impactX.init_lattice_elements_from_inputs()
 
     impactX.evolve(num_steps=1)
+
+
+def test_impactx_nofile():
+    """
+    This tests using ImpactX without an inputs file
+    """
+    impactX = ImpactX()
+
+    impactX.set_particle_shape(2)
+    impactX.init_grids()
+
+    # init particle beam
+    # TODO
+
+    # init accelerator lattice
+    fodo = [
+        elements.Drift(0.25),
+        elements.Quad(1.0, 1.0),
+        elements.Drift(0.5),
+        elements.Quad(1.0, -1.0),
+        elements.Drift(0.25)
+    ]
+    #  assign a fodo segment
+    #impactX.lattice = fodo
+
+    #  add 4 more FODO segments
+    for i in range(4):
+        impactX.lattice.extend(fodo)
+
+    # add 2 more drifts
+    for i in range(4):
+        impactX.lattice.append(elements.Drift(0.25))
+
+    print(impactX.lattice)
+    print(len(impactX.lattice))
+    assert(len(impactX.lattice) > 5)
+
+    #impactX.evolve(num_steps=1)

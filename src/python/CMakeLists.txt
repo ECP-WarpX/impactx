@@ -4,5 +4,6 @@
 #
 target_sources(pyImpactX
   PRIVATE
+    elements.cpp
     ImpactX.cpp
 )

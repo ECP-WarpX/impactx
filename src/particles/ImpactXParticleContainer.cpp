@@ -29,21 +29,26 @@ namespace impactx
         SetParticleSize();
     }
 
-    void ImpactXParticleContainer::SetParticleShape ()
-    {
-        if (m_particle_shape.has_value()) {
+    void ImpactXParticleContainer::SetParticleShape (int const order) {
+        if (m_particle_shape.has_value())
+        {
             throw std::logic_error(
                 "ImpactXParticleContainer::SetParticleShape This was already called before and cannot be changed.");
         } else
         {
-            amrex::ParmParse pp_algo("algo");
-            int v = 0;
-            pp_algo.get("particle_shape", v);
-            m_particle_shape = v;
-            if (m_particle_shape.value() < 1 || m_particle_shape.value() > 3) {
-                amrex::Abort("algo.particle_shape can be only 1, 2, or 3");
+            if (order < 1 || order > 3) {
+                amrex::Abort("algo.particle_shape order can be only 1, 2, or 3");
             }
+            m_particle_shape = order;
         }
+    }
+
+    void ImpactXParticleContainer::SetParticleShape ()
+    {
+        amrex::ParmParse pp_algo("algo");
+        int v = 0;
+        pp_algo.get("particle_shape", v);
+        SetParticleShape(v);
     }
 
     void

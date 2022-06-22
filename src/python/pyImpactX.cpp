@@ -1,20 +1,22 @@
-/* Copyright 2021-2022 The AMReX Community
+/* Copyright 2021-2022 The ImpactX Community
  *
  * Authors: Axel Huebl
  * License: BSD-3-Clause-LBNL
  */
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "pyImpactX.H"
 
 #include <ImpactX.H>
+#include <particles/elements/All.H>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
+using namespace impactx;
 
 
 // forward declarations of exposed classes
+void init_elements(py::module&);
 void init_ImpactX(py::module&);
 
 PYBIND11_MODULE(impactx_pybind, m) {
@@ -29,9 +31,11 @@ PYBIND11_MODULE(impactx_pybind, m) {
             .. autosummary::
                :toctree: _generate
                ImpactX
+               elements
     )pbdoc";
 
     // note: order from parent to child classes
+    init_elements(m);
     init_ImpactX(m);
 
     // API runtime version
