@@ -261,9 +261,11 @@ namespace impactx
         refPart.x = 0.0;
         refPart.y = 0.0;
         refPart.t = 0.0;
+        refPart.z = 0.0;
         refPart.px = 0.0;
         refPart.py = 0.0;
         refPart.pt = -energy/massE - 1.0_prt;
+        refPart.pz = sqrt(pow(refPart.pt,2) - 1.0_prt);
         m_particle_container->SetRefParticle(refPart);
 
         // print information on the initialized beam
