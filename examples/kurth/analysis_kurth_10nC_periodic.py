@@ -92,8 +92,7 @@ print(f"  sigx={sigx:e} sigy={sigy:e} sigt={sigt:e}")
 print(f"  emittance_x={emittance_x:e} emittance_y={emittance_y:e} emittance_t={emittance_t:e}")
 
 atol = 1.0  # a big number
-#rtol = num_particles**-0.5  # from random sampling of a smooth distribution
-rtol = 1.0  # large value to be used when space charge is not active
+rtol = num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
