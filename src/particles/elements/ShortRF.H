@@ -85,6 +85,34 @@ namespace impactx
 
         }
 
+        void operator() (
+                RefPart refpart) const {
+
+            using namespace amrex::literals; // for _rt and _prt
+
+            // assign input reference particle values
+            amrex::ParticleReal const x = refpart.x;
+            amrex::ParticleReal const px = refpart.px;
+            amrex::ParticleReal const y = refpart.y;
+            amrex::ParticleReal const py = refpart.py;
+            amrex::ParticleReal const z = refpart.z;
+            amrex::ParticleReal const pz = refpart.pz;
+            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const pt = refpart.pt;
+
+            // advance position and momentum (zero-length element)
+            refpart.x = x;
+            refpart.y = y;
+            refpart.z = z;
+            refpart.t = t;
+
+            refpart.px = px;
+            refpart.py = py;
+            refpart.pz = pz;
+            refpart.pt = pt;
+
+        }
+
     private:
         amrex::ParticleReal m_V; //! normalized (max) RF voltage drop.
         amrex::ParticleReal m_k; //! RF wavenumber in 1/m.
