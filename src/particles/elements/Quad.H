@@ -101,8 +101,13 @@ namespace impactx
 
         }
 
+        /** This pushes the reference particle.
+         *
+         * @param[in,out] refpart reference particle
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                RefPart refpart) const {
+                RefPart & AMREX_RESTRICT refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
 

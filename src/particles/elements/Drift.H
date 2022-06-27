@@ -56,7 +56,7 @@ namespace impactx
             amrex::ParticleReal const y = p.pos(1);
             amrex::ParticleReal const t = p.pos(2);
 
-            // intialize output values of momenta
+            // initialize output values of momenta
             amrex::ParticleReal pxout = px;
             amrex::ParticleReal pyout = py;
             amrex::ParticleReal ptout = pt;
@@ -80,8 +80,13 @@ namespace impactx
 
         }
 
+        /** This pushes the reference particle.
+         *
+         * @param[in,out] refpart reference particle
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                RefPart refpart) const {
+                RefPart & AMREX_RESTRICT refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
 
