@@ -28,13 +28,6 @@ namespace impactx::diagnostics
     {
         using namespace amrex::literals; // for _rt and _prt
 
-        // create a host-side particle buffer
-        auto tmp = pc.make_alike<amrex::PinnedArenaAllocator>();
-
-        // copy device-to-host
-        bool const local = true;
-        tmp.copyParticles(pc, local);
-
         // write file header per MPI RANK
         if (!append) {
             if (otype == OutputType::PrintParticles) {
@@ -45,6 +38,13 @@ namespace impactx::diagnostics
                 amrex::AllPrintToFile(file_name) << "step x y z t px py pz pt\n";
             }
         }
+
+        // create a host-side particle buffer
+        auto tmp = pc.make_alike<amrex::PinnedArenaAllocator>();
+
+        // copy device-to-host
+        bool const local = true;
+        tmp.copyParticles(pc, local);
 
         // loop over refinement levels
         int const nLevel = tmp.finestLevel();
