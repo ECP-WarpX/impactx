@@ -123,8 +123,8 @@ namespace impactx
         m_refpart = refpart;
     }
 
-    RefPart
-    ImpactXParticleContainer::GetRefParticle () const
+    RefPart &
+    ImpactXParticleContainer::GetRefParticle ()
     {
         return m_refpart;
     }

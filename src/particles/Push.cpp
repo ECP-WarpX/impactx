@@ -126,18 +126,20 @@ namespace detail
                 // ...
 
                 // preparing to access reference particle data: RefPart
-                RefPart ref_part;
-                ref_part = pc.GetRefParticle();
+                RefPart & ref_part = pc.GetRefParticle();
 
                 // loop over all beamline elements
                 for (auto & element_variant : lattice) {
                     // here we just access the element by its respective type
-                    std::visit([=](auto&& element) {
+                    std::visit([=, &ref_part](auto&& element) {
+                        // push beam particles relative to reference particle
                         detail::PushSingleParticle<decltype(element)> const pushSingleParticle(
                             element, aos_ptr, part_px, part_py, part_pt, ref_part);
-
-                        // loop over particles in the box
+                        //   loop over beam particles in the box
                         amrex::ParallelFor(np, pushSingleParticle);
+
+                        // push reference particle in global coordinates
+                        element(ref_part);
                     }, element_variant);
                 }; // end loop over all beamline elements
             } // end loop over all particle boxes

@@ -144,8 +144,8 @@ namespace impactx
          *
          * @returns refpart
          */
-        RefPart
-        GetRefParticle () const;
+        RefPart &
+        GetRefParticle ();
 
         /** Get particle shape
          */
