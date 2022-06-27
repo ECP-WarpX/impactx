@@ -117,6 +117,17 @@ namespace impactx
 
         }
 
+        /** This pushes the reference particle.
+         *
+         * @param[in,out] refpart reference particle
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void operator() (
+                [[maybe_unused]] RefPart & AMREX_RESTRICT refpart) const {
+
+            // nothing to do: this is a zero-length element
+        }
+
     private:
         amrex::ParticleReal m_knll; //! integrated strength of the nonlinear lens (m)
         amrex::ParticleReal m_cnll; //! distance of singularities from the origin (m)

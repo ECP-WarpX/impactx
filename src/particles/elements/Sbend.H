@@ -91,6 +91,43 @@ namespace impactx
 
         }
 
+        /** This pushes the reference particle.
+         *
+         * @param[in,out] refpart reference particle
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void operator() (
+                RefPart & AMREX_RESTRICT refpart) const {
+
+            using namespace amrex::literals; // for _rt and _prt
+
+            // assign input reference particle values
+            amrex::ParticleReal const x = refpart.x;
+            amrex::ParticleReal const px = refpart.px;
+            amrex::ParticleReal const y = refpart.y;
+            amrex::ParticleReal const py = refpart.py;
+            amrex::ParticleReal const z = refpart.z;
+            amrex::ParticleReal const pz = refpart.pz;
+            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const pt = refpart.pt;
+
+            // assign intermediate parameter
+            amrex::ParticleReal const theta = m_ds/m_rc;
+            amrex::ParticleReal const B = sqrt(pow(pt,2)-1.0_prt)/m_rc;
+
+            // advance position and momentum (bend)
+            refpart.px = px*cos(theta) - pz*sin(theta);
+            refpart.py = py;
+            refpart.pz = pz*cos(theta) + px*sin(theta);
+            refpart.pt = pt;
+
+            refpart.x = x + (refpart.pz - pz)/B;
+            refpart.y = y + (theta/B)*py;
+            refpart.z = z - (refpart.px - px)/B;
+            refpart.t = t - (theta/B)*pt;
+
+        }
+
     private:
         amrex::ParticleReal m_ds; //! segment length in m
         amrex::ParticleReal m_rc; //! bend radius in m

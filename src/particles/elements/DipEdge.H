@@ -84,6 +84,17 @@ namespace impactx
             py = py + R43*y;
         }
 
+        /** This pushes the reference particle.
+         *
+         * @param[in,out] refpart reference particle
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void operator() (
+                [[maybe_unused]] RefPart & AMREX_RESTRICT refpart) const {
+
+            // nothing to do: this is a zero-length element
+        }
+
     private:
         amrex::ParticleReal m_psi; //! pole face angle in rad
         amrex::ParticleReal m_rc; //! bend radius in m

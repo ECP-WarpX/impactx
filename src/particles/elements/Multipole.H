@@ -108,6 +108,17 @@ namespace impactx
 
         }
 
+        /** This pushes the reference particle.
+         *
+         * @param[in,out] refpart reference particle
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void operator() (
+                [[maybe_unused]] RefPart & AMREX_RESTRICT refpart) const {
+
+            // nothing to do: this is a zero-length element
+        }
+
     private:
         int m_multipole; //! multipole index
         int m_mfactorial; //! factorial of multipole index
