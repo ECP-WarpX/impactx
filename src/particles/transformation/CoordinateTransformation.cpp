@@ -21,8 +21,8 @@
 namespace impactx
 {
 namespace transformation {
-    void CoordinateTransformation(ImpactXParticleContainer &pc,
-                                  Direction const &direction) {
+    void CoordinateTransformation (ImpactXParticleContainer &pc,
+                                   Direction const &direction) {
         using namespace amrex::literals; // for _rt and _prt
 
         // preparing to access reference particle data: RefPart
