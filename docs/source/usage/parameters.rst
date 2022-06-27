@@ -175,9 +175,12 @@ Lattice Elements
 * ``<element_name>.type`` (``string``)
     Indicates the element type for this lattice element. This should be one of:
 
-        * ``drift`` for free drift. This requires this additional parameter:
+        * ``drift`` for free drift. This requires this additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used
+              for the application of space charge (default = 1)
 
         * ``quad`` for a quadrupole. This requires these additional parameters:
 
@@ -189,11 +192,17 @@ Lattice Elements
               * k > 0 horizontal focusing
               * k < 0 horizontal defocusing
 
+            * ``<element_name>.nslice`` (``integer``) number of slices used
+              for the application of space charge (default = 1)
+
         * ``sbend`` for a bending magnet. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
             * ``<element_name>.rc`` (``float``, in meters) the bend radius
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used
+              for the application of space charge (default = 1)
 
         * ``dipedge`` for dipole edge focusing. This requires these additional parameters:
 
@@ -219,6 +228,9 @@ Lattice Elements
 
             * ``<element_name>.kt`` (``float``, in 1/meters) the
               longitudinal focusing strength
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used
+              for the application of space charge (default = 1)
 
         * ``shortrf`` for a short RF (bunching) cavity element. This requires these additional parameters:
 
