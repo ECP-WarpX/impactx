@@ -20,7 +20,7 @@
 
 namespace impactx::diagnostics
 {
-    void DiagnosticOutput (ImpactXParticleContainer const & pc,
+    void DiagnosticOutput (ImpactXParticleContainer & pc,
                            OutputType const otype,
                            std::string file_name)
     {
@@ -38,6 +38,8 @@ namespace impactx::diagnostics
             amrex::AllPrintToFile(file_name) << "id x y t px py pt\n";
         } else if (otype == OutputType::PrintNonlinearLensInvariants) {
             amrex::AllPrintToFile(file_name) << "id H I\n";
+        } else if (otype == OutputType::PrintRefParticle) {
+            amrex::AllPrintToFile(file_name) << "x y z t px py pz pt\n";
         }
 
         // loop over refinement levels
@@ -129,6 +131,26 @@ namespace impactx::diagnostics
 
                     } // i=0...np
                 } // if( otype == OutputType::PrintInvariants)
+                if (otype == OutputType::PrintRefParticle) {
+                    // print reference particle to file
+
+                    // preparing to access reference particle data: RefPart
+                    RefPart & ref_part = pc.GetRefParticle();
+
+                    amrex::ParticleReal const x = ref_part.x;
+                    amrex::ParticleReal const y = ref_part.y;
+                    amrex::ParticleReal const z = ref_part.z;
+                    amrex::ParticleReal const t = ref_part.t;
+                    amrex::ParticleReal const px = ref_part.px;
+                    amrex::ParticleReal const py = ref_part.py;
+                    amrex::ParticleReal const pz = ref_part.pz;
+                    amrex::ParticleReal const pt = ref_part.pt;
+
+                    // write particle data to file
+                    amrex::AllPrintToFile(file_name)
+                            << x << " " << y << " " << z << " " << t << " "
+                            << px << " " << py << " " << pz << " " << pt << "\n";
+                } // if( otype == OutputType::PrintRefParticle)
             } // end loop over all particle boxes
         } // env mesh-refinement level loop
     }

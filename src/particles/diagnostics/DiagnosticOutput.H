@@ -22,7 +22,8 @@ namespace impactx::diagnostics
     enum class OutputType
     {
         PrintParticles, ///< ASCII diagnostics, for small tests only
-        PrintNonlinearLensInvariants ///< ASCII diagnostics for the IOTA nonlinear lens, for small tests only
+        PrintNonlinearLensInvariants, ///< ASCII diagnostics for the IOTA nonlinear lens, for small tests only
+        PrintRefParticle ///< ASCII diagnostics, for small tests only
     };
 
     /** ASCII output diagnostics associated with the beam.
@@ -35,7 +36,7 @@ namespace impactx::diagnostics
      * @param otype the type of output to produce
      * @param file_name the file name to write to
      */
-    void DiagnosticOutput (ImpactXParticleContainer const & pc,
+    void DiagnosticOutput (ImpactXParticleContainer & pc,
                            OutputType const otype,
                            std::string file_name);
 

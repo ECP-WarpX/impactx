@@ -57,6 +57,11 @@ namespace impactx
                                       diagnostics::OutputType::PrintParticles,
                                       "diags/initial_beam.txt");
 
+        // print initial reference particle to file
+        diagnostics::DiagnosticOutput(*m_particle_container,
+                                      diagnostics::OutputType::PrintRefParticle,
+                                      "diags/ref_particle.txt");
+
         // print the initial values of the two invariants H and I
         diagnostics::DiagnosticOutput(*m_particle_container,
                                       diagnostics::OutputType::PrintNonlinearLensInvariants,
@@ -120,6 +125,11 @@ namespace impactx
         diagnostics::DiagnosticOutput(*m_particle_container,
                                       diagnostics::OutputType::PrintParticles,
                                       "diags/output_beam.txt");
+
+        // print final reference particle to file
+        diagnostics::DiagnosticOutput(*m_particle_container,
+                                      diagnostics::OutputType::PrintRefParticle,
+                                      "diags/ref_particle.txt");
 
         // print the final values of the two invariants H and I
         diagnostics::DiagnosticOutput(*m_particle_container,
