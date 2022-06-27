@@ -16,8 +16,11 @@ using namespace impactx;
 
 
 // forward declarations of exposed classes
+void init_distribution(py::module&);
 void init_elements(py::module&);
 void init_ImpactX(py::module&);
+void init_impactxparticlecontainer(py::module&);
+void init_refparticle(py::module&);
 
 PYBIND11_MODULE(impactx_pybind, m) {
     // make sure AMReX types are known
@@ -31,11 +34,15 @@ PYBIND11_MODULE(impactx_pybind, m) {
             .. autosummary::
                :toctree: _generate
                ImpactX
+               distribution
                elements
     )pbdoc";
 
     // note: order from parent to child classes
+    init_distribution(m);
     init_elements(m);
+    init_refparticle(m);
+    init_impactxparticlecontainer(m);
     init_ImpactX(m);
 
     // API runtime version
