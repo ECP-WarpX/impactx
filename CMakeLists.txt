@@ -44,19 +44,20 @@ set_ccache()
 # Output Directories ##########################################################
 #
 # temporary build directories
-set_default_build_dirs()
+impactx_set_default_build_dirs()
 
-# install directories
-set_default_install_dirs()
+# default installation directories (w/o Python)
+impactx_set_default_install_dirs()
 
 
 # Options and Variants ########################################################
 #
 include(CMakeDependentOption)
 option(ImpactX_APP           "Build the ImpactX executable application"     ON)
-option(ImpactX_LIB           "Build ImpactX as a shared library"            OFF)
+option(ImpactX_LIB           "Build ImpactX as a library"                   OFF)
 option(ImpactX_MPI           "Multi-node support (message-passing)"         ON)
 option(ImpactX_OPENPMD       "openPMD I/O (HDF5, ADIOS)"                    OFF)
+option(ImpactX_PYTHON        "Python bindings"                              OFF)
 
 set(ImpactX_PRECISION_VALUES SINGLE DOUBLE)
 set(ImpactX_PRECISION DOUBLE CACHE STRING "Floating point precision (SINGLE/DOUBLE)")
@@ -77,6 +78,10 @@ mark_as_advanced(ImpactX_MPI_THREAD_MULTIPLE)
 
 option(ImpactX_ablastr_internal                  "Download & build ABLASTR" ON)
 option(ImpactX_amrex_internal                    "Download & build AMReX" ON)
+option(ImpactX_pyamrex_internal                  "Download & build pyAMReX" ON)
+
+set(pyImpactX_VERSION_INFO "" CACHE STRING
+    "PEP-440 conformant version (set by distutils)")
 
 # change the default build type to Release (or RelWithDebInfo) instead of Debug
 set_default_build_type("Release")
@@ -99,9 +104,28 @@ include(CTest)
 include(${ImpactX_SOURCE_DIR}/cmake/dependencies/ABLASTR.cmake)
 impactx_make_third_party_includes_system(WarpX::ablastr ablastr)
 
+# Python
+if(ImpactX_PYTHON)
+    find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+
+    # default installation directories: Python
+    impactx_set_default_install_dirs_python()
+
+    # pybind11
+    #   builds pybind11 from git (default), form local source or
+    #   finds an existing install
+    include(${ImpactX_SOURCE_DIR}/cmake/dependencies/pybind11.cmake)
+
+    # pyAMReX
+    include(${ImpactX_SOURCE_DIR}/cmake/dependencies/pyAMReX.cmake)
+endif()
+
 
 # Targets #####################################################################
 #
+if(ImpactX_PYTHON)
+    set(ImpactX_LIB ON CACHE STRING "library" FORCE)
+endif()
 if(NOT ImpactX_APP AND NOT ImpactX_LIB)
     message(FATAL_ERROR "Need to build at least ImpactX app or "
                         "library/Python bindings")
@@ -122,18 +146,54 @@ if(ImpactX_APP)
     list(APPEND _ALL_TARGETS app)
 endif()
 
-# link into a shared library
+# link into a library (shared or static)
 if(ImpactX_LIB)
-    add_library(shared MODULE)
-    add_library(ImpactX::shared ALIAS shared)
-    target_link_libraries(shared PUBLIC ImpactX)
-    set(_BUILDINFO_SRC shared)
-    list(APPEND _ALL_TARGETS shared)
+    add_library(lib)
+    add_library(ImpactX::lib ALIAS lib)
+    target_link_libraries(lib PUBLIC ImpactX)
+    set(_BUILDINFO_SRC lib)
+    list(APPEND _ALL_TARGETS lib)
 
-    set_target_properties(ImpactX shared PROPERTIES
+    set_target_properties(ImpactX lib PROPERTIES
         POSITION_INDEPENDENT_CODE ON
         WINDOWS_EXPORT_ALL_SYMBOLS ON
     )
+endif()
+
+# build Python module (this is always a shared library)
+if(ImpactX_PYTHON)
+    add_library(pyImpactX MODULE src/python/pyImpactX.cpp)
+    add_library(ImpactX::pyImpactX ALIAS pyImpactX)
+    target_link_libraries(pyImpactX PUBLIC lib)
+    set(_BUILDINFO_SRC pyImpactX)
+    list(APPEND _ALL_TARGETS pyImpactX)
+
+    # set Python module properties
+    set_target_properties(pyImpactX PROPERTIES
+        # hide symbols for combining multiple pybind11 modules downstream & for
+        # reduced binary size
+        CXX_VISIBILITY_PRESET "hidden"
+        CUDA_VISIBILITY_PRESET "hidden"
+        # name of the pybind-generated python module, which is wrapped in another
+        # fluffy front-end modules, so we can extend it with pure Python
+        ARCHIVE_OUTPUT_NAME impactx_pybind
+        LIBRARY_OUTPUT_NAME impactx_pybind
+        # build output directories - mainly set to run tests from CMake & IDEs
+        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY}/impactx
+        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY}/impactx
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY}/impactx
+        PDB_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY}/impactx
+        COMPILE_PDB_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY}/impactx
+    )
+    if(EMSCRIPTEN)
+        set_target_properties(pyImpactX PROPERTIES
+            PREFIX "")
+    else()
+        pybind11_extension(pyImpactX)
+    endif()
+    if(NOT MSVC AND NOT ${CMAKE_BUILD_TYPE} MATCHES Debug|RelWithDebInfo)
+        pybind11_strip(pyImpactX)
+    endif()
 endif()
 
 # own headers
@@ -168,6 +228,9 @@ endif()
 # link dependencies
 #     note: only PUBLIC because ImpactX is an OBJECT collection
 target_link_libraries(ImpactX PUBLIC ImpactX::thirdparty::ablastr)
+if(ImpactX_PYTHON)
+    target_link_libraries(pyImpactX PRIVATE pybind11::module pybind11::lto pybind11::windows_extras)
+endif()
 
 if(ImpactX_OPENPMD)
     target_compile_definitions(ImpactX PUBLIC ImpactX_USE_OPENPMD)
@@ -199,13 +262,18 @@ if(ImpactX_COMPUTE STREQUAL CUDA)
 endif()
 
 # fancy binary name for build variants
-set_ImpactX_binary_name()
+impactx_set_binary_name()
 
 
 # Defines #####################################################################
 #
 if(ImpactX_OPENPMD)
     target_compile_definitions(ImpactX PUBLIC ImpactX_USE_OPENPMD)
+endif()
+if(ImpactX_PYTHON)
+    # for module __version__
+    target_compile_definitions(pyImpactX PRIVATE
+        PYIMPACTX_VERSION_INFO=${pyImpactX_VERSION_INFO})
 endif()
 
 
@@ -235,13 +303,17 @@ configure_file(
 
 # Installs ####################################################################
 #
+
 # headers, libraries and executables
 set(ImpactX_INSTALL_TARGET_NAMES)
 if(ImpactX_APP)
     list(APPEND ImpactX_INSTALL_TARGET_NAMES app)
 endif()
 if(ImpactX_LIB)
-    list(APPEND ImpactX_INSTALL_TARGET_NAMES shared)
+    list(APPEND ImpactX_INSTALL_TARGET_NAMES lib)
+endif()
+if(ImpactX_PYTHON)
+    list(APPEND ImpactX_INSTALL_TARGET_NAMES pyImpactX)
 endif()
 
 install(TARGETS ${ImpactX_INSTALL_TARGET_NAMES}
@@ -266,7 +338,7 @@ if(ImpactX_LIB)
         set(ABS_INSTALL_LIB_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
     endif()
     install(CODE "file(CREATE_LINK
-        $<TARGET_FILE_NAME:shared>
+        $<TARGET_FILE_NAME:lib>
         ${ABS_INSTALL_LIB_DIR}/libImpactX.${mod_ext}
         COPY_ON_ERROR SYMBOLIC)")
 endif()
@@ -275,14 +347,71 @@ endif()
 #install(EXPORT ImpactXTargets
 #    FILE ImpactXTargets.cmake
 #    NAMESPACE ImpactX::
-#    DESTINATION ${CMAKE_INSTALL_CMAKEDIR}
+#    DESTINATION ${ImpactX_INSTALL_CMAKEDIR}
 #)
 #install(
 #    FILES
 #        ${ImpactX_BINARY_DIR}/ImpactXConfig.cmake
 #        ${ImpactX_BINARY_DIR}/ImpactXConfigVersion.cmake
-#    DESTINATION ${CMAKE_INSTALL_CMAKEDIR}
+#    DESTINATION ${ImpactX_INSTALL_CMAKEDIR}
 #)
+
+
+# pip helpers for the impactx package #########################################
+#
+if(ImpactX_PYTHON)
+    set(PYINSTALLOPTIONS "" CACHE STRING
+        "Additional parameters to pass to `pip install`")
+
+    # add a prefix to custom targets so we do not collide if used as a subproject
+    if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+        set(_ImpactX_CUSTOM_TARGET_PREFIX_DEFAULT "")
+    else()
+        set(_ImpactX_CUSTOM_TARGET_PREFIX_DEFAULT "impactx_")
+    endif()
+    set(ImpactX_CUSTOM_TARGET_PREFIX "${_ImpactX_CUSTOM_TARGET_PREFIX_DEFAULT}"
+        CACHE STRING "Prefix for custom targets")
+
+    # build the wheel by re-using the lib library we build
+    add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel
+        ${CMAKE_COMMAND} -E rm -f "impactx*.whl"
+        COMMAND
+            ${CMAKE_COMMAND} -E env PYIMPACTX_LIBDIR=$<TARGET_FILE_DIR:pyImpactX>
+                ${Python_EXECUTABLE} -m pip wheel -v --no-build-isolation ${ImpactX_SOURCE_DIR}
+        WORKING_DIRECTORY
+            ${ImpactX_BINARY_DIR}
+        DEPENDS
+            pyImpactX
+    )
+
+    # this will also upgrade/downgrade dependencies, e.g., when the version of numpy changes
+    add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_requirements
+        ${Python_EXECUTABLE} -m pip install ${PYINSTALLOPTIONS} -r "${ImpactX_SOURCE_DIR}/requirements.txt"
+        WORKING_DIRECTORY
+            ${ImpactX_BINARY_DIR}
+    )
+
+    # if we do a superbuild, make sure we install pyAMReX via its custom install
+    # target
+    set(_EXTRA_INSTALL_DEPENDS)
+    if(ImpactX_pyamrex_internal OR ImpactX_pyamrex_src)
+        set(_EXTRA_INSTALL_DEPENDS pyamrex_pip_install)
+    endif()
+
+    # We force-install because in development, it is likely that the version of
+    # the package does not change, but the code did change. We need --no-deps,
+    # because otherwise pip would also force reinstall all dependencies.
+    add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_install
+        ${CMAKE_COMMAND} -E env IMPACTX_MPI=${ImpactX_MPI}
+            ${Python_EXECUTABLE} -m pip install --force-reinstall --no-deps ${PYINSTALLOPTIONS} "impactx*.whl"
+        WORKING_DIRECTORY
+            ${ImpactX_BINARY_DIR}
+        DEPENDS
+            pyImpactX
+            ${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel ${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_requirements
+            ${_EXTRA_INSTALL_DEPENDS}
+    )
+endif()
 
 
 # Tests #######################################################################
@@ -291,10 +420,23 @@ if(BUILD_TESTING)
     enable_testing()
 
     # examples
-    add_subdirectory(examples)
+    if(ImpactX_APP)
+        add_subdirectory(examples)
+    endif()
+
+    # unit tests
+    if(ImpactX_PYTHON)
+        # copy Python wrapper library to build directory
+        add_custom_command(TARGET pyImpactX POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${ImpactX_SOURCE_DIR}/src/python/impactx
+                $<TARGET_FILE_DIR:pyImpactX>
+        )
+    endif()
+    add_subdirectory(tests)
 endif()
 
 
 # Status Summary for Build Options ############################################
 #
-ImpactX_print_summary()
+impactx_print_summary()

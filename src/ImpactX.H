@@ -92,6 +92,7 @@ namespace impactx
         //! Delete level data
         void ClearLevel (int lev) override;
 
+      public:
         /** Resize the mesh, based on the extent of the bunch of particle
          *
          * This only changes the physical extent of the mesh, but not the
@@ -107,6 +108,8 @@ namespace impactx
 
         /** these are elements defining the lattice */
         std::list<KnownElements> m_lattice;
+
+        std::list<std::variant<int>> m_lattice_test;
     };
 
 } // namespace impactx

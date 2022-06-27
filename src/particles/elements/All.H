@@ -17,6 +17,7 @@
 #include "ConstF.H"
 #include "ShortRF.H"
 #include "Multipole.H"
+#include "None.H"
 #include "NonlinearLens.H"
 
 #include <variant>
@@ -24,8 +25,10 @@
 
 namespace impactx
 {
-    using KnownElements = std::variant<Drift, Sbend, Quad, DipEdge, ConstF,
-                                       ShortRF, Multipole, NonlinearLens>;
+    using KnownElements = std::variant<
+        None, /* must be first, so KnownElements creates a default constructor */
+        ConstF, DipEdge, Drift, Multipole, NonlinearLens,
+        Quad, Sbend, ShortRF>;
 
 } // namespace impactx
 

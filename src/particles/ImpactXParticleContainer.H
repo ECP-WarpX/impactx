@@ -160,6 +160,16 @@ namespace impactx
          */
         void SetParticleShape ();
 
+        /** Set Particle Shape order
+         *
+         * Note: this can only be called once. All later calls are a logic error.
+         * The reason for that is that subsequent calls would need to change
+         * the guard size of all our MultiFabs, which is not implemented.
+         *
+         * @param order the order of the particle shape
+         */
+        void SetParticleShape (int const order);
+
         /** Compute the min and max of the particle position in each dimension
          *
          * @returns x_min, y_min, z_min, x_max, y_max, z_max

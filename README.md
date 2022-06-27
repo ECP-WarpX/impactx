@@ -238,6 +238,16 @@ or by adding arguments with `-D<OPTION>=<VALUE>` to the first CMake call, e.g.:
 cmake -S . -B build -DImpactX_COMPUTE=CUDA -DImpactX_MPI=OFF
 ```
 
+### Python Compile
+
+```bash
+# find dependencies & configure
+cmake -S . -B build -DImpactX_PYTHON=ON
+
+# compile & install
+cmake --build build -j 4 --target pip_install
+```
+
 ## Run
 
 An executable ImpactX binary with the current compile-time options encoded in its file name will be created in `build/bin/`.
@@ -284,6 +294,7 @@ In order to run our tests, you need to have a few Python packages installed:
 ```console
 python3 -m pip install -U pip setuptools wheel
 python3 -m pip install -r requirements.txt
+python3 -m pip install -r examples/requirements.txt
 ```
 
 You can run all our tests with:

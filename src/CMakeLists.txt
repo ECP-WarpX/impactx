@@ -11,6 +11,15 @@ target_sources(ImpactX
 add_subdirectory(initialization)
 add_subdirectory(particles)
 
+
+###############################################################################
+# This builds Python bindings for classes and functions
+#
+if(ImpactX_PYTHON)
+    add_subdirectory(python)
+endif()
+
+
 ###############################################################################
 # This is the entry point of the application.
 # This fail primarily contains main(), so we can run ImpactX as an application
