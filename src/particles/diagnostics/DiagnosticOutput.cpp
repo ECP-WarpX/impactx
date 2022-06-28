@@ -20,7 +20,7 @@
 
 namespace impactx::diagnostics
 {
-    void DiagnosticOutput (ImpactXParticleContainer & pc,
+    void DiagnosticOutput (ImpactXParticleContainer const & pc,
                            OutputType const otype,
                            std::string file_name)
     {
@@ -135,7 +135,7 @@ namespace impactx::diagnostics
                     // print reference particle to file
 
                     // preparing to access reference particle data: RefPart
-                    RefPart & ref_part = pc.GetRefParticle();
+                    RefPart const ref_part = pc.GetRefParticle();
 
                     amrex::ParticleReal const x = ref_part.x;
                     amrex::ParticleReal const y = ref_part.y;

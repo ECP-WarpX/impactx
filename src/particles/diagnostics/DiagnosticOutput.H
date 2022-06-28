@@ -36,7 +36,7 @@ namespace impactx::diagnostics
      * @param otype the type of output to produce
      * @param file_name the file name to write to
      */
-    void DiagnosticOutput (ImpactXParticleContainer & pc,
+    void DiagnosticOutput (ImpactXParticleContainer const & pc,
                            OutputType const otype,
                            std::string file_name);
 
