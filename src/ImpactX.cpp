@@ -60,7 +60,7 @@ namespace impactx
         // print initial reference particle to file
         diagnostics::DiagnosticOutput(*m_particle_container,
                                       diagnostics::OutputType::PrintRefParticle,
-                                      "diags/ref_particle.txt");
+                                      "diags/initial_ref_particle.txt");
 
         // print the initial values of the two invariants H and I
         diagnostics::DiagnosticOutput(*m_particle_container,
@@ -129,7 +129,7 @@ namespace impactx
         // print final reference particle to file
         diagnostics::DiagnosticOutput(*m_particle_container,
                                       diagnostics::OutputType::PrintRefParticle,
-                                      "diags/ref_particle.txt");
+                                      "diags/output_ref_particle.txt");
 
         // print the final values of the two invariants H and I
         diagnostics::DiagnosticOutput(*m_particle_container,
