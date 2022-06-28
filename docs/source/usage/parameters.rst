@@ -175,7 +175,7 @@ Lattice Elements
 * ``<element_name>.type`` (``string``)
     Indicates the element type for this lattice element. This should be one of:
 
-        * ``drift`` for free drift. This requires this additional parameters:
+        * ``drift`` for free drift. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
