@@ -147,6 +147,13 @@ namespace impactx
         RefPart &
         GetRefParticle ();
 
+        /** Get a copy to the reference particle attributes
+         *
+         * @returns refpart
+         */
+        RefPart const
+        GetRefParticle () const;
+
         /** Get particle shape
          */
         int
