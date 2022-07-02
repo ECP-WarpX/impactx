@@ -11,6 +11,7 @@
 #include "particles/elements/All.H"
 
 #include <AMReX.H>
+#include <AMReX_BLProfiler.H>
 #include <AMReX_REAL.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_Print.H>
@@ -23,6 +24,8 @@ namespace impactx
 {
     void ImpactX::initLatticeElementsFromInputs ()
     {
+        BL_PROFILE("ImpactX::initLatticeElementsFromInputs");
+
         // make sure the element sequence is empty
         m_lattice.clear();
 

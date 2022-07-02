@@ -16,6 +16,7 @@
 
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
+#include <AMReX_BLProfiler.H>
 #include <AMReX_Print.H>
 #include <AMReX_Utility.H>
 
@@ -36,6 +37,8 @@ namespace impactx
 
     void ImpactX::initGrids ()
     {
+        BL_PROFILE("ImpactX::initGrids");
+
         // this is the earliest point that we need to know the particle shape,
         // so that we can initialize the guard size of our MultiFabs
         m_particle_container->SetParticleShape();
