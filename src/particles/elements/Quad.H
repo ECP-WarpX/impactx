@@ -65,7 +65,7 @@ namespace impactx
             amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
 
             // compute phase advance per unit length in s (in rad/m)
-            amrex::ParticleReal const omega = sqrt(abs(m_k));
+            amrex::ParticleReal const omega = sqrt(std::abs(m_k));
 
             // intialize output values of momenta
             amrex::ParticleReal pxout = px;
