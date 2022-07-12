@@ -9,6 +9,7 @@
  */
 #include "Push.H"
 
+#include <AMReX_BLProfiler.H>
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_REAL.H>       // for ParticleReal
 
@@ -95,6 +96,8 @@ namespace detail
     void Push (ImpactXParticleContainer & pc,
                std::list<KnownElements> const & lattice)
     {
+        BL_PROFILE("Push");
+
         using namespace amrex::literals; // for _rt and _prt
 
         // loop over refinement levels

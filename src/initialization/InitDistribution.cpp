@@ -17,6 +17,7 @@
 #include "particles/distribution/Semigaussian.H"
 
 #include <AMReX.H>
+#include <AMReX_BLProfiler.H>
 #include <AMReX_REAL.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_Print.H>
@@ -87,6 +88,8 @@ namespace impactx
 {
     void ImpactX::initBeamDistributionFromInputs ()
     {
+        BL_PROFILE("ImpactX::initBeamDistributionFromInputs");
+
         using namespace amrex::literals;
 
         // Parse the beam distribution parameters
