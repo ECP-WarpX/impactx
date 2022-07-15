@@ -24,7 +24,7 @@ namespace impactx
      * @param lattice elements to push the particles through
      */
     void Push (ImpactXParticleContainer & pc,
-               std::list<KnownElements> const & lattice);
+               KnownElements const & element);
 
 } // namespace impactx
 

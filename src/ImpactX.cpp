@@ -67,6 +67,8 @@ namespace impactx
                                       diagnostics::OutputType::PrintNonlinearLensInvariants,
                                       "diags/initial_nonlinear_lens_invariants.txt");
 
+        for (auto & element_variant : m_lattice) {
+
         for (int step = 0; step < num_steps; ++step)
         {
             BL_PROFILE("ImpactX::evolve::step");
@@ -114,12 +116,14 @@ namespace impactx
             // assuming that the distribution did not change
 
             // push all particles with external maps
-            Push(*m_particle_container, m_lattice);
+            Push(*m_particle_container, element_variant);
 
             // just prints an empty newline at the end of the step
             amrex::Print() << "\n";
 
         } // end step loop
+
+        } // end element loop
 
         // print final particle distribution to file
         diagnostics::DiagnosticOutput(*m_particle_container,
