@@ -70,59 +70,64 @@ namespace impactx
                                       diagnostics::OutputType::PrintNonlinearLensInvariants,
                                       "diags/initial_nonlinear_lens_invariants.txt");
 
-        for (int step = 0; step < num_steps; ++step)
+        // loop over all beamline elements
+        for (auto & element_variant : m_lattice)
         {
-            BL_PROFILE("ImpactX::evolve::step");
-            amrex::Print() << " ++++ Starting step=" << step << "\n";
+            // sub-steps for space charge within the element
+            for (int step = 0; step < num_steps; ++step)
+            {
+                BL_PROFILE("ImpactX::evolve::step");
+                amrex::Print() << " ++++ Starting step=" << step << "\n";
 
-            // transform from x',y',t to x,y,z
-            transformation::CoordinateTransformation(*m_particle_container,
-                                                     transformation::Direction::T2Z);
+                // transform from x',y',t to x,y,z
+                transformation::CoordinateTransformation(*m_particle_container,
+                                                         transformation::Direction::T2Z);
 
-            // Space-charge calculation: turn off if there is only 1 particle
-            if (m_particle_container->TotalNumberOfParticles(false,false) > 1) {
+                // Space-charge calculation: turn off if there is only 1 particle
+                if (m_particle_container->TotalNumberOfParticles(false,false) > 1) {
 
-                // Note: The following operation assume that
-                // the particles are in x, y, z coordinates.
+                    // Note: The following operation assume that
+                    // the particles are in x, y, z coordinates.
 
-                // Resize the mesh, based on `m_particle_container` extent
-                ResizeMesh();
+                    // Resize the mesh, based on `m_particle_container` extent
+                    ResizeMesh();
 
-                // Redistribute particles in the new mesh in x, y, z
-                //m_particle_container->Redistribute();  // extra overload/arguments?
+                    // Redistribute particles in the new mesh in x, y, z
+                    m_particle_container->Redistribute();
 
-                // charge deposition
-                m_particle_container->DepositCharge(m_rho, this->refRatio());
+                    // charge deposition
+                    m_particle_container->DepositCharge(m_rho, this->refRatio());
 
-                // poisson solve in x,y,z
-                //   TODO
+                    // poisson solve in x,y,z
+                    //   TODO
 
-                // gather and space-charge push in x,y,z , assuming the space-charge
-                // field is the same before/after transformation
-                //   TODO
-            }
+                    // gather and space-charge push in x,y,z , assuming the space-charge
+                    // field is the same before/after transformation
+                    //   TODO
+                }
 
-            // transform from x,y,z to x',y',t
-            transformation::CoordinateTransformation(*m_particle_container,
-                                                     transformation::Direction::Z2T);
+                // transform from x,y,z to x',y',t
+                transformation::CoordinateTransformation(*m_particle_container,
+                                                         transformation::Direction::Z2T);
 
-            // for later: original Impact implementation as an option
-            // Redistribute particles in x',y',t
-            //   TODO: only needed if we want to gather and push space charge
-            //         in x',y',t
-            //   TODO: change geometry beforehand according to transformation
-            //m_particle_container->Redistribute();
-            //
-            // in original Impact, we gather and space-charge push in x',y',t ,
-            // assuming that the distribution did not change
+                // for later: original Impact implementation as an option
+                // Redistribute particles in x',y',t
+                //   TODO: only needed if we want to gather and push space charge
+                //         in x',y',t
+                //   TODO: change geometry beforehand according to transformation
+                //m_particle_container->Redistribute();
+                //
+                // in original Impact, we gather and space-charge push in x',y',t ,
+                // assuming that the distribution did not change
 
-            // push all particles with external maps
-            Push(*m_particle_container, m_lattice);
+                // push all particles with external maps
+                Push(*m_particle_container, element_variant);
 
-            // just prints an empty newline at the end of the step
-            amrex::Print() << "\n";
+                // just prints an empty newline at the end of the step
+                amrex::Print() << "\n";
 
-        } // end step loop
+            } // end in-element space-charge sub-step loop
+        } // end beamline element loop
 
         // print final particle distribution to file
         diagnostics::DiagnosticOutput(*m_particle_container,

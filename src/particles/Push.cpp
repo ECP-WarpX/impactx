@@ -94,7 +94,7 @@ namespace detail
 } // namespace detail
 
     void Push (ImpactXParticleContainer & pc,
-               std::list<KnownElements> const & lattice)
+               KnownElements const & element_variant)
     {
         BL_PROFILE("Push");
 
@@ -126,15 +126,13 @@ namespace detail
                 amrex::ParticleReal* const AMREX_RESTRICT part_px = soa_real[RealSoA::ux].dataPtr();
                 amrex::ParticleReal* const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
                 amrex::ParticleReal* const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
-                // ...
 
                 // preparing to access reference particle data: RefPart
                 RefPart & ref_part = pc.GetRefParticle();
 
-                // loop over all beamline elements
-                for (auto & element_variant : lattice) {
-                    // here we just access the element by its respective type
-                    std::visit([=, &ref_part](auto&& element) {
+                // here we just access the element by its respective type
+                std::visit(
+                    [=, &ref_part](auto&& element) {
                         // push beam particles relative to reference particle
                         detail::PushSingleParticle<decltype(element)> const pushSingleParticle(
                             element, aos_ptr, part_px, part_py, part_pt, ref_part);
@@ -143,8 +141,9 @@ namespace detail
 
                         // push reference particle in global coordinates
                         element(ref_part);
-                    }, element_variant);
-                }; // end loop over all beamline elements
+                    },
+                    element_variant
+                );
             } // end loop over all particle boxes
         } // env mesh-refinement level loop
     }
