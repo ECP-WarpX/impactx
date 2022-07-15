@@ -90,7 +90,7 @@ namespace impactx
                     ResizeMesh();
 
                     // Redistribute particles in the new mesh in x, y, z
-                    //m_particle_container->Redistribute();  // extra overload/arguments?
+                    m_particle_container->Redistribute();
 
                     // charge deposition
                     m_particle_container->DepositCharge(m_rho, this->refRatio());
