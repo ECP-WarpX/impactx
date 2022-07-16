@@ -11,8 +11,9 @@
 #include "initialization/InitAmrCore.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
-#include "particles/transformation/CoordinateTransformation.H"
 #include "particles/diagnostics/DiagnosticOutput.H"
+#include "particles/spacecharge/PoissonSolve.H"
+#include "particles/transformation/CoordinateTransformation.H"
 
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
@@ -133,7 +134,11 @@ namespace impactx
                     m_particle_container->DepositCharge(m_rho, this->refRatio());
 
                     // poisson solve in x,y,z
-                    //   TODO
+                    spacecharge::PoissonSolve(*m_particle_container, m_rho, m_phi);
+
+                    // calculate force
+                    // TODO: FDTD stencil m_phi -> m_space_charge
+                    // nodal: (-1 and +1) / 2dx
 
                     // gather and space-charge push in x,y,z , assuming the space-charge
                     // field is the same before/after transformation
