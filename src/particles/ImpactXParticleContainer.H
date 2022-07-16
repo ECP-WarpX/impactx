@@ -200,7 +200,8 @@ namespace impactx
         /** Deposit the charge of the particles onto a grid
          *
          * This resets the values in rho to zero and then deposits the particle
-         * charge.
+         * charge. In MPI-parallel contexts, this also performs a communication
+         * of boundary regions to sum neighboring contributions.
          *
          * @param rho charge grid per level to deposit on
          * @param ref_ratio mesh refinement ratios between levels

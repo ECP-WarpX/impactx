@@ -81,6 +81,16 @@ namespace impactx
                              dx, xyzmin, n_rz_azimuthal_modes);
                 }
             }
+
+            // start async charge communication for this level
+            rho_at_level.SumBoundary_nowait();
+        }
+
+        // finalize communication
+        for (int lev = 0; lev <= nLevel; ++lev)
+        {
+            amrex::MultiFab & rho_at_level = rho.at(lev);
+            rho_at_level.SumBoundary_finish();
         }
     }
 } // namespace impactx
