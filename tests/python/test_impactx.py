@@ -3,7 +3,7 @@
 from impactx import ImpactX, elements
 
 
-def aasdtest_impactx_fodo_file():
+def test_impactx_fodo_file():
     """
     This tests an equivalent to main.cpp in C++
     """
