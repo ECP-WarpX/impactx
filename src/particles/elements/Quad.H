@@ -32,8 +32,9 @@ namespace impactx
          *           k > 0 horizontal focusing
          *           k < 0 horizontal defocusing
          */
-        Quad( amrex::ParticleReal const ds, amrex::ParticleReal const k )
-        : m_ds(ds), m_k(k)
+        Quad( amrex::ParticleReal const ds, amrex::ParticleReal const k, 
+           int nslice )
+        : m_ds(ds), m_k(k), m_nslice(nslice)
         {
         }
 
@@ -135,6 +136,7 @@ namespace impactx
     private:
         amrex::ParticleReal m_ds; //! segment length in m
         amrex::ParticleReal m_k; //! quadrupole strength in 1/m
+        int m_nslice; //! number of slices
     };
 
 } // namespace impactx

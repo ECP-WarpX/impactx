@@ -28,8 +28,8 @@ namespace impactx
          *
          * @param ds Segment length in m.
          */
-        Drift( amrex::ParticleReal const ds )
-        : m_ds(ds)
+        Drift( amrex::ParticleReal const ds, int nslice )
+        : m_ds(ds), m_nslice(nslice)
         {
         }
 
@@ -112,7 +112,8 @@ namespace impactx
         }
 
     private:
-        amrex::ParticleReal m_ds;
+        amrex::ParticleReal m_ds; //! segment length in m
+        int m_nslice;  //! number of slices
     };
 
 } // namespace impactx

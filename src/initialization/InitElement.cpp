@@ -34,33 +34,42 @@ namespace impactx
         std::vector<std::string> lattice_elements;
         pp_lattice.queryarr("elements", lattice_elements);
 
+        // Input default number of slices per element
+        int num_steps = 1;
+        pp_lattice.query("num_steps", num_steps);
+
         // Loop through lattice elements
         for (std::string const & element_name : lattice_elements) {
             // Check the element type
             amrex::ParmParse pp_element(element_name);
             std::string element_type;
             pp_element.get("type", element_type);
+
+            // Input default number of slices per element
+//            int num_steps = 1;
+//            pp_element.query("num_steps", num_steps);
+
             // Initialize the corresponding element according to its type
             if (element_type == "quad") {
                 amrex::Real ds, k;
-                int nslice = 1;
+                int nslice = num_steps;
                 pp_element.get("ds", ds);
                 pp_element.get("k", k);
                 pp_element.query("nslice", nslice);
-                m_lattice.emplace_back( Quad(ds, k) );
+                m_lattice.emplace_back( Quad(ds, k, nslice) );
             } else if (element_type == "drift") {
                 amrex::Real ds;
-                int nslice = 1;
+                int nslice = num_steps;
                 pp_element.get("ds", ds);
                 pp_element.query("nslice", nslice);
-                m_lattice.emplace_back( Drift(ds) );
+                m_lattice.emplace_back( Drift(ds, nslice) );
             } else if (element_type == "sbend") {
                 amrex::Real ds, rc;
-                int nslice = 1;
+                int nslice = num_steps;
                 pp_element.get("ds", ds);
                 pp_element.get("rc", rc);
                 pp_element.query("nslice", nslice);
-                m_lattice.emplace_back( Sbend(ds, rc) );
+                m_lattice.emplace_back( Sbend(ds, rc, nslice) );
             } else if (element_type == "dipedge") {
                 amrex::Real psi, rc, g, K2;
                 pp_element.get("psi", psi);
@@ -70,13 +79,13 @@ namespace impactx
                 m_lattice.emplace_back( DipEdge(psi, rc, g, K2) );
             } else if (element_type == "constf") {
                 amrex::Real ds, kx, ky, kt;
-                int nslice = 1;
+                int nslice = num_steps;
                 pp_element.get("ds", ds);
                 pp_element.get("kx", kx);
                 pp_element.get("ky", ky);
                 pp_element.get("kt", kt);
                 pp_element.query("nslice", nslice);
-                m_lattice.emplace_back( ConstF(ds, kx, ky, kt) );
+                m_lattice.emplace_back( ConstF(ds, kx, ky, kt, nslice) );
             } else if (element_type == "shortrf") {
                 amrex::Real V, k;
                 pp_element.get("V", V);

@@ -33,8 +33,9 @@ namespace impactx
          *
          */
         ConstF( amrex::ParticleReal const ds, amrex::ParticleReal const kx,
-                amrex::ParticleReal const ky, amrex::ParticleReal const kt )
-        : m_ds(ds), m_kx(kx), m_ky(ky), m_kt(kt)
+                amrex::ParticleReal const ky, amrex::ParticleReal const kt,
+                int nslice )
+        : m_ds(ds), m_kx(kx), m_ky(ky), m_kt(kt), m_nslice(nslice)
         {
         }
 
@@ -124,6 +125,7 @@ namespace impactx
         amrex::ParticleReal m_kx; //! focusing x strength in 1/m
         amrex::ParticleReal m_ky; //! focusing y strength in 1/m
         amrex::ParticleReal m_kt; //! focusing t strength in 1/m
+        int m_nslice; //! number of slices
 
     };
 

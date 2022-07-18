@@ -172,6 +172,10 @@ Lattice Elements
     A list of names (one name per lattice element), in the order that they
     appear in the lattice.
 
+* ``lattice.num_steps`` (``integer``) optional (default: 1)
+    A positive integer specifying the number of slices used for the application of 
+    space charge in all elements; overloaded by element parameter "nslice"
+
 * ``<element_name>.type`` (``string``)
     Indicates the element type for this lattice element. This should be one of:
 
