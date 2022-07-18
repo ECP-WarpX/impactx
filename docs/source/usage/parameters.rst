@@ -173,7 +173,7 @@ Lattice Elements
     appear in the lattice.
 
 * ``lattice.num_steps`` (``integer``) optional (default: 1)
-    A positive integer specifying the number of slices used for the application of 
+    A positive integer specifying the number of slices used for the application of
     space charge in all elements; overloaded by element parameter "nslice"
 
 * ``<element_name>.type`` (``string``)

@@ -32,7 +32,7 @@ namespace impactx
          *           k > 0 horizontal focusing
          *           k < 0 horizontal defocusing
          */
-        Quad( amrex::ParticleReal const ds, amrex::ParticleReal const k, 
+        Quad( amrex::ParticleReal const ds, amrex::ParticleReal const k,
            int nslice )
         : m_ds(ds), m_k(k), m_nslice(nslice)
         {
