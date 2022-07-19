@@ -172,7 +172,7 @@ Lattice Elements
     A list of names (one name per lattice element), in the order that they
     appear in the lattice.
 
-* ``lattice.nslice`` (``integer``) optional (default: ``1`` unless thin element)
+* ``lattice.nslice`` (``integer``) optional (default: ``1``)
     A positive integer specifying the number of slices used for the application of
     space charge in all elements; overwritten by element parameter "nslice"
 
@@ -364,7 +364,7 @@ Numerics and algorithms
 Diagnostics and output
 ----------------------
 
-* ``diag.slice_step_diagnostics`` (``boolean``, default: ``false``)
+* ``diag.slice_step_diagnostics`` (``boolean``, optional, default: ``false``)
   By default, diagnostics is performed at the beginning and end of the simulation.
   Enabling this flag will write diagnostics every step and slice step
 
