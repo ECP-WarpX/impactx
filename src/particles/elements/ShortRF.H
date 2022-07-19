@@ -27,8 +27,7 @@ namespace impactx
         /** A short RF cavity element at zero crossing for bunching
          *
          * @param V Normalized RF voltage drop V = Emax*L/(c*Brho)
-         * @param k Wavenumber of RF in 1/m.
-         *
+         * @param k Wavenumber of RF in 1/m
          */
         ShortRF( amrex::ParticleReal const V, amrex::ParticleReal const k )
         : m_V(V), m_k(k)
@@ -100,7 +99,6 @@ namespace impactx
     private:
         amrex::ParticleReal m_V; //! normalized (max) RF voltage drop.
         amrex::ParticleReal m_k; //! RF wavenumber in 1/m.
-
     };
 
 } // namespace impactx

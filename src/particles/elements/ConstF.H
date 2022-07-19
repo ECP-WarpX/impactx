@@ -30,7 +30,7 @@ namespace impactx
          * @param kx Focusing strength for x in 1/m.
          * @param ky Focusing strength for y in 1/m.
          * @param kt Focusing strength for t in 1/m.
-         *
+         * @param nslice number of slices used for the application of space charge
          */
         ConstF( amrex::ParticleReal const ds, amrex::ParticleReal const kx,
                 amrex::ParticleReal const ky, amrex::ParticleReal const kt,
@@ -125,8 +125,7 @@ namespace impactx
         amrex::ParticleReal m_kx; //! focusing x strength in 1/m
         amrex::ParticleReal m_ky; //! focusing y strength in 1/m
         amrex::ParticleReal m_kt; //! focusing t strength in 1/m
-        int m_nslice; //! number of slices
-
+        int m_nslice; //! number of slices used for the application of space charge
     };
 
 } // namespace impactx

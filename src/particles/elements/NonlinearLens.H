@@ -33,7 +33,6 @@ namespace impactx
          *
          * @param knll - integrated strength of the nonlinear lens (m)
          * @param cnll - distance of singularities from the origin (m)
-         *
          */
         NonlinearLens( amrex::ParticleReal const knll,
                    amrex::ParticleReal const cnll )
@@ -131,7 +130,6 @@ namespace impactx
     private:
         amrex::ParticleReal m_knll; //! integrated strength of the nonlinear lens (m)
         amrex::ParticleReal m_cnll; //! distance of singularities from the origin (m)
-
     };
 
 } // namespace impactx

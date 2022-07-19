@@ -31,9 +31,10 @@ namespace impactx
          *           = (gradient in T/m) / (rigidity in T-m)
          *           k > 0 horizontal focusing
          *           k < 0 horizontal defocusing
+         * @param nslice number of slices used for the application of space charge
          */
         Quad( amrex::ParticleReal const ds, amrex::ParticleReal const k,
-           int nslice )
+              int nslice )
         : m_ds(ds), m_k(k), m_nslice(nslice)
         {
         }
@@ -136,7 +137,7 @@ namespace impactx
     private:
         amrex::ParticleReal m_ds; //! segment length in m
         amrex::ParticleReal m_k; //! quadrupole strength in 1/m
-        int m_nslice; //! number of slices
+        int m_nslice; //! number of slices used for the application of space charge
     };
 
 } // namespace impactx

@@ -29,7 +29,6 @@ namespace impactx
          * @param multipole index m (m=1 dipole, m=2 quadrupole, m=3 sextupole etc.)
          * @param K_normal Integrated normal multipole coefficient (1/meter^m)
          * @param K_skew Integrated skew multipole coefficient (1/meter^m)
-         *
          */
         Multipole( int const multipole,
                    amrex::ParticleReal const K_normal,

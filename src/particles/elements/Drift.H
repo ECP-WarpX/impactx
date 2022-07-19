@@ -26,7 +26,8 @@ namespace impactx
 
         /** A drift
          *
-         * @param ds Segment length in m.
+         * @param ds Segment length in m
+         * @param nslice number of slices used for the application of space charge
          */
         Drift( amrex::ParticleReal const ds, int nslice )
         : m_ds(ds), m_nslice(nslice)
@@ -113,7 +114,7 @@ namespace impactx
 
     private:
         amrex::ParticleReal m_ds; //! segment length in m
-        int m_nslice;  //! number of slices
+        int m_nslice; //! number of slices used for the application of space charge
     };
 
 } // namespace impactx

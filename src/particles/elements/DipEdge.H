@@ -38,8 +38,8 @@ namespace impactx
          * @param g Gap parameter in m.
          * @param K2 Fringe field integral (unitless).
          */
-        DipEdge( amrex::ParticleReal const psi, amrex::ParticleReal const rc, amrex::ParticleReal const
-        g, amrex::ParticleReal const K2)
+        DipEdge( amrex::ParticleReal const psi, amrex::ParticleReal const rc,
+                 amrex::ParticleReal const g, amrex::ParticleReal const K2 )
         : m_psi(psi), m_rc(rc), m_g(g), m_K2(K2)
         {
         }
