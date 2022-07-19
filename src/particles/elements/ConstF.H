@@ -34,7 +34,7 @@ namespace impactx
          */
         ConstF( amrex::ParticleReal const ds, amrex::ParticleReal const kx,
                 amrex::ParticleReal const ky, amrex::ParticleReal const kt,
-                int nslice )
+                int const nslice )
         : m_ds(ds), m_kx(kx), m_ky(ky), m_kt(kt), m_nslice(nslice)
         {
         }

@@ -34,7 +34,7 @@ namespace impactx
          * @param nslice number of slices used for the application of space charge
          */
         Quad( amrex::ParticleReal const ds, amrex::ParticleReal const k,
-              int nslice )
+              int const nslice )
         : m_ds(ds), m_k(k), m_nslice(nslice)
         {
         }

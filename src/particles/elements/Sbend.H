@@ -31,7 +31,7 @@ namespace impactx
          * @param nslice number of slices used for the application of space charge
          */
         Sbend( amrex::ParticleReal const ds, amrex::ParticleReal const rc,
-               int nslice)
+               int const nslice)
         : m_ds(ds), m_rc(rc), m_nslice(nslice)
         {
         }
