@@ -49,6 +49,7 @@ namespace impactx
                     auto & AMREX_RESTRICT soa_real = pti.GetStructOfArrays().GetRealData();
                     // after https://github.com/ECP-WarpX/WarpX/pull/2838 add const:
                     auto const wp = soa_real[RealSoA::w];
+                    amrex::Print() << "wp[0]=" << wp[0] << "\n";
                     int const * const AMREX_RESTRICT ion_lev = nullptr;
 
                     // physical lower corner of the current box
@@ -66,7 +67,7 @@ namespace impactx
                     //auto const rel_ref_ratio = ref_ratio.at(depos_lev) / ref_ratio.at(lev);
                     amrex::ignore_unused(ref_ratio);
 
-                    amrex::ParticleReal const charge = 1.0; // TODO once we implement charge
+                    amrex::ParticleReal const charge = 1.0; // TODO: once we implement charge
 
                     // cell size of the mesh to deposit to
                     std::array<amrex::Real, 3> const & AMREX_RESTRICT dx = {gm.CellSize(0), gm.CellSize(1), gm.CellSize(2)};
