@@ -127,6 +127,16 @@ namespace impactx
             // nothing to do: this is a zero-length element
         }
 
+        /** Number of slices used for the application of space charge
+         *
+         * @return zero, because this is a zero-length element
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        int nslice () const
+        {
+            return 0;
+        }
+
     private:
         amrex::ParticleReal m_knll; //! integrated strength of the nonlinear lens (m)
         amrex::ParticleReal m_cnll; //! distance of singularities from the origin (m)

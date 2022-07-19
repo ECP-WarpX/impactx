@@ -15,7 +15,7 @@ def test_impactx_fodo_file():
     impactX.init_beam_distribution_from_inputs()
     impactX.init_lattice_elements_from_inputs()
 
-    impactX.evolve(num_steps=1)
+    impactX.evolve()
 
 
 def test_impactx_nofile():
@@ -53,4 +53,4 @@ def test_impactx_nofile():
     print(len(impactX.lattice))
     assert(len(impactX.lattice) > 5)
 
-    #impactX.evolve(num_steps=1)
+    #impactX.evolve()

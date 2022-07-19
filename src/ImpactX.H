@@ -64,10 +64,8 @@ namespace impactx
         void initLatticeElementsFromInputs ();
 
         /** Run the main simulation loop for a number of steps
-         *
-         * @param num_steps number of steps to evolve
          */
-        void evolve (int num_steps);
+        void evolve ();
 
       private:
         //! Tag cells for refinement.  TagBoxArray tags is built on level lev grids.

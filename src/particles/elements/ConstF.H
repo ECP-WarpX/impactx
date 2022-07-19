@@ -120,6 +120,16 @@ namespace impactx
 
         }
 
+        /** Number of slices used for the application of space charge
+         *
+         * @return positive integer
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        int nslice () const
+        {
+            return m_nslice;
+        }
+
     private:
         amrex::ParticleReal m_ds; //! segment length in m
         amrex::ParticleReal m_kx; //! focusing x strength in 1/m

@@ -96,6 +96,16 @@ namespace impactx
 
         }
 
+        /** Number of slices used for the application of space charge
+         *
+         * @return zero, because this is a zero-length element
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        int nslice () const
+        {
+            return 0;
+        }
+
     private:
         amrex::ParticleReal m_V; //! normalized (max) RF voltage drop.
         amrex::ParticleReal m_k; //! RF wavenumber in 1/m.

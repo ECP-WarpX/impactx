@@ -51,7 +51,7 @@ namespace impactx
         amrex::UtilCreateCleanDirectory("diags", true);
     }
 
-    void ImpactX::evolve (int num_steps)
+    void ImpactX::evolve ()
     {
         BL_PROFILE("ImpactX::evolve");
 
@@ -73,8 +73,12 @@ namespace impactx
         // loop over all beamline elements
         for (auto & element_variant : m_lattice)
         {
+            // number of slices used for the application of space charge
+            int nslice = 1;
+            std::visit([&nslice](auto&& element){ nslice = element.nslice(); }, element_variant);
+
             // sub-steps for space charge within the element
-            for (int step = 0; step < num_steps; ++step)
+            for (int step = 0; step < nslice; ++step)
             {
                 BL_PROFILE("ImpactX::evolve::step");
                 amrex::Print() << " ++++ Starting step=" << step << "\n";

@@ -63,7 +63,7 @@ void init_ImpactX(py::module& m)
         .def("init_grids", &ImpactX::initGrids)
         .def("init_beam_distribution_from_inputs", &ImpactX::initBeamDistributionFromInputs)
         .def("init_lattice_elements_from_inputs", &ImpactX::initLatticeElementsFromInputs)
-        .def("evolve", &ImpactX::evolve, py::arg("num_steps"))
+        .def("evolve", &ImpactX::evolve)
 
         //.def_property("particle_container", &ImpactX::m_particle_container)
         //.def_readwrite("rho", &ImpactX::m_rho)

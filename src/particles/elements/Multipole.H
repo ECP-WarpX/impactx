@@ -118,6 +118,16 @@ namespace impactx
             // nothing to do: this is a zero-length element
         }
 
+        /** Number of slices used for the application of space charge
+         *
+         * @return zero, because this is a zero-length element
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        int nslice () const
+        {
+            return 0;
+        }
+
     private:
         int m_multipole; //! multipole index
         int m_mfactorial; //! factorial of multipole index

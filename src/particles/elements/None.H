@@ -60,6 +60,16 @@ namespace impactx
 
         }
 
+        /** Number of slices used for the application of space charge
+         *
+         * @return zero, because this is a zero-length element
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        int nslice () const
+        {
+            return 0;
+        }
+
     };
 
 } // namespace impactx
