@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         impactX.initGrids();
         impactX.initBeamDistributionFromInputs();
         impactX.initLatticeElementsFromInputs();
-        impactX.evolve( /* num_steps = */ 1);
+        impactX.evolve();
     }
     BL_PROFILE_VAR_STOP(pmain);
 

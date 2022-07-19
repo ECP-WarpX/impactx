@@ -172,9 +172,9 @@ Lattice Elements
     A list of names (one name per lattice element), in the order that they
     appear in the lattice.
 
-* ``lattice.num_steps`` (``integer``) optional (default: 1)
+* ``lattice.nslice`` (``integer``) optional (default: ``1`` unless thin element)
     A positive integer specifying the number of slices used for the application of
-    space charge in all elements; overloaded by element parameter "nslice"
+    space charge in all elements; overwritten by element parameter "nslice"
 
 * ``<element_name>.type`` (``string``)
     Indicates the element type for this lattice element. This should be one of:
@@ -184,7 +184,7 @@ Lattice Elements
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
             * ``<element_name>.nslice`` (``integer``) number of slices used
-              for the application of space charge (default = 1)
+              for the application of space charge (default: ``1``)
 
         * ``quad`` for a quadrupole. This requires these additional parameters:
 
@@ -197,7 +197,7 @@ Lattice Elements
               * k < 0 horizontal defocusing
 
             * ``<element_name>.nslice`` (``integer``) number of slices used
-              for the application of space charge (default = 1)
+              for the application of space charge (default: ``1``)
 
         * ``sbend`` for a bending magnet. This requires these additional parameters:
 
@@ -206,7 +206,7 @@ Lattice Elements
             * ``<element_name>.rc`` (``float``, in meters) the bend radius
 
             * ``<element_name>.nslice`` (``integer``) number of slices used
-              for the application of space charge (default = 1)
+              for the application of space charge (default: ``1``)
 
         * ``dipedge`` for dipole edge focusing. This requires these additional parameters:
 
@@ -234,7 +234,7 @@ Lattice Elements
               longitudinal focusing strength
 
             * ``<element_name>.nslice`` (``integer``) number of slices used
-              for the application of space charge (default = 1)
+              for the application of space charge (default: ``1``)
 
         * ``shortrf`` for a short RF (bunching) cavity element. This requires these additional parameters:
 
@@ -268,7 +268,7 @@ Lattice Elements
 Distribution across MPI ranks and parallelization
 -------------------------------------------------
 
-* ``amr.max_grid_size`` (``integer``) optional (default ``128``)
+* ``amr.max_grid_size`` (``integer``) optional (default: ``128``)
     Maximum allowable size of each **subdomain**
     (expressed in number of grid points, in each direction).
     Each subdomain has its own ghost cells, and can be handled by a
