@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import matplotlib.pyplot as plt
-
 from impactx import ImpactX, elements
+import matplotlib.pyplot as plt
 
 
 def tst_space_charge():
