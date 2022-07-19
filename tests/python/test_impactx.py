@@ -25,6 +25,7 @@ def test_impactx_nofile():
     impactX = ImpactX()
 
     impactX.set_particle_shape(2)
+    impactX.set_diags_slice_step_diagnostics(True)
     impactX.init_grids()
 
     # init particle beam
@@ -53,4 +54,4 @@ def test_impactx_nofile():
     print(len(impactX.lattice))
     assert(len(impactX.lattice) > 5)
 
-    #impactX.evolve()
+    impactX.evolve()

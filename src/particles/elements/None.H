@@ -47,7 +47,6 @@ namespace impactx
             // nothing to do
         }
 
-
         /** This pushes the reference particle.
          *
          * @param[in,out] refpart reference particle
@@ -62,14 +61,13 @@ namespace impactx
 
         /** Number of slices used for the application of space charge
          *
-         * @return zero, because this is a zero-length element
+         * @return one, because this is a zero-length element
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         int nslice () const
         {
-            return 0;
+            return 1;
         }
-
     };
 
 } // namespace impactx

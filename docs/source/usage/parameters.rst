@@ -364,6 +364,13 @@ Numerics and algorithms
 Diagnostics and output
 ----------------------
 
+* ``diag.slice_step_diagnostics`` (``boolean``, default: ``false``)
+  By default, diagnostics is performed at the beginning and end of the simulation.
+  Enabling this flag will write diagnostics every step and slice step
+
+* ``diag.file_min_digits`` (``integer``, optional, default: ``6``)
+    The minimum number of digits used for the iteration number appended to the diagnostic file names.
+
 Diagnostics related to integrable optics in the IOTA nonlinear magnetic insert element:
 
 * ``diag.alpha`` (``float``, unitless) Twiss alpha of the bare linear lattice at the location of output for the nonlinear
