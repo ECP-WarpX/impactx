@@ -46,6 +46,8 @@ namespace impactx
         int navg = npart / nprocs;
         int nleft = npart - navg * nprocs;
         int npart_this_proc = (myproc < nleft) ? navg+1 : navg;
+        auto const rel_part_this_proc = amrex::ParticleReal(npart_this_proc) /
+                                        amrex::ParticleReal(npart);
 
         std::visit([&](auto&& distribution){
             x.reserve(npart_this_proc);
@@ -68,7 +70,7 @@ namespace impactx
 
         int const lev = 0;
         m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
-                                            qm, bunch_charge);
+                                            qm, bunch_charge * rel_part_this_proc);
 
         // Resize the mesh to fit the spatial extent of the beam and then
         // redistribute particles, so they reside on the MPI rank that is

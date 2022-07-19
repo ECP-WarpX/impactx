@@ -23,7 +23,7 @@ sim.init_grids()
 # load a 2 GeV electron beam with an initial
 # unnormalized rms emittance of 2 nm
 energy_MeV = 2.0e3  # reference energy
-charge_C = 0.0  # assign zero weighting to particles
+charge_C = 1.0e-9  # used with space charge
 mass_MeV = 0.510998950
 qm_qeeV = -1.0e-6/mass_MeV  # charge/mass
 npart = 10000  # number of macro particles

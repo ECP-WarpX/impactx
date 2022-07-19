@@ -66,7 +66,8 @@ namespace impactx
                     //auto const rel_ref_ratio = ref_ratio.at(depos_lev) / ref_ratio.at(lev);
                     amrex::ignore_unused(ref_ratio);
 
-                    amrex::ParticleReal const charge = 1.0; // TODO once we implement charge
+                    amrex::ParticleReal const q_e = 1.60217662e-19;  // TODO move out
+                    amrex::ParticleReal const charge = q_e;
 
                     // cell size of the mesh to deposit to
                     std::array<amrex::Real, 3> const & AMREX_RESTRICT dx = {gm.CellSize(0), gm.CellSize(1), gm.CellSize(2)};
@@ -84,6 +85,8 @@ namespace impactx
 
             // start async charge communication for this level
             rho_at_level.SumBoundary_nowait();
+            //int const comp = 0;
+            //rho_at_level.SumBoundary_nowait(comp, comp, rho_at_level.nGrowVect());
         }
 
         // finalize communication

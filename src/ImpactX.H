@@ -15,6 +15,7 @@
 #include "particles/ImpactXParticleContainer.H"
 
 #include <AMReX_AmrCore.H>
+#include <AMReX_MultiFab.H>
 
 #include <list>
 #include <memory>
