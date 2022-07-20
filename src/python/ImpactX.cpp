@@ -50,6 +50,7 @@ void init_ImpactX(py::module& m)
 
                 amrex::ParmParse::addfile(filename);
             })
+
         .def("set_particle_shape",
             [](ImpactX & ix, int const order) {
                 AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ix.m_particle_container,
@@ -60,10 +61,21 @@ void init_ImpactX(py::module& m)
                 amrex::ParmParse pp_ago("algo");
                 pp_ago.add("particle_shape", order);
             })
+        .def("set_diags_slice_step_diagnostics",
+             [](ImpactX & /* ix */, bool const slice_step_diagnostics) {
+                 amrex::ParmParse pp_diag("diag");
+                 pp_diag.add("slice_step_diagnostics", slice_step_diagnostics);
+             })
+        .def("set_diags_file_min_digits",
+             [](ImpactX & /* ix */, int const file_min_digits) {
+                 amrex::ParmParse pp_diag("diag");
+                 pp_diag.add("file_min_digits", file_min_digits);
+             })
+
         .def("init_grids", &ImpactX::initGrids)
         .def("init_beam_distribution_from_inputs", &ImpactX::initBeamDistributionFromInputs)
         .def("init_lattice_elements_from_inputs", &ImpactX::initLatticeElementsFromInputs)
-        .def("evolve", &ImpactX::evolve, py::arg("num_steps"))
+        .def("evolve", &ImpactX::evolve)
 
         //.def_property("particle_container", &ImpactX::m_particle_container)
         //.def_readwrite("rho", &ImpactX::m_rho)

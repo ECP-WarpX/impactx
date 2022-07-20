@@ -29,7 +29,6 @@ namespace impactx
          * @param multipole index m (m=1 dipole, m=2 quadrupole, m=3 sextupole etc.)
          * @param K_normal Integrated normal multipole coefficient (1/meter^m)
          * @param K_skew Integrated skew multipole coefficient (1/meter^m)
-         *
          */
         Multipole( int const multipole,
                    amrex::ParticleReal const K_normal,
@@ -117,6 +116,16 @@ namespace impactx
                 [[maybe_unused]] RefPart & AMREX_RESTRICT refpart) const {
 
             // nothing to do: this is a zero-length element
+        }
+
+        /** Number of slices used for the application of space charge
+         *
+         * @return one, because this is a zero-length element
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        int nslice () const
+        {
+            return 1;
         }
 
     private:

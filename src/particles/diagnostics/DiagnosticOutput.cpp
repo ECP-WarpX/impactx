@@ -90,19 +90,19 @@ namespace impactx::diagnostics
                     using namespace amrex::literals;
 
                     // Parse the diagnostic parameters
-                    amrex::ParmParse pp_dist("diag");
+                    amrex::ParmParse pp_diag("diag");
 
                     amrex::ParticleReal alpha = 0.0;
-                    pp_dist.query("alpha", alpha);
+                    pp_diag.queryAdd("alpha", alpha);
 
                     amrex::ParticleReal beta = 1.0;
-                    pp_dist.query("beta", beta);
+                    pp_diag.queryAdd("beta", beta);
 
                     amrex::ParticleReal tn = 0.4;
-                    pp_dist.query("tn", tn);
+                    pp_diag.queryAdd("tn", tn);
 
                     amrex::ParticleReal cn = 0.01;
-                    pp_dist.query("cn", cn);
+                    pp_diag.queryAdd("cn", cn);
 
                     NonlinearLensInvariants const nonlinear_lens_invariants(alpha, beta, tn, cn);
 

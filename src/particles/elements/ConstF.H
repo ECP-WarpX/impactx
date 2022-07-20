@@ -30,11 +30,12 @@ namespace impactx
          * @param kx Focusing strength for x in 1/m.
          * @param ky Focusing strength for y in 1/m.
          * @param kt Focusing strength for t in 1/m.
-         *
+         * @param nslice number of slices used for the application of space charge
          */
         ConstF( amrex::ParticleReal const ds, amrex::ParticleReal const kx,
-                amrex::ParticleReal const ky, amrex::ParticleReal const kt )
-        : m_ds(ds), m_kx(kx), m_ky(ky), m_kt(kt)
+                amrex::ParticleReal const ky, amrex::ParticleReal const kt,
+                int const nslice )
+        : m_ds(ds), m_kx(kx), m_ky(ky), m_kt(kt), m_nslice(nslice)
         {
         }
 
@@ -119,12 +120,22 @@ namespace impactx
 
         }
 
+        /** Number of slices used for the application of space charge
+         *
+         * @return positive integer
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        int nslice () const
+        {
+            return m_nslice;
+        }
+
     private:
         amrex::ParticleReal m_ds; //! segment length in m
         amrex::ParticleReal m_kx; //! focusing x strength in 1/m
         amrex::ParticleReal m_ky; //! focusing y strength in 1/m
         amrex::ParticleReal m_kt; //! focusing t strength in 1/m
-
+        int m_nslice; //! number of slices used for the application of space charge
     };
 
 } // namespace impactx

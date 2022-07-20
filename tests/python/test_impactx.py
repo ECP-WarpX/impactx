@@ -15,7 +15,7 @@ def test_impactx_fodo_file():
     impactX.init_beam_distribution_from_inputs()
     impactX.init_lattice_elements_from_inputs()
 
-    impactX.evolve(num_steps=1)
+    impactX.evolve()
 
 
 def test_impactx_nofile():
@@ -25,6 +25,7 @@ def test_impactx_nofile():
     impactX = ImpactX()
 
     impactX.set_particle_shape(2)
+    impactX.set_diags_slice_step_diagnostics(True)
     impactX.init_grids()
 
     # init particle beam
@@ -53,4 +54,5 @@ def test_impactx_nofile():
     print(len(impactX.lattice))
     assert(len(impactX.lattice) > 5)
 
-    #impactX.evolve(num_steps=1)
+    # TODO: enable once particle beam is loaded
+    #impactX.evolve()

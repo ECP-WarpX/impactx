@@ -51,7 +51,7 @@ namespace impactx
         amrex::UtilCreateCleanDirectory("diags", true);
     }
 
-    void ImpactX::evolve (int num_steps)
+    void ImpactX::evolve ()
     {
         BL_PROFILE("ImpactX::evolve");
 
@@ -70,14 +70,23 @@ namespace impactx
                                       diagnostics::OutputType::PrintNonlinearLensInvariants,
                                       "diags/initial_nonlinear_lens_invariants.txt");
 
+        // a global step for diagnostics including space charge slice steps in elements
+        int global_step = -1;
+
         // loop over all beamline elements
         for (auto & element_variant : m_lattice)
         {
+            // number of slices used for the application of space charge
+            int nslice = 1;
+            std::visit([&nslice](auto&& element){ nslice = element.nslice(); }, element_variant);
+
             // sub-steps for space charge within the element
-            for (int step = 0; step < num_steps; ++step)
+            for (int slice_step = 0; slice_step < nslice; ++slice_step)
             {
-                BL_PROFILE("ImpactX::evolve::step");
-                amrex::Print() << " ++++ Starting step=" << step << "\n";
+                BL_PROFILE("ImpactX::evolve::slice_step");
+                global_step++;
+                amrex::Print() << " ++++ Starting global_step=" << global_step
+                               << " slice_step=" << slice_step << "\n";
 
                 // transform from x',y',t to x,y,z
                 transformation::CoordinateTransformation(*m_particle_container,
@@ -123,10 +132,38 @@ namespace impactx
                 // push all particles with external maps
                 Push(*m_particle_container, element_variant);
 
-                // just prints an empty newline at the end of the step
+                // just prints an empty newline at the end of the slice_step
                 amrex::Print() << "\n";
 
-            } // end in-element space-charge sub-step loop
+                // slice-step diagnostics
+                amrex::ParmParse pp_diag("diag");
+                bool slice_step_diagnostics = false;
+                pp_diag.queryAdd("slice_step_diagnostics", slice_step_diagnostics);
+                int file_min_digits = 6;
+                pp_diag.queryAdd("file_min_digits", file_min_digits);
+
+                if (slice_step_diagnostics)
+                {
+                    // print final particle distribution to file
+                    std::string diag_name = amrex::Concatenate("diags/beam_", global_step, file_min_digits);
+                    diagnostics::DiagnosticOutput(*m_particle_container,
+                                                  diagnostics::OutputType::PrintParticles,
+                                                  diag_name);
+
+                    // print final reference particle to file
+                    diag_name = amrex::Concatenate("diags/ref_particle_", global_step, file_min_digits);
+                    diagnostics::DiagnosticOutput(*m_particle_container,
+                                                  diagnostics::OutputType::PrintRefParticle,
+                                                  diag_name);
+
+                    // print the final values of the two invariants H and I
+                    diag_name = amrex::Concatenate("diags/nonlinear_lens_invariants_", global_step, file_min_digits);
+                    diagnostics::DiagnosticOutput(*m_particle_container,
+                                                  diagnostics::OutputType::PrintNonlinearLensInvariants,
+                                                  diag_name);
+                }
+
+            } // end in-element space-charge slice-step loop
         } // end beamline element loop
 
         // print final particle distribution to file

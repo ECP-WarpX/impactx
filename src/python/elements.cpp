@@ -60,9 +60,12 @@ void init_elements(py::module& m)
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
-                amrex::ParticleReal const>(),
-             py::arg("ds"), py::arg("kx"), py::arg("ky"), py::arg("kt")
-        );
+                amrex::ParticleReal const,
+                int const >(),
+             py::arg("ds"), py::arg("kx"), py::arg("ky"), py::arg("kt"), py::arg("nslice") = 1
+        )
+        .def_property_readonly("nslice", &ConstF::nslice)
+    ;
 
     py::class_<DipEdge>(me, "DipEdge")
         .def(py::init<
@@ -71,12 +74,18 @@ void init_elements(py::module& m)
                 amrex::ParticleReal const,
                 amrex::ParticleReal const>(),
              py::arg("psi"), py::arg("rc"), py::arg("g"), py::arg("K2")
-        );
+        )
+        .def_property_readonly("nslice", &DipEdge::nslice)
+    ;
 
     py::class_<Drift>(me, "Drift")
-        .def(py::init<amrex::ParticleReal const>(),
-             py::arg("ds")
-        );
+        .def(py::init<
+                amrex::ParticleReal const,
+                int const >(),
+             py::arg("ds"), py::arg("nslice") = 1
+        )
+        .def_property_readonly("nslice", &Drift::nslice)
+    ;
 
     py::class_<Multipole>(me, "Multipole")
         .def(py::init<
@@ -84,33 +93,45 @@ void init_elements(py::module& m)
                 amrex::ParticleReal const,
                 amrex::ParticleReal const>(),
              py::arg("multiple"), py::arg("K_normal"), py::arg("K_skew")
-        );
+        )
+        .def_property_readonly("nslice", &Multipole::nslice)
+    ;
 
     py::class_<NonlinearLens>(me, "NonlinearLens")
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const>(),
              py::arg("knll"), py::arg("cnll")
-        );
+        )
+        .def_property_readonly("nslice", &NonlinearLens::nslice)
+    ;
 
     py::class_<Sbend>(me, "Sbend")
         .def(py::init<
                 amrex::ParticleReal const,
-                amrex::ParticleReal const>(),
-             py::arg("ds"), py::arg("rc")
-        );
+                amrex::ParticleReal const,
+                int const>(),
+             py::arg("ds"), py::arg("rc"), py::arg("nslice") = 1
+        )
+        .def_property_readonly("nslice", &Sbend::nslice)
+    ;
 
     py::class_<ShortRF>(me, "ShortRF")
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const>(),
              py::arg("V"), py::arg("k")
-        );
+        )
+        .def_property_readonly("nslice", &ShortRF::nslice)
+    ;
 
     py::class_<Quad>(me, "Quad")
         .def(py::init<
                 amrex::ParticleReal const,
-                amrex::ParticleReal const>(),
-             py::arg("ds"), py::arg("k")
-        );
+                amrex::ParticleReal const,
+                int const>(),
+             py::arg("ds"), py::arg("k"), py::arg("nslice") = 1
+        )
+        .def_property_readonly("nslice", &Quad::nslice)
+    ;
 }

@@ -33,7 +33,6 @@ namespace impactx
          *
          * @param knll - integrated strength of the nonlinear lens (m)
          * @param cnll - distance of singularities from the origin (m)
-         *
          */
         NonlinearLens( amrex::ParticleReal const knll,
                    amrex::ParticleReal const cnll )
@@ -128,10 +127,19 @@ namespace impactx
             // nothing to do: this is a zero-length element
         }
 
+        /** Number of slices used for the application of space charge
+         *
+         * @return one, because this is a zero-length element
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        int nslice () const
+        {
+            return 1;
+        }
+
     private:
         amrex::ParticleReal m_knll; //! integrated strength of the nonlinear lens (m)
         amrex::ParticleReal m_cnll; //! distance of singularities from the origin (m)
-
     };
 
 } // namespace impactx

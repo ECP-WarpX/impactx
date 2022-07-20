@@ -28,9 +28,11 @@ namespace impactx
          *
          * @param ds Segment length in m.
          * @param rc Radius of curvature in m.
+         * @param nslice number of slices used for the application of space charge
          */
-        Sbend( amrex::ParticleReal const ds, amrex::ParticleReal const rc)
-        : m_ds(ds), m_rc(rc)
+        Sbend( amrex::ParticleReal const ds, amrex::ParticleReal const rc,
+               int const nslice)
+        : m_ds(ds), m_rc(rc), m_nslice(nslice)
         {
         }
 
@@ -128,9 +130,20 @@ namespace impactx
 
         }
 
+        /** Number of slices used for the application of space charge
+         *
+         * @return positive integer
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        int nslice () const
+        {
+            return m_nslice;
+        }
+
     private:
         amrex::ParticleReal m_ds; //! segment length in m
         amrex::ParticleReal m_rc; //! bend radius in m
+        int m_nslice; //! number of slices used for the application of space charge
     };
 
 } // namespace impactx

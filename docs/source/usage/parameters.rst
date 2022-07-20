@@ -172,12 +172,19 @@ Lattice Elements
     A list of names (one name per lattice element), in the order that they
     appear in the lattice.
 
+* ``lattice.nslice`` (``integer``) optional (default: ``1``)
+    A positive integer specifying the number of slices used for the application of
+    space charge in all elements; overwritten by element parameter "nslice"
+
 * ``<element_name>.type`` (``string``)
     Indicates the element type for this lattice element. This should be one of:
 
-        * ``drift`` for free drift. This requires this additional parameter:
+        * ``drift`` for free drift. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used
+              for the application of space charge (default: ``1``)
 
         * ``quad`` for a quadrupole. This requires these additional parameters:
 
@@ -189,11 +196,17 @@ Lattice Elements
               * k > 0 horizontal focusing
               * k < 0 horizontal defocusing
 
+            * ``<element_name>.nslice`` (``integer``) number of slices used
+              for the application of space charge (default: ``1``)
+
         * ``sbend`` for a bending magnet. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
             * ``<element_name>.rc`` (``float``, in meters) the bend radius
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used
+              for the application of space charge (default: ``1``)
 
         * ``dipedge`` for dipole edge focusing. This requires these additional parameters:
 
@@ -219,6 +232,9 @@ Lattice Elements
 
             * ``<element_name>.kt`` (``float``, in 1/meters) the
               longitudinal focusing strength
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used
+              for the application of space charge (default: ``1``)
 
         * ``shortrf`` for a short RF (bunching) cavity element. This requires these additional parameters:
 
@@ -252,7 +268,7 @@ Lattice Elements
 Distribution across MPI ranks and parallelization
 -------------------------------------------------
 
-* ``amr.max_grid_size`` (``integer``) optional (default ``128``)
+* ``amr.max_grid_size`` (``integer``) optional (default: ``128``)
     Maximum allowable size of each **subdomain**
     (expressed in number of grid points, in each direction).
     Each subdomain has its own ghost cells, and can be handled by a
@@ -347,6 +363,13 @@ Numerics and algorithms
 
 Diagnostics and output
 ----------------------
+
+* ``diag.slice_step_diagnostics`` (``boolean``, optional, default: ``false``)
+  By default, diagnostics is performed at the beginning and end of the simulation.
+  Enabling this flag will write diagnostics every step and slice step
+
+* ``diag.file_min_digits`` (``integer``, optional, default: ``6``)
+    The minimum number of digits used for the iteration number appended to the diagnostic file names.
 
 Diagnostics related to integrable optics in the IOTA nonlinear magnetic insert element:
 

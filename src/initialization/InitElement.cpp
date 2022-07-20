@@ -34,27 +34,38 @@ namespace impactx
         std::vector<std::string> lattice_elements;
         pp_lattice.queryarr("elements", lattice_elements);
 
+        // Default number of slices per element
+        int nslice_default = 1;
+        pp_lattice.query("nslice", nslice_default);
+
         // Loop through lattice elements
         for (std::string const & element_name : lattice_elements) {
             // Check the element type
             amrex::ParmParse pp_element(element_name);
             std::string element_type;
             pp_element.get("type", element_type);
+
             // Initialize the corresponding element according to its type
             if (element_type == "quad") {
                 amrex::Real ds, k;
+                int nslice = nslice_default;
                 pp_element.get("ds", ds);
                 pp_element.get("k", k);
-                m_lattice.emplace_back( Quad(ds, k) );
+                pp_element.queryAdd("nslice", nslice);
+                m_lattice.emplace_back( Quad(ds, k, nslice) );
             } else if (element_type == "drift") {
                 amrex::Real ds;
+                int nslice = nslice_default;
                 pp_element.get("ds", ds);
-                m_lattice.emplace_back( Drift(ds) );
+                pp_element.queryAdd("nslice", nslice);
+                m_lattice.emplace_back( Drift(ds, nslice) );
             } else if (element_type == "sbend") {
                 amrex::Real ds, rc;
+                int nslice = nslice_default;
                 pp_element.get("ds", ds);
                 pp_element.get("rc", rc);
-                m_lattice.emplace_back( Sbend(ds, rc) );
+                pp_element.queryAdd("nslice", nslice);
+                m_lattice.emplace_back( Sbend(ds, rc, nslice) );
             } else if (element_type == "dipedge") {
                 amrex::Real psi, rc, g, K2;
                 pp_element.get("psi", psi);
@@ -64,11 +75,13 @@ namespace impactx
                 m_lattice.emplace_back( DipEdge(psi, rc, g, K2) );
             } else if (element_type == "constf") {
                 amrex::Real ds, kx, ky, kt;
+                int nslice = nslice_default;
                 pp_element.get("ds", ds);
                 pp_element.get("kx", kx);
                 pp_element.get("ky", ky);
                 pp_element.get("kt", kt);
-                m_lattice.emplace_back( ConstF(ds, kx, ky, kt) );
+                pp_element.queryAdd("nslice", nslice);
+                m_lattice.emplace_back( ConstF(ds, kx, ky, kt, nslice) );
             } else if (element_type == "shortrf") {
                 amrex::Real V, k;
                 pp_element.get("V", V);
