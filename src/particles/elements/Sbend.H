@@ -64,11 +64,14 @@ namespace impactx
             amrex::ParticleReal pyout = py;
             amrex::ParticleReal ptout = pt;
 
+            // length of the current slice
+            amrex::ParticleReal const slice_ds = m_ds / nslice();
+
             // access reference particle values to find beta*gamma^2
             amrex::ParticleReal const pt_ref = refpart.pt;
             amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
             amrex::ParticleReal const bet = sqrt(betgam2/(1.0_prt + betgam2));
-            amrex::ParticleReal const theta = m_ds/m_rc;
+            amrex::ParticleReal const theta = slice_ds/m_rc;
 
             // advance position and momentum (sector bend)
 
@@ -113,8 +116,11 @@ namespace impactx
             amrex::ParticleReal const t = refpart.t;
             amrex::ParticleReal const pt = refpart.pt;
 
+            // length of the current slice
+            amrex::ParticleReal const slice_ds = m_ds / nslice();
+
             // assign intermediate parameter
-            amrex::ParticleReal const theta = m_ds/m_rc;
+            amrex::ParticleReal const theta = slice_ds/m_rc;
             amrex::ParticleReal const B = sqrt(pow(pt,2)-1.0_prt)/m_rc;
 
             // advance position and momentum (bend)

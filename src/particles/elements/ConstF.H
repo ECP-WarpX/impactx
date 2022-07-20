@@ -72,15 +72,18 @@ namespace impactx
             amrex::ParticleReal pyout = py;
             amrex::ParticleReal ptout = pt;
 
+            // length of the current slice
+            amrex::ParticleReal const slice_ds = m_ds / nslice();
+
             // advance position and momentum
-            p.pos(0) = cos(m_kx*m_ds)*x + sin(m_kx*m_ds)/m_kx*px;
-            pxout = -m_kx*sin(m_kx*m_ds)*x + cos(m_kx*m_ds)*px;
+            p.pos(0) = cos(m_kx*slice_ds)*x + sin(m_kx*slice_ds)/m_kx*px;
+            pxout = -m_kx*sin(m_kx*slice_ds)*x + cos(m_kx*slice_ds)*px;
 
-            p.pos(1) = cos(m_ky*m_ds)*y + sin(m_ky*m_ds)/m_ky*py;
-            pyout = -m_ky*sin(m_ky*m_ds)*y + cos(m_ky*m_ds)*py;
+            p.pos(1) = cos(m_ky*slice_ds)*y + sin(m_ky*slice_ds)/m_ky*py;
+            pyout = -m_ky*sin(m_ky*slice_ds)*y + cos(m_ky*slice_ds)*py;
 
-            p.pos(2) = cos(m_kt*m_ds)*t + sin(m_kt*m_ds)/(betgam2*m_kt)*pt;
-            ptout = -(m_kt*betgam2)*sin(m_kt*m_ds)*t + cos(m_kt*m_ds)*pt;
+            p.pos(2) = cos(m_kt*slice_ds)*t + sin(m_kt*slice_ds)/(betgam2*m_kt)*pt;
+            ptout = -(m_kt*betgam2)*sin(m_kt*slice_ds)*t + cos(m_kt*slice_ds)*pt;
 
             // assign updated momenta
             px = pxout;
@@ -109,15 +112,17 @@ namespace impactx
             amrex::ParticleReal const t = refpart.t;
             amrex::ParticleReal const pt = refpart.pt;
 
+            // length of the current slice
+            amrex::ParticleReal const slice_ds = m_ds / nslice();
+
             // assign intermediate parameter
-            amrex::ParticleReal const s = m_ds/sqrt(pow(pt,2)-1.0_prt);
+            amrex::ParticleReal const s = slice_ds / sqrt(pow(pt, 2)-1.0_prt);
 
             // advance position and momentum (straight element)
             refpart.x = x + s*px;
             refpart.y = y + s*py;
             refpart.z = z + s*pz;
             refpart.t = t - s*pt;
-
         }
 
         /** Number of slices used for the application of space charge

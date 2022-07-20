@@ -62,6 +62,9 @@ namespace impactx
             amrex::ParticleReal const y = p.pos(1);
             amrex::ParticleReal const t = p.pos(2);
 
+            // length of the current slice
+            amrex::ParticleReal const slice_ds = m_ds / nslice();
+
             // access reference particle values to find beta*gamma^2
             amrex::ParticleReal const pt_ref = refpart.pt;
             amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
@@ -76,23 +79,23 @@ namespace impactx
 
             if(m_k > 0.0) {
                // advance position and momentum (focusing quad)
-               p.pos(0) = cos(omega*m_ds)*x + sin(omega*m_ds)/omega*px;
-               pxout = -omega*sin(omega*m_ds)*x + cos(omega*m_ds)*px;
+               p.pos(0) = cos(omega*slice_ds)*x + sin(omega*slice_ds)/omega*px;
+               pxout = -omega*sin(omega*slice_ds)*x + cos(omega*slice_ds)*px;
 
-               p.pos(1) = cosh(omega*m_ds)*y + sinh(omega*m_ds)/omega*py;
-               pyout = omega*sinh(omega*m_ds)*y + cosh(omega*m_ds)*py;
+               p.pos(1) = cosh(omega*slice_ds)*y + sinh(omega*slice_ds)/omega*py;
+               pyout = omega*sinh(omega*slice_ds)*y + cosh(omega*slice_ds)*py;
 
-               p.pos(2) = t + (m_ds/betgam2)*pt;
+               p.pos(2) = t + (slice_ds/betgam2)*pt;
                // ptout = pt;
             } else {
                // advance position and momentum (defocusing quad)
-               p.pos(0) = cosh(omega*m_ds)*x + sinh(omega*m_ds)/omega*px;
-               pxout = omega*sinh(omega*m_ds)*x + cosh(omega*m_ds)*px;
+               p.pos(0) = cosh(omega*slice_ds)*x + sinh(omega*slice_ds)/omega*px;
+               pxout = omega*sinh(omega*slice_ds)*x + cosh(omega*slice_ds)*px;
 
-               p.pos(1) = cos(omega*m_ds)*y + sin(omega*m_ds)/omega*py;
-               pyout = -omega*sin(omega*m_ds)*y + cos(omega*m_ds)*py;
+               p.pos(1) = cos(omega*slice_ds)*y + sin(omega*slice_ds)/omega*py;
+               pyout = -omega*sin(omega*slice_ds)*y + cos(omega*slice_ds)*py;
 
-               p.pos(2) = t + (m_ds/betgam2)*pt;
+               p.pos(2) = t + (slice_ds/betgam2)*pt;
                // ptout = pt;
             }
 
@@ -123,8 +126,11 @@ namespace impactx
             amrex::ParticleReal const t = refpart.t;
             amrex::ParticleReal const pt = refpart.pt;
 
+            // length of the current slice
+            amrex::ParticleReal const slice_ds = m_ds / nslice();
+
             // assign intermediate parameter
-            amrex::ParticleReal const s = m_ds/sqrt(pow(pt,2)-1.0_prt);
+            amrex::ParticleReal const s = slice_ds / sqrt(pow(pt,2)-1.0_prt);
 
             // advance position and momentum (straight element)
             refpart.x = x + s*px;

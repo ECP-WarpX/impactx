@@ -62,16 +62,19 @@ namespace impactx
             amrex::ParticleReal pyout = py;
             amrex::ParticleReal ptout = pt;
 
+            // length of the current slice
+            amrex::ParticleReal const slice_ds = m_ds / nslice();
+
             // access reference particle values to find beta*gamma^2
             amrex::ParticleReal const pt_ref = refpart.pt;
             amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
 
             // advance position and momentum (drift)
-            p.pos(0) = x + m_ds * px;
+            p.pos(0) = x + slice_ds * px;
             // pxout = px;
-            p.pos(1) = y + m_ds * py;
+            p.pos(1) = y + slice_ds * py;
             // pyout = py;
-            p.pos(2) = t + (m_ds/betgam2) * pt;
+            p.pos(2) = t + (slice_ds/betgam2) * pt;
             // ptout = pt;
 
             // assign updated momenta
@@ -101,8 +104,11 @@ namespace impactx
             amrex::ParticleReal const t = refpart.t;
             amrex::ParticleReal const pt = refpart.pt;
 
+            // length of the current slice
+            amrex::ParticleReal const slice_ds = m_ds / nslice();
+
             // assign intermediate parameter
-            amrex::ParticleReal const s = m_ds/sqrt(pow(pt,2)-1.0_prt);
+            amrex::ParticleReal const s = slice_ds / sqrt(pow(pt,2)-1.0_prt);
 
             // advance position and momentum (drift)
             refpart.x = x + s*px;
