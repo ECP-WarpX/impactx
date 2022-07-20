@@ -54,4 +54,5 @@ def test_impactx_nofile():
     print(len(impactX.lattice))
     assert(len(impactX.lattice) > 5)
 
-    impactX.evolve()
+    # TODO: enable once particle beam is loaded
+    #impactX.evolve()
