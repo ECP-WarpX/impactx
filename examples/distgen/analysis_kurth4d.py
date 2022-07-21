@@ -56,8 +56,8 @@ def read_all_files(file_pattern):
 
 
 # initial/final beam on rank zero
-initial = read_all_files("diags/initial_beam.txt.*")
-final = read_all_files("diags/output_beam.txt.*")
+initial = read_all_files("diags/beam_000000.*")
+final = read_all_files("diags/beam_final.*")
 
 # compare number of particles
 num_particles = 10000
