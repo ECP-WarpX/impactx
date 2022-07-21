@@ -5,6 +5,7 @@
 # License: BSD-3-Clause-LBNL
 #
 
+import argparse
 import glob
 import re
 
@@ -62,6 +63,13 @@ def read_time_series(file_pattern):
         axis=0,
         ignore_index=True,
     ) #.set_index('id')
+
+
+# options to run this script
+parser = argparse.ArgumentParser(description='Plot the chicane benchmark.')
+parser.add_argument('--save-png', action="store_true",
+    help='non-interactive run: save to PNGs')
+args = parser.parse_args()
 
 
 # initial/final beam on rank zero
@@ -143,7 +151,10 @@ ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 ax3.spines.right.set_position(("axes", 1.2))
 ax3.yaxis.label.set_color(im_xz[0].get_color())
 plt.tight_layout()
-plt.show()
+if args.save_png:
+    plt.savefig("chicane_sigma.png")
+else:
+    plt.show()
 
 
 # beam transversal scatter plot over steps
@@ -218,4 +229,7 @@ axs[(1, 0)].set_ylabel(r"$p_x$ [mrad]")
 axs[(2, 0)].set_ylabel(r"$x$ [mm]")
 axs[(3, 0)].set_ylabel(r"$p_x$ [mrad]")
 plt.tight_layout()
-plt.show()
+if args.save_png:
+    plt.savefig("chicane_scatter.png")
+else:
+    plt.show()

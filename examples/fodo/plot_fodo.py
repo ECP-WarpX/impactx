@@ -5,6 +5,7 @@
 # License: BSD-3-Clause-LBNL
 #
 
+import argparse
 import glob
 import re
 
@@ -62,6 +63,13 @@ def read_time_series(file_pattern):
         axis=0,
         ignore_index=True,
     ) #.set_index('id')
+
+
+# options to run this script
+parser = argparse.ArgumentParser(description='Plot the FODO benchmark.')
+parser.add_argument('--save-png', action="store_true",
+    help='non-interactive run: save to PNGs')
+args = parser.parse_args()
 
 
 # initial/final beam on rank zero
@@ -129,7 +137,10 @@ ax2.set_ylabel(r"$\epsilon_{x,y}$ [nm]")
 ax2.set_ylim([1.5, 2.5])
 ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.tight_layout()
-plt.show()
+if args.save_png:
+    plt.savefig("fodo_sigma.png")
+else:
+    plt.show()
 
 
 # beam transversal scatter plot over steps
@@ -185,4 +196,7 @@ axs[(0, 0)].set_ylabel(r"$y$ [mm]")
 axs[(1, 0)].set_ylabel(r"$p_x$ [mrad]")
 axs[(2, 0)].set_ylabel(r"$p_y$ [mrad]")
 plt.tight_layout()
-plt.show()
+if args.save_png:
+    plt.savefig("fodo_scatter.png")
+else:
+    plt.show()

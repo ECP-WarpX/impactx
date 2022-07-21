@@ -30,7 +30,7 @@ add_test(NAME FODO.analysis
          WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
 )
 add_test(NAME FODO.plot
-         COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py --save-png
          WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
 )
 
@@ -51,7 +51,7 @@ if(ImpactX_MPI)
             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
     )
     add_test(NAME FODO.MPI.plot
-            COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py
+            COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py --save-png
             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
     )
 
@@ -72,7 +72,7 @@ add_test(NAME chicane.analysis
          WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
 )
 add_test(NAME chicane.plot
-         COMMAND ${ImpactX_SOURCE_DIR}/examples/chicane/plot_chicane.py
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/chicane/plot_chicane.py --save-png
          WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
 )
 
