@@ -29,8 +29,13 @@ add_test(NAME FODO.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/analysis_fodo.py
          WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
 )
+add_test(NAME FODO.plot
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py --save-png
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
 
 set_tests_properties(FODO.analysis PROPERTIES DEPENDS "FODO.run")
+set_tests_properties(FODO.plot PROPERTIES DEPENDS "FODO.run")
 
 
 # MPI-Parallel FODO Cell ######################################################
@@ -45,9 +50,14 @@ if(ImpactX_MPI)
             COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/analysis_fodo.py
             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
     )
+    add_test(NAME FODO.MPI.plot
+            COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py --save-png
+            WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+    )
 
     set_tests_properties(FODO.MPI.run PROPERTIES ENVIRONMENT "OMP_NUM_THREADS=1")
     set_tests_properties(FODO.MPI.analysis PROPERTIES DEPENDS "FODO.MPI.run")
+    set_tests_properties(FODO.MPI.plot PROPERTIES DEPENDS "FODO.MPI.run")
 endif()
 
 
@@ -61,8 +71,13 @@ add_test(NAME chicane.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/chicane/analysis_chicane.py
          WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
 )
+add_test(NAME chicane.plot
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/chicane/plot_chicane.py --save-png
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
 
 set_tests_properties(chicane.analysis PROPERTIES DEPENDS "chicane.run")
+set_tests_properties(chicane.plot PROPERTIES DEPENDS "chicane.run")
 
 
 # Constant Focusing Channel ###################################################
