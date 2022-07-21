@@ -71,8 +71,13 @@ add_test(NAME chicane.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/chicane/analysis_chicane.py
          WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
 )
+add_test(NAME chicane.plot
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/chicane/plot_chicane.py
+         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+)
 
 set_tests_properties(chicane.analysis PROPERTIES DEPENDS "chicane.run")
+set_tests_properties(chicane.plot PROPERTIES DEPENDS "chicane.run")
 
 
 # Constant Focusing Channel ###################################################

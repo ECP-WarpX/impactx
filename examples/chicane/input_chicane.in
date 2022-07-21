@@ -24,6 +24,7 @@ beam.mutpt = 0.999999961419755
 
 lattice.elements = sbend1 dipedge1 drift1 dipedge2 sbend2 drift2 sbend2
                    dipedge2 drift1 dipedge1 sbend1 drift3
+lattice.nslice = 25
 
 sbend1.type = sbend
 sbend1.ds = 0.50037       # projected length 0.5 m, angle 2.77 deg
@@ -59,3 +60,9 @@ dipedge2.K2 = 0.0
 # Algorithms
 ###############################################################################
 algo.particle_shape = 2
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = true
