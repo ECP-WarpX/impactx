@@ -55,23 +55,33 @@ namespace impactx
     {
         BL_PROFILE("ImpactX::evolve");
 
-        // print initial particle distribution to file
-        diagnostics::DiagnosticOutput(*m_particle_container,
-                                      diagnostics::OutputType::PrintParticles,
-                                      "diags/initial_beam.txt");
-
-        // print initial reference particle to file
-        diagnostics::DiagnosticOutput(*m_particle_container,
-                                      diagnostics::OutputType::PrintRefParticle,
-                                      "diags/initial_ref_particle.txt");
-
-        // print the initial values of the two invariants H and I
-        diagnostics::DiagnosticOutput(*m_particle_container,
-                                      diagnostics::OutputType::PrintNonlinearLensInvariants,
-                                      "diags/initial_nonlinear_lens_invariants.txt");
-
         // a global step for diagnostics including space charge slice steps in elements
-        int global_step = -1;
+        //   before we start the evolve loop, we are in "step 0" (initial state)
+        int global_step = 0;
+
+        amrex::ParmParse pp_diag("diag");
+        int file_min_digits = 6;
+        {
+            pp_diag.queryAdd("file_min_digits", file_min_digits);
+
+            // print initial particle distribution to file
+            std::string diag_name = amrex::Concatenate("diags/beam_", global_step, file_min_digits);
+            diagnostics::DiagnosticOutput(*m_particle_container,
+                                          diagnostics::OutputType::PrintParticles,
+                                          diag_name);
+
+            // print initial reference particle to file
+            diagnostics::DiagnosticOutput(*m_particle_container,
+                                          diagnostics::OutputType::PrintRefParticle,
+                                          "diags/ref_particle",
+                                          global_step);
+
+            // print the initial values of the two invariants H and I
+            diag_name = amrex::Concatenate("diags/nonlinear_lens_invariants_", global_step, file_min_digits);
+            diagnostics::DiagnosticOutput(*m_particle_container,
+                                          diagnostics::OutputType::PrintNonlinearLensInvariants,
+                                          diag_name);
+        }
 
         // loop over all beamline elements
         for (auto & element_variant : m_lattice)
@@ -136,11 +146,8 @@ namespace impactx
                 amrex::Print() << "\n";
 
                 // slice-step diagnostics
-                amrex::ParmParse pp_diag("diag");
                 bool slice_step_diagnostics = false;
                 pp_diag.queryAdd("slice_step_diagnostics", slice_step_diagnostics);
-                int file_min_digits = 6;
-                pp_diag.queryAdd("file_min_digits", file_min_digits);
 
                 if (slice_step_diagnostics)
                 {
@@ -148,19 +155,22 @@ namespace impactx
                     std::string diag_name = amrex::Concatenate("diags/beam_", global_step, file_min_digits);
                     diagnostics::DiagnosticOutput(*m_particle_container,
                                                   diagnostics::OutputType::PrintParticles,
-                                                  diag_name);
+                                                  diag_name,
+                                                  global_step);
 
                     // print final reference particle to file
-                    diag_name = amrex::Concatenate("diags/ref_particle_", global_step, file_min_digits);
                     diagnostics::DiagnosticOutput(*m_particle_container,
                                                   diagnostics::OutputType::PrintRefParticle,
-                                                  diag_name);
+                                                  "diags/ref_particle",
+                                                  global_step,
+                                                  true);
 
                     // print the final values of the two invariants H and I
                     diag_name = amrex::Concatenate("diags/nonlinear_lens_invariants_", global_step, file_min_digits);
                     diagnostics::DiagnosticOutput(*m_particle_container,
                                                   diagnostics::OutputType::PrintNonlinearLensInvariants,
-                                                  diag_name);
+                                                  diag_name,
+                                                  global_step);
                 }
 
             } // end in-element space-charge slice-step loop
@@ -169,17 +179,20 @@ namespace impactx
         // print final particle distribution to file
         diagnostics::DiagnosticOutput(*m_particle_container,
                                       diagnostics::OutputType::PrintParticles,
-                                      "diags/output_beam.txt");
+                                      "diags/beam_final",
+                                      global_step);
 
         // print final reference particle to file
         diagnostics::DiagnosticOutput(*m_particle_container,
                                       diagnostics::OutputType::PrintRefParticle,
-                                      "diags/output_ref_particle.txt");
+                                      "diags/ref_particle_final",
+                                      global_step);
 
         // print the final values of the two invariants H and I
         diagnostics::DiagnosticOutput(*m_particle_container,
                                       diagnostics::OutputType::PrintNonlinearLensInvariants,
-                                      "diags/output_nonlinear_lens_invariants.txt");
+                                      "diags/nonlinear_lens_invariants_final",
+                                      global_step);
 
     }
 } // namespace impactx

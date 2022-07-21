@@ -22,7 +22,9 @@ namespace impactx::diagnostics
 {
     void DiagnosticOutput (ImpactXParticleContainer const & pc,
                            OutputType const otype,
-                           std::string file_name)
+                           std::string file_name,
+                           int const step,
+                           bool const append)
     {
         using namespace amrex::literals; // for _rt and _prt
 
@@ -34,12 +36,14 @@ namespace impactx::diagnostics
         tmp.copyParticles(pc, local);
 
         // write file header per MPI RANK
-        if (otype == OutputType::PrintParticles) {
-            amrex::AllPrintToFile(file_name) << "id x y t px py pt\n";
-        } else if (otype == OutputType::PrintNonlinearLensInvariants) {
-            amrex::AllPrintToFile(file_name) << "id H I\n";
-        } else if (otype == OutputType::PrintRefParticle) {
-            amrex::AllPrintToFile(file_name) << "x y z t px py pz pt\n";
+        if (!append) {
+            if (otype == OutputType::PrintParticles) {
+                amrex::AllPrintToFile(file_name) << "id x y t px py pt\n";
+            } else if (otype == OutputType::PrintNonlinearLensInvariants) {
+                amrex::AllPrintToFile(file_name) << "id H I\n";
+            } else if (otype == OutputType::PrintRefParticle) {
+                amrex::AllPrintToFile(file_name) << "step x y z t px py pz pt\n";
+            }
         }
 
         // loop over refinement levels
@@ -148,6 +152,7 @@ namespace impactx::diagnostics
 
                     // write particle data to file
                     amrex::AllPrintToFile(file_name)
+                            << step << " "
                             << x << " " << y << " " << z << " " << t << " "
                             << px << " " << py << " " << pz << " " << pt << "\n";
                 } // if( otype == OutputType::PrintRefParticle)
