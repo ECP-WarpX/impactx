@@ -100,8 +100,8 @@ z = list(map(
     lambda step: ref_particle[ref_particle["step"] == step].z.values[0],
     steps
 ))
-x_mm = list(map(
-    lambda step: ref_particle[ref_particle["step"] == step].x.values[0] * millimeter,
+x = list(map(
+    lambda step: ref_particle[ref_particle["step"] == step].x.values[0],
     steps
 ))
 #print(f"z={z}")
@@ -123,33 +123,39 @@ emittance_t = list(map(lambda step_val: step_val[1][5] * nm_rad, moments))
 
 # print beam transversal size over steps
 f = plt.figure(figsize=(9, 4.8))
-ax1 = f.gca()
+
+f, axs = plt.subplots(
+    2, 1,
+    figsize=(9, 4.8),
+    sharex=True,
+    gridspec_kw={'height_ratios': [1, 2]}
+)
+ax0 = axs[0]
+im_xz = ax0.plot(z, x,
+    '--', lw=3, label=r'$x$')
+ax0.legend(loc='upper right')
+ax0.set_ylim([0, None])
+ax0.set_ylabel(r"$x$ [m]")
+
+ax1 = axs[1]
 im_sigx = ax1.plot(z, sigx, label=r'$\sigma_x$')
 im_sigt = ax1.plot(z, sigt, label=r'$\sigma_t$')
 ax2 = ax1.twinx()
 ax2._get_lines.prop_cycler = ax1._get_lines.prop_cycler
 im_emittance_x = ax2.plot(z, emittance_x, ':', label=r'$\epsilon_x$')
 im_emittance_t = ax2.plot(z, emittance_t, ':', label=r'$\epsilon_t$')
-ax3 = ax1.twinx()
-ax3._get_lines.prop_cycler = ax1._get_lines.prop_cycler
-im_xz = ax3.plot(z, x_mm,
-    '--', lw=3, label=r'$x$')
 
 ax1.legend(
-    handles=im_sigx+im_sigt+im_emittance_x+im_emittance_t+im_xz,
+    handles=im_sigx+im_sigt+im_emittance_x+im_emittance_t,
     loc='upper right'
 )
 ax1.set_xlabel(r"$z$ [m]")
 ax1.set_ylabel(r"$\sigma_{x,t}$ [mm]")
 #ax2.set_ylabel(r"$\epsilon_{x,y}$ [mm-mrad]")
 ax2.set_ylabel(r"$\epsilon_{x,t}$ [nm]")
-ax3.set_ylabel(r"$x$ [mm]")
 ax1.set_ylim([0, None])
 ax2.set_ylim([0, None])
-ax3.set_ylim([0, None])
 ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
-ax3.spines.right.set_position(("axes", 1.2))
-ax3.yaxis.label.set_color(im_xz[0].get_color())
 plt.tight_layout()
 if args.save_png:
     plt.savefig("chicane_sigma.png")
