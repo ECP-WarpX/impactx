@@ -7,7 +7,6 @@
 # -*- coding: utf-8 -*-
 
 import amrex
-
 from impactx import ImpactX, RefPart, distribution, elements
 
 impactX = ImpactX()
