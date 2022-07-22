@@ -81,6 +81,7 @@ namespace impactx
             diagnostics::DiagnosticOutput(*m_particle_container,
                                           diagnostics::OutputType::PrintNonlinearLensInvariants,
                                           diag_name);
+
         }
 
         // loop over all beamline elements
@@ -151,26 +152,20 @@ namespace impactx
 
                 if (slice_step_diagnostics)
                 {
-                    // print final particle distribution to file
+                    // print slice step particle distribution to file
                     std::string diag_name = amrex::Concatenate("diags/beam_", global_step, file_min_digits);
                     diagnostics::DiagnosticOutput(*m_particle_container,
                                                   diagnostics::OutputType::PrintParticles,
                                                   diag_name,
                                                   global_step);
 
-                    // print final reference particle to file
+                    // print slice step reference particle to file
                     diagnostics::DiagnosticOutput(*m_particle_container,
                                                   diagnostics::OutputType::PrintRefParticle,
                                                   "diags/ref_particle",
                                                   global_step,
                                                   true);
 
-                    // print the final values of the two invariants H and I
-                    diag_name = amrex::Concatenate("diags/nonlinear_lens_invariants_", global_step, file_min_digits);
-                    diagnostics::DiagnosticOutput(*m_particle_container,
-                                                  diagnostics::OutputType::PrintNonlinearLensInvariants,
-                                                  diag_name,
-                                                  global_step);
                 }
 
             } // end in-element space-charge slice-step loop
