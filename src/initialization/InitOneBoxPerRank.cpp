@@ -9,6 +9,8 @@
  */
 #include "InitOneBoxPerRank.H"
 
+#include "initialization/InitAMReX.H"
+
 #include <AMReX_Array.H>
 #include <AMReX_Box.H>
 #include <AMReX_CoordSys.H>
@@ -18,12 +20,21 @@
 #include <AMReX_RealBox.H>
 #include <AMReX_SPACE.H>
 
+#include <stdexcept>
+
 
 namespace impactx::initialization
 {
     AmrCoreData
     one_box_per_rank ()
     {
+        if (!amrex::Initialized())
+        {
+            default_init_AMReX();
+            // note: due to global state, it would be too early to use amrex::Abort() here
+            //throw std::runtime_error("AMReX must be initialized before ImpactX simulation can be constructed.");
+        }
+
         amrex::AmrInfo amr_info;
         const int nprocs = amrex::ParallelDescriptor::NProcs();
         const amrex::IntVect high_end = amr_info.blocking_factor[0]

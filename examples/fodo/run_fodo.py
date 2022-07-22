@@ -7,15 +7,8 @@
 # -*- coding: utf-8 -*-
 
 import amrex
+
 from impactx import ImpactX, RefPart, distribution, elements
-
-
-amrex.initialize([
-    # print some AMReX status messages
-    "amrex.verbose=1",
-    # abort GPU runs if out-of-memory instead of swapping to host RAM
-    "amrex.abort_on_out_of_gpu_memory=1"
-])
 
 impactX = ImpactX()
 

@@ -8,16 +8,13 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "ImpactX.H"
-#include "initialization/InitParser.H"
+#include "initialization/InitAMReX.H"
 
 #include <AMReX.H>
 #include <AMReX_BLProfiler.H>
-#include <AMReX_ParallelDescriptor.H>
 
 #if defined(AMREX_USE_MPI)
 #   include <mpi.h>
-#else
-#   include <AMReX_ccse-mpi.H>
 #endif
 
 
@@ -27,14 +24,7 @@ int main(int argc, char* argv[])
     AMREX_ALWAYS_ASSERT(MPI_SUCCESS == MPI_Init(&argc, &argv));
 #endif
 
-    bool const build_parm_parse = true;
-    amrex::Initialize(
-        argc,
-        argv,
-        build_parm_parse,
-        MPI_COMM_WORLD,
-        impactx::initialization::overwrite_amrex_parser_defaults
-    );
+    impactx::initialization::default_init_AMReX(argc, argv);
 
     BL_PROFILE_VAR("main()", pmain);
     {
