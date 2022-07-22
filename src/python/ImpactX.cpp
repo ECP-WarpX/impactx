@@ -78,9 +78,30 @@ void init_ImpactX(py::module& m)
         .def("evolve", &ImpactX::evolve)
 
         //.def_property("particle_container", &ImpactX::m_particle_container)
-        //.def_readwrite("rho", &ImpactX::m_rho)
+        .def(
+            "rho",
+            [](ImpactX & ix, int const lev) { return &ix.m_rho.at(lev); },
+            py::return_value_policy::reference_internal
+        )
         .def_readwrite("lattice", &ImpactX::m_lattice)
         //.def_readwrite("lattice", &ImpactX::m_lattice_test)
+
+        // from AmrCore->AmrMesh
+        .def("Geom",
+            //[](ImpactX const & ix, int const lev) { return ix.Geom(lev); },
+            py::overload_cast< int >(&ImpactX::Geom, py::const_),
+            py::arg("lev")
+        )
+        .def("DistributionMap",
+            [](ImpactX const & ix, int const lev) { return ix.DistributionMap(lev); },
+            //py::overload_cast< int >(&ImpactX::DistributionMap, py::const_),
+            py::arg("lev")
+        )
+        .def("boxArray",
+            [](ImpactX const & ix, int const lev) { return ix.boxArray(lev); },
+            //py::overload_cast< int >(&ImpactX::boxArray, py::const_),
+            py::arg("lev")
+        )
     ;
 
     py::class_<Config>(m, "Config")
