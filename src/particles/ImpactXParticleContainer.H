@@ -75,6 +75,7 @@ namespace impactx
      */
     struct RefPart
     {
+        amrex::ParticleReal s = 0.0;  ///< integrated orbit path length, in meters
         amrex::ParticleReal x = 0.0;  ///< horizontal position x, in meters
         amrex::ParticleReal y = 0.0;  ///< vertical position y, in meters
         amrex::ParticleReal z = 0.0;  ///< longitudinal position y, in meters

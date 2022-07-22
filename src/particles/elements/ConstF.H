@@ -111,18 +111,23 @@ namespace impactx
             amrex::ParticleReal const pz = refpart.pz;
             amrex::ParticleReal const t = refpart.t;
             amrex::ParticleReal const pt = refpart.pt;
+            amrex::ParticleReal const s = refpart.s;
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // assign intermediate parameter
-            amrex::ParticleReal const s = slice_ds / sqrt(pow(pt, 2)-1.0_prt);
+            amrex::ParticleReal const step = slice_ds / sqrt(pow(pt, 2)-1.0_prt);
 
             // advance position and momentum (straight element)
-            refpart.x = x + s*px;
-            refpart.y = y + s*py;
-            refpart.z = z + s*pz;
-            refpart.t = t - s*pt;
+            refpart.x = x + step*px;
+            refpart.y = y + step*py;
+            refpart.z = z + step*pz;
+            refpart.t = t - step*pt;
+
+            // advance integrated path length
+            refpart.s = s + slice_ds;
+
         }
 
         /** Number of slices used for the application of space charge

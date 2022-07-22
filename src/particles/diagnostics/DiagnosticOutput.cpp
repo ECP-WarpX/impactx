@@ -141,6 +141,7 @@ namespace impactx::diagnostics
                     // preparing to access reference particle data: RefPart
                     RefPart const ref_part = pc.GetRefParticle();
 
+                    amrex::ParticleReal const s = ref_part.s;
                     amrex::ParticleReal const x = ref_part.x;
                     amrex::ParticleReal const y = ref_part.y;
                     amrex::ParticleReal const z = ref_part.z;
