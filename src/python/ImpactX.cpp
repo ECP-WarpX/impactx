@@ -29,7 +29,7 @@ void init_ImpactX(py::module& m)
     >(m, "MultiFabPerLevel");
     */
 
-    py::class_<ImpactX, amrex::AmrCore>(m, "ImpactX")
+    py::class_<ImpactX>(m, "ImpactX")
         .def(py::init<>())
 
         .def("load_inputs_file",
