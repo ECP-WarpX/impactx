@@ -55,3 +55,9 @@ You can run the following script to visualize the beam evolution over time:
 .. literalinclude:: plot_fodo.py
    :language: python3
    :caption: You can copy this file from ``examples/fodo/plot_fodo.py``.
+
+.. figure:: https://user-images.githubusercontent.com/1353258/180287840-8561f6fd-278f-4856-abd8-04fbdb78c8ff.png
+ :alt: FODO beam width and emittance evolution
+
+.. figure:: https://user-images.githubusercontent.com/1353258/180287845-eb0210a7-2500-4aa9-844c-67fb094329d3.png
+ :alt: FODO phase space evolution
