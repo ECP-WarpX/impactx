@@ -16,6 +16,7 @@ void init_refparticle(py::module& m)
 {
     py::class_<RefPart>(m, "RefPart")
         .def(py::init<>())
+        .def_readwrite("s", &RefPart::s, "integrated orbit path length, in meters")
         .def_readwrite("x", &RefPart::x, "horizontal position x, in meters")
         .def_readwrite("y", &RefPart::y, "vertical position y, in meters")
         .def_readwrite("z", &RefPart::z, "longitudinal position y, in meters")

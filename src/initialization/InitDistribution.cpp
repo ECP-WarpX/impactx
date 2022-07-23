@@ -203,6 +203,7 @@ namespace impactx
             massE = 0.510998950;  // default to electron
         }
         RefPart refPart;
+        refPart.s = 0.0;
         refPart.x = 0.0;
         refPart.y = 0.0;
         refPart.t = 0.0;

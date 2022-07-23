@@ -35,7 +35,7 @@ namespace impactx::diagnostics
             } else if (otype == OutputType::PrintNonlinearLensInvariants) {
                 amrex::AllPrintToFile(file_name) << "id H I\n";
             } else if (otype == OutputType::PrintRefParticle) {
-                amrex::AllPrintToFile(file_name) << "step x y z t px py pz pt\n";
+                amrex::AllPrintToFile(file_name) << "step s x y z t px py pz pt\n";
             }
         }
 
@@ -141,6 +141,7 @@ namespace impactx::diagnostics
                     // preparing to access reference particle data: RefPart
                     RefPart const ref_part = pc.GetRefParticle();
 
+                    amrex::ParticleReal const s = ref_part.s;
                     amrex::ParticleReal const x = ref_part.x;
                     amrex::ParticleReal const y = ref_part.y;
                     amrex::ParticleReal const z = ref_part.z;
@@ -152,7 +153,7 @@ namespace impactx::diagnostics
 
                     // write particle data to file
                     amrex::AllPrintToFile(file_name)
-                            << step << " "
+                            << step << " " << s << " "
                             << x << " " << y << " " << z << " " << t << " "
                             << px << " " << py << " " << pz << " " << pt << "\n";
                 } // if( otype == OutputType::PrintRefParticle)
