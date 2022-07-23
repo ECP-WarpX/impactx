@@ -12,11 +12,12 @@
 
 #include <ablastr/particles/IndexHandling.H>
 
+#include <AMReX_BLProfiler.H> // for BL_PROFILE
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
-#include <AMReX_ParallelDescriptor.H>  // for ParallelDescriptor
 #include <AMReX_ParmParse.H>  // for ParmParse
 #include <AMReX_REAL.H>       // for ParticleReal
 #include <AMReX_Print.H>      // for PrintToFile
+
 
 namespace impactx::diagnostics
 {
@@ -26,6 +27,8 @@ namespace impactx::diagnostics
                            int const step,
                            bool const append)
     {
+        BL_PROFILE("impactx::diagnostics::DiagnosticOutput");
+
         using namespace amrex::literals; // for _rt and _prt
 
         // write file header per MPI RANK

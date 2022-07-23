@@ -146,6 +146,7 @@ namespace impactx
             amrex::ParticleReal, amrex::ParticleReal>
     ImpactXParticleContainer::MinAndMaxPositions ()
     {
+        BL_PROFILE("ImpactXParticleContainer::MinAndMaxPositions");
         return ablastr::particles::MinAndMaxPositions(*this);
     }
 
@@ -155,6 +156,7 @@ namespace impactx
             amrex::ParticleReal, amrex::ParticleReal>
     ImpactXParticleContainer::MeanAndStdPositions ()
     {
+        BL_PROFILE("ImpactXParticleContainer::MeanAndStdPositions");
         return ablastr::particles::MeanAndStdPositions<
             ImpactXParticleContainer, RealSoA::w
         >(*this);
