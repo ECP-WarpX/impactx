@@ -51,7 +51,7 @@ void init_distribution(py::module& m)
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
-             py::arg("muxpx"), py::arg("muypy"), py::arg("mutpt")
+             py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0
         );
 
     py::class_<distribution::Kurth4D>(md, "Kurth4D")
@@ -62,7 +62,7 @@ void init_distribution(py::module& m)
          >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
-             py::arg("muxpx"), py::arg("muypy"), py::arg("mutpt")
+             py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0
         );
 
     py::class_<distribution::Kurth6D>(md, "Kurth6D")
@@ -73,7 +73,7 @@ void init_distribution(py::module& m)
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
-             py::arg("muxpx"), py::arg("muypy"), py::arg("mutpt")
+             py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0
         );
 
     py::class_<distribution::KVdist>(md, "KVdist")
@@ -84,7 +84,7 @@ void init_distribution(py::module& m)
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
-             py::arg("muxpx"), py::arg("muypy"), py::arg("mutpt")
+             py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0
         );
 
     py::class_<distribution::Semigaussian>(md, "Semigaussian")
@@ -95,7 +95,7 @@ void init_distribution(py::module& m)
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
-             py::arg("muxpx"), py::arg("muypy"), py::arg("mutpt")
+             py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0
         );
 
     py::class_<distribution::Waterbag>(md, "Waterbag")
@@ -106,7 +106,7 @@ void init_distribution(py::module& m)
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
-             py::arg("muxpx"), py::arg("muypy"), py::arg("mutpt")
+             py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0
         );
 
     register_generate_add_particles(md);
