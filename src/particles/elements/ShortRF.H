@@ -22,6 +22,7 @@ namespace impactx
 {
     struct ShortRF
     {
+        static constexpr auto name = "ShortRF";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A short RF cavity element at zero crossing for bunching

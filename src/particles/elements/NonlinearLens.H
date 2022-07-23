@@ -22,6 +22,7 @@ namespace impactx
 {
     struct NonlinearLens
     {
+        static constexpr auto name = "NonlinearLens";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** Single short segment of the nonlinear magnetic insert element

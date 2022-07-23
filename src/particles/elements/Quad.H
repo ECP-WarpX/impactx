@@ -22,6 +22,7 @@ namespace impactx
 {
     struct Quad
     {
+        static constexpr auto name = "Quad";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A Quadrupole magnet

@@ -20,6 +20,7 @@ namespace impactx
 {
     struct None
     {
+        static constexpr auto name = "None";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** This element does nothing.

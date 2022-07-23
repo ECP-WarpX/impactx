@@ -96,7 +96,12 @@ namespace detail
     void Push (ImpactXParticleContainer & pc,
                KnownElements const & element_variant)
     {
-        BL_PROFILE("Push");
+        // performance profiling per element
+        std::string element_name;
+        std::visit([&element_name](auto&& element){ element_name = element.name; }, element_variant);
+        std::string const profile_name = "impactx::Push::" + element_name;
+        BL_PROFILE("impactx::Push");
+        BL_PROFILE(profile_name);
 
         using namespace amrex::literals; // for _rt and _prt
 

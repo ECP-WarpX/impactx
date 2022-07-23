@@ -22,6 +22,7 @@ namespace impactx
 {
     struct Sbend
     {
+        static constexpr auto name = "Sbend";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** An ideal sector bend
