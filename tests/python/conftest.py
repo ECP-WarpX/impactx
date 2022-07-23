@@ -10,7 +10,7 @@ if impactx.Config.have_mpi:
 else:
     print("NO mpi4py load")
 
-@pytest.fixture(autouse=True, scope='session')
+@pytest.fixture(autouse=True, scope='function')
 def amrex_init():
     amrex.initialize([
         # print AMReX status messages

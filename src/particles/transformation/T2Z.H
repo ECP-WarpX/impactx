@@ -62,6 +62,8 @@ namespace transformation
             amrex::ParticleReal const arg = 1.0_prt + pow(m_pzd+pt, 2) + pow(px, 2) + pow(py, 2);
 
             // check for validity of arguments
+            //   TODO: we need to check this before we call kernels, otherwise we cannot catch this on GPU
+            //         runs; also, checking here outside of DEBUG builds can harm vectorization
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(argd > 0.0_prt, "invalid ptd arg (<=0)");
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pt arg (<=0)");
 
