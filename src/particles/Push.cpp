@@ -100,6 +100,9 @@ namespace detail
 
         using namespace amrex::literals; // for _rt and _prt
 
+        // preparing to access reference particle data: RefPart
+        RefPart & ref_part = pc.GetRefParticle();
+
         // loop over refinement levels
         int const nLevel = pc.finestLevel();
         for (int lev = 0; lev <= nLevel; ++lev)
@@ -127,12 +130,9 @@ namespace detail
                 amrex::ParticleReal* const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
                 amrex::ParticleReal* const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
 
-                // preparing to access reference particle data: RefPart
-                RefPart & ref_part = pc.GetRefParticle();
-
                 // here we just access the element by its respective type
                 std::visit(
-                    [=, &ref_part](auto&& element) {
+                    [=, &ref_part](auto element) {
                         // push beam particles relative to reference particle
                         detail::PushSingleParticle<decltype(element)> const pushSingleParticle(
                             element, aos_ptr, part_px, part_py, part_pt, ref_part);
