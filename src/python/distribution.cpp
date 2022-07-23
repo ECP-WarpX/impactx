@@ -29,7 +29,10 @@ namespace
         using V = impactx::distribution::KnownDistributions;
         using T = std::variant_alternative_t<I, V>;
 
-        md.def("generate_add_particles", &generate_add_particles<T>);
+        md.def("generate_add_particles", &generate_add_particles<T>,
+            py::arg("pc"), py::arg("qm"), py::arg("bunch_charge"),
+            py::arg("distr"), py::arg("npart")
+        );
 
         if constexpr (I < std::variant_size_v<V> - 1)
             register_generate_add_particles<I + 1>(md);
