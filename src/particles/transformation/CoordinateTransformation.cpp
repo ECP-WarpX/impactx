@@ -12,6 +12,7 @@
 #include "T2Z.H"
 #include "Z2T.H"
 
+#include <AMReX_BLProfiler.H> // for BL_PROFILE
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_REAL.H>       // for ParticleReal
 
@@ -22,7 +23,9 @@ namespace impactx
 {
 namespace transformation {
     void CoordinateTransformation (ImpactXParticleContainer &pc,
-                                   Direction const &direction) {
+                                   Direction const &direction)
+   {
+        BL_PROFILE("impactx::transformation::CoordinateTransformation");
         using namespace amrex::literals; // for _rt and _prt
 
         // preparing to access reference particle data: RefPart
@@ -49,6 +52,7 @@ namespace transformation {
                 amrex::ParticleReal *const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
 
                 if( direction == Direction::T2Z) {
+                    BL_PROFILE("impactx::transformation::CoordinateTransformation::T2Z");
                     // Design value of pz/mc = beta*gamma
                     amrex::ParticleReal const pzd = sqrt(pow(pd, 2) - 1.0);
 
@@ -65,6 +69,7 @@ namespace transformation {
                         t2z(p, px, py, pt);
                     });
                 } else {
+                    BL_PROFILE("impactx::transformation::CoordinateTransformation::Z2T");
                     amrex::ParticleReal const ptd = pd;  // Design value of pt/mc2 = -gamma.
                     Z2T z2t(ptd);
                     amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE(long i) {

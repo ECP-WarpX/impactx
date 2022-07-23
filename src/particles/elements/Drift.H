@@ -22,6 +22,7 @@ namespace impactx
 {
     struct Drift
     {
+        static constexpr auto name = "Drift";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A drift

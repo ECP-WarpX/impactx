@@ -12,6 +12,7 @@
 #include "particles/distribution/Waterbag.H"
 
 #include <AMReX.H>
+#include <AMReX_BLProfiler.H>
 #include <AMReX_REAL.H>
 #include <AMReX_Utility.H>
 
@@ -102,7 +103,10 @@ namespace impactx
         m_rho.erase(lev);
     }
 
-    void ImpactX::ResizeMesh () {
+    void ImpactX::ResizeMesh ()
+    {
+        BL_PROFILE("ImpactX::ResizeMesh");
+
         // Extract the min and max of the particle positions
         auto const [x_min, y_min, z_min, x_max, y_max, z_max] = m_particle_container->MinAndMaxPositions();
         // Resize the domain size

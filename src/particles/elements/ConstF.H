@@ -22,6 +22,7 @@ namespace impactx
 {
     struct ConstF
     {
+        static constexpr auto name = "ConstF";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A linear Constant Focusing element

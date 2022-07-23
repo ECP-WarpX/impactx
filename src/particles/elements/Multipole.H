@@ -22,6 +22,7 @@ namespace impactx
 {
     struct Multipole
     {
+        static constexpr auto name = "Multipole";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A general thin multipole element

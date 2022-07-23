@@ -22,6 +22,7 @@ namespace impactx
 {
     struct DipEdge
     {
+        static constexpr auto name = "DipEdge";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** Edge focusing associated with bend entry or exit
