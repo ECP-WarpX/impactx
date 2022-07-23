@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import pytest
+
 from impactx import ImpactX, RefPart, distribution, elements
 
 
@@ -77,3 +79,106 @@ def test_impactx_nofile():
     assert len(sim.lattice) > 5
 
     sim.evolve()
+
+
+def test_impactx_noparticles():
+    """
+    This tests using ImpactX without particles:
+    must throw a user-friendly runtime error
+    """
+    sim = ImpactX()
+
+    sim.set_particle_shape(2)
+    sim.init_grids()
+
+    # init particle beam
+    energy_MeV = 2.0e3
+
+    #   reference particle
+    ref = sim.particle_container().ref_particle()
+    ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_energy_MeV(energy_MeV)
+    #   particle bunch: init intentionally missing
+
+    # init accelerator lattice
+    sim.lattice.append(elements.Drift(0.5))
+
+    with pytest.raises(
+        RuntimeError, match="No particles found. Cannot run evolve without a beam."
+    ):
+        sim.evolve()
+
+
+def test_impactx_noshape():
+    """
+    This tests using ImpactX without particle shape:
+    must throw a user-friendly runtime error
+    """
+    sim = ImpactX()
+
+    # impactX.set_particle_shape intentionally missing
+
+    with pytest.raises(
+        RuntimeError,
+        match="particle_shape is not set, cannot initialize grids with guard cells.",
+    ):
+        sim.init_grids()
+
+    # correct the mistake and keep going
+    sim.set_particle_shape(2)
+    sim.init_grids()
+
+
+def test_impactx_resting_refparticle():
+    """
+    This tests using ImpactX with a resting reference particle:
+    must throw a user-friendly runtime error
+    """
+    sim = ImpactX()
+
+    sim.set_particle_shape(2)
+    sim.init_grids()
+
+    # init particle beam
+    #   reference particle: init intentionally missing
+    #   particle bunch
+    gaussian = distribution.Gaussian(
+        sigmaX=4.0e-5,
+        sigmaY=5.0e-5,
+        sigmaT=1.0e-3,
+        sigmaPx=1.0e-5,
+        sigmaPy=3.0e-5,
+        sigmaPt=2.0e-3,
+    )
+    with pytest.raises(
+        RuntimeError,
+        match="add_particles: Reference particle charge not yet set!",
+    ):
+        sim.add_particles(bunch_charge=0.0, distr=gaussian, npart=10)
+
+    sim.lattice.append(elements.Drift(0.25))
+
+    with pytest.raises(
+        RuntimeError,
+        match="The reference particle energy is zero. Not yet initialized?",
+    ):
+        sim.evolve()
+
+
+def test_impactx_no_elements():
+    """
+    This tests using ImpactX without a beamline lattice:
+    must throw a user-friendly runtime error
+    """
+    sim = ImpactX()
+
+    sim.load_inputs_file("examples/fodo/input_fodo.in")
+
+    sim.init_grids()
+    sim.init_beam_distribution_from_inputs()
+    # intentionally skipped: no lattice initialized
+
+    with pytest.raises(
+        RuntimeError,
+        match="Beamline lattice has zero elements. Not yet initialized?",
+    ):
+        sim.evolve()

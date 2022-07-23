@@ -16,6 +16,7 @@
 #include <AMReX_REAL.H>
 #include <AMReX_Utility.H>
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -109,6 +110,12 @@ namespace impactx
 
         // Extract the min and max of the particle positions
         auto const [x_min, y_min, z_min, x_max, y_max, z_max] = m_particle_container->MinAndMaxPositions();
+
+        // guard for flat beams:
+        //   https://github.com/ECP-WarpX/impactx/issues/44
+        if (x_min == x_max || y_min == y_max || z_min == z_max)
+            throw std::runtime_error("Flat beam detected. This is not yet supported: https://github.com/ECP-WarpX/impactx/issues/44");
+
         // Resize the domain size
         // The box is expanded slightly beyond the min and max of particles.
         // This controlled by the variable `frac` below.

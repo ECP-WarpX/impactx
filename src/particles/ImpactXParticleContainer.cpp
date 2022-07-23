@@ -47,7 +47,9 @@ namespace impactx
     {
         amrex::ParmParse pp_algo("algo");
         int v = 0;
-        pp_algo.get("particle_shape", v);
+        bool has_shape = pp_algo.query("particle_shape", v);
+        if (!has_shape)
+            throw std::runtime_error("particle_shape is not set, cannot initialize grids with guard cells.");
         SetParticleShape(v);
     }
 

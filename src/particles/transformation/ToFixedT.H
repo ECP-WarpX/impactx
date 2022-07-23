@@ -63,7 +63,7 @@ namespace transformation
 
             // compute value of reference pzd = beta*gamma
             amrex::ParticleReal const argd = -1.0_prt + pow(m_ptd, 2);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(argd > 0.0_prt, "invalid pzd arg (<=0)");
+            AMREX_ASSERT_WITH_MESSAGE(argd > 0.0_prt, "invalid pzd arg (<=0)");
             amrex::ParticleReal const pzd = argd > 0.0_prt ? sqrt(argd) : 0.0_prt;
 
             // transform momenta to dynamic units (eg, so that momenta are

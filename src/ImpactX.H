@@ -82,6 +82,10 @@ namespace impactx
             int npart
         );
 
+        /** Validate the simulation is ready to run via @see evolve
+         */
+        void validate ();
+
         /** Run the main simulation loop for a number of steps
          */
         void evolve ();

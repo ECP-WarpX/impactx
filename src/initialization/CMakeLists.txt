@@ -7,4 +7,5 @@ target_sources(ImpactX
     InitMeshRefinement.cpp
     InitOneBoxPerRank.cpp
     InitParser.cpp
+    Validate.cpp
 )
