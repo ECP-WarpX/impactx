@@ -59,6 +59,20 @@ namespace impactx
         //   before we start the evolve loop, we are in "step 0" (initial state)
         int global_step = 0;
 
+        // count particles - if no particles are found in our particle container, then a lot of
+        // AMReX routines over ParIter won't work and we have nothing to do here anyways
+        {
+            int const nLevelPC = finestLevel();
+            amrex::Long nParticles = 0;
+            for (int lev = 0; lev <= nLevelPC; ++lev) {
+                nParticles += m_particle_container->NumberOfParticlesAtLevel(lev);
+            }
+            if (nParticles == 0) {
+                amrex::Abort("No particles found. Cannot run evolve without a beam.");
+                return;
+            }
+        }
+
         amrex::ParmParse pp_diag("diag");
         int file_min_digits = 6;
         {

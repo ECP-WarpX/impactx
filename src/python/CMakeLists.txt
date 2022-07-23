@@ -4,6 +4,9 @@
 #
 target_sources(pyImpactX
   PRIVATE
+    distribution.cpp
     elements.cpp
     ImpactX.cpp
+    ImpactXParticleContainer.cpp
+    ReferenceParticle.cpp
 )

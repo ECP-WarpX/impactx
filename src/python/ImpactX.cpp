@@ -6,6 +6,14 @@
 #include "pyImpactX.H"
 
 #include <ImpactX.H>
+#include <initialization/InitDistribution.H>
+#include <particles/distribution/Gaussian.H>
+#include <particles/distribution/Kurth4D.H>
+#include <particles/distribution/Kurth6D.H>
+#include <particles/distribution/KVdist.H>
+#include <particles/distribution/Semigaussian.H>
+#include <particles/distribution/Waterbag.H>
+
 #include <AMReX.H>
 #include <AMReX_ParmParse.H>
 
@@ -76,8 +84,12 @@ void init_ImpactX(py::module& m)
         .def("init_beam_distribution_from_inputs", &ImpactX::initBeamDistributionFromInputs)
         .def("init_lattice_elements_from_inputs", &ImpactX::initLatticeElementsFromInputs)
         .def("evolve", &ImpactX::evolve)
-
-        //.def_property("particle_container", &ImpactX::m_particle_container)
+        .def("particle_container",
+             [](ImpactX & ix) -> ImpactXParticleContainer & {
+                return *ix.m_particle_container;
+             },
+             py::return_value_policy::reference_internal
+        )
         //.def_readwrite("rho", &ImpactX::m_rho)
         .def_readwrite("lattice", &ImpactX::m_lattice)
         //.def_readwrite("lattice", &ImpactX::m_lattice_test)

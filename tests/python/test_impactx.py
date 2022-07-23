@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from impactx import ImpactX, elements
+from impactx import ImpactX, RefPart, distribution, elements
 
 
 def test_impactx_fodo_file():
@@ -29,7 +29,33 @@ def test_impactx_nofile():
     impactX.init_grids()
 
     # init particle beam
-    # TODO
+    energy_MeV = 2.0e3
+    charge_C = 0.0
+    mass_MeV = 0.510998950
+    qm_qeeV = -1.0/0.510998950e6
+    npart = 10000
+
+    distr = distribution.Waterbag(
+        sigmaX = 3.9984884770e-5,
+        sigmaY = 3.9984884770e-5,
+        sigmaT = 1.0e-3,
+        sigmaPx = 2.6623538760e-5,
+        sigmaPy = 2.6623538760e-5,
+        sigmaPt = 2.0e-3,
+        muxpx = -0.846574929020762,
+        muypy = 0.846574929020762,
+        mutpt = 0.0)
+    distribution.generate_add_particles(
+        impactX.particle_container(), qm_qeeV, charge_C, distr, npart)
+
+    # init reference particle
+    refPart = RefPart()
+    # make the next two lines a helper function?
+    refPart.pt = -energy_MeV / mass_MeV - 1.0
+    refPart.pz = (refPart.pt**2 - 1.0)**0.5
+    impactX.particle_container().set_ref_particle(refPart)
+
+    assert(impactX.particle_container().TotalNumberOfParticles() == npart)
 
     # init accelerator lattice
     fodo = [
@@ -54,5 +80,4 @@ def test_impactx_nofile():
     print(len(impactX.lattice))
     assert(len(impactX.lattice) > 5)
 
-    # TODO: enable once particle beam is loaded
-    #impactX.evolve()
+    impactX.evolve()

@@ -18,6 +18,20 @@ if(ImpactX_MPI)
     )
 endif()
 
+function(impactx_test_set_pythonpath test_name)
+    if(WIN32)
+        string(REPLACE ";" "\\;" WIN_PYTHONPATH "$ENV{PYTHONPATH}")
+        string(REGEX REPLACE "/" "\\\\" WIN_PYTHON_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY})
+        set_tests_properties(TEST ${test_name}
+            PROPERTIES ENVIRONMENT "PYTHONPATH=${WIN_PYTHON_OUTPUT_DIRECTORY}\;${WIN_PYTHONPATH}"
+        )
+    else()
+        set_tests_properties(${test_name}
+            PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_PYTHON_OUTPUT_DIRECTORY}:$ENV{PYTHONPATH}"
+        )
+    endif()
+endfunction()
+
 
 # FODO Cell ###################################################################
 #
@@ -42,22 +56,69 @@ set_tests_properties(FODO.plot PROPERTIES DEPENDS "FODO.run")
 #
 if(ImpactX_MPI)
     add_test(NAME FODO.MPI.run
-            COMMAND ${MPI_TEST_EXE}
-                $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/fodo/input_fodo.in
-            WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+             COMMAND ${MPI_TEST_EXE}
+                 $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/fodo/input_fodo.in
+             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
     )
     add_test(NAME FODO.MPI.analysis
-            COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/analysis_fodo.py
-            WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+             COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/analysis_fodo.py
+             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
     )
     add_test(NAME FODO.MPI.plot
-            COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py --save-png
-            WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+             COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py --save-png
+             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
     )
 
     set_tests_properties(FODO.MPI.run PROPERTIES ENVIRONMENT "OMP_NUM_THREADS=1")
     set_tests_properties(FODO.MPI.analysis PROPERTIES DEPENDS "FODO.MPI.run")
     set_tests_properties(FODO.MPI.plot PROPERTIES DEPENDS "FODO.MPI.run")
+endif()
+
+
+# Python: FODO Cell ###########################################################
+#
+if(ImpactX_PYTHON)
+    add_test(NAME FODO.py.run
+             COMMAND ${Python_EXECUTABLE}
+                 ${ImpactX_SOURCE_DIR}/examples/fodo/run_fodo.py
+             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+    )
+    add_test(NAME FODO.py.analysis
+             COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/analysis_fodo.py
+             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+    )
+    add_test(NAME FODO.py.plot
+             COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py --save-png
+             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+    )
+
+    set_tests_properties(FODO.py.analysis PROPERTIES DEPENDS "FODO.py.run")
+    set_tests_properties(FODO.py.plot PROPERTIES DEPENDS "FODO.py.run")
+    impactx_test_set_pythonpath(FODO.py.run)
+endif()
+
+
+# Python: MPI-parallel FODO Cell ##############################################
+#
+if(ImpactX_PYTHON AND ImpactX_MPI)
+    add_test(NAME FODO.py.MPI.run
+             COMMAND ${MPI_TEST_EXE} ${Python_EXECUTABLE}
+                 ${ImpactX_SOURCE_DIR}/examples/fodo/run_fodo.py
+             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+    )
+    add_test(NAME FODO.py.MPI.analysis
+             COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/analysis_fodo.py
+             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+    )
+    add_test(NAME FODO.py.MPI.plot
+             COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py --save-png
+             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+    )
+
+    set_tests_properties(FODO.py.MPI.run PROPERTIES ENVIRONMENT "OMP_NUM_THREADS=1")
+    set_tests_properties(FODO.py.MPI.analysis PROPERTIES DEPENDS "FODO.py.MPI.run")
+    set_tests_properties(FODO.py.MPI.plot PROPERTIES DEPENDS "FODO.py.MPI.run")
+    impactx_test_set_pythonpath(FODO.py.MPI.run)
 endif()
 
 

@@ -30,8 +30,8 @@ namespace transformation
      * @param pc container of the particles to push
      * @param direction the direction (Z to T or vice versa)
      */
-    void CoordinateTransformation(ImpactXParticleContainer &pc,
-                                  Direction const & direction);
+    void CoordinateTransformation (ImpactXParticleContainer &pc,
+                                   Direction const & direction);
 
 } // namespace transformation
 } // namespace impactx
