@@ -12,7 +12,7 @@ The matched Twiss parameters at entry are:
 * :math:`\beta_\mathrm{y} = 2.82161941` m
 * :math:`\alpha_\mathrm{y} = 1.59050035`
 
-We use a 2 GeV proton beam with initial unnormalized rms emittance of 2 nm.
+We use a 2 GeV electron beam with initial unnormalized rms emittance of 2 nm.
 
 The second moments of the particle distribution after the FODO cell should coincide with the second moments of the particle distribution before the FODO cell, to within the level expected due to noise due to statistical sampling.
 
