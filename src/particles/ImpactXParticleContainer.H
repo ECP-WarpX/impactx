@@ -141,6 +141,17 @@ namespace impactx
         void
         SetRefParticle (RefPart const refpart);
 
+
+        /** Initialize reference particle energy
+         *
+         * @param energy initial kinetic energy (MeV)
+         * @param massE particle rest energy (MeV)
+         */
+        void
+        Set_Energy_MeV (amrex::ParticleReal const energy,
+            amrex::ParticleReal const massE);
+
+
         /** Get reference particle attributes
          *
          * @returns refpart
@@ -154,6 +165,43 @@ namespace impactx
          */
         RefPart const
         GetRefParticle () const;
+
+
+        /** Get reference particle relativistic gamma
+         *
+         * @param refpart reference particle
+         * @returns relativistic gamma
+         */
+        amrex::ParticleReal
+        GetGamma (RefPart const refpart);
+
+
+        /** Get reference particle relativistic beta
+         *
+         * @param refpart reference particle
+         * @returns relativistic beta
+         */
+        amrex::ParticleReal
+        GetBeta (RefPart const refpart);
+
+
+        /** Get reference particle beta*gamma
+         *
+         * @param refpart reference particle
+         * @returns relativistic beta*gamma
+         */
+        amrex::ParticleReal
+        GetBetaGamma (RefPart const refpart);
+
+
+        /** Get reference particle energy
+         *
+         * @param refpart reference particle
+         * @returns kinetic energy in MeV
+         */
+        amrex::ParticleReal
+        Get_Energy_MeV (amrex::ParticleReal massE, RefPart const refpart);
+
 
         /** Get particle shape
          */

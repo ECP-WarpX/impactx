@@ -122,11 +122,14 @@ namespace impactx
                 particle_tile, pinned_tile, 0, old_np, pinned_tile.numParticles());
     }
 
+    // Reference particle helper functions
+
     void
     ImpactXParticleContainer::SetRefParticle (RefPart const refpart)
     {
         m_refpart = refpart;
     }
+
 
     RefPart &
     ImpactXParticleContainer::GetRefParticle ()
@@ -134,11 +137,73 @@ namespace impactx
         return m_refpart;
     }
 
+
     RefPart const
     ImpactXParticleContainer::GetRefParticle () const
     {
         return m_refpart;
     }
+
+
+    void
+    ImpactXParticleContainer::Set_Energy_MeV (amrex::ParticleReal const energy,
+            amrex::ParticleReal const massE)
+    {
+        using namespace amrex::literals;
+
+        m_refpart.s = 0.0;
+        m_refpart.x = 0.0;
+        m_refpart.y = 0.0;
+        m_refpart.z = 0.0;
+        m_refpart.t = 0.0;
+        m_refpart.px = 0.0;
+        m_refpart.py = 0.0;
+        m_refpart.pt = -energy/massE - 1.0_prt;
+        m_refpart.pz = sqrt(pow(m_refpart.pt,2) - 1.0_prt);
+    }
+
+
+    amrex::ParticleReal
+    ImpactXParticleContainer::GetGamma (RefPart const refpart)
+    {
+        amrex::ParticleReal ref_gamma = -refpart.pt;
+        return ref_gamma;
+    }
+
+
+    amrex::ParticleReal
+    ImpactXParticleContainer::GetBeta (RefPart const refpart)
+    {
+        using namespace amrex::literals;
+
+        amrex::ParticleReal ref_gamma = -refpart.pt;
+        amrex::ParticleReal ref_beta = sqrt(1.0_prt - 1.0_prt/pow(ref_gamma,2));
+        return ref_beta;
+    }
+
+
+    amrex::ParticleReal
+    ImpactXParticleContainer::GetBetaGamma (RefPart const refpart)
+    {
+        using namespace amrex::literals;
+
+        amrex::ParticleReal ref_gamma = -refpart.pt;
+        amrex::ParticleReal ref_betagamma = sqrt(pow(ref_gamma,2) - 1.0_prt);
+        return ref_betagamma;
+    }
+
+
+    amrex::ParticleReal
+    ImpactXParticleContainer::Get_Energy_MeV (amrex::ParticleReal massE, RefPart const
+           refpart)
+    {
+        using namespace amrex::literals;
+
+        amrex::ParticleReal ref_gamma = -refpart.pt;
+        amrex::ParticleReal ref_energy = massE*(ref_gamma - 1.0_prt);
+        return ref_energy;
+    }
+
 
     std::tuple<
             amrex::ParticleReal, amrex::ParticleReal,
