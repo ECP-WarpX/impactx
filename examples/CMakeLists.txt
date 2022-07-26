@@ -35,17 +35,18 @@ endfunction()
 
 # FODO Cell ###################################################################
 #
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO)
 add_test(NAME FODO.run
          COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/fodo/input_fodo.in
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO
 )
 add_test(NAME FODO.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/analysis_fodo.py
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO
 )
 add_test(NAME FODO.plot
          COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py --save-png
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO
 )
 
 set_tests_properties(FODO.analysis PROPERTIES DEPENDS "FODO.run")
@@ -55,18 +56,19 @@ set_tests_properties(FODO.plot PROPERTIES DEPENDS "FODO.run")
 # MPI-Parallel FODO Cell ######################################################
 #
 if(ImpactX_MPI)
+    file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.MPI)
     add_test(NAME FODO.MPI.run
              COMMAND ${MPI_TEST_EXE}
                  $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/fodo/input_fodo.in
-             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.MPI
     )
     add_test(NAME FODO.MPI.analysis
              COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/analysis_fodo.py
-             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.MPI
     )
     add_test(NAME FODO.MPI.plot
              COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py --save-png
-             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.MPI
     )
 
     set_tests_properties(FODO.MPI.run PROPERTIES ENVIRONMENT "OMP_NUM_THREADS=1")
@@ -78,18 +80,19 @@ endif()
 # Python: FODO Cell ###########################################################
 #
 if(ImpactX_PYTHON)
+    file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.py)
     add_test(NAME FODO.py.run
              COMMAND ${Python_EXECUTABLE}
                  ${ImpactX_SOURCE_DIR}/examples/fodo/run_fodo.py
-             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.py
     )
     add_test(NAME FODO.py.analysis
              COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/analysis_fodo.py
-             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.py
     )
     add_test(NAME FODO.py.plot
              COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py --save-png
-             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.py
     )
 
     set_tests_properties(FODO.py.analysis PROPERTIES DEPENDS "FODO.py.run")
@@ -101,18 +104,19 @@ endif()
 # Python: MPI-parallel FODO Cell ##############################################
 #
 if(ImpactX_PYTHON AND ImpactX_MPI)
+    file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.py.MPI)
     add_test(NAME FODO.py.MPI.run
              COMMAND ${MPI_TEST_EXE} ${Python_EXECUTABLE}
                  ${ImpactX_SOURCE_DIR}/examples/fodo/run_fodo.py
-             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.py.MPI
     )
     add_test(NAME FODO.py.MPI.analysis
              COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/analysis_fodo.py
-             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.py.MPI
     )
     add_test(NAME FODO.py.MPI.plot
              COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo/plot_fodo.py --save-png
-             WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.py.MPI
     )
 
     set_tests_properties(FODO.py.MPI.run PROPERTIES ENVIRONMENT "OMP_NUM_THREADS=1")
@@ -124,17 +128,18 @@ endif()
 
 # Chicane #####################################################################
 #
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chicane)
 add_test(NAME chicane.run
          COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/chicane/input_chicane.in
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chicane
 )
 add_test(NAME chicane.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/chicane/analysis_chicane.py
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chicane
 )
 add_test(NAME chicane.plot
          COMMAND ${ImpactX_SOURCE_DIR}/examples/chicane/plot_chicane.py --save-png
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chicane
 )
 
 set_tests_properties(chicane.analysis PROPERTIES DEPENDS "chicane.run")
@@ -143,13 +148,14 @@ set_tests_properties(chicane.plot PROPERTIES DEPENDS "chicane.run")
 
 # Constant Focusing Channel ###################################################
 #
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/cfchannel)
 add_test(NAME cfchannel.run
          COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/cfchannel/input_cfchannel.in
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/cfchannel
 )
 add_test(NAME cfchannel.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/cfchannel/analysis_cfchannel.py
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/cfchannel
 )
 
 set_tests_properties(cfchannel.analysis PROPERTIES DEPENDS "cfchannel.run")
@@ -157,13 +163,14 @@ set_tests_properties(cfchannel.analysis PROPERTIES DEPENDS "cfchannel.run")
 
 # Kurth Distribution Test ###################################################
 #
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kurth)
 add_test(NAME kurth.run
          COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/kurth/input_kurth.in
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kurth
 )
 add_test(NAME kurth.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/kurth/analysis_kurth.py
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kurth
 )
 
 set_tests_properties(kurth.analysis PROPERTIES DEPENDS "kurth.run")
@@ -171,13 +178,14 @@ set_tests_properties(kurth.analysis PROPERTIES DEPENDS "kurth.run")
 
 # 6D Gaussian Distribution Test ###################################################
 #
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/gaussian)
 add_test(NAME gaussian.run
          COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/distgen/input_gaussian.in
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/gaussian
 )
 add_test(NAME gaussian.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/distgen/analysis_gaussian.py
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/gaussian
 )
 
 set_tests_properties(gaussian.analysis PROPERTIES DEPENDS "gaussian.run")
@@ -185,13 +193,14 @@ set_tests_properties(gaussian.analysis PROPERTIES DEPENDS "gaussian.run")
 
 # K-V Distribution Test ############################################################
 #
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kvdist)
 add_test(NAME kvdist.run
          COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/distgen/input_kvdist.in
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kvdist
 )
 add_test(NAME kvdist.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/distgen/analysis_kvdist.py
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kvdist
 )
 
 set_tests_properties(kvdist.analysis PROPERTIES DEPENDS "kvdist.run")
@@ -199,13 +208,14 @@ set_tests_properties(kvdist.analysis PROPERTIES DEPENDS "kvdist.run")
 
 # FODO Cell with RF ###################################################################
 #
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO_RF)
 add_test(NAME FODO_RF.run
          COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/fodo_rf/input_fodo_rf.in
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO_RF
 )
 add_test(NAME FODO_RF.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/fodo_rf/analysis_fodo_rf.py
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO_RF
 )
 
 set_tests_properties(FODO_RF.analysis PROPERTIES DEPENDS "FODO_RF.run")
@@ -213,13 +223,14 @@ set_tests_properties(FODO_RF.analysis PROPERTIES DEPENDS "FODO_RF.run")
 
 # 4D Kurth Distribution Test ############################################################
 #
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kurth4d)
 add_test(NAME kurth4d.run
          COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/distgen/input_kurth4d.in
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kurth4d
 )
 add_test(NAME kurth4d.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/distgen/analysis_kurth4d.py
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kurth4d
 )
 
 set_tests_properties(kurth4d.analysis PROPERTIES DEPENDS "kurth4d.run")
@@ -227,39 +238,42 @@ set_tests_properties(kurth4d.analysis PROPERTIES DEPENDS "kurth4d.run")
 
 # Semi-Gaussian Distribution Test ############################################################
 #
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/semigaussian)
 add_test(NAME semigaussian.run
          COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/distgen/input_semigaussian.in
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/semigaussian
 )
 add_test(NAME semigaussian.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/distgen/analysis_semigaussian.py
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/semigaussian
 )
 
 set_tests_properties(semigaussian.analysis PROPERTIES DEPENDS "semigaussian.run")
 
 # Chain of Multipoles Test ############################################################
 #
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/multipole)
 add_test(NAME multipole.run
          COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/multipole/input_multipole.in
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/multipole
 )
 add_test(NAME multipole.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/multipole/analysis_multipole.py
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/multipole
 )
 
 set_tests_properties(multipole.analysis PROPERTIES DEPENDS "multipole.run")
 
 # IOTA Nonlinear Focusing Channel Test ############################################################
 #
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalens)
 add_test(NAME iotalens.run
          COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/iota_lens/input_iotalens.in
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalens
 )
 add_test(NAME iotalens.analysis
          COMMAND ${ImpactX_SOURCE_DIR}/examples/iota_lens/analysis_iotalens.py
-         WORKING_DIRECTORY ${ImpactX_RUNTIME_OUTPUT_DIRECTORY}
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalens
 )
 
 set_tests_properties(iotalens.analysis PROPERTIES DEPENDS "iotalens.run")
