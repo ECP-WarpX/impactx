@@ -7,15 +7,9 @@
  * Authors: Axel Huebl, Chad Mitchell, Ji Qiang
  * License: BSD-3-Clause-LBNL
  */
-#include "InitDistribution.H"
 #include "ImpactX.H"
 #include "particles/ImpactXParticleContainer.H"
-#include "particles/distribution/Waterbag.H"
-#include "particles/distribution/Kurth6D.H"
-#include "particles/distribution/Gaussian.H"
-#include "particles/distribution/KVdist.H"
-#include "particles/distribution/Kurth4D.H"
-#include "particles/distribution/Semigaussian.H"
+#include "particles/distribution/All.H"
 
 #include <AMReX.H>
 #include <AMReX_BLProfiler.H>
@@ -28,6 +22,61 @@
 
 namespace impactx
 {
+    void
+    ImpactX::add_particles (
+        amrex::ParticleReal qm,
+        amrex::ParticleReal bunch_charge,
+        distribution::KnownDistributions distr,
+        int npart
+    )
+    {
+        BL_PROFILE("ImpactX::add_particles");
+
+        amrex::Vector<amrex::ParticleReal> x, y, t;
+        amrex::Vector<amrex::ParticleReal> px, py, pt;
+        amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
+        amrex::RandomEngine rng;
+
+        // Logic: We initialize 1/Nth of particles, independent of their
+        // position, per MPI rank. We then measure the distribution's spatial
+        // extent, create a grid, resize it to fit the beam, and then
+        // redistribute particles so that they reside on the correct MPI rank.
+        int myproc = amrex::ParallelDescriptor::MyProc();
+        int nprocs = amrex::ParallelDescriptor::NProcs();
+        int navg = npart / nprocs;
+        int nleft = npart - navg * nprocs;
+        int npart_this_proc = (myproc < nleft) ? navg+1 : navg;
+
+        std::visit([&](auto&& distribution){
+            x.reserve(npart_this_proc);
+            y.reserve(npart_this_proc);
+            t.reserve(npart_this_proc);
+            px.reserve(npart_this_proc);
+            py.reserve(npart_this_proc);
+            pt.reserve(npart_this_proc);
+
+            for (amrex::Long i = 0; i < npart_this_proc; ++i) {
+                distribution(ix, iy, it, ipx, ipy, ipt, rng);
+                x.push_back(ix);
+                y.push_back(iy);
+                t.push_back(it);
+                px.push_back(ipx);
+                py.push_back(ipy);
+                pt.push_back(ipt);
+            }
+        }, distr);
+
+        int const lev = 0;
+        m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
+                                            qm, bunch_charge);
+
+        // Resize the mesh to fit the spatial extent of the beam and then
+        // redistribute particles, so they reside on the MPI rank that is
+        // responsible for the respective spatial particle position.
+        this->ResizeMesh();
+        m_particle_container->Redistribute();
+    }
+
     void ImpactX::initBeamDistributionFromInputs ()
     {
         BL_PROFILE("ImpactX::initBeamDistributionFromInputs");
@@ -83,7 +132,7 @@ namespace impactx
               sigpx, sigpy, sigpt,
               muxpx, muypy, mutpt);
 
-          generate_add_particles(*m_particle_container, qm, bunch_charge, waterbag, npart);
+          add_particles(qm, bunch_charge, waterbag, npart);
 
         } else if (distribution_type == "kurth6d") {
           amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
@@ -103,7 +152,7 @@ namespace impactx
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt);
 
-          generate_add_particles(*m_particle_container, qm, bunch_charge, kurth6D, npart);
+          add_particles(qm, bunch_charge, kurth6D, npart);
 
         } else if (distribution_type == "gaussian") {
           amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
@@ -123,7 +172,7 @@ namespace impactx
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt);
 
-          generate_add_particles(*m_particle_container, qm, bunch_charge, gaussian, npart);
+          add_particles(qm, bunch_charge, gaussian, npart);
 
         } else if (distribution_type == "kvdist") {
           amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
@@ -143,7 +192,7 @@ namespace impactx
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt);
 
-          generate_add_particles(*m_particle_container, qm, bunch_charge, kvDist, npart);
+          add_particles(qm, bunch_charge, kvDist, npart);
 
         } else if (distribution_type == "kurth4d") {
           amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
@@ -163,7 +212,7 @@ namespace impactx
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt);
 
-          generate_add_particles(*m_particle_container, qm, bunch_charge, kurth4D, npart);
+          add_particles(qm, bunch_charge, kurth4D, npart);
         } else if (distribution_type == "semigaussian") {
           amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
           amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
@@ -182,16 +231,10 @@ namespace impactx
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt);
 
-          generate_add_particles(*m_particle_container, qm, bunch_charge, semigaussian, npart);
+          add_particles(qm, bunch_charge, semigaussian, npart);
         } else {
             amrex::Abort("Unknown distribution: " + distribution_type);
         }
-
-        // Resize the mesh to fit the spatial extent of the beam and then
-        // redistribute particles, so they reside on the MPI rank that is
-        // responsible for the respective spatial particle position.
-        this->ResizeMesh();
-        m_particle_container->Redistribute();
 
         // reference particle
         amrex::ParticleReal massE;  // MeV

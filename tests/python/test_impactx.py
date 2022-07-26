@@ -45,8 +45,7 @@ def test_impactx_nofile():
         muxpx = -0.846574929020762,
         muypy = 0.846574929020762,
         mutpt = 0.0)
-    distribution.generate_add_particles(
-        impactX.particle_container(), qm_qeeV, charge_C, distr, npart)
+    impactX.add_particles(qm_qeeV, charge_C, distr, npart)
 
     # init reference particle
     refPart = RefPart()

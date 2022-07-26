@@ -10,6 +10,7 @@
 #ifndef IMPACT_X_H
 #define IMPACT_X_H
 
+#include "particles/distribution/All.H"
 #include "particles/elements/All.H"
 #include "particles/ImpactXParticleContainer.H"
 
@@ -62,6 +63,25 @@ namespace impactx
          * input file and command-line options, as parsed by amrex::ParmParse.
          */
         void initLatticeElementsFromInputs ();
+
+        /** Generate and add n particles to the particle container
+         *
+         * Will also resize the geometry based on the updated particle
+         * distribution's extent and then redistribute particles in according
+         * AMReX grid boxes.
+         *
+         * @param qm charge/mass ratio (q_e/eV)
+         * @param bunch_charge bunch charge (C)
+         * @param distr distribution function to draw from (object)
+         * @param npart number of particles to draw
+         */
+        void
+        add_particles (
+            amrex::ParticleReal qm,
+            amrex::ParticleReal bunch_charge,
+            distribution::KnownDistributions distr,
+            int npart
+        );
 
         /** Run the main simulation loop for a number of steps
          */
