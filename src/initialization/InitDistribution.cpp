@@ -127,10 +127,10 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          impactx::distribution::Waterbag waterbag(
+          distribution::KnownDistributions waterbag(distribution::Waterbag(
               sigx, sigy, sigt,
               sigpx, sigpy, sigpt,
-              muxpx, muypy, mutpt);
+              muxpx, muypy, mutpt));
 
           add_particles(qm, bunch_charge, waterbag, npart);
 
@@ -147,10 +147,10 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          impactx::distribution::Kurth6D kurth6D(
+          distribution::KnownDistributions kurth6D(distribution::Kurth6D(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
-            muxpx, muypy, mutpt);
+            muxpx, muypy, mutpt));
 
           add_particles(qm, bunch_charge, kurth6D, npart);
 
@@ -167,10 +167,10 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          impactx::distribution::Gaussian gaussian(
+          distribution::KnownDistributions gaussian(distribution::Gaussian(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
-            muxpx, muypy, mutpt);
+            muxpx, muypy, mutpt));
 
           add_particles(qm, bunch_charge, gaussian, npart);
 
@@ -187,10 +187,10 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          impactx::distribution::KVdist kvDist(
+          distribution::KnownDistributions kvDist(distribution::KVdist(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
-            muxpx, muypy, mutpt);
+            muxpx, muypy, mutpt));
 
           add_particles(qm, bunch_charge, kvDist, npart);
 
@@ -207,10 +207,10 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          impactx::distribution::Kurth4D kurth4D(
+          distribution::KnownDistributions kurth4D(distribution::Kurth4D(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
-            muxpx, muypy, mutpt);
+            muxpx, muypy, mutpt));
 
           add_particles(qm, bunch_charge, kurth4D, npart);
         } else if (distribution_type == "semigaussian") {
@@ -226,10 +226,10 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          impactx::distribution::Semigaussian semigaussian(
+          distribution::KnownDistributions semigaussian(distribution::Semigaussian(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
-            muxpx, muypy, mutpt);
+            muxpx, muypy, mutpt));
 
           add_particles(qm, bunch_charge, semigaussian, npart);
         } else {
