@@ -6,7 +6,7 @@ The "bare" linear lattice of the Fermilab IOTA storage ring.
 The linear lattice of the IOTA storage ring, configured for operation with a
 2.5 MeV proton beam.
 
-The drift regions available for insertion of the special nonlinear magnetic 
+The drift regions available for insertion of the special nonlinear magnetic
 element for integrable optics experiments are denoted "dnll".
 
 The second moments of the particle distribution after a single turn should

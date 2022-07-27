@@ -291,4 +291,3 @@ add_test(NAME iotalattice.analysis
 )
 
 set_tests_properties(iotalattice.analysis PROPERTIES DEPENDS "iotalattice.run")
-
