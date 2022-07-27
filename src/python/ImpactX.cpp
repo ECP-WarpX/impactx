@@ -6,7 +6,6 @@
 #include "pyImpactX.H"
 
 #include <ImpactX.H>
-#include <initialization/InitDistribution.H>
 #include <particles/distribution/Gaussian.H>
 #include <particles/distribution/Kurth4D.H>
 #include <particles/distribution/Kurth6D.H>
@@ -37,7 +36,8 @@ void init_ImpactX(py::module& m)
     >(m, "MultiFabPerLevel");
     */
 
-    py::class_<ImpactX>(m, "ImpactX")
+    py::class_<ImpactX> impactx(m, "ImpactX");
+    impactx
         .def(py::init<>())
 
         .def("load_inputs_file",
@@ -83,6 +83,10 @@ void init_ImpactX(py::module& m)
         .def("init_grids", &ImpactX::initGrids)
         .def("init_beam_distribution_from_inputs", &ImpactX::initBeamDistributionFromInputs)
         .def("init_lattice_elements_from_inputs", &ImpactX::initLatticeElementsFromInputs)
+        .def("add_particles", &ImpactX::add_particles,
+             py::arg("qm"), py::arg("bunch_charge"),
+             py::arg("distr"), py::arg("npart")
+        )
         .def("evolve", &ImpactX::evolve)
         .def("particle_container",
              [](ImpactX & ix) -> ImpactXParticleContainer & {

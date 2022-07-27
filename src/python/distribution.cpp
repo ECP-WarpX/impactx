@@ -5,7 +5,6 @@
  */
 #include "pyImpactX.H"
 
-#include <initialization/InitDistribution.H>
 #include <particles/distribution/All.H>
 
 #include <AMReX.H>
@@ -16,28 +15,6 @@
 namespace py = pybind11;
 using namespace impactx;
 
-namespace
-{
-    /** Register impactx::generate_add_particles for each distribution
-     *
-     * @tparam I counter through all known distributions in impactx::distribution::KnownDistributions
-     * @param md the module to register the function in
-     */
-    template< std::size_t I = 0 >
-    void register_generate_add_particles(py::module& md)
-    {
-        using V = impactx::distribution::KnownDistributions;
-        using T = std::variant_alternative_t<I, V>;
-
-        md.def("generate_add_particles", &generate_add_particles<T>,
-            py::arg("pc"), py::arg("qm"), py::arg("bunch_charge"),
-            py::arg("distr"), py::arg("npart")
-        );
-
-        if constexpr (I < std::variant_size_v<V> - 1)
-            register_generate_add_particles<I + 1>(md);
-    }
-}
 
 void init_distribution(py::module& m)
 {
@@ -111,6 +88,4 @@ void init_distribution(py::module& m)
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
              py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0
         );
-
-    register_generate_add_particles(md);
 }
