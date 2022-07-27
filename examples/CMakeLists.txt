@@ -277,3 +277,18 @@ add_test(NAME iotalens.analysis
 )
 
 set_tests_properties(iotalens.analysis PROPERTIES DEPENDS "iotalens.run")
+
+# IOTA Linear Lattice Test ############################################################
+#
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice)
+add_test(NAME iotalattice.run
+         COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/iota_lattice/input_iotalattice.in
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice
+)
+add_test(NAME iotalattice.analysis
+         COMMAND ${ImpactX_SOURCE_DIR}/examples/iota_lattice/analysis_iotalattice.py
+         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice
+)
+
+set_tests_properties(iotalattice.analysis PROPERTIES DEPENDS "iotalattice.run")
+
