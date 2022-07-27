@@ -24,7 +24,7 @@
 namespace py = pybind11;
 using namespace impactx;
 
-namespace {
+namespace impactx {
     struct Config {};
 }
 
