@@ -385,8 +385,13 @@ if(ImpactX_PYTHON)
     )
 
     # this will also upgrade/downgrade dependencies, e.g., when the version of numpy changes
+    if(ImpactX_MPI)
+        set(pyImpactX_REQUIREMENT_FILE "requirements_mpi.txt")
+    else()
+        set(pyImpactX_REQUIREMENT_FILE "requirements.txt")
+    endif()
     add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_requirements
-        ${Python_EXECUTABLE} -m pip install ${PYINSTALLOPTIONS} -r "${ImpactX_SOURCE_DIR}/requirements.txt"
+        ${Python_EXECUTABLE} -m pip install ${PYINSTALLOPTIONS} -r "${ImpactX_SOURCE_DIR}/${pyImpactX_REQUIREMENT_FILE}"
         WORKING_DIRECTORY
             ${ImpactX_BINARY_DIR}
     )
