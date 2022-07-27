@@ -280,35 +280,39 @@ add_test(NAME iotalens.analysis
 
 set_tests_properties(iotalens.analysis PROPERTIES DEPENDS "iotalens.run")
 
+
 # IOTA Linear Lattice Test ############################################################
 #
-file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice)
-add_test(NAME iotalattice.run
-         COMMAND $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/iota_lattice/input_iotalattice.in
-         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice
-)
-add_test(NAME iotalattice.analysis
-         COMMAND ${ImpactX_SOURCE_DIR}/examples/iota_lattice/analysis_iotalattice.py
-         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice
-)
+if(ImpactX_MPI)
+    file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice.MPI)
+    add_test(NAME iotalattice.MPI.run
+             COMMAND ${MPI_TEST_EXE}
+                 $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/examples/iota_lattice/input_iotalattice.in
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice.MPI
+    )
+    add_test(NAME iotalattice.MPI.analysis
+             COMMAND ${ImpactX_SOURCE_DIR}/examples/iota_lattice/analysis_iotalattice.py
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice.MPI
+    )
 
-set_tests_properties(iotalattice.analysis PROPERTIES DEPENDS "iotalattice.run")
+    set_tests_properties(iotalattice.MPI.analysis PROPERTIES DEPENDS "iotalattice.MPI.run")
+endif()
 
 
 # Python: IOTA Linear Lattice Test ############################################
 #
-if(ImpactX_PYTHON)
-    file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice.py)
-    add_test(NAME iotalattice.py.run
-             COMMAND ${Python_EXECUTABLE}
+if(ImpactX_PYTHON AND ImpactX_MPI)
+    file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice.py.MPI)
+    add_test(NAME iotalattice.py.MPI.run
+             COMMAND ${MPI_TEST_EXE} ${Python_EXECUTABLE}
                  ${ImpactX_SOURCE_DIR}/examples/iota_lattice/run_iotalattice.py
-             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice.py
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice.py.MPI
     )
-    add_test(NAME iotalattice.py.analysis
+    add_test(NAME iotalattice.py.MPI.analysis
              COMMAND ${ImpactX_SOURCE_DIR}/examples/iota_lattice/analysis_iotalattice.py
-             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice.py
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice.py.MPI
     )
 
-    set_tests_properties(iotalattice.py.analysis PROPERTIES DEPENDS "iotalattice.py.run")
-    impactx_test_set_pythonpath(iotalattice.py.run)
+    set_tests_properties(iotalattice.py.MPI.analysis PROPERTIES DEPENDS "iotalattice.py.MPI.run")
+    impactx_test_set_pythonpath(iotalattice.py.MPI.run)
 endif()
