@@ -19,7 +19,7 @@ impactX.init_grids()
 energy_MeV = 2.0e3
 charge_C = 0.0  # assign zero weighting to particles
 mass_MeV = 0.510998950
-qm_qeeV = -1.0/0.510998950e6
+qm_qeeV = -1.0e-6/mass_MeV
 npart = 10000
 
 distr = distribution.Waterbag(

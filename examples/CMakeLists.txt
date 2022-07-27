@@ -250,6 +250,7 @@ add_test(NAME semigaussian.analysis
 
 set_tests_properties(semigaussian.analysis PROPERTIES DEPENDS "semigaussian.run")
 
+
 # Chain of Multipoles Test ############################################################
 #
 file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/multipole)
@@ -263,6 +264,7 @@ add_test(NAME multipole.analysis
 )
 
 set_tests_properties(multipole.analysis PROPERTIES DEPENDS "multipole.run")
+
 
 # IOTA Nonlinear Focusing Channel Test ############################################################
 #
@@ -291,3 +293,22 @@ add_test(NAME iotalattice.analysis
 )
 
 set_tests_properties(iotalattice.analysis PROPERTIES DEPENDS "iotalattice.run")
+
+
+# Python: IOTA Linear Lattice Test ############################################
+#
+if(ImpactX_PYTHON)
+    file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice.py)
+    add_test(NAME iotalattice.py.run
+             COMMAND ${Python_EXECUTABLE}
+                 ${ImpactX_SOURCE_DIR}/examples/iota_lattice/run_iotalattice.py
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice.py
+    )
+    add_test(NAME iotalattice.py.analysis
+             COMMAND ${ImpactX_SOURCE_DIR}/examples/iota_lattice/analysis_iotalattice.py
+             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/iotalattice.py
+    )
+
+    set_tests_properties(iotalattice.py.analysis PROPERTIES DEPENDS "iotalattice.py.run")
+    impactx_test_set_pythonpath(iotalattice.py.run)
+endif()
