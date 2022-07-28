@@ -66,8 +66,36 @@ namespace impactx
         else  // odd shape orders
             num_guards_rho = (particle_shape + 1) / 2;
 
-        m_rho.emplace(lev,
-                      amrex::MultiFab{amrex::convert(cba, rho_nodal_flag), dm, num_components_rho, num_guards_rho, tag("rho")});
+        m_rho.emplace(
+            lev,
+            amrex::MultiFab{amrex::convert(cba, rho_nodal_flag), dm, num_components_rho, num_guards_rho, tag("rho")});
+
+        // scalar potential
+        auto const phi_nodal_flag = rho_nodal_flag;
+        int const num_components_phi = 1;
+        int const num_guards_phi = num_guards_rho + 1; // todo: I think this just depends on max(MLMG, force calc)
+        m_phi.emplace(
+            lev,
+            amrex::MultiFab{amrex::convert(cba, phi_nodal_flag), dm, num_components_phi, num_guards_phi, tag("phi")});
+
+        // space charge force
+        for (std::string const comp : {"x", "y", "z"})
+        {
+            std::string const str_tag = "space_charge_force_" + comp;
+
+            std::unordered_map<std::string, amrex::MultiFab> f_comp;
+            f_comp.emplace(
+                comp,
+                amrex::MultiFab{
+                    amrex::convert(cba, rho_nodal_flag),
+                    dm,
+                    num_components_rho,
+                    num_guards_rho,
+                    tag(str_tag)
+                }
+            );
+            m_space_charge_force.emplace(lev, std::move(f_comp));
+        }
     }
 
     /** Make a new level using provided BoxArray and DistributionMapping and fill
@@ -101,6 +129,8 @@ namespace impactx
     void ImpactX::ClearLevel (int lev)
     {
         m_rho.erase(lev);
+        m_phi.erase(lev);
+        m_space_charge_force.erase(lev);
     }
 
     void ImpactX::ResizeMesh ()
