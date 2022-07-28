@@ -9,18 +9,24 @@
 import amrex
 from impactx import ImpactX, RefPart, distribution, elements
 
-impactX = ImpactX()
+sim = ImpactX()
 
-impactX.set_particle_shape(2)
-impactX.set_diags_slice_step_diagnostics(True)
-impactX.init_grids()
+# set numerical parameters and IO control
+sim.set_particle_shape(2)  # B-spline order
+sim.set_diags_slice_step_diagnostics(True)
 
-# init particle beam
-energy_MeV = 2.0e3
+# domain decomposition & space charge mesh
+sim.init_grids()
+# access distributed particle beam storage
+particles = sim.particle_container()
+
+# load a 2 GeV electron beam with an initial
+# unnormalized rms emittance of 2 nm
+energy_MeV = 2.0e3  # reference energy
 charge_C = 0.0  # assign zero weighting to particles
 mass_MeV = 0.510998950
-qm_qeeV = -1.0e-6/mass_MeV
-npart = 10000
+qm_qeeV = -1.0e-6/mass_MeV  # charge/mass
+npart = 10000  # number of macro particles
 
 distr = distribution.Waterbag(
     sigmaX = 3.9984884770e-5,
@@ -32,16 +38,16 @@ distr = distribution.Waterbag(
     muxpx = -0.846574929020762,
     muypy = 0.846574929020762,
     mutpt = 0.0)
-impactX.add_particles(qm_qeeV, charge_C, distr, npart)
+sim.add_particles(qm_qeeV, charge_C, distr, npart)
 
 # init reference particle
 refPart = RefPart()
 # make the next two lines a helper function?
 refPart.pt = -energy_MeV / mass_MeV - 1.0
 refPart.pz = (refPart.pt**2 - 1.0)**0.5
-impactX.particle_container().set_ref_particle(refPart)
+particles.set_ref_particle(refPart)
 
-# init accelerator lattice
+# design the accelerator lattice
 ns = 25  # number of slices per ds in the element
 fodo = [
     elements.Drift(ds=0.25, nslice=ns),
@@ -50,12 +56,12 @@ fodo = [
     elements.Quad(ds=1.0, k=-1.0, nslice=ns),
     elements.Drift(ds=0.25, nslice=ns)
 ]
-#  assign a fodo segment
-impactX.lattice.extend(fodo)
+# assign a fodo segment
+sim.lattice.extend(fodo)
 
 # run simulation
-impactX.evolve()
+sim.evolve()
 
 # clean shutdown
-del impactX
+del sim
 amrex.finalize()
