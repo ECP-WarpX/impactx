@@ -1,0 +1,217 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.energy = 2.5
+beam.charge = 0.0
+beam.particle = proton
+beam.distribution = waterbag
+beam.sigmaX = 1.588960728035e-3
+beam.sigmaY = 2.496625268437e-3
+beam.sigmaT = 1.0e-3
+beam.sigmaPx = 2.8320397837724e-3
+beam.sigmaPy = 1.802433091137e-3
+beam.sigmaPt = 0.0
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+
+lattice.elements = dra1 qa1 dra2 qa2 dra3 qa3 dra4 qa4 dra5
+                   edge30 sbend30 edge30 drb1 qb1 drb2 qb2 drb2 qb3
+                   drb3 dnll drb3 qb4 drb2 qb5 drb2 qb6 drb4
+                   edge60 sbend60 edge60 drc1 qc1 drc2 qc2 drc2 qc3 drc1
+                   edge60 sbend60 edge60 drd1 qd1 drd2 qd2 drd3 qd3 drd2 qd4 drd4
+                   edge30 sbend30 edge30 dre1 qe1 dre2 qe2 dre3 qe3
+                   dre3 qe2 dre2 qe1 dre1 edge30 sbend30 edge30
+                   drd4 qd4 drd2 qd3 drd3 qd2 drd2 qd1 drd1 edge60 sbend60 edge60
+                   drc1 qc3 drc2 qc2 drc2 qc1 drc1 edge60 sbend60 edge60
+                   drb4 qb6 drb2 qb5 drb2 qb4 drb3 dnll drb3
+                   qb3 drb2 qb2 drb2 qb1 drb1 edge30 sbend30 edge30
+                   dra5 qa4 dra4 qa3 dra3 qa2 dra2 qa1 dra1
+
+lattice.nslice = 10
+
+
+# Drift elements:
+
+dra1.type = drift
+dra1.ds = 0.9125
+
+dra2.type = drift
+dra2.ds = 0.135
+
+dra3.type = drift
+dra3.ds = 0.725
+
+dra4.type = drift
+dra4.ds = 0.145
+
+dra5.type = drift
+dra5.ds = 0.3405
+
+drb1.type = drift
+drb1.ds = 0.3205
+
+drb2.type = drift
+drb2.ds = 0.14
+
+drb3.type = drift
+drb3.ds = 0.1525
+
+drb4.type = drift
+drb4.ds = 0.31437095
+
+drc1.type = drift
+drc1.ds = 0.42437095
+
+drc2.type = drift
+drc2.ds = 0.355
+
+dnll.type = drift
+dnll.ds = 1.8
+
+drd1.type = drift
+drd1.ds = 0.62437095
+
+drd2.type = drift
+drd2.ds = 0.42
+
+drd3.type = drift
+drd3.ds = 1.625
+
+drd4.type = drift
+drd4.ds = 0.6305
+
+dre1.type = drift
+dre1.ds = 0.5305
+
+dre2.type = drift
+dre2.ds = 1.235
+
+dre3.type = drift
+dre3.ds = 0.8075
+
+
+# Bend elements:
+
+sbend30.type = sbend
+sbend30.ds = 0.4305191429
+sbend30.rc = 0.822230996255981
+
+edge30.type = dipedge
+edge30.psi = 0.0
+edge30.rc = 0.822230996255981
+edge30.g = 0.058
+edge30.K2 = 0.5
+
+sbend60.type = sbend
+sbend60.ds = 0.8092963858
+sbend60.rc = 0.772821121503940
+
+edge60.type = dipedge
+edge60.psi = 0.0
+edge60.rc = 0.772821121503940
+edge60.g = 0.058
+edge60.K2 = 0.5
+
+
+# Quad elements:
+
+qa1.type = quad
+qa1.ds = 0.21
+qa1.k = -8.78017699
+
+qa2.type = quad
+qa2.ds = 0.21
+qa2.k = 13.24451745
+
+qa3.type = quad
+qa3.ds = 0.21
+qa3.k = -13.65151327
+
+qa4.type = quad
+qa4.ds = 0.21
+qa4.k = 19.75138652
+
+qb1.type = quad
+qb1.ds = 0.21
+qb1.k = -10.84199727
+
+qb2.type = quad
+qb2.ds = 0.21
+qb2.k = 16.24844348
+
+qb3.type = quad
+qb3.ds = 0.21
+qb3.k = -8.27411104
+
+qb4.type = quad
+qb4.ds = 0.21
+qb4.k = -7.45719247
+
+qb5.type = quad
+qb5.ds = 0.21
+qb5.k = 14.03362243
+
+qb6.type = quad
+qb6.ds = 0.21
+qb6.k = -12.23595641
+
+qc1.type = quad
+qc1.ds = 0.21
+qc1.k = -13.18863768
+
+qc2.type = quad
+qc2.ds = 0.21
+qc2.k = 11.50601829
+
+qc3.type = quad
+qc3.ds = 0.21
+qc3.k = -11.10445869
+
+qd1.type = quad
+qd1.ds = 0.21
+qd1.k = -6.78179218
+
+qd2.type = quad
+qd2.ds = 0.21
+qd2.k = 5.19026998
+
+qd3.type = quad
+qd3.ds = 0.21
+qd3.k = -5.8586173
+
+qd4.type = quad
+qd4.ds = 0.21
+qd4.k = 4.62460039
+
+qe1.type = quad
+qe1.ds = 0.21
+qe1.k = -4.49607687
+
+qe2.type = quad
+qe2.ds = 0.21
+qe2.k = 6.66737146
+
+qe3.type = quad
+qe3.ds = 0.21
+qe3.k = -6.69148177
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+
+diag.slice_step_diagnostics = true
