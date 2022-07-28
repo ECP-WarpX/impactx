@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from impactx import ImpactX, RefPart, distribution, elements
+import pytest
 
 
 def test_impactx_fodo_file():
@@ -80,3 +81,65 @@ def test_impactx_nofile():
     assert(len(impactX.lattice) > 5)
 
     impactX.evolve()
+
+
+def test_impactx_noparticles():
+    """
+    This tests using ImpactX without particles:
+    must throw a user-friendly runtime error
+    """
+    impactX = ImpactX()
+
+    impactX.set_particle_shape(2)
+    impactX.init_grids()
+
+    # particle init missing intentionally
+
+    impactX.lattice.append(elements.Drift(0.5))
+    with pytest.raises(RuntimeError,
+                       match="No particles found. Cannot run evolve without a beam."):
+        impactX.evolve()
+
+
+def test_impactx_noshape():
+    """
+    This tests using ImpactX without particle shape:
+    must throw a user-friendly runtime error
+    """
+    impactX = ImpactX()
+
+    # impactX.set_particle_shape intentionally missing
+
+    with pytest.raises(RuntimeError,
+                       match="particle_shape is not set, cannot initialize grids with guard cells."):
+        impactX.init_grids()
+
+    # correct the mistake and keep going
+    impactX.set_particle_shape(2)
+    impactX.init_grids()
+
+
+def test_impactx_resting_refparticle():
+    """
+    This tests using ImpactX with a resting reference particle:
+    must throw a user-friendly runtime error
+    """
+    impactX = ImpactX()
+
+    impactX.set_particle_shape(2)
+    impactX.init_grids()
+
+    gaussian = distribution.Gaussian(
+        sigmaX = 4.0e-5, sigmaY = 5.0e-5, sigmaT = 1.0e-3,
+        sigmaPx = 1.0e-5, sigmaPy = 3.0e-5, sigmaPt = 2.0e-3)
+    distribution.generate_add_particles(
+        impactX.particle_container(), qm=-1.0/0.510998950e6, bunch_charge=0.0, distr=gaussian, npart=10)
+
+    # reference particle init intentionally missing
+
+    impactX.lattice.append(elements.Drift(0.25))
+
+    # TODO: we need to check this before we call kernels, otherwise we cannot catch this on GPU
+    #       runs
+    #with pytest.raises(RuntimeError):
+    #    impactX.evolve()
