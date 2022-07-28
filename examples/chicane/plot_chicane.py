@@ -228,7 +228,7 @@ for step in print_steps:
         beam_at_step.px.multiply(mrad),
         s=0.01
     )
-    ax.set_xlabel(r"$x$ [mm]")
+    ax.set_xlabel(r"$ct$ [mm]")
 
 axs[(0, 0)].set_ylabel(r"$p_t$ [mrad]")
 axs[(1, 0)].set_ylabel(r"$p_x$ [mrad]")

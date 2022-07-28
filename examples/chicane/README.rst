@@ -46,5 +46,5 @@ You can run the following script to visualize the beam evolution over time:
 .. figure:: https://user-images.githubusercontent.com/1353258/180332191-f9ce11fc-8c56-4713-a91a-2ad12ab09805.png
  :alt: Chicane beam width and emittance evolution
 
-.. figure:: https://user-images.githubusercontent.com/1353258/180332189-a0e6933b-d3c6-4170-acd0-d79b366602e0.png
+.. figure:: https://user-images.githubusercontent.com/1353258/181611473-754dde72-3281-453b-9d9a-43317a5a49f2.png
  :alt: Chicane phase space evolution
