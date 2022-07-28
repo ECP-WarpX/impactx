@@ -84,6 +84,44 @@ namespace impactx
         amrex::ParticleReal py = 0.0; ///< momentum in y, normalized to proper velocity
         amrex::ParticleReal pz = 0.0; ///< momentum in z, normalized to proper velocity
         amrex::ParticleReal pt = 0.0; ///< energy deviation, normalized by rest energy
+
+        /** Get reference particle relativistic gamma
+         *
+         * @returns relativistic gamma
+         */
+        amrex::ParticleReal
+        GetGamma ();
+
+        /** Get reference particle relativistic beta
+         *
+         * @returns relativistic beta
+         */
+        amrex::ParticleReal
+        GetBeta ();
+
+        /** Get reference particle beta*gamma
+         *
+         * @returns relativistic beta*gamma
+         */
+        amrex::ParticleReal
+        GetBetaGamma ();
+
+        /** Initialize reference particle energy
+         *
+         * @param energy initial kinetic energy (MeV)
+         * @param massE particle rest energy (MeV)
+         */
+        void
+        Set_Energy_MeV (amrex::ParticleReal const energy,
+            amrex::ParticleReal const massE);
+
+        /** Get reference particle energy
+         *
+         * @returns kinetic energy in MeV
+         */
+        amrex::ParticleReal
+        Get_Energy_MeV (amrex::ParticleReal massE);
+
     };
 
     /** Beam Particles in ImpactX
@@ -141,17 +179,6 @@ namespace impactx
         void
         SetRefParticle (RefPart const refpart);
 
-
-        /** Initialize reference particle energy
-         *
-         * @param energy initial kinetic energy (MeV)
-         * @param massE particle rest energy (MeV)
-         */
-        void
-        Set_Energy_MeV (amrex::ParticleReal const energy,
-            amrex::ParticleReal const massE);
-
-
         /** Get reference particle attributes
          *
          * @returns refpart
@@ -165,43 +192,6 @@ namespace impactx
          */
         RefPart const
         GetRefParticle () const;
-
-
-        /** Get reference particle relativistic gamma
-         *
-         * @param refpart reference particle
-         * @returns relativistic gamma
-         */
-        amrex::ParticleReal
-        GetGamma (RefPart const refpart);
-
-
-        /** Get reference particle relativistic beta
-         *
-         * @param refpart reference particle
-         * @returns relativistic beta
-         */
-        amrex::ParticleReal
-        GetBeta (RefPart const refpart);
-
-
-        /** Get reference particle beta*gamma
-         *
-         * @param refpart reference particle
-         * @returns relativistic beta*gamma
-         */
-        amrex::ParticleReal
-        GetBetaGamma (RefPart const refpart);
-
-
-        /** Get reference particle energy
-         *
-         * @param refpart reference particle
-         * @returns kinetic energy in MeV
-         */
-        amrex::ParticleReal
-        Get_Energy_MeV (amrex::ParticleReal massE, RefPart const refpart);
-
 
         /** Get particle shape
          */

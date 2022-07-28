@@ -247,7 +247,11 @@ namespace impactx
         }
 
         // set the energy and initialize the reference particle
-        m_particle_container->Set_Energy_MeV(energy, massE);
+        RefPart refpart;
+        refpart.Set_Energy_MeV(energy, massE);
+        m_particle_container->SetRefParticle(refpart);
+
+//        m_particle_container->Set_Energy_MeV(energy, massE);
 
         // print information on the initialized beam
         amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;
