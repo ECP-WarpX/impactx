@@ -17,8 +17,6 @@ sim.set_diags_slice_step_diagnostics(True)
 
 # domain decomposition & space charge mesh
 sim.init_grids()
-# access distributed particle beam storage
-particles = sim.particle_container()
 
 # load a 2 GeV electron beam with an initial
 # unnormalized rms emittance of 2 nm
@@ -40,12 +38,9 @@ distr = distribution.Waterbag(
     mutpt = 0.0)
 sim.add_particles(qm_qeeV, charge_C, distr, npart)
 
-# init reference particle
-refPart = RefPart()
-# make the next two lines a helper function?
-refPart.pt = -energy_MeV / mass_MeV - 1.0
-refPart.pz = (refPart.pt**2 - 1.0)**0.5
-particles.set_ref_particle(refPart)
+# set the energy in the reference particle
+sim.particle_container().get_ref_particle() \
+    .set_energy_MeV(energy_MeV, mass_MeV)
 
 # design the accelerator lattice
 ns = 25  # number of slices per ds in the element

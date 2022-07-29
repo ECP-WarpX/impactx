@@ -246,12 +246,8 @@ namespace impactx
             massE = 0.510998950;  // default to electron
         }
 
-        // set the energy and initialize the reference particle
-        RefPart refpart;
-        refpart.Set_Energy_MeV(energy, massE);
-        m_particle_container->SetRefParticle(refpart);
-
-//        m_particle_container->Set_Energy_MeV(energy, massE);
+        // set the energy in the reference particle
+        m_particle_container->GetRefParticle().set_energy_MeV(energy, massE);
 
         // print information on the initialized beam
         amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;
