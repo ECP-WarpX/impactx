@@ -140,6 +140,62 @@ namespace impactx
         return m_refpart;
     }
 
+    // Reference particle helper functions
+
+    void
+    RefPart::set_energy_MeV (amrex::ParticleReal const energy,
+            amrex::ParticleReal const massE)
+    {
+        using namespace amrex::literals;
+
+        s = 0.0;
+        x = 0.0;
+        y = 0.0;
+        z = 0.0;
+        t = 0.0;
+        px = 0.0;
+        py = 0.0;
+        pt = -energy/massE - 1.0_prt;
+        pz = sqrt(pow(pt,2) - 1.0_prt);
+    }
+
+    amrex::ParticleReal
+    RefPart::gamma () const
+    {
+        amrex::ParticleReal ref_gamma = -pt;
+        return ref_gamma;
+    }
+
+    amrex::ParticleReal
+    RefPart::beta () const
+    {
+        using namespace amrex::literals;
+
+        amrex::ParticleReal ref_gamma = -pt;
+        amrex::ParticleReal ref_beta = sqrt(1.0_prt - 1.0_prt/pow(ref_gamma,2));
+        return ref_beta;
+    }
+
+    amrex::ParticleReal
+    RefPart::beta_gamma () const
+    {
+        using namespace amrex::literals;
+
+        amrex::ParticleReal ref_gamma = -pt;
+        amrex::ParticleReal ref_betagamma = sqrt(pow(ref_gamma,2) - 1.0_prt);
+        return ref_betagamma;
+    }
+
+    amrex::ParticleReal
+    RefPart::energy_MeV (amrex::ParticleReal massE) const
+    {
+        using namespace amrex::literals;
+
+        amrex::ParticleReal ref_gamma = -pt;
+        amrex::ParticleReal ref_energy = massE*(ref_gamma - 1.0_prt);
+        return ref_energy;
+    }
+
     std::tuple<
             amrex::ParticleReal, amrex::ParticleReal,
             amrex::ParticleReal, amrex::ParticleReal,

@@ -25,5 +25,14 @@ void init_refparticle(py::module& m)
         .def_readwrite("py", &RefPart::py, "momentum in y, normalized to proper velocity")
         .def_readwrite("pz", &RefPart::pz, "momentum in z, normalized to proper velocity")
         .def_readwrite("pt", &RefPart::pt, "energy deviation, normalized by rest energy")
+
+        .def_property_readonly("gamma", &RefPart::gamma, "Get reference particle relativistic gamma")
+        .def_property_readonly("beta", &RefPart::beta, "Get reference particle relativistic beta")
+        .def_property_readonly("beta_gamma", &RefPart::beta_gamma, "Get reference particle beta*gamma")
+        .def("energy_MeV", &RefPart::energy_MeV, "Get reference particle energy",
+             py::arg("massE_MeV"))
+
+        .def("set_energy_MeV", &RefPart::set_energy_MeV, "Set reference particle energy",
+             py::arg("energy_MeV"), py::arg("massE_MeV"))
     ;
 }

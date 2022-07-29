@@ -11,8 +11,11 @@ from impactx import ImpactX, RefPart, distribution, elements
 
 sim = ImpactX()
 
-sim.set_particle_shape(2)
+# set numerical parameters and IO control
+sim.set_particle_shape(2)  # B-spline order
 sim.set_diags_slice_step_diagnostics(True)
+
+# domain decomposition & space charge mesh
 sim.init_grids()
 
 # init particle beam
@@ -32,12 +35,9 @@ distr = distribution.Waterbag(
 sim.add_particles(
     qm_qeeV, charge_C, distr, npart)
 
-# init reference particle
-refPart = RefPart()
-# make the next two lines a helper function?
-refPart.pt = -energy_MeV / mass_MeV - 1.0
-refPart.pz = (refPart.pt**2 - 1.0)**0.5
-sim.particle_container().set_ref_particle(refPart)
+# set the energy in the reference particle
+sim.particle_container().ref_particle() \
+    .set_energy_MeV(energy_MeV, mass_MeV)
 
 # init accelerator lattice
 ns = 10  # number of slices per ds in the element

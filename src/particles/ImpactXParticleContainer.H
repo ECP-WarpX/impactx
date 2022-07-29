@@ -84,6 +84,45 @@ namespace impactx
         amrex::ParticleReal py = 0.0; ///< momentum in y, normalized to proper velocity
         amrex::ParticleReal pz = 0.0; ///< momentum in z, normalized to proper velocity
         amrex::ParticleReal pt = 0.0; ///< energy deviation, normalized by rest energy
+
+        /** Get reference particle relativistic gamma
+         *
+         * @returns relativistic gamma
+         */
+        amrex::ParticleReal
+        gamma () const;
+
+        /** Get reference particle relativistic beta
+         *
+         * @returns relativistic beta
+         */
+        amrex::ParticleReal
+        beta () const;
+
+        /** Get reference particle beta*gamma
+         *
+         * @returns relativistic beta*gamma
+         */
+        amrex::ParticleReal
+        beta_gamma () const;
+
+        /** Get reference particle energy
+         *
+         * @returns kinetic energy in MeV
+         */
+        amrex::ParticleReal
+        energy_MeV (amrex::ParticleReal massE) const;
+
+        /** Set reference particle energy
+         *
+         * @param energy initial kinetic energy (MeV)
+         * @param massE particle rest energy (MeV)
+         */
+        void
+        set_energy_MeV (
+            amrex::ParticleReal const energy,
+            amrex::ParticleReal const massE);
+
     };
 
     /** Beam Particles in ImpactX

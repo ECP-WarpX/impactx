@@ -245,18 +245,9 @@ namespace impactx
         } else {
             massE = 0.510998950;  // default to electron
         }
-        RefPart refPart;
-        refPart.s = 0.0;
-        refPart.x = 0.0;
-        refPart.y = 0.0;
-        refPart.t = 0.0;
-        refPart.z = 0.0;
-        refPart.px = 0.0;
-        refPart.py = 0.0;
-        // make the next two lines a helper function?
-        refPart.pt = -energy/massE - 1.0_prt;
-        refPart.pz = sqrt(pow(refPart.pt,2) - 1.0_prt);
-        m_particle_container->SetRefParticle(refPart);
+
+        // set the energy in the reference particle
+        m_particle_container->GetRefParticle().set_energy_MeV(energy, massE);
 
         // print information on the initialized beam
         amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;
