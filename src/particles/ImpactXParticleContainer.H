@@ -90,37 +90,38 @@ namespace impactx
          * @returns relativistic gamma
          */
         amrex::ParticleReal
-        GetGamma ();
+        gamma () const;
 
         /** Get reference particle relativistic beta
          *
          * @returns relativistic beta
          */
         amrex::ParticleReal
-        GetBeta ();
+        beta () const;
 
         /** Get reference particle beta*gamma
          *
          * @returns relativistic beta*gamma
          */
         amrex::ParticleReal
-        GetBetaGamma ();
-
-        /** Initialize reference particle energy
-         *
-         * @param energy initial kinetic energy (MeV)
-         * @param massE particle rest energy (MeV)
-         */
-        void
-        Set_Energy_MeV (amrex::ParticleReal const energy,
-            amrex::ParticleReal const massE);
+        beta_gamma () const;
 
         /** Get reference particle energy
          *
          * @returns kinetic energy in MeV
          */
         amrex::ParticleReal
-        Get_Energy_MeV (amrex::ParticleReal massE);
+        energy_MeV (amrex::ParticleReal massE) const;
+
+        /** Set reference particle energy
+         *
+         * @param energy initial kinetic energy (MeV)
+         * @param massE particle rest energy (MeV)
+         */
+        void
+        set_energy_MeV (
+            amrex::ParticleReal const energy,
+            amrex::ParticleReal const massE);
 
     };
 
