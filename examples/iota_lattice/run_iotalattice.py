@@ -36,7 +36,7 @@ sim.add_particles(
     qm_qeeV, charge_C, distr, npart)
 
 # set the energy in the reference particle
-sim.particle_container().get_ref_particle() \
+sim.particle_container().ref_particle() \
     .set_energy_MeV(energy_MeV, mass_MeV)
 
 # init accelerator lattice

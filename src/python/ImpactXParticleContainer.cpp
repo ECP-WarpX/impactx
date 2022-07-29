@@ -21,7 +21,7 @@ void init_impactxparticlecontainer(py::module& m)
     >(m, "ImpactXParticleContainer")
         //.def(py::init<>())
         .def("add_n_particles", &ImpactXParticleContainer::AddNParticles)
-        .def("get_ref_particle",
+        .def("ref_particle",
             py::overload_cast<>(&ImpactXParticleContainer::GetRefParticle),
             py::return_value_policy::reference_internal
         )
