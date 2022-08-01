@@ -359,8 +359,8 @@ Numerics and algorithms
     High-order shape factors are computationally more expensive, but may increase the overall accuracy of the results. For production runs it is generally safer to use high-order shape factors, such as cubic order.
 
 * ``algo.space_charge`` (``boolean``, optional, default: ``true``)
-    Wheter to calculate space charge effects.
-    This is in-development. At the moment, this flag only activates coordiante transformations and charge deposition.
+    Whether to calculate space charge effects.
+    This is in-development. At the moment, this flag only activates coordinate transformations and charge deposition.
 
 .. _running-cpp-parameters-diagnostics:
 
@@ -380,7 +380,7 @@ Reduced Diagnostics
 ^^^^^^^^^^^^^^^^^^^
 
 Reduced diagnostics allow the user to compute some reduced quantity (invariants of motion, particle temperature, max of a field, ...) and write a small amount of data to text files.
-Reduced diagnostics are un *in situ* with the simulation.
+Reduced diagnostics are run *in situ* with the simulation.
 
 Diagnostics related to integrable optics in the IOTA nonlinear magnetic insert element:
 
