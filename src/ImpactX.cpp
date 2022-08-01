@@ -98,6 +98,11 @@ namespace impactx
 
         }
 
+        amrex::ParmParse pp_algo("algo");
+        bool space_charge = true;
+        pp_algo.queryAdd("space_charge", space_charge);
+        amrex::Print() << " Space Charge effects: " << space_charge << "\n";
+
         // loop over all beamline elements
         for (auto & element_variant : m_lattice)
         {
@@ -113,12 +118,14 @@ namespace impactx
                 amrex::Print() << " ++++ Starting global_step=" << global_step
                                << " slice_step=" << slice_step << "\n";
 
-                // transform from x',y',t to x,y,z
-                transformation::CoordinateTransformation(*m_particle_container,
-                                                         transformation::Direction::T2Z);
-
                 // Space-charge calculation: turn off if there is only 1 particle
-                if (m_particle_container->TotalNumberOfParticles(false,false) > 1) {
+                if (space_charge &&
+                    m_particle_container->TotalNumberOfParticles(false,false) > 1)
+                {
+
+                    // transform from x',y',t to x,y,z
+                    transformation::CoordinateTransformation(*m_particle_container,
+                                                             transformation::Direction::T2Z);
 
                     // Note: The following operation assume that
                     // the particles are in x, y, z coordinates.
@@ -138,11 +145,11 @@ namespace impactx
                     // gather and space-charge push in x,y,z , assuming the space-charge
                     // field is the same before/after transformation
                     //   TODO
-                }
 
-                // transform from x,y,z to x',y',t
-                transformation::CoordinateTransformation(*m_particle_container,
-                                                         transformation::Direction::Z2T);
+                    // transform from x,y,z to x',y',t
+                    transformation::CoordinateTransformation(*m_particle_container,
+                                                             transformation::Direction::Z2T);
+                }
 
                 // for later: original Impact implementation as an option
                 // Redistribute particles in x',y',t
