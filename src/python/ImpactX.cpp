@@ -70,20 +70,33 @@ void init_ImpactX(py::module& m)
                 pp_ago.add("particle_shape", order);
             })
         .def("set_space_charge",
-             [](ImpactX & /* ix */, bool const space_charge) {
+             [](ImpactX & /* ix */, bool const enable) {
                  amrex::ParmParse pp_algo("algo");
-                 pp_algo.add("space_charge", space_charge);
-             })
-        .def("set_diags_slice_step_diagnostics",
-             [](ImpactX & /* ix */, bool const slice_step_diagnostics) {
+                 pp_algo.add("space_charge", enable);
+             },
+             py::arg("enable")
+         )
+        .def("set_diagnostics",
+             [](ImpactX & /* ix */, bool const enable) {
                  amrex::ParmParse pp_diag("diag");
-                 pp_diag.add("slice_step_diagnostics", slice_step_diagnostics);
-             })
-        .def("set_diags_file_min_digits",
+                 pp_diag.add("enable", enable);
+             },
+             py::arg("enable")
+         )
+        .def("set_slice_step_diagnostics",
+             [](ImpactX & /* ix */, bool const enable) {
+                 amrex::ParmParse pp_diag("diag");
+                 pp_diag.add("slice_step_diagnostics", enable);
+             },
+             py::arg("enable")
+         )
+        .def("set_diag_file_min_digits",
              [](ImpactX & /* ix */, int const file_min_digits) {
                  amrex::ParmParse pp_diag("diag");
                  pp_diag.add("file_min_digits", file_min_digits);
-             })
+             },
+             py::arg("file_min_digits")
+         )
 
         .def("init_grids", &ImpactX::initGrids)
         .def("init_beam_distribution_from_inputs", &ImpactX::initBeamDistributionFromInputs)

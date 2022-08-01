@@ -25,7 +25,7 @@ def test_impactx_nofile():
     impactX = ImpactX()
 
     impactX.set_particle_shape(2)
-    impactX.set_diags_slice_step_diagnostics(True)
+    impactX.set_slice_step_diagnostics(True)
     impactX.init_grids()
 
     # init particle beam

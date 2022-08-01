@@ -367,6 +367,10 @@ Numerics and algorithms
 Diagnostics and output
 ----------------------
 
+* ``diag.enable`` (``boolean``, optional, default: ``true``)
+  Enable or disable diagnostics generally.
+  Disabling this is mostly used for benchmarking.
+
 * ``diag.slice_step_diagnostics`` (``boolean``, optional, default: ``false``)
   By default, diagnostics is performed at the beginning and end of the simulation.
   Enabling this flag will write diagnostics every step and slice step
