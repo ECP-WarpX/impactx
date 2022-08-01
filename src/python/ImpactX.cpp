@@ -69,6 +69,11 @@ void init_ImpactX(py::module& m)
                 amrex::ParmParse pp_ago("algo");
                 pp_ago.add("particle_shape", order);
             })
+        .def("set_space_charge",
+             [](ImpactX & /* ix */, bool const space_charge) {
+                 amrex::ParmParse pp_algo("algo");
+                 pp_algo.add("space_charge", space_charge);
+             })
         .def("set_diags_slice_step_diagnostics",
              [](ImpactX & /* ix */, bool const slice_step_diagnostics) {
                  amrex::ParmParse pp_diag("diag");
