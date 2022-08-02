@@ -74,7 +74,12 @@ namespace impactx
         }
 
         amrex::ParmParse pp_diag("diag");
+        bool diag_enable = true;
+        pp_diag.queryAdd("enable", diag_enable);
+        amrex::Print() << " Diagnostics: " << diag_enable << "\n";
+
         int file_min_digits = 6;
+        if (diag_enable)
         {
             pp_diag.queryAdd("file_min_digits", file_min_digits);
 
@@ -171,7 +176,7 @@ namespace impactx
                 bool slice_step_diagnostics = false;
                 pp_diag.queryAdd("slice_step_diagnostics", slice_step_diagnostics);
 
-                if (slice_step_diagnostics)
+                if (diag_enable && slice_step_diagnostics)
                 {
                     // print slice step particle distribution to file
                     std::string diag_name = amrex::Concatenate("diags/beam_", global_step, file_min_digits);
@@ -192,23 +197,26 @@ namespace impactx
             } // end in-element space-charge slice-step loop
         } // end beamline element loop
 
-        // print final particle distribution to file
-        diagnostics::DiagnosticOutput(*m_particle_container,
-                                      diagnostics::OutputType::PrintParticles,
-                                      "diags/beam_final",
-                                      global_step);
+        if (diag_enable)
+        {
+            // print final particle distribution to file
+            diagnostics::DiagnosticOutput(*m_particle_container,
+                                          diagnostics::OutputType::PrintParticles,
+                                          "diags/beam_final",
+                                          global_step);
 
-        // print final reference particle to file
-        diagnostics::DiagnosticOutput(*m_particle_container,
-                                      diagnostics::OutputType::PrintRefParticle,
-                                      "diags/ref_particle_final",
-                                      global_step);
+            // print final reference particle to file
+            diagnostics::DiagnosticOutput(*m_particle_container,
+                                          diagnostics::OutputType::PrintRefParticle,
+                                          "diags/ref_particle_final",
+                                          global_step);
 
-        // print the final values of the two invariants H and I
-        diagnostics::DiagnosticOutput(*m_particle_container,
-                                      diagnostics::OutputType::PrintNonlinearLensInvariants,
-                                      "diags/nonlinear_lens_invariants_final",
-                                      global_step);
+            // print the final values of the two invariants H and I
+            diagnostics::DiagnosticOutput(*m_particle_container,
+                                          diagnostics::OutputType::PrintNonlinearLensInvariants,
+                                          "diags/nonlinear_lens_invariants_final",
+                                          global_step);
+        }
 
     }
 } // namespace impactx
