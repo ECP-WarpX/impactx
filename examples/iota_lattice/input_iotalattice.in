@@ -35,7 +35,7 @@ lattice.elements = dra1 qa1 dra2 qa2 dra3 qa3 dra4 qa4 dra5
                    qb3 drb2 qb2 drb2 qb1 drb1 edge30 sbend30 edge30
                    dra5 qa4 dra4 qa3 dra3 qa2 dra2 qa1 dra1
 
-lattice.nslice = 10
+lattice.nslice = 23
 
 
 # Drift elements:

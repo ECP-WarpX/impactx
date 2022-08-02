@@ -42,7 +42,7 @@ sim.particle_container().ref_particle() \
     .set_energy_MeV(energy_MeV, mass_MeV)
 
 # init accelerator lattice
-ns = 10  # number of slices per ds in the element
+ns = 23  # number of slices per ds in the element
 
 # Drift elements
 dra1 = elements.Drift(ds=0.9125, nslice=ns)

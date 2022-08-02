@@ -71,11 +71,28 @@ def read_time_series(file_pattern):
 
 
 # options to run this script
-parser = argparse.ArgumentParser(description='Plot the chicane benchmark.')
+parser = argparse.ArgumentParser(description='Plot the FODO benchmark.')
 parser.add_argument('--save-png', action="store_true",
     help='non-interactive run: save to PNGs')
 args = parser.parse_args()
 
+
+# IMPACT-Z data
+iz_x = pd.read_csv(
+    "impactz/IMPACTZ_outputX.txt",
+    delimiter=r"\s+",
+    skiprows=1,
+    names=['s', 'mean_x', 'sigma_x', 'mean_px', 'sigma_px', 'Twiss_alpha', 'emittance_x']
+).set_index('s')
+iz_y = pd.read_csv(
+    "impactz/IMPACTZ_outputY.txt",
+    delimiter=r"\s+",
+    skiprows=1,
+    names=['s', 'mean_y', 'sigma_y', 'mean_py', 'sigma_py', 'Twiss_alpha', 'emittance_y']
+).set_index('s').drop(columns=['Twiss_alpha'])
+iz = iz_x.join(
+    iz_y
+)
 
 # initial/final beam on rank zero
 beam = read_time_series("diags/beam_[0-9]*.*")
@@ -85,7 +102,6 @@ ref_particle = read_time_series("diags/ref_particle.*")
 
 # scaling to units
 millimeter = 1.e3  # m->mm
-# for "t": the time coordinate is scaled by c, and therefore has units of length (m) by default, so we can label the axis ct (mm)
 mrad = 1.e3  # ImpactX uses "static units": momenta are normalized by the magnitude of the momentum of the reference particle p0: px/p0 (rad)
 #mm_mrad = 1.e6
 nm_rad = 1.e9
@@ -101,12 +117,16 @@ steps = beam.step.unique()
 steps.sort()
 #print(f"steps={steps}")
 
-z = list(map(
-    lambda step: ref_particle[ref_particle["step"] == step].z.values[0],
+s = list(map(
+    lambda step: ref_particle[ref_particle["step"] == step].s.values[0],
     steps
 ))
 x = list(map(
     lambda step: ref_particle[ref_particle["step"] == step].x.values[0],
+    steps
+))
+z = list(map(
+    lambda step: ref_particle[ref_particle["step"] == step].z.values[0],
     steps
 ))
 #print(f"z={z}")
@@ -119,101 +139,65 @@ moments = list(map(
 ))
 #print(moments)
 sigx = list(map(lambda step_val: step_val[1][0] * millimeter, moments))
-sigt = list(map(lambda step_val: step_val[1][2] * millimeter, moments))
+sigy = list(map(lambda step_val: step_val[1][1] * millimeter, moments))
 emittance_x = list(map(lambda step_val: step_val[1][3] * nm_rad, moments))
-emittance_t = list(map(lambda step_val: step_val[1][5] * nm_rad, moments))
+emittance_y = list(map(lambda step_val: step_val[1][4] * nm_rad, moments))
 
-#print(sigx, sigt)
+#print(sigx, sigy)
 
+# print beam position over s
+f = plt.figure(figsize=(7, 2))
+ax1 = f.gca()
+im_x = ax1.plot(z, x, label=r'$\z-x')
 
-# print beam transversal size over steps
-f, axs = plt.subplots(
-    1, 1,
-    figsize=(7, 2)
-)
-#ax0 = axs[0]
-#ax0.legend(loc='upper right')
-#ax0.set_ylim([0, None])
-#ax0.set_ylabel(r"$x$ [m]")
-
-ax1 = axs
-#im_sigx = ax1.plot(z, sigx, label=r'$\sigma_x$')
-im_sigt = ax1.plot(z, sigt, label=r'$\sigma_t$')
-ax2 = ax1.twinx()
-ax2._get_lines.prop_cycler = ax1._get_lines.prop_cycler
-im_emittance_x = ax2.plot(z, emittance_x, ':', label=r'$\epsilon_x$')
-#im_emittance_t = ax2.plot(z, emittance_t, ':', label=r'$\epsilon_t$')
-
-ax1.legend(
-    handles=im_sigt+im_emittance_x,
-    loc='upper right'
-)
 ax1.set_xlabel(r"$z$ [m]")
-ax1.set_ylabel("beam size\n[mm]")
-#ax2.set_ylabel(r"$\epsilon_{x,y}$ [mm-mrad]")
-ax2.set_ylabel("emittance\n[nm]")
-ax1.set_ylim([0, None])
-ax2.set_ylim([0, None])
-ax1.set_xlim([0, 15])
-ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
+ax1.set_ylabel(r"$x$ [m]")
+#ax1.set_xlim([0, 40])
+ax1.set_ylim([-8.8, 0.5])
+ax1.set_yticks([-8, -4, 0])
+#ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.tight_layout()
 if args.save_png:
-    plt.savefig("chicane_sigma.eps")
+    plt.savefig("iotalattice_position.eps")
 else:
     plt.show()
 
 
-# beam transversal scatter plot over steps
-plot_ever_nstep = 25  # this is lattice.nslice in inputs
-# entry and exit dipedge are part of each bending element
-# lattice.elements = sbend1 dipedge1 drift1 dipedge2 sbend2 drift2 sbend2
-#                    dipedge2 drift1 dipedge1 sbend1 drift3
-# lattice.nslice = 25
-print_steps = [
-    0, #26, 51,
-    77, #102,
-    128,
-    #153,
-    #179,
-    204
-]
-num_plots_per_row = len(print_steps)
-fig, axs = plt.subplots(
-    1, num_plots_per_row,
-    figsize=(7, 2),
-    sharex='row', sharey='row'
+# print beam transversal size over steps
+f = plt.figure(figsize=(7, 2))
+ax1 = f.gca()
+
+# IMPACT-Z - ImpactX
+im_sigx_iz = ax1.plot(
+    iz.index,
+    iz.sigma_x.multiply(millimeter),
+    label=r'IMPACT-Z $\sigma_x$',
+    lw='5',
+    color='lightsteelblue'
 )
+im_sigx = ax1.plot(s, sigx, label=r'$\sigma_x$')
 
-# thin our scatterplot to avoid huge eps
-particle_thinning = 10  # take only every Nth particle
+im_sigy_iz = ax1.plot(
+    iz.index,
+    iz.sigma_y.multiply(millimeter),
+    label=r'IMPACT-Z $\sigma_y$',
+    lw='5',
+    color='peachpuff'
+)
+im_sigy = ax1.plot(s, sigy, label=r'$\sigma_y$')
 
-ncol_ax = -1
-for step in print_steps:
-    # plot initial distribution & at exit of each element
-    print(step)
-    ncol_ax += 1
-
-    # t-pt
-    ax = axs[ncol_ax] #[(0, ncol_ax)]
-    beam_at_step = beam[beam["step"] == step]
-    ax.scatter(
-        beam_at_step.t.multiply(millimeter)[::particle_thinning],
-        beam_at_step.pt.multiply(mrad)[::particle_thinning],
-        s=0.01
-    )
-    ax.set_xlabel(r"$ct$ [mm]")
-    z_var = ""
-    if ncol_ax == 0:
-        z_var = "z="
-    z_unit = ""
-    if ncol_ax == num_plots_per_row - 1:
-        z_unit = " [m]"
-    ax.set_title(f"${z_var}{z[step]:.1f}${z_unit}")
-
-axs[0].set_ylabel(r"$p_t$ [$10^{-3}$]")
-#fig.supxlabel(r"$ct$ [mm]", size="medium")
+ax1.legend(
+    handles=im_sigx+im_sigy,
+    loc='center right',
+    bbox_to_anchor=(0.83, 0.5)
+)
+ax1.set_xlabel(r"distance $s$ [m]")
+ax1.set_ylabel("beam size\n[mm]")
+ax1.set_xlim([0, 40])
+ax1.set_ylim([0, None])
+ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.tight_layout()
 if args.save_png:
-    plt.savefig("chicane_scatter.eps")
+    plt.savefig("iotalattice_sigma.eps")
 else:
     plt.show()
