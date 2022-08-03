@@ -1,0 +1,67 @@
+{
+    "creators": [
+      {
+        "affiliation": "Lawrence Berkeley National Laboratory",
+        "name": "Huebl, Axel",
+        "orcid": "0000-0003-1943-7141"
+      },
+      {
+        "affiliation": "Lawrence Berkeley National Laboratory",
+        "name": "Mitchell, Chad E.",
+        "orcid": "0000-0002-1986-9852"
+      },
+      {
+        "affiliation": "Lawrence Berkeley National Laboratory",
+        "name": "Lehe, Remi",
+        "orcid": "0000-0002-3656-9659"
+      },
+      {
+        "affiliation": "Lawrence Berkeley National Laboratory",
+        "name": "Qiang, Ji",
+        "orcid": "0000-"
+      },
+      {
+        "affiliation": "Lawrence Berkeley National Laboratory",
+        "name": "Myers, Andrew",
+        "orcid": "0000-0001-8427-8330"
+      },
+      {
+        "affiliation": "Lawrence Berkeley National Laboratory",
+        "name": "Zhang, Weiqun",
+        "orcid": "0000-0001-8092-1974"
+      },
+      {
+        "affiliation": "Lawrence Berkeley National Laboratory",
+        "name": "Sandberg, Ryan T.",
+        "orcid": "0000-0001-7680-8733"
+      }
+    ],
+    "contributors": [
+      {
+        "type": "ResearchGroup",
+        "affiliation": "Lawrence Berkeley National Laboratory",
+        "name": "Vay, Jean-Luc",
+        "orcid": "0000-0002-0040-799X"
+      }
+    ],
+    "license": {
+      "id": "BSD-3-Clause-LBNL"
+    },
+    "language": "eng",
+    "keywords": [
+      "research",
+      "simulation",
+      "particle accelerator",
+      "beam dynamics",
+      "particle-in-cell",
+      "space charge",
+      "gpu",
+      "physics",
+      "pic"
+    ],
+    "access_right": "open",
+    "references": [
+      "Huebl A, Lehe R, Mitchell CE, Qiang J, Ryne RD, Sandberg RT and Vay J-L. Next Generation Computational Tools For The Modeling And Design Of Particle Accelerators At Exascale. NAPAC22 (2022)",
+      "Qiang J, Ryne R, Habib S, Decyk V. An Object-Oriented Parallel Particle-in-Cell Code for Beam Dynamics Simulation in Linear Accelerators. J. Comput. Phys. 163, 434-451 (2000). DOI:10.1006/jcph.2000.6570"
+    ]
+}
