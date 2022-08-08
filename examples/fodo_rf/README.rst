@@ -1,4 +1,4 @@
-.. _examples-fodo:
+.. _examples-fodo-rf:
 
 FODO Cell with RF
 =================
