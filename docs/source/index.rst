@@ -68,8 +68,8 @@ Usage
    :hidden:
 
    usage/how_to_run
-   usage/parameters
    usage/python
+   usage/parameters
    usage/examples
    usage/workflows
 

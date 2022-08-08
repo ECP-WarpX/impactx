@@ -62,7 +62,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
                 int const >(),
-             py::arg("ds"), py::arg("kx"), py::arg("ky"), py::arg("kt"), py::arg("nslice") = 1
+             py::arg("ds"), py::arg("kx"), py::arg("ky"), py::arg("kt"), py::arg("nslice") = 1,
+             "A linear Constant Focusing element."
         )
         .def_property_readonly("nslice", &ConstF::nslice)
     ;
@@ -73,7 +74,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
                 amrex::ParticleReal const>(),
-             py::arg("psi"), py::arg("rc"), py::arg("g"), py::arg("K2")
+             py::arg("psi"), py::arg("rc"), py::arg("g"), py::arg("K2"),
+             "Edge focusing associated with bend entry or exit."
         )
         .def_property_readonly("nslice", &DipEdge::nslice)
     ;
@@ -82,7 +84,8 @@ void init_elements(py::module& m)
         .def(py::init<
                 amrex::ParticleReal const,
                 int const >(),
-             py::arg("ds"), py::arg("nslice") = 1
+             py::arg("ds"), py::arg("nslice") = 1,
+             "A drift."
         )
         .def_property_readonly("nslice", &Drift::nslice)
     ;
@@ -92,18 +95,38 @@ void init_elements(py::module& m)
                 int const,
                 amrex::ParticleReal const,
                 amrex::ParticleReal const>(),
-             py::arg("multiple"), py::arg("K_normal"), py::arg("K_skew")
+             py::arg("multiple"), py::arg("K_normal"), py::arg("K_skew"),
+             "A general thin multipole element."
         )
         .def_property_readonly("nslice", &Multipole::nslice)
+    ;
+
+    py::class_<None>(me, "None")
+        .def(py::init<>(),
+             "This element does nothing."
+        )
+        .def_property_readonly("nslice", &None::nslice)
     ;
 
     py::class_<NonlinearLens>(me, "NonlinearLens")
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const>(),
-             py::arg("knll"), py::arg("cnll")
+             py::arg("knll"), py::arg("cnll"),
+             "Single short segment of the nonlinear magnetic insert element."
         )
         .def_property_readonly("nslice", &NonlinearLens::nslice)
+    ;
+
+    py::class_<Quad>(me, "Quad")
+        .def(py::init<
+                amrex::ParticleReal const,
+                amrex::ParticleReal const,
+                int const>(),
+             py::arg("ds"), py::arg("k"), py::arg("nslice") = 1,
+             "A Quadrupole magnet."
+        )
+        .def_property_readonly("nslice", &Quad::nslice)
     ;
 
     py::class_<Sbend>(me, "Sbend")
@@ -111,7 +134,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
                 int const>(),
-             py::arg("ds"), py::arg("rc"), py::arg("nslice") = 1
+             py::arg("ds"), py::arg("rc"), py::arg("nslice") = 1,
+             "An ideal sector bend."
         )
         .def_property_readonly("nslice", &Sbend::nslice)
     ;
@@ -120,18 +144,9 @@ void init_elements(py::module& m)
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const>(),
-             py::arg("V"), py::arg("k")
+             py::arg("V"), py::arg("k"),
+             "A short RF cavity element at zero crossing for bunching."
         )
         .def_property_readonly("nslice", &ShortRF::nslice)
-    ;
-
-    py::class_<Quad>(me, "Quad")
-        .def(py::init<
-                amrex::ParticleReal const,
-                amrex::ParticleReal const,
-                int const>(),
-             py::arg("ds"), py::arg("k"), py::arg("nslice") = 1
-        )
-        .def_property_readonly("nslice", &Quad::nslice)
     ;
 }

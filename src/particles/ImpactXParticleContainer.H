@@ -70,7 +70,7 @@ namespace impactx
         };
     };
 
-    /** This struct indexes the reference particle attributes
+    /** This struct stores the reference particle attributes
      *  stored in ImpactXParticleContainer
      */
     struct RefPart
