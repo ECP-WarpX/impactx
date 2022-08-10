@@ -30,12 +30,6 @@ namespace impactx {
 
 void init_ImpactX(py::module& m)
 {
-    /*
-    py::bind_map<
-        std::unordered_map<int, amrex::MultiFab>
-    >(m, "MultiFabPerLevel");
-    */
-
     py::class_<ImpactX> impactx(m, "ImpactX");
     impactx
         .def(py::init<>())
@@ -68,53 +62,75 @@ void init_ImpactX(py::module& m)
 
                 amrex::ParmParse pp_ago("algo");
                 pp_ago.add("particle_shape", order);
-            })
+            },
+            "Whether to calculate space charge effects."
+        )
         .def("set_space_charge",
              [](ImpactX & /* ix */, bool const enable) {
                  amrex::ParmParse pp_algo("algo");
                  pp_algo.add("space_charge", enable);
              },
-             py::arg("enable")
-         )
+             py::arg("enable"),
+             "Enable or disable space charge calculations (default: enabled)."
+        )
         .def("set_diagnostics",
              [](ImpactX & /* ix */, bool const enable) {
                  amrex::ParmParse pp_diag("diag");
                  pp_diag.add("enable", enable);
              },
-             py::arg("enable")
+             py::arg("enable"),
+             "Enable or disable diagnostics generally (default: enabled).\n"
+             "Disabling this is mostly used for benchmarking."
          )
         .def("set_slice_step_diagnostics",
              [](ImpactX & /* ix */, bool const enable) {
                  amrex::ParmParse pp_diag("diag");
                  pp_diag.add("slice_step_diagnostics", enable);
              },
-             py::arg("enable")
+             py::arg("enable"),
+             "Enable or disable diagnostics every slice step in elements (default: disabled).\n\n"
+             "By default, diagnostics is performed at the beginning and end of the simulation.\n"
+             "Enabling this flag will write diagnostics every step and slice step."
          )
         .def("set_diag_file_min_digits",
              [](ImpactX & /* ix */, int const file_min_digits) {
                  amrex::ParmParse pp_diag("diag");
                  pp_diag.add("file_min_digits", file_min_digits);
              },
-             py::arg("file_min_digits")
+             py::arg("file_min_digits"),
+             "The minimum number of digits (default: 6) used for the step\n"
+             "number appended to the diagnostic file names."
          )
 
-        .def("init_grids", &ImpactX::initGrids)
+        .def("init_grids", &ImpactX::initGrids,
+             "Initialize AMReX blocks/grids for domain decomposition & space charge mesh.\n\n"
+             "This must come first, before particle beams and lattice elements are initialized."
+        )
         .def("init_beam_distribution_from_inputs", &ImpactX::initBeamDistributionFromInputs)
         .def("init_lattice_elements_from_inputs", &ImpactX::initLatticeElementsFromInputs)
         .def("add_particles", &ImpactX::add_particles,
              py::arg("qm"), py::arg("bunch_charge"),
-             py::arg("distr"), py::arg("npart")
+             py::arg("distr"), py::arg("npart"),
+             "Generate and add n particles to the particle container.\n\n"
+             "Will also resize the geometry based on the updated particle\n"
+             "distribution's extent and then redistribute particles in according\n"
+             "AMReX grid boxes."
         )
-        .def("evolve", &ImpactX::evolve)
+        .def("evolve", &ImpactX::evolve,
+             "Run the main simulation loop for a number of steps."
+        )
         .def("particle_container",
              [](ImpactX & ix) -> ImpactXParticleContainer & {
                 return *ix.m_particle_container;
              },
-             py::return_value_policy::reference_internal
+             py::return_value_policy::reference_internal,
+             "Access the beam particle container."
         )
         //.def_readwrite("rho", &ImpactX::m_rho)
-        .def_readwrite("lattice", &ImpactX::m_lattice)
-        //.def_readwrite("lattice", &ImpactX::m_lattice_test)
+        .def_readwrite("lattice",
+            &ImpactX::m_lattice,
+            "Access the accelerator element lattice."
+        )
     ;
 
     py::class_<Config>(m, "Config")

@@ -43,7 +43,7 @@ namespace impactx
         void operator= (ImpactX const&) = delete;
         void operator= (ImpactX &&) = delete;
 
-        /** Initialize AMReX blocks/grids
+        /** Initialize AMReX blocks/grids for domain decomposition & space charge mesh.
          *
          * This must come first, before particle beams and lattice elements are
          * initialized.
@@ -124,10 +124,8 @@ namespace impactx
         /** charge per level */
         std::unordered_map<int, amrex::MultiFab> m_rho;
 
-        /** these are elements defining the lattice */
+        /** these are elements defining the accelerator lattice */
         std::list<KnownElements> m_lattice;
-
-        std::list<std::variant<int>> m_lattice_test;
     };
 
 } // namespace impactx

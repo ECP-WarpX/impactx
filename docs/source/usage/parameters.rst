@@ -1,7 +1,9 @@
 .. _running-cpp-parameters:
 
-Input Parameters
-================
+Parameters: Inputs File
+=======================
+
+This documents on how to use ImpactX with an inputs file (``impactx input_file.in``).
 
 .. note::
    The AMReX parser (see :ref:`running-cpp-parameters-parser`) is used for the right-hand-side of all input parameters that consist of one or more integers or floats, so expressions like ``<species_name>.density_max = "2.+1."`` and/or using user-defined constants are accepted.
@@ -356,11 +358,13 @@ Numerics and algorithms
 * ``algo.particle_shape`` (``integer``; ``1``, ``2``, or ``3``)
     The order of the shape factors (splines) for the macro-particles along all spatial directions: `1` for linear, `2` for quadratic, `3` for cubic.
     Low-order shape factors result in faster simulations, but may lead to more noisy results.
-    High-order shape factors are computationally more expensive, but may increase the overall accuracy of the results. For production runs it is generally safer to use high-order shape factors, such as cubic order.
+    High-order shape factors are computationally more expensive, but may increase the overall accuracy of the results.
+    For production runs it is generally safer to use high-order shape factors, such as cubic order.
 
 * ``algo.space_charge`` (``boolean``, optional, default: ``true``)
     Whether to calculate space charge effects.
-    This is in-development. At the moment, this flag only activates coordinate transformations and charge deposition.
+    This is in-development.
+    At the moment, this flag only activates coordinate transformations and charge deposition.
 
 .. _running-cpp-parameters-diagnostics:
 
@@ -376,7 +380,7 @@ Diagnostics and output
   Enabling this flag will write diagnostics every step and slice step
 
 * ``diag.file_min_digits`` (``integer``, optional, default: ``6``)
-    The minimum number of digits used for the iteration number appended to the diagnostic file names.
+    The minimum number of digits used for the step number appended to the diagnostic file names.
 
 .. _running-cpp-parameters-diagnostics-reduced:
 

@@ -32,8 +32,8 @@ namespace impactx
          *  S. Nagaitsev, PRSTAB 13, 084002 (2010), Sect. V.A.  This
          *  element appears in MAD-X as type NLLENS.
          *
-         * @param knll - integrated strength of the nonlinear lens (m)
-         * @param cnll - distance of singularities from the origin (m)
+         * @param knll integrated strength of the nonlinear lens (m)
+         * @param cnll distance of singularities from the origin (m)
          */
         NonlinearLens( amrex::ParticleReal const knll,
                    amrex::ParticleReal const cnll )
