@@ -109,7 +109,7 @@ namespace impactx
         pinned_tile.push_back_real(RealSoA::uy, py);
         pinned_tile.push_back_real(RealSoA::pt, pz);
         pinned_tile.push_back_real(RealSoA::m_qm, np, qm);
-        amrex::ParticleReal const q_e = 1.60217662e-19;
+        amrex::ParticleReal const q_e = 1.60217662e-19;  // TODO move out
         pinned_tile.push_back_real(RealSoA::w, np, bchchg/q_e/np);
 
         /* Redistributes particles to their respective tiles (spatial bucket

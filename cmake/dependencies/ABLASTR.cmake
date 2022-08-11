@@ -142,7 +142,7 @@ set(ImpactX_ablastr_branch "22.08"
 set(ImpactX_amrex_repo "https://github.com/AMReX-Codes/amrex.git"
     CACHE STRING
     "Repository URI to pull and build AMReX from if(ImpactX_amrex_internal)")
-set(ImpactX_amrex_branch ""
+set(ImpactX_amrex_branch "1bda173b489024d5f4ec79627f3f612c350e521f"
     CACHE STRING
     "Repository branch for ImpactX_amrex_repo if(ImpactX_amrex_internal)")
 
