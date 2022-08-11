@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import pytest
+
 import amrex
 import impactx
-import pytest
 
 if impactx.Config.have_mpi:
     from mpi4py import MPI

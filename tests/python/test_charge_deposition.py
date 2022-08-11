@@ -3,10 +3,11 @@
 
 import math
 
-import amrex
-import impactx
 import matplotlib.pyplot as plt
 import numpy as np
+
+import amrex
+import impactx
 
 
 def test_charge_deposition():
