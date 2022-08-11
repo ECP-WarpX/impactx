@@ -13,6 +13,7 @@
 #include "particles/Push.H"
 #include "particles/diagnostics/DiagnosticOutput.H"
 #include "particles/spacecharge/PoissonSolve.H"
+#include "particles/spacecharge/ForceFromSelfFields.H"
 #include "particles/transformation/CoordinateTransformation.H"
 
 #include <AMReX.H>
@@ -136,9 +137,10 @@ namespace impactx
                     // poisson solve in x,y,z
                     spacecharge::PoissonSolve(*m_particle_container, m_rho, m_phi);
 
-                    // calculate force
-                    // TODO: FDTD stencil m_phi -> m_space_charge
-                    // nodal: (-1 and +1) / 2dx
+                    // calculate force in x,y,z
+                    spacecharge::ForceFromSelfFields(m_space_charge_force,
+                                                     m_phi,
+                                                     this->geom);
 
                     // gather and space-charge push in x,y,z , assuming the space-charge
                     // field is the same before/after transformation
