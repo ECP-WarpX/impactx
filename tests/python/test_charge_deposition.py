@@ -25,16 +25,14 @@ def test_charge_deposition():
     sim.evolve()
 
     rho = sim.rho(lev=0)
-    # TODO: for non-cell-centered data, this double counts non-owned cells with MPI
-    rs = rho.sum(comp=0, local=False)
+    rs = rho.sum_unique(comp=0, local=False)
 
     gm = sim.Geom(lev=0)
     dr = gm.data().CellSize()
     dV = np.prod(dr)
 
     beam_charge = dV*rs  # in C
-    # TODO: does not yet pass with MPI runs (too large value, see above)
-    #assert math.isclose(beam_charge, 1.0e-9)
+    assert math.isclose(beam_charge, 1.0e-9)
 
     f = plt.figure()
     ax = f.gca()
