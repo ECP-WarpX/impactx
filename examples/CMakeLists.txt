@@ -22,7 +22,7 @@ function(impactx_test_set_pythonpath test_name)
     if(WIN32)
         string(REPLACE ";" "\\;" WIN_PYTHONPATH "$ENV{PYTHONPATH}")
         string(REGEX REPLACE "/" "\\\\" WIN_PYTHON_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY})
-        set_tests_properties(TEST ${test_name}
+        set_tests_properties(${test_name}
             PROPERTIES ENVIRONMENT "PYTHONPATH=${WIN_PYTHON_OUTPUT_DIRECTORY}\;${WIN_PYTHONPATH}"
         )
     else()
