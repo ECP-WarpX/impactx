@@ -31,6 +31,9 @@ Please add the following sentence to your publications, it helps contributors ke
 Main ImpactX reference
 **********************
 
-.. note::
+If your project leads to a scientific publication, please consider citing the paper below.
 
-   TODO :-)
+- Huebl A, Lehe R, Mitchell C E, Qiang J, Ryne R D, Sandberg R T, Vay JL.
+  **Next Generation Computational Tools for the Modeling and Design of Particle Accelerators at Exascale**.
+  *NAPAC'22*, 2022.
+  `arXiv:2208.02382 <https://arxiv.org/abs/2208.02382>`__
