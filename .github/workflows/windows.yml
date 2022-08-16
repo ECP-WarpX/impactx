@@ -47,7 +47,7 @@ jobs:
         cmake --build build --config Debug --target pip_install
         if(!$?) { Exit $LASTEXITCODE }
 
-        ctest --test-dir build --config Debug --output-on-failure -E AMReX
+        ctest --test-dir build --build-config Debug --output-on-failure -E AMReX
         if(!$?) { Exit $LASTEXITCODE }
 
   build_win_clang:
@@ -96,5 +96,5 @@ jobs:
         cmake --build build --config Release --target pip_install
         if errorlevel 1 exit 1
 
-        ctest --test-dir build --config Release --output-on-failure -E AMReX
+        ctest --test-dir build --build-config Release --output-on-failure -E AMReX
         if errorlevel 1 exit 1
