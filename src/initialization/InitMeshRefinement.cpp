@@ -81,11 +81,10 @@ namespace impactx
             amrex::MultiFab{amrex::convert(cba, phi_nodal_flag), dm, num_components_phi, num_guards_phi, tag("phi")});
 
         // space charge force
+        std::unordered_map<std::string, amrex::MultiFab> f_comp;
         for (std::string const comp : {"x", "y", "z"})
         {
             std::string const str_tag = "space_charge_force_" + comp;
-
-            std::unordered_map<std::string, amrex::MultiFab> f_comp;
             f_comp.emplace(
                 comp,
                 amrex::MultiFab{
@@ -96,8 +95,8 @@ namespace impactx
                     tag(str_tag)
                 }
             );
-            m_space_charge_force.emplace(lev, std::move(f_comp));
         }
+        m_space_charge_force.emplace(lev, std::move(f_comp));
     }
 
     /** Make a new level using provided BoxArray and DistributionMapping and fill
