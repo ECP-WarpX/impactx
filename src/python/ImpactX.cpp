@@ -210,7 +210,24 @@ void init_ImpactX(py::module& m)
             "rho",
             [](ImpactX & ix, int const lev) { return &ix.m_rho.at(lev); },
             py::arg("lev"),
-            py::return_value_policy::reference_internal
+            py::return_value_policy::reference_internal,
+            "charge density per level"
+        )
+        .def(
+            "phi",
+            [](ImpactX & ix, int const lev) { return &ix.m_phi.at(lev); },
+            py::arg("lev"),
+            py::return_value_policy::reference_internal,
+            "scalar potential per level"
+        )
+        .def(
+            "space_charge_force",
+            [](ImpactX & ix, int const lev, std::string const comp) {
+                return &ix.m_space_charge_force.at(lev).at(comp);
+            },
+            py::arg("lev"), py::arg("comp"),
+            py::return_value_policy::reference_internal,
+            "space charge force (vector: x,y,z) per level"
         )
         .def_readwrite("lattice",
             &ImpactX::m_lattice,
