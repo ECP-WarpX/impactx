@@ -146,6 +146,30 @@ set_tests_properties(chicane.analysis PROPERTIES DEPENDS "chicane.run")
 set_tests_properties(chicane.plot PROPERTIES DEPENDS "chicane.run")
 
 
+# Python: Chicane #####################################################################
+#
+if(ImpactX_PYTHON)
+    file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chicane.py)
+    add_test(NAME chicane.py.run
+            COMMAND ${Python_EXECUTABLE}
+            ${ImpactX_SOURCE_DIR}/examples/chicane/run_chicane.py
+            WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chicane.py
+            )
+    add_test(NAME chicane.py.analysis
+            COMMAND ${ImpactX_SOURCE_DIR}/examples/chicane/analysis_chicane.py
+            WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chicane.py
+            )
+    add_test(NAME chicane.py.plot
+            COMMAND ${ImpactX_SOURCE_DIR}/examples/chicane/plot_chicane.py --save-png
+            WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chicane.py
+            )
+
+    set_tests_properties(chicane.py.analysis PROPERTIES DEPENDS "chicane.py.run")
+    set_tests_properties(chicane.py.plot PROPERTIES DEPENDS "chicane.py.run")
+    impactx_test_set_pythonpath(chicane.py.run)
+endif()
+
+
 # Constant Focusing Channel ###################################################
 #
 file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/cfchannel)
