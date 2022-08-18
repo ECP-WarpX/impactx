@@ -84,4 +84,3 @@ sim.evolve()
 # clean shutdown
 del sim
 amrex.finalize()
-
