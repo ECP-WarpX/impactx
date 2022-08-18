@@ -36,6 +36,7 @@ jobs:
         python3 -m pip install -r examples/requirements.txt
 
         cmake -S . -B build               `
+              -DBUILD_SHARED_LIBS=OFF        `
               -DCMAKE_BUILD_TYPE=Debug    `
               -DCMAKE_VERBOSE_MAKEFILE=ON `
               -DImpactX_COMPUTE=NOACC     `
@@ -85,6 +86,7 @@ jobs:
               -G "Ninja"      ^
               -DCMAKE_C_COMPILER=clang-cl   ^
               -DCMAKE_CXX_COMPILER=clang-cl ^
+              -DBUILD_SHARED_LIBS=OFF           ^
               -DCMAKE_BUILD_TYPE=Release    ^
               -DCMAKE_VERBOSE_MAKEFILE=ON   ^
               -DImpactX_COMPUTE=OMP         ^
