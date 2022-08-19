@@ -37,18 +37,18 @@ jobs:
 
         cmake -S . -B build               `
               -DBUILD_SHARED_LIBS=OFF        `
-              -DCMAKE_BUILD_TYPE=Debug    `
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo    `
               -DCMAKE_VERBOSE_MAKEFILE=ON `
               -DImpactX_COMPUTE=NOACC     `
               -DImpactX_MPI=OFF           `
               -DImpactX_PYTHON=ON
         if(!$?) { Exit $LASTEXITCODE }
-        cmake --build build --config Debug --parallel 2
+        cmake --build build --config RelWithDebInfo --parallel 2
         if(!$?) { Exit $LASTEXITCODE }
-        cmake --build build --config Debug --target pip_install
+        cmake --build build --config RelWithDebInfo --target pip_install
         if(!$?) { Exit $LASTEXITCODE }
 
-        ctest --test-dir build --build-config Debug --output-on-failure -E AMReX
+        ctest --test-dir build --build-config RelWithDebInfo --output-on-failure -E AMReX
         if(!$?) { Exit $LASTEXITCODE }
 
   build_win_clang:
