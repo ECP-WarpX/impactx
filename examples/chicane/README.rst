@@ -17,11 +17,19 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 Run
 ---
 
-This example an either be run with an inputs file (``impactx input_chicane.in``):
+This example an either be run as a Python script (``python3 run_chicane.py``):
+
+.. literalinclude:: run_chicane.py
+   :language: python3
+   :caption: You can copy this file from ``examples/chicane/run_chicane.py``.
+
+Or with an inputs file (``impactx input_chicane.in``):
 
 .. literalinclude:: input_chicane.in
    :language: ini
    :caption: You can copy this file from ``examples/chicane/input_chicane.in``.
+
+Both execution modes can also be prefixed with an MPI executor, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
 
 Analyze
