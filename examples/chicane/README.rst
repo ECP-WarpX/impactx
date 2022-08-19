@@ -17,7 +17,7 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 Run
 ---
 
-This example an either be run a Python script (``python3 run_chicane.py``):
+This example an either be run as a Python script (``python3 run_chicane.py``):
 
 .. literalinclude:: run_chicane.py
    :language: python3

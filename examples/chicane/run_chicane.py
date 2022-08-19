@@ -62,7 +62,6 @@ sbend2 = elements.Sbend(ds=0.50037, rc=rc, nslice=ns)
 dipedge1 = elements.DipEdge(psi=-psi, rc=-rc, g=0.0, K2=0.0)
 dipedge2 = elements.DipEdge(psi=psi, rc=rc, g=0.0, K2=0.0)
 
-
 lattice_half = [
     sbend1,
     dipedge1,
