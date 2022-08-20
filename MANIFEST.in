@@ -1,7 +1,7 @@
-include README.md LICENSE
+include README.md LICENSE.txt
 include CODE_OF_CONDUCT.rst CONTRIBUTING.rst
 include pyproject.toml
-include requirements.txt
+include requirements.txt requirements_mpi.txt
 
 global-include CMakeLists.txt *.cmake *.in
 
@@ -9,7 +9,6 @@ recursive-include cmake *
 recursive-include docs *
 recursive-include etc *
 recursive-include examples *
-recursive-include include *
 recursive-include src *
 recursive-include tests *
 

@@ -179,27 +179,27 @@ spack add fftw
 spack add hdf5          # for openPMD
 spack add mpi
 spack add pkgconfig     # for fftw
+spack add python
+spack add py-pip
+spack add py-setuptools
+spack add py-wheel
 
 # OpenMP support on macOS
 [[ $OSTYPE == 'darwin'* ]] && spack add llvm-openmp
 
-# optional:
-# spack add cuda
-# spack add python
-# spack add py-pip
-# spack add py-pandas
-# spack add py-numpy
-# spack add py-scipy
+# optional: Linux only
+#spack add cuda
 
 spack install
+python3 -m pip install matplotlib numpy openpmd-api pandas pytest scipy
 ```
 
-(in new terminals, re-activate the environment with `spack env activate impactx-dev` again)
+In new terminals, re-activate the environment with `spack env activate impactx-dev` again.
 
 ### Conda (Linux/macOS/Windows)
 
 ```bash
-conda create -n impactx-dev -c conda-forge adios2 ccache cmake compilers git hdf5 fftw matplotlib ninja numpy pandas scipy
+conda create -n impactx-dev -c conda-forge adios2 ccache cmake compilers git hdf5 fftw matplotlib ninja numpy pandas pytest scipy
 conda activate impactx-dev
 
 # compile with -DImpactX_MPI=OFF
@@ -294,8 +294,7 @@ Examples:
 
 In order to run our tests, you need to have a few Python packages installed:
 ```console
-python3 -m pip install -U pip setuptools wheel
-python3 -m pip install -r requirements.txt
+python3 -m pip install -U pip setuptools wheel pytest
 python3 -m pip install -r examples/requirements.txt
 ```
 

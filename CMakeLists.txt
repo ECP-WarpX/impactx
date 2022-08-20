@@ -374,10 +374,10 @@ if(ImpactX_PYTHON)
 
     # build the wheel by re-using the lib library we build
     add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel
-        ${CMAKE_COMMAND} -E rm -f "impactx*.whl"
+        ${CMAKE_COMMAND} -E rm -f -r impactx-whl
         COMMAND
             ${CMAKE_COMMAND} -E env PYIMPACTX_LIBDIR=$<TARGET_FILE_DIR:pyImpactX>
-                ${Python_EXECUTABLE} -m pip wheel -v --no-build-isolation ${ImpactX_SOURCE_DIR}
+                ${Python_EXECUTABLE} -m pip wheel -v --no-build-isolation --no-deps --wheel-dir=impactx-whl ${ImpactX_SOURCE_DIR}
         WORKING_DIRECTORY
             ${ImpactX_BINARY_DIR}
         DEPENDS
@@ -408,7 +408,7 @@ if(ImpactX_PYTHON)
     # because otherwise pip would also force reinstall all dependencies.
     add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_install
         ${CMAKE_COMMAND} -E env IMPACTX_MPI=${ImpactX_MPI}
-            ${Python_EXECUTABLE} -m pip install --force-reinstall --no-deps ${PYINSTALLOPTIONS} "impactx*.whl"
+            ${Python_EXECUTABLE} -m pip install --force-reinstall --no-index --no-deps ${PYINSTALLOPTIONS} --find-links=impactx-whl impactx
         WORKING_DIRECTORY
             ${ImpactX_BINARY_DIR}
         DEPENDS

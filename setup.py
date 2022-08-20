@@ -125,12 +125,17 @@ class CMakeBuild(build_ext):
         #if ImpactX_pyamrex_src:
         #    cmake_args.append('-DImpactX_pyamrex_src=' + ImpactX_pyamrex_src)
 
+        if CMAKE_INTERPROCEDURAL_OPTIMIZATION is not None:
+            cmake_args.append('-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=' +
+                              CMAKE_INTERPROCEDURAL_OPTIMIZATION)
         if sys.platform == "darwin":
             cmake_args.append('-DCMAKE_INSTALL_RPATH=@loader_path')
         else:
             # values: linux*, aix, freebsd, ...
             #   just as well win32 & cygwin (although Windows has no RPaths)
             cmake_args.append('-DCMAKE_INSTALL_RPATH=$ORIGIN')
+
+        cmake_args += extra_cmake_args
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
@@ -186,6 +191,8 @@ ImpactX_PRECISION = os.environ.get('IMPACTX_PRECISION', 'DOUBLE')
 ImpactX_SPACEDIM = os.environ.get('IMPACTX_SPACEDIM', '3')
 BUILD_SHARED_LIBS = os.environ.get('IMPACTX_BUILD_SHARED_LIBS',
                                    'OFF')
+CMAKE_INTERPROCEDURAL_OPTIMIZATION = os.environ.get(
+    'CMAKE_INTERPROCEDURAL_OPTIMIZATION', None)
 # CMake dependency control (developers & package managers)
 ImpactX_amrex_src = os.environ.get('IMPACTX_AMREX_SRC')
 ImpactX_amrex_internal = os.environ.get('IMPACTX_AMREX_INTERNAL', 'ON')
@@ -197,6 +204,16 @@ ImpactX_amrex_branch = os.environ.get('IMPACTX_PYAMREX_BRANCH', 'development')
 #ImpactX_pyamrex_repo = os.environ.get('IMPACTX_PYAMREX_REPO',
 #    'https://github.com/AMReX-Codes/pyamrex.git')
 #ImpactX_pyamrex_branch = os.environ.get('IMPACTX_PYAMREX_BRANCH', 'development')
+
+# extra CMake arguments
+extra_cmake_args = []
+for k, v in os.environ.items():
+    extra_cmake_args_prefix = "IMPACTX_CMAKE_"
+    if k.startswith(extra_cmake_args_prefix) and \
+       len(k) > len(extra_cmake_args_prefix):
+        extra_cmake_args.append("-D{0}={1}".format(
+            k[len(extra_cmake_args_prefix):],
+            v))
 
 # https://cmake.org/cmake/help/v3.0/command/if.html
 if ImpactX_MPI.upper() in ['1', 'ON', 'TRUE', 'YES']:

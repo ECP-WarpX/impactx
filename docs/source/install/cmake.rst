@@ -76,7 +76,8 @@ Compile including Python Bindings
 
    .. code-block:: bash
 
-      python3 -m pip install -U pip setuptools wheel
+      python3 -m pip install -U pip setuptools wheel pytest
+      python3 -m pip install -r examples/requirements.txt
 
 For PICMI Python bindings, add a configure option and call our ``pip_install`` *CMake target*:
 

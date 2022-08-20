@@ -44,28 +44,21 @@ Spack (macOS/Linux)
    spack add hdf5          # for openPMD
    spack add mpi
    spack add pkgconfig     # for fftw
+   spack add python
+   spack add py-pip
+   spack add py-setuptools
+   spack add py-wheel
 
    # OpenMP support on macOS
    [[ $OSTYPE == 'darwin'* ]] && spack add llvm-openmp
 
-   # optional:
-   # spack add cuda
-   # spack add python
-   # spack add py-pip
-   # spack add py-pip
-   # spack add py-pandas
-   # spack add py-numpy
-   # spack add py-scipy
+   # optional: Linux only
+   #spack add cuda
 
    spack install
+   python3 -m pip install matplotlib numpy openpmd-api pandas pytest scipy
 
-(in new terminals, re-activate the environment with ``spack env activate impactx-dev`` again)
-
-If you also want to run runtime tests and added Python (``spack add python`` and ``spack add py-pip``) above, install also these additional Python packages in the active Spack environment:
-
-.. code-block:: bash
-
-   python3 -m pip install matplotlib yt scipy numpy openpmd-api
+In new terminals, re-activate the environment with ``spack env activate impactx-dev`` again.
 
 
 Brew (macOS/Linux)
