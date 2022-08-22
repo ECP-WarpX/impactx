@@ -253,7 +253,7 @@ add_impactx_test(iotalattice.MPI
 # Python: IOTA Linear Lattice Test ############################################
 #
 add_impactx_test(iotalattice.py.MPI
-    examples/iota_lattice/run_iotalattice/py
+    examples/iota_lattice/run_iotalattice.py
       ON   # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/iota_lattice/analysis_iotalattice.py
