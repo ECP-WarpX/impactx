@@ -96,7 +96,7 @@ With MPI (only Linux/macOS):
 
 .. code-block:: bash
 
-   conda create -n impactx-dev -c conda-forge ccache cmake compilers git openpmd-api=*=mpi_mpich* python mpich numpy scipy yt fftw=*=mpi_mpich* matplotlib mamba ninja numpy pandas pytest scipy
+   conda create -n impactx-dev -c conda-forge ccache cmake compilers git "openpmd-api=*=mpi_mpich*" python mpich numpy scipy yt "fftw=*=mpi_mpich*" matplotlib mamba ninja numpy pandas pytest scipy
    conda activate impactx-dev
 
 .. note::
