@@ -88,7 +88,6 @@ jobs:
         cmake -S . -B build            \
           -DCMAKE_BUILD_TYPE=Debug     \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
-          -DImpactX_APP=OFF            \
           -DImpactX_MPI=OFF            \
           -DImpactX_PYTHON=ON
         cmake --build build -j 2
