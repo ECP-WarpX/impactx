@@ -83,6 +83,13 @@ Brew (macOS/Linux)
 Conda (Linux/macOS/Windows)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+With MPI (only Linux/macOS):
+
+.. code-block:: bash
+
+   conda create -n impactx-dev -c conda-forge ccache cmake compilers git "openpmd-api=*=mpi_mpich*" python mpich numpy scipy yt "fftw=*=mpi_mpich*" matplotlib mamba ninja numpy pandas pytest scipy
+   conda activate impactx-dev
+
 Without MPI:
 
 .. code-block:: bash
@@ -91,13 +98,6 @@ Without MPI:
    conda activate impactx-nompi-dev
 
    # compile ImpactX with -DImpactX_MPI=OFF
-
-With MPI (only Linux/macOS):
-
-.. code-block:: bash
-
-   conda create -n impactx-dev -c conda-forge ccache cmake compilers git "openpmd-api=*=mpi_mpich*" python mpich numpy scipy yt "fftw=*=mpi_mpich*" matplotlib mamba ninja numpy pandas pytest scipy
-   conda activate impactx-dev
 
 .. note::
 
