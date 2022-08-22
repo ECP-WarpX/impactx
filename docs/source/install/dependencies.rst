@@ -99,6 +99,15 @@ With MPI (only Linux/macOS):
    conda create -n impactx-dev -c conda-forge ccache cmake compilers git openpmd-api=*=mpi_mpich* python mpich numpy scipy yt fftw=*=mpi_mpich* matplotlib mamba ninja numpy pandas pytest scipy
    conda activate impactx-dev
 
+.. note::
+
+   A general option to deactivate that conda self-activates its base environment.
+   This `avoids interference with the system and other package managers <https://collegeville.github.io/CW20/WorkshopResources/WhitePapers/huebl-working-with-multiple-pkg-mgrs.pdf>`__.
+
+   .. code-block:: bash
+
+      conda config --set auto_activate_base false
+
 
 Apt (Debian/Ubuntu)
 ^^^^^^^^^^^^^^^^^^^
