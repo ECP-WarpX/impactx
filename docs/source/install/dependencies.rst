@@ -87,8 +87,8 @@ Without MPI:
 
 .. code-block:: bash
 
-   conda create -n impactx-dev -c conda-forge ccache cmake compilers git openpmd-api python numpy scipy yt fftw matplotlib mamba ninja numpy pandas scipy
-   conda activate impactx-dev
+   conda create -n impactx-nompi-dev -c conda-forge ccache cmake compilers git openpmd-api python numpy scipy yt fftw matplotlib mamba ninja numpy pandas scipy
+   conda activate impactx-nompi-dev
 
    # compile ImpactX with -DImpactX_MPI=OFF
 
@@ -96,7 +96,7 @@ With MPI (only Linux/macOS):
 
 .. code-block:: bash
 
-   conda create -n impactx-dev -c conda-forge ccache cmake compilers git openpmd-api=*=mpi_openmpi* python numpy scipy yt fftw=*=mpi_openmpi* matplotlib mamba ninja numpy pandas scipy openmpi
+   conda create -n impactx-dev -c conda-forge ccache cmake compilers git openpmd-api=*=mpi_mpich* python mpich numpy scipy yt fftw=*=mpi_mpich* matplotlib mamba ninja numpy pandas pytest scipy
    conda activate impactx-dev
 
 
