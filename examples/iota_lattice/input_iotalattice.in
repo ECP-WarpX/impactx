@@ -4,7 +4,7 @@
 beam.npart = 10000
 beam.units = static
 beam.energy = 2.5
-beam.charge = 0.0
+beam.charge = 1.0e-9
 beam.particle = proton
 beam.distribution = waterbag
 beam.sigmaX = 1.588960728035e-3
@@ -21,7 +21,6 @@ beam.mutpt = 0.0
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
-
 lattice.elements = dra1 qa1 dra2 qa2 dra3 qa3 dra4 qa4 dra5
                    edge30 sbend30 edge30 drb1 qb1 drb2 qb2 drb2 qb3
                    drb3 dnll drb3 qb4 drb2 qb5 drb2 qb6 drb4
@@ -208,10 +207,10 @@ qe3.k = -6.69148177
 # Algorithms
 ###############################################################################
 algo.particle_shape = 2
+algo.space_charge = false
 
 
 ###############################################################################
 # Diagnostics
 ###############################################################################
-
 diag.slice_step_diagnostics = true

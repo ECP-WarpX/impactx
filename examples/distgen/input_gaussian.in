@@ -4,7 +4,7 @@
 beam.npart = 10000
 beam.units = static
 beam.energy = 2.0e3
-beam.charge = 0.0
+beam.charge = 1.0e-9
 beam.particle = electron
 beam.distribution = gaussian
 beam.sigmaX = 3.9984884770e-5
@@ -21,7 +21,6 @@ beam.mutpt = 0.0
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
-
 lattice.elements = drift1 quad1 drift2 quad2 drift3
 
 drift1.type = drift
@@ -41,7 +40,9 @@ quad2.k = -1.0
 drift3.type = drift
 drift3.ds = 0.25
 
+
 ###############################################################################
 # Algorithms
 ###############################################################################
 algo.particle_shape = 2
+algo.space_charge = false

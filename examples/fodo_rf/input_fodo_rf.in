@@ -4,7 +4,7 @@
 beam.npart = 10000
 beam.units = static
 beam.energy = 250.0
-beam.charge = 0.0
+beam.charge = 1.0e-9
 beam.particle = proton
 beam.distribution = waterbag
 beam.sigmaX = 3.131948925200e-3
@@ -21,7 +21,6 @@ beam.mutpt = 0.0
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
-
 lattice.elements = quad1 drift1 shortrf1 drift1 quad2 drift1 shortrf1 drift1 quad1
 
 quad1.type = quad
@@ -39,7 +38,9 @@ quad2.type = quad
 quad2.ds = 0.3
 quad2.k = -2.5
 
+
 ###############################################################################
 # Algorithms
 ###############################################################################
 algo.particle_shape = 2
+algo.space_charge = false

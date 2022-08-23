@@ -23,7 +23,7 @@ sim.init_grids()
 # load a 5 GeV electron beam with an initial
 # normalized transverse rms emittance of 1 um
 energy_MeV = 5.0e3  # reference energy
-charge_C = 0.0  # used with space charge
+charge_C = 1.0e-9  # used with space charge
 mass_MeV = 0.510998950
 qm_qeeV = -1.0e-6/mass_MeV  # charge/mass
 npart = 10000  # number of macro particles
