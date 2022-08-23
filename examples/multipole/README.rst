@@ -17,7 +17,7 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
    :language: ini
    :caption: You can copy this file from ``examples/multipole/input_multipole.in``.
 
-This test can also be run as a Python script (``python3 run_chicane.py``):
+This test can also be run as a Python script (``python3 run_multipole.py``):
 
 .. literalinclude:: run_multipole.py
    :language: python3
