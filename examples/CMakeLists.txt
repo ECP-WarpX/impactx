@@ -229,6 +229,16 @@ add_impactx_test(multipole
     OFF  # not plotting script yet
 )
 
+# Python: Chain of Multipoles Test ############################################################
+#
+add_impactx_test(multipole.py
+    examples/multipole/run_multipole.py
+      OFF  # ImpactX MPI-parallel
+      ON  # ImpactX Python interface
+    examples/multipole/analysis_multipole.py
+    OFF  # not plotting script yet
+)
+
 # IOTA Nonlinear Focusing Channel Test ############################################################
 #
 add_impactx_test(iotalens
