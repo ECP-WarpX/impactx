@@ -30,6 +30,35 @@ Install
 
 Pick *one* of the installation methods below to install all dependencies for ImpactX development in a consistent manner.
 
+Conda (Linux/macOS/Windows)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+With MPI (only Linux/macOS):
+
+.. code-block:: bash
+
+   conda create -n impactx-dev -c conda-forge ccache cmake compilers git "openpmd-api=*=mpi_mpich*" python mpich numpy scipy yt "fftw=*=mpi_mpich*" matplotlib mamba ninja numpy pandas pytest scipy
+   conda activate impactx-dev
+
+Without MPI:
+
+.. code-block:: bash
+
+   conda create -n impactx-nompi-dev -c conda-forge ccache cmake compilers git openpmd-api python numpy scipy yt fftw matplotlib mamba ninja numpy pandas scipy
+   conda activate impactx-nompi-dev
+
+   # compile ImpactX with -DImpactX_MPI=OFF
+
+.. note::
+
+   A general option to deactivate that conda self-activates its base environment.
+   This `avoids interference with the system and other package managers <https://collegeville.github.io/CW20/WorkshopResources/WhitePapers/huebl-working-with-multiple-pkg-mgrs.pdf>`__.
+
+   .. code-block:: bash
+
+      conda config --set auto_activate_base false
+
+
 Spack (macOS/Linux)
 ^^^^^^^^^^^^^^^^^^^
 
@@ -78,35 +107,6 @@ Brew (macOS/Linux)
    brew install open-mpi
    brew install python
    python3 -m pip install matplotlib yt scipy numpy openpmd-api
-
-
-Conda (Linux/macOS/Windows)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-With MPI (only Linux/macOS):
-
-.. code-block:: bash
-
-   conda create -n impactx-dev -c conda-forge ccache cmake compilers git "openpmd-api=*=mpi_mpich*" python mpich numpy scipy yt "fftw=*=mpi_mpich*" matplotlib mamba ninja numpy pandas pytest scipy
-   conda activate impactx-dev
-
-Without MPI:
-
-.. code-block:: bash
-
-   conda create -n impactx-nompi-dev -c conda-forge ccache cmake compilers git openpmd-api python numpy scipy yt fftw matplotlib mamba ninja numpy pandas scipy
-   conda activate impactx-nompi-dev
-
-   # compile ImpactX with -DImpactX_MPI=OFF
-
-.. note::
-
-   A general option to deactivate that conda self-activates its base environment.
-   This `avoids interference with the system and other package managers <https://collegeville.github.io/CW20/WorkshopResources/WhitePapers/huebl-working-with-multiple-pkg-mgrs.pdf>`__.
-
-   .. code-block:: bash
-
-      conda config --set auto_activate_base false
 
 
 Apt (Debian/Ubuntu)
