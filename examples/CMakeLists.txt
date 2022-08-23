@@ -104,6 +104,16 @@ add_impactx_test(FODO.py
     examples/fodo/plot_fodo.py
 )
 
+# Python MADX: FODO Cell ######################################################
+#
+add_impactx_test(FODO_MADX.py
+        examples/fodo/run_fodo_madx.py
+        OFF  # ImpactX MPI-parallel
+        ON   # ImpactX Python interface
+        examples/fodo/analysis_fodo.py
+        examples/fodo/plot_fodo.py --save-png
+        )
+
 # Python: MPI-parallel FODO Cell ##############################################
 #
 add_impactx_test(FODO.py.MPI

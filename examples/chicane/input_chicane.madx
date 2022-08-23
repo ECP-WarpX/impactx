@@ -1,0 +1,15 @@
+beam, particle=electron, energy=40.e-3;
+
+DLEFT:   drift, L=0.7578;
+DMIDDLE: drift, L=0.9575;
+DRIGHT:  drift, L=0.7578;
+! TODO make this work with inline calculations
+! theta=pi/10.;
+! TODO put theta again everywhere after `angle=` with its right sign
+D114: sbend, L=0.264687, angle= 0.31415926535, e1= 0.000, e2= 0.31415926535, k1= 0.00;
+D115: sbend, L=0.264687, angle=-0.31415926535, e1=-0.31415926535, e2= 0.000, k1= 0.00;
+D116: sbend, L=0.264687, angle=-0.31415926535, e1= 0.000, e2=-0.31415926535, k1= 0.00;
+D117: sbend, L=0.264687, angle= 0.31415926535, e1= 0.31415926535, e2= 0.000, k1= 0.00;
+ 
+BC1:     Line=(D114,DLEFT,D115,DMIDDLE,D116,DRIGHT,D117);
+USE, SEQUENCE = BC1;
