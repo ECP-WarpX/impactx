@@ -21,7 +21,7 @@ sim.set_slice_step_diagnostics(True)
 sim.init_grids()
 
 # load a 2 GeV proton beam with an initial
-# unnormalized rms emittance of 1 um in each 
+# unnormalized rms emittance of 1 um in each
 # coordinate plane
 energy_MeV = 2.0e3  # reference energy
 charge_C = 1.0e-9  # used with space charge
