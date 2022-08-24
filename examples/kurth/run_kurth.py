@@ -20,8 +20,9 @@ sim.set_slice_step_diagnostics(True)
 # domain decomposition & space charge mesh
 sim.init_grids()
 
-# load a 2 GeV electron beam with an initial
-# unnormalized rms emittance of 2 nm
+# load a 2 GeV proton beam with an initial
+# unnormalized rms emittance of 1 um in each 
+# coordinate plane
 energy_MeV = 2.0e3  # reference energy
 charge_C = 1.0e-9  # used with space charge
 mass_MeV = 938.27208816
