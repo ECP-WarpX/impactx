@@ -1,5 +1,5 @@
 # Author: Matthias Frey, Andreas Adelmann
-# Date: 13. Oct. 2017 
+# Date: 13. Oct. 2017
 #
 # This file parses MAD-X file into a beamline
 # composed of pyAcceLEGOrator elements.
@@ -7,6 +7,7 @@
 # 10.8.2022 Adapted for standalone use
 #
 import re
+
 
 class MADXParserError(Exception):
     pass
@@ -338,7 +339,7 @@ class MADXParser:
         if self.__lattice:
 
             beamline = []
-                  
+
             for elem in self.__lattice['elem']:
                 for e in self.__elements:
                     if elem == e['name']:

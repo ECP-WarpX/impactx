@@ -6,11 +6,11 @@
 #
 # -*- coding: utf-8 -*-
 
-import sys
 import os
 
 import amrex
-from impactx import ImpactX, RefPart, distribution, elements, MADXParser, madx2impactx
+from impactx import (ImpactX, MADXParser, RefPart, distribution, elements,
+                     madx2impactx)
 
 sim = ImpactX()
 
@@ -82,7 +82,3 @@ sim.evolve()
 # clean shutdown
 del sim
 amrex.finalize()
-
-
-
-

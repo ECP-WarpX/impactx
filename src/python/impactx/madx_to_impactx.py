@@ -1,5 +1,6 @@
 from impactx import elements
 
+
 def madx2impactx(parsed_beamline,nslice=25):
     """
     Function that converts a list of elements in the MADXParser former into ImpactX format
@@ -44,5 +45,3 @@ def madx2impactx(parsed_beamline,nslice=25):
                 list(madx_to_impactx_dict.keys())
             )
     return impactx_beamline
-
-
