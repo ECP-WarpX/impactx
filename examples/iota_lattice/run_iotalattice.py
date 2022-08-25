@@ -22,7 +22,7 @@ sim.init_grids()
 
 # init particle beam
 energy_MeV = 2.5
-charge_C = 0.0  # assign zero weighting to particles
+charge_C = 1.0e-9  # assign zero weighting to particles
 mass_MeV = 938.27208816
 qm_qeeV = 1.0e-6/mass_MeV
 npart = 10000

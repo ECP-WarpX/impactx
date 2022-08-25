@@ -17,6 +17,7 @@ def test_charge_deposition():
     sim = impactx.ImpactX()
 
     sim.load_inputs_file("examples/fodo/input_fodo.in")
+    sim.set_space_charge(True)
     sim.set_slice_step_diagnostics(False)
 
     sim.init_grids()

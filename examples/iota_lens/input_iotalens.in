@@ -4,7 +4,7 @@
 beam.npart = 10000
 beam.units = static
 beam.energy = 2.5
-beam.charge = 0.0
+beam.charge = 1.0e-9
 beam.particle = proton
 beam.distribution = waterbag
 beam.sigmaX = 2.0e-3
@@ -21,7 +21,6 @@ beam.mutpt = 0.0
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
-
 lattice.elements = const_end nllens const nllens const nllens const nllens const
                    nllens const nllens const nllens const nllens const nllens const nllens
                    const_end
@@ -47,6 +46,7 @@ const.kt = 1.0e-12
 # Algorithms
 ###############################################################################
 algo.particle_shape = 2
+algo.space_charge = false
 
 
 ###############################################################################
