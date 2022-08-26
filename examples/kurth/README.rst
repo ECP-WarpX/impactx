@@ -20,3 +20,9 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 .. literalinclude:: input_kurth.in
    :language: ini
    :caption: You can copy this file from ``examples/kurth/input_kurth.in``.
+
+This test can also be run as a Python script (``python3 run_kurth.py``):
+
+.. literalinclude:: run_kurth.py
+   :language: python3
+   :caption: You can copy this file from ``examples/kurth/run_kurth.py``.

@@ -16,3 +16,9 @@ In this test, the initial and final values of :math:`\mu_H`, :math:`\sigma_H`, :
 .. literalinclude:: input_iotalens.in
    :language: ini
    :caption: You can copy this file from ``examples/iota_lens/input_iotalens.in``.
+
+This test can also be run as a Python script (``python3 run_iotalens.py``):
+
+.. literalinclude:: run_iotalens.py
+   :language: python3
+   :caption: You can copy this file from ``examples/iota_lens/run_iotalens.py``.

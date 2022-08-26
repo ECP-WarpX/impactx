@@ -169,6 +169,16 @@ add_impactx_test(kurth
     OFF  # not plotting script yet
 )
 
+# Python: Kurth Distribution Test ##################################################
+#
+add_impactx_test(kurth.py
+    examples/kurth/run_kurth.py
+      OFF  # ImpactX MPI-parallel
+      ON  # ImpactX Python interface
+    examples/kurth/analysis_kurth.py
+    OFF  # not plotting script yet
+)
+
 # 6D Gaussian Distribution Test ###################################################
 #
 add_impactx_test(gaussian
@@ -245,6 +255,16 @@ add_impactx_test(iotalens
     examples/iota_lens/input_iotalens.in
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
+    examples/iota_lens/analysis_iotalens.py
+    OFF  # not plotting script yet
+)
+
+# Python: IOTA Nonlinear Focusing Channel Test #####################################
+#
+add_impactx_test(iotalens.py
+    examples/iota_lens/run_iotalens.py
+      OFF  # ImpactX MPI-parallel
+      ON  # ImpactX Python interface
     examples/iota_lens/analysis_iotalens.py
     OFF  # not plotting script yet
 )
