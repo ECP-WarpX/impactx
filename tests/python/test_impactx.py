@@ -32,29 +32,30 @@ def test_impactx_nofile():
     energy_MeV = 2.0e3
     charge_C = 0.0
     mass_MeV = 0.510998950
-    qm_qeeV = -1.0/0.510998950e6
+    qm_qeeV = -1.0 / 0.510998950e6
     npart = 10000
 
     distr = distribution.Waterbag(
-        sigmaX = 3.9984884770e-5,
-        sigmaY = 3.9984884770e-5,
-        sigmaT = 1.0e-3,
-        sigmaPx = 2.6623538760e-5,
-        sigmaPy = 2.6623538760e-5,
-        sigmaPt = 2.0e-3,
-        muxpx = -0.846574929020762,
-        muypy = 0.846574929020762,
-        mutpt = 0.0)
+        sigmaX=3.9984884770e-5,
+        sigmaY=3.9984884770e-5,
+        sigmaT=1.0e-3,
+        sigmaPx=2.6623538760e-5,
+        sigmaPy=2.6623538760e-5,
+        sigmaPt=2.0e-3,
+        muxpx=-0.846574929020762,
+        muypy=0.846574929020762,
+        mutpt=0.0,
+    )
     impactX.add_particles(qm_qeeV, charge_C, distr, npart)
 
     # init reference particle
     refPart = RefPart()
     # make the next two lines a helper function?
     refPart.pt = -energy_MeV / mass_MeV - 1.0
-    refPart.pz = (refPart.pt**2 - 1.0)**0.5
+    refPart.pz = (refPart.pt**2 - 1.0) ** 0.5
     impactX.particle_container().set_ref_particle(refPart)
 
-    assert(impactX.particle_container().TotalNumberOfParticles() == npart)
+    assert impactX.particle_container().TotalNumberOfParticles() == npart
 
     # init accelerator lattice
     fodo = [
@@ -62,10 +63,10 @@ def test_impactx_nofile():
         elements.Quad(1.0, 1.0),
         elements.Drift(0.5),
         elements.Quad(1.0, -1.0),
-        elements.Drift(0.25)
+        elements.Drift(0.25),
     ]
     #  assign a fodo segment
-    #impactX.lattice = fodo
+    # impactX.lattice = fodo
 
     #  add 4 more FODO segments
     for i in range(4):
@@ -77,6 +78,6 @@ def test_impactx_nofile():
 
     print(impactX.lattice)
     print(len(impactX.lattice))
-    assert(len(impactX.lattice) > 5)
+    assert len(impactX.lattice) > 5
 
     impactX.evolve()
