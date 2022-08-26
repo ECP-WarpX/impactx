@@ -106,6 +106,9 @@ add_impactx_test(FODO.py
 
 # Python MADX: FODO Cell ######################################################
 #
+# copy MAD-X lattice file
+file(COPY ${ImpactX_SOURCE_DIR}/examples/fodo/input_fodo.madx DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO_MADX.py)
+
 add_impactx_test(FODO_MADX.py
         examples/fodo/run_fodo_madx.py
         OFF  # ImpactX MPI-parallel
