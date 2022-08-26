@@ -169,7 +169,7 @@ add_impactx_test(kurth
     OFF  # not plotting script yet
 )
 
-# Python: Kurth Distribution Test ###################################################
+# Python: Kurth Distribution Test ##################################################
 #
 add_impactx_test(kurth.py
     examples/kurth/run_kurth.py
@@ -249,7 +249,7 @@ add_impactx_test(iotalens
     OFF  # not plotting script yet
 )
 
-# Python: IOTA Nonlinear Focusing Channel Test ############################################################
+# Python: IOTA Nonlinear Focusing Channel Test #####################################
 #
 add_impactx_test(iotalens.py
     examples/iota_lens/run_iotalens.py
