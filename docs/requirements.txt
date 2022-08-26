@@ -11,4 +11,5 @@ docutils<=0.16
 pygments
 recommonmark
 sphinx>=2.0
+sphinx-design
 sphinx_rtd_theme>=0.3.1
