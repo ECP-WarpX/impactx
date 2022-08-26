@@ -147,6 +147,19 @@ add_impactx_test(chicane.py
     examples/chicane/plot_chicane.py
 )
 
+# Python MADX: Chicane ######################################################
+#
+# copy MAD-X lattice file
+file(COPY ${ImpactX_SOURCE_DIR}/examples/chicane/input_chicane.madx DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chicane_MADX.py)
+
+add_impactx_test(chicane_MADX.py
+        examples/chicane/run_chicane_madx.py
+        OFF  # ImpactX MPI-parallel
+        ON   # ImpactX Python interface
+        examples/chicane/analysis_chicane.py
+        examples/chicane/plot_chicane.py --save-png
+        )
+
 # Constant Focusing Channel ###################################################
 #
 add_impactx_test(cfchannel

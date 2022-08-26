@@ -7,6 +7,7 @@
 # 10.8.2022 Adapted for standalone use
 #
 import re
+import warnings
 
 
 class MADXParserError(Exception):
@@ -16,6 +17,9 @@ class MADXInputError(MADXParserError):
     def __init__(self, args, with_traceback):
         self.args = args
         self.with_traceback = with_traceback
+
+class MADXInputWarning(UserWarning):
+    pass
 
 class MADXParser:
     """
@@ -362,14 +366,14 @@ class MADXParser:
 
 
     def getParticle(self):
-        particle = None
-        if self.beam['particle'] == 'electron':
-            particle = 'Electron'
-        elif self.beam['particle'] == 'proton':
-            particle = 'Proton'
+        particle = self.beam['particle']
+        known_particles = ['positron', 'electron', 'proton', 'antiproton', 'posmuon', 'negmuon', 'ion']
+
+        if particle not in known_particles:
+            warning_message = 'No particle type ' + "'" + self.beam['particle'] + "' available."
+            warnings.warn(warning_message, MADXInputWarning)
         else:
-            raise MADXInputError('', 'No particle type ' + "'" +
-                                 self.beam['particle'] + "' available.")
+            pass
 
         return particle
 

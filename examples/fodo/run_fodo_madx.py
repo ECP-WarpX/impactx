@@ -10,7 +10,7 @@ import os
 
 import amrex
 from impactx import (ImpactX, MADXParser, RefPart, distribution, elements,
-                     madx2impactx)
+                     madx2impactx_lattice, madx2impactx_beam)
 
 sim = ImpactX()
 
@@ -35,14 +35,25 @@ except Exception as e:
     print(f"Unexpected {e = }, {type(e) = }")
     raise
 
+# print summary
+print(madx)
+
+beamline = madx.getBeamline()
+
+ref_particle_dict = madx2impactx_beam(
+    madx.getParticle(),  # if particle species is known, mass, charge, and potentially energy are set to default
+    # TODO MADX parser needs to extract charge if it's given,
+    # TODO MADX parser needs to extract mass if it's given,
+    energy=float(madx.getEtot())  # MADX default energy is in GeV
+)
+
 # load a 2 GeV electron beam with an initial
 # unnormalized rms emittance of 2 nm
 
 # @TODO read CHARGE (single particle charge) from MADX as well
 charge_C = 1.0e-9  # used with space charge
-# @TODO get from dictionary b/c MADX knows P
-mass_MeV = 0.510998950
-qm_qeeV = -1.0e-6/mass_MeV  # charge/mass
+
+qm_qeeV = ref_particle_dict['mass']/ref_particle_dict['charge']  # charge/mass
 npart = 10000  # number of macro particles
 
 distr = distribution.Waterbag(
@@ -60,19 +71,11 @@ sim.add_particles(qm_qeeV, charge_C, distr, npart)
 # design the accelerator lattice
 ns = 25  # number of slices per ds in the element
 
-
-# print summary
-print(madx)
-
-# MADX default energy is in GeV
-energy_MeV = float(madx.getEtot()) * 1e3
-beamline = madx.getBeamline()
-
 # set the energy in the reference particle
 sim.particle_container().ref_particle() \
-    .set_energy_MeV(energy_MeV, mass_MeV)
+    .set_energy_MeV(ref_particle_dict['energy'], ref_particle_dict['mass'])
 
-fodo = madx2impactx(beamline)
+fodo = madx2impactx_lattice(beamline)
 # assign a fodo segment
 sim.lattice.extend(fodo)
 

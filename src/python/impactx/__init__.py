@@ -1,7 +1,7 @@
 from . import impactx_pybind
 from .MADXParser import *  # noqa
 from .impactx_pybind import *  # noqa
-from .madx_to_impactx import madx2impactx  # noqa
+from .madx_to_impactx import madx2impactx_lattice, madx2impactx_beam  # noqa
 
 __version__ = impactx_pybind.__version__
 __doc__ = impactx_pybind.__doc__
