@@ -47,14 +47,14 @@ sim.particle_container().ref_particle() \
 
 # design the accelerator lattice
 constF = [
-    elements.ConstF(
+    ]
+# assign a single element
+sim.lattice.append(elements.ConstF(
         ds = 2.0,
         kx = 1.0,
         ky = 1.0,
         kt = 1.0)
-]
-# assign a fodo segment
-sim.lattice.append(constF)
+)
 
 # run simulation
 sim.evolve()

@@ -60,8 +60,8 @@ const = elements.ConstF(
 num_lenses = 10
 nllens_lattice = [constEnd] + [nllens, const] * (num_lenses-1) + [nllens, constEnd]
 
-# assign a fodo segment
-sim.lattice.append(nllens_lattice)
+# add elements to the lattice segment
+sim.lattice.extend(nllens_lattice)
 
 # run simulation
 sim.evolve()
