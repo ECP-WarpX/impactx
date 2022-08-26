@@ -54,7 +54,7 @@ constF = [
         kt = 1.0)
 ]
 # assign a fodo segment
-sim.lattice.extend(constF)
+sim.lattice.append(constF)
 
 # run simulation
 sim.evolve()
