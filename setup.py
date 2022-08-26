@@ -258,7 +258,7 @@ setup(
     url="https://impactx.readthedocs.io",
     project_urls={
         "Documentation": "https://impactx.readthedocs.io",
-        #        'Tutorials': 'https://impactx-codes.github.io/impactx/tutorials_html/',
+        # 'Tutorials': 'https://impactx-codes.github.io/impactx/tutorials_html/',
         "Doxygen": "https://impactx.readthedocs.io/en/latest/_static/doxyhtml",
         "Source": "https://github.com/ECP-WarpX/impactx",
         "DOI (source)": "https://doi.org/10.5281/zenodo.6954922",

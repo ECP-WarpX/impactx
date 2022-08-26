@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright 2021 Axel Huebl
+# Copyright 2021-2022 Axel Huebl
 #
 # This file is part of ImpactX.
 #
@@ -62,7 +62,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "ImpactX"
-copyright = "2021, ImpactX collaboration"
+copyright = "2021-2022, ImpactX collaboration"
 author = "ImpactX collaboration"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -170,7 +170,7 @@ texinfo_documents = [
         "ImpactX Documentation",
         author,
         "ImpactX",
-        "ImpactX is an advanced electromagnetic Particle-In-Cell code.",
+        "ImpactX is an advanced, s-based particle accelerator modeling code.",
         "Miscellaneous",
     ),
 ]
