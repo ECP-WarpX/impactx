@@ -45,10 +45,7 @@ sim.add_particles(qm_qeeV, charge_C, distr, npart)
 sim.particle_container().ref_particle() \
     .set_energy_MeV(energy_MeV, mass_MeV)
 
-# design the accelerator lattice
-constF = [
-    ]
-# assign a single element
+# design the accelerator lattice: here we just assign a single element
 sim.lattice.append(elements.ConstF(
         ds = 2.0,
         kx = 1.0,
