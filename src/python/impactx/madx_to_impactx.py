@@ -13,7 +13,6 @@ import scipy.constants as sc
 from impactx import elements
 
 
-
 def madx2impactx_lattice(parsed_beamline,nslice=25):
     """
     Function that converts a list of elements in the MADXParser format into ImpactX format

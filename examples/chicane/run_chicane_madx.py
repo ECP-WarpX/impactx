@@ -10,7 +10,7 @@ import os
 
 import amrex
 from impactx import (ImpactX, MADXParser, RefPart, distribution, elements,
-                     madx2impactx_lattice, madx2impactx_beam)
+                     madx2impactx_beam, madx2impactx_lattice)
 
 sim = ImpactX()
 
