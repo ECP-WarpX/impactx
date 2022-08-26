@@ -57,8 +57,8 @@ const = elements.ConstF(
     ky = 1.0,
     kt = 1.0e-12)
 # design the accelerator lattice
-num_lenses = 9
-nllens_lattice = [constEnd] + [nllens, const] * num_lenses + [nllens, constEnd]
+num_lenses = 10
+nllens_lattice = [constEnd] + [nllens, const] * (num_lenses-1) + [nllens, constEnd]
 
 # assign a fodo segment
 sim.lattice.extend(nllens_lattice)
