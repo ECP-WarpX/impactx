@@ -54,7 +54,7 @@ fodo = [
     elements.Drift(ds=0.25, nslice=ns)
 ]
 # assign a fodo segment
-sim.lattice.extend(fodo)
+sim.lattice.append(fodo)
 
 # run simulation
 sim.evolve()
