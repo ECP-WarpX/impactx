@@ -229,7 +229,7 @@ add_impactx_test(multipole
     OFF  # not plotting script yet
 )
 
-# Python: Chain of Multipoles Test ############################################################
+# Python: Chain of Multipoles Test #########################################################
 #
 add_impactx_test(multipole.py
     examples/multipole/run_multipole.py

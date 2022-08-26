@@ -34,10 +34,7 @@ distr = distribution.Waterbag(
     sigmaT = 1.0e-3,
     sigmaPx = 3.0e-4,
     sigmaPy = 3.0e-4,
-    sigmaPt = 2.0e-3,
-    muxpx = 0.0,
-    muypy = 0.0,
-    mutpt = 0.0)
+    sigmaPt = 2.0e-3)
 sim.add_particles(qm_qeeV, charge_C, distr, npart)
 
 # set the energy in the reference particle
