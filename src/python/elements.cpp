@@ -26,7 +26,7 @@ void init_elements(py::module& m)
         .def(py::init<KnownElements>())
         .def(py::init([](py::list l){
             auto v = new KnownElementsList;
-            for (auto &handle : l)
+            for (auto const & handle : l)
                 v->push_back(handle.cast<KnownElements>());
             return v;
         }))
@@ -34,12 +34,12 @@ void init_elements(py::module& m)
         .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(el); })
 
         .def("extend", [](KnownElementsList &v, KnownElementsList l) {
-            for (auto &el : l)
+            for (auto const & el : l)
                 v.push_back(el);
             return v;
         })
         .def("extend", [](KnownElementsList &v, py::list l) {
-            for (auto &handle : l)
+            for (auto const & handle : l)
             {
                 auto el = handle.cast<KnownElements>();
                 v.push_back(el);
