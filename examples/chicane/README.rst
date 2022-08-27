@@ -17,19 +17,22 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 Run
 ---
 
-This example an either be run as a Python script (``python3 run_chicane.py``):
+This example can be run as a Python script (``python3 run_chicane.py``) or with an app with an input file (``impactx input_chicane.in``).
+Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
-.. literalinclude:: run_chicane.py
-   :language: python3
-   :caption: You can copy this file from ``examples/chicane/run_chicane.py``.
+.. tab-set::
 
-Or with an inputs file (``impactx input_chicane.in``):
+   .. tab-item:: Python Script
 
-.. literalinclude:: input_chicane.in
-   :language: ini
-   :caption: You can copy this file from ``examples/chicane/input_chicane.in``.
+       .. literalinclude:: run_chicane.py
+          :language: python3
+          :caption: You can copy this file from ``examples/chicane/run_chicane.py``.
 
-Both execution modes can also be prefixed with an MPI executor, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
+   .. tab-item:: App Input File
+
+       .. literalinclude:: input_chicane.in
+          :language: ini
+          :caption: You can copy this file from ``examples/chicane/input_chicane.in``.
 
 
 Analyze
@@ -37,9 +40,11 @@ Analyze
 
 We run the following script to analyze correctness:
 
-.. literalinclude:: analysis_chicane.py
-   :language: python3
-   :caption: You can copy this file from ``examples/chicane/analysis_chicane.py``.
+.. dropdown:: Script ``analysis_chicane.py``
+
+   .. literalinclude:: analysis_chicane.py
+      :language: python3
+      :caption: You can copy this file from ``examples/chicane/analysis_chicane.py``.
 
 
 Visualize
@@ -47,12 +52,19 @@ Visualize
 
 You can run the following script to visualize the beam evolution over time:
 
-.. literalinclude:: plot_chicane.py
-   :language: python3
-   :caption: You can copy this file from ``examples/chicane/plot_chicane.py``.
+.. dropdown:: Script ``plot_chicane.py``
+
+   .. literalinclude:: plot_chicane.py
+      :language: python3
+      :caption: You can copy this file from ``examples/chicane/plot_chicane.py``.
 
 .. figure:: https://user-images.githubusercontent.com/1353258/180332191-f9ce11fc-8c56-4713-a91a-2ad12ab09805.png
- :alt: Chicane beam width and emittance evolution
+   :alt: Chicane floorplan, beam width and restored emittane in our Chicane benchmark
+
+   (top) Chicane floorplan.
+   (bottom) Chicane beam width and emittance evolution.
 
 .. figure:: https://user-images.githubusercontent.com/1353258/181611473-754dde72-3281-453b-9d9a-43317a5a49f2.png
- :alt: Chicane phase space evolution
+   :alt: Beam transversal compression in our chicane example.
+
+   Chicane beam width and emittance evolution

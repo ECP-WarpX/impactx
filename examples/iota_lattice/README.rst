@@ -15,16 +15,31 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 Run
 ---
 
-This example an either be run with an inputs file (``impactx input_iotalattice.in``):
+This example can be run as a Python script (``python3 run_iotalattice.py``) or with an app with an input file (``impactx input_iotalattice.in``).
+Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
-.. literalinclude:: input_iotalattice.in
-   :language: ini
-   :caption: You can copy this file from ``examples/iota_lattice/input_iotalattice.in``.
+.. tab-set::
 
-Or as a Python script (``python3 run_iotalattice.py``):
+   .. tab-item:: Python Script
 
-.. literalinclude:: run_iotalattice.py
-   :language: python3
-   :caption: You can copy this file from ``examples/iota_lattice/run_iotalattice.py``.
+       .. literalinclude:: run_iotalattice.py
+          :language: python3
+          :caption: You can copy this file from ``examples/iota_lattice/run_iotalattice.py``.
 
-Both execution modes can also be prefixed with an MPI executor, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
+   .. tab-item:: App Input File
+
+       .. literalinclude:: input_iotalattice.in
+          :language: ini
+          :caption: You can copy this file from ``examples/iota_lattice/input_iotalattice.in``.
+
+
+Analyze
+-------
+
+We run the following script to analyze correctness:
+
+.. dropdown:: Script ``analysis_iotalattice.py``
+
+   .. literalinclude:: analysis_iotalattice.py
+      :language: python3
+      :caption: You can copy this file from ``examples/iota_lattice/analysis_iotalattice.py``.
