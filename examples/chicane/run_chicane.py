@@ -14,7 +14,7 @@ sim = ImpactX()
 # set numerical parameters and IO control
 sim.set_particle_shape(2)  # B-spline order
 sim.set_space_charge(False)
-#sim.set_diagnostics(False)  # benchmarking
+# sim.set_diagnostics(False)  # benchmarking
 sim.set_slice_step_diagnostics(True)
 
 # domain decomposition & space charge mesh
@@ -25,24 +25,24 @@ sim.init_grids()
 energy_MeV = 5.0e3  # reference energy
 charge_C = 1.0e-9  # used with space charge
 mass_MeV = 0.510998950
-qm_qeeV = -1.0e-6/mass_MeV  # charge/mass
+qm_qeeV = -1.0e-6 / mass_MeV  # charge/mass
 npart = 10000  # number of macro particles
 
 distr = distribution.Waterbag(
-    sigmaX = 2.2951017632e-5,
-    sigmaY = 1.3084093142e-5,
-    sigmaT = 5.5555553e-8,
-    sigmaPx = 1.598353425e-6,
-    sigmaPy = 2.803697378e-6,
-    sigmaPt = 2.000000000e-6,
-    muxpx = 0.933345606203060,
-    muypy = 0.933345606203060,
-    mutpt = 0.999999961419755)
+    sigmaX=2.2951017632e-5,
+    sigmaY=1.3084093142e-5,
+    sigmaT=5.5555553e-8,
+    sigmaPx=1.598353425e-6,
+    sigmaPy=2.803697378e-6,
+    sigmaPt=2.000000000e-6,
+    muxpx=0.933345606203060,
+    muypy=0.933345606203060,
+    mutpt=0.999999961419755,
+)
 sim.add_particles(qm_qeeV, charge_C, distr, npart)
 
 # set the energy in the reference particle
-sim.particle_container().ref_particle() \
-    .set_energy_MeV(energy_MeV, mass_MeV)
+sim.particle_container().ref_particle().set_energy_MeV(energy_MeV, mass_MeV)
 
 # design the accelerator lattice
 ns = 25  # number of slices per ds in the element
@@ -62,13 +62,7 @@ sbend2 = elements.Sbend(ds=0.50037, rc=rc, nslice=ns)
 dipedge1 = elements.DipEdge(psi=-psi, rc=-rc, g=0.0, K2=0.0)
 dipedge2 = elements.DipEdge(psi=psi, rc=rc, g=0.0, K2=0.0)
 
-lattice_half = [
-    sbend1,
-    dipedge1,
-    dr1,
-    dipedge2,
-    sbend2
-]
+lattice_half = [sbend1, dipedge1, dr1, dipedge2, sbend2]
 # assign a segment with the first half of the lattice
 sim.lattice.extend(lattice_half)
 sim.lattice.append(dr2)

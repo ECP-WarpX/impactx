@@ -33,7 +33,7 @@ def test_charge_deposition():
     dr = gm.data().CellSize()
     dV = np.prod(dr)
 
-    beam_charge = dV*rs  # in C
+    beam_charge = dV * rs  # in C
     assert math.isclose(beam_charge, 1.0e-9)
 
     f = plt.figure()
@@ -48,20 +48,13 @@ def test_charge_deposition():
 
         half_z = arr_np.shape[1] // 2  # indices: comp, z, y, x
         comp = 0
-        mu = 1.e6  # m->mu
+        mu = 1.0e6  # m->mu
         im = ax.imshow(
-            #arr_np[comp, half_z, ...] * dV,  # including guard
-            arr_np[
-                comp,
-                half_z,
-                ng[1]:-ng[1],
-                ng[0]:-ng[0]] * dV,  # w/o guard
-            origin='lower',
-            aspect='auto',
-            extent=[
-                rbx.lo(0) * mu, rbx.hi(0) * mu,
-                rbx.lo(1) * mu, rbx.hi(1) * mu
-            ]
+            # arr_np[comp, half_z, ...] * dV,  # including guard
+            arr_np[comp, half_z, ng[1] : -ng[1], ng[0] : -ng[0]] * dV,  # w/o guard
+            origin="lower",
+            aspect="auto",
+            extent=[rbx.lo(0) * mu, rbx.hi(0) * mu, rbx.lo(1) * mu, rbx.hi(1) * mu],
         )
         cb = f.colorbar(im)
         cb.set_label(r"charge density  [C/m$^3$]")
@@ -72,5 +65,5 @@ def test_charge_deposition():
 
 # implement a direct script run mode, so we can run this directly too,
 # with interactive matplotlib windows, w/o pytest
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_charge_deposition()

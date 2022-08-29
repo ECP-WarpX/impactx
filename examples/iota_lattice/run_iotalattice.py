@@ -14,7 +14,7 @@ sim = ImpactX()
 # set numerical parameters and IO control
 sim.set_particle_shape(2)  # B-spline order
 sim.set_space_charge(False)
-#sim.set_diagnostics(False)  # benchmarking
+# sim.set_diagnostics(False)  # benchmarking
 sim.set_slice_step_diagnostics(True)
 
 # domain decomposition & space charge mesh
@@ -24,22 +24,21 @@ sim.init_grids()
 energy_MeV = 2.5
 charge_C = 1.0e-9  # assign zero weighting to particles
 mass_MeV = 938.27208816
-qm_qeeV = 1.0e-6/mass_MeV
+qm_qeeV = 1.0e-6 / mass_MeV
 npart = 10000
 
 distr = distribution.Waterbag(
-    sigmaX = 1.588960728035e-3,
-    sigmaY = 2.496625268437e-3,
-    sigmaT = 1.0e-3,
-    sigmaPx = 2.8320397837724e-3,
-    sigmaPy = 1.802433091137e-3,
-    sigmaPt = 0.0)
-sim.add_particles(
-    qm_qeeV, charge_C, distr, npart)
+    sigmaX=1.588960728035e-3,
+    sigmaY=2.496625268437e-3,
+    sigmaT=1.0e-3,
+    sigmaPx=2.8320397837724e-3,
+    sigmaPy=1.802433091137e-3,
+    sigmaPt=0.0,
+)
+sim.add_particles(qm_qeeV, charge_C, distr, npart)
 
 # set the energy in the reference particle
-sim.particle_container().ref_particle() \
-    .set_energy_MeV(energy_MeV, mass_MeV)
+sim.particle_container().ref_particle().set_energy_MeV(energy_MeV, mass_MeV)
 
 # init accelerator lattice
 ns = 10  # number of slices per ds in the element
@@ -98,6 +97,7 @@ qe2 = elements.Quad(ds=ds_quad, k=6.66737146, nslice=ns)
 qe3 = elements.Quad(ds=ds_quad, k=-6.69148177, nslice=ns)
 
 # build lattice: first half, qe3, then mirror
+# fmt: off
 lattice_half = [
     dra1, qa1, dra2, qa2, dra3, qa3, dra4, qa4, dra5,
     edge30, sbend30, edge30, drb1, qb1, drb2, qb2, drb2, qb3,
@@ -106,6 +106,7 @@ lattice_half = [
     edge60, sbend60, edge60, drd1, qd1, drd2, qd2, drd3, qd3, drd2, qd4, drd4,
     edge30, sbend30, edge30, dre1, qe1, dre2, qe2, dre3
 ]
+# fmt:on
 sim.lattice.extend(lattice_half)
 sim.lattice.append(qe3)
 lattice_half.reverse()
