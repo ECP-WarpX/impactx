@@ -1,0 +1,46 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.energy = 2.0e3
+beam.charge = 1.0e-9
+beam.particle = proton
+beam.distribution = waterbag
+beam.sigmaX = 1.0e-3
+beam.sigmaY = 1.0e-3
+beam.sigmaT = 3.369701494258956e-4
+beam.sigmaPx = 1.0e-3
+beam.sigmaPy = 1.0e-3
+beam.sigmaPt = 2.9676219145931020e-3
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = cavity
+lattice.nslice = 25
+
+cavity.type = rfcavity
+cavity.ds = 2.0
+cavity.escale = 1.0
+cavity.freq = 1.3e9
+cavity.phase = 30.0
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = true
+                                                                                                                                          50,0-1        Bot
+

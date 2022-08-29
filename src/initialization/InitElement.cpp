@@ -99,6 +99,17 @@ namespace impactx
                 pp_element.get("knll", knll);
                 pp_element.get("cnll", cnll);
                 m_lattice.emplace_back( NonlinearLens(knll, cnll) );
+            } else if (element_type == "rfcavity") {
+                amrex::Real ds, Escale, freq, phase;
+                amrex::Real Bzsol = 0.0;
+                int nslice = nslice_default;
+                pp_element.get("ds", ds);
+                pp_element.get("escale", Escale);
+                pp_element.get("freq", freq);
+                pp_element.get("phase", phase);
+                pp_element.queryAdd("bsol", Bzsol);
+                pp_element.queryAdd("nslice", nslice);
+                m_lattice.emplace_back( RFCavity(ds, Escale, freq, phase, Bzsol, nslice) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }

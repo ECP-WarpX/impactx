@@ -19,6 +19,7 @@
 #include "Multipole.H"
 #include "None.H"
 #include "NonlinearLens.H"
+#include "RFCavity.H"
 
 #include <variant>
 
@@ -28,7 +29,7 @@ namespace impactx
     using KnownElements = std::variant<
         None, /* must be first, so KnownElements creates a default constructor */
         ConstF, DipEdge, Drift, Multipole, NonlinearLens,
-        Quad, Sbend, ShortRF>;
+        Quad, Sbend, ShortRF, RFCavity>;
 
 } // namespace impactx
 
