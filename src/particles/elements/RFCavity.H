@@ -123,10 +123,10 @@ namespace impactx
             amrex::ParticleReal const bgi = sqrt(pow(pt,2)-1.0_prt);
 
             // call integrator to advance (t,pt)
-	    // temporarily hard-coded uniform acceleration
+        // temporarily hard-coded uniform acceleration
             amrex::ParticleReal const tf = t;
-	    amrex::ParticleReal const ptf = pt - slice_ds*0.1_prt;
-	    refpart.t = tf;
+        amrex::ParticleReal const ptf = pt - slice_ds*0.1_prt;
+        refpart.t = tf;
             refpart.pt = ptf;
 
             // advance position (x,y,z)
