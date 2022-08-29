@@ -40,9 +40,14 @@ If want to use ImpactX on a specific high-performance computing (HPC) systems, j
 Using the Conda Package
 -----------------------
 
-.. note::
+A package for ImpactX is available via the `Conda <https://conda.io>`_ package manager.
 
-   Coming soon.
+.. code-block:: bash
+
+   conda create -n impactx -c conda-forge impactx
+   conda activate impactx
+
+Note: the ``impactx`` `conda package <https://anaconda.org/conda-forge/impactx>`__ does not yet provide GPU support.
 
 
 .. _install-spack:
