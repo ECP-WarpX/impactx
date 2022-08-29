@@ -17,6 +17,8 @@
 #include "particles/spacecharge/PoissonSolve.H"
 #include "particles/transformation/CoordinateTransformation.H"
 
+#include <ablastr/warn_manager/WarnManager.H>
+
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
 #include <AMReX_BLProfiler.H>
@@ -63,6 +65,22 @@ namespace impactx
         // a global step for diagnostics including space charge slice steps in elements
         //   before we start the evolve loop, we are in "step 0" (initial state)
         int global_step = 0;
+
+        bool early_params_checked = false; // check typos in inputs after step 1
+
+        // count particles - if no particles are found in our particle container, then a lot of
+        // AMReX routines over ParIter won't work and we have nothing to do here anyways
+        {
+            int const nLevelPC = finestLevel();
+            amrex::Long nParticles = 0;
+            for (int lev = 0; lev <= nLevelPC; ++lev) {
+                nParticles += m_particle_container->NumberOfParticlesAtLevel(lev);
+            }
+            if (nParticles == 0) {
+                amrex::Abort("No particles found. Cannot run evolve without a beam.");
+                return;
+            }
+        }
 
         amrex::ParmParse pp_diag("diag");
         bool diag_enable = true;
@@ -197,6 +215,17 @@ namespace impactx
                                                   global_step,
                                                   true);
 
+                }
+
+                // inputs: unused parameters (e.g. typos) check after step 1 has finished
+                if (!early_params_checked) {
+                    amrex::Print() << "\n"; // better: conditional \n based on return value
+                    amrex::ParmParse().QueryUnusedInputs();
+
+                    //Print the warning list right after the first step.
+                    amrex::Print() <<
+                                   ablastr::warn_manager::GetWMInstance().PrintGlobalWarnings("FIRST STEP");
+                    early_params_checked = true;
                 }
 
             } // end in-element space-charge slice-step loop
