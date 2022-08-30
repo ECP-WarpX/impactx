@@ -19,21 +19,6 @@ if(ImpactX_MPI)
 endif()
 
 
-function(impactx_test_set_pythonpath test_name)
-    if(WIN32)
-        string(REPLACE ";" "\\;" WIN_PYTHONPATH "$ENV{PYTHONPATH}")
-        string(REGEX REPLACE "/" "\\\\" WIN_PYTHON_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY})
-        set_property(TEST ${test_name}
-            APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${WIN_PYTHON_OUTPUT_DIRECTORY}\;${WIN_PYTHONPATH}"
-        )
-    else()
-        set_property(TEST ${test_name}
-            APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_PYTHON_OUTPUT_DIRECTORY}:$ENV{PYTHONPATH}"
-        )
-    endif()
-endfunction()
-
-
 function(add_impactx_test name input is_mpi is_python analysis_script plot_script)
     # make a unique run directory
     file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name})

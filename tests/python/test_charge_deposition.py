@@ -10,7 +10,7 @@ import amrex
 import impactx
 
 
-def test_charge_deposition():
+def test_charge_deposition(save_png=True):
     """
     Deposit charge and access/plot it
     """
@@ -60,10 +60,13 @@ def test_charge_deposition():
         cb.set_label(r"charge density  [C/m$^3$]")
         ax.set_xlabel(r"$x$  [$\mu$m]")
         ax.set_ylabel(r"$y$  [$\mu$m]")
-        plt.show()
+        if save_png:
+            plt.savefig("charge_deposition.png")
+        else:
+            plt.show()
 
 
 # implement a direct script run mode, so we can run this directly too,
 # with interactive matplotlib windows, w/o pytest
 if __name__ == "__main__":
-    test_charge_deposition()
+    test_charge_deposition(save_png=False)
