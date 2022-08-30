@@ -9,7 +9,7 @@
 
 import amrex
 from impactx import (ImpactX, MADXParser, RefPart, distribution, elements,
-                     madx2impactx_beam, madx2impactx_lattice)
+                     read_beam, read_lattice)
 
 sim = ImpactX()
 
@@ -37,7 +37,7 @@ print(madx)
 
 beamline = madx.getBeamline()
 
-ref_particle_dict = madx2impactx_beam(
+ref_particle_dict = read_beam(
     madx.getParticle(),  # if particle species is known, mass, charge, and potentially energy are set to default
     # TODO MADX parser needs to extract charge if it's given,
     # TODO MADX parser needs to extract mass if it's given,

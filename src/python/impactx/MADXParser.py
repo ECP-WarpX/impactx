@@ -213,7 +213,7 @@ class MADXParser:
                                 self.__dipedge[obj.group(i)] = float(obj.group(i + 1))
                             else:
                                 raise MADXInputError(
-                                    "DipEgde",
+                                    "DipEdge",
                                     "Line "
                                     + str(nLine)
                                     + ": Parameter "
@@ -393,7 +393,7 @@ class MADXParser:
                 + "            *  #quadrupole:\t"
                 + str(nTypes[2])
                 + "\n"
-                + "            *  #dipedge:\t"
+                + "            *     #dipedge:\t"
                 + str(nTypes[3])
                 + "\n"
                 + "           beam:\t\n"
