@@ -107,15 +107,15 @@ add_impactx_test(FODO.py
 # Python MADX: FODO Cell ######################################################
 #
 # copy MAD-X lattice file
-file(COPY ${ImpactX_SOURCE_DIR}/examples/fodo/input_fodo.madx DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO_MADX.py)
+file(COPY ${ImpactX_SOURCE_DIR}/examples/fodo/fodo.madx DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.MADX.py)
 
-add_impactx_test(FODO_MADX.py
-        examples/fodo/run_fodo_madx.py
-        OFF  # ImpactX MPI-parallel
-        ON   # ImpactX Python interface
-        examples/fodo/analysis_fodo.py
-        examples/fodo/plot_fodo.py --save-png
-        )
+add_impactx_test(FODO.MADX.py
+    examples/fodo/run_fodo_madx.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/fodo/analysis_fodo.py
+    examples/fodo/plot_fodo.py --save-png
+)
 
 # Python: MPI-parallel FODO Cell ##############################################
 #
@@ -150,15 +150,15 @@ add_impactx_test(chicane.py
 # Python MADX: Chicane ######################################################
 #
 # copy MAD-X lattice file
-file(COPY ${ImpactX_SOURCE_DIR}/examples/chicane/input_chicane.madx DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chicane_MADX.py)
+file(COPY ${ImpactX_SOURCE_DIR}/examples/chicane/chicane.madx DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chicane.MADX.py)
 
-add_impactx_test(chicane_MADX.py
-        examples/chicane/run_chicane_madx.py
-        OFF  # ImpactX MPI-parallel
-        ON   # ImpactX Python interface
-        examples/chicane/analysis_chicane.py
-        examples/chicane/plot_chicane.py --save-png
-        )
+add_impactx_test(chicane.MADX.py
+    examples/chicane/run_chicane_madx.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/chicane/analysis_chicane.py
+    examples/chicane/plot_chicane.py --save-png
+)
 
 # Constant Focusing Channel ###################################################
 #

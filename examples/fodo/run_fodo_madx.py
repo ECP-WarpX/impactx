@@ -29,7 +29,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 try:
     madx = MADXParser()
 
-    madx.parse('{}/input_fodo.madx'.format(dir_path))
+    madx.parse(f"{dir_path}/fodo.madx")
 
 except Exception as e:
     print(f"Unexpected {e = }, {type(e) = }")
