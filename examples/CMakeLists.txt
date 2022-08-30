@@ -81,7 +81,7 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
     endif()
     if(plot_script)
         add_test(NAME ${name}.plot
-                 COMMAND ${THIS_Python_SCRIPT_EXE} ${ImpactX_SOURCE_DIR}/${plot_script}
+                 COMMAND ${THIS_Python_SCRIPT_EXE} ${ImpactX_SOURCE_DIR}/${plot_script} --save-png
                  WORKING_DIRECTORY ${THIS_WORKING_DIR}
         )
         set_tests_properties(${name}.plot PROPERTIES DEPENDS "${name}.run")
@@ -96,7 +96,7 @@ add_impactx_test(FODO
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/fodo/analysis_fodo.py
-    examples/fodo/plot_fodo.py --save-png
+    examples/fodo/plot_fodo.py
 )
 
 # MPI-Parallel FODO Cell ######################################################
@@ -106,7 +106,7 @@ add_impactx_test(FODO.MPI
       ON   # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/fodo/analysis_fodo.py
-    examples/fodo/plot_fodo.py --save-png
+    examples/fodo/plot_fodo.py
 )
 
 # Python: FODO Cell ###########################################################
@@ -116,7 +116,7 @@ add_impactx_test(FODO.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/fodo/analysis_fodo.py
-    examples/fodo/plot_fodo.py --save-png
+    examples/fodo/plot_fodo.py
 )
 
 # Python: MPI-parallel FODO Cell ##############################################
@@ -126,7 +126,7 @@ add_impactx_test(FODO.py.MPI
       ON  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/fodo/analysis_fodo.py
-    examples/fodo/plot_fodo.py --save-png
+    examples/fodo/plot_fodo.py
 )
 
 # Chicane #####################################################################
@@ -136,7 +136,7 @@ add_impactx_test(chicane
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/chicane/analysis_chicane.py
-    examples/chicane/plot_chicane.py --save-png
+    examples/chicane/plot_chicane.py
 )
 
 # Python: Chicane #####################################################################
@@ -146,7 +146,7 @@ add_impactx_test(chicane.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/chicane/analysis_chicane.py
-    examples/chicane/plot_chicane.py --save-png
+    examples/chicane/plot_chicane.py
 )
 
 # Constant Focusing Channel ###################################################
@@ -156,7 +156,7 @@ add_impactx_test(cfchannel
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/cfchannel/analysis_cfchannel.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # Kurth Distribution Test ###################################################
@@ -166,7 +166,7 @@ add_impactx_test(kurth
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/kurth/analysis_kurth.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # Python: Kurth Distribution Test ##################################################
@@ -186,7 +186,7 @@ add_impactx_test(gaussian
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/distgen/analysis_gaussian.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # K-V Distribution Test ############################################################
@@ -196,7 +196,7 @@ add_impactx_test(kvdist
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/distgen/analysis_kvdist.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # FODO Cell with RF ###################################################################
@@ -206,7 +206,7 @@ add_impactx_test(FODO_RF
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/fodo_rf/analysis_fodo_rf.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # 4D Kurth Distribution Test ############################################################
@@ -216,7 +216,7 @@ add_impactx_test(kurth4d
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/distgen/analysis_kurth4d.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # Semi-Gaussian Distribution Test ############################################################
@@ -226,7 +226,7 @@ add_impactx_test(semigaussian
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/distgen/analysis_semigaussian.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # Chain of Multipoles Test ############################################################
@@ -236,7 +236,7 @@ add_impactx_test(multipole
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/multipole/analysis_multipole.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # Python: Chain of Multipoles Test #########################################################
@@ -256,7 +256,7 @@ add_impactx_test(iotalens
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/iota_lens/analysis_iotalens.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # Python: IOTA Nonlinear Focusing Channel Test #####################################
@@ -276,7 +276,7 @@ add_impactx_test(iotalattice.MPI
       ON   # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/iota_lattice/analysis_iotalattice.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 
@@ -287,5 +287,5 @@ add_impactx_test(iotalattice.py.MPI
       ON   # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/iota_lattice/analysis_iotalattice.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
