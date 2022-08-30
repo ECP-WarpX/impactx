@@ -23,12 +23,12 @@ function(impactx_test_set_pythonpath test_name)
     if(WIN32)
         string(REPLACE ";" "\\;" WIN_PYTHONPATH "$ENV{PYTHONPATH}")
         string(REGEX REPLACE "/" "\\\\" WIN_PYTHON_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY})
-        set_tests_properties(${test_name}
-            PROPERTIES ENVIRONMENT "PYTHONPATH=${WIN_PYTHON_OUTPUT_DIRECTORY}\;${WIN_PYTHONPATH}"
+        set_property(TEST ${test_name}
+            APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${WIN_PYTHON_OUTPUT_DIRECTORY}\;${WIN_PYTHONPATH}"
         )
     else()
-        set_tests_properties(${test_name}
-            PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_PYTHON_OUTPUT_DIRECTORY}:$ENV{PYTHONPATH}"
+        set_property(TEST ${test_name}
+            APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_PYTHON_OUTPUT_DIRECTORY}:$ENV{PYTHONPATH}"
         )
     endif()
 endfunction()
@@ -61,10 +61,10 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
         )
     endif()
     if(is_mpi)
-        set_tests_properties(${name}.run PROPERTIES ENVIRONMENT "OMP_NUM_THREADS=1")
+        set_property(TEST ${name}.run APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=1")
     else()
         # TODO: Change to 2 after OpenMP support was added #195
-        set_tests_properties(${name}.run PROPERTIES ENVIRONMENT "OMP_NUM_THREADS=1")
+        set_property(TEST ${name}.run APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=1")
     endif()
 
     # analysis and plots
@@ -77,14 +77,14 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
                  COMMAND ${THIS_Python_SCRIPT_EXE} ${ImpactX_SOURCE_DIR}/${analysis_script}
                  WORKING_DIRECTORY ${THIS_WORKING_DIR}
         )
-        set_tests_properties(${name}.analysis PROPERTIES DEPENDS "${name}.run")
+        set_property(TEST ${name}.analysis APPEND PROPERTY DEPENDS "${name}.run")
     endif()
     if(plot_script)
         add_test(NAME ${name}.plot
                  COMMAND ${THIS_Python_SCRIPT_EXE} ${ImpactX_SOURCE_DIR}/${plot_script} --save-png
                  WORKING_DIRECTORY ${THIS_WORKING_DIR}
         )
-        set_tests_properties(${name}.plot PROPERTIES DEPENDS "${name}.run")
+        set_property(TEST ${name}.plot APPEND PROPERTY DEPENDS "${name}.run")
     endif()
 endfunction()
 
