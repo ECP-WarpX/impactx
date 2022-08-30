@@ -47,6 +47,14 @@ def lattice(parsed_beamline, nslice=1):
                 impactx_beamline.append(
                     elements.Quad(ds=d["l"], k=d["k1"], nslice=nslice)
                 )
+            elif d['name'] == "sbend":
+                impactx_beamline.append(
+                    elements.Sbend(ds=d['l'], rc=d['l']/d['angle'], nslice=nslice)
+                )
+            elif d['name'] == "dipedge":
+                impactx_beamline.append(
+                    elements.DipEdge(psi=d['e1'], rc=1/d['h'], nslice=nslice)
+                )
         else:
             raise NotImplementedError(
                 "The beamline element named ",

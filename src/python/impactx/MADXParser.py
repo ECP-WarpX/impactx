@@ -61,6 +61,21 @@ class MADXParser:
         # TODO add rbend
         self.__nDipole = 2 * (len(self.__sbend) - 2)
 
+        self.__dipedge = {
+            'name': '',
+            'h': 0.0,
+            'e1': 0.0,
+            'fint': 0.0,
+            'hgap': 0.0,
+            'tilt': 0.0,
+            'type': 'dipedge'
+        }
+
+        self.__dipedge_pattern = '(.*):dipedge,(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*);'
+
+        # don't count name and type --> len - 2
+        self.__nDipedge = 2 * (len(self.__dipedge) - 2)
+
         self.beam = {
             "energy": 0.0,
             # TODO extend by 'PC'
@@ -161,10 +176,6 @@ class MADXParser:
                 elif "sbend" in line:
 
                     obj = re.match(self.__sbend_pattern, line)
-                    if obj:  # TODO remove DEBUG line
-                        print("OBJ: ", obj)  # TODO remove DEBUG line
-                    else:
-                        print("Oops")
 
                     # first tag is name
                     self.__sbend["name"] = obj.group(1)
@@ -186,7 +197,27 @@ class MADXParser:
                             )
 
                     self.__elements.append(self.__sbend.copy())
-                elif "marker" in line:
+
+                elif 'dipedge' in line:
+
+                        obj = re.match(self.__dipedge_pattern, line)
+
+                        # first tag is name
+                        self.__dipedge['name'] = obj.group(1)
+
+                        for i in range(2, self.__nDipedge + 2, 2):
+
+                            if obj.group(i) in self.__dipedge:
+                                self.__dipedge[obj.group(i)] = float(obj.group(i + 1))
+                            else:
+                                raise MADXInputError('DipEgde',
+                                                     'Line ' + str(nLine) + ': Parameter ' +
+                                                     "'" + obj.group(i) + "'" +
+                                                     ' does not exist for dipole edge.')
+
+                        self.__elements.append(self.__dipedge.copy())
+
+                elif 'marker' in line:
                     pass
 
                 elif "beam" in line:
@@ -255,9 +286,6 @@ class MADXParser:
 
         # 14. Oct. 2017,
         # https://stackoverflow.com/questions/7900882/extract-item-from-list-of-dictionaries
-        for l in self.__lines:  # TODO remove this DEBUG line
-            print(l)
-        print(self.sequence)
         start = [l for l in self.__lines if l["name"] == self.sequence["name"]][0]
 
         self._flatten(start)
@@ -319,8 +347,8 @@ class MADXParser:
         if self.__lattice:
             length = 0.0
 
-            # drift, dipole, quadrupole
-            nTypes = [0, 0, 0]
+            # drift, dipole, quadrupole, dipedge
+            nTypes = [0, 0, 0, 0]
 
             for elem in self.__lattice["elem"]:
                 for e in self.__elements:
@@ -333,6 +361,8 @@ class MADXParser:
                             nTypes[1] += 1
                         elif e["type"] == "quad":
                             nTypes[2] += 1
+                        elif e['type'] == 'dipedge':
+                            nTypes[3] += 1
                         break
 
             sign = "*" * 70
@@ -354,6 +384,9 @@ class MADXParser:
                 + "\n"
                 + "            *  #quadrupole:\t"
                 + str(nTypes[2])
+                + "\n"
+                + "            *  #dipedge:\t"
+                + str(nTypes[3])
                 + "\n"
                 + "           beam:\t\n"
                 + "            *     particle:\t"
@@ -385,6 +418,9 @@ class MADXParser:
                             beamline.append(e)
                         elif e["type"] == "quad":
                             print("Quadrupole L= ", e["l"], " k1 = ", e["k1"])
+                            beamline.append(e)
+                        elif e['type'] == 'dipedge':
+                            print("Dipedge H= ",e['h'],' E1 = ',e['e1'])
                             beamline.append(e)
                         else:
                             print("Skipping element type " + "'" + e["type"] + "'")
