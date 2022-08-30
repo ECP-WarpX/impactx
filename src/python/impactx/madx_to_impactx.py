@@ -49,11 +49,17 @@ def lattice(parsed_beamline, nslice=1):
                 )
             elif d['name'] == "sbend":
                 impactx_beamline.append(
-                    elements.Sbend(ds=d['l'], rc=d['l']/d['angle'], nslice=nslice)
+                    elements.Sbend(ds=d["l"], rc=d["l"]/d["angle"], nslice=nslice)
                 )
             elif d['name'] == "dipedge":
                 impactx_beamline.append(
-                    elements.DipEdge(psi=d['e1'], rc=1/d['h'], nslice=nslice)
+                    elements.DipEdge(
+                        psi=d["e1"],
+                        rc=1.0 / d["h"],
+                        # MAD-X is using half the gap height
+                        g=2.0 * d["hgap"],
+                        K2=d['fint'],
+                        nslice=nslice)
                 )
         else:
             raise NotImplementedError(

@@ -62,16 +62,18 @@ class MADXParser:
         self.__nDipole = 2 * (len(self.__sbend) - 2)
 
         self.__dipedge = {
-            'name': '',
-            'h': 0.0,
-            'e1': 0.0,
-            'fint': 0.0,
-            'hgap': 0.0,
-            'tilt': 0.0,
-            'type': 'dipedge'
+            "name": "",
+            "h": 0.0,
+            "e1": 0.0,
+            "fint": 0.0,
+            "hgap": 0.0,
+            "tilt": 0.0,
+            "type": "dipedge"
         }
 
-        self.__dipedge_pattern = '(.*):dipedge,(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*);'
+        self.__dipedge_pattern = (
+             r"(.*):dipedge,(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*);"
+        )
 
         # don't count name and type --> len - 2
         self.__nDipedge = 2 * (len(self.__dipedge) - 2)
@@ -198,26 +200,32 @@ class MADXParser:
 
                     self.__elements.append(self.__sbend.copy())
 
-                elif 'dipedge' in line:
+                elif "dipedge" in line:
 
                         obj = re.match(self.__dipedge_pattern, line)
 
                         # first tag is name
-                        self.__dipedge['name'] = obj.group(1)
+                        self.__dipedge["name"] = obj.group(1)
 
                         for i in range(2, self.__nDipedge + 2, 2):
 
                             if obj.group(i) in self.__dipedge:
                                 self.__dipedge[obj.group(i)] = float(obj.group(i + 1))
                             else:
-                                raise MADXInputError('DipEgde',
-                                                     'Line ' + str(nLine) + ': Parameter ' +
-                                                     "'" + obj.group(i) + "'" +
-                                                     ' does not exist for dipole edge.')
+                                raise MADXInputError(
+                                    "DipEgde",
+                                    "Line "
+                                    + str(nLine)
+                                    + ": Parameter "
+                                    + "'"
+                                    + obj.group(i)
+                                    + "'"
+                                    + " does not exist for dipole edge."
+                                )
 
                         self.__elements.append(self.__dipedge.copy())
 
-                elif 'marker' in line:
+                elif "marker" in line:
                     pass
 
                 elif "beam" in line:
@@ -419,8 +427,8 @@ class MADXParser:
                         elif e["type"] == "quad":
                             print("Quadrupole L= ", e["l"], " k1 = ", e["k1"])
                             beamline.append(e)
-                        elif e['type'] == 'dipedge':
-                            print("Dipedge H= ",e['h'],' E1 = ',e['e1'])
+                        elif e["type"] == "dipedge":
+                            print("Dipedge H= ",e["h"]," E1 = ",e["e1"])
                             beamline.append(e)
                         else:
                             print("Skipping element type " + "'" + e["type"] + "'")

@@ -9,6 +9,7 @@ DRIFT3: drift, L=2.0;
 ! TODO put theta again everywhere after `angle=` with its right sign
 SBEND1: sbend, L=0.50037, angle=0.048345, e1=0.000, e2=0.000, k1=0.00;
 SBEND2: sbend, L=0.50037, angle=-0.048345, e1=0.000, e2=0.000, k1=0.00;
+! dipole edge elements
 DIPEDGE1: dipedge, H=0.096618357, e1=-0.048345620280243, fint=0.000, hgap=0.000, tilt=0.00;
 DIPEDGE2: dipedge, H=0.096618357, e1=0.048345620280243, fint=0.000, hgap=0.000, tilt=0.00;;
 
