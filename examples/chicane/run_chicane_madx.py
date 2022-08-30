@@ -6,18 +6,10 @@
 #
 # -*- coding: utf-8 -*-
 
-import os
 
 import amrex
-from impactx import (
-    ImpactX,
-    MADXParser,
-    RefPart,
-    distribution,
-    elements,
-    madx2impactx_beam,
-    madx2impactx_lattice,
-)
+from impactx import (ImpactX, MADXParser, RefPart, distribution, elements,
+                     madx2impactx_beam, madx2impactx_lattice)
 
 sim = ImpactX()
 
@@ -30,13 +22,10 @@ sim.set_slice_step_diagnostics(True)
 # domain decomposition & space charge mesh
 sim.init_grids()
 
-# @TODO make this better ... shouldn't need that. But somehow the working directory is
-dir_path = os.path.dirname(os.path.realpath(__file__))
-
 try:
     madx = MADXParser()
 
-    madx.parse(f"{dir_path}/chicane.madx")
+    madx.parse("chicane.madx")
 
 except Exception as e:
     print(f"Unexpected {e = }, {type(e) = }")
@@ -86,9 +75,8 @@ sim.particle_container().ref_particle().set_energy_MeV(
     ref_particle_dict["energy"], ref_particle_dict["mass"]
 )
 
-chicane = madx2impactx_lattice(beamline)
 # assign a fodo segment
-sim.lattice.extend(chicane)
+sim.lattice.load_file("chicane.madx", nslice=25)
 
 # run simulation
 sim.evolve()

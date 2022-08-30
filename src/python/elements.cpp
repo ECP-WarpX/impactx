@@ -31,25 +31,34 @@ void init_elements(py::module& m)
             return v;
         }))
 
-        .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(el); })
+        .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(el); },
+             "Add a single element to the list.")
 
-        .def("extend", [](KnownElementsList &v, KnownElementsList l) {
-            for (auto const & el : l)
-                v.push_back(el);
-            return v;
-        })
-        .def("extend", [](KnownElementsList &v, py::list l) {
-            for (auto const & handle : l)
-            {
-                auto el = handle.cast<KnownElements>();
-                v.push_back(el);
-            }
-            return v;
-        })
+        .def("extend",
+             [](KnownElementsList &v, KnownElementsList l) {
+                 for (auto const & el : l)
+                    v.push_back(el);
+                 return v;
+             },
+             "Add a list of elements to the list.")
+        .def("extend",
+             [](KnownElementsList &v, py::list l) {
+                 for (auto const & handle : l)
+                 {
+                    auto el = handle.cast<KnownElements>();
+                    v.push_back(el);
+                 }
+                 return v;
+             },
+             "Add a list of elements to the list."
+         )
 
-        .def("clear", &KnownElementsList::clear)
-        .def("pop_back", &KnownElementsList::pop_back)
-        .def("__len__", [](const KnownElementsList &v) { return v.size(); })
+        .def("clear", &KnownElementsList::clear,
+             "Clear the list to become empty.")
+        .def("pop_back", &KnownElementsList::pop_back,
+             "Return and remove the last element of the list.")
+        .def("__len__", [](const KnownElementsList &v) { return v.size(); },
+             "The length of the list.")
         .def("__iter__", [](KnownElementsList &v) {
             return py::make_iterator(v.begin(), v.end());
         }, py::keep_alive<0, 1>()) /* Keep list alive while iterator is used */

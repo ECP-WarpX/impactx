@@ -12,11 +12,14 @@ import scipy.constants as sc
 
 from impactx import elements
 
+from .MADXParser import MADXParser
 
-def madx2impactx_lattice(parsed_beamline, nslice=25):
+
+def lattice(parsed_beamline, nslice=1):
     """
     Function that converts a list of elements in the MADXParser format into ImpactX format
     :param parsed_beamline: list of dictionaries
+    :param nslice: number of ds slices per element
     :return: list of translated dictionaries
     """
 
@@ -57,7 +60,19 @@ def madx2impactx_lattice(parsed_beamline, nslice=25):
     return impactx_beamline
 
 
-def madx2impactx_beam(particle, charge=None, mass=None, energy=None):
+def read_lattice(madx_file, nslice=1):
+    """
+    Function that reads elements from a MAD-X file into a list of ImpactX.KnownElements
+    :param madx_file: file name to MAD-X file with beamline elements
+    :param nslice: number of ds slices per element
+    :return: list of ImpactX.KnownElements
+    """
+    madx = MADXParser()
+    beamline = madx.parse(madx_file).getBeamline()
+    return lattice(beamline, nslice)
+
+
+def beam(particle, charge=None, mass=None, energy=None):
     """
     Function that converts a list of beam parameter dictionaries in the MADXParser format into ImpactX format
 
@@ -71,34 +86,34 @@ def madx2impactx_beam(particle, charge=None, mass=None, energy=None):
     :return dict: dictionary containing particle and beam attributes in ImpactX units
     """
 
-    GeV2MeV = 1e-3
-    kg2MeV = sc.c**2 / sc.electron_volt * 1e-6
+    GeV2MeV = 1.0e-3
+    kg2MeV = sc.c**2 / sc.electron_volt * 1.0e-6
     muon_mass = sc.physical_constants["electron-muon mass ratio"][0] / sc.m_e
     if energy is None:
-        energy_MeV = 1e3  # MAD-X default is 1 GeV particle energy
+        energy_MeV = 1.0e3  # MAD-X default is 1 GeV particle energy
     else:
         energy_MeV = energy * GeV2MeV
 
     impactx_beam = {
-        "positron": {"mass": sc.m_e * kg2MeV, "charge": 1},
-        "electron": {"mass": sc.m_e * kg2MeV, "charge": -1},
-        "proton": {"mass": sc.m_p * kg2MeV, "charge": 1},
-        "antiproton": {"mass": sc.m_p * kg2MeV, "charge": -1},
+        "positron": {"mass": sc.m_e * kg2MeV, "charge": 1.0},
+        "electron": {"mass": sc.m_e * kg2MeV, "charge": -1.0},
+        "proton": {"mass": sc.m_p * kg2MeV, "charge": 1.0},
+        "antiproton": {"mass": sc.m_p * kg2MeV, "charge": -1.0},
         "posmuon": {
             "mass": muon_mass * kg2MeV,
-            "charge": 1,
+            "charge": 1.0,
         },  # positively charged muon (anti-muon)
         "negmuon": {
             "mass": muon_mass * kg2MeV,
-            "charge": -1,
+            "charge": -1.0,
         },  # negatively charged muon
-        "ion": {"mass": sc.m_u * kg2MeV, "charge": 1},
+        "ion": {"mass": sc.m_u * kg2MeV, "charge": 1.0},
         "generic": {"mass": mass, "charge": charge},
     }
 
     if particle not in impactx_beam.keys():
         warnings.warn(
-            'Particle species name "' + particle + '" not in ' + impactx_beam.keys(),
+            f"Particle species name '{particle}' not in '{impactx_beam.keys()}'",
             UserWarning,
         )
         print(
@@ -108,12 +123,21 @@ def madx2impactx_beam(particle, charge=None, mass=None, energy=None):
     else:
         _particle = particle
         print(
-            'Choosing provided particle species "',
-            particle,
-            '", ignoring potentially provided `charge` and `mass` and setting defaults.',
+            f"Choosing provided particle species '{particle}', ignoring potentially provided `charge` and `mass` and setting defaults.",
         )
 
     reference_particle = impactx_beam[_particle]
     reference_particle["energy"] = energy_MeV
 
     return reference_particle
+
+
+def read_beam(madx_file):
+    """
+    Function that reads elements from a MAD-X file into a list of ImpactX.KnownElements
+    :param madx_file: file name to MAD-X file with beamline elements
+    :return: list of ImpactX.KnownElements
+    """
+    madx = MADXParser()
+    beamline = madx.parse(madx_file).getBeamline()
+    return beam(beamline)
