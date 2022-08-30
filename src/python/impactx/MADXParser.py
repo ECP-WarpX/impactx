@@ -34,14 +34,14 @@ class MADXParser:
 
         self.__drift = {"name": "", "l": 0.0, "type": "drift"}
 
-        self.__drift_pattern = "(.*):drift,(.*)=(.*);"
+        self.__drift_pattern = r"(.*):drift,(.*)=(.*);"
 
         self.__quadrupole = {"name": "", "l": 0.0, "k1": 0.0, "type": "quad"}
 
         # don't count name and type --> len - 2
         self.__nQuad = 2 * (len(self.__quadrupole) - 2)
 
-        self.quad_pattern = "(.*):quadrupole,(.*)=(.*),(.*)=(.*);"
+        self.quad_pattern = r"(.*):quadrupole,(.*)=(.*),(.*)=(.*);"
 
         self.__sbend = {
             "name": "",
@@ -54,7 +54,7 @@ class MADXParser:
         }
 
         self.__sbend_pattern = (
-            "(.*):sbend,(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*);"
+            r"(.*):sbend,(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*);"
         )
 
         # don't count name and type --> len - 2
@@ -69,18 +69,18 @@ class MADXParser:
 
         self.__nBeam = 2 * len(self.beam)
 
-        self.beam_pattern = "beam,(.*)=(.*),(.*)=(.*);"
+        self.beam_pattern = r"beam,(.*)=(.*),(.*)=(.*);"
 
         self.__line = {
             "name": "",
             "elem": [],
         }
 
-        self.__line_pattern = "(.*):line=\(+(.*)\);"
+        self.__line_pattern = r"(.*):line=\(+(.*)\);"
 
         self.sequence = {"name": ""}
 
-        self.seq_pattern = "use,sequence=(.*);"
+        self.seq_pattern = r"use,sequence=(.*);"
 
         self.__elements = []
         self.__lines = []
