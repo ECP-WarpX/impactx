@@ -13,7 +13,7 @@ import scipy.constants as sc
 from impactx import elements
 
 
-def madx2impactx_lattice(parsed_beamline,nslice=25):
+def madx2impactx_lattice(parsed_beamline, nslice=25):
     """
     Function that converts a list of elements in the MADXParser format into ImpactX format
     :param parsed_beamline: list of dictionaries
@@ -37,26 +37,25 @@ def madx2impactx_lattice(parsed_beamline,nslice=25):
 
     for d in parsed_beamline:
 
-        if d['type'] in [k.casefold() for k in list(madx_to_impactx_dict.keys())]:
-            if d['name'] == "drift":
+        if d["type"] in [k.casefold() for k in list(madx_to_impactx_dict.keys())]:
+            if d["name"] == "drift":
+                impactx_beamline.append(elements.Drift(ds=d["l"], nslice=nslice))
+            elif d["name"] == "quadrupole":
                 impactx_beamline.append(
-                    elements.Drift(ds=d['l'], nslice=nslice)
-                )
-            elif d['name'] == "quadrupole":
-                impactx_beamline.append(
-                    elements.Quad(ds=d['l'], k=d['k1'], nslice=nslice)
+                    elements.Quad(ds=d["l"], k=d["k1"], nslice=nslice)
                 )
         else:
             raise NotImplementedError(
                 "The beamline element named ",
-                d['name'],
+                d["name"],
                 "of type ",
-                d['type'],
+                d["type"],
                 "is not implemented in impactx.elements.",
                 "Available elements are:",
-                list(madx_to_impactx_dict.keys())
+                list(madx_to_impactx_dict.keys()),
             )
     return impactx_beamline
+
 
 def madx2impactx_beam(particle, charge=None, mass=None, energy=None):
     """
@@ -73,34 +72,48 @@ def madx2impactx_beam(particle, charge=None, mass=None, energy=None):
     """
 
     GeV2MeV = 1e-3
-    kg2MeV = sc.c ** 2 / sc.electron_volt * 1e-6
-    muon_mass = sc.physical_constants['electron-muon mass ratio'][0] / sc.m_e
+    kg2MeV = sc.c**2 / sc.electron_volt * 1e-6
+    muon_mass = sc.physical_constants["electron-muon mass ratio"][0] / sc.m_e
     if energy is None:
         energy_MeV = 1e3  # MAD-X default is 1 GeV particle energy
     else:
         energy_MeV = energy * GeV2MeV
 
     impactx_beam = {
-        'positron': {'mass': sc.m_e * kg2MeV, 'charge': 1},
-        'electron': {'mass': sc.m_e * kg2MeV, 'charge': -1},
-        'proton': {'mass': sc.m_p * kg2MeV, 'charge': 1},
-        'antiproton': {'mass': sc.m_p * kg2MeV, 'charge': -1},
-        'posmuon': {'mass': muon_mass * kg2MeV, 'charge': 1},  # positively charged muon (anti-muon)
-        'negmuon': {'mass': muon_mass * kg2MeV, 'charge': -1},  # negatively charged muon
-        'ion': {'mass': sc.m_u * kg2MeV, 'charge': 1},
-        'generic': {'mass': mass, 'charge': charge}
+        "positron": {"mass": sc.m_e * kg2MeV, "charge": 1},
+        "electron": {"mass": sc.m_e * kg2MeV, "charge": -1},
+        "proton": {"mass": sc.m_p * kg2MeV, "charge": 1},
+        "antiproton": {"mass": sc.m_p * kg2MeV, "charge": -1},
+        "posmuon": {
+            "mass": muon_mass * kg2MeV,
+            "charge": 1,
+        },  # positively charged muon (anti-muon)
+        "negmuon": {
+            "mass": muon_mass * kg2MeV,
+            "charge": -1,
+        },  # negatively charged muon
+        "ion": {"mass": sc.m_u * kg2MeV, "charge": 1},
+        "generic": {"mass": mass, "charge": charge},
     }
 
-
     if particle not in impactx_beam.keys():
-        warnings.warn('Particle species name "' + particle + '" not in ' + impactx_beam.keys(), UserWarning)
-        print('Choosing generic particle species, using provided `charge`, `mass` and `energy`.')
-        _particle = 'generic'
+        warnings.warn(
+            'Particle species name "' + particle + '" not in ' + impactx_beam.keys(),
+            UserWarning,
+        )
+        print(
+            "Choosing generic particle species, using provided `charge`, `mass` and `energy`."
+        )
+        _particle = "generic"
     else:
         _particle = particle
-        print('Choosing provided particle species "', particle, '", ignoring potentially provided `charge` and `mass` and setting defaults.')
+        print(
+            'Choosing provided particle species "',
+            particle,
+            '", ignoring potentially provided `charge` and `mass` and setting defaults.',
+        )
 
     reference_particle = impactx_beam[_particle]
-    reference_particle['energy'] = energy_MeV
+    reference_particle["energy"] = energy_MeV
 
     return reference_particle
