@@ -32,7 +32,7 @@ namespace impactx::integrators
         amrex::ParticleReal const tau2 = dz/(1.0_prt + alpha);
         amrex::ParticleReal const tau1 = tau2/2.0_prt;
         amrex::ParticleReal const tau3 = alpha*tau1;
-        amrex::ParticleReal const tau4 = (alpha - 1.0_prt)*tau2; 
+        amrex::ParticleReal const tau4 = (alpha - 1.0_prt)*tau2;
 
         // initialize the value of the independent variable
         amrex::ParticleReal zeval = zin;
@@ -61,7 +61,7 @@ namespace impactx::integrators
 
            amrex::ParticleReal const t = refpart.t;
            amrex::ParticleReal const pt = refpart.pt;
-        
+
            if(pt < -1.0_prt){
               refpart.t = t + tau/sqrt(1.0_prt - pow(pt,-2));
               refpart.pt = pt;
@@ -72,7 +72,7 @@ namespace impactx::integrators
            }
            zeval = zeval + tau;
         }
- 
+
     }
 
     void map2 (amrex::ParticleReal const tau, RefPart & refpart,
