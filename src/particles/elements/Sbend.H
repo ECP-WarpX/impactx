@@ -151,6 +151,16 @@ namespace impactx
             return m_nslice;
         }
 
+        /** Return the segment length
+         *
+         * @return value in meters
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        amrex::ParticleReal ds () const
+        {
+            return m_ds;
+        }
+
     private:
         amrex::ParticleReal m_ds; //! segment length in m
         amrex::ParticleReal m_rc; //! bend radius in m

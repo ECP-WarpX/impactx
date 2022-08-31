@@ -129,6 +129,17 @@ namespace impactx
             return 1;
         }
 
+        /** Return the segment length
+         *
+         * @return zero, because this is a zero-length element
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        amrex::ParticleReal ds () const
+        {
+            using namespace amrex::literals;
+            return 0.0_prt;
+        }
+
     private:
         int m_multipole; //! multipole index
         int m_mfactorial; //! factorial of multipole index

@@ -138,6 +138,17 @@ namespace impactx
             return 1;
         }
 
+        /** Return the segment length
+         *
+         * @return zero, because this is a zero-length element
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        amrex::ParticleReal ds () const
+        {
+            using namespace amrex::literals;
+            return 0.0_prt;
+        }
+
     private:
         amrex::ParticleReal m_knll; //! integrated strength of the nonlinear lens (m)
         amrex::ParticleReal m_cnll; //! distance of singularities from the origin (m)
