@@ -221,9 +221,9 @@ void init_ImpactX(py::module& m)
             "scalar potential per level"
         )
         .def(
-            "space_charge_force",
+            "space_charge_field",
             [](ImpactX & ix, int const lev, std::string const comp) {
-                return &ix.m_space_charge_force.at(lev).at(comp);
+                return &ix.m_space_charge_field.at(lev).at(comp);
             },
             py::arg("lev"), py::arg("comp"),
             py::return_value_policy::reference_internal,

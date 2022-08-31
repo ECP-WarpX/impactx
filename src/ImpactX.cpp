@@ -138,7 +138,7 @@ namespace impactx
                     spacecharge::PoissonSolve(*m_particle_container, m_rho, m_phi);
 
                     // calculate force in x,y,z
-                    spacecharge::ForceFromSelfFields(m_space_charge_force,
+                    spacecharge::ForceFromSelfFields(m_space_charge_field,
                                                      m_phi,
                                                      this->geom);
 

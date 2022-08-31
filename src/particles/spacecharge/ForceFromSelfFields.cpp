@@ -19,7 +19,7 @@
 namespace impactx::spacecharge
 {
     void ForceFromSelfFields (
-        std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > & space_charge_force,
+        std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > & space_charge_field,
         std::unordered_map<int, amrex::MultiFab> const & phi,
         amrex::Vector<amrex::Geometry> const & geom
     )
@@ -37,19 +37,19 @@ namespace impactx::spacecharge
             auto const dr = gm.CellSizeArray();
             amrex::GpuArray<amrex::Real, 3> const inv2dr{AMREX_D_DECL(0.5_rt/dr[0], 0.5_rt/dr[1], 0.5_rt/dr[2])};
 
-            // reset the values in space_charge_force to zero
-            space_charge_force.at(lev).at("x").setVal(0.);
-            space_charge_force.at(lev).at("y").setVal(0.);
-            space_charge_force.at(lev).at("z").setVal(0.);
+            // reset the values in space_charge_field to zero
+            space_charge_field.at(lev).at("x").setVal(0.);
+            space_charge_field.at(lev).at("y").setVal(0.);
+            space_charge_field.at(lev).at("z").setVal(0.);
 
             for (amrex::MFIter mfi(phi.at(lev)); mfi.isValid(); ++mfi) {
 
                 amrex::Box bx = mfi.validbox();
                 auto const phi_arr = (phi.at(lev))[mfi].const_array();
 
-                auto scf_arr_x = space_charge_force[lev]["x"][mfi].array();
-                auto scf_arr_y = space_charge_force[lev]["y"][mfi].array();
-                auto scf_arr_z = space_charge_force[lev]["z"][mfi].array();
+                auto scf_arr_x = space_charge_field[lev]["x"][mfi].array();
+                auto scf_arr_y = space_charge_field[lev]["y"][mfi].array();
+                auto scf_arr_z = space_charge_field[lev]["z"][mfi].array();
 
                 amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
                     scf_arr_x(i, j, k) = inv2dr[0] * (phi_arr(i-1, j, k) - phi_arr(i+1, j, k));

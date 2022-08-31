@@ -84,7 +84,7 @@ namespace impactx
         std::unordered_map<std::string, amrex::MultiFab> f_comp;
         for (std::string const comp : {"x", "y", "z"})
         {
-            std::string const str_tag = "space_charge_force_" + comp;
+            std::string const str_tag = "space_charge_field_" + comp;
             f_comp.emplace(
                 comp,
                 amrex::MultiFab{
@@ -96,7 +96,7 @@ namespace impactx
                 }
             );
         }
-        m_space_charge_force.emplace(lev, std::move(f_comp));
+        m_space_charge_field.emplace(lev, std::move(f_comp));
     }
 
     /** Make a new level using provided BoxArray and DistributionMapping and fill
@@ -129,7 +129,7 @@ namespace impactx
     {
         m_rho.erase(lev);
         m_phi.erase(lev);
-        m_space_charge_force.erase(lev);
+        m_space_charge_field.erase(lev);
     }
 
     void ImpactX::ResizeMesh ()

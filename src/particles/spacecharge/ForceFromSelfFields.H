@@ -26,12 +26,12 @@ namespace impactx::spacecharge
      * This resets the values in scf_<component> to zero and then calculates the space
      * charge force field.
      *
-     * @param[inout] space_charge_force space charge force component in x,y,z per level
+     * @param[inout] space_charge_field space charge force component in x,y,z per level
      * @param[in] phi scalar potential per level
      * @param[in] geom geometry object
      */
     void ForceFromSelfFields (
-        std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > & space_charge_force,
+        std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > & space_charge_field,
         std::unordered_map<int, amrex::MultiFab> const & phi,
         const amrex::Vector<amrex::Geometry>& geom
     );

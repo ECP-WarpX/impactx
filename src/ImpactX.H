@@ -128,8 +128,8 @@ namespace impactx
         std::unordered_map<int, amrex::MultiFab> m_rho;
         /** scalar potential per level */
         std::unordered_map<int, amrex::MultiFab> m_phi;
-        /** space charge force (vector) per level */
-        std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > m_space_charge_force;
+        /** space charge field (vector) per level */
+        std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > m_space_charge_field;
 
         /** these are elements defining the accelerator lattice */
         std::list<KnownElements> m_lattice;
