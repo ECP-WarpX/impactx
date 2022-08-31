@@ -45,11 +45,9 @@ sim.add_particles(qm_qeeV, charge_C, distr, npart)
 sim.particle_container().ref_particle().set_energy_MeV(energy_MeV, mass_MeV)
 
 # design the accelerator lattice
-ns = 25  # number of slices per ds in the element
-
-constf1 = elements.ConstF(ds=2.0, kx=1.0, ky=1.0, kt=1.0)
-
-sim.lattice.extend(constf1)
+sim.lattice.append(elements.ConstF(
+    ds=2.0, kx=1.0, ky=1.0, kt=1.0
+))
 
 # run simulation
 sim.evolve()
