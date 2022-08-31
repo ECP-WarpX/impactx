@@ -223,8 +223,8 @@ namespace impactx
                     amrex::ParmParse().QueryUnusedInputs();
 
                     //Print the warning list right after the first step.
-                    amrex::Print() <<
-                                   ablastr::warn_manager::GetWMInstance().PrintGlobalWarnings("FIRST STEP");
+                    amrex::Print() << ablastr::warn_manager::GetWMInstance()
+                                      .PrintGlobalWarnings("FIRST STEP");
                     early_params_checked = true;
                 }
 
