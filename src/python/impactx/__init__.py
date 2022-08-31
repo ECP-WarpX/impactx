@@ -10,6 +10,10 @@ __author__ = cxx.__author__
 # at this place we can enhance Python classes with additional methods written
 # in pure Python or add some other Python logic
 
-# MAD-X reader for beamline lattice elements
-#   adds an overload to existing methods
-elements.KnownElementsList.load_file = lambda madx_file, nslice=1 : read_lattice(madx_file, nslice)  # noqa
+# MAD-X file reader for beamline lattice elements
+elements.KnownElementsList.load_file = lambda self, madx_file, nslice=1: self.extend(
+    read_lattice(madx_file, nslice)
+)  # noqa
+
+# MAD-X file reader for reference particle
+RefPart.load_file = lambda self, madx_file: read_beam(self, madx_file)  # noqa

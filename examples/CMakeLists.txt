@@ -114,7 +114,7 @@ add_impactx_test(FODO.MADX.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/fodo/analysis_fodo.py
-    examples/fodo/plot_fodo.py --save-png
+    examples/fodo/plot_fodo.py
 )
 
 # Python: MPI-parallel FODO Cell ##############################################
@@ -157,7 +157,7 @@ add_impactx_test(chicane.MADX.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/chicane/analysis_chicane.py
-    examples/chicane/plot_chicane.py --save-png
+    examples/chicane/plot_chicane.py
 )
 
 # Constant Focusing Channel ###################################################

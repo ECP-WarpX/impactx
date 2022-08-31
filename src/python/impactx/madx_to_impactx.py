@@ -10,7 +10,7 @@ import warnings
 
 import scipy.constants as sc
 
-from impactx import elements
+from impactx import RefPart, elements
 
 from .MADXParser import MADXParser
 
@@ -47,19 +47,20 @@ def lattice(parsed_beamline, nslice=1):
                 impactx_beamline.append(
                     elements.Quad(ds=d["l"], k=d["k1"], nslice=nslice)
                 )
-            elif d['name'] == "sbend":
+            elif d["name"] == "sbend":
                 impactx_beamline.append(
-                    elements.Sbend(ds=d["l"], rc=d["l"]/d["angle"], nslice=nslice)
+                    elements.Sbend(ds=d["l"], rc=d["l"] / d["angle"], nslice=nslice)
                 )
-            elif d['name'] == "dipedge":
+            elif d["name"] == "dipedge":
                 impactx_beamline.append(
                     elements.DipEdge(
                         psi=d["e1"],
                         rc=1.0 / d["h"],
                         # MAD-X is using half the gap height
                         g=2.0 * d["hgap"],
-                        K2=d['fint'],
-                        nslice=nslice)
+                        K2=d["fint"],
+                        nslice=nslice,
+                    )
                 )
         else:
             raise NotImplementedError(
@@ -82,7 +83,9 @@ def read_lattice(madx_file, nslice=1):
     :return: list of ImpactX.KnownElements
     """
     madx = MADXParser()
-    beamline = madx.parse(madx_file).getBeamline()
+    madx.parse(madx_file)
+    beamline = madx.getBeamline()
+
     return lattice(beamline, nslice)
 
 
@@ -146,12 +149,22 @@ def beam(particle, charge=None, mass=None, energy=None):
     return reference_particle
 
 
-def read_beam(madx_file):
+def read_beam(ref: RefPart, madx_file):
     """
     Function that reads elements from a MAD-X file into a list of ImpactX.KnownElements
     :param madx_file: file name to MAD-X file with beamline elements
     :return: list of ImpactX.KnownElements
     """
     madx = MADXParser()
-    beamline = madx.parse(madx_file).getBeamline()
-    return beam(beamline)
+    madx.parse(madx_file)
+
+    ref_particle_dict = beam(
+        madx.getParticle(),  # if particle species is known, mass, charge, and potentially energy are set to default
+        # TODO MADX parser needs to extract charge if it's given,
+        # TODO MADX parser needs to extract mass if it's given,
+        energy=float(madx.getEtot()),  # MADX default energy is in GeV
+    )
+
+    ref.set_charge_qe(ref_particle_dict["charge"])
+    ref.set_mass_MeV(ref_particle_dict["mass"])
+    ref.set_energy_MeV(ref_particle_dict["energy"])

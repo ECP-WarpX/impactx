@@ -6,6 +6,7 @@
 #
 # 10.8.2022 Adapted for standalone use
 #
+import os
 import re
 import warnings
 
@@ -68,11 +69,11 @@ class MADXParser:
             "fint": 0.0,
             "hgap": 0.0,
             "tilt": 0.0,
-            "type": "dipedge"
+            "type": "dipedge",
         }
 
         self.__dipedge_pattern = (
-             r"(.*):dipedge,(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*);"
+            r"(.*):dipedge,(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*),(.*)=(.*);"
         )
 
         # don't count name and type --> len - 2
@@ -117,6 +118,9 @@ class MADXParser:
         fn (str)    filename
 
         """
+
+        if not os.path.isfile(fn):
+            raise FileNotFoundError(f"File '{fn}' not found!")
 
         nLine = 0
 
@@ -202,28 +206,28 @@ class MADXParser:
 
                 elif "dipedge" in line:
 
-                        obj = re.match(self.__dipedge_pattern, line)
+                    obj = re.match(self.__dipedge_pattern, line)
 
-                        # first tag is name
-                        self.__dipedge["name"] = obj.group(1)
+                    # first tag is name
+                    self.__dipedge["name"] = obj.group(1)
 
-                        for i in range(2, self.__nDipedge + 2, 2):
+                    for i in range(2, self.__nDipedge + 2, 2):
 
-                            if obj.group(i) in self.__dipedge:
-                                self.__dipedge[obj.group(i)] = float(obj.group(i + 1))
-                            else:
-                                raise MADXInputError(
-                                    "DipEdge",
-                                    "Line "
-                                    + str(nLine)
-                                    + ": Parameter "
-                                    + "'"
-                                    + obj.group(i)
-                                    + "'"
-                                    + " does not exist for dipole edge."
-                                )
+                        if obj.group(i) in self.__dipedge:
+                            self.__dipedge[obj.group(i)] = float(obj.group(i + 1))
+                        else:
+                            raise MADXInputError(
+                                "DipEdge",
+                                "Line "
+                                + str(nLine)
+                                + ": Parameter "
+                                + "'"
+                                + obj.group(i)
+                                + "'"
+                                + " does not exist for dipole edge.",
+                            )
 
-                        self.__elements.append(self.__dipedge.copy())
+                    self.__elements.append(self.__dipedge.copy())
 
                 elif "marker" in line:
                     pass
@@ -369,7 +373,7 @@ class MADXParser:
                             nTypes[1] += 1
                         elif e["type"] == "quad":
                             nTypes[2] += 1
-                        elif e['type'] == 'dipedge':
+                        elif e["type"] == "dipedge":
                             nTypes[3] += 1
                         break
 
@@ -428,7 +432,7 @@ class MADXParser:
                             print("Quadrupole L= ", e["l"], " k1 = ", e["k1"])
                             beamline.append(e)
                         elif e["type"] == "dipedge":
-                            print("Dipedge H= ",e["h"]," E1 = ",e["e1"])
+                            print("Dipedge H= ", e["h"], " E1 = ", e["e1"])
                             beamline.append(e)
                         else:
                             print("Skipping element type " + "'" + e["type"] + "'")

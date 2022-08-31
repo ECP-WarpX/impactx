@@ -240,6 +240,12 @@ Particles
 
       Write-only: Set reference particle energy.
 
+   .. py:method:: load_file(madx_file)
+
+      Load reference particle information from a MAD-X file.
+
+      :param madx_file: file name to MAD-X file with a ``BEAM`` entry
+
 
 Initial Beam Distributions
 --------------------------
