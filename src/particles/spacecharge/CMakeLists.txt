@@ -1,5 +1,6 @@
 target_sources(ImpactX
   PRIVATE
-    PoissonSolve.cpp
     ForceFromSelfFields.cpp
+    GatherAndPush.cpp
+    PoissonSolve.cpp
 )
