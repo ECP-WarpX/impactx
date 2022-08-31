@@ -5,7 +5,7 @@
  */
 #include "pyImpactX.H"
 
-#include <particles/ImpactXParticleContainer.H>
+#include <particles/ReferenceParticle.H>
 #include <AMReX.H>
 
 namespace py = pybind11;

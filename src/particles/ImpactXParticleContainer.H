@@ -10,6 +10,8 @@
 #ifndef IMPACTX_PARTICLE_CONTAINER_H
 #define IMPACTX_PARTICLE_CONTAINER_H
 
+#include "ReferenceParticle.H"
+
 #include <AMReX_AmrCoreFwd.H>
 #include <AMReX_BaseFwd.H>
 #include <AMReX_MultiFab.H>
@@ -68,94 +70,6 @@ namespace impactx
         {
             nattribs ///< the number of particles above (always last)
         };
-    };
-
-    /** This struct stores the reference particle attributes
-     *  stored in ImpactXParticleContainer
-     */
-    struct RefPart
-    {
-        amrex::ParticleReal s = 0.0;  ///< integrated orbit path length, in meters
-        amrex::ParticleReal x = 0.0;  ///< horizontal position x, in meters
-        amrex::ParticleReal y = 0.0;  ///< vertical position y, in meters
-        amrex::ParticleReal z = 0.0;  ///< longitudinal position y, in meters
-        amrex::ParticleReal t = 0.0;  ///< clock time * c in meters
-        amrex::ParticleReal px = 0.0; ///< momentum in x, normalized to proper velocity
-        amrex::ParticleReal py = 0.0; ///< momentum in y, normalized to proper velocity
-        amrex::ParticleReal pz = 0.0; ///< momentum in z, normalized to proper velocity
-        amrex::ParticleReal pt = 0.0; ///< energy deviation, normalized by rest energy
-        amrex::ParticleReal mass = 0.0; ///< reference rest mass, in kg
-        amrex::ParticleReal charge = 0.0; ///< reference charge, in C
-
-        /** Get reference particle relativistic gamma
-         *
-         * @returns relativistic gamma
-         */
-        amrex::ParticleReal
-        gamma () const;
-
-        /** Get reference particle relativistic beta
-         *
-         * @returns relativistic beta
-         */
-        amrex::ParticleReal
-        beta () const;
-
-        /** Get reference particle beta*gamma
-         *
-         * @returns relativistic beta*gamma
-         */
-        amrex::ParticleReal
-        beta_gamma () const;
-
-        /** Get reference particle rest mass
-         *
-         * @returns rest mass in MeV/c^2
-         */
-        amrex::ParticleReal
-        mass_MeV () const;
-
-        /** Set reference particle rest mass
-         *
-         * @param massE particle rest mass (MeV/c^2)
-         */
-        RefPart &
-        set_mass_MeV (amrex::ParticleReal const massE);
-
-        /** Get reference particle energy
-         *
-         * @returns kinetic energy in MeV
-         */
-        amrex::ParticleReal
-        energy_MeV () const;
-
-        /** Set reference particle energy
-         *
-         * @param energy initial kinetic energy (MeV)
-         */
-        RefPart &
-        set_energy_MeV (amrex::ParticleReal const energy);
-
-        /** Get reference particle charge
-         *
-         * @returns charge in multiples of the (positive) elementary charge
-         */
-        amrex::ParticleReal
-        charge_qe () const;
-
-        /** Set reference particle charge
-         *
-         * @param charge_qe in multiples of the (positive) elementary charge
-         */
-        RefPart &
-        set_charge_qe (amrex::ParticleReal const charge_qe);
-
-        /** Get reference particle charge to mass ratio
-         *
-         * @returns charge to mass ratio (elementary charge/eV)
-         */
-        amrex::ParticleReal
-        qm_qeeV () const;
     };
 
     /** Beam Particles in ImpactX
