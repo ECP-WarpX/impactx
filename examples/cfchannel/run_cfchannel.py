@@ -23,11 +23,14 @@ sim.init_grids()
 # load a 2 GeV proton beam with an initial
 # normalized transverse rms emittance of 1 um
 energy_MeV = 2.0e3  # reference energy
-charge_C = 1.0e-9  # used with space charge
-mass_MeV = 938.27208816
-qm_qeeV = -1.0e-6 / mass_MeV  # charge/mass
+bunch_charge_C = 1.0e-9  # used with space charge
 npart = 10000  # number of macro particles
 
+#   reference particle
+ref = sim.particle_container().ref_particle()
+ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_energy_MeV(energy_MeV)
+
+#   particle bunch
 distr = distribution.Waterbag(
     sigmaX=1.0e-3,
     sigmaY=1.0e-3,
@@ -39,10 +42,7 @@ distr = distribution.Waterbag(
     muypy=0.0,
     mutpt=0.0,
 )
-sim.add_particles(qm_qeeV, charge_C, distr, npart)
-
-# set the energy in the reference particle
-sim.particle_container().ref_particle().set_energy_MeV(energy_MeV, mass_MeV)
+sim.add_particles(bunch_charge_C, distr, npart)
 
 # design the accelerator lattice
 sim.lattice.append(elements.ConstF(
