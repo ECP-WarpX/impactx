@@ -7,34 +7,37 @@ def test_impactx_fodo_file():
     """
     This tests an equivalent to main.cpp in C++
     """
-    impactX = ImpactX()
+    sim = ImpactX()
 
-    impactX.load_inputs_file("examples/fodo/input_fodo.in")
+    sim.load_inputs_file("examples/fodo/input_fodo.in")
 
-    impactX.init_grids()
-    impactX.init_beam_distribution_from_inputs()
-    impactX.init_lattice_elements_from_inputs()
+    sim.init_grids()
+    sim.init_beam_distribution_from_inputs()
+    sim.init_lattice_elements_from_inputs()
 
-    impactX.evolve()
+    sim.evolve()
 
 
 def test_impactx_nofile():
     """
     This tests using ImpactX without an inputs file
     """
-    impactX = ImpactX()
+    sim = ImpactX()
 
-    impactX.set_particle_shape(2)
-    impactX.set_slice_step_diagnostics(True)
-    impactX.init_grids()
+    sim.set_particle_shape(2)
+    sim.set_slice_step_diagnostics(True)
+    sim.init_grids()
 
     # init particle beam
     energy_MeV = 2.0e3
-    charge_C = 0.0
-    mass_MeV = 0.510998950
-    qm_qeeV = -1.0 / 0.510998950e6
+    bunch_charge_C = 1.0e-9
     npart = 10000
 
+    #   reference particle
+    ref = sim.particle_container().ref_particle()
+    ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_energy_MeV(energy_MeV)
+
+    #   particle bunch
     distr = distribution.Waterbag(
         sigmaX=3.9984884770e-5,
         sigmaY=3.9984884770e-5,
@@ -46,16 +49,9 @@ def test_impactx_nofile():
         muypy=0.846574929020762,
         mutpt=0.0,
     )
-    impactX.add_particles(qm_qeeV, charge_C, distr, npart)
+    sim.add_particles(bunch_charge_C, distr, npart)
 
-    # init reference particle
-    refPart = RefPart()
-    # make the next two lines a helper function?
-    refPart.pt = -energy_MeV / mass_MeV - 1.0
-    refPart.pz = (refPart.pt**2 - 1.0) ** 0.5
-    impactX.particle_container().set_ref_particle(refPart)
-
-    assert impactX.particle_container().TotalNumberOfParticles() == npart
+    assert sim.particle_container().TotalNumberOfParticles() == npart
 
     # init accelerator lattice
     fodo = [
@@ -66,18 +62,18 @@ def test_impactx_nofile():
         elements.Drift(0.25),
     ]
     #  assign a fodo segment
-    # impactX.lattice = fodo
+    # sim.lattice = fodo
 
     #  add 4 more FODO segments
     for i in range(4):
-        impactX.lattice.extend(fodo)
+        sim.lattice.extend(fodo)
 
     # add 2 more drifts
     for i in range(4):
-        impactX.lattice.append(elements.Drift(0.25))
+        sim.lattice.append(elements.Drift(0.25))
 
-    print(impactX.lattice)
-    print(len(impactX.lattice))
-    assert len(impactX.lattice) > 5
+    print(sim.lattice)
+    print(len(sim.lattice))
+    assert len(sim.lattice) > 5
 
-    impactX.evolve()
+    sim.evolve()

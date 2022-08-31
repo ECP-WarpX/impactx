@@ -24,13 +24,20 @@ namespace impactx
 {
     void
     ImpactX::add_particles (
-        amrex::ParticleReal qm,
         amrex::ParticleReal bunch_charge,
         distribution::KnownDistributions distr,
         int npart
     )
     {
         BL_PROFILE("ImpactX::add_particles");
+
+        auto const & ref = m_particle_container->GetRefParticle();
+        AMREX_ASSERT_WITH_MESSAGE(ref.charge_qe() != 0.0,
+                                  "add_particles: Reference particle charge not yet set!");
+        AMREX_ASSERT_WITH_MESSAGE(ref.mass_MeV() != 0.0,
+                                  "add_particles: Reference particle mass not yet set!");
+        AMREX_ASSERT_WITH_MESSAGE(ref.energy_MeV() != 0.0,
+                                  "add_particles: Reference particle energy not yet set!");
 
         amrex::Vector<amrex::ParticleReal> x, y, t;
         amrex::Vector<amrex::ParticleReal> px, py, pt;
@@ -70,7 +77,8 @@ namespace impactx
 
         int const lev = 0;
         m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
-                                            qm, bunch_charge * rel_part_this_proc);
+                                            ref.qm_qeeV(),
+                                            bunch_charge * rel_part_this_proc);
 
         // Resize the mesh to fit the spatial extent of the beam and then
         // redistribute particles, so they reside on the MPI rank that is
@@ -97,15 +105,23 @@ namespace impactx
         std::string particle_type;  // Particle type
         pp_dist.get("particle", particle_type);
 
-        amrex::ParticleReal qm = 0.0; // charge/mass ratio (q_e/eV)
+        amrex::ParticleReal qe;     // charge (elementary charge)
+        amrex::ParticleReal massE;  // MeV/c^2
         if(particle_type == "electron") {
-            qm = -1.0/0.510998950e6;
+            qe = -1.0;
+            massE = 0.510998950;
         } else if(particle_type == "proton") {
-            qm = 1.0/938.27208816e6;
+            qe = 1.0;
+            massE = 938.27208816;
         }
-        else {
-            qm = 0.0;
+        else {  // default to electron
+            qe = -1.0;
+            massE = 0.510998950;
         }
+
+        // set charge and mass and energy of ref particle
+        m_particle_container->GetRefParticle()
+            .set_charge_qe(qe).set_mass_MeV(massE).set_energy_MeV(energy);
 
         int npart = 1;  // Number of simulation particles
         pp_dist.get("npart", npart);
@@ -134,7 +150,7 @@ namespace impactx
               sigpx, sigpy, sigpt,
               muxpx, muypy, mutpt));
 
-          add_particles(qm, bunch_charge, waterbag, npart);
+          add_particles(bunch_charge, waterbag, npart);
 
         } else if (distribution_type == "kurth6d") {
           amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
@@ -154,7 +170,7 @@ namespace impactx
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
 
-          add_particles(qm, bunch_charge, kurth6D, npart);
+          add_particles(bunch_charge, kurth6D, npart);
 
         } else if (distribution_type == "gaussian") {
           amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
@@ -174,7 +190,7 @@ namespace impactx
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
 
-          add_particles(qm, bunch_charge, gaussian, npart);
+          add_particles(bunch_charge, gaussian, npart);
 
         } else if (distribution_type == "kvdist") {
           amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
@@ -194,7 +210,7 @@ namespace impactx
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
 
-          add_particles(qm, bunch_charge, kvDist, npart);
+          add_particles(bunch_charge, kvDist, npart);
 
         } else if (distribution_type == "kurth4d") {
           amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
@@ -214,7 +230,7 @@ namespace impactx
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
 
-          add_particles(qm, bunch_charge, kurth4D, npart);
+          add_particles(bunch_charge, kurth4D, npart);
         } else if (distribution_type == "semigaussian") {
           amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
           amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
@@ -233,23 +249,10 @@ namespace impactx
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
 
-          add_particles(qm, bunch_charge, semigaussian, npart);
+          add_particles(bunch_charge, semigaussian, npart);
         } else {
             amrex::Abort("Unknown distribution: " + distribution_type);
         }
-
-        // reference particle
-        amrex::ParticleReal massE;  // MeV
-        if (particle_type == "electron") {
-            massE = 0.510998950;
-        } else if (particle_type == "proton") {
-            massE = 938.27208816;
-        } else {
-            massE = 0.510998950;  // default to electron
-        }
-
-        // set the energy in the reference particle
-        m_particle_container->GetRefParticle().set_energy_MeV(energy, massE);
 
         // print information on the initialized beam
         amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;

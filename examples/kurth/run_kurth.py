@@ -24,11 +24,14 @@ sim.init_grids()
 # unnormalized rms emittance of 1 um in each
 # coordinate plane
 energy_MeV = 2.0e3  # reference energy
-charge_C = 1.0e-9  # used with space charge
-mass_MeV = 938.27208816
-qm_qeeV = 1.0e-6 / mass_MeV  # charge/mass
+bunch_charge_C = 1.0e-9  # used with space charge
 npart = 10000  # number of macro particles
 
+#   reference particle
+ref = sim.particle_container().ref_particle()
+ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_energy_MeV(energy_MeV)
+
+#   particle bunch
 distr = distribution.Kurth6D(
     sigmaX=1.0e-3,
     sigmaY=1.0e-3,
@@ -36,14 +39,8 @@ distr = distribution.Kurth6D(
     sigmaPx=1.0e-3,
     sigmaPy=1.0e-3,
     sigmaPt=2.9676219145931020e-3,
-    muxpx=0.0,
-    muypy=0.0,
-    mutpt=0.0,
 )
-sim.add_particles(qm_qeeV, charge_C, distr, npart)
-
-# set the energy in the reference particle
-sim.particle_container().ref_particle().set_energy_MeV(energy_MeV, mass_MeV)
+sim.add_particles(bunch_charge_C, distr, npart)
 
 # design the accelerator lattice: here we just assign a single element
 sim.lattice.append(elements.ConstF(ds=2.0, kx=1.0, ky=1.0, kt=1.0))

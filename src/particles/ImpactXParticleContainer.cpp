@@ -142,21 +142,52 @@ namespace impactx
 
     // Reference particle helper functions
 
-    void
-    RefPart::set_energy_MeV (amrex::ParticleReal const energy,
-            amrex::ParticleReal const massE)
+    RefPart &
+    RefPart::set_mass_MeV (amrex::ParticleReal const massE)
     {
         using namespace amrex::literals;
 
-        s = 0.0;
-        x = 0.0;
-        y = 0.0;
-        z = 0.0;
-        t = 0.0;
+        AMREX_ASSERT_WITH_MESSAGE(massE != 0.0_prt,
+                                  "set_mass_MeV: Mass cannot be zero!");
+
+        constexpr amrex::ParticleReal MeVc2_kg = 1.78266192e-30;
+        mass = massE * MeVc2_kg;
+
+        // re-scale pt and pz
+        if (pt != 0.0_prt)
+        {
+            pt = -energy_MeV() / massE - 1.0_prt;
+            pz = sqrt(pow(pt, 2) - 1.0_prt);
+        }
+
+        return *this;
+    }
+
+    RefPart &
+    RefPart::set_energy_MeV (amrex::ParticleReal const energy)
+    {
+        using namespace amrex::literals;
+
+        AMREX_ASSERT_WITH_MESSAGE(mass != 0.0_prt,
+                                  "set_energy_MeV: Set mass first!");
+
         px = 0.0;
         py = 0.0;
-        pt = -energy/massE - 1.0_prt;
-        pz = sqrt(pow(pt,2) - 1.0_prt);
+        pt = -energy / mass_MeV() - 1.0_prt;
+        pz = sqrt(pow(pt, 2) - 1.0_prt);
+
+        return *this;
+    }
+
+    RefPart &
+    RefPart::set_charge_qe (amrex::ParticleReal const charge_qe)
+    {
+        using namespace amrex::literals;
+
+        constexpr double qe = 1.602176634e-19;
+        this->charge = charge_qe * qe;
+
+        return *this;
     }
 
     amrex::ParticleReal
@@ -182,18 +213,42 @@ namespace impactx
         using namespace amrex::literals;
 
         amrex::ParticleReal ref_gamma = -pt;
-        amrex::ParticleReal ref_betagamma = sqrt(pow(ref_gamma,2) - 1.0_prt);
+        amrex::ParticleReal ref_betagamma = sqrt(pow(ref_gamma, 2) - 1.0_prt);
         return ref_betagamma;
     }
 
     amrex::ParticleReal
-    RefPart::energy_MeV (amrex::ParticleReal massE) const
+    RefPart::mass_MeV () const
+    {
+        using namespace amrex::literals;
+
+        constexpr double MeVc2_kg = 1.78266192e-30;
+        return amrex::ParticleReal(mass / MeVc2_kg);
+    }
+
+    amrex::ParticleReal
+    RefPart::energy_MeV () const
     {
         using namespace amrex::literals;
 
         amrex::ParticleReal ref_gamma = -pt;
-        amrex::ParticleReal ref_energy = massE*(ref_gamma - 1.0_prt);
+        amrex::ParticleReal ref_energy = mass_MeV() * (ref_gamma - 1.0_prt);
         return ref_energy;
+    }
+
+    amrex::ParticleReal
+    RefPart::charge_qe () const
+    {
+        using namespace amrex::literals;
+
+        constexpr double qe = 1.602176634e-19;
+        return amrex::ParticleReal(charge / qe);
+    }
+
+    amrex::ParticleReal
+    RefPart::qm_qeeV () const
+    {
+        return charge / mass;
     }
 
     std::tuple<
