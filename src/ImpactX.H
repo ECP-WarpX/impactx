@@ -71,14 +71,12 @@ namespace impactx
          * distribution's extent and then redistribute particles in according
          * AMReX grid boxes.
          *
-         * @param qm charge/mass ratio (q_e/eV)
          * @param bunch_charge bunch charge (C)
          * @param distr distribution function to draw from (object)
          * @param npart number of particles to draw
          */
         void
         add_particles (
-            amrex::ParticleReal qm,
             amrex::ParticleReal bunch_charge,
             distribution::KnownDistributions distr,
             int npart
