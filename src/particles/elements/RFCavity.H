@@ -131,7 +131,6 @@ namespace impactx
             integrators::symp4_integrate(refpart,zin,zout,nsteps,element_type);
             amrex::ParticleReal const ptf = refpart.pt;
 
-
             // advance position (x,y,z)
             refpart.x = x + slice_ds*px/bgi;
             refpart.y = y + slice_ds*py/bgi;
