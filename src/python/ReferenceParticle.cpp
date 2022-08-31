@@ -31,15 +31,22 @@ void init_refparticle(py::module& m)
         .def_readwrite("mass", &RefPart::charge, "reference rest mass, in kg")
         .def_readwrite("charge", &RefPart::mass, "reference charge, in C")
 
+        .def_property_readonly("charge_qe", &RefPart::charge_qe, "Get reference particle charge (positive elementary charge)")
         .def_property_readonly("gamma", &RefPart::gamma, "Get reference particle relativistic gamma")
         .def_property_readonly("beta", &RefPart::beta, "Get reference particle relativistic beta")
         .def_property_readonly("beta_gamma", &RefPart::beta_gamma, "Get reference particle beta*gamma")
         .def_property_readonly("mass_MeV", &RefPart::mass_MeV, "Get reference particle rest mass (MeV/c^2)")
-        .def("set_charge_qe", &RefPart::set_mass_MeV, "Set reference particle charge (positive elementary charge)", py::arg("charge_qe"))
-        .def_property_readonly("charge_qe", &RefPart::energy_MeV, "Get reference particle charge (positive elementary charge)")
-        .def("set_mass_MeV", &RefPart::set_mass_MeV, "Set reference particle rest mass (MeV/c^2)", py::arg("mass_MeV"))
         .def_property_readonly("energy_MeV", &RefPart::energy_MeV, "Get reference particle energy (MeV)")
-        .def("set_energy_MeV", &RefPart::set_energy_MeV, "Set reference particle energy (MeV)", py::arg("energy_MeV"))
         .def_property_readonly("qm_qeeV", &RefPart::qm_qeeV, "Get reference particle charge to mass ratio (charge/eV)")
+
+        .def("set_charge_qe", &RefPart::set_charge_qe,
+             py::return_value_policy::reference_internal,
+             "Set reference particle charge (positive elementary charge)", py::arg("charge_qe"))
+        .def("set_mass_MeV", &RefPart::set_mass_MeV,
+             py::return_value_policy::reference_internal,
+             "Set reference particle rest mass (MeV/c^2)", py::arg("mass_MeV"))
+        .def("set_energy_MeV", &RefPart::set_energy_MeV,
+             py::return_value_policy::reference_internal,
+             "Set reference particle energy (MeV)", py::arg("energy_MeV"))
     ;
 }

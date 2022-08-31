@@ -34,8 +34,8 @@ namespace impactx
         auto const & ref = m_particle_container->GetRefParticle();
         AMREX_ASSERT_WITH_MESSAGE(ref.charge_qe() != 0.0,
                                   "add_particles: Reference particle charge not yet set!");
-        AMREX_ASSERT_WITH_MESSAGE(ref.energy_MeV() != 0.0,
-                                  "add_particles: Reference particle energy not yet set!");
+        AMREX_ASSERT_WITH_MESSAGE(ref.mass_MeV() != 0.0,
+                                  "add_particles: Reference particle mass not yet set!");
         AMREX_ASSERT_WITH_MESSAGE(ref.energy_MeV() != 0.0,
                                   "add_particles: Reference particle energy not yet set!");
 
