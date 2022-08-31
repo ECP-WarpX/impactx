@@ -1,17 +1,17 @@
 beam, particle=electron, energy=5.0;
 
-DRIFT1: drift, L=5.0058489435;
-DRIFT2: drift, L=1.0;
-DRIFT3: drift, L=2.0;
+D1: drift, L=5.0058489435;
+D2: drift, L=1.0;
+D3: drift, L=2.0;
 ! TODO make this work with inline calculations
 ! theta=0.50037/10.35;
 ! inv_rho=1.0/10.35
 ! TODO put theta again everywhere after `angle=` with its right sign
-SBEND1: sbend, L=0.50037, angle=0.048345, e1=0.000, e2=0.000, k1=0.00;
-SBEND2: sbend, L=0.50037, angle=-0.048345, e1=0.000, e2=0.000, k1=0.00;
+SB1: sbend, L=0.50037, angle=0.048345, e1=0.000, e2=0.000, k1=0.00;
+SB2: sbend, L=0.50037, angle=-0.048345, e1=0.000, e2=0.000, k1=0.00;
 ! dipole edge elements
-DIPEDGE1: dipedge, H=0.096618357, e1=-0.048345620280243, fint=0.000, hgap=0.000, tilt=0.00;
-DIPEDGE2: dipedge, H=0.096618357, e1=0.048345620280243, fint=0.000, hgap=0.000, tilt=0.00;
+DIPE1: dipedge, H=0.096618357, e1=-0.048345620280243, fint=0.000, hgap=0.000, tilt=0.00;
+DIPE2: dipedge, H=0.096618357, e1=0.048345620280243, fint=0.000, hgap=0.000, tilt=0.00;
 
-CHICANE:     Line=(SBEND1,DIPEDGE1,DRIFT1,DIPEDGE2,SBEND2,DRIFT2,SBEND2,DIPEDGE2,DRIFT1,DIPEDGE1,SBEND1,DRIFT3);
+CHICANE:     Line=(SB1,DIP1,D1,DIP2,SB2,D2,SB2,DIPE2,D1,DIPE1,SB1,D3);
 USE, SEQUENCE = CHICANE;

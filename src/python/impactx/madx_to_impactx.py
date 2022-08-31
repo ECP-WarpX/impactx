@@ -152,6 +152,7 @@ def beam(particle, charge=None, mass=None, energy=None):
 def read_beam(ref: RefPart, madx_file):
     """
     Function that reads elements from a MAD-X file into a list of ImpactX.KnownElements
+    :param RefPart ref: ImpactX reference particle (pybind_11 object)
     :param madx_file: file name to MAD-X file with beamline elements
     :return: list of ImpactX.KnownElements
     """
