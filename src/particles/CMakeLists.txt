@@ -7,3 +7,4 @@ target_sources(ImpactX
 
 add_subdirectory(transformation)
 add_subdirectory(diagnostics)
+add_subdirectory(integrators)

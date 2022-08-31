@@ -11,6 +11,7 @@
 #define IMPACTX_RFCAVITY_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "particles/integrators/Integrators.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -112,7 +113,6 @@ namespace impactx
             amrex::ParticleReal const py = refpart.py;
             amrex::ParticleReal const z = refpart.z;
             amrex::ParticleReal const pz = refpart.pz;
-            amrex::ParticleReal const t = refpart.t;
             amrex::ParticleReal const pt = refpart.pt;
             amrex::ParticleReal const s = refpart.s;
 
@@ -123,11 +123,14 @@ namespace impactx
             amrex::ParticleReal const bgi = sqrt(pow(pt,2)-1.0_prt);
 
             // call integrator to advance (t,pt)
-	    // temporarily hard-coded uniform acceleration
-            amrex::ParticleReal const tf = t;
-	    amrex::ParticleReal const ptf = pt - slice_ds*0.1_prt;
-	    refpart.t = tf;
-            refpart.pt = ptf;
+            amrex::ParticleReal const zin = s;
+            amrex::ParticleReal const zout = s + slice_ds;
+            std::string element_type = "rfcavity";
+            int const nsteps = 10;
+
+            integrators::symp4_integrate(refpart,zin,zout,nsteps,element_type);
+            amrex::ParticleReal const ptf = refpart.pt;
+
 
             // advance position (x,y,z)
             refpart.x = x + slice_ds*px/bgi;
