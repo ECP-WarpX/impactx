@@ -32,9 +32,9 @@ Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, 
 
    .. tab-item:: Python Script
 
-       .. literalinclude:: run_fodo.py
-          :language: python3
-          :caption: You can copy this file from ``examples/cfchannel/run_cfchannel.py``.
+      .. literalinclude:: run_cfchannel.py
+         :language: python3
+         :caption: You can copy this file from ``examples/cfchannel/run_cfchannel.py``.
 
    .. tab-item:: App Input File
 

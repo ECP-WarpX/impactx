@@ -151,7 +151,7 @@ add_impactx_test(cfchannel.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/cfchannel/analysis_cfchannel.py
-    OFF  # no plotting script yet
+    OFF  # no plot script yet
 )
 
 # Kurth Distribution Test ###################################################
