@@ -63,13 +63,13 @@ General
 
       This must come first, before particle beams and lattice elements are initialized.
 
-   .. py:method:: add_particles(qm_qeeV, charge_C, distr, npart)
+   .. py:method:: add_particles(charge_C, distr, npart)
 
       Generate and add n particles to the particle container.
+      Note: Set the reference particle properties (charge, mass, energy) first.
 
       Will also resize the geometry based on the updated particle distribution's extent and then redistribute particles in according AMReX grid boxes.
 
-      :param float qm_qeeV: charge/mass ratio (q_e/eV)
       :param float charge_C: bunch charge (C)
       :param distr: distribution function to draw from (object from :py:mod:`impactx.distribution`)
       :param int npart: number of particles to draw
@@ -224,7 +224,19 @@ Particles
 
       Read-only: Get reference particle beta*gamma
 
-   .. py:method:: set_energy_MeV(energy_MeV, massE_MeV)
+   .. py:property:: qm_qeeV
+
+      Read-only: Get reference particle charge to mass ratio (elementary charge/eV)
+
+   .. py:method:: set_charge_qe(charge_qe)
+
+      Write-only: Set reference particle charge in (positive) elementary charges.
+
+   .. py:method:: set_mass_MeV(massE)
+
+      Write-only: Set reference particle rest mass (MeV/c^2).
+
+   .. py:method:: set_energy_MeV(energy_MeV)
 
       Write-only: Set reference particle energy.
 
