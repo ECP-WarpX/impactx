@@ -52,11 +52,11 @@ namespace impactx
     {
         enum
         {
-            ux,  ///< momentum in x, normalized to proper velocity
-            uy,  ///< momentum in y, normalized to proper velocity
-            pt,  ///< kinetic energy deviation, (E0-E)/mc^2
-            m_qm, ///< charge to mass ratio, in q_e/m_e (q_e/eV)
-            w,   ///< particle weight, unitless
+            ux,  ///< momentum in x, normalized to reference longitudinal momentum (unitless)
+            uy,  ///< momentum in y, normalized to reference longitudinal momentum (unitless)
+            pt,  ///< kinetic energy deviation, normalized to (E0-E)/mc^2 (unitless)
+            m_qm, ///< charge to mass ratio, normalized to q_e/m_e (q_e/eV)
+            w,   ///< particle weight, (unitless)
             nattribs ///< the number of attributes above (always last)
         };
     };
