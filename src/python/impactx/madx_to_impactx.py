@@ -27,7 +27,7 @@ def lattice(parsed_beamline, nslice=1):
         "MARKER": "None",
         "DRIFT": "Drift",
         "SBEND": "Sbend",  # Sector Bending Magnet
-        "QUAD": "Quad",  # Quadrupole
+        "QUADRUPOLE": "Quad",  # Quadrupole
         "DIPEDGE": "DipEdge",
         "MULTIPOLE": "Multipole",
         "NLLENS": "NonlinearLens",
@@ -41,17 +41,18 @@ def lattice(parsed_beamline, nslice=1):
     for d in parsed_beamline:
 
         if d["type"] in [k.casefold() for k in list(madx_to_impactx_dict.keys())]:
-            if d["name"] == "drift":
+
+            if d["type"] == "drift":
                 impactx_beamline.append(elements.Drift(ds=d["l"], nslice=nslice))
-            elif d["name"] == "quadrupole":
+            elif d["type"] == "quadrupole":
                 impactx_beamline.append(
                     elements.Quad(ds=d["l"], k=d["k1"], nslice=nslice)
                 )
-            elif d["name"] == "sbend":
+            elif d["type"] == "sbend":
                 impactx_beamline.append(
                     elements.Sbend(ds=d["l"], rc=d["l"] / d["angle"], nslice=nslice)
                 )
-            elif d["name"] == "dipedge":
+            elif d["type"] == "dipedge":
                 impactx_beamline.append(
                     elements.DipEdge(
                         psi=d["e1"],
@@ -152,7 +153,7 @@ def beam(particle, charge=None, mass=None, energy=None):
 def read_beam(ref: RefPart, madx_file):
     """
     Function that reads elements from a MAD-X file into a list of ImpactX.KnownElements
-    :param RefPart ref: ImpactX reference particle (pybind_11 object)
+    :param RefPart ref: ImpactX reference particle (passed by reference)
     :param madx_file: file name to MAD-X file with beamline elements
     :return: list of ImpactX.KnownElements
     """

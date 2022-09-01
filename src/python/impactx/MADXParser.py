@@ -37,7 +37,7 @@ class MADXParser:
 
         self.__drift_pattern = r"(.*):drift,(.*)=(.*);"
 
-        self.__quadrupole = {"name": "", "l": 0.0, "k1": 0.0, "type": "quad"}
+        self.__quadrupole = {"name": "", "l": 0.0, "k1": 0.0, "type": "quadrupole"}
 
         # don't count name and type --> len - 2
         self.__nQuad = 2 * (len(self.__quadrupole) - 2)
@@ -371,7 +371,7 @@ class MADXParser:
                             nTypes[0] += 1
                         elif e["type"] == "sbend":
                             nTypes[1] += 1
-                        elif e["type"] == "quad":
+                        elif e["type"] == "quadrupole":
                             nTypes[2] += 1
                         elif e["type"] == "dipedge":
                             nTypes[3] += 1
@@ -428,7 +428,7 @@ class MADXParser:
                         elif e["type"] == "sbend":
                             print("Sbend L= ", e["l"], " angle = ", e["angle"])
                             beamline.append(e)
-                        elif e["type"] == "quad":
+                        elif e["type"] == "quadrupole":
                             print("Quadrupole L= ", e["l"], " k1 = ", e["k1"])
                             beamline.append(e)
                         elif e["type"] == "dipedge":
