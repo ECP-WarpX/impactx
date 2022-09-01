@@ -34,7 +34,7 @@ namespace impactx
          * @param phase RF driven phase in deg
          * @param Bzsol Strength of solenoid field in T
          * @param mapsteps number of integration steps per slice used for
-         *        map and reference particle push in applied fields 
+         *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
          */
         RFCavity( amrex::ParticleReal const ds, amrex::ParticleReal const
