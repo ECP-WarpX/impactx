@@ -144,6 +144,16 @@ add_impactx_test(cfchannel
     OFF  # no plot script yet
 )
 
+# Python: Constant Focusing Channel ###########################################
+#
+add_impactx_test(cfchannel.py
+    examples/cfchannel/run_cfchannel.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/cfchannel/analysis_cfchannel.py
+    OFF  # no plot script yet
+)
+
 # Kurth Distribution Test ###################################################
 #
 add_impactx_test(kurth
