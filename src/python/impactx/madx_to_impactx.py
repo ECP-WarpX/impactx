@@ -60,7 +60,6 @@ def lattice(parsed_beamline, nslice=1):
                         # MAD-X is using half the gap height
                         g=2.0 * d["hgap"],
                         K2=d["fint"],
-                        nslice=nslice,
                     )
                 )
         else:
