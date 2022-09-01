@@ -1,11 +1,14 @@
-# Author: Matthias Frey, Andreas Adelmann
-# Date: 13. Oct. 2017
+#!/usr/bin/env python3
 #
-# This file parses MAD-X file into a beamline
-# composed of pyAcceLEGOrator elements.
+# Copyright 2022 ImpactX contributors
+# Authors: Matthias Frey, Andreas Adelmann, Marco Garten
+# License: BSD-3-Clause
 #
-# 10.8.2022 Adapted for standalone use
+# Changelog:
+#   Oct 13th, 2017: original version for pyAcceLEGOrator elements
+#   Aug 10th, 2022: adapted for standalone use
 #
+# -*- coding: utf-8 -*-
 import os
 import re
 import warnings
