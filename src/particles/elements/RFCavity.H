@@ -33,12 +33,14 @@ namespace impactx
          * @param freq RF frequency in Hz
          * @param phase RF driven phase in deg
          * @param Bzsol Strength of solenoid field in T
+         * @param mapsteps number of integration steps per slice used for
+         *        map and reference particle push in applied fields 
          * @param nslice number of slices used for the application of space charge
          */
         RFCavity( amrex::ParticleReal const ds, amrex::ParticleReal const
          Escale, amrex::ParticleReal const freq, amrex::ParticleReal const
-         phase, amrex::ParticleReal const Bzsol, int const nslice )
-        : m_ds(ds), m_Escale(Escale), m_freq(freq), m_phase(phase), m_Bzsol(Bzsol), m_nslice(nslice)
+         phase, amrex::ParticleReal const Bzsol, int const mapsteps, int const nslice )
+        : m_ds(ds), m_Escale(Escale), m_freq(freq), m_phase(phase), m_Bzsol(Bzsol), m_mapsteps(mapsteps), m_nslice(nslice)
         {
         }
 
@@ -126,7 +128,7 @@ namespace impactx
             amrex::ParticleReal const zin = s;
             amrex::ParticleReal const zout = s + slice_ds;
             std::string element_type = "rfcavity";
-            int const nsteps = 10;
+            int const nsteps = m_mapsteps;
 
             integrators::symp4_integrate(refpart,zin,zout,nsteps,element_type);
             amrex::ParticleReal const ptf = refpart.pt;
@@ -165,6 +167,7 @@ namespace impactx
         amrex::ParticleReal m_freq; //! RF frequency in Hz
         amrex::ParticleReal m_phase; //! RF driven phase in deg
         amrex::ParticleReal m_Bzsol; //! strength of solenoid field in T
+        int m_mapsteps; //! number of map integration steps per slice
         int m_nslice; //! number of slices used for the application of space charge
     };
 
