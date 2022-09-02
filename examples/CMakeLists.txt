@@ -204,7 +204,7 @@ add_impactx_test(FODO_RF
     OFF  # no plot script yet
 )
 
-# Python: FODO Cell with RF ###################################################################
+# Python: FODO Cell with RF ###################################################
 #
 add_impactx_test(FODO_RF.py
     examples/fodo_rf/run_fodo_rf.py
