@@ -426,16 +426,16 @@ class MADXParser:
                 for e in self.__elements:
                     if elem == e["name"]:
                         if e["type"] == "drift":
-                            print("Drift L= " + str(e["l"]))
+                            # print("Drift L= " + str(e["l"]))
                             beamline.append(e)
                         elif e["type"] == "sbend":
-                            print("Sbend L= ", e["l"], " angle = ", e["angle"])
+                            # print("Sbend L= ", e["l"], " angle = ", e["angle"])
                             beamline.append(e)
                         elif e["type"] == "quadrupole":
-                            print("Quadrupole L= ", e["l"], " k1 = ", e["k1"])
+                            # print("Quadrupole L= ", e["l"], " k1 = ", e["k1"])
                             beamline.append(e)
                         elif e["type"] == "dipedge":
-                            print("Dipedge H= ", e["h"], " E1 = ", e["e1"])
+                            # print("Dipedge H= ", e["h"], " E1 = ", e["e1"])
                             beamline.append(e)
                         else:
                             print("Skipping element type " + "'" + e["type"] + "'")
