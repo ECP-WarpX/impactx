@@ -32,9 +32,11 @@ Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, 
 
 .. tab-set::
 
-   .. tab-item:: Python Script (TODO)
+   .. tab-item:: Python Script
 
-       This one is to-do.
+       .. literalinclude:: run_fodo_rf.py
+          :language: python3
+          :caption: You can copy this file from ``examples/fodo_rf/run_fodo_rf.py``.
 
    .. tab-item:: App Input File
 

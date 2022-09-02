@@ -29,7 +29,7 @@ Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, 
 
        .. literalinclude:: run_kurth.py
           :language: python3
-          :caption: You can copy this file from ``examples/kurth/run_chicane.py``.
+          :caption: You can copy this file from ``examples/kurth/run_kurth.py``.
 
    .. tab-item:: App Input File
 
