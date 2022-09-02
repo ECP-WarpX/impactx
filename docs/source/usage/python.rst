@@ -240,6 +240,12 @@ Particles
 
       Write-only: Set reference particle energy.
 
+   .. py:method:: load_file(madx_file)
+
+      Load reference particle information from a MAD-X file.
+
+      :param madx_file: file name to MAD-X file with a ``BEAM`` entry
+
 
 Initial Beam Distributions
 --------------------------
@@ -304,6 +310,25 @@ This module provides elements for the accelerator lattice.
 .. py:class:: impactx.elements.KnownElementsList
 
    An iterable, ``list``-like type of elements.
+
+   .. py:method:: clear()
+
+      Clear the list to become empty.
+
+   .. py:method:: extend(list)
+
+      Add a list of elements to the list.
+
+   .. py:method:: append(element)
+
+      Add a single element to the list.
+
+   .. py:method:: load_file(madx_file, nslice=1)
+
+      Load and append an accelerator lattice description from a MAD-X file.
+
+      :param madx_file: file name to MAD-X file with beamline elements
+      :param nslice: number of slices used for the application of space charge
 
 .. py:class:: impactx.elements.ConstF(ds, kx, ky, kt, nslice=1)
 
