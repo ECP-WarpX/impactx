@@ -187,6 +187,21 @@ if(ImpactX_PYTHON)
         PDB_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY}/impactx
         COMPILE_PDB_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY}/impactx
     )
+    get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+    if(isMultiConfig)
+        foreach(CFG IN LISTS CMAKE_CONFIGURATION_TYPES)
+            string(TOUPPER "${CFG}" CFG_UPPER)
+            set_target_properties(pyImpactX PROPERTIES
+                # build output directories - mainly set to run tests from CMake & IDEs
+                # note: same as above, but for Multi-Config generators
+                ARCHIVE_OUTPUT_DIRECTORY_${CFG_UPPER} ${CMAKE_PYTHON_OUTPUT_DIRECTORY}/impactx
+                LIBRARY_OUTPUT_DIRECTORY_${CFG_UPPER} ${CMAKE_PYTHON_OUTPUT_DIRECTORY}/impactx
+                RUNTIME_OUTPUT_DIRECTORY_${CFG_UPPER} ${CMAKE_PYTHON_OUTPUT_DIRECTORY}/impactx
+                PDB_OUTPUT_DIRECTORY_${CFG_UPPER} ${CMAKE_PYTHON_OUTPUT_DIRECTORY}/impactx
+                COMPILE_PDB_OUTPUT_DIRECTORY_${CFG_UPPER} ${CMAKE_PYTHON_OUTPUT_DIRECTORY}/impactx
+            )
+        endforeach()
+    endif()
     if(EMSCRIPTEN)
         set_target_properties(pyImpactX PROPERTIES
             PREFIX "")

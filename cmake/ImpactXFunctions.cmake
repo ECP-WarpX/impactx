@@ -130,9 +130,12 @@ endmacro()
 function(impactx_test_set_pythonpath test_name)
     if(WIN32)
         string(REPLACE ";" "\\;" WIN_PYTHONPATH "$ENV{PYTHONPATH}")
+        string(REPLACE ";" "\\;" WIN_PATH "$ENV{PATH}")  # DLLs
         string(REGEX REPLACE "/" "\\\\" WIN_PYTHON_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY})
         set_property(TEST ${test_name}
-            APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${WIN_PYTHON_OUTPUT_DIRECTORY}\;${WIN_PYTHONPATH}"
+            APPEND PROPERTY ENVIRONMENT
+                "PYTHONPATH=${WIN_PYTHON_OUTPUT_DIRECTORY}\;${WIN_PYTHONPATH}"
+                "PATH=$<TARGET_FILE_DIR:lib>\;${WIN_PATH}$"
         )
     else()
         set_property(TEST ${test_name}
