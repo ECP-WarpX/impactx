@@ -20,6 +20,11 @@ endif()
 
 
 function(add_impactx_test name input is_mpi is_python analysis_script plot_script)
+    # cannot run Python tests w/o Python support
+    if(is_python AND NOT ImpactX_PYTHON)
+        return()
+    endif()
+
     # make a unique run directory
     file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name})
 
