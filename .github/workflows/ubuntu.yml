@@ -39,21 +39,31 @@ jobs:
       run: |
         cmake -S . -B build            \
           -DCMAKE_BUILD_TYPE=Debug     \
+          -DCMAKE_INSTALL_PREFIX=/usr  \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
           -DImpactX_PYTHON=ON
         cmake --build build -j 2
-        cmake --build build --target pip_install
 
-    - name: run ImpactX
+    - name: run tests
       run: |
         ctest --test-dir build --output-on-failure
 
-        build/bin/impactx examples/fodo/input_fodo.in algo.particle_shape = 1 || \
+    - name: run installed app
+      run: |
+        sudo cmake --build build --target install
+
+        impactx.MPI.OMP.DP.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 1 || \
         { cat Backtrace.0.0; exit 1; }
-        build/bin/impactx examples/fodo/input_fodo.in algo.particle_shape = 2 || \
+        impactx.MPI.OMP.DP.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 2 || \
         { cat Backtrace.0.0; exit 1; }
-        build/bin/impactx examples/fodo/input_fodo.in algo.particle_shape = 3 || \
+        impactx.MPI.OMP.DP.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 3 || \
         { cat Backtrace.0.0; exit 1; }
+
+    - name: run installed python module
+      run: |
+        cmake --build build --target pip_install
+
+        python3 examples/fodo/run_fodo.py
 
   build_gcc_python:
     name: GCC w/o MPI w/ Python
@@ -87,12 +97,29 @@ jobs:
       run: |
         cmake -S . -B build            \
           -DCMAKE_BUILD_TYPE=Debug     \
+          -DCMAKE_INSTALL_PREFIX=/usr  \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
           -DImpactX_MPI=OFF            \
           -DImpactX_PYTHON=ON
         cmake --build build -j 2
-        cmake --build build --target pip_install
 
-    - name: run ImpactX
+    - name: run tests
       run: |
         ctest --test-dir build --output-on-failure
+
+    - name: run installed app
+      run: |
+        sudo cmake --build build --target install
+
+        impactx.NOMPI.OMP.DP.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 1 || \
+        { cat Backtrace.0.0; exit 1; }
+        impactx.NOMPI.OMP.DP.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 2 || \
+        { cat Backtrace.0.0; exit 1; }
+        impactx.NOMPI.OMP.DP.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 3 || \
+        { cat Backtrace.0.0; exit 1; }
+
+    - name: run installed python module
+      run: |
+        cmake --build build --target pip_install
+
+        python3 examples/fodo/run_fodo.py
