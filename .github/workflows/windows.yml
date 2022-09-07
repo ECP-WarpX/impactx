@@ -48,7 +48,7 @@ jobs:
         if(!$?) { Exit $LASTEXITCODE }
     - name: Test
       run: |
-        ctest --test-dir build --build-config RelWithDebInfo --output-on-failure -E AMReX
+        ctest --test-dir build --build-config RelWithDebInfo --output-on-failure -E AMReX  -R py
         if(!$?) { Exit $LASTEXITCODE }
     - name: Install
       run: |
@@ -106,7 +106,7 @@ jobs:
       shell: cmd
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
-        ctest --test-dir build --build-config Release --output-on-failure -E AMReX
+        ctest --test-dir build --build-config Release --output-on-failure -E AMReX -R py
         if errorlevel 1 exit 1
     - name: Install
       shell: cmd
