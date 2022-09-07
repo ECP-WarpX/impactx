@@ -18,6 +18,7 @@
 #include "particles/transformation/CoordinateTransformation.H"
 
 #include <ablastr/warn_manager/WarnManager.H>
+#include <ablastr/utils/TextMsg.H>
 
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
@@ -116,6 +117,34 @@ namespace impactx
         bool space_charge = true;
         pp_algo.queryAdd("space_charge", space_charge);
         amrex::Print() << " Space Charge effects: " << space_charge << "\n";
+
+        amrex::ParmParse pp_impactx("impactx");
+
+        //"Synthetic" warning messages may be injected in the Warning Manager via
+        // inputfile for debug&testing purposes.
+        ablastr::warn_manager::GetWMInstance().debug_read_warnings_from_input(pp_impactx);
+
+        // Set the flag to control if WarpX has to emit a warning message as soon as a warning is recorded
+        bool always_warn_immediately = false;
+        pp_impactx.query("always_warn_immediately", always_warn_immediately);
+        ablastr::warn_manager::GetWMInstance().SetAlwaysWarnImmediately(always_warn_immediately);
+
+        // Set the WarnPriority threshold to decide if ImpactX has to abort when a warning is recorded
+        if(std::string str_abort_on_warning_threshold = "";
+                pp_impactx.query("abort_on_warning_threshold", str_abort_on_warning_threshold)){
+            std::optional<ablastr::warn_manager::WarnPriority> abort_on_warning_threshold = std::nullopt;
+            if (str_abort_on_warning_threshold == "high")
+                abort_on_warning_threshold = ablastr::warn_manager::WarnPriority::high;
+            else if (str_abort_on_warning_threshold == "medium" )
+                abort_on_warning_threshold = ablastr::warn_manager::WarnPriority::medium;
+            else if (str_abort_on_warning_threshold == "low")
+                abort_on_warning_threshold = ablastr::warn_manager::WarnPriority::low;
+            else {
+                amrex::Abort(ablastr::utils::TextMsg::Err(str_abort_on_warning_threshold
+                                          +"is not a valid option for impactx.abort_on_warning_threshold (use: low, medium or high)"));
+            }
+            ablastr::warn_manager::GetWMInstance().SetAbortThreshold(abort_on_warning_threshold);
+        }
 
         // loop over all beamline elements
         for (auto & element_variant : m_lattice)

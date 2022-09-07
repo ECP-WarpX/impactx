@@ -31,6 +31,16 @@ Overall simulation parameters
     When set to ``1``, this option causes the simulation to fail *after* its completion if there were unused parameters.
     It is mainly intended for continuous integration and automated testing to check that all tests and inputs are adapted to API changes.
 
+* ``impactx.always_warn_immediately`` (``0`` or ``1``; default is ``0`` for false)
+    If set to ``1``, ImpactX immediately prints every warning message as soon as it is generated.
+    It is mainly intended for debug purposes, in case a simulation crashes before a global warning report can be printed.
+
+* ``impactx.abort_on_warning_threshold`` (string: ``low``, ``medium`` or ``high``) optional
+    Optional threshold to abort as soon as a warning is raised.
+    If the threshold is set, warning messages with priority greater than or equal to the threshold trigger an immediate abort.
+    It is mainly intended for debug purposes, and is best used with ``impactx.always_warn_immediately=1``.
+    For more information on the warning logger, see `this section <https://warpx.readthedocs.io/en/latest/developers/warning_logger.html>`_ of the WarpX documentation.
+
 .. _running-cpp-parameters-box:
 
 
