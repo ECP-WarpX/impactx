@@ -9,8 +9,6 @@
  */
 #include "ForceFromSelfFields.H"
 
-#include <ablastr/fields/PoissonSolver.H>
-
 #include <AMReX_BLProfiler.H>
 #include <AMReX_REAL.H>       // for Real
 #include <AMReX_SPACE.H>      // for AMREX_D_DECL
