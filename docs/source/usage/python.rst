@@ -23,6 +23,25 @@ General
 
       :param int order: B-spline order ``1``, ``2``, or ``3``
 
+   .. py:property:: n_cell
+
+      The number of grid points along each direction on the coarsest level.
+
+   .. py:property:: domain
+
+      The physical extent of the full simulation domain in meters.
+      When set, turns ``dynamic_size`` to ``False``.
+
+      Note: particles that move outside the simulation domain are removed.
+
+   .. py:property:: prob_relative
+
+      The field mesh is expanded beyond the physical extent of particles by this factor.
+      When set, turns ``dynamic_size`` to ``True``.
+
+   .. py:property:: dynamic_size
+
+      Use dynamic (``True``) resizing of the field mesh or static sizing (``False``).
 
    .. py:method:: set_space_charge(enable)
 
