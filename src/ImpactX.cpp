@@ -8,7 +8,7 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "ImpactX.H"
-#include "initialization/InitOneBoxPerRank.H"
+#include "initialization/InitAmrCore.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
 #include "particles/transformation/CoordinateTransformation.H"
@@ -26,7 +26,7 @@
 namespace impactx
 {
     ImpactX::ImpactX ()
-        : AmrCore(initialization::one_box_per_rank()),
+        : AmrCore(initialization::init_amr_core()),
           m_particle_container(std::make_unique<ImpactXParticleContainer>(this))
     {
         // todo: if amr.n_cells is provided, overwrite/redefine AmrCore object

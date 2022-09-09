@@ -38,6 +38,14 @@ namespace impactx::initialization
             amrex::Geometry const& level_0_geom,
             amrex::AmrInfo const& amr_info
         );
+        AmrCoreData (
+            amrex::RealBox const & rb,
+            int max_level_in,
+            amrex::Vector<int> const & n_cell_in,
+            int coord,
+            amrex::Vector<amrex::IntVect> const & ref_ratios,
+            amrex::Array<int,AMREX_SPACEDIM> const & is_per
+        );
 
         AmrCoreData (AmrCoreData&& rhs) = default;
         AmrCoreData& operator= (AmrCoreData&& rhs) = default;

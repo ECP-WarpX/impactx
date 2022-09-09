@@ -33,36 +33,38 @@ Overall simulation parameters
 Setting up the field mesh
 -------------------------
 
-* ``amr.n_cell`` (2 integers in 2D, 3 integers in 3D)
+* ``amr.n_cell`` (3 integers) optional (default: 1 `blocking_factor <https://amrex-codes.github.io/amrex/docs_html/GridCreation.html>`__ per MPI process)
     The number of grid points along each direction (on the **coarsest level**)
 
 * ``amr.max_level`` (``integer``, default: ``0``)
     When using mesh refinement, the number of refinement levels that will be used.
 
-    Use 0 in order to disable mesh refinement.
-    Note: currently, ``0`` and ``1`` are supported.
+    Use ``0`` in order to disable mesh refinement.
 
-* ``amr.ref_ratio`` (`integer` per refined level, default: ``2``)
+* ``amr.ref_ratio`` (``integer`` per refined level, default: ``2``)
     When using mesh refinement, this is the refinement ratio per level.
     With this option, all directions are fined by the same ratio.
-
-    Note: in development; currently, ``2`` is supported.
 
 * ``amr.ref_ratio_vect`` (3 integers for x,y,z per refined level)
     When using mesh refinement, this can be used to set the refinement ratio per direction and level, relative to the previous level.
 
     Example: for three levels, a value of ``2 2 4 8 8 16`` refines the first level by 2-fold in x and y and 4-fold in z compared to the coarsest level (level 0/mother grid); compared to the first level, the second level is refined 8-fold in x and y and 16-fold in z.
 
-    Note: in development; currently allowed value: ``2 2 2``.
+* ``geometry.dynamic_size`` (``boolean``) optional (default: ``true`` for dynamic)
+    Use dynamic (``true``) resizing of the field mesh, via ``geometry.prob_relative``, or static sizing (``false``), via ``geometry.prob_lo``/``geometry.prob_hi``.
 
-* ``geometry.coord_sys`` (``integer``) optional (default ``0``)
-    Coordinate system used by the simulation. 0 for Cartesian, 1 for cylindrical.
+* ``geometry.prob_relative`` (``float``, unitless) optional (default: ``0.1``)
+    By default, we dynamically extract the minimum and maximum of the particle positions in the beam.
+    The field mesh is expanded beyond the physical extent of particles by this factor.
 
-* ``geometry.prob_lo`` and ``geometry.prob_hi`` (2 floats in 2D, 3 floats in 3D; in meters)
-    The extent of the full simulation box. This box is rectangular, and thus its
-    extent is given here by the coordinates of the lower corner (``geometry.prob_lo``) and
-    upper corner (``geometry.prob_hi``). The first axis of the coordinates is x
-    (or r with cylindrical) and the last is z.
+* ``geometry.prob_lo`` and ``geometry.prob_hi`` (3 floats, in meters) optional (required if ``geometry.dynamic_size`` is ``false``)
+    The extent of the full simulation domain.
+    This can be used to explicitly size the simulation box and ignore ``geometry.prob_relative``.
+
+    This box is rectangular, and thus its extent is given here by the coordinates of the lower corner (``geometry.prob_lo``) and upper corner (``geometry.prob_hi``).
+    The first axis of the coordinates is x and the last is z.
+
+    Note: particles that move outside the simulation domain are removed.
 
 
 .. _running-cpp-parameters-bc:
