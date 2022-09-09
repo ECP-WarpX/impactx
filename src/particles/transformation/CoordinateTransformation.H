@@ -21,14 +21,14 @@ namespace transformation
      */
     enum class Direction
     {
-        T2Z,
-        Z2T
+        To_Fixed_S,
+        To_Fixed_T
     };
 
     /** Transform the coordinate system of all particles
      *
      * @param pc container of the particles to push
-     * @param direction the direction (Z to T or vice versa)
+     * @param direction the transformation (to fixed s or to fixed t)
      */
     void CoordinateTransformation (ImpactXParticleContainer &pc,
                                    Direction const & direction);

@@ -7,8 +7,8 @@
  * Authors: Chad Mitchell, Axel Huebl
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_T2Z_H
-#define IMPACTX_T2Z_H
+#ifndef IMPACTX_TO_FIXED_S_H
+#define IMPACTX_TO_FIXED_S_H
 
 #include "particles/ImpactXParticleContainer.H"
 
@@ -23,20 +23,23 @@ namespace impactx
 {
 namespace transformation
 {
-    struct T2Z
+    struct To_Fixed_S
     {
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** A T-to-Z transformation
+        /** Transformation of particles from fixed time t to fixed location
+         *  s.  At fixed s, each particle is represented by phase space
+         *  coordinates (x,y,t,px,py,pt).
          *
          * @param pzd Design value of pz/mc = beta*gamma.
          */
-        T2Z( amrex::ParticleReal const pzd )
+        To_Fixed_S( amrex::ParticleReal const pzd )
         : m_pzd(pzd)
         {
         }
 
-        /** This is a t-to-z map, so that a variable of this type can be used like a t-to-z function.
+        /** This is a t-to-s map, so that a variable of this type can be used like a
+         *  t-to-s function.
          *
          * @param p Particle AoS data for positions and cpu/id
          * @param px particle momentum in x
@@ -57,18 +60,23 @@ namespace transformation
             amrex::ParticleReal const y = p.pos(1);
             amrex::ParticleReal const t = p.pos(2);
 
-            // arguments for ptd and pt
+            // compute value of reference ptd = -gamma
             amrex::ParticleReal const argd = 1.0_prt + pow(m_pzd, 2);
-            amrex::ParticleReal const arg = 1.0_prt + pow(m_pzd+pt, 2) + pow(px, 2) + pow(py, 2);
-
-            // check for validity of arguments
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(argd > 0.0_prt, "invalid ptd arg (<=0)");
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pt arg (<=0)");
-
-            // transform position and momentum (t2z)
-            //   (universal for all elements - needs tracking for RF elements)
             amrex::ParticleReal const ptdf = argd > 0.0_prt ? -sqrt(argd) : -1.0_prt;
+
+            // transform momenta to dynamic units (eg, so that momenta are
+            // normalized by mc):
+            px = px*m_pzd;
+            py = py*m_pzd;
+            pt = pt*m_pzd;
+
+            // compute value of particle pt = -gamma
+            amrex::ParticleReal const arg = 1.0_prt + pow(m_pzd+pt, 2) + pow(px, 2) + pow(py, 2);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pt arg (<=0)");
             amrex::ParticleReal const ptf = arg > 0.0_prt ? -sqrt(arg) : -1.0_prt;
+
+            // transform position and momentum (from fixed t to fixed s)
 
             p.pos(0) = x - px*t/(m_pzd+pt);
             // px = px;
@@ -76,6 +84,13 @@ namespace transformation
             // py = py;
             p.pos(2) = ptf*t/(m_pzd+pt);  // This now represents t.
             pt = ptf - ptdf;                    // This now represents pt.
+
+            // transform momenta to static units (eg, so that momenta are
+            // normalized by pzd):
+            px = px/m_pzd;
+            py = py/m_pzd;
+            pt = pt/m_pzd;
+
         }
 
     private:
@@ -85,4 +100,4 @@ namespace transformation
 } // namespace transformation
 } // namespace impactx
 
-#endif // IMPACTX_T2Z_H
+#endif // IMPACTX_TO_FIXED_S_H
