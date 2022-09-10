@@ -47,7 +47,7 @@ namespace impactx::initialization
     one_box_per_rank ();
 
     //! the fake domain size (lower end), used to indicate that the user made no choice for it
-    constexpr amrex::RealVect undefined_geometry_prob_lo(0.0);
+    constexpr amrex::RealVect undefined_geometry_prob_lo(-1.0);
     //! the fake domain size (higher end), used to indicate that the user made no choice for it
     constexpr amrex::RealVect undefined_geometry_prob_hi(1.0);
 
