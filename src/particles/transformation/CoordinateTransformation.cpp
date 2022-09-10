@@ -9,8 +9,8 @@
  */
 #include "CoordinateTransformation.H"
 
-#include "TO_FIXED_S.H"
-#include "TO_FIXED_T.H"
+#include "ToFixedS.H"
+#include "ToFixedT.H"
 
 #include <AMReX_BLProfiler.H> // for BL_PROFILE
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
@@ -51,12 +51,12 @@ namespace transformation {
                 amrex::ParticleReal *const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
                 amrex::ParticleReal *const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
 
-                if( direction == Direction::To_Fixed_S) {
-                    BL_PROFILE("impactx::transformation::CoordinateTransformation::To_Fixed_S");
+                if( direction == Direction::to_fixed_s) {
+                    BL_PROFILE("impactx::transformation::CoordinateTransformation::to_fixed_s");
                     // Design value of pz/mc = beta*gamma
                     amrex::ParticleReal const pzd = sqrt(pow(pd, 2) - 1.0);
 
-                    To_Fixed_S to_fixed_s(pzd);
+                    ToFixedS const to_s(pzd);
                     amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE(long i) {
                         // access AoS data such as positions and cpu/id
                         PType &p = aos_ptr[i];
@@ -64,14 +64,14 @@ namespace transformation {
                         // access SoA Real data
                         amrex::ParticleReal &px = part_px[i];
                         amrex::ParticleReal &py = part_py[i];
-                        amrex::ParticleReal &pt = part_pt[i];
+                        amrex::ParticleReal &pz = part_pt[i];
 
-                        to_fixed_s(p, px, py, pt);
+                        to_s(p, px, py, pz);
                     });
                 } else {
-                    BL_PROFILE("impactx::transformation::CoordinateTransformation::To_Fixed_T");
+                    BL_PROFILE("impactx::transformation::CoordinateTransformation::to_fixed_t");
                     amrex::ParticleReal const ptd = pd;  // Design value of pt/mc2 = -gamma.
-                    To_Fixed_T to_fixed_t(ptd);
+                    ToFixedT const to_t(ptd);
                     amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE(long i) {
                         // access AoS data such as positions and cpu/id
                         PType &p = aos_ptr[i];
@@ -81,7 +81,7 @@ namespace transformation {
                         amrex::ParticleReal &py = part_py[i];
                         amrex::ParticleReal &pt = part_pt[i];
 
-                        to_fixed_t(p, px, py, pt);
+                        to_t(p, px, py, pt);
                     });
                 }
             } // end loop over all particle boxes

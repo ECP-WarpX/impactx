@@ -23,17 +23,18 @@ namespace impactx
 {
 namespace transformation
 {
-    struct To_Fixed_S
+    struct ToFixedS
     {
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** Transformation of particles from fixed time t to fixed location
-         *  s.  At fixed s, each particle is represented by phase space
+        /** Transformation of particles from fixed time t to fixed location s.
+         *
+         * At fixed s, each particle is represented by phase space
          *  coordinates (x,y,t,px,py,pt).
          *
          * @param pzd Design value of pz/mc = beta*gamma.
          */
-        To_Fixed_S( amrex::ParticleReal const pzd )
+        ToFixedS( amrex::ParticleReal const pzd )
         : m_pzd(pzd)
         {
         }
@@ -65,7 +66,7 @@ namespace transformation
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(argd > 0.0_prt, "invalid ptd arg (<=0)");
             amrex::ParticleReal const ptdf = argd > 0.0_prt ? -sqrt(argd) : -1.0_prt;
 
-            // transform momenta to dynamic units (eg, so that momenta are
+            // transform momenta to dynamic units (e.g., so that momenta are
             // normalized by mc):
             px = px*m_pzd;
             py = py*m_pzd;
@@ -73,7 +74,7 @@ namespace transformation
 
             // compute value of particle pt = -gamma
             amrex::ParticleReal const arg = 1.0_prt + pow(m_pzd+pt, 2) + pow(px, 2) + pow(py, 2);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pt arg (<=0)");
+            AMREX_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pt arg (<=0)");
             amrex::ParticleReal const ptf = arg > 0.0_prt ? -sqrt(arg) : -1.0_prt;
 
             // transform position and momentum (from fixed t to fixed s)

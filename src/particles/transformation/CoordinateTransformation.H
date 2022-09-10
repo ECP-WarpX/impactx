@@ -21,8 +21,8 @@ namespace transformation
      */
     enum class Direction
     {
-        To_Fixed_S,
-        To_Fixed_T
+        to_fixed_s,
+        to_fixed_t
     };
 
     /** Transform the coordinate system of all particles
