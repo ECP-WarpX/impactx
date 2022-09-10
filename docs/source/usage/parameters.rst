@@ -58,7 +58,7 @@ Setting up the field mesh
     The field mesh is expanded beyond the physical extent of particles by this factor.
 
 * ``geometry.prob_lo`` and ``geometry.prob_hi`` (3 floats, in meters) optional (required if ``geometry.dynamic_size`` is ``false``)
-    The extent of the full simulation domain.
+    The extent of the full simulation domain relative to the reference particle position.
     This can be used to explicitly size the simulation box and ignore ``geometry.prob_relative``.
 
     This box is rectangular, and thus its extent is given here by the coordinates of the lower corner (``geometry.prob_lo``) and upper corner (``geometry.prob_hi``).

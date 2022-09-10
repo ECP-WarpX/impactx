@@ -29,7 +29,7 @@ General
 
    .. py:property:: domain
 
-      The physical extent of the full simulation domain in meters.
+      The physical extent of the full simulation domain, relative to the reference particle position, in meters.
       When set, turns ``dynamic_size`` to ``False``.
 
       Note: particles that move outside the simulation domain are removed.

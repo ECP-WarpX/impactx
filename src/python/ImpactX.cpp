@@ -102,7 +102,7 @@ void init_ImpactX(py::module& m)
 
                 ix.ResizeMesh();
             },
-            "The physical extent of the full simulation domain in meters."
+            "The physical extent of the full simulation domain, relative to the reference particle position, in meters."
         )
 
         .def_property("prob_relative",
