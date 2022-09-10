@@ -153,7 +153,7 @@ namespace impactx
 
                     // transform from x,y,z to x',y',t
                     transformation::CoordinateTransformation(*m_particle_container,
-                                                             transformation::Direction::To_Fixed_S);
+                                                             transformation::Direction::to_fixed_s);
                 }
 
                 // for later: original Impact implementation as an option
