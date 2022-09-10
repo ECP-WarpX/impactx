@@ -39,9 +39,9 @@ namespace impactx
     {
         enum
         {
-            x,  ///< position in x [m] (at fixed t OR fixed z)
-            y,  ///< position in y [m] (at fixed t OR fixed z)
-            z,  ///< position in z [m] (at fixed t) OR time-of-flight ct [m] (at fixed z)
+            x,  ///< position in x [m] (at fixed t OR fixed s)
+            y,  ///< position in y [m] (at fixed t OR fixed s)
+            z,  ///< position in z [m] (at fixed t) OR time-of-flight ct [m] (at fixed s)
         };
     };
 
@@ -52,9 +52,9 @@ namespace impactx
     {
         enum
         {
-            ux,  ///< momentum in x, normalized to proper velocity
-            uy,  ///< momentum in y, normalized to proper velocity
-            pt,  ///< kinetic energy deviation, (E0-E)/mc^2
+            ux,  ///< momentum in x, scaled by the magnitude of the reference momentum [unitless] (at fixed t or s)
+            uy,  ///< momentum in y, scaled by the magnitude of the reference momentum [unitless] (at fixed t or s)
+            pt,  ///< momentum in z, scaled by the magnitude of the reference momentum [unitless] (at fixed t) OR energy deviation, scaled by speed of light * the magnitude of the reference momentum [unitless] (at fixed s)
             m_qm, ///< charge to mass ratio, in q_e/m_e (q_e/eV)
             w,   ///< particle weight, unitless
             nattribs ///< the number of attributes above (always last)
