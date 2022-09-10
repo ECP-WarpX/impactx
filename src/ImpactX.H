@@ -86,9 +86,19 @@ namespace impactx
          */
         void validate ();
 
+        /** Check inputs for unused parameters (e.g. typos) after step 1
+         */
+        void early_param_check ();
+
         /** Run the main simulation loop for a number of steps
          */
         void evolve ();
+
+        /** Query input for warning logger variables and set up warning logger accordingly
+         *
+         * Input variables are: ``always_warn_immediately`` and ``abort_on_warning_threshold``.
+         */
+        void warn_logger_control ();
 
       private:
         //! Tag cells for refinement.  TagBoxArray tags is built on level lev grids.

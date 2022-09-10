@@ -39,6 +39,49 @@ namespace impactx
 
         // todo: if charge deposition and/or space charge are requested, require
         //       amr.n_cells from user inputs
+
+        // query input for warning logger variables and set up warning logger accordingly
+        warn_logger_control();
+
+    }
+
+    void ImpactX::warn_logger_control()
+    {
+        amrex::ParmParse pp_impactx("impactx");
+
+        //"Synthetic" warning messages may be injected in the Warning Manager via
+        // inputfile for debug&testing purposes.
+        ablastr::warn_manager::GetWMInstance().debug_read_warnings_from_input(pp_impactx);
+
+        // Set the flag to control if ImpactX has to emit a warning message as soon as a warning is recorded
+        bool always_warn_immediately = false;
+        pp_impactx.query("always_warn_immediately", always_warn_immediately);
+        ablastr::warn_manager::GetWMInstance().SetAlwaysWarnImmediately(always_warn_immediately);
+
+        ablastr::warn_manager::WMRecordWarning(
+                "ImpactX::add_particles",
+                "The bunch charge is set to zero. ImpactX will run with "
+                "zero-weighted particles. Did you mean to set the space "
+                "charge algorithm to off instead?",
+                ablastr::warn_manager::WarnPriority::medium
+        );
+
+        // Set the WarnPriority threshold to decide if ImpactX has to abort when a warning is recorded
+        if(std::string str_abort_on_warning_threshold = "";
+                pp_impactx.query("abort_on_warning_threshold", str_abort_on_warning_threshold)){
+            std::optional<ablastr::warn_manager::WarnPriority> abort_on_warning_threshold = std::nullopt;
+            if (str_abort_on_warning_threshold == "high")
+                abort_on_warning_threshold = ablastr::warn_manager::WarnPriority::high;
+            else if (str_abort_on_warning_threshold == "medium" )
+                abort_on_warning_threshold = ablastr::warn_manager::WarnPriority::medium;
+            else if (str_abort_on_warning_threshold == "low")
+                abort_on_warning_threshold = ablastr::warn_manager::WarnPriority::low;
+            else {
+                amrex::Abort(ablastr::utils::TextMsg::Err(str_abort_on_warning_threshold
+                                                          +"is not a valid option for impactx.abort_on_warning_threshold (use: low, medium or high)"));
+            }
+            ablastr::warn_manager::GetWMInstance().SetAbortThreshold(abort_on_warning_threshold);
+        }
     }
 
     void ImpactX::initGrids ()
@@ -57,6 +100,19 @@ namespace impactx
         amrex::UtilCreateCleanDirectory("diags", true);
     }
 
+    void ImpactX::early_param_check()
+    {
+        BL_PROFILE("ImpactX::early_param_check");
+
+        amrex::Print() << "\n"; // better: conditional \n based on return value
+        amrex::ParmParse().QueryUnusedInputs();
+
+        //Print the warning list right after the first step.
+        amrex::Print() << ablastr::warn_manager::GetWMInstance()
+                .PrintGlobalWarnings("FIRST STEP");
+
+    }
+
     void ImpactX::evolve ()
     {
         BL_PROFILE("ImpactX::evolve");
@@ -67,7 +123,8 @@ namespace impactx
         //   before we start the evolve loop, we are in "step 0" (initial state)
         int global_step = 0;
 
-        bool early_params_checked = false; // check typos in inputs after step 1
+        // check typos in inputs after step 1
+        bool early_params_checked = false;
 
         // count particles - if no particles are found in our particle container, then a lot of
         // AMReX routines over ParIter won't work and we have nothing to do here anyways
@@ -117,34 +174,6 @@ namespace impactx
         bool space_charge = true;
         pp_algo.queryAdd("space_charge", space_charge);
         amrex::Print() << " Space Charge effects: " << space_charge << "\n";
-
-        amrex::ParmParse pp_impactx("impactx");
-
-        //"Synthetic" warning messages may be injected in the Warning Manager via
-        // inputfile for debug&testing purposes.
-        ablastr::warn_manager::GetWMInstance().debug_read_warnings_from_input(pp_impactx);
-
-        // Set the flag to control if WarpX has to emit a warning message as soon as a warning is recorded
-        bool always_warn_immediately = false;
-        pp_impactx.query("always_warn_immediately", always_warn_immediately);
-        ablastr::warn_manager::GetWMInstance().SetAlwaysWarnImmediately(always_warn_immediately);
-
-        // Set the WarnPriority threshold to decide if ImpactX has to abort when a warning is recorded
-        if(std::string str_abort_on_warning_threshold = "";
-                pp_impactx.query("abort_on_warning_threshold", str_abort_on_warning_threshold)){
-            std::optional<ablastr::warn_manager::WarnPriority> abort_on_warning_threshold = std::nullopt;
-            if (str_abort_on_warning_threshold == "high")
-                abort_on_warning_threshold = ablastr::warn_manager::WarnPriority::high;
-            else if (str_abort_on_warning_threshold == "medium" )
-                abort_on_warning_threshold = ablastr::warn_manager::WarnPriority::medium;
-            else if (str_abort_on_warning_threshold == "low")
-                abort_on_warning_threshold = ablastr::warn_manager::WarnPriority::low;
-            else {
-                amrex::Abort(ablastr::utils::TextMsg::Err(str_abort_on_warning_threshold
-                                          +"is not a valid option for impactx.abort_on_warning_threshold (use: low, medium or high)"));
-            }
-            ablastr::warn_manager::GetWMInstance().SetAbortThreshold(abort_on_warning_threshold);
-        }
 
         // loop over all beamline elements
         for (auto & element_variant : m_lattice)
@@ -247,15 +276,7 @@ namespace impactx
                 }
 
                 // inputs: unused parameters (e.g. typos) check after step 1 has finished
-                if (!early_params_checked) {
-                    amrex::Print() << "\n"; // better: conditional \n based on return value
-                    amrex::ParmParse().QueryUnusedInputs();
-
-                    //Print the warning list right after the first step.
-                    amrex::Print() << ablastr::warn_manager::GetWMInstance()
-                                      .PrintGlobalWarnings("FIRST STEP");
-                    early_params_checked = true;
-                }
+                if (!early_params_checked) { early_param_check(); early_params_checked = true;}
 
             } // end in-element space-charge slice-step loop
         } // end beamline element loop
