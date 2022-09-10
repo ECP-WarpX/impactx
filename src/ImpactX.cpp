@@ -130,7 +130,7 @@ namespace impactx
 
                     // transform from x',y',t to x,y,z
                     transformation::CoordinateTransformation(*m_particle_container,
-                                                             transformation::Direction::To_Fixed_T);
+                                                             transformation::Direction::to_fixed_t);
 
                     // Note: The following operation assume that
                     // the particles are in x, y, z coordinates.
