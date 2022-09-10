@@ -64,7 +64,7 @@ namespace transformation {
                         // access SoA Real data
                         amrex::ParticleReal &px = part_px[i];
                         amrex::ParticleReal &py = part_py[i];
-                        amrex::ParticleReal &pt = part_pt[i];
+                        amrex::ParticleReal &pz = part_pt[i];
 
                         to_s(p, px, py, pz);
                     });
