@@ -23,17 +23,18 @@ namespace impactx
 {
 namespace transformation
 {
-    struct To_Fixed_T
+    struct ToFixedT
     {
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** Transformation of particles from fixed location s to fixed time
-         *  t.  At fixed t, each particle is represented by phase space
+        /** Transformation of particles from fixed location s to fixed time t.
+         *
+         * At fixed t, each particle is represented by phase space
          *  coordinates (x,y,z,px,py,pz).
          *
          * @param ptd Design value of pt/mc2 = -gamma.
          */
-        To_Fixed_T( amrex::ParticleReal const ptd )
+        ToFixedT( amrex::ParticleReal const ptd )
         : m_ptd(ptd)
         {
         }
@@ -73,7 +74,7 @@ namespace transformation
 
             // compute value of particle pz = beta*gamma
             amrex::ParticleReal const arg = -1.0_prt + pow(m_ptd+pt, 2) - pow(px, 2) - pow(py, 2);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pz arg (<=0)");
+            AMREX_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pz arg (<=0)");
             amrex::ParticleReal const pz = arg > 0.0_prt ? sqrt(arg) : 0.0_prt;
 
             // transform position and momentum (from fixed s to fixed t)
