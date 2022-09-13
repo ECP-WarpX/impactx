@@ -166,18 +166,18 @@ set(ImpactX_openpmd_src ""
     "Local path to openPMD-api source directory (preferred if set)")
 
 # Git fetcher
-set(ImpactX_ablastr_repo "https://github.com/ECP-WarpX/WarpX.git"
+set(ImpactX_ablastr_repo "https://github.com/Thierry992/WarpX.git"
     CACHE STRING
     "Repository URI to pull and build ABLASTR from if(ImpactX_ablastr_internal)")
-set(ImpactX_ablastr_branch "23.04"
+set(ImpactX_ablastr_branch "soa-particle"
     CACHE STRING
     "Repository branch for ImpactX_ablastr_repo if(ImpactX_ablastr_internal)")
 
 # AMReX is transitively pulled through ABLASTR
-set(ImpactX_amrex_repo "https://github.com/AMReX-Codes/amrex.git"
+set(ImpactX_amrex_repo "https://github.com/Thierry992/amrex.git"
     CACHE STRING
     "Repository URI to pull and build AMReX from if(ImpactX_amrex_internal)")
-set(ImpactX_amrex_branch ""
+set(ImpactX_amrex_branch "particle_soa_refactor"
     CACHE STRING
     "Repository branch for ImpactX_amrex_repo if(ImpactX_amrex_internal)")
 

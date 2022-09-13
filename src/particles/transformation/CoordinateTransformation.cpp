@@ -43,10 +43,7 @@ namespace transformation {
             for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
                 const int np = pti.numParticles();
 
-                // preparing access to particle data: AoS
                 using PType = ImpactXParticleContainer::ParticleType;
-                auto &aos = pti.GetArrayOfStructs();
-                PType *AMREX_RESTRICT aos_ptr = aos().dataPtr();
 
                 // preparing access to particle data: SoA of Reals
                 auto &soa_real = pti.GetStructOfArrays().GetRealData();
@@ -60,9 +57,11 @@ namespace transformation {
                     amrex::ParticleReal const pzd = sqrt(pow(pd, 2) - 1.0);
 
                     ToFixedS const to_s(pzd);
+                    auto tile_data = pti.GetParticleTile().getParticleTileData();
+
                     amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE(long i) {
-                        // access AoS data such as positions and cpu/id
-                        PType &p = aos_ptr[i];
+
+                        PType p(tile_data,i);
 
                         // access SoA Real data
                         amrex::ParticleReal &px = part_px[i];
@@ -75,9 +74,10 @@ namespace transformation {
                     BL_PROFILE("impactx::transformation::CoordinateTransformation::to_fixed_t");
                     amrex::ParticleReal const ptd = pd;  // Design value of pt/mc2 = -gamma.
                     ToFixedT const to_t(ptd);
+                    auto tile_data = pti.GetParticleTile().getParticleTileData();
                     amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE(long i) {
                         // access AoS data such as positions and cpu/id
-                        PType &p = aos_ptr[i];
+                        PType p(tile_data,i);
 
                         // access SoA Real data
                         amrex::ParticleReal &px = part_px[i];

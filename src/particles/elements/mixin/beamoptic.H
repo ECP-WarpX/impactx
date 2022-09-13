@@ -40,23 +40,25 @@ namespace detail
     struct PushSingleParticle
     {
         using PType = ImpactXParticleContainer::ParticleType;
+        using ParticleTileType = amrex::ParticleTile<amrex::SoAParticle<RealSoA::nattribs, IntSoA::nattribs>,RealSoA::nattribs, IntSoA::nattribs>;
+        using ParticleTileDataType = amrex::ParticleTileData<ParticleTileType::StorageParticleType,RealSoA::nattribs, IntSoA::nattribs>;
 
         /** Constructor taking in pointers to particle data
          *
          * @param element the beamline element to push through
-         * @param aos_ptr the array-of-struct with position and ids
+         * @param ptd particle data tile
          * @param part_px the array to the particle momentum (x)
          * @param part_py the array to the particle momentum (y)
          * @param part_pt the array to the particle momentum (t)
          * @param ref_part the struct containing the reference particle
          */
         PushSingleParticle (T_Element element,
-                            PType* AMREX_RESTRICT aos_ptr,
+                            ParticleTileDataType ptd,
                             amrex::ParticleReal* AMREX_RESTRICT part_px,
                             amrex::ParticleReal* AMREX_RESTRICT part_py,
                             amrex::ParticleReal* AMREX_RESTRICT part_pt,
                             RefPart ref_part)
-                : m_element(std::move(element)), m_aos_ptr(aos_ptr),
+                : m_element(std::move(element)), m_ptd(ptd),
                   m_part_px(part_px), m_part_py(part_py), m_part_pt(part_pt),
                   m_ref_part(std::move(ref_part))
         {
@@ -75,8 +77,7 @@ namespace detail
         void
         operator() (long i) const
         {
-            // access AoS data such as positions and cpu/id
-            PType& AMREX_RESTRICT p = m_aos_ptr[i];
+            PType p(m_ptd, i);
 
             // access SoA Real data
             amrex::ParticleReal & AMREX_RESTRICT px = m_part_px[i];
@@ -90,7 +91,7 @@ namespace detail
 
     private:
         T_Element const m_element;
-        PType* const AMREX_RESTRICT m_aos_ptr;
+        ParticleTileDataType const m_ptd;
         amrex::ParticleReal* const AMREX_RESTRICT m_part_px;
         amrex::ParticleReal* const AMREX_RESTRICT m_part_py;
         amrex::ParticleReal* const AMREX_RESTRICT m_part_pt;
@@ -107,10 +108,12 @@ namespace detail
     ) {
         const int np = pti.numParticles();
 
-        // preparing access to particle data: AoS
+        // preparing access to particle data
         using PType = ImpactXParticleContainer::ParticleType;
-        auto& aos = pti.GetArrayOfStructs();
-        PType* AMREX_RESTRICT aos_ptr = aos().dataPtr();
+        using ParticleTile = amrex::ParticleTile<amrex::SoAParticle<RealSoA::nattribs, IntSoA::nattribs>,RealSoA::nattribs, IntSoA::nattribs>;
+        using ParticleTileDataType = amrex::ParticleTileData<ParticleTile::StorageParticleType,RealSoA::nattribs, IntSoA::nattribs>;
+
+        ParticleTileDataType tile_data = pti.GetParticleTile().getParticleTileData();
 
         // preparing access to particle data: SoA of Reals
         auto& soa_real = pti.GetStructOfArrays().GetRealData();
@@ -119,7 +122,7 @@ namespace detail
         amrex::ParticleReal* const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
 
         detail::PushSingleParticle<T_Element> const pushSingleParticle(
-                element, aos_ptr, part_px, part_py, part_pt, ref_part);
+                element, tile_data, part_px, part_py, part_pt, ref_part);
         //   loop over beam particles in the box
         amrex::ParallelFor(np, pushSingleParticle);
     }

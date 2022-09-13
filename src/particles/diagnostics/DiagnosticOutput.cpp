@@ -17,6 +17,7 @@
 #include <AMReX_ParmParse.H>  // for ParmParse
 #include <AMReX_REAL.H>       // for ParticleReal
 #include <AMReX_Print.H>      // for PrintToFile
+#include <AMReX_ParticleTile.H>     // for constructor of SoAParticle
 
 
 namespace impactx::diagnostics
@@ -46,7 +47,8 @@ namespace impactx::diagnostics
         }
 
         // create a host-side particle buffer
-        auto tmp = pc.make_alike<amrex::PinnedArenaAllocator>();
+        using ParticleType = amrex::SoAParticle<RealSoA::nattribs,IntSoA::nattribs>;
+        auto tmp = pc.template make_alike<amrex::PinnedArenaAllocator>();
 
         // copy device-to-host
         bool const local = true;
@@ -56,34 +58,34 @@ namespace impactx::diagnostics
         int const nLevel = tmp.finestLevel();
         for (int lev = 0; lev <= nLevel; ++lev) {
             // loop over all particle boxes
-            using ParIt = typename decltype(tmp)::ParConstIterType;
-            for (ParIt pti(tmp, lev); pti.isValid(); ++pti) {
+            using MyPinnedParIter = amrex::ParIterSoA<RealSoA::nattribs,IntSoA::nattribs, amrex::PinnedArenaAllocator>;
+            for (MyPinnedParIter pti(tmp, lev); pti.isValid(); ++pti) {
                 const int np = pti.numParticles();
 
                 // preparing access to particle data: AoS
-                using PType = ImpactXParticleContainer::ParticleType;
-                auto const &aos = pti.GetArrayOfStructs();
-                PType const *const AMREX_RESTRICT aos_ptr = aos().dataPtr();
+                //using PType = ImpactXParticleContainer::ParticleType;
+                //auto const &aos = pti.GetArrayOfStructs();
+                //PType const *const AMREX_RESTRICT aos_ptr = aos().dataPtr();
 
                 // preparing access to particle data: SoA of Reals
-                auto &soa_real = pti.GetStructOfArrays().GetRealData();
-                amrex::ParticleReal const *const AMREX_RESTRICT part_px = soa_real[RealSoA::ux].dataPtr();
-                amrex::ParticleReal const *const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
-                amrex::ParticleReal const *const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
+                auto const& particle_attributes = pti.GetStructOfArrays();
+                auto const& part_px = particle_attributes.GetRealData(RealSoA::ux);
+                auto const& part_py = particle_attributes.GetRealData(RealSoA::uy);
+                auto const& part_pt = particle_attributes.GetRealData(RealSoA::pt);
+
+                // Preparing the constructor for the new SoA Particle Type
+                auto ptd = pti.GetParticleTile().getParticleTileData();
 
                 if (otype == OutputType::PrintParticles) {
                     // print out particles (this hack works only on CPU and on GPUs with
                     // unified memory access)
                     for (int i = 0; i < np; ++i) {
-
-                        // access AoS data such as positions and cpu/id
-                        PType const &p = aos_ptr[i];
+                        ParticleType p(ptd, i);
                         amrex::ParticleReal const x = p.pos(0);
                         amrex::ParticleReal const y = p.pos(1);
                         amrex::ParticleReal const t = p.pos(2);
                         uint64_t const global_id = ablastr::particles::localIDtoGlobal(p.id(), p.cpu());
 
-                        // access SoA Real data
                         amrex::ParticleReal const px = part_px[i];
                         amrex::ParticleReal const py = part_py[i];
                         amrex::ParticleReal const pt = part_pt[i];
@@ -119,14 +121,11 @@ namespace impactx::diagnostics
                     // print out particles (this hack works only on CPU and on GPUs with
                     // unified memory access)
                     for (int i = 0; i < np; ++i) {
-
-                        // access AoS data such as positions and cpu/id
-                        PType const &p = aos_ptr[i];
+                        ParticleType p(ptd, i);
                         amrex::ParticleReal const x = p.pos(0);
                         amrex::ParticleReal const y = p.pos(1);
                         uint64_t const global_id = ablastr::particles::localIDtoGlobal(p.id(), p.cpu());
 
-                        // access SoA Real data
                         amrex::ParticleReal const px = part_px[i];
                         amrex::ParticleReal const py = part_py[i];
 

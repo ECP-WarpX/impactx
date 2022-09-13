@@ -17,7 +17,6 @@
 #include <AMReX_AmrParGDB.H>
 #include <AMReX_ParallelDescriptor.H>
 #include <AMReX_ParmParse.H>
-#include <AMReX_ParticleTile.H>
 
 #include <stdexcept>
 
@@ -31,24 +30,24 @@ namespace impactx
         return do_dynamic;
     }
 
-    ParIter::ParIter (ContainerType& pc, int level)
-        : amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+    ParIterSoA::ParIterSoA (ContainerType& pc, int level)
+        : amrex::ParIterSoA<RealSoA::nattribs, IntSoA::nattribs>(pc, level,
                    amrex::MFItInfo().SetDynamic(do_omp_dynamic())) {}
 
-    ParIter::ParIter (ContainerType& pc, int level, amrex::MFItInfo& info)
-        : amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+    ParIterSoA::ParIterSoA (ContainerType& pc, int level, amrex::MFItInfo& info)
+        : amrex::ParIterSoA<RealSoA::nattribs, IntSoA::nattribs>(pc, level,
               info.SetDynamic(do_omp_dynamic())) {}
 
-    ParConstIter::ParConstIter (ContainerType& pc, int level)
-        : amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+    ParConstIterSoA::ParConstIterSoA (ContainerType& pc, int level)
+        : amrex::ParConstIterSoA<RealSoA::nattribs, IntSoA::nattribs>(pc, level,
               amrex::MFItInfo().SetDynamic(do_omp_dynamic())) {}
 
-    ParConstIter::ParConstIter (ContainerType& pc, int level, amrex::MFItInfo& info)
-        : amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+    ParConstIterSoA::ParConstIterSoA (ContainerType& pc, int level, amrex::MFItInfo& info)
+        : amrex::ParConstIterSoA<RealSoA::nattribs, IntSoA::nattribs>(pc, level,
               info.SetDynamic(do_omp_dynamic())) {}
 
     ImpactXParticleContainer::ImpactXParticleContainer (amrex::AmrCore* amr_core)
-        : amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
+        : amrex::ParticleContainerPureSoA<RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
     {
         SetParticleSize();
     }
@@ -105,32 +104,26 @@ namespace impactx
         reserveData();
         resizeData();
 
+        // write Real attributes (SoA) to particle initialized zero
         auto& particle_tile = DefineAndReturnParticleTile(0, 0, 0);
 
         /* Create a temporary tile to obtain data from simulation. This data
          * is then copied to the permanent tile which is stored on the particle
          * (particle_tile).
          */
-        using PinnedTile = amrex::ParticleTile<NStructReal, NStructInt, NArrayReal, NArrayInt,
-                amrex::PinnedArenaAllocator>;
+        using PinnedTile = typename ContainerLike<amrex::PinnedArenaAllocator>::ParticleTileType;
         PinnedTile pinned_tile;
         pinned_tile.define(NumRuntimeRealComps(), NumRuntimeIntComps());
 
         for (int i = 0; i < np; i++)
         {
-            ParticleType p;
-            p.id() = ParticleType::NextID();
-            p.cpu() = amrex::ParallelDescriptor::MyProc();
-            p.pos(0) = x[i];
-            p.pos(1) = y[i];
-            p.pos(2) = z[i];
-            // write position, creating cpu id, and particle id
-            pinned_tile.push_back(p);
+            pinned_tile.push_back_int(IntSoA::id, ParticleType::NextID());
+            pinned_tile.push_back_int(IntSoA::cpu, amrex::ParallelDescriptor::MyProc());
         }
 
-        // write Real attributes (SoA) to particle initialized zero
-        DefineAndReturnParticleTile(0, 0, 0);
-
+        pinned_tile.push_back_real(RealSoA::x, x);
+        pinned_tile.push_back_real(RealSoA::y, y);
+        pinned_tile.push_back_real(RealSoA::z, z);
         pinned_tile.push_back_real(RealSoA::ux, px);
         pinned_tile.push_back_real(RealSoA::uy, py);
         pinned_tile.push_back_real(RealSoA::pt, pz);
@@ -142,6 +135,7 @@ namespace impactx
          */
         auto old_np = particle_tile.numParticles();
         auto new_np = old_np + pinned_tile.numParticles();
+        amrex::AllPrint() << "old_np=" << old_np << " new_np=" << new_np << "\n";
         particle_tile.resize(new_np);
         amrex::copyParticles(
                 particle_tile, pinned_tile, 0, old_np, pinned_tile.numParticles());
