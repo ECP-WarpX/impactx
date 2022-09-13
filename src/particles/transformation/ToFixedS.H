@@ -63,7 +63,7 @@ namespace transformation
 
             // compute value of reference ptd = -gamma
             amrex::ParticleReal const argd = 1.0_prt + pow(m_pzd, 2);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(argd > 0.0_prt, "invalid ptd arg (<=0)");
+            AMREX_ASSERT_WITH_MESSAGE(argd > 0.0_prt, "invalid ptd arg (<=0)");
             amrex::ParticleReal const ptdf = argd > 0.0_prt ? -sqrt(argd) : -1.0_prt;
 
             // transform momenta to dynamic units (e.g., so that momenta are

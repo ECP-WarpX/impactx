@@ -47,7 +47,7 @@ void init_ImpactX(py::module& m)
                     inputs_file_exists = true;
                 }
                 AMREX_ALWAYS_ASSERT_WITH_MESSAGE(inputs_file_exists,
-                    "load_inputs_file: invalid filename");
+                    "load_inputs_file: file does not exist: " + filename);
 #endif
 
                 amrex::ParmParse::addfile(filename);
