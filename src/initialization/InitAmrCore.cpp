@@ -64,11 +64,10 @@ namespace details
     AmrCoreData
     init_amr_core ()
     {
+        // note: due to global state, it would be too early to use amrex::Abort() in these functions
         if (!amrex::Initialized())
         {
             default_init_AMReX();
-            // note: due to global state, it would be too early to use amrex::Abort() here
-            //throw std::runtime_error("AMReX must be initialized before ImpactX simulation can be constructed.");
         }
 
         amrex::ParmParse pp_amr("amr");
