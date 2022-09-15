@@ -1,7 +1,15 @@
+#!/usr/bin/env python3
+#
+# Copyright 2022 The ImpactX Community
+#
+# Authors: Axel Huebl
+# License: BSD-3-Clause-LBNL
+#
 # -*- coding: utf-8 -*-
 
 import pytest
 
+import amrex
 from impactx import ImpactX, RefPart, distribution, elements
 
 
@@ -182,3 +190,36 @@ def test_impactx_no_elements():
         match="Beamline lattice has zero elements. Not yet initialized?",
     ):
         sim.evolve()
+
+
+def test_impactx_change_resolution():
+    """
+    This test checks we can change the grid resolution.
+    This is currently a work-around because we cannot yet change the cells
+    after the simulation object as been created.
+    """
+    pp_amr = amrex.ParmParse("amr")
+    pp_amr.addarr("n_cell", [16, 24, 32])
+
+    sim = ImpactX()
+
+    # Future:
+    # sim.ncell = [16, 24, 32]
+    # sim.domain = amrex.RealBox([1., 2., 3.], [4., 5., 6.])
+
+    sim.set_particle_shape(2)
+    sim.set_slice_step_diagnostics(False)
+    sim.set_diagnostics(False)
+    sim.init_grids()
+
+    assert sim.n_cell == [16, 24, 32]
+
+    rho = sim.rho(lev=0)
+    assert rho.nComp == 1
+    assert rho.size == 1
+    assert rho.num_comp == 1
+    # assert rho.nGrowVect == [2, 2, 2]
+    print(f"rho.nGrowVect={rho.nGrowVect}")
+    assert iter(rho).length > 0
+    assert not rho.is_all_cell_centered
+    assert rho.is_all_nodal

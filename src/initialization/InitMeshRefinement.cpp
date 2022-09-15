@@ -8,6 +8,7 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "ImpactX.H"
+#include "initialization/InitAmrCore.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/distribution/Waterbag.H"
 
@@ -36,13 +37,11 @@ namespace impactx
     /** Make a new level from scratch using provided BoxArray and DistributionMapping.
      *
      * Only used during initialization.
-     *
-     * @todo this function is not (yet) implemented.
      */
     void ImpactX::MakeNewLevelFromScratch (int lev, amrex::Real time, const amrex::BoxArray& ba,
                                           const amrex::DistributionMapping& dm)
     {
-        amrex::ignore_unused(time, ba, dm);
+        amrex::ignore_unused(time);
 
         // set human-readable tag for each MultiFab
         auto const tag = [lev]( std::string tagname ) {
@@ -96,8 +95,6 @@ namespace impactx
     }
 
     /** Delete level data
-     *
-     * @todo this function is not (yet) implemented.
      */
     void ImpactX::ClearLevel (int lev)
     {
@@ -116,13 +113,44 @@ namespace impactx
         if (x_min == x_max || y_min == y_max || z_min == z_max)
             throw std::runtime_error("Flat beam detected. This is not yet supported: https://github.com/ECP-WarpX/impactx/issues/44");
 
+        amrex::ParmParse pp_geometry("geometry");
+        bool dynamic_size = true;
+        pp_geometry.query("dynamic_size", dynamic_size);
+
+        amrex::RealBox rb;
+        if (dynamic_size)
+        {
+            // The box is expanded beyond the min and max of particles.
+            // This controlled by the variable `frac` below.
+            amrex::Real frac = 0.1;
+            pp_geometry.query("prob_relative", frac);
+
+            rb = {
+                {x_min - frac * (x_max - x_min), y_min - frac * (y_max - y_min),
+                 z_min - frac * (z_max - z_min)}, // Low bound
+                {x_max + frac * (x_max - x_min), y_max + frac * (y_max - y_min),
+                 z_max + frac * (z_max - z_min)}  // High bound
+            };
+        }
+        else
+        {
+            // note: we read and set the size again because an interactive /
+            //       Python user might have changed it between steps
+            amrex::Vector<amrex::Real> prob_lo;
+            amrex::Vector<amrex::Real> prob_hi;
+            pp_geometry.getarr("prob_lo", prob_lo);
+            pp_geometry.getarr("prob_hi", prob_hi);
+
+            rb = {prob_lo.data(), prob_hi.data()};
+        }
+
+        // updating geometry.prob_lo/hi for consistency
+        amrex::Vector<amrex::Real> const prob_lo = {rb.lo()[0], rb.lo()[1], rb.lo()[2]};
+        amrex::Vector<amrex::Real> const prob_hi = {rb.hi()[0], rb.hi()[1], rb.hi()[2]};
+        pp_geometry.addarr("prob_lo", prob_lo);
+        pp_geometry.addarr("prob_hi", prob_hi);
+
         // Resize the domain size
-        // The box is expanded slightly beyond the min and max of particles.
-        // This controlled by the variable `frac` below.
-        const amrex::Real frac=0.1;
-        amrex::RealBox rb(
-            {x_min-frac*(x_max-x_min), y_min-frac*(y_max-y_min), z_min-frac*(z_max-z_min)}, // Low bound
-            {x_max+frac*(x_max-x_min), y_max+frac*(y_max-y_min), z_max+frac*(z_max-z_min)}); // High bound
         amrex::Geometry::ResetDefaultProbDomain(rb);
         for (int lev = 0; lev <= this->max_level; ++lev) {
             amrex::Geometry g = Geom(lev);

@@ -15,6 +15,7 @@
 
 #include <AMReX.H>
 #include <AMReX_ParmParse.H>
+#include <AMReX_ParallelDescriptor.H>
 
 #if defined(AMREX_DEBUG) || defined(DEBUG)
 #   include <cstdio>
@@ -52,6 +53,85 @@ void init_ImpactX(py::module& m)
 
                 amrex::ParmParse::addfile(filename);
             })
+
+        .def_property("n_cell",
+            [](ImpactX & /* ix */) {
+                std::vector<int> n_cell;
+                amrex::ParmParse pp_amr("amr");
+                pp_amr.getarr("n_cell", n_cell);
+                return n_cell;
+            },
+            [](ImpactX & /* ix */, std::array<int, AMREX_SPACEDIM> /* n_cell */) {
+                throw std::runtime_error("setting n_cell is not yet implemented");
+                /*
+                amrex::ParmParse pp_amr("amr");
+                amrex::Vector<int> const n_cell_v(n_cell.begin(), n_cell.end());
+                pp_amr.addarr("n_cell", n_cell_v);
+
+                int const max_level = ix.maxLevel();
+                for (int lev=0; lev<=max_level; lev++) {
+                    ix.ClearLevel(lev);
+                    // TODO: more...
+                }
+                if (amrex::ParallelDescriptor::IOProcessor())
+                    ix.printGridSummary(amrex::OutStream(), 0, max_level);
+                */
+            },
+            "The number of grid points along each direction on the coarsest level."
+        )
+
+        .def_property("domain",
+            [](ImpactX & /* ix */) {
+                amrex::ParmParse pp_geometry("geometry");
+                amrex::Vector<amrex::Real> prob_lo;
+                amrex::Vector<amrex::Real> prob_hi;
+                pp_geometry.getarr("prob_lo", prob_lo);
+                pp_geometry.getarr("prob_hi", prob_hi);
+                amrex::RealBox rb(prob_lo.data(), prob_hi.data());
+                return rb;
+            },
+            [](ImpactX & ix, amrex::RealBox rb) {
+                amrex::ParmParse pp_geometry("geometry");
+                amrex::RealVect const prob_lo_rv(rb.lo());
+                amrex::Vector<amrex::Real> const prob_lo_v({rb.lo()[0], rb.lo()[1], rb.lo()[2]});
+                amrex::Vector<amrex::Real> const prob_hi_v({rb.hi()[0], rb.hi()[1], rb.hi()[2]});
+                pp_geometry.addarr("prob_lo", prob_lo_v);
+                pp_geometry.addarr("prob_hi", prob_hi_v);
+
+                pp_geometry.add("dynamic_size", false);
+
+                ix.ResizeMesh();
+            },
+            "The physical extent of the full simulation domain, relative to the reference particle position, in meters."
+        )
+
+        .def_property("prob_relative",
+              [](ImpactX & /* ix */) {
+                  amrex::ParmParse pp_geometry("geometry");
+                  amrex::Real frac;
+                  pp_geometry.get("prob_relative", frac);
+                  return frac;
+              },
+              [](ImpactX & /* ix */, amrex::Real frac) {
+                  amrex::ParmParse pp_geometry("geometry");
+                  pp_geometry.add("prob_relative", frac);
+              },
+              "The field mesh is expanded beyond the physical extent of particles by this factor."
+        )
+
+        .def_property("dynamic_size",
+              [](ImpactX & /* ix */) {
+                  amrex::ParmParse pp_geometry("geometry");
+                  bool dynamic_size;
+                  pp_geometry.get("dynamic_size", dynamic_size);
+                  return dynamic_size;
+              },
+              [](ImpactX & /* ix */, bool dynamic_size) {
+                  amrex::ParmParse pp_geometry("geometry");
+                  pp_geometry.add("dynamic_size", dynamic_size);
+              },
+              "Use dynamic (``true``) resizing of the field mesh or static sizing (``false``)."
+        )
 
         .def("set_particle_shape",
             [](ImpactX & ix, int const order) {
