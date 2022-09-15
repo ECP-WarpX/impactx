@@ -48,6 +48,9 @@ namespace details
         amrex::Vector<amrex::Real> prob_hi(undefined_geometry_prob_hi.begin(), undefined_geometry_prob_hi.end());
         if (dynamic_size)
         {
+            // read and conditionally overwrite problem domain size:
+            //   users might switch to !dynamic_size after init and we don't
+            //   want to overwrite their inputs
             pp_geometry.queryAdd("prob_lo", prob_lo);
             pp_geometry.queryAdd("prob_hi", prob_hi);
         }

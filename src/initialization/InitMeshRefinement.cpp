@@ -134,6 +134,8 @@ namespace impactx
         }
         else
         {
+            // note: we read and set the size again because an interactive /
+            //       Python user might have changed it between steps
             amrex::Vector<amrex::Real> prob_lo;
             amrex::Vector<amrex::Real> prob_hi;
             pp_geometry.getarr("prob_lo", prob_lo);
