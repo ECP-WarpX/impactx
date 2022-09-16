@@ -58,13 +58,13 @@ print("Initial Beam:")
 meanH, sigH, meanI, sigI = get_moments(initial)
 print(f"  meanH={meanH:e} sigH={sigH:e} meanI={meanI:e} sigI={sigI:e}")
 
-atol = 1.0  # a big number
-rtol = num_particles**-0.5  # from random sampling of a smooth distribution
+atol = 0.0  # a big number
+rtol = 1.5 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
     [meanH, sigH, meanI, sigI],
-    [1.604948e-01, 1.757985e-01, 2.882956e-01, 3.844099e-01],
+    [4.122650e-02, 4.235181e-02, 7.356057e-02, 8.793753e-02],
     rtol=rtol,
     atol=atol,
 )
@@ -75,13 +75,13 @@ print("Final Beam:")
 meanH, sigH, meanI, sigI = get_moments(final)
 print(f"  meanH={meanH:e} sigH={sigH:e} meanI={meanI:e} sigI={sigI:e}")
 
-atol = 1.0  # a big number
-rtol = num_particles**-0.5  # from random sampling of a smooth distribution
+atol = 0.0  # a big number
+rtol = 1.5 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
     [meanH, sigH, meanI, sigI],
-    [1.605336e-01, 1.756235e-01, 2.880581e-01, 3.839625e-01],
+    [4.122704e-02, 4.230576e-02, 7.348275e-02, 8.783157e-02],
     rtol=rtol,
     atol=atol,
 )
@@ -95,7 +95,7 @@ beam_joined["dI"] = (beam_joined["I_initial"] - beam_joined["I_final"]).abs()
 
 # particle-wise comparison of H & I initial to final
 atol = 2.0e-3
-rtol = 1.0  # large number
+rtol = 0.0  # large number
 print()
 print(f"  atol={atol} (ignored: rtol~={rtol})")
 
