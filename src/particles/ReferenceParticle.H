@@ -10,6 +10,8 @@
 #ifndef IMPACTX_REFERENCE_PARTICLE_H
 #define IMPACTX_REFERENCE_PARTICLE_H
 
+#include <ablastr/constant.H>
+
 #include <AMReX_BLassert.H>
 #include <AMReX_Extension.H>
 #include <AMReX_GpuQualifiers.H>
@@ -89,8 +91,8 @@ namespace impactx
         {
             using namespace amrex::literals;
 
-            constexpr double MeVc2_kg = 1.78266192e-30;
-            return amrex::ParticleReal(mass / MeVc2_kg);
+            constexpr amrex::ParticleReal inv_MeV_invc2 = ablastr::constant::SI::MeV_invc2;
+            return amrex::ParticleReal(mass * inv_MeV_invc2);
         }
 
         /** Set reference particle rest mass
@@ -106,8 +108,7 @@ namespace impactx
             AMREX_ASSERT_WITH_MESSAGE(massE != 0.0_prt,
                                       "set_mass_MeV: Mass cannot be zero!");
 
-            constexpr amrex::ParticleReal MeVc2_kg = 1.78266192e-30;
-            mass = massE * MeVc2_kg;
+            mass = massE * ablastr::constant::SI::MeV_invc2;
 
             // re-scale pt and pz
             if (pt != 0.0_prt)
@@ -165,8 +166,8 @@ namespace impactx
         {
             using namespace amrex::literals;
 
-            constexpr double qe = 1.602176634e-19;
-            return amrex::ParticleReal(charge / qe);
+            constexpr amrex::ParticleReal inv_qe = ablastr::constant::SI::q_e;
+            return amrex::ParticleReal(charge * inv_qe);
         }
 
         /** Set reference particle charge
@@ -179,8 +180,7 @@ namespace impactx
         {
             using namespace amrex::literals;
 
-            constexpr double qe = 1.602176634e-19;
-            this->charge = charge_qe * qe;
+            this->charge = charge_qe * ablastr::constant::SI::q_e;
 
             return *this;
         }
