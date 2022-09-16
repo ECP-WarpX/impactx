@@ -52,7 +52,7 @@ def test_charge_deposition(save_png=True):
     dV = np.prod(dr)
 
     beam_charge = dV * rs  # in C
-    assert math.isclose(beam_charge, 1.0e-9)
+    assert math.isclose(beam_charge, -1.0e-9, rel_tol=1.0e-8)
 
     half_z = sim.n_cell[2] // 2  # order: x,y,z
 
