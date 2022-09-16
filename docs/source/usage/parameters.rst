@@ -50,12 +50,24 @@ Setting up the field mesh
 
     Example: for three levels, a value of ``2 2 4 8 8 16`` refines the first level by 2-fold in x and y and 4-fold in z compared to the coarsest level (level 0/mother grid); compared to the first level, the second level is refined 8-fold in x and y and 16-fold in z.
 
+.. note::
+
+   Field boundaries for space charge calculation are located at the outer ends of the field mesh.
+   We currently assume `Dirichlet boundary conditions <https://en.wikipedia.org/wiki/Dirichlet_boundary_condition>`__ with zero potential (a mirror charge).
+   Thus, to emulate open boundaries, consider adding enough vacuum padding to the beam.
+   This will be improved in future versions.
+
+.. note::
+
+   Particles that move outside the simulation domain are removed.
+
 * ``geometry.dynamic_size`` (``boolean``) optional (default: ``true`` for dynamic)
     Use dynamic (``true``) resizing of the field mesh, via ``geometry.prob_relative``, or static sizing (``false``), via ``geometry.prob_lo``/``geometry.prob_hi``.
 
-* ``geometry.prob_relative`` (``float``, unitless) optional (default: ``0.1``)
+* ``geometry.prob_relative`` (positive ``float``, unitless) optional (default: ``1.0``)
     By default, we dynamically extract the minimum and maximum of the particle positions in the beam.
-    The field mesh is expanded beyond the physical extent of particles by this factor.
+    The field mesh is expanded, per direction, beyond the physical extent of particles by this factor.
+    For instance, ``0.1`` means 10% more cells above and below the beam for vacuum; ``1.0`` means twice as many cells as covered by the beam are used, per direction, for vacuump padding.
 
 * ``geometry.prob_lo`` and ``geometry.prob_hi`` (3 floats, in meters) optional (required if ``geometry.dynamic_size`` is ``false``)
     The extent of the full simulation domain relative to the reference particle position.
@@ -63,8 +75,6 @@ Setting up the field mesh
 
     This box is rectangular, and thus its extent is given here by the coordinates of the lower corner (``geometry.prob_lo``) and upper corner (``geometry.prob_hi``).
     The first axis of the coordinates is x and the last is z.
-
-    Note: particles that move outside the simulation domain are removed.
 
 
 .. _running-cpp-parameters-bc:
