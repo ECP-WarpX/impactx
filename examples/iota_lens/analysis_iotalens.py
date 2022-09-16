@@ -58,7 +58,7 @@ print("Initial Beam:")
 meanH, sigH, meanI, sigI = get_moments(initial)
 print(f"  meanH={meanH:e} sigH={sigH:e} meanI={meanI:e} sigI={sigI:e}")
 
-atol = 1.0  # a big number
+atol = 0.0  # ignored
 rtol = num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
@@ -75,7 +75,7 @@ print("Final Beam:")
 meanH, sigH, meanI, sigI = get_moments(final)
 print(f"  meanH={meanH:e} sigH={sigH:e} meanI={meanI:e} sigI={sigI:e}")
 
-atol = 1.0  # a big number
+atol = 0.0  # ignored
 rtol = num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
