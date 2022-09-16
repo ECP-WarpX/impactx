@@ -12,6 +12,8 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/distribution/Waterbag.H"
 
+#include <ablastr/warn_manager/WarnManager.H>
+
 #include <AMReX.H>
 #include <AMReX_BLProfiler.H>
 #include <AMReX_REAL.H>
@@ -122,8 +124,22 @@ namespace impactx
         {
             // The box is expanded beyond the min and max of particles.
             // This controlled by the variable `frac` below.
-            amrex::Real frac = 0.1;
+            amrex::Real frac = 1.0;
             pp_geometry.query("prob_relative", frac);
+
+            if (frac < 1.0)
+                ablastr::warn_manager::WMRecordWarning(
+                    "ImpactX::ResizeMesh",
+                    "Dynamic resizing of the mesh uses a geometry.prob_relative "
+                    "padding of less than 1. This might result in boundary "
+                    "artifacts for space charge calculation. "
+                    "There is no minimum good value for this parameter, consider "
+                    "doing a convergence test.",
+                    ablastr::warn_manager::WarnPriority::high
+                );
+
+            if (frac < 0.0)
+                throw std::runtime_error("geometry.prob_relative must be positive");
 
             rb = {
                 {x_min - frac * (x_max - x_min), y_min - frac * (y_max - y_min),
