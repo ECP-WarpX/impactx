@@ -1,7 +1,7 @@
 .. _examples-expanding:
 
 Expanding Beam in Free Space
-=============================
+============================
 
 A coasting bunch expanding freely in free space under its own space charge.
 
