@@ -124,8 +124,9 @@ namespace impactx
                 {
 
                     // transform from x',y',t to x,y,z
-                    transformation::CoordinateTransformation(*m_particle_container,
-                                                             transformation::Direction::to_fixed_t);
+                    transformation::CoordinateTransformation(
+                        *m_particle_container,
+                        transformation::Direction::to_fixed_t);
 
                     // Note: The following operation assume that
                     // the particles are in x, y, z coordinates.
@@ -150,7 +151,10 @@ namespace impactx
                     // gather and space-charge push in x,y,z , assuming the space-charge
                     // field is the same before/after transformation
                     // TODO: This is currently using linear order.
-                    spacecharge::GatherAndPush(*m_particle_container, m_space_charge_field, this->geom, slice_ds);
+                    spacecharge::GatherAndPush(*m_particle_container,
+                                               m_space_charge_field,
+                                               this->geom,
+                                               slice_ds);
 
                     // transform from x,y,z to x',y',t
                     transformation::CoordinateTransformation(*m_particle_container,

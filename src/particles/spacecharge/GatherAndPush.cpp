@@ -45,16 +45,13 @@ namespace impactx::spacecharge
             using ParIt = ImpactXParticleContainer::iterator;
             for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
                 const int np = pti.numParticles();
-                //const auto t_lev = pti.GetLevel();
-                //const auto index = pti.GetPairIndex();
-                // ...
 
-                //
-                auto scf_arr_x = space_charge_field.at(lev).at("x")[pti].array();
-                auto scf_arr_y = space_charge_field.at(lev).at("y")[pti].array();
-                auto scf_arr_z = space_charge_field.at(lev).at("z")[pti].array();
+                // get the device pointer-wrapper Array4 for 3D field access
+                auto const scf_arr_x = space_charge_field.at(lev).at("x")[pti].array();
+                auto const scf_arr_y = space_charge_field.at(lev).at("y")[pti].array();
+                auto const scf_arr_z = space_charge_field.at(lev).at("z")[pti].array();
 
-                // ...
+                // physical constants and reference quantities
                 amrex::ParticleReal const c0_SI = 2.99792458e8;  // TODO move out
                 amrex::ParticleReal const mc_SI = pc.GetRefParticle().mass * c0_SI;
                 amrex::ParticleReal const pz_ref_SI = pc.GetRefParticle().beta_gamma() * mc_SI;
@@ -65,8 +62,8 @@ namespace impactx::spacecharge
 
                 // preparing access to particle data: AoS
                 using PType = ImpactXParticleContainer::ParticleType;
-                auto& aos = pti.GetArrayOfStructs();
-                PType* AMREX_RESTRICT aos_ptr = aos().dataPtr();
+                auto const & aos = pti.GetArrayOfStructs();
+                PType const * const AMREX_RESTRICT aos_ptr = aos().dataPtr();
 
                 // preparing access to particle data: SoA of Reals
                 auto& soa_real = pti.GetStructOfArrays().GetRealData();
@@ -74,7 +71,10 @@ namespace impactx::spacecharge
                 amrex::ParticleReal* const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
                 amrex::ParticleReal* const AMREX_RESTRICT part_pz = soa_real[RealSoA::pt].dataPtr(); // note: currently in z
 
-                // ...
+                // group together constants for the momentum push
+                amrex::ParticleReal const push_consts = dt * charge * inv_gamma2 / pz_ref_SI;
+
+                // gather to each particle and push momentum
                 amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE (int i) {
                     // access AoS data such as positions and cpu/id
                     PType const & AMREX_RESTRICT p = aos_ptr[i];
@@ -93,9 +93,9 @@ namespace impactx::spacecharge
                             prob_lo);
 
                     // push momentum
-                    px += dt * charge * field_interp[0] * inv_gamma2 / pz_ref_SI;
-                    py += dt * charge * field_interp[1] * inv_gamma2 / pz_ref_SI;
-                    pz += dt * charge * field_interp[2] * inv_gamma2 / pz_ref_SI;
+                    px += field_interp[0] * push_consts;
+                    py += field_interp[1] * push_consts;
+                    pz += field_interp[2] * push_consts;
 
                     // push position is done in the lattice elements
                 });

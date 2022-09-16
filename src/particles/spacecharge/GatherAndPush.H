@@ -22,9 +22,12 @@
 
 namespace impactx::spacecharge
 {
-    /** Gather force fields and push particles
+    /** Gather force fields and push particles in x,y,z
      *
-     * details ... ...
+     * This gathers the space charge field with respect to particle position
+     * and shape. The momentum of all particles is then pushed using a common
+     * time step given by the reference particle speed and ds slice. The
+     * position push is done in the lattice elements and not here.
      *
      * @param[inout] pc container of the particles that deposited rho
      * @param[in] space_charge_field space charge force component in x,y,z per level
