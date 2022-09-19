@@ -290,6 +290,16 @@ add_impactx_test(expanding_beam
     OFF  # no plot script yet
 )
 
+# Python: Expanding Beam Test #########################################################
+#
+add_impactx_test(expanding_beam.py
+    examples/expanding_beam/run_expanding.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/expanding_beam/analysis_expanding.py
+    OFF  # no plot script yet
+)
+
 # Python: Chain of Multipoles Test #########################################################
 #
 add_impactx_test(multipole.py
