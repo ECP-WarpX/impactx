@@ -91,7 +91,7 @@ namespace impactx
         {
             using namespace amrex::literals;
 
-            constexpr amrex::ParticleReal inv_MeV_invc2 = ablastr::constant::SI::MeV_invc2;
+            constexpr amrex::ParticleReal inv_MeV_invc2 = 1.0_prt /  ablastr::constant::SI::MeV_invc2;
             return amrex::ParticleReal(mass * inv_MeV_invc2);
         }
 
@@ -166,7 +166,7 @@ namespace impactx
         {
             using namespace amrex::literals;
 
-            constexpr amrex::ParticleReal inv_qe = ablastr::constant::SI::q_e;
+            constexpr amrex::ParticleReal inv_qe = 1.0_prt / ablastr::constant::SI::q_e;
             return amrex::ParticleReal(charge * inv_qe);
         }
 
