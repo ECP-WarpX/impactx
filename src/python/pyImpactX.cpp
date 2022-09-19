@@ -55,7 +55,7 @@ PYBIND11_MODULE(impactx_pybind, m) {
 
     // authors
     m.attr("__author__") =
-        "Axel Huebl, Chad Mitchell, Ryan Sandberg, Ji Qiang, et al.";
+        "Axel Huebl, Chad Mitchell, Ryan Sandberg, Marco Garten, Ji Qiang, et al.";
 
     // API runtime build-time feature variants
     // m.attr("variants") = impactx::getVariants();
