@@ -244,8 +244,8 @@ setup(
     # Python sources:
     package_dir={"": "src/python"},
     # ImpactX authors:
-    author="Axel Huebl, Chad Mitchell, Ryan Sandberg, Ji Qiang, et al.",
-    author_email="axelhuebl@lbl.gov, chadmitchell@lbl.gov, RSandberg@lbl.gov, jqiang@lbl.gov",
+    author="Axel Huebl, Chad Mitchell, Ryan Sandberg, Marco Garten, Ji Qiang, et al.",
+    author_email="axelhuebl@lbl.gov, chadmitchell@lbl.gov, rsandberg@lbl.gov, mgarten@lbl.gov, jqiang@lbl.gov",
     # wheel/pypi packages:
     maintainer="Axel Huebl, Chad Mitchell, Ji Qiang",
     maintainer_email="axelhuebl@lbl.gov, chadmitchell@lbl.gov, jqiang@lbl.gov",
