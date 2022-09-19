@@ -25,6 +25,11 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
         return()
     endif()
 
+    # cannot run MPI tests w/o MPI support
+    if(is_mpi AND NOT ImpactX_MPI)
+        return()
+    endif()
+
     # make a unique run directory
     file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name})
 
