@@ -24,41 +24,28 @@
 
 namespace impactx
 {
+    bool do_omp_dynamic () {
+        bool do_dynamic = false;
+        amrex::ParmParse pp_impactx("impactx");
+        pp_impactx.query("do_dynamic_scheduling", do_dynamic);
+        return do_dynamic;
+    }
+
     ParIter::ParIter (ContainerType& pc, int level)
         : amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
-              amrex::MFItInfo().SetDynamic( []() -> bool {
-                  bool do_dynamic = false;
-                  amrex::ParmParse pp_impactx("impactx");
-                  pp_impactx.query("do_dynamic_scheduling", do_dynamic);
-                  return do_dynamic; }()))
-    {}
+                   amrex::MFItInfo().SetDynamic(do_omp_dynamic())) {}
 
     ParIter::ParIter (ContainerType& pc, int level, amrex::MFItInfo& info)
         : amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
-              info.SetDynamic( []() -> bool {
-                  bool do_dynamic = false;
-                  amrex::ParmParse pp_impactx("impactx");
-                  pp_impactx.query("do_dynamic_scheduling", do_dynamic);
-                  return do_dynamic; }()))
-    {}
+              info.SetDynamic(do_omp_dynamic())) {}
 
     ParConstIter::ParConstIter (ContainerType& pc, int level)
         : amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
-              amrex::MFItInfo().SetDynamic( []() -> bool {
-                  bool do_dynamic = false;
-                  amrex::ParmParse pp_impactx("impactx");
-                  pp_impactx.query("do_dynamic_scheduling", do_dynamic);
-                  return do_dynamic; }()))
-    {}
+              amrex::MFItInfo().SetDynamic(do_omp_dynamic())) {}
 
     ParConstIter::ParConstIter (ContainerType& pc, int level, amrex::MFItInfo& info)
         : amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
-              info.SetDynamic( []() -> bool {
-                  bool do_dynamic = false;
-                  amrex::ParmParse pp_impactx("impactx");
-                  pp_impactx.query("do_dynamic_scheduling", do_dynamic);
-                  return do_dynamic; }()))
-    {}
+              info.SetDynamic(do_omp_dynamic())) {}
 
     ImpactXParticleContainer::ImpactXParticleContainer (amrex::AmrCore* amr_core)
         : amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
