@@ -45,26 +45,14 @@ namespace impactx
 
     }
 
-    void ImpactX::warn_logger_control()
+    void ImpactX::warn_logger_control ()
     {
         amrex::ParmParse pp_impactx("impactx");
-
-        //"Synthetic" warning messages may be injected in the Warning Manager via
-        // inputfile for debug&testing purposes.
-        ablastr::warn_manager::GetWMInstance().debug_read_warnings_from_input(pp_impactx);
 
         // Set the flag to control if ImpactX has to emit a warning message as soon as a warning is recorded
         bool always_warn_immediately = false;
         pp_impactx.query("always_warn_immediately", always_warn_immediately);
         ablastr::warn_manager::GetWMInstance().SetAlwaysWarnImmediately(always_warn_immediately);
-
-        ablastr::warn_manager::WMRecordWarning(
-                "ImpactX::add_particles",
-                "The bunch charge is set to zero. ImpactX will run with "
-                "zero-weighted particles. Did you mean to set the space "
-                "charge algorithm to off instead?",
-                ablastr::warn_manager::WarnPriority::medium
-        );
 
         // Set the WarnPriority threshold to decide if ImpactX has to abort when a warning is recorded
         if(std::string str_abort_on_warning_threshold = "";
@@ -80,8 +68,13 @@ namespace impactx
                 amrex::Abort(ablastr::utils::TextMsg::Err(str_abort_on_warning_threshold
                                                           +"is not a valid option for impactx.abort_on_warning_threshold (use: low, medium or high)"));
             }
+            amrex::AllPrint() << "str_abort_on_warning_threshold=" << str_abort_on_warning_threshold << "\n";
             ablastr::warn_manager::GetWMInstance().SetAbortThreshold(abort_on_warning_threshold);
         }
+
+        // "Synthetic" warning messages may be injected in the Warning Manager via
+        // inputfile for debug&testing purposes.
+        ablastr::warn_manager::GetWMInstance().debug_read_warnings_from_input(pp_impactx);
     }
 
     void ImpactX::initGrids ()
