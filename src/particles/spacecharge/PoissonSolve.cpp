@@ -52,8 +52,8 @@ namespace impactx::spacecharge
         amrex::Real const mlmg_relative_tolerance = 1.e-7; // relative TODO: make smaller for SP
         amrex::Real const mlmg_absolute_tolerance = 0.0;   // ignored
 
-        int const mlmg_max_iters = 100;
-        int const mlmg_verbosity = 1;
+        int const mlmg_max_iters = 250;
+        int const mlmg_verbosity = 2;
 
         struct PoissonBoundaryHandler {
             amrex::Array<amrex::LinOpBCType, AMREX_SPACEDIM> const lobc = {
