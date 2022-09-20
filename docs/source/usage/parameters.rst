@@ -99,12 +99,12 @@ Initial Beam Distributions
     * ``waterbag`` for initial Waterbag distribution.
       With additional parameters:
 
-        * ``<distribution>.sigx`` (``float``, in meters) rms X
-        * ``<distribution>.sigy`` (``float``, in meters) rms Y
-        * ``<distribution>.sigt`` (``float``, in radian) rms normalized time difference T
-        * ``<distribution>.sigpx`` (``float``, in momentum) rms Px
-        * ``<distribution>.sigpy`` (``float``, in momentum) rms Py
-        * ``<distribution>.sigpt`` (``float``, in energy deviation) rms Pt
+        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
+        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
+        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
+        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
+        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
         * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
         * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
@@ -112,12 +112,12 @@ Initial Beam Distributions
     * ``kurth6d`` for initial 6D Kurth distribution.
       With additional parameters:
 
-        * ``<distribution>.sigx`` (``float``, in meters) rms X
-        * ``<distribution>.sigy`` (``float``, in meters) rms Y
-        * ``<distribution>.sigt`` (``float``, in radian) rms normalized time difference T
-        * ``<distribution>.sigpx`` (``float``, in momentum) rms Px
-        * ``<distribution>.sigpy`` (``float``, in momentum) rms Py
-        * ``<distribution>.sigpt`` (``float``, in energy deviation) rms Pt
+        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
+        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
+        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
+        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
+        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
         * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
         * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
@@ -125,12 +125,12 @@ Initial Beam Distributions
     * ``gaussian`` for initial 6D Gaussian (normal) distribution.
       With additional parameters:
 
-        * ``<distribution>.sigx`` (``float``, in meters) rms X
-        * ``<distribution>.sigy`` (``float``, in meters) rms Y
-        * ``<distribution>.sigt`` (``float``, in radian) rms normalized time difference T
-        * ``<distribution>.sigpx`` (``float``, in momentum) rms Px
-        * ``<distribution>.sigpy`` (``float``, in momentum) rms Py
-        * ``<distribution>.sigpt`` (``float``, in energy deviation) rms Pt
+        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
+        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
+        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
+        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
+        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
         * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
         * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
@@ -139,12 +139,12 @@ Initial Beam Distributions
       The distribution is uniform in t and Gaussian in pt.
       With additional parameters:
 
-        * ``<distribution>.sigx`` (``float``, in meters) rms X
-        * ``<distribution>.sigy`` (``float``, in meters) rms Y
-        * ``<distribution>.sigt`` (``float``, in radian) rms normalized time difference T
-        * ``<distribution>.sigpx`` (``float``, in momentum) rms Px
-        * ``<distribution>.sigpy`` (``float``, in momentum) rms Py
-        * ``<distribution>.sigpt`` (``float``, in energy deviation) rms Pt
+        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
+        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
+        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
+        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
+        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
         * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
         * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
@@ -153,12 +153,12 @@ Initial Beam Distributions
       The distribution is uniform in t and Gaussian in pt.
       With additional parameters:
 
-        * ``<distribution>.sigx`` (``float``, in meters) rms X
-        * ``<distribution>.sigy`` (``float``, in meters) rms Y
-        * ``<distribution>.sigt`` (``float``, in radian) rms normalized time difference T
-        * ``<distribution>.sigpx`` (``float``, in momentum) rms Px
-        * ``<distribution>.sigpy`` (``float``, in momentum) rms Py
-        * ``<distribution>.sigpt`` (``float``, in energy deviation) rms Pt
+        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
+        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
+        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
+        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
+        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
         * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
         * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
@@ -167,12 +167,12 @@ Initial Beam Distributions
       in momenta (px,py,pt).
       With additional parameters:
 
-        * ``<distribution>.sigx`` (``float``, in meters) rms X
-        * ``<distribution>.sigy`` (``float``, in meters) rms Y
-        * ``<distribution>.sigt`` (``float``, in radian) rms normalized time difference T
-        * ``<distribution>.sigpx`` (``float``, in momentum) rms Px
-        * ``<distribution>.sigpy`` (``float``, in momentum) rms Py
-        * ``<distribution>.sigpt`` (``float``, in energy deviation) rms Pt
+        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
+        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
+        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
+        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
+        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
         * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
         * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
