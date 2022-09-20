@@ -11,6 +11,7 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/distribution/All.H"
 
+#include <ablastr/constant.H>
 #include <ablastr/warn_manager/WarnManager.H>
 
 #include <AMReX.H>
@@ -122,16 +123,21 @@ namespace impactx
 
         amrex::ParticleReal qe;     // charge (elementary charge)
         amrex::ParticleReal massE;  // MeV/c^2
-        if(particle_type == "electron") {
+        if (particle_type == "electron") {
             qe = -1.0;
-            massE = 0.510998950;
-        } else if(particle_type == "proton") {
+            massE = ablastr::constant::SI::m_e / ablastr::constant::SI::MeV_invc2;
+        } else if (particle_type == "proton") {
             qe = 1.0;
-            massE = 938.27208816;
+            massE = ablastr::constant::SI::m_p / ablastr::constant::SI::MeV_invc2;
         }
         else {  // default to electron
+            ablastr::warn_manager::WMRecordWarning(
+                "ImpactX::initBeamDistributionFromInputs",
+                "No beam.particle specified, defaulting to electrons.",
+                ablastr::warn_manager::WarnPriority::low
+            );
             qe = -1.0;
-            massE = 0.510998950;
+            massE = ablastr::constant::SI::m_e / ablastr::constant::SI::MeV_invc2;
         }
 
         // set charge and mass and energy of ref particle
