@@ -124,8 +124,12 @@ namespace impactx
         /** these are the physical/beam particles of the simulation */
         std::unique_ptr<ImpactXParticleContainer> m_particle_container;
 
-        /** charge per level */
+        /** charge density per level */
         std::unordered_map<int, amrex::MultiFab> m_rho;
+        /** scalar potential per level */
+        std::unordered_map<int, amrex::MultiFab> m_phi;
+        /** space charge field (vector) per level */
+        std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > m_space_charge_field;
 
         /** these are elements defining the accelerator lattice */
         std::list<KnownElements> m_lattice;

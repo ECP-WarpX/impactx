@@ -11,8 +11,11 @@
 #include "initialization/InitAmrCore.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
-#include "particles/transformation/CoordinateTransformation.H"
 #include "particles/diagnostics/DiagnosticOutput.H"
+#include "particles/spacecharge/ForceFromSelfFields.H"
+#include "particles/spacecharge/GatherAndPush.H"
+#include "particles/spacecharge/PoissonSolve.H"
+#include "particles/transformation/CoordinateTransformation.H"
 
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
@@ -101,7 +104,11 @@ namespace impactx
         {
             // number of slices used for the application of space charge
             int nslice = 1;
-            std::visit([&nslice](auto&& element){ nslice = element.nslice(); }, element_variant);
+            amrex::ParticleReal slice_ds; // in meters
+            std::visit([&nslice, &slice_ds](auto&& element){
+                nslice = element.nslice();
+                slice_ds = element.ds() / nslice;
+            }, element_variant);
 
             // sub-steps for space charge within the element
             for (int slice_step = 0; slice_step < nslice; ++slice_step)
@@ -117,8 +124,9 @@ namespace impactx
                 {
 
                     // transform from x',y',t to x,y,z
-                    transformation::CoordinateTransformation(*m_particle_container,
-                                                             transformation::Direction::to_fixed_t);
+                    transformation::CoordinateTransformation(
+                        *m_particle_container,
+                        transformation::Direction::to_fixed_t);
 
                     // Note: The following operation assume that
                     // the particles are in x, y, z coordinates.
@@ -133,11 +141,20 @@ namespace impactx
                     m_particle_container->DepositCharge(m_rho, this->refRatio());
 
                     // poisson solve in x,y,z
-                    //   TODO
+                    spacecharge::PoissonSolve(*m_particle_container, m_rho, m_phi);
+
+                    // calculate force in x,y,z
+                    spacecharge::ForceFromSelfFields(m_space_charge_field,
+                                                     m_phi,
+                                                     this->geom);
 
                     // gather and space-charge push in x,y,z , assuming the space-charge
                     // field is the same before/after transformation
-                    //   TODO
+                    // TODO: This is currently using linear order.
+                    spacecharge::GatherAndPush(*m_particle_container,
+                                               m_space_charge_field,
+                                               this->geom,
+                                               slice_ds);
 
                     // transform from x,y,z to x',y',t
                     transformation::CoordinateTransformation(*m_particle_container,
