@@ -209,6 +209,35 @@ void init_ImpactX(py::module& m)
              "The minimum number of digits (default: 6) used for the step\n"
              "number appended to the diagnostic file names."
          )
+        .def("set_abort_on_warning_threshold",
+             [](ImpactX & /* ix */, std::string const abort_on_warning_threshold) {
+                 amrex::ParmParse pp_impactx("impactx");
+                 pp_impactx.add("abort_on_warning_threshold", abort_on_warning_threshold);
+             },
+             py::arg("abort_on_warning_threshold"),
+             "Set WarnPriority threshold to decide if ImpactX\n"
+             "has to abort when a warning is recorded.\n"
+             "Valid choices are: ['low', 'medium', 'high']."
+        )
+        .def("set_always_warn_immediately",
+                 [](ImpactX & /* ix */, int const always_warn_immediately) {
+                     amrex::ParmParse pp_impactx("impactx");
+                     pp_impactx.add("always_warn_immediately", always_warn_immediately);
+                 },
+                 py::arg("always_warn_immediately"),
+                 "If set to 1, immediately prints every warning message\n"
+                 " as soon as it is generated."
+        )
+        // TODO this is an integer with 0 or 1 - can I just make this a boolean here?
+        .def("set_abort_on_unused_parameters",
+                 [](ImpactX & /* ix */, int const abort_on_unused_inputs) {
+                     amrex::ParmParse pp_amrex("amrex");
+                     pp_amrex.add("abort_on_unused_inputs", abort_on_unused_inputs);
+                 },
+                 py::arg("abort_on_unused_inputs"),
+                 "Configure simulation to abort AFTER it has run\n"
+                 "if there are unused parameters in the input."
+        )
 
         .def("init_grids", &ImpactX::initGrids,
              "Initialize AMReX blocks/grids for domain decomposition & space charge mesh.\n\n"
