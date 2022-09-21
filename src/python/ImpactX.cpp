@@ -135,9 +135,9 @@ void init_ImpactX(py::module& m)
 
         .def_property("particle_shape",
             [](ImpactX & /* ix */) {
-                amrex::ParmParse pp_ago("algo");
+                amrex::ParmParse pp_algo("algo");
                 int order = 0;
-                bool const has_shape = pp_ago.query("particle_shape", order);
+                bool const has_shape = pp_algo.query("particle_shape", order);
                 if (!has_shape)
                     throw std::runtime_error("particle_shape is not set yet");
                 return order;
