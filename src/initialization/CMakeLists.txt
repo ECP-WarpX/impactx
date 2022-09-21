@@ -8,4 +8,5 @@ target_sources(ImpactX
     InitMeshRefinement.cpp
     InitParser.cpp
     Validate.cpp
+    Warnings.cpp
 )
