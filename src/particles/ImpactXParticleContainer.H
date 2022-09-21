@@ -72,6 +72,11 @@ namespace impactx
         };
     };
 
+    /** AMReX iterator for particle boxes
+     *
+     * We subclass here to change the default threading strategy, which is
+     * `static` in AMReX, to `dynamic` in ImpactX.
+     */
     class ParIter
         : public amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
     {
@@ -83,6 +88,11 @@ namespace impactx
         ParIter (ContainerType& pc, int level, amrex::MFItInfo& info);
     };
 
+    /** Const AMReX iterator for particle boxes - data is read only.
+     *
+     * We subclass here to change the default threading strategy, which is
+     * `static` in AMReX, to `dynamic` in ImpactX.
+     */
     class ParConstIter
         : public amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
     {
