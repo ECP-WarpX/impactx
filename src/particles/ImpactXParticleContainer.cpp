@@ -25,7 +25,7 @@
 namespace impactx
 {
     bool do_omp_dynamic () {
-        bool do_dynamic = false;
+        bool do_dynamic = true;
         amrex::ParmParse pp_impactx("impactx");
         pp_impactx.query("do_dynamic_scheduling", do_dynamic);
         return do_dynamic;
