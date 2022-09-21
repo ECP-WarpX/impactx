@@ -28,12 +28,41 @@ namespace impactx
 {
     /** Tag cells for refinement.  TagBoxArray tags is built on level lev grids.
      *
-     * @todo this function is not (yet) implemented.
+     * @TODO handle ngrow argument?
      */
-    void ImpactX::ErrorEst (int lev, amrex::TagBoxArray& tags, amrex::Real time, int ngrow)
+    void ImpactX::ErrorEst (int lev, amrex::TagBoxArray& tags, amrex::Real /* time */, int /* ngrow */)
     {
-        // todo
-        amrex::ignore_unused(lev, tags, time, ngrow);
+        using namespace amrex;
+
+        const auto problo = Geom(lev).ProbLoArray();
+        const auto dx = Geom(lev).CellSizeArray();
+
+        amrex::ParmParse pp_geometry("geometry");
+
+        // TODO: this is hard-coded to one level right now
+        Vector<Real> lo, hi;
+        pp_geometry.getarr("fine_tag_lo", lo);
+        pp_geometry.getarr("fine_tag_hi", hi);
+        amrex::RealVect fine_tag_lo = RealVect{lo};
+        amrex::RealVect fine_tag_hi = RealVect{hi};
+
+#ifdef AMREX_USE_OMP
+#pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
+#endif
+        for (MFIter mfi(tags); mfi.isValid(); ++mfi)
+        {
+            const Box& bx = mfi.fabbox();
+            const auto& fab = tags.array(mfi);
+            ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+            {
+                RealVect pos {AMREX_D_DECL((i+0.5_rt)*dx[0]+problo[0],
+                                           (j+0.5_rt)*dx[1]+problo[1],
+                                           (k+0.5_rt)*dx[2]+problo[2])};
+                if (pos > fine_tag_lo && pos < fine_tag_hi) {
+                    fab(i,j,k) = TagBox::SET;
+                }
+            });
+        }
     }
 
     /** Make a new level from scratch using provided BoxArray and DistributionMapping.

@@ -102,8 +102,10 @@ namespace impactx
 
       private:
         //! Tag cells for refinement.  TagBoxArray tags is built on level lev grids.
-        void ErrorEst (int lev, amrex::TagBoxArray& tags, amrex::Real time,
-                               int ngrow) override;
+        void ErrorEst (int lev,
+                       amrex::TagBoxArray& tags,
+                       amrex::Real time,
+                       int ngrow) override;
 
         //! Make a new level from scratch using provided BoxArray and DistributionMapping.
         //! Only used during initialization.

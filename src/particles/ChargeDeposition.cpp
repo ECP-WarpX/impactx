@@ -83,6 +83,20 @@ namespace impactx
                 }
             }
 
+            // TODO: Call portion's of WarpX' SyncRho from fine to coarser levels
+            //   TODO: do coarsening to a temp, local lev-1 patch
+            //   TODO: start communicating this patch into rho_at_level_minus_1
+            //   note: this can either move parts from WarpXComm.cpp (SyncRho & AddRhoFromFineLevelandSumBoundary)
+            //         or use code from SyncPhi in ABLASTR's PoissonSolve (in opposite order: FP->CP here)
+
+            // TODO: implement charge filters here
+            // note: we do this after SyncRho, because the physical (dx) size of
+            //       the stencil is different for each level
+            // note: we might not be able to do this after SumBoundary because we would then
+            //       not have valid filtered values in the guard. We access the guard
+            //       when we sum contributions from particles close to the
+            //       MR border between levels.
+
             // start async charge communication for this level
             rho_at_level.SumBoundary_nowait();
             //int const comp = 0;
