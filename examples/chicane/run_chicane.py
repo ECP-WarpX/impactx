@@ -12,10 +12,10 @@ from impactx import ImpactX, RefPart, distribution, elements
 sim = ImpactX()
 
 # set numerical parameters and IO control
-sim.set_particle_shape(2)  # B-spline order
-sim.set_space_charge(False)
-# sim.set_diagnostics(False)  # benchmarking
-sim.set_slice_step_diagnostics(True)
+sim.particle_shape = 2  # B-spline order
+sim.space_charge = False
+# sim.diagnostics = False  # benchmarking
+sim.slice_step_diagnostics = True
 
 # domain decomposition & space charge mesh
 sim.init_grids()

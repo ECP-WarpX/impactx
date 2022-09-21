@@ -15,14 +15,14 @@ pp_amr.addarr("n_cell", [40, 40, 32])
 sim = ImpactX()
 
 # set numerical parameters and IO control
-sim.set_particle_shape(2)  # B-spline order
-sim.set_space_charge(True)
+sim.particle_shape = 2  # B-spline order
+sim.space_charge = True
 sim.dynamic_size = True
 sim.prob_relative = 1.0
 
 # beam diagnostics
-# sim.set_diagnostics(False)  # benchmarking
-sim.set_slice_step_diagnostics(False)
+# sim.diagnostics = False  # benchmarking
+sim.slice_step_diagnostics = False
 
 # domain decomposition & space charge mesh
 sim.init_grids()
