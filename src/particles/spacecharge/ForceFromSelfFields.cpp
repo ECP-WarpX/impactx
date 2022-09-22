@@ -40,6 +40,9 @@ namespace impactx::spacecharge
             space_charge_field.at(lev).at("y").setVal(0.);
             space_charge_field.at(lev).at("z").setVal(0.);
 
+#ifdef AMREX_USE_OMP
+#pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
+#endif
             for (amrex::MFIter mfi(phi.at(lev)); mfi.isValid(); ++mfi) {
 
                 amrex::Box bx = mfi.validbox();

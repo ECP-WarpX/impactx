@@ -72,6 +72,38 @@ namespace impactx
         };
     };
 
+    /** AMReX iterator for particle boxes
+     *
+     * We subclass here to change the default threading strategy, which is
+     * `static` in AMReX, to `dynamic` in ImpactX.
+     */
+    class ParIter
+        : public amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
+    {
+    public:
+        using amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>::ParIter;
+
+        ParIter (ContainerType& pc, int level);
+
+        ParIter (ContainerType& pc, int level, amrex::MFItInfo& info);
+    };
+
+    /** Const AMReX iterator for particle boxes - data is read only.
+     *
+     * We subclass here to change the default threading strategy, which is
+     * `static` in AMReX, to `dynamic` in ImpactX.
+     */
+    class ParConstIter
+        : public amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
+    {
+    public:
+        using amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>::ParConstIter;
+
+        ParConstIter (ContainerType& pc, int level);
+
+        ParConstIter (ContainerType& pc, int level, amrex::MFItInfo& info);
+    };
+
     /** Beam Particles in ImpactX
      *
      * This class stores particles, distributed over MPI ranks.
@@ -81,10 +113,10 @@ namespace impactx
     {
     public:
         //! amrex iterator for particle boxes
-        using iterator = amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>;
+        using iterator = impactx::ParIter;
 
         //! amrex constant iterator for particle boxes (read-only)
-        using const_iterator = amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>;
+        using const_iterator = impactx::ParConstIter;
 
         //! Construct a new particle container
         ImpactXParticleContainer (amrex::AmrCore* amr_core);
