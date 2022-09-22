@@ -58,8 +58,7 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
     if(is_mpi)
         set_property(TEST ${name}.run APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=1")
     else()
-        # TODO: Change to 2 after OpenMP support was added #195
-        set_property(TEST ${name}.run APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=1")
+        set_property(TEST ${name}.run APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=2")
     endif()
 
     # analysis and plots
