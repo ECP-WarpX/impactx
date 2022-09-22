@@ -133,7 +133,15 @@ void init_ImpactX(py::module& m)
               "Use dynamic (``true``) resizing of the field mesh or static sizing (``false``)."
         )
 
-        .def("set_particle_shape",
+        .def_property("particle_shape",
+            [](ImpactX & /* ix */) {
+                amrex::ParmParse pp_algo("algo");
+                int order = 0;
+                bool const has_shape = pp_algo.query("particle_shape", order);
+                if (!has_shape)
+                    throw std::runtime_error("particle_shape is not set yet");
+                return order;
+            },
             [](ImpactX & ix, int const order) {
                 AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ix.m_particle_container,
                     "particle container not initialized");
@@ -145,39 +153,59 @@ void init_ImpactX(py::module& m)
             },
             "Whether to calculate space charge effects."
         )
-        .def("set_space_charge",
+        .def_property("space_charge",
+             [](ImpactX & /* ix */) {
+                 amrex::ParmParse pp_algo("algo");
+                 bool enable = false;
+                 pp_algo.get("space_charge", enable);
+                 return enable;
+             },
              [](ImpactX & /* ix */, bool const enable) {
                  amrex::ParmParse pp_algo("algo");
                  pp_algo.add("space_charge", enable);
              },
-             py::arg("enable"),
              "Enable or disable space charge calculations (default: enabled)."
         )
-        .def("set_diagnostics",
+        .def_property("diagnostics",
+             [](ImpactX & /* ix */) {
+                 amrex::ParmParse pp_diag("diag");
+                 bool enable = true;
+                 pp_diag.get("enable", enable);
+                 return enable;
+             },
              [](ImpactX & /* ix */, bool const enable) {
                  amrex::ParmParse pp_diag("diag");
                  pp_diag.add("enable", enable);
              },
-             py::arg("enable"),
              "Enable or disable diagnostics generally (default: enabled).\n"
              "Disabling this is mostly used for benchmarking."
          )
-        .def("set_slice_step_diagnostics",
+        .def_property("slice_step_diagnostics",
+             [](ImpactX & /* ix */) {
+                 amrex::ParmParse pp_diag("diag");
+                 bool enable = false;
+                 pp_diag.get("slice_step_diagnostics", enable);
+                 return enable;
+             },
              [](ImpactX & /* ix */, bool const enable) {
                  amrex::ParmParse pp_diag("diag");
                  pp_diag.add("slice_step_diagnostics", enable);
              },
-             py::arg("enable"),
              "Enable or disable diagnostics every slice step in elements (default: disabled).\n\n"
              "By default, diagnostics is performed at the beginning and end of the simulation.\n"
              "Enabling this flag will write diagnostics every step and slice step."
          )
-        .def("set_diag_file_min_digits",
+        .def_property("diag_file_min_digits",
+             [](ImpactX & /* ix */) {
+                 amrex::ParmParse pp_diag("diag");
+                 int file_min_digits = 6;
+                 pp_diag.get("file_min_digits", file_min_digits);
+                 return file_min_digits;
+             },
              [](ImpactX & /* ix */, int const file_min_digits) {
                  amrex::ParmParse pp_diag("diag");
                  pp_diag.add("file_min_digits", file_min_digits);
              },
-             py::arg("file_min_digits"),
              "The minimum number of digits (default: 6) used for the step\n"
              "number appended to the diagnostic file names."
          )

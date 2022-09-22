@@ -29,8 +29,8 @@ def test_charge_deposition(save_png=True):
     assert sim.n_cell == [16, 24, 32]
 
     sim.load_inputs_file("examples/fodo/input_fodo.in")
-    sim.set_space_charge(True)
-    sim.set_slice_step_diagnostics(False)
+    sim.space_charge = True
+    sim.slice_step_diagnostics = False
 
     # Future:
     # sim.ncell = [25, 25, 45]

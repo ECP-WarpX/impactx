@@ -34,8 +34,8 @@ def test_impactx_nofile():
     """
     sim = ImpactX()
 
-    sim.set_particle_shape(2)
-    sim.set_slice_step_diagnostics(True)
+    sim.particle_shape = 2
+    sim.slice_step_diagnostics = True
     sim.init_grids()
 
     # init particle beam
@@ -96,7 +96,7 @@ def test_impactx_noparticles():
     """
     sim = ImpactX()
 
-    sim.set_particle_shape(2)
+    sim.particle_shape = 2
     sim.init_grids()
 
     # init particle beam
@@ -123,7 +123,7 @@ def test_impactx_noshape():
     """
     sim = ImpactX()
 
-    # impactX.set_particle_shape intentionally missing
+    # "sim.particle_shape = order" is intentionally missing
 
     with pytest.raises(
         RuntimeError,
@@ -131,8 +131,14 @@ def test_impactx_noshape():
     ):
         sim.init_grids()
 
+    with pytest.raises(
+        RuntimeError,
+        match="particle_shape is not set yet",
+    ):
+        print(sim.particle_shape)
+
     # correct the mistake and keep going
-    sim.set_particle_shape(2)
+    sim.particle_shape = 2
     sim.init_grids()
 
 
@@ -143,7 +149,7 @@ def test_impactx_resting_refparticle():
     """
     sim = ImpactX()
 
-    sim.set_particle_shape(2)
+    sim.particle_shape = 2
     sim.init_grids()
 
     # init particle beam
@@ -207,9 +213,9 @@ def test_impactx_change_resolution():
     # sim.ncell = [16, 24, 32]
     # sim.domain = amrex.RealBox([1., 2., 3.], [4., 5., 6.])
 
-    sim.set_particle_shape(2)
-    sim.set_slice_step_diagnostics(False)
-    sim.set_diagnostics(False)
+    sim.particle_shape = 2
+    sim.slice_step_diagnostics = False
+    sim.diagnostics = False
     sim.init_grids()
 
     assert sim.n_cell == [16, 24, 32]
