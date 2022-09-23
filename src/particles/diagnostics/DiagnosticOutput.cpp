@@ -31,14 +31,17 @@ namespace impactx::diagnostics
 
         using namespace amrex::literals; // for _rt and _prt
 
+        // keep file open as we add more and more lines
+        amrex::AllPrintToFile file_handler(file_name);
+
         // write file header per MPI RANK
         if (!append) {
             if (otype == OutputType::PrintParticles) {
-                amrex::AllPrintToFile(file_name) << "id x y t px py pt\n";
+                file_handler << "id x y t px py pt\n";
             } else if (otype == OutputType::PrintNonlinearLensInvariants) {
-                amrex::AllPrintToFile(file_name) << "id H I\n";
+                file_handler << "id H I\n";
             } else if (otype == OutputType::PrintRefParticle) {
-                amrex::AllPrintToFile(file_name) << "step s x y z t px py pz pt\n";
+                file_handler << "step s x y z t px py pz pt\n";
             }
         }
 
@@ -86,7 +89,7 @@ namespace impactx::diagnostics
                         amrex::ParticleReal const pt = part_pt[i];
 
                         // write particle data to file
-                        amrex::AllPrintToFile(file_name)
+                        file_handler
                                 << global_id << " "
                                 << x << " " << y << " " << t << " "
                                 << px << " " << py << " " << pt << "\n";
@@ -132,7 +135,7 @@ namespace impactx::diagnostics
                             nonlinear_lens_invariants(x, y, px, py);
 
                         // write particle invariant data to file
-                        amrex::AllPrintToFile(file_name)
+                        file_handler
                                 << global_id << " "
                                 << HI_out.H << " " << HI_out.I << "\n";
 
@@ -155,7 +158,7 @@ namespace impactx::diagnostics
                     amrex::ParticleReal const pt = ref_part.pt;
 
                     // write particle data to file
-                    amrex::AllPrintToFile(file_name)
+                    file_handler
                             << step << " " << s << " "
                             << x << " " << y << " " << z << " " << t << " "
                             << px << " " << py << " " << pz << " " << pt << "\n";
