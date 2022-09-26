@@ -10,21 +10,28 @@
 #include "ImpactX.H"
 
 #include <ablastr/warn_manager/WarnManager.H>
-#include <ablastr/utils/TextMsg.H>
 
 #include <AMReX_BLProfiler.H>
+#include <AMReX_ParmParse.H>
+
+#include <optional>
+#include <stdexcept>
+#include <string>
 
 
-void impactx::ImpactX::warn_logger_control ()
+void impactx::ImpactX::init_warning_logger ()
 {
     amrex::ParmParse pp_impactx("impactx");
 
-    // Set the flag to control if ImpactX has to emit a warning message as soon as a warning is recorded
+    // Set the flag to control if ImpactX has to emit a warning message
+    // as soon as a warning is recorded
     bool always_warn_immediately = false;
     pp_impactx.query("always_warn_immediately", always_warn_immediately);
-    ablastr::warn_manager::GetWMInstance().SetAlwaysWarnImmediately(always_warn_immediately);
+    ablastr::warn_manager::GetWMInstance().
+        SetAlwaysWarnImmediately(always_warn_immediately);
 
-    // Set the WarnPriority threshold to decide if ImpactX has to abort when a warning is recorded
+    // Set the WarnPriority threshold to decide if ImpactX has to abort
+    // when a warning is recorded
     if(std::string str_abort_on_warning_threshold = "";
             pp_impactx.query("abort_on_warning_threshold", str_abort_on_warning_threshold)){
         std::optional<ablastr::warn_manager::WarnPriority> abort_on_warning_threshold = std::nullopt;
@@ -35,26 +42,22 @@ void impactx::ImpactX::warn_logger_control ()
         else if (str_abort_on_warning_threshold == "low")
             abort_on_warning_threshold = ablastr::warn_manager::WarnPriority::low;
         else {
-            amrex::Abort(ablastr::utils::TextMsg::Err(str_abort_on_warning_threshold
-                                                      +"is not a valid option for impactx.abort_on_warning_threshold (use: low, medium or high)"));
+            throw std::runtime_error(str_abort_on_warning_threshold
+                +"is not a valid option for impactx.abort_on_warning_threshold (use: low, medium or high)");
         }
-        amrex::AllPrint() << "str_abort_on_warning_threshold=" << str_abort_on_warning_threshold << "\n";
-        ablastr::warn_manager::GetWMInstance().SetAbortThreshold(abort_on_warning_threshold);
+        ablastr::warn_manager::GetWMInstance().
+            SetAbortThreshold(abort_on_warning_threshold);
     }
-
-    // "Synthetic" warning messages may be injected in the Warning Manager via
-    // inputfile for debugging & testing purposes.
-    ablastr::warn_manager::GetWMInstance().debug_read_warnings_from_input(pp_impactx);
 }
 
-void impactx::ImpactX::early_param_check()
+void impactx::ImpactX::early_param_check ()
 {
     BL_PROFILE("ImpactX::early_param_check");
 
     amrex::Print() << "\n";
     amrex::ParmParse().QueryUnusedInputs();
 
-    //Print the warning list right after the first step.
+    // Print the warning list right after the first step.
     amrex::Print() << ablastr::warn_manager::GetWMInstance()
             .PrintGlobalWarnings("FIRST STEP");
 

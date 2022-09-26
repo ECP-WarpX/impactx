@@ -98,7 +98,7 @@ namespace impactx
          *
          * Input variables are: ``always_warn_immediately`` and ``abort_on_warning_threshold``.
          */
-        void warn_logger_control ();
+        void init_warning_logger ();
 
       private:
         //! Tag cells for refinement.  TagBoxArray tags is built on level lev grids.

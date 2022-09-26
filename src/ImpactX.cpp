@@ -17,6 +17,8 @@
 #include "particles/spacecharge/PoissonSolve.H"
 #include "particles/transformation/CoordinateTransformation.H"
 
+#include <ablastr/warn_manager/WarnManager.H>
+
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
 #include <AMReX_BLProfiler.H>
@@ -38,8 +40,12 @@ namespace impactx
         //       amr.n_cells from user inputs
 
         // query input for warning logger variables and set up warning logger accordingly
-        warn_logger_control();
-
+        init_warning_logger();
+        // "Synthetic" warning messages may be injected in the Warning Manager via
+        // inputfile for debugging & testing purposes.
+        amrex::ParmParse pp_impactx("impactx");
+        ablastr::warn_manager::GetWMInstance().
+                debug_read_warnings_from_input(pp_impactx);
     }
 
     void ImpactX::initGrids ()
@@ -70,20 +76,6 @@ namespace impactx
 
         // check typos in inputs after step 1
         bool early_params_checked = false;
-
-        // count particles - if no particles are found in our particle container, then a lot of
-        // AMReX routines over ParIter won't work and we have nothing to do here anyways
-        {
-            int const nLevelPC = finestLevel();
-            amrex::Long nParticles = 0;
-            for (int lev = 0; lev <= nLevelPC; ++lev) {
-                nParticles += m_particle_container->NumberOfParticlesAtLevel(lev);
-            }
-            if (nParticles == 0) {
-                amrex::Abort("No particles found. Cannot run evolve without a beam.");
-                return;
-            }
-        }
 
         amrex::ParmParse pp_diag("diag");
         bool diag_enable = true;
