@@ -94,6 +94,21 @@ General
       Access the elements in the accelerator lattice.
       See :py:mod:`impactx.elements` for lattice elements.
 
+   .. py:property:: abort_on_warning_threshold
+
+      (optional) Set to "low", "medium" or "high".
+      Cause the code to abort if a warning is raised that exceeds the warning threshold.
+
+   .. py:property:: abort_on_unused_inputs
+
+      Set to ``1`` to cause the simulation to fail *after* its completion if there were unused parameters. (default: ``0`` for false)
+      It is mainly intended for continuous integration and automated testing to check that all tests and inputs are adapted to API changes.
+
+   .. py:property:: always_warn_immediately
+
+      If set to ``1``, ImpactX immediately prints every warning message as soon as it is generated. (default: ``0`` for false)
+      It is mainly intended for debug purposes, in case a simulation crashes before a global warning report can be printed.
+
    .. py:method:: evolve()
 
       Run the main simulation loop for a number of steps.
