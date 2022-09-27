@@ -5,7 +5,7 @@ beam.npart = 10000
 beam.units = static
 beam.energy = 200
 beam.charge = 1.0e-9
-beam.particle = proton
+beam.particle = electron
 beam.distribution = waterbag
 beam.sigmaX = 1.0e-3
 beam.sigmaY = 1.0e-3
@@ -22,10 +22,10 @@ beam.mutpt = 0.0
 # Beamline: lattice elements and segments
 ###############################################################################
 lattice.elements = cavity
-lattice.nslice = 25
+lattice.nslice = 50
 
 cavity.type = rfcavity
-cavity.ds = 2.0
+cavity.ds = 1.31879807
 cavity.escale = 1.0
 cavity.freq = 1.3e9
 cavity.phase = 30.0

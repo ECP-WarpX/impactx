@@ -32,6 +32,7 @@ namespace impactx::integrators
     void map2 (amrex::ParticleReal const tau, RefPart & refpart,
                            amrex::ParticleReal & zeval, std::string element_type);
 
+    amrex::ParticleReal RF_Efield (amrex::ParticleReal & zeval);
 
 } // namespace impactx::integrators
 
