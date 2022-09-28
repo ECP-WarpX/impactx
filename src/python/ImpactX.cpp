@@ -209,6 +209,54 @@ void init_ImpactX(py::module& m)
              "The minimum number of digits (default: 6) used for the step\n"
              "number appended to the diagnostic file names."
          )
+        .def_property("abort_on_warning_threshold",
+             [](ImpactX & /* ix */){
+                 amrex::ParmParse pp_impactx("impactx");
+                 std::string str_abort_on_warning_threshold;
+                 pp_impactx.get("abort_on_warning_threshold", str_abort_on_warning_threshold);
+                 return str_abort_on_warning_threshold;
+             },
+             [](ImpactX & ix, std::string const str_abort_on_warning_threshold) {
+                 amrex::ParmParse pp_impactx("impactx");
+                 pp_impactx.add("abort_on_warning_threshold", str_abort_on_warning_threshold);
+                 // query input for warning logger variables and set up warning logger accordingly
+                 ix.init_warning_logger();
+             },
+             "Set WarnPriority threshold to decide if ImpactX\n"
+             "has to abort when a warning is recorded.\n"
+             "Valid choices are: ['low', 'medium', 'high']."
+        )
+        .def_property("always_warn_immediately",
+            [](ImpactX & /* ix */){
+                amrex::ParmParse pp_impactx("impactx");
+                int always_warn_immediately;
+                pp_impactx.get("always_warn_immediately", always_warn_immediately);
+                return always_warn_immediately;
+              },
+            [](ImpactX & /* ix */, int const always_warn_immediately) {
+                amrex::ParmParse pp_impactx("impactx");
+                pp_impactx.add("always_warn_immediately", always_warn_immediately);
+            },
+            "If set to 1, immediately prints every warning message\n"
+            " as soon as it is generated."
+        )
+        // TODO this is an integer with 0 or 1 - can I just make this a boolean here?
+        .def_property("abort_on_unused_inputs",
+            [](ImpactX & /* ix */){
+                amrex::ParmParse pp_amrex("amrex");
+                int abort_on_unused_inputs;
+                pp_amrex.get("abort_on_unused_inputs", abort_on_unused_inputs);
+                return abort_on_unused_inputs;
+            },
+            [](ImpactX & ix, int const abort_on_unused_inputs) {
+                amrex::ParmParse pp_amrex("amrex");
+                pp_amrex.add("abort_on_unused_inputs", abort_on_unused_inputs);
+                // query input for warning logger variables and set up warning logger accordingly
+                ix.init_warning_logger();
+            },
+            "Configure simulation to abort AFTER it has run\n"
+            "if there are unused parameters in the input."
+        )
 
         .def("init_grids", &ImpactX::initGrids,
              "Initialize AMReX blocks/grids for domain decomposition & space charge mesh.\n\n"
