@@ -133,7 +133,7 @@ def test_impactx_noshape():
 
     with pytest.raises(
         RuntimeError,
-        match="particle_shape is not set yet",
+        match="algo.particle_shape is not set yet",
     ):
         print(sim.particle_shape)
 

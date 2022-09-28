@@ -20,6 +20,7 @@
 #if defined(AMREX_DEBUG) || defined(DEBUG)
 #   include <cstdio>
 #endif
+#include <string>
 
 
 namespace py = pybind11;
@@ -29,7 +30,34 @@ namespace impactx {
     struct Config {};
 }
 
-void init_ImpactX(py::module& m)
+namespace detail
+{
+    /** Helper Function for Property Getters
+     *
+     * This queries an amrex::ParmParse entry. This throws a
+     * std::runtime_error if the entry is not found.
+     *
+     * This handles most common throw exception logic in ImpactX instead of
+     * going over library boundaries via amrex::Abort().
+     *
+     * @tparam T type of the amrex::ParmParse entry
+     * @param prefix the prefix, e.g., "impactx" or "amr"
+     * @param name the actual key of the entry, e.g., "particle_shape"
+     * @return the queried value (or throws if not found)
+     */
+    template< typename T>
+    auto get_or_throw (std::string const prefix, std::string const name)
+    {
+        T value;
+        bool const has_name = amrex::ParmParse(prefix).query(name.c_str(), value);
+
+        if (!has_name)
+            throw std::runtime_error(prefix + "." + name + " is not set yet");
+        return value;
+    }
+}
+
+void init_ImpactX (py::module& m)
 {
     py::class_<ImpactX> impactx(m, "ImpactX");
     impactx
@@ -107,10 +135,7 @@ void init_ImpactX(py::module& m)
 
         .def_property("prob_relative",
               [](ImpactX & /* ix */) {
-                  amrex::ParmParse pp_geometry("geometry");
-                  amrex::Real frac;
-                  pp_geometry.get("prob_relative", frac);
-                  return frac;
+                  return detail::get_or_throw<amrex::Real>("geometry", "prob_relative");
               },
               [](ImpactX & /* ix */, amrex::Real frac) {
                   amrex::ParmParse pp_geometry("geometry");
@@ -135,12 +160,7 @@ void init_ImpactX(py::module& m)
 
         .def_property("particle_shape",
             [](ImpactX & /* ix */) {
-                amrex::ParmParse pp_algo("algo");
-                int order = 0;
-                bool const has_shape = pp_algo.query("particle_shape", order);
-                if (!has_shape)
-                    throw std::runtime_error("particle_shape is not set yet");
-                return order;
+                return detail::get_or_throw<int>("algo", "particle_shape");
             },
             [](ImpactX & ix, int const order) {
                 AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ix.m_particle_container,
@@ -155,10 +175,7 @@ void init_ImpactX(py::module& m)
         )
         .def_property("space_charge",
              [](ImpactX & /* ix */) {
-                 amrex::ParmParse pp_algo("algo");
-                 bool enable = false;
-                 pp_algo.get("space_charge", enable);
-                 return enable;
+                 return detail::get_or_throw<bool>("algo", "space_charge");
              },
              [](ImpactX & /* ix */, bool const enable) {
                  amrex::ParmParse pp_algo("algo");
@@ -168,10 +185,7 @@ void init_ImpactX(py::module& m)
         )
         .def_property("diagnostics",
              [](ImpactX & /* ix */) {
-                 amrex::ParmParse pp_diag("diag");
-                 bool enable = true;
-                 pp_diag.get("enable", enable);
-                 return enable;
+                 return detail::get_or_throw<bool>("diag", "enable");
              },
              [](ImpactX & /* ix */, bool const enable) {
                  amrex::ParmParse pp_diag("diag");
@@ -182,10 +196,7 @@ void init_ImpactX(py::module& m)
          )
         .def_property("slice_step_diagnostics",
              [](ImpactX & /* ix */) {
-                 amrex::ParmParse pp_diag("diag");
-                 bool enable = false;
-                 pp_diag.get("slice_step_diagnostics", enable);
-                 return enable;
+                 return detail::get_or_throw<bool>("diag", "slice_step_diagnostics");
              },
              [](ImpactX & /* ix */, bool const enable) {
                  amrex::ParmParse pp_diag("diag");
@@ -197,10 +208,7 @@ void init_ImpactX(py::module& m)
          )
         .def_property("diag_file_min_digits",
              [](ImpactX & /* ix */) {
-                 amrex::ParmParse pp_diag("diag");
-                 int file_min_digits = 6;
-                 pp_diag.get("file_min_digits", file_min_digits);
-                 return file_min_digits;
+                 return detail::get_or_throw<int>("diag", "file_min_digits");
              },
              [](ImpactX & /* ix */, int const file_min_digits) {
                  amrex::ParmParse pp_diag("diag");
@@ -211,10 +219,7 @@ void init_ImpactX(py::module& m)
          )
         .def_property("abort_on_warning_threshold",
              [](ImpactX & /* ix */){
-                 amrex::ParmParse pp_impactx("impactx");
-                 std::string str_abort_on_warning_threshold;
-                 pp_impactx.get("abort_on_warning_threshold", str_abort_on_warning_threshold);
-                 return str_abort_on_warning_threshold;
+                 return detail::get_or_throw<std::string>("impactx", "abort_on_warning_threshold");
              },
              [](ImpactX & ix, std::string const str_abort_on_warning_threshold) {
                  amrex::ParmParse pp_impactx("impactx");
@@ -228,10 +233,7 @@ void init_ImpactX(py::module& m)
         )
         .def_property("always_warn_immediately",
             [](ImpactX & /* ix */){
-                amrex::ParmParse pp_impactx("impactx");
-                int always_warn_immediately;
-                pp_impactx.get("always_warn_immediately", always_warn_immediately);
-                return always_warn_immediately;
+                 return detail::get_or_throw<int>("impactx", "always_warn_immediately");
               },
             [](ImpactX & /* ix */, int const always_warn_immediately) {
                 amrex::ParmParse pp_impactx("impactx");
@@ -243,10 +245,7 @@ void init_ImpactX(py::module& m)
         // TODO this is an integer with 0 or 1 - can I just make this a boolean here?
         .def_property("abort_on_unused_inputs",
             [](ImpactX & /* ix */){
-                amrex::ParmParse pp_amrex("amrex");
-                int abort_on_unused_inputs;
-                pp_amrex.get("abort_on_unused_inputs", abort_on_unused_inputs);
-                return abort_on_unused_inputs;
+                return detail::get_or_throw<int>("amrex", "abort_on_unused_inputs");
             },
             [](ImpactX & ix, int const abort_on_unused_inputs) {
                 amrex::ParmParse pp_amrex("amrex");
