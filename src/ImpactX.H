@@ -87,6 +87,8 @@ namespace impactx
         void validate ();
 
         /** Check inputs for unused parameters (e.g. typos) after step 1
+         *
+         * @return true if successful
          */
         void early_param_check ();
 

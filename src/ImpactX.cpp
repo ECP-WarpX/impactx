@@ -41,11 +41,6 @@ namespace impactx
 
         // query input for warning logger variables and set up warning logger accordingly
         init_warning_logger();
-        // "Synthetic" warning messages may be injected in the Warning Manager via
-        // inputfile for debugging & testing purposes.
-        amrex::ParmParse pp_impactx("impactx");
-        ablastr::warn_manager::GetWMInstance().
-                debug_read_warnings_from_input(pp_impactx);
     }
 
     void ImpactX::initGrids ()
@@ -213,7 +208,7 @@ namespace impactx
                 }
 
                 // inputs: unused parameters (e.g. typos) check after step 1 has finished
-                if (!early_params_checked) { early_param_check(); early_params_checked = true;}
+                if (!early_params_checked) { early_params_checked = early_param_check(); }
 
             } // end in-element space-charge slice-step loop
         } // end beamline element loop

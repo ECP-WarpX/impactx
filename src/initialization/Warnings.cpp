@@ -19,7 +19,9 @@
 #include <string>
 
 
-void impactx::ImpactX::init_warning_logger ()
+namespace impactx
+{
+void ImpactX::init_warning_logger ()
 {
     amrex::ParmParse pp_impactx("impactx");
 
@@ -50,7 +52,7 @@ void impactx::ImpactX::init_warning_logger ()
     }
 }
 
-void impactx::ImpactX::early_param_check ()
+bool ImpactX::early_param_check ()
 {
     BL_PROFILE("ImpactX::early_param_check");
 
@@ -61,4 +63,6 @@ void impactx::ImpactX::early_param_check ()
     amrex::Print() << ablastr::warn_manager::GetWMInstance()
             .PrintGlobalWarnings("FIRST STEP");
 
+    return true;
 }
+} // namespace impactx
