@@ -90,7 +90,7 @@ namespace impactx
          *
          * @return true if successful
          */
-        void early_param_check ();
+        bool early_param_check ();
 
         /** Run the main simulation loop for a number of steps
          */
