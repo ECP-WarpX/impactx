@@ -22,14 +22,14 @@ beam.mutpt = 0.0
 # Beamline: lattice elements and segments
 ###############################################################################
 lattice.elements = cavity
-lattice.nslice = 50
+lattice.nslice = 1
 
 cavity.type = rfcavity
 cavity.ds = 1.31879807
-cavity.escale = 1.0
+cavity.escale = 62.0
 cavity.freq = 1.3e9
-cavity.phase = 30.0
-
+cavity.phase = -11.459155902616464
+cavity.mapsteps = 50
 
 ###############################################################################
 # Algorithms

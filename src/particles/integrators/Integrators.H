@@ -7,33 +7,53 @@
  * Authors: Axel Huebl, Chad Mitchell
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_INTEGRATORS_H
-#define IMPACTX_INTEGRATORS_H
+#ifndef IMPACTX_INTEGRATORS_H_
+#define IMPACTX_INTEGRATORS_H_
 
-#include "particles/ImpactXParticleContainer.H"
+#include <ablastr/particles/IndexHandling.H>
 
-#include <string>
+#include <AMReX_Extension.H>  // for AMREX_RESTRICT
+#include <AMReX_REAL.H>       // for ParticleReal
+#include <AMReX_Print.H>      // for PrintToFile
 
 
 namespace impactx::integrators
 {
-    /** Comments here
-     *
-     */
 
+    template <typename T_Element>
     void symp4_integrate (RefPart & refpart,
                            amrex::ParticleReal const zin,
                            amrex::ParticleReal const zout,
-                           int const nsteps, std::string element_type);
+                           int const nsteps, T_Element & element)
+    {
 
-    void map1 (amrex::ParticleReal const tau, RefPart & refpart,
-                           amrex::ParticleReal & zeval, std::string element_type);
+        using namespace amrex::literals; // for _rt and _prt
 
-    void map2 (amrex::ParticleReal const tau, RefPart & refpart,
-                           amrex::ParticleReal & zeval, std::string element_type);
+        // initialize numerical integration parameters
+        amrex::ParticleReal const dz = (zout-zin)/nsteps;
+        amrex::ParticleReal const alpha = 1.0_prt - pow(2.0_prt,1.0/3.0);
+        amrex::ParticleReal const tau2 = dz/(1.0_prt + alpha);
+        amrex::ParticleReal const tau1 = tau2/2.0_prt;
+        amrex::ParticleReal const tau3 = alpha*tau1;
+        amrex::ParticleReal const tau4 = (alpha - 1.0_prt)*tau2;
 
-    amrex::ParticleReal RF_Efield (amrex::ParticleReal & zeval);
+        // initialize the value of the independent variable
+        amrex::ParticleReal zeval = zin;
+
+        // loop over integration steps
+        for(int j=0; j < nsteps; ++j)
+        {
+            element.map1(tau1,refpart,zeval);
+            element.map2(tau2,refpart,zeval);
+            element.map1(tau3,refpart,zeval);
+            element.map2(tau4,refpart,zeval);
+            element.map1(tau3,refpart,zeval);
+            element.map2(tau2,refpart,zeval);
+            element.map1(tau1,refpart,zeval);
+        }
+
+    }
 
 } // namespace impactx::integrators
 
-#endif // IMPACTX_INTEGRATORS_H
+#endif 
