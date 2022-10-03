@@ -239,7 +239,7 @@ with open("./requirements.txt") as f:
 setup(
     name="impactx",
     # note PEP-440 syntax: x.y.zaN but x.y.z.devN
-    version="22.08",
+    version="22.10",
     packages=["impactx"],
     # Python sources:
     package_dir={"": "src/python"},
@@ -275,7 +275,7 @@ setup(
     # cmdclass={'test': PyTest},
     # platforms='any',
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Natural Language :: English",
         "Environment :: Console",
         "Environment :: GPU",
