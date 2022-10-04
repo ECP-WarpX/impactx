@@ -117,36 +117,13 @@ def mad_init_c(gvar):
 
 
 def madx_start(gvar):
-    # TODO: Implement normal madx_start
 
     mad_init_c(gvar)
 
-    time = None
-    # /*  setbuf(stdout,(char *)0); */ /* no buffering - for debugging */
-    # time(&start_time); /* initialize timing */
-    # tm = localtime(&start_time); /* split system time */
-    # last_time = start_time;
-
-    # // compute padding of OSTYPE
-    # const char *pad[] = { "", " ", "  ", "    " };
-    # const int pad_sz = sizeof pad/sizeof *pad;
-    # int pad_idx = strlen("Windows")-strlen(version_ostype);
-    # if (pad_idx >= pad_sz) pad_idx = pad_sz-1;
-
-    #  printf("\n  ++++++++++++++++++++++++++++++++++++++++++++\n");
-    # printf("  +     MAD-X %s  (%s bit, %s) %s    +\n", version_name, version_arch, version_ostype, pad[pad_idx]);
-    # printf("  + Support: mad@cern.ch, http://cern.ch/mad +\n");
-    # printf("  + Release   date: %s               +\n", version_date);
-    # printf("  + Execution date: %04d.%02d.%02d %02d:%02d:%02d      +\n",
-    #        tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
-    #                                            tm->tm_hour, tm->tm_min, tm->tm_sec);
-    # printf("  ++++++++++++++++++++++++++++++++++++++++++++\n");
-    # if (interactive) putchar('\n');
     return None
 
 
 def madx_input(filename, gvar):
-    # TODO: Implement dynamic metadata lists
 
     # The original MadX file uses charbuffers, but in the Python version we want to keep
     # implementation simple with filenames and char lists, and whatever equivalent looping
@@ -158,9 +135,11 @@ def madx_input(filename, gvar):
     i = 0
     in_stop = False
     while not in_stop:
+        # TODO: Implement dynamic metadata lists
+        # We don't need line numbers per se, just the order of buffer consumption is enough for metadata.
         stolower_nq(file_content, i)
 
-        # TODO: Figure out exactly where pro_input is defined. This is the entry point into the interpreter logic
+        # TODO: Figure out exactly where pro_input is defined. This is the entry point into the interpreter logic but isn't clearly defined in the source code.
         # pro_input(file_content, i)
         if gvar.stop_flag:
             return
@@ -172,36 +151,16 @@ def madx_input(filename, gvar):
 
 
 def madx_finish(gvar):
-    # TODO: Implement normal madx_finish
-    # TODO: Implement MadX-ImpactX Interface by dumping lists
-    # int warn_numb, warn_numbf, nwarnings;
-    #
-    # /* should work with Lahey on windows 24.03.2004 */
-    #
-    # match2_delete_expressions();
-    # match2_delete_arrays();
-    #
-    # if (final_message == 0)
-    #     {
-    #         final_message = 1;
-    # if (plots_made)
-    # {
-    #     gxterm_();
-    # }
-    # mad_err_getwarn(&warn_numb, &warn_numbf);
-    # nwarnings = warn_numb + warn_numbf;
-    # printf("\n  Number of warnings: %d\n",nwarnings);
-    # if (nwarnings > 0)
-    # {
-    #     printf("%d in C and %d in Fortran\n",warn_numb,warn_numbf);
-    # }
-    # if (get_option("trace")) time_stamp("end");
-    #
-    # // printf("poly-mul= %llu\n", poly_mul_count);
-    #
-    # printf("\n"
-    # "  ++++++++++++++++++++++++++++++++++++++++++++\n");
-    # printf("  +          MAD-X finished normally         +\n");
-    # printf("  ++++++++++++++++++++++++++++++++++++++++++++\n");
-    # }
+    for variable in gvar.variable_list:
+        # TODO: Convert variable into ImpactX known type and add to other lists
+        variable = variable
+
+    for element in gvar.el_list:
+        # TODO: Convert element into ImpactX known type and add to other lists
+        element = element
+
+    for line in gvar.line_list:
+        # TODO: Convert line into ImpactX known type and add to other lists
+        line = line
+
     return None
