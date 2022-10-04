@@ -6,7 +6,6 @@ def mad_init(gvar):
     madx_start(gvar)
 
 
-# TODO: Redefine function to take in gvar and filepath argument instead of int
 def mad_run(gvar, file=0):
     madx_input(file, gvar)
 

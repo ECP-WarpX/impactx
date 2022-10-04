@@ -14,3 +14,6 @@ volume of code.
 ### Removed/Changed Functionalities
 - stdin stdout char buffers are replaced with Python file read
 - Removed Fortran90 interface
+
+### Other dev notes
+- Execution begins at mad_main.py

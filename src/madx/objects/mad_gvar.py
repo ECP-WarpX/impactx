@@ -1,3 +1,4 @@
+# TODO: Implement on-demand
 class GlobalVariable:
     def __init__(self):
         self.variable_list = None

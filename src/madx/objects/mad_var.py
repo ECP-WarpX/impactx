@@ -1,3 +1,4 @@
+# TODO: Implement on-demand
 class Constant:
     def __init__(self, name, expr, value, stamp):
         self.name = name
@@ -25,7 +26,6 @@ class VariableList:
         self.lst += [var]
 
 
-# TODO: Implement as needed
 def enter_variable(in_cmd):
     return None
 
@@ -46,7 +46,6 @@ def delete_var_list(var_list):
     return None
 
 def add_to_var_list(var, var_list, flag):
-    # TODO: Re-implement placeholder function var flag
     var_list.add_var(var)
 
 def find_variable(name, var_list):

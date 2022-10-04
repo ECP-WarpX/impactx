@@ -10,7 +10,6 @@ from src.madx.utils.mad_str import *
 
 
 def mad_init_c(gvar):
-    # TODO: Implement subset of mad_init_c
     # allocate variable ptr
     ione = 1
 

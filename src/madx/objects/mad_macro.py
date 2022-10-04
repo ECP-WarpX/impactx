@@ -1,3 +1,4 @@
+# TODO: Implement on-demand
 class Macro:
     def __init__(self, name, n_formal, dead, formal, tokens, body, stamp, original):
         self.name = name

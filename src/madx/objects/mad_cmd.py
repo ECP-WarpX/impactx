@@ -1,3 +1,4 @@
+# TODO: Implement on-demand
 class Command:
     def __init__(self, name, module, group, stamp, link_type, mad8_type, beam_def, par_names, par):
         self.name = name
@@ -19,7 +20,6 @@ class CommandList:
         self.max_length = max_length
 
     def add_var(self, var):
-        # TODO: add separately for names
         self.lst += [var]
 
 
@@ -30,11 +30,9 @@ class CommandListList:
         self.max_length = max_length
 
     def add_var(self, var):
-        # TODO: add separately for names
         self.lst += [var]
 
 
-# TODO: Implement functions as needed
 # Interface
 def new_command(name, nl_length, pl_length, module, group, link, mad_8):
     return None
