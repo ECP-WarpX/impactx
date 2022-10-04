@@ -12,3 +12,6 @@ class GlobalVariable:
         self.element_list = None
         self.selected_elements = None
 
+        self.return_flag = False
+        self.stop_flag = False
+

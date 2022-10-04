@@ -1,10 +1,12 @@
 # include <signal.h>
 # include "madx.h"
 
-from mad_var import *
-from mad_elem import *
-from mad_macro import *
-from mad_cmd import *
+from src.madx.objects.mad_var import *
+from src.madx.objects.mad_elem import *
+from src.madx.objects.mad_macro import *
+from src.madx.objects.mad_cmd import *
+
+from src.madx.utils.mad_str import *
 
 
 def mad_init_c(gvar):
@@ -143,36 +145,33 @@ def madx_start(gvar):
     return None
 
 
-def madx_input(top):
-    # TODO: Implement normal madx_input
+def madx_input(filename, gvar):
     # TODO: Implement dynamic metadata lists
-    # {
-    #     fputs("This is where STDOUT is", stdout);
-    # if (interactive && in->curr == 0) fputs("X:> ", stdout);
-    # if (return_flag || get_stmt(in->input_files[in->curr], 0) == 0)
-    # {
-    # if (in->input_files[in->curr] != stdin) {
-    # fclose(in->input_files[in->curr]);
-    # in->input_files[in->curr] = 0;
-    # }
-    # if (in->curr == 0)
-    # return;
-    # else
-    #     in->curr -= 1;
-    # return_flag = 0;
-    # if (in->curr == top) return;
-    # }
-    # else
-    # {
-    # stolower_nq(in->buffers[in->curr]->c_a->c);
-    # pro_input(in->buffers[in->curr]->c_a->c);
-    # if (stop_flag)  return;
-    # }
-    # }
+
+    # The original MadX file uses charbuffers, but in the Python version we want to keep
+    # implementation simple with filenames and char lists, and whatever equivalent looping
+    # logic. We assume that given ImpactX's use case, there is only one case for the input:
+    # That is, anything and everything is in file_content, so we don't have to do any buffer logic.
+    file_content = []
+    with open(filename, 'r') as f:
+        file_content += [f.read()]
+    i = 0
+    in_stop = False
+    while not in_stop:
+        stolower_nq(file_content, i)
+
+        # TODO: Figure out exactly where pro_input is defined. This is the entry point into the interpreter logic
+        # pro_input(file_content, i)
+        if gvar.stop_flag:
+            return
+
+        in_stop = i < len(file_content)
+        i += 1  # whenever a buffer char is popped for interpreter
+
     return None
 
 
-def madx_finish():
+def madx_finish(gvar):
     # TODO: Implement normal madx_finish
     # TODO: Implement MadX-ImpactX Interface by dumping lists
     # int warn_numb, warn_numbf, nwarnings;

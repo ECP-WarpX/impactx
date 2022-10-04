@@ -11,5 +11,6 @@ volume of code.
 - Elements
 - Macros (Lines)
 
-### Removed Functionalities
-- Fortran90 interface
+### Removed/Changed Functionalities
+- stdin stdout char buffers are replaced with Python file read
+- Removed Fortran90 interface
