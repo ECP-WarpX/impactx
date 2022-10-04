@@ -69,6 +69,7 @@ def buffer(string):
 def permbuff(string):
     return buffer(string)
 
+
 def is_token(pb, string, string_length):
     return False
 
