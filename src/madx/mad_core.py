@@ -1,12 +1,12 @@
 # include <signal.h>
 # include "madx.h"
 
+from src.madx.interpreter.mad_eval import *
 from src.madx.objects.mad_cmd import *
 from src.madx.objects.mad_elem import *
 from src.madx.objects.mad_macro import *
 from src.madx.objects.mad_var import *
 from src.madx.utils.mad_str import *
-from src.madx.interpreter.mad_eval import *
 
 
 def mad_init_c(gvar):
