@@ -15,4 +15,3 @@ class GlobalVariable:
 
         self.return_flag = False
         self.stop_flag = False
-

@@ -1,11 +1,10 @@
 # include <signal.h>
 # include "madx.h"
 
-from src.madx.objects.mad_var import *
+from src.madx.objects.mad_cmd import *
 from src.madx.objects.mad_elem import *
 from src.madx.objects.mad_macro import *
-from src.madx.objects.mad_cmd import *
-
+from src.madx.objects.mad_var import *
 from src.madx.utils.mad_str import *
 
 
@@ -78,7 +77,7 @@ def mad_init_c(gvar):
     # all_table_lists = new_table_list_list(10); /* dynamic */
 
     # # Initialize needed work for commands
-    var = new_variable("twiss_tol", 1.e-6, 1, 1, None, None)
+    var = new_variable("twiss_tol", 1.0e-6, 1, 1, None, None)
     add_to_var_list(var, gvar.variable_list, 1)
     # title = permbuff("no-title");
     # set_defaults("option");
@@ -129,7 +128,7 @@ def madx_input(filename, gvar):
     # logic. We assume that given ImpactX's use case, there is only one case for the input:
     # That is, anything and everything is in file_content, so we don't have to do any buffer logic.
     file_content = []
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         file_content += [f.read()]
     i = 0
     in_stop = False
