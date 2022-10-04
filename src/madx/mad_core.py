@@ -6,6 +6,7 @@ from src.madx.objects.mad_elem import *
 from src.madx.objects.mad_macro import *
 from src.madx.objects.mad_var import *
 from src.madx.utils.mad_str import *
+from src.madx.interpreter.mad_eval import *
 
 
 def mad_init_c(gvar):
@@ -137,8 +138,9 @@ def madx_input(filename, gvar):
         # We don't need line numbers per se, just the order of buffer consumption is enough for metadata.
         stolower_nq(file_content, i)
 
-        # TODO: Figure out exactly where pro_input is defined. This is the entry point into the interpreter logic but isn't clearly defined in the source code.
-        # pro_input(file_content, i)
+        # TODO: Figure out exactly where pro_input is defined. This is the entry point into the interpreter logic but
+        #  isn't clearly defined in the source code.
+        pro_input(file_content, i)
         if gvar.stop_flag:
             return
 
