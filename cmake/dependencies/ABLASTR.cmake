@@ -29,7 +29,6 @@ macro(find_ablastr)
     # transitive control for openPMD/FFT/PICSAR superbuild
     # TODO (future)
 
-    # TODO: delete this
     # ABLASTR superbuild
     if(ImpactX_ablastr_internal OR ImpactX_ablastr_src)
         set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
