@@ -72,6 +72,7 @@ def permbuff(string):
 def is_token(pb, string, string_length):
     return False
 
+
 def join(it_list, n):
     return ""
 
