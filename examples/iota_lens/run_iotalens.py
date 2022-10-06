@@ -6,7 +6,6 @@
 #
 # -*- coding: utf-8 -*-
 
-import amrex
 from impactx import ImpactX, distribution, elements
 
 sim = ImpactX()
@@ -52,7 +51,3 @@ sim.lattice.extend(nllens_lattice)
 
 # run simulation
 sim.evolve()
-
-# clean shutdown
-del sim
-amrex.finalize()

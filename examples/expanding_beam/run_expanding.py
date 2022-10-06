@@ -53,7 +53,3 @@ sim.lattice.append(elements.Drift(ds=6.0, nslice=30))
 
 # run simulation
 sim.evolve()
-
-# clean shutdown
-del sim
-amrex.finalize()

@@ -6,7 +6,6 @@
 #
 # -*- coding: utf-8 -*-
 
-import amrex
 from impactx import ImpactX, distribution, elements
 
 sim = ImpactX()
@@ -61,7 +60,3 @@ for element in lattice_no_drifts[1:]:
 
 # run simulation
 sim.evolve()
-
-# clean shutdown
-del sim
-amrex.finalize()
