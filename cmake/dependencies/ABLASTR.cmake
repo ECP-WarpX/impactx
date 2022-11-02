@@ -117,7 +117,7 @@ macro(find_ablastr)
         set(COMPONENT_DIM 3D)
         set(COMPONENT_PRECISION ${ImpactX_PRECISION} P${ImpactX_PRECISION})
 
-        find_package(ABLASTR 22.10 CONFIG REQUIRED COMPONENTS ${COMPONENT_DIM})
+        find_package(ABLASTR 22.11 CONFIG REQUIRED COMPONENTS ${COMPONENT_DIM})
         message(STATUS "ABLASTR: Found version '${ABLASTR_VERSION}'")
     endif()
 endmacro()
