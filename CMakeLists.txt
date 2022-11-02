@@ -90,6 +90,11 @@ set_default_build_type("Release")
 # (also know as "link-time optimization" or "whole program optimization")
 option(ImpactX_IPO "Compile ImpactX with interprocedural optimization (will take more time)" OFF)
 
+# enforce consistency of dependent options
+if(ImpactX_PYTHON)
+    set(ImpactX_LIB ON CACHE STRING "Build ImpactX as a library" FORCE)
+endif()
+
 # this defined the variable BUILD_TESTING which is ON by default
 include(CTest)
 
@@ -123,9 +128,6 @@ endif()
 
 # Targets #####################################################################
 #
-if(ImpactX_PYTHON)
-    set(ImpactX_LIB ON CACHE STRING "library" FORCE)
-endif()
 if(NOT ImpactX_APP AND NOT ImpactX_LIB)
     message(FATAL_ERROR "Need to build at least ImpactX app or "
                         "library/Python bindings")
@@ -325,7 +327,6 @@ install(TARGETS ${ImpactX_INSTALL_TARGET_NAMES}
 )
 
 # simplified library alias
-# this is currently expected by Python bindings
 if(ImpactX_LIB)
     if(WIN32)
         set(mod_ext "dll")
@@ -372,7 +373,7 @@ if(ImpactX_PYTHON)
     set(ImpactX_CUSTOM_TARGET_PREFIX "${_ImpactX_CUSTOM_TARGET_PREFIX_DEFAULT}"
         CACHE STRING "Prefix for custom targets")
 
-    # build the wheel by re-using the lib library we build
+    # build the wheel by re-using the python module that we build
     add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel
         ${CMAKE_COMMAND} -E rm -f -r impactx-whl
         COMMAND
