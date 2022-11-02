@@ -287,7 +287,7 @@ function(impactx_set_binary_name)
         )
     endif()
     if(ImpactX_LIB)
-        if(WIN32)
+        if(WIN32)  # TODO: handle static lib extensions
             set(mod_ext "dll")
         else()
             set(mod_ext "so")
