@@ -343,11 +343,6 @@ install(TARGETS ${ImpactX_INSTALL_TARGET_NAMES}
 
 # simplified library alias
 if(ImpactX_LIB)
-    if(WIN32)
-        set(mod_ext "dll")
-    else()
-        set(mod_ext "so")
-    endif()
     if(IS_ABSOLUTE ${CMAKE_INSTALL_LIBDIR})
         set(ABS_INSTALL_LIB_DIR ${CMAKE_INSTALL_LIBDIR})
     else()
@@ -355,7 +350,7 @@ if(ImpactX_LIB)
     endif()
     install(CODE "file(CREATE_LINK
         $<TARGET_FILE_NAME:lib>
-        ${ABS_INSTALL_LIB_DIR}/libImpactX.${mod_ext}
+        ${ABS_INSTALL_LIB_DIR}/libImpactX$<TARGET_FILE_SUFFIX:lib>
         COPY_ON_ERROR SYMBOLIC)")
 endif()
 

@@ -55,7 +55,7 @@ macro(find_ablastr)
             # BETWEEN MULTIPLE PYTHON MODULES
             # TODO this is likely an export/symbol hiding issue that we could
             #      alleviate later on
-            set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
+            set(AMReX_BUILD_SHARED_LIBS ON CACHE BOOL "Build AMReX shared library" FORCE)
         endif()
 
         if(ImpactX_ablastr_src)

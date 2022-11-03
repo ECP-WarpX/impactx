@@ -249,9 +249,9 @@ function(impactx_set_binary_name)
         list(APPEND ImpactX_bin_names app)
     endif()
     if(ImpactX_LIB)
-        list(APPEND ImpactX_bin_names shared)
+        list(APPEND ImpactX_bin_names lib)
     endif()
-    foreach(tgt IN LISTS _ALL_TARGETS)
+    foreach(tgt IN LISTS ImpactX_bin_names)
         set_target_properties(${tgt} PROPERTIES OUTPUT_NAME "impactx")
 
         if(ImpactX_MPI)
@@ -295,15 +295,10 @@ function(impactx_set_binary_name)
         )
     endif()
     if(ImpactX_LIB)
-        if(WIN32)  # TODO: handle static lib extensions
-            set(mod_ext "dll")
-        else()
-            set(mod_ext "so")
-        endif()
         add_custom_command(TARGET lib POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E create_symlink
                 $<TARGET_FILE_NAME:lib>
-                $<TARGET_FILE_DIR:lib>/libimpactx.${mod_ext}
+                $<TARGET_FILE_DIR:lib>/libimpactx$<TARGET_FILE_SUFFIX:lib>
         )
     endif()
 endfunction()
