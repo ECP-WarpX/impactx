@@ -132,6 +132,11 @@ function(impactx_test_set_pythonpath test_name)
         string(REPLACE ";" "\\;" WIN_PYTHONPATH "$ENV{PYTHONPATH}")
         string(REPLACE ";" "\\;" WIN_PATH "$ENV{PATH}")  # DLLs
         string(REGEX REPLACE "/" "\\\\" WIN_PYTHON_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY})
+        # shared library note:
+        #   For Windows Python 3.8+, this also needs to be injected via
+        #   os.add_dll_directory.
+        #   https://github.com/python/cpython/issues/80266
+        #   https://docs.python.org/3.8/library/os.html#os.add_dll_directory
         set_property(TEST ${test_name}
             APPEND PROPERTY ENVIRONMENT
                 "PYTHONPATH=${WIN_PYTHON_OUTPUT_DIRECTORY}\;${WIN_PYTHONPATH}"
