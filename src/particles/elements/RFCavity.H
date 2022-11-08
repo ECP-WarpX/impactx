@@ -131,6 +131,7 @@ namespace impactx
             int const nsteps = m_mapsteps;
 
             integrators::symp4_integrate(refpart,zin,zout,nsteps,*this);
+//            integrators::symp2_integrate(refpart,zin,zout,nsteps,*this);
             amrex::ParticleReal const ptf = refpart.pt;
 
             // advance position (x,y,z)
