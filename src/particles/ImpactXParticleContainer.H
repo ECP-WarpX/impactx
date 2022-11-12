@@ -85,6 +85,8 @@ namespace impactx
         amrex::ParticleReal pz = 0.0; ///< momentum in z, normalized to proper velocity
         amrex::ParticleReal pt = 0.0; ///< energy deviation, normalized by rest energy
 
+        amrex::Array2D<amrex::ParticleReal,1,6,1,6> map; ///< linearized map
+
         /** Get reference particle relativistic gamma
          *
          * @returns relativistic gamma
@@ -124,6 +126,7 @@ namespace impactx
             amrex::ParticleReal const massE);
 
     };
+
 
     /** Beam Particles in ImpactX
      *

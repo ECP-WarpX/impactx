@@ -48,6 +48,36 @@ namespace impactx::integrators
     }
 
     template <typename T_Element>
+    void symp2_integrate_split3 (RefPart & refpart,
+                           amrex::ParticleReal const zin,
+                           amrex::ParticleReal const zout,
+                           int const nsteps, T_Element & element)
+    {
+
+        using namespace amrex::literals; // for _rt and _prt
+
+        // initialize numerical integration parameters
+        amrex::ParticleReal const dz = (zout-zin)/nsteps;
+        amrex::ParticleReal const tau1 = dz/2.0_prt;
+        amrex::ParticleReal const tau2 = dz/2.0_prt;
+        amrex::ParticleReal const tau3 = dz;
+
+        // initialize the value of the independent variable
+        amrex::ParticleReal zeval = zin;
+
+        // loop over integration steps
+        for(int j=0; j < nsteps; ++j)
+        {
+            element.map1(tau1,refpart,zeval);
+            element.map2(tau2,refpart,zeval);
+            element.map3(tau3,refpart,zeval);
+            element.map2(tau2,refpart,zeval);
+            element.map1(tau1,refpart,zeval);
+        }
+
+    }
+
+    template <typename T_Element>
     void symp4_integrate (RefPart & refpart,
                            amrex::ParticleReal const zin,
                            amrex::ParticleReal const zout,

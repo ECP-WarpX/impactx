@@ -17,10 +17,11 @@
 #include <AMReX_REAL.H>
 
 #include <cmath>
-
+#include <tuple>
 
 namespace impactx
 {
+
     struct RFCavity
     {
         static constexpr auto name = "RFCavity";
@@ -59,7 +60,7 @@ namespace impactx
                 amrex::ParticleReal & AMREX_RESTRICT px,
                 amrex::ParticleReal & AMREX_RESTRICT py,
                 amrex::ParticleReal & AMREX_RESTRICT pt,
-                RefPart const refpart) const {
+                [[maybe_unused]] RefPart const refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
 
@@ -74,22 +75,34 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // length of the current slice
-            amrex::ParticleReal const slice_ds = m_ds / nslice();
+            //amrex::ParticleReal const slice_ds = m_ds / nslice();
 
-            // access reference particle values to find beta*gamma^2
-            amrex::ParticleReal const pt_ref = refpart.pt;
-            amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
+            // get the linear map
+            amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
 
-            // The following map is that of a drift.  It must be
-            // replaced by the map for an RF cavity.
+            // write the linear map
+            for (int i=1; i<7; i++) {
+               for (int j=1; j<7; j++) {
+                  amrex::AllPrintToFile("mapout") << "R" << " " << i << " " 
+                     << j << " " << R(i,j) << "\n";
+               }
+            }
 
-            // advance position and momentum (drift)
-            p.pos(0) = x + slice_ds * px;
-            // pxout = px;
-            p.pos(1) = y + slice_ds * py;
-            // pyout = py;
-            p.pos(2) = t + (slice_ds/betgam2) * pt;
-            // ptout = pt;
+
+            // push particles using the linear map
+
+            p.pos(0) = R(1,1)*x + R(1,2)*px + R(1,3)*y
+                     + R(1,4)*py + R(1,5)*t + R(1,6)*pt;
+            pxout = R(2,1)*x + R(2,2)*px + R(2,3)*y
+                  + R(2,4)*py + R(2,5)*t + R(2,6)*pt;
+            p.pos(1) = R(3,1)*x + R(3,2)*px + R(3,3)*y
+                     + R(3,4)*py + R(3,5)*t + R(3,6)*pt;
+            pyout = R(4,1)*x + R(4,2)*px + R(4,3)*y
+                  + R(4,4)*py + R(4,5)*t + R(4,6)*pt;
+            p.pos(2) = R(5,1)*x + R(5,2)*px + R(5,3)*y
+                     + R(5,4)*py + R(5,5)*t + R(5,6)*pt;
+            ptout = R(6,1)*x + R(6,2)*px + R(6,3)*y
+                  + R(6,4)*py + R(6,5)*t + R(6,6)*pt;
 
             // assign updated momenta
             px = pxout;
@@ -118,6 +131,17 @@ namespace impactx
             amrex::ParticleReal const pt = refpart.pt;
             amrex::ParticleReal const s = refpart.s;
 
+            // initialize linear map (deviation) values
+            
+            for (int i=1; i<7; i++) {
+               for (int j=1; j<7; j++) {
+                  if (i == j)
+                      refpart.map(i,j) = 1.0_prt;
+                  else
+                      refpart.map(i,j) = 0.0_prt;
+               }
+            }
+
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
@@ -130,8 +154,7 @@ namespace impactx
             std::string element_type = "rfcavity";
             int const nsteps = m_mapsteps;
 
-            integrators::symp4_integrate(refpart,zin,zout,nsteps,*this);
-//            integrators::symp2_integrate(refpart,zin,zout,nsteps,*this);
+            integrators::symp2_integrate_split3(refpart,zin,zout,nsteps,*this);
             amrex::ParticleReal const ptf = refpart.pt;
 
             // advance position (x,y,z)
@@ -147,13 +170,31 @@ namespace impactx
             refpart.py = py*bgf/bgi;
             refpart.pz = pz*bgf/bgi;
 
+            // convert linear map from dynamic to static units
+            amrex::ParticleReal scale_in = 1.0_prt;
+            amrex::ParticleReal scale_fin = 1.0_prt;
+
+            for (int i=1; i<7; i++) {
+               for (int j=1; j<7; j++) {
+                   if( i % 2 == 0) 
+                      scale_fin = bgf;
+                   else
+                      scale_fin = 1.0_prt;
+                   if( j % 2 == 0) 
+                      scale_in = bgi;
+                   else
+                      scale_in = 1.0_prt;
+                   refpart.map(i,j) = refpart.map(i,j)*scale_in/scale_fin;
+               }
+            }
+            
             // advance integrated path length
             refpart.s = s + slice_ds;
 
         }
 
-        amrex::ParticleReal
-        RF_Efield (amrex::ParticleReal & zeval) const
+        std::tuple<amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal>
+        RF_Efield (amrex::ParticleReal const zeval) const
         {
             using namespace amrex::literals; // for _rt and _prt
 
@@ -198,11 +239,13 @@ namespace impactx
             amrex::ParticleReal efield = 0.0;
             amrex::ParticleReal efieldp = 0.0;
             amrex::ParticleReal efieldpp = 0.0;
+            amrex::ParticleReal efieldint = 0.0;
             amrex::ParticleReal const z = zeval - zmid;
 
             if (abs(z)<=zmid)
             {
                efield = 0.5_prt*cos_coef[0];
+               efieldint = z*efield;
                for(int j=1; j < ncoef; ++j)
                {
                  efield = efield + cos_coef[j]*cos(j*2*pi*z/zlen) + 
@@ -211,17 +254,21 @@ namespace impactx
                       j*2*pi*sin_coef[j]*cos(j*2*pi*z/zlen)/zlen;
                  efieldpp = efieldpp- pow(j*2*pi*cos_coef[j]/zlen,2) *cos(j*2*pi*z/zlen) -
                       pow(j*2*pi*sin_coef[j]/zlen,2) *sin(j*2*pi*z/zlen);
+                 efieldint = efieldint + zlen*cos_coef[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
+                      zlen*sin_coef[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
                }
             }
-            return efield;
+            return std::make_tuple(efield,efieldp,efieldint);
         }
 
-        void map1 (amrex::ParticleReal const tau, RefPart & refpart,
+        void map3 (amrex::ParticleReal const tau, RefPart & refpart,
                                amrex::ParticleReal & zeval) const
         {
 
             using namespace amrex::literals; // for _rt and _prt
 
+
+               // push the reference particle
 
                amrex::ParticleReal const t = refpart.t;
                amrex::ParticleReal const pt = refpart.pt;
@@ -234,8 +281,15 @@ namespace impactx
                  refpart.t = t;
                  refpart.pt = pt;
                }
-               zeval = zeval + tau;
+               zeval = zeval;
 
+              // push the linear map equations
+
+              amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
+              amrex::ParticleReal const betgam = refpart.beta_gamma();
+
+              refpart.map(5,5) = R(5,5) + tau*R(6,5)/pow(betgam,3);
+              refpart.map(5,6) = R(5,6) + tau*R(6,6)/pow(betgam,3);
         }
 
         void map2 (amrex::ParticleReal const tau, RefPart & refpart,
@@ -255,10 +309,75 @@ namespace impactx
                amrex::ParticleReal const phi = m_phase*pi/180.0_prt;
                amrex::ParticleReal const E0 = m_Escale;
 
+               // push the reference particle
+
+               auto[ez,ezp,ezint] = RF_Efield(zeval);
+
                refpart.t = t;
-               refpart.pt = pt - tau*E0*RF_Efield(zeval)*cos(k*t+phi);
+               refpart.pt = pt;
                zeval = zeval;
-               amrex::AllPrintToFile("rfout") << zeval << " " << RF_Efield(zeval) << "\n";
+
+               // push the linear map equations
+ 
+              amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
+              amrex::ParticleReal const s = tau/refpart.beta_gamma();
+              amrex::ParticleReal const L = E0*ezp*sin(k*t+phi)/(2.0_prt*k);
+
+              refpart.map(1,1) = (1.0_prt-s*L)*R(1,1) + s*R(2,1);
+              refpart.map(1,2) = (1.0_prt-s*L)*R(1,2) + s*R(2,2);
+              refpart.map(2,1) = -s*pow(L,2)*R(1,1) + (1.0_prt+s*L)*R(2,1);
+              refpart.map(2,2) = -s*pow(L,2)*R(1,2) + (1.0_prt+s*L)*R(2,2);
+
+              refpart.map(3,3) = (1.0_prt-s*L)*R(3,3) + s*R(4,3);
+              refpart.map(3,4) = (1.0_prt-s*L)*R(3,4) + s*R(4,4);
+              refpart.map(4,3) = -s*pow(L,2)*R(3,3) + (1.0_prt+s*L)*R(4,3);
+              refpart.map(4,4) = -s*pow(L,2)*R(3,4) + (1.0_prt+s*L)*R(4,4);
+
+        }
+
+        void map1 (amrex::ParticleReal const tau, RefPart & refpart,
+                               amrex::ParticleReal & zeval) const
+        {
+
+            using namespace amrex::literals; // for _rt and _prt
+
+
+               amrex::ParticleReal const t = refpart.t;
+               amrex::ParticleReal const pt = refpart.pt;
+               amrex::ParticleReal const z = zeval;
+
+               // Define parameters and intermediate constants
+               amrex::ParticleReal const pi = 3.141592653589793_prt;
+               amrex::ParticleReal const c = 2.99792458e8;
+               amrex::ParticleReal const k = 2.0_prt*pi*m_freq/c;
+               amrex::ParticleReal const phi = m_phase*pi/180.0_prt;
+               amrex::ParticleReal const E0 = m_Escale;
+
+               // push the reference particle
+
+               auto[ez,ezp,ezint] = RF_Efield(z);
+               zeval = z + tau;
+               auto[ezf,ezpf,ezintf] = RF_Efield(zeval);
+
+               refpart.t = t;
+               refpart.pt = pt - E0*(ezintf-ezint)*cos(k*t+phi);
+               amrex::AllPrintToFile("rfout") << z << " " << ez << "\n";
+
+               // push the linear map equations
+ 
+              amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
+              amrex::ParticleReal const M = E0*(ezintf-ezint)*k*sin(k*t+phi);
+              amrex::ParticleReal const L = E0*(ezpf-ezp)*sin(k*t+phi)/(2.0_prt*k)+M/2.0_prt;
+
+              refpart.map(2,1) = L*R(1,1) + R(2,1);
+              refpart.map(2,2) = L*R(1,2) + R(2,2);
+
+              refpart.map(4,3) = L*R(3,3) + R(4,3);
+              refpart.map(4,4) = L*R(3,4) + R(4,4);
+
+              refpart.map(6,5) = M*R(5,5) + R(6,5);
+              refpart.map(6,6) = M*R(5,6) + R(6,6);
+
         }
 
 
@@ -271,6 +390,7 @@ namespace impactx
         {
             return m_nslice;
         }
+
 
     private:
         amrex::ParticleReal m_ds; //! segment length in m
