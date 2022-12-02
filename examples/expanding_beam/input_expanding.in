@@ -23,9 +23,7 @@ beam.mutpt = 0.0
 # Beamline: lattice elements and segments
 ###############################################################################
 lattice.elements = drift1
-#lattice.nslice = 30
 lattice.nslice = 40
-#lattice.nslice = 60
 
 drift1.type = drift
 drift1.ds = 6.0
@@ -37,8 +35,5 @@ drift1.ds = 6.0
 algo.particle_shape = 2
 algo.space_charge = true
 
-#amr.n_cell = 40 40 32
-#amr.n_cell = 48 48 40
 amr.n_cell = 56 56 48
-#amr.n_cell = 80 80 64
 geometry.prob_relative = 1.0
