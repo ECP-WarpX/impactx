@@ -54,8 +54,8 @@ def read_all_files(file_pattern):
 
 
 # initial/final beam on rank zero
-initial = read_all_files("diags/initial_beam.txt.*")
-final = read_all_files("diags/output_beam.txt.*")
+initial = read_all_files("diags/beam_000000.*")
+final = read_all_files("diags/beam_final.*")
 
 # compare number of particles
 num_particles = 10000
@@ -70,7 +70,7 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 1.5 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
@@ -97,7 +97,7 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 1.5 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
