@@ -4,7 +4,7 @@
 beam.npart = 10000
 beam.units = static
 beam.energy = 2.0e3
-beam.charge = 0.0
+beam.charge = 1.0e-9
 beam.particle = proton
 beam.distribution = kurth6d
 beam.sigmaX = 1.11e-3
