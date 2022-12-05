@@ -70,7 +70,7 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 2.5 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
@@ -97,7 +97,7 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 2.5 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
