@@ -81,7 +81,7 @@ Setting up the field mesh
 * ``geometry.prob_relative`` (positive ``float``, unitless) optional (default: ``1.0``)
     By default, we dynamically extract the minimum and maximum of the particle positions in the beam.
     The field mesh is expanded, per direction, beyond the physical extent of particles by this factor.
-    For instance, ``0.1`` means 10% more cells above and below the beam for vacuum; ``1.0`` means twice as many cells as covered by the beam are used, per direction, for vacuump padding.
+    For instance, ``0.1`` means 10% more cells above and below the beam for vacuum; ``1.0`` means twice as many cells as covered by the beam are used, per direction, for vacuum padding.
 
 * ``geometry.prob_lo`` and ``geometry.prob_hi`` (3 floats, in meters) optional (required if ``geometry.dynamic_size`` is ``false``)
     The extent of the full simulation domain relative to the reference particle position.
@@ -177,8 +177,7 @@ Initial Beam Distributions
         * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
-    * ``semigaussian`` for initial Semi-Gaussian distribution.  The distribution is uniform within a cylinder in (x,y,z) and Gaussian
-      in momenta (px,py,pt).
+    * ``semigaussian`` for initial Semi-Gaussian distribution.  The distribution is uniform within a cylinder in (x,y,z) and Gaussian in momenta (px,py,pt).
       With additional parameters:
 
         * ``<distribution>.sigmaX`` (``float``, in meters) rms X
@@ -211,21 +210,20 @@ Lattice Elements
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
-            * ``<element_name>.nslice`` (``integer``) number of slices used
-              for the application of space charge (default: ``1``)
+            * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``quad`` for a quadrupole. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
             * ``<element_name>.k`` (``float``, in inverse meters squared) the quadrupole strength
-                    = (magnetic field gradient in T/m) / (magnetic rigidity in T-m)
+
+                = (magnetic field gradient in T/m) / (magnetic rigidity in T-m)
 
               * k > 0 horizontal focusing
               * k < 0 horizontal defocusing
 
-            * ``<element_name>.nslice`` (``integer``) number of slices used
-              for the application of space charge (default: ``1``)
+            * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``sbend`` for a bending magnet. This requires these additional parameters:
 
@@ -233,62 +231,64 @@ Lattice Elements
 
             * ``<element_name>.rc`` (``float``, in meters) the bend radius
 
-            * ``<element_name>.nslice`` (``integer``) number of slices used
-              for the application of space charge (default: ``1``)
+            * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``dipedge`` for dipole edge focusing. This requires these additional parameters:
 
-            * ``<element_name>.psi`` (``float``, in radians) the pole face
-              rotation angle
+            * ``<element_name>.psi`` (``float``, in radians) the pole face rotation angle
 
             * ``<element_name>.rc`` (``float``, in meters) the bend radius
 
             * ``<element_name>.g`` (``float``, in meters) the gap size
 
-            * ``<element_name>.K2`` (``float``, dimensionless) normalized
-              field integral for fringe field
+            * ``<element_name>.K2`` (``float``, dimensionless) normalized field integral for fringe field
 
         * ``constf`` for a constant focusing element. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
-            * ``<element_name>.kx`` (``float``, in 1/meters) the horizontal
-              focusing strength
+            * ``<element_name>.kx`` (``float``, in 1/meters) the horizontal focusing strength
 
-            * ``<element_name>.ky`` (``float``, in 1/meters) the vertical
-              focusing strength
+            * ``<element_name>.ky`` (``float``, in 1/meters) the vertical focusing strength
 
-            * ``<element_name>.kt`` (``float``, in 1/meters) the
-              longitudinal focusing strength
+            * ``<element_name>.kt`` (``float``, in 1/meters) the longitudinal focusing strength
 
-            * ``<element_name>.nslice`` (``integer``) number of slices used
-              for the application of space charge (default: ``1``)
+            * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
-        * ``shortrf`` for a short RF (bunching) cavity element. This requires these additional parameters:
+        * ``shortrf`` for a short RF (bunching) cavity element.
+          This requires these additional parameters:
 
             * ``<element_name>.V`` (``float``, dimensionless) normalized voltage drop across the cavity
-                    = (maximum voltage drop in Volts) / (speed of light in m/s * magnetic rigidity in T-m)
+
+                = (maximum voltage drop in Volts) / (speed of light in m/s * magnetic rigidity in T-m)
 
             * ``<element_name>.k`` (``float``, in 1/meters) the RF wavenumber
-                    = 2*pi/(RF wavelength in m)
 
-        * ``multipole`` for a thin multipole element. This requires these additional parameters:
+                = 2*pi/(RF wavelength in m)
+
+        * ``multipole`` for a thin multipole element.
+          This requires these additional parameters:
 
             * ``<element_name>.multipole`` (``integer``, dimensionless) order of multipole
-                    (m = 1) dipole, (m = 2) quadrupole, (m = 3) sextupole, etc.
+
+                (m = 1) dipole, (m = 2) quadrupole, (m = 3) sextupole, etc.
 
             * ``<element_name>.k_normal`` (``float``, in 1/meters^m) integrated normal multipole coefficient (MAD-X convention)
-                   = 1/(magnetic rigidity in T-m) * (derivative of order m-1 of By with respect to x)
+
+                = 1/(magnetic rigidity in T-m) * (derivative of order m-1 of By with respect to x)
 
             * ``<element_name>.k_skew`` (``float``, in 1/meters^m) integrated skew multipole strength (MAD-X convention)
 
-        * ``nonlinear_lens`` for a thin IOTA nonlinear lens element. This requires these additional parameters:
+        * ``nonlinear_lens`` for a thin IOTA nonlinear lens element.
+          This requires these additional parameters:
 
             * ``<element_name>.knll`` (``float``, in meters) integrated strength of the lens segment (MAD-X convention)
-                   = dimensionless lens strength * c parameter**2 * length / Twiss beta
+
+                = dimensionless lens strength * c parameter**2 * length / Twiss beta
 
             * ``<element_name>.cnll`` (``float``, in meters) distance of the singularities from the origin (MAD-X convention)
-                   = c parameter * sqrt(Twiss beta)
+
+                = c parameter * sqrt(Twiss beta)
 
 
 .. _running-cpp-parameters-parallelization:
@@ -418,11 +418,11 @@ Reduced diagnostics are run *in situ* with the simulation.
 
 Diagnostics related to integrable optics in the IOTA nonlinear magnetic insert element:
 
-* ``diag.alpha`` (``float``, unitless) Twiss alpha of the bare linear lattice at the location of output for the nonlinear
-    IOTA invariants H and I.  Horizontal and vertical values must be equal.
+* ``diag.alpha`` (``float``, unitless) Twiss alpha of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.
+  Horizontal and vertical values must be equal.
 
-* ``diag.beta`` (``float``, meters) Twiss beta of the bare linear lattice at the location of output for the nonlinear
-    IOTA invariants H and I.  Horizontal and vertical values must be equal.
+* ``diag.beta`` (``float``, meters) Twiss beta of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.
+  Horizontal and vertical values must be equal.
 
 * ``diag.tn`` (``float``, unitless) dimensionless strength of the IOTA nonlinear magnetic insert element used for computing H and I.
 
