@@ -86,6 +86,7 @@ namespace impactx
         amrex::ParticleReal pt = 0.0; ///< energy deviation, normalized by rest energy
 
         amrex::Array2D<amrex::ParticleReal,1,6,1,6> map; ///< linearized map
+        amrex::ParticleReal sedge = 0.0;  ///< value of s at entrance of the current beamline element
 
         /** Get reference particle relativistic gamma
          *
@@ -196,6 +197,11 @@ namespace impactx
          */
         RefPart const
         GetRefParticle () const;
+
+        /** Update reference particle element edge
+         *
+         */
+        void SetRefParticleEdge ();
 
         /** Get particle shape
          */

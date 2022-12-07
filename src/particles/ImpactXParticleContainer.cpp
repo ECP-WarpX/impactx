@@ -139,6 +139,12 @@ namespace impactx
     {
         return m_refpart;
     }
+    
+    void
+    ImpactXParticleContainer::SetRefParticleEdge ()
+    {
+        m_refpart.sedge = m_refpart.s;
+    }
 
     // Reference particle helper functions
 

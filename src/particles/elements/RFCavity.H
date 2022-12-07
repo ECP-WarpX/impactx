@@ -81,13 +81,13 @@ namespace impactx
             amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
 
             // write the linear map
-            for (int i=1; i<7; i++) {
+/*            for (int i=1; i<7; i++) {
                for (int j=1; j<7; j++) {
                   amrex::AllPrintToFile("mapout") << "R" << " " << i << " " 
                      << j << " " << R(i,j) << "\n";
                }
             }
-
+*/
 
             // push particles using the linear map
 
@@ -130,6 +130,7 @@ namespace impactx
             amrex::ParticleReal const pz = refpart.pz;
             amrex::ParticleReal const pt = refpart.pt;
             amrex::ParticleReal const s = refpart.s;
+            amrex::ParticleReal const sedge = refpart.sedge;
 
             // initialize linear map (deviation) values
             
@@ -149,8 +150,8 @@ namespace impactx
             amrex::ParticleReal const bgi = sqrt(pow(pt,2)-1.0_prt);
 
             // call integrator to advance (t,pt)
-            amrex::ParticleReal const zin = s;
-            amrex::ParticleReal const zout = s + slice_ds;
+            amrex::ParticleReal const zin = s - sedge;
+            amrex::ParticleReal const zout = zin + slice_ds;
             std::string element_type = "rfcavity";
             int const nsteps = m_mapsteps;
 
