@@ -10,7 +10,7 @@ import amrex
 from impactx import ImpactX, RefPart, distribution, elements
 
 pp_amr = amrex.ParmParse("amr")
-pp_amr.addarr("n_cell", [40, 40, 32])
+pp_amr.addarr("n_cell", [56, 56, 48])
 
 sim = ImpactX()
 
@@ -31,14 +31,14 @@ sim.init_grids()
 # unnormalized rms emittance of 2 nm
 energy_MeV = 250  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
-npart = 10000  # number of macro particles
+npart = 10000  # number of macro particles (outside tests, use 1e5 or more)
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
 ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_energy_MeV(energy_MeV)
 
 #   particle bunch
-distr = distribution.Waterbag(
+distr = distribution.Kurth6D(
     sigmaX=4.472135955e-4,
     sigmaY=4.472135955e-4,
     sigmaT=9.12241869e-7,
@@ -49,7 +49,7 @@ distr = distribution.Waterbag(
 sim.add_particles(bunch_charge_C, distr, npart)
 
 # design the accelerator lattice
-sim.lattice.append(elements.Drift(ds=6.0, nslice=30))
+sim.lattice.append(elements.Drift(ds=6.0, nslice=40))
 
 # run simulation
 sim.evolve()
