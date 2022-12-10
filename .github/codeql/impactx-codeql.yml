@@ -1,0 +1,5 @@
+name: "ImpactX CodeQL config"
+
+# ignore ABLASTR, AMReX, pyAMReX, openPMD et al.
+paths-ignore:
+  - build/_deps
