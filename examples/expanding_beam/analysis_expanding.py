@@ -58,7 +58,7 @@ initial = read_all_files("diags/beam_000000.*")
 final = read_all_files("diags/beam_final.*")
 
 # compare number of particles
-num_particles = 100000
+num_particles = 10000
 assert num_particles == len(initial)
 assert num_particles == len(final)
 

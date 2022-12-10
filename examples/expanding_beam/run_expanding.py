@@ -31,7 +31,7 @@ sim.init_grids()
 # unnormalized rms emittance of 2 nm
 energy_MeV = 250  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
-npart = 100000  # number of macro particles
+npart = 10000  # number of macro particles (outside tests, use 1e5 or more)
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
