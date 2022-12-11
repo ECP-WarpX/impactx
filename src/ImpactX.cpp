@@ -111,6 +111,10 @@ namespace impactx
         // loop over all beamline elements
         for (auto & element_variant : m_lattice)
         {
+        
+            // update element edge of the reference particle
+            m_particle_container->SetRefParticleEdge();
+
             // number of slices used for the application of space charge
             int nslice = 1;
             std::visit([&nslice](auto&& element){ nslice = element.nslice(); }, element_variant);
