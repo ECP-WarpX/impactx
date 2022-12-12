@@ -1,5 +1,6 @@
 name: "ImpactX CodeQL config"
 
 # ignore ABLASTR, AMReX, pyAMReX, openPMD et al.
+# note: not yet suppored, thus doing post-analysis SARIF filtering
 paths-ignore:
   - build/_deps
