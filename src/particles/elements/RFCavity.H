@@ -289,7 +289,7 @@ namespace impactx
                  refpart.t = t;
                  refpart.pt = pt;
                }
-               zeval = zeval;
+               //zeval = zeval;
 
               // push the linear map equations
 
