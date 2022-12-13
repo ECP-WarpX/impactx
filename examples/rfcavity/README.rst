@@ -1,14 +1,13 @@
 .. _examples-rfcavity:
 
-Acceleration by RF cavities
-=========================
+Acceleration by RF Cavities
+===========================
 
 Beam accelerated through a sequence of 4 RF cavities (without space charge).
 
 We use a 230 MeV electron beam with initial normalized rms emittance of 1 um.
 
-The lattice and beam parameters are based on Example 2 of the IMPACT-Z
-examples folder:
+The lattice and beam parameters are based on Example 2 of the IMPACT-Z examples folder:
 
 https://github.com/impact-lbl/IMPACT-Z/tree/master/examples/Example2
 
@@ -26,9 +25,11 @@ Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, 
 
 .. tab-set::
 
-   .. tab-item:: Python Script (TODO)
+   .. tab-item:: Python Script
 
-       This one is to-do.
+       .. literalinclude:: run_rfcavity.py
+          :language: python3
+          :caption: You can copy this file from ``examples/rfcavity/run_rfcavity.py``.
 
    .. tab-item:: App Input File
 

@@ -143,7 +143,6 @@ namespace detail
                 // here we just access the element by its respective type
                 std::visit(
                     [=, &ref_part](auto element) {
-
                         // push reference particle in global coordinates
                         element(ref_part);
 
@@ -152,7 +151,6 @@ namespace detail
                             element, aos_ptr, part_px, part_py, part_pt, ref_part);
                         //   loop over beam particles in the box
                         amrex::ParallelFor(np, pushSingleParticle);
-
                     },
                     element_variant
                 );

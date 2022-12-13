@@ -19,6 +19,7 @@
 #include <cmath>
 #include <tuple>
 
+
 namespace impactx
 {
 
@@ -38,10 +39,17 @@ namespace impactx
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
          */
-        RFCavity( amrex::ParticleReal const ds, amrex::ParticleReal const
-         Escale, amrex::ParticleReal const freq, amrex::ParticleReal const
-         phase, amrex::ParticleReal const Bzsol, int const mapsteps, int const nslice )
-        : m_ds(ds), m_Escale(Escale), m_freq(freq), m_phase(phase), m_Bzsol(Bzsol), m_mapsteps(mapsteps), m_nslice(nslice)
+        RFCavity(
+            amrex::ParticleReal const ds,
+            amrex::ParticleReal const Escale,
+            amrex::ParticleReal const freq,
+            amrex::ParticleReal const phase,
+            amrex::ParticleReal const Bzsol,
+            int const mapsteps,
+            int const nslice
+        )
+          : m_ds(ds), m_Escale(Escale), m_freq(freq), m_phase(phase),
+            m_Bzsol(Bzsol), m_mapsteps(mapsteps), m_nslice(nslice)
         {
         }
 
@@ -60,7 +68,7 @@ namespace impactx
                 amrex::ParticleReal & AMREX_RESTRICT px,
                 amrex::ParticleReal & AMREX_RESTRICT py,
                 amrex::ParticleReal & AMREX_RESTRICT pt,
-                [[maybe_unused]] RefPart const refpart) const {
+                [[maybe_unused]] RefPart const & refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
 
@@ -81,13 +89,14 @@ namespace impactx
             amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
 
             // write the linear map
-/*            for (int i=1; i<7; i++) {
+            /*
+            for (int i=1; i<7; i++) {
                for (int j=1; j<7; j++) {
                   amrex::AllPrintToFile("mapout") << "R" << " " << i << " "
                      << j << " " << R(i,j) << "\n";
                }
             }
-*/
+            */
 
             // push particles using the linear map
 
@@ -116,8 +125,7 @@ namespace impactx
          * @param[in,out] refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void operator() (
-                RefPart & AMREX_RESTRICT refpart) const {
+        void operator() (RefPart & AMREX_RESTRICT refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
 

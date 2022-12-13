@@ -4,7 +4,7 @@
  *
  * This file is part of ImpactX.
  *
- * Authors: Axel Huebl, Chad Mitchell
+ * Authors: Chad Mitchell, Axel Huebl
  * License: BSD-3-Clause-LBNL
  */
 #ifndef IMPACTX_INTEGRATORS_H_
@@ -21,12 +21,14 @@ namespace impactx::integrators
 {
 
     template <typename T_Element>
-    void symp2_integrate (RefPart & refpart,
-                           amrex::ParticleReal const zin,
-                           amrex::ParticleReal const zout,
-                           int const nsteps, T_Element & element)
+    void symp2_integrate (
+        RefPart & refpart,
+        amrex::ParticleReal const zin,
+        amrex::ParticleReal const zout,
+        int const nsteps,
+        T_Element const & element
+    )
     {
-
         using namespace amrex::literals; // for _rt and _prt
 
         // initialize numerical integration parameters
@@ -44,16 +46,17 @@ namespace impactx::integrators
             element.map2(tau2,refpart,zeval);
             element.map1(tau1,refpart,zeval);
         }
-
     }
 
     template <typename T_Element>
-    void symp2_integrate_split3 (RefPart & refpart,
-                           amrex::ParticleReal const zin,
-                           amrex::ParticleReal const zout,
-                           int const nsteps, T_Element & element)
+    void symp2_integrate_split3 (
+        RefPart & refpart,
+        amrex::ParticleReal const zin,
+        amrex::ParticleReal const zout,
+        int const nsteps,
+        T_Element const & element
+    )
     {
-
         using namespace amrex::literals; // for _rt and _prt
 
         // initialize numerical integration parameters
@@ -74,16 +77,17 @@ namespace impactx::integrators
             element.map2(tau2,refpart,zeval);
             element.map1(tau1,refpart,zeval);
         }
-
     }
 
     template <typename T_Element>
-    void symp4_integrate (RefPart & refpart,
-                           amrex::ParticleReal const zin,
-                           amrex::ParticleReal const zout,
-                           int const nsteps, T_Element & element)
+    void symp4_integrate (
+        RefPart & refpart,
+        amrex::ParticleReal const zin,
+        amrex::ParticleReal const zout,
+        int const nsteps,
+        T_Element const & element
+    )
     {
-
         using namespace amrex::literals; // for _rt and _prt
 
         // initialize numerical integration parameters
@@ -108,7 +112,6 @@ namespace impactx::integrators
             element.map2(tau2,refpart,zeval);
             element.map1(tau1,refpart,zeval);
         }
-
     }
 
 } // namespace impactx::integrators

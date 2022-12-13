@@ -104,7 +104,6 @@ namespace impactx
         ParConstIter (ContainerType& pc, int level, amrex::MFItInfo& info);
     };
 
-
     /** Beam Particles in ImpactX
      *
      * This class stores particles, distributed over MPI ranks.

@@ -110,7 +110,6 @@ namespace impactx
         // loop over all beamline elements
         for (auto & element_variant : m_lattice)
         {
-
             // update element edge of the reference particle
             m_particle_container->SetRefParticleEdge();
 

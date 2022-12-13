@@ -39,7 +39,7 @@ namespace impactx
         pp_lattice.query("nslice", nslice_default);
 
         // Default number of map integration steps per slice
-        int mapsteps_default = 10; //used only in RF cavity
+        int mapsteps_default = 10;  // used only in RF cavity
 
         // Loop through lattice elements
         for (std::string const & element_name : lattice_elements) {
