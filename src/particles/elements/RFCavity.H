@@ -13,6 +13,7 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/integrators/Integrators.H"
 
+#include <AMReX_Array.H>
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
 
@@ -83,21 +84,8 @@ namespace impactx
             amrex::ParticleReal pyout = py;
             amrex::ParticleReal ptout = pt;
 
-            // length of the current slice
-            //amrex::ParticleReal const slice_ds = m_ds / nslice();
-
             // get the linear map
-            amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
-
-            // write the linear map
-            /*
-            for (int i=1; i<7; i++) {
-               for (int j=1; j<7; j++) {
-                  amrex::AllPrintToFile("mapout") << "R" << " " << i << " "
-                     << j << " " << R(i,j) << "\n";
-               }
-            }
-            */
+            amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
 
             // push particles using the linear map
             p.pos(0) = R(1,1)*x + R(1,2)*px + R(1,3)*y
@@ -140,7 +128,6 @@ namespace impactx
             amrex::ParticleReal const sedge = refpart.sedge;
 
             // initialize linear map (deviation) values
-
             for (int i=1; i<7; i++) {
                for (int j=1; j<7; j++) {
                   if (i == j)
@@ -270,124 +257,107 @@ namespace impactx
 
         void map3 (amrex::ParticleReal const tau,
                    RefPart & refpart,
-                   amrex::ParticleReal & zeval) const
+                   [[maybe_unused]] amrex::ParticleReal & zeval) const
         {
-
             using namespace amrex::literals; // for _rt and _prt
 
+            // push the reference particle
+            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const pt = refpart.pt;
 
-               // push the reference particle
+            if (pt < -1.0_prt) {
+                refpart.t = t + tau/sqrt(1.0_prt - pow(pt,-2));
+                refpart.pt = pt;
+            }
+            else {
+                refpart.t = t;
+                refpart.pt = pt;
+            }
 
-               amrex::ParticleReal const t = refpart.t;
-               amrex::ParticleReal const pt = refpart.pt;
+            // push the linear map equations
+            amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
+            amrex::ParticleReal const betgam = refpart.beta_gamma();
 
-               if(pt < -1.0_prt){
-                  refpart.t = t + tau/sqrt(1.0_prt - pow(pt,-2));
-                  refpart.pt = pt;
-               }
-               else {
-                 refpart.t = t;
-                 refpart.pt = pt;
-               }
-               //zeval = zeval;
-
-              // push the linear map equations
-
-              amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
-              amrex::ParticleReal const betgam = refpart.beta_gamma();
-
-              refpart.map(5,5) = R(5,5) + tau*R(6,5)/pow(betgam,3);
-              refpart.map(5,6) = R(5,6) + tau*R(6,6)/pow(betgam,3);
+            refpart.map(5,5) = R(5,5) + tau*R(6,5)/pow(betgam,3);
+            refpart.map(5,6) = R(5,6) + tau*R(6,6)/pow(betgam,3);
         }
 
         void map2 (amrex::ParticleReal const tau,
                    RefPart & refpart,
                    amrex::ParticleReal & zeval) const
         {
-
             using namespace amrex::literals; // for _rt and _prt
 
+            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const pt = refpart.pt;
 
-               amrex::ParticleReal const t = refpart.t;
-               amrex::ParticleReal const pt = refpart.pt;
+            // Define parameters and intermediate constants
+            amrex::ParticleReal const pi = 3.141592653589793_prt;
+            amrex::ParticleReal const c = 2.99792458e8;
+            amrex::ParticleReal const k = 2.0_prt*pi*m_freq/c;
+            amrex::ParticleReal const phi = m_phase*pi/180.0_prt;
+            amrex::ParticleReal const E0 = m_Escale;
 
-               // Define parameters and intermediate constants
-               amrex::ParticleReal const pi = 3.141592653589793_prt;
-               amrex::ParticleReal const c = 2.99792458e8;
-               amrex::ParticleReal const k = 2.0_prt*pi*m_freq/c;
-               amrex::ParticleReal const phi = m_phase*pi/180.0_prt;
-               amrex::ParticleReal const E0 = m_Escale;
+            // push the reference particle
+            [[maybe_unused]] auto [ez, ezp, ezint] = RF_Efield(zeval);
 
-               // push the reference particle
+            refpart.t = t;
+            refpart.pt = pt;
 
-               auto[ez,ezp,ezint] = RF_Efield(zeval);
+            // push the linear map equations
+            amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
+            amrex::ParticleReal const s = tau/refpart.beta_gamma();
+            amrex::ParticleReal const L = E0*ezp*sin(k*t+phi)/(2.0_prt*k);
 
-               refpart.t = t;
-               refpart.pt = pt;
-               zeval = zeval;
+            refpart.map(1,1) = (1.0_prt-s*L)*R(1,1) + s*R(2,1);
+            refpart.map(1,2) = (1.0_prt-s*L)*R(1,2) + s*R(2,2);
+            refpart.map(2,1) = -s*pow(L,2)*R(1,1) + (1.0_prt+s*L)*R(2,1);
+            refpart.map(2,2) = -s*pow(L,2)*R(1,2) + (1.0_prt+s*L)*R(2,2);
 
-               // push the linear map equations
-
-              amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
-              amrex::ParticleReal const s = tau/refpart.beta_gamma();
-              amrex::ParticleReal const L = E0*ezp*sin(k*t+phi)/(2.0_prt*k);
-
-              refpart.map(1,1) = (1.0_prt-s*L)*R(1,1) + s*R(2,1);
-              refpart.map(1,2) = (1.0_prt-s*L)*R(1,2) + s*R(2,2);
-              refpart.map(2,1) = -s*pow(L,2)*R(1,1) + (1.0_prt+s*L)*R(2,1);
-              refpart.map(2,2) = -s*pow(L,2)*R(1,2) + (1.0_prt+s*L)*R(2,2);
-
-              refpart.map(3,3) = (1.0_prt-s*L)*R(3,3) + s*R(4,3);
-              refpart.map(3,4) = (1.0_prt-s*L)*R(3,4) + s*R(4,4);
-              refpart.map(4,3) = -s*pow(L,2)*R(3,3) + (1.0_prt+s*L)*R(4,3);
-              refpart.map(4,4) = -s*pow(L,2)*R(3,4) + (1.0_prt+s*L)*R(4,4);
-
+            refpart.map(3,3) = (1.0_prt-s*L)*R(3,3) + s*R(4,3);
+            refpart.map(3,4) = (1.0_prt-s*L)*R(3,4) + s*R(4,4);
+            refpart.map(4,3) = -s*pow(L,2)*R(3,3) + (1.0_prt+s*L)*R(4,3);
+            refpart.map(4,4) = -s*pow(L,2)*R(3,4) + (1.0_prt+s*L)*R(4,4);
         }
 
         void map1 (amrex::ParticleReal const tau,
                    RefPart & refpart,
                    amrex::ParticleReal & zeval) const
         {
-
             using namespace amrex::literals; // for _rt and _prt
 
+            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const pt = refpart.pt;
+            amrex::ParticleReal const z = zeval;
 
-               amrex::ParticleReal const t = refpart.t;
-               amrex::ParticleReal const pt = refpart.pt;
-               amrex::ParticleReal const z = zeval;
+            // Define parameters and intermediate constants
+            amrex::ParticleReal const pi = 3.141592653589793_prt;
+            amrex::ParticleReal const c = 2.99792458e8;
+            amrex::ParticleReal const k = 2.0_prt*pi*m_freq/c;
+            amrex::ParticleReal const phi = m_phase*pi/180.0_prt;
+            amrex::ParticleReal const E0 = m_Escale;
 
-               // Define parameters and intermediate constants
-               amrex::ParticleReal const pi = 3.141592653589793_prt;
-               amrex::ParticleReal const c = 2.99792458e8;
-               amrex::ParticleReal const k = 2.0_prt*pi*m_freq/c;
-               amrex::ParticleReal const phi = m_phase*pi/180.0_prt;
-               amrex::ParticleReal const E0 = m_Escale;
+            // push the reference particle
+            [[maybe_unused]] auto [ez, ezp, ezint] = RF_Efield(z);
+            zeval = z + tau;
+            [[maybe_unused]] auto [ezf, ezpf, ezintf] = RF_Efield(zeval);
 
-               // push the reference particle
+            refpart.t = t;
+            refpart.pt = pt - E0*(ezintf-ezint)*cos(k*t+phi);
 
-               auto[ez,ezp,ezint] = RF_Efield(z);
-               zeval = z + tau;
-               auto[ezf,ezpf,ezintf] = RF_Efield(zeval);
+            // push the linear map equations
+            amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
+            amrex::ParticleReal const M = E0*(ezintf-ezint)*k*sin(k*t+phi);
+            amrex::ParticleReal const L = E0*(ezpf-ezp)*sin(k*t+phi)/(2.0_prt*k)+M/2.0_prt;
 
-               refpart.t = t;
-               refpart.pt = pt - E0*(ezintf-ezint)*cos(k*t+phi);
-               amrex::AllPrintToFile("rfout") << z << " " << ez << "\n";
+            refpart.map(2,1) = L*R(1,1) + R(2,1);
+            refpart.map(2,2) = L*R(1,2) + R(2,2);
 
-               // push the linear map equations
+            refpart.map(4,3) = L*R(3,3) + R(4,3);
+            refpart.map(4,4) = L*R(3,4) + R(4,4);
 
-              amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
-              amrex::ParticleReal const M = E0*(ezintf-ezint)*k*sin(k*t+phi);
-              amrex::ParticleReal const L = E0*(ezpf-ezp)*sin(k*t+phi)/(2.0_prt*k)+M/2.0_prt;
-
-              refpart.map(2,1) = L*R(1,1) + R(2,1);
-              refpart.map(2,2) = L*R(1,2) + R(2,2);
-
-              refpart.map(4,3) = L*R(3,3) + R(4,3);
-              refpart.map(4,4) = L*R(3,4) + R(4,4);
-
-              refpart.map(6,5) = M*R(5,5) + R(6,5);
-              refpart.map(6,6) = M*R(5,6) + R(6,6);
-
+            refpart.map(6,5) = M*R(5,5) + R(6,5);
+            refpart.map(6,6) = M*R(5,6) + R(6,6);
         }
 
         /** Number of slices used for the application of space charge
