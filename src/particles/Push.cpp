@@ -13,6 +13,8 @@
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_REAL.H>       // for ParticleReal
 
+#include <utility>
+
 
 namespace impactx
 {
@@ -53,7 +55,7 @@ namespace detail
                             RefPart ref_part)
             : m_element(element), m_aos_ptr(aos_ptr),
               m_part_px(part_px), m_part_py(part_py), m_part_pt(part_pt),
-              m_ref_part(ref_part)
+              m_ref_part(std::move(ref_part))
         {
         }
 
