@@ -40,8 +40,8 @@ namespace impactx
         amrex::ParticleReal mass = 0.0; ///< reference rest mass, in kg
         amrex::ParticleReal charge = 0.0; ///< reference charge, in C
 
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> map; ///< linearized map
         amrex::ParticleReal sedge = 0.0;  ///< value of s at entrance of the current beamline element
+        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> map; ///< linearized map
 
         /** Get reference particle relativistic gamma
          *
