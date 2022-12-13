@@ -364,3 +364,14 @@ add_impactx_test(rfcavity.MPI
     examples/rfcavity/analysis_rfcavity.py
     OFF  # no plot script yet
 )
+
+
+# Python: Acceleration by RF Cavities #########################################
+#
+add_impactx_test(rfcavity.py.MPI
+    examples/rfcavity/run_rfcavity.py
+      ON   # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/rfcavity/analysis_rfcavity.py
+    OFF  # no plot script yet
+)
