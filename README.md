@@ -6,11 +6,12 @@
 [![Supported Platforms](https://img.shields.io/badge/platforms-linux%20|%20osx%20|%20win-blue)](https://impactx.readthedocs.io/en/latest/install/users.html)  
 [![DOI (source)](https://img.shields.io/badge/DOI%20(source)-10.5281/zenodo.6954922-blue.svg)](https://doi.org/10.5281/zenodo.6954922)
 [![DOI (paper)](https://img.shields.io/badge/DOI%20(paper)-10.48550/arXiv.2208.02382-blue.svg)](https://doi.org/10.48550/arXiv.2208.02382)  
-[![Development Status](https://img.shields.io/badge/development%20status-alpha-orange.svg)](https://en.wikipedia.org/wiki/Software_release_life_cycle)
+[![Development Status](https://img.shields.io/badge/development%20status-beta-orange.svg)](https://en.wikipedia.org/wiki/Software_release_life_cycle)
 [![Language: C++17](https://img.shields.io/badge/language-C%2B%2B17-orange.svg)](https://isocpp.org/)
 [![Language: Python](https://img.shields.io/badge/language-Python-orange.svg)](https://python.org/)
 
-ImpactX: the next generation of the [IMPACT-Z](https://github.com/impact-lbl/IMPACT-Z) code
+ImpactX: an s-based beam dynamics code including space charge effects.
+This is the next generation of the [IMPACT-Z](https://github.com/impact-lbl/IMPACT-Z) code.
 
 ## Documentation
 
@@ -87,11 +88,11 @@ cmake -S . -B build_perlmutter -DImpactX_COMPUTE=CUDA
 cmake --build build_perlmutter -j 10
 
 # test
-srun -N 1 --ntasks-per-node=4 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ctest --test-dir build_perlmutter --output-on-failure
+srun -N 1 --ntasks-per-gpu=1 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ctest --test-dir build_perlmutter --output-on-failure
 
 # run
 cd build_perlmutter/bin
-srun -N 1 --ntasks-per-node=4 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ./impactx ../../examples/fodo/input_fodo.in
+srun -N 1 --ntasks-per-gpu=1 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ./impactx ../../examples/fodo/input_fodo.in
 ```
 
 ### Cori KNL (NERSC)

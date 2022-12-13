@@ -72,21 +72,25 @@ namespace impactx
             amrex::ParticleReal const pt_ref = refpart.pt;
             amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
             amrex::ParticleReal const bet = sqrt(betgam2/(1.0_prt + betgam2));
+
+            // calculate expensive terms once
+            //   TODO: use sincos function once wrapped in AMReX
             amrex::ParticleReal const theta = slice_ds/m_rc;
+            amrex::ParticleReal const sin_theta = sin(theta);
+            amrex::ParticleReal const cos_theta = cos(theta);
 
             // advance position and momentum (sector bend)
+            p.pos(0) = cos_theta*x + m_rc*sin_theta*px
+                       - (m_rc/bet)*(1.0_prt - cos_theta)*pt;
 
-            p.pos(0) = cos(theta)*x + m_rc*sin(theta)*px
-                     - (m_rc/bet)*(1.0_prt - cos(theta))*pt;
-
-            pxout = -sin(theta)/m_rc*x + cos(theta)*px - sin(theta)/bet*pt;
+            pxout = -sin_theta/m_rc*x + cos_theta*px - sin_theta/bet*pt;
 
             p.pos(1) = y + m_rc*theta*py;
 
             // pyout = py;
 
-            p.pos(2) = sin(theta)/bet*x + m_rc/bet*(1.0_prt - cos(theta))*px + t
-                     + m_rc*(-theta+sin(theta)/(bet*bet))*pt;
+            p.pos(2) = sin_theta/bet*x + m_rc/bet*(1.0_prt - cos_theta)*px + t
+                       + m_rc*(-theta+sin_theta/(bet*bet))*pt;
 
             // ptout = pt;
 
@@ -125,10 +129,15 @@ namespace impactx
             amrex::ParticleReal const theta = slice_ds/m_rc;
             amrex::ParticleReal const B = sqrt(pow(pt,2)-1.0_prt)/m_rc;
 
+            // calculate expensive terms once
+            //   TODO: use sincos function once wrapped in AMReX
+            amrex::ParticleReal const sin_theta = sin(theta);
+            amrex::ParticleReal const cos_theta = cos(theta);
+
             // advance position and momentum (bend)
-            refpart.px = px*cos(theta) - pz*sin(theta);
+            refpart.px = px*cos_theta - pz*sin_theta;
             refpart.py = py;
-            refpart.pz = pz*cos(theta) + px*sin(theta);
+            refpart.pz = pz*cos_theta + px*sin_theta;
             refpart.pt = pt;
 
             refpart.x = x + (refpart.pz - pz)/B;
@@ -149,6 +158,16 @@ namespace impactx
         int nslice () const
         {
             return m_nslice;
+        }
+
+        /** Return the segment length
+         *
+         * @return value in meters
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        amrex::ParticleReal ds () const
+        {
+            return m_ds;
         }
 
     private:

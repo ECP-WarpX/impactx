@@ -10,6 +10,8 @@
 #ifndef IMPACTX_PARTICLE_CONTAINER_H
 #define IMPACTX_PARTICLE_CONTAINER_H
 
+#include "ReferenceParticle.H"
+
 #include <AMReX_AmrCoreFwd.H>
 #include <AMReX_BaseFwd.H>
 #include <AMReX_MultiFab.H>
@@ -37,9 +39,9 @@ namespace impactx
     {
         enum
         {
-            x,  ///< position in x [m] (at fixed t OR fixed z)
-            y,  ///< position in y [m] (at fixed t OR fixed z)
-            z,  ///< position in z [m] (at fixed t) OR time-of-flight ct [m] (at fixed z)
+            x,  ///< position in x [m] (at fixed t OR fixed s)
+            y,  ///< position in y [m] (at fixed t OR fixed s)
+            z,  ///< position in z [m] (at fixed t) OR time-of-flight ct [m] (at fixed s)
         };
     };
 
@@ -50,9 +52,9 @@ namespace impactx
     {
         enum
         {
-            ux,  ///< momentum in x, normalized to proper velocity
-            uy,  ///< momentum in y, normalized to proper velocity
-            pt,  ///< kinetic energy deviation, (E0-E)/mc^2
+            ux,  ///< momentum in x, scaled by the magnitude of the reference momentum [unitless] (at fixed t or s)
+            uy,  ///< momentum in y, scaled by the magnitude of the reference momentum [unitless] (at fixed t or s)
+            pt,  ///< momentum in z, scaled by the magnitude of the reference momentum [unitless] (at fixed t) OR energy deviation, scaled by speed of light * the magnitude of the reference momentum [unitless] (at fixed s)
             m_qm, ///< charge to mass ratio, in q_e/m_e (q_e/eV)
             w,   ///< particle weight, unitless
             nattribs ///< the number of attributes above (always last)
@@ -70,62 +72,36 @@ namespace impactx
         };
     };
 
-    /** This struct stores the reference particle attributes
-     *  stored in ImpactXParticleContainer
+    /** AMReX iterator for particle boxes
+     *
+     * We subclass here to change the default threading strategy, which is
+     * `static` in AMReX, to `dynamic` in ImpactX.
      */
-    struct RefPart
+    class ParIter
+        : public amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
     {
-        amrex::ParticleReal s = 0.0;  ///< integrated orbit path length, in meters
-        amrex::ParticleReal x = 0.0;  ///< horizontal position x, in meters
-        amrex::ParticleReal y = 0.0;  ///< vertical position y, in meters
-        amrex::ParticleReal z = 0.0;  ///< longitudinal position y, in meters
-        amrex::ParticleReal t = 0.0;  ///< clock time * c in meters
-        amrex::ParticleReal px = 0.0; ///< momentum in x, normalized to proper velocity
-        amrex::ParticleReal py = 0.0; ///< momentum in y, normalized to proper velocity
-        amrex::ParticleReal pz = 0.0; ///< momentum in z, normalized to proper velocity
-        amrex::ParticleReal pt = 0.0; ///< energy deviation, normalized by rest energy
+    public:
+        using amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>::ParIter;
 
-        amrex::Array2D<amrex::ParticleReal,1,6,1,6> map; ///< linearized map
-        amrex::ParticleReal sedge = 0.0;  ///< value of s at entrance of the current beamline element
+        ParIter (ContainerType& pc, int level);
 
-        /** Get reference particle relativistic gamma
-         *
-         * @returns relativistic gamma
-         */
-        amrex::ParticleReal
-        gamma () const;
+        ParIter (ContainerType& pc, int level, amrex::MFItInfo& info);
+    };
 
-        /** Get reference particle relativistic beta
-         *
-         * @returns relativistic beta
-         */
-        amrex::ParticleReal
-        beta () const;
+    /** Const AMReX iterator for particle boxes - data is read only.
+     *
+     * We subclass here to change the default threading strategy, which is
+     * `static` in AMReX, to `dynamic` in ImpactX.
+     */
+    class ParConstIter
+        : public amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
+    {
+    public:
+        using amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>::ParConstIter;
 
-        /** Get reference particle beta*gamma
-         *
-         * @returns relativistic beta*gamma
-         */
-        amrex::ParticleReal
-        beta_gamma () const;
+        ParConstIter (ContainerType& pc, int level);
 
-        /** Get reference particle energy
-         *
-         * @returns kinetic energy in MeV
-         */
-        amrex::ParticleReal
-        energy_MeV (amrex::ParticleReal massE) const;
-
-        /** Set reference particle energy
-         *
-         * @param energy initial kinetic energy (MeV)
-         * @param massE particle rest energy (MeV)
-         */
-        void
-        set_energy_MeV (
-            amrex::ParticleReal const energy,
-            amrex::ParticleReal const massE);
-
+        ParConstIter (ContainerType& pc, int level, amrex::MFItInfo& info);
     };
 
 
@@ -138,10 +114,10 @@ namespace impactx
     {
     public:
         //! amrex iterator for particle boxes
-        using iterator = amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>;
+        using iterator = impactx::ParIter;
 
         //! amrex constant iterator for particle boxes (read-only)
-        using const_iterator = amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>;
+        using const_iterator = impactx::ParConstIter;
 
         //! Construct a new particle container
         ImpactXParticleContainer (amrex::AmrCore* amr_core);

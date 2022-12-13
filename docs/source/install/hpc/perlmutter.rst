@@ -56,10 +56,10 @@ We use the following modules and environments on the system (``$HOME/perlmutter_
 
    # an alias to request an interactive batch node for one hour
    #   for parallel execution, start on the batch node: srun <command>
-   alias getNode="salloc -N 1 --ntasks-per-node=4 -t 1:00:00 -q interactive -C gpu --gpu-bind=single:1 -c 32 -G 4 -A $proj"
+   alias getNode="salloc -N 1 --ntasks-per-gpu=1 -t 1:00:00 -q interactive -C gpu --gpu-bind=single:1 -c 32 -G 4 -A $proj"
    # an alias to run a command on a batch node for up to 30min
    #   usage: runNode <command>
-   alias runNode="srun -N 1 --ntasks-per-node=4 -t 0:30:00 -q interactive -C gpu --gpu-bind=single:1 -c 32 -G 4 -A $proj"
+   alias runNode="srun -N 1 --ntasks-per-gpu=1 -t 0:30:00 -q interactive -C gpu --gpu-bind=single:1 -c 32 -G 4 -A $proj"
 
    # GPU-aware MPI
    export MPICH_GPU_SUPPORT_ENABLED=1
@@ -113,7 +113,7 @@ To run all tests, do:
 
 .. code-block:: bash
 
-   srun -N 1 --ntasks-per-node=4 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ctest --test-dir build_perlmutter --output-on-failure
+   srun -N 1 --ntasks-per-gpu=1 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ctest --test-dir build_perlmutter --output-on-failure
 
 The general :ref:`cmake compile-time options <building-cmake>` apply as usual.
 

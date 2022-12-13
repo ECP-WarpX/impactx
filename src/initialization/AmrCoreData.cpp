@@ -22,6 +22,18 @@ namespace impactx::initialization
     {
     }
 
+    AmrCoreData::AmrCoreData (
+        amrex::RealBox const & rb,
+        int max_level_in,
+        amrex::Vector<int> const & n_cell_in,
+        int coord,
+        amrex::Vector<amrex::IntVect> const & ref_ratios,
+        amrex::Array<int,AMREX_SPACEDIM> const & is_per
+    )
+        : amrex::AmrCore(rb, max_level_in, n_cell_in, coord, ref_ratios, is_per)
+    {
+    }
+
     void
     AmrCoreData::ErrorEst (
         [[maybe_unused]] int lev,

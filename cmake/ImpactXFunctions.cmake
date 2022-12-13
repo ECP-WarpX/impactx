@@ -124,6 +124,24 @@ macro(impactx_set_default_install_dirs_python)
 endmacro()
 
 
+# function to set the PYTHONPATH on a test
+# this avoids that we need to install our python packages to run ctest
+#
+function(impactx_test_set_pythonpath test_name)
+    if(WIN32)
+        string(REPLACE ";" "\\;" WIN_PYTHONPATH "$ENV{PYTHONPATH}")
+        string(REGEX REPLACE "/" "\\\\" WIN_PYTHON_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY})
+        set_property(TEST ${test_name}
+            APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${WIN_PYTHON_OUTPUT_DIRECTORY}\;${WIN_PYTHONPATH}"
+        )
+    else()
+        set_property(TEST ${test_name}
+            APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${CMAKE_PYTHON_OUTPUT_DIRECTORY}:$ENV{PYTHONPATH}"
+        )
+    endif()
+endfunction()
+
+
 # change the default CMAKE_BUILD_TYPE
 # the default in CMake is Debug for historic reasons
 #
@@ -269,7 +287,7 @@ function(impactx_set_binary_name)
         )
     endif()
     if(ImpactX_LIB)
-        if(WIN32)
+        if(WIN32)  # TODO: handle static lib extensions
             set(mod_ext "dll")
         else()
             set(mod_ext "so")

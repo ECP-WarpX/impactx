@@ -29,6 +29,16 @@ ImpactX depends on popular third party software.
 
    dependencies
 
+.. note::
+
+   Preparation: make sure you work with up-to-date Python tooling.
+
+   .. code-block:: bash
+
+      python3 -m pip install -U pip setuptools wheel pytest
+      python3 -m pip install -r examples/requirements.txt
+
+
 Compile
 -------
 
@@ -39,7 +49,7 @@ From the base of the ImpactX source directory, execute:
    # find dependencies & configure
    #   see additional options below, e.g.
    #                   -DCMAKE_INSTALL_PREFIX=$HOME/sw/impactX
-   cmake -S . -B build
+   cmake -S . -B build -DImpactX_PYTHON=ON
 
    # compile, here we use four threads
    cmake --build build -j 4
@@ -52,7 +62,11 @@ If you want to install the executables in a programmatic way, run this:
 .. code-block:: bash
 
    # for default install paths, you will need administrator rights, e.g. with sudo:
+   #   this installs the application
    cmake --build build --target install
+
+   #   this installs the Python bindings via "python3 -m pip install ..."
+   cmake --build build --target pip_install -j 4
 
 You can inspect and modify build options after running ``cmake -S . -B build`` with either
 
@@ -64,35 +78,12 @@ or by adding arguments with ``-D<OPTION>=<VALUE>`` to the first CMake call, e.g.
 
 .. code-block:: bash
 
-   cmake -S . -B build -DImpactX_COMPUTE=CUDA
-
-
-Compile including Python Bindings
----------------------------------
-
-.. note::
-
-   Preparation: make sure you work with up-to-date Python tooling.
-
-   .. code-block:: bash
-
-      python3 -m pip install -U pip setuptools wheel pytest
-      python3 -m pip install -r examples/requirements.txt
-
-For PICMI Python bindings, add a configure option and call our ``pip_install`` *CMake target*:
-
-.. code-block:: bash
-
-   # find dependencies & configure
-   cmake -S . -B build -DImpactX_PYTHON=ON
-
-   # build and then call "python3 -m pip install ..."
-   cmake --build build --target pip_install -j 4
+   cmake -S . -B build -DImpactX_PYTHON=ON -DImpactX_COMPUTE=CUDA
 
 **That's it!**
-*TODO:* You can now :ref:`run a first 3D PICMI script <usage-picmi>` from our :ref:`examples <usage-examples>`.
+You can now :ref:`run a first example <usage-examples>`.
 
-Developers could now change the ImpactX source code and then call the build line again to refresh the Python installation.
+Developers could now change the ImpactX source code and then call the install lines again to refresh the installation.
 
 .. tip::
 
@@ -161,7 +152,7 @@ If you re-compile often, consider installing the `Ninja <https://github.com/ninj
 Pass ``-G Ninja`` to the CMake configuration call to speed up parallel compiles.
 
 
-Configure your compiler
+Configure Your Compiler
 -----------------------
 
 If you don't want to use your default compiler, you can set the following environment variables.
@@ -188,16 +179,7 @@ If you also want to select a CUDA compiler:
 Run
 ---
 
-An executable ImpactX binary with the current compile-time options encoded in its file name will be created in ``build/bin/``.
+The ImpactX Python bindings, which provide the imports ``impactx`` and ``amrex`` (from `pyAMReX <https://github.com/AMReX-Codes/pyamrex>`__), are automatically packaged and installed when calling the ``pip_install`` *CMake target*.
 
+An executable ImpactX application binary with the current compile-time options encoded in its file name will be created in ``build/bin/``.
 Additionally, a `symbolic link <https://en.wikipedia.org/wiki/Symbolic_link>`_ named ``impactx`` can be found in that directory, which points to the last built ImpactX executable.
-
-
-.. _building-cmake-python:
-
-Python Bindings
----------------
-
-.. note::
-
-   TODO: Coming soon :-)

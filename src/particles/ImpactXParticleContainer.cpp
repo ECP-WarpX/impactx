@@ -9,6 +9,7 @@
  */
 #include "ImpactXParticleContainer.H"
 
+#include <ablastr/constant.H>
 #include <ablastr/particles/ParticleMoments.H>
 
 #include <AMReX.H>
@@ -23,6 +24,29 @@
 
 namespace impactx
 {
+    bool do_omp_dynamic () {
+        bool do_dynamic = true;
+        amrex::ParmParse pp_impactx("impactx");
+        pp_impactx.query("do_dynamic_scheduling", do_dynamic);
+        return do_dynamic;
+    }
+
+    ParIter::ParIter (ContainerType& pc, int level)
+        : amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+                   amrex::MFItInfo().SetDynamic(do_omp_dynamic())) {}
+
+    ParIter::ParIter (ContainerType& pc, int level, amrex::MFItInfo& info)
+        : amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+              info.SetDynamic(do_omp_dynamic())) {}
+
+    ParConstIter::ParConstIter (ContainerType& pc, int level)
+        : amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+              amrex::MFItInfo().SetDynamic(do_omp_dynamic())) {}
+
+    ParConstIter::ParConstIter (ContainerType& pc, int level, amrex::MFItInfo& info)
+        : amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+              info.SetDynamic(do_omp_dynamic())) {}
+
     ImpactXParticleContainer::ImpactXParticleContainer (amrex::AmrCore* amr_core)
         : amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
     {
@@ -47,7 +71,9 @@ namespace impactx
     {
         amrex::ParmParse pp_algo("algo");
         int v = 0;
-        pp_algo.get("particle_shape", v);
+        bool has_shape = pp_algo.query("particle_shape", v);
+        if (!has_shape)
+            throw std::runtime_error("particle_shape is not set, cannot initialize grids with guard cells.");
         SetParticleShape(v);
     }
 
@@ -109,8 +135,7 @@ namespace impactx
         pinned_tile.push_back_real(RealSoA::uy, py);
         pinned_tile.push_back_real(RealSoA::pt, pz);
         pinned_tile.push_back_real(RealSoA::m_qm, np, qm);
-        amrex::ParticleReal const q_e = 1.60217662e-19;  // TODO move out
-        pinned_tile.push_back_real(RealSoA::w, np, bchchg/q_e/np);
+        pinned_tile.push_back_real(RealSoA::w, np, bchchg/ablastr::constant::SI::q_e/np);
 
         /* Redistributes particles to their respective tiles (spatial bucket
          * sort per box over MPI ranks)
@@ -126,9 +151,7 @@ namespace impactx
     ImpactXParticleContainer::SetRefParticle (RefPart const refpart)
     {
         m_refpart = refpart;
-    }
-
-    RefPart &
+    }    RefPart &
     ImpactXParticleContainer::GetRefParticle ()
     {
         return m_refpart;
@@ -139,67 +162,11 @@ namespace impactx
     {
         return m_refpart;
     }
-    
+
     void
     ImpactXParticleContainer::SetRefParticleEdge ()
     {
         m_refpart.sedge = m_refpart.s;
-    }
-
-    // Reference particle helper functions
-
-    void
-    RefPart::set_energy_MeV (amrex::ParticleReal const energy,
-            amrex::ParticleReal const massE)
-    {
-        using namespace amrex::literals;
-
-        s = 0.0;
-        x = 0.0;
-        y = 0.0;
-        z = 0.0;
-        t = 0.0;
-        px = 0.0;
-        py = 0.0;
-        pt = -energy/massE - 1.0_prt;
-        pz = sqrt(pow(pt,2) - 1.0_prt);
-    }
-
-    amrex::ParticleReal
-    RefPart::gamma () const
-    {
-        amrex::ParticleReal ref_gamma = -pt;
-        return ref_gamma;
-    }
-
-    amrex::ParticleReal
-    RefPart::beta () const
-    {
-        using namespace amrex::literals;
-
-        amrex::ParticleReal ref_gamma = -pt;
-        amrex::ParticleReal ref_beta = sqrt(1.0_prt - 1.0_prt/pow(ref_gamma,2));
-        return ref_beta;
-    }
-
-    amrex::ParticleReal
-    RefPart::beta_gamma () const
-    {
-        using namespace amrex::literals;
-
-        amrex::ParticleReal ref_gamma = -pt;
-        amrex::ParticleReal ref_betagamma = sqrt(pow(ref_gamma,2) - 1.0_prt);
-        return ref_betagamma;
-    }
-
-    amrex::ParticleReal
-    RefPart::energy_MeV (amrex::ParticleReal massE) const
-    {
-        using namespace amrex::literals;
-
-        amrex::ParticleReal ref_gamma = -pt;
-        amrex::ParticleReal ref_energy = massE*(ref_gamma - 1.0_prt);
-        return ref_energy;
     }
 
     std::tuple<

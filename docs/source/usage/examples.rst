@@ -11,6 +11,7 @@ This section allows you to **download input files** that correspond to different
    examples/fodo/README.rst
    examples/chicane/README.rst
    examples/cfchannel/README.rst
+   examples/expanding_beam/README.rst
    examples/kurth/README.rst
    examples/fodo_rf/README.rst
    examples/multipole/README.rst

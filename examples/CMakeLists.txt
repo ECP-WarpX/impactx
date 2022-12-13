@@ -19,22 +19,17 @@ if(ImpactX_MPI)
 endif()
 
 
-function(impactx_test_set_pythonpath test_name)
-    if(WIN32)
-        string(REPLACE ";" "\\;" WIN_PYTHONPATH "$ENV{PYTHONPATH}")
-        string(REGEX REPLACE "/" "\\\\" WIN_PYTHON_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY})
-        set_tests_properties(${test_name}
-            PROPERTIES ENVIRONMENT "PYTHONPATH=${WIN_PYTHON_OUTPUT_DIRECTORY}\;${WIN_PYTHONPATH}"
-        )
-    else()
-        set_tests_properties(${test_name}
-            PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_PYTHON_OUTPUT_DIRECTORY}:$ENV{PYTHONPATH}"
-        )
-    endif()
-endfunction()
-
-
 function(add_impactx_test name input is_mpi is_python analysis_script plot_script)
+    # cannot run Python tests w/o Python support
+    if(is_python AND NOT ImpactX_PYTHON)
+        return()
+    endif()
+
+    # cannot run MPI tests w/o MPI support
+    if(is_mpi AND NOT ImpactX_MPI)
+        return()
+    endif()
+
     # make a unique run directory
     file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${name})
 
@@ -56,15 +51,18 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
         impactx_test_set_pythonpath(${name}.run)
     else()
         add_test(NAME ${name}.run
-                 COMMAND ${THIS_MPI_TEST_EXE} $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/${input}
+                 COMMAND
+                    ${THIS_MPI_TEST_EXE} $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/${input}
+                        amrex.abort_on_unused_inputs=1
+                        impactx.always_warn_immediately=1
+                        impactx.abort_on_warning_threshold=low
                  WORKING_DIRECTORY ${THIS_WORKING_DIR}
         )
     endif()
     if(is_mpi)
-        set_tests_properties(${name}.run PROPERTIES ENVIRONMENT "OMP_NUM_THREADS=1")
+        set_property(TEST ${name}.run APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=1")
     else()
-        # TODO: Change to 2 after OpenMP support was added #195
-        set_tests_properties(${name}.run PROPERTIES ENVIRONMENT "OMP_NUM_THREADS=1")
+        set_property(TEST ${name}.run APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=2")
     endif()
 
     # analysis and plots
@@ -77,14 +75,14 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
                  COMMAND ${THIS_Python_SCRIPT_EXE} ${ImpactX_SOURCE_DIR}/${analysis_script}
                  WORKING_DIRECTORY ${THIS_WORKING_DIR}
         )
-        set_tests_properties(${name}.analysis PROPERTIES DEPENDS "${name}.run")
+        set_property(TEST ${name}.analysis APPEND PROPERTY DEPENDS "${name}.run")
     endif()
     if(plot_script)
         add_test(NAME ${name}.plot
-                 COMMAND ${THIS_Python_SCRIPT_EXE} ${ImpactX_SOURCE_DIR}/${plot_script}
+                 COMMAND ${THIS_Python_SCRIPT_EXE} ${ImpactX_SOURCE_DIR}/${plot_script} --save-png
                  WORKING_DIRECTORY ${THIS_WORKING_DIR}
         )
-        set_tests_properties(${name}.plot PROPERTIES DEPENDS "${name}.run")
+        set_property(TEST ${name}.plot APPEND PROPERTY DEPENDS "${name}.run")
     endif()
 endfunction()
 
@@ -96,7 +94,7 @@ add_impactx_test(FODO
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/fodo/analysis_fodo.py
-    examples/fodo/plot_fodo.py --save-png
+    examples/fodo/plot_fodo.py
 )
 
 # MPI-Parallel FODO Cell ######################################################
@@ -106,7 +104,7 @@ add_impactx_test(FODO.MPI
       ON   # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/fodo/analysis_fodo.py
-    examples/fodo/plot_fodo.py --save-png
+    examples/fodo/plot_fodo.py
 )
 
 # Python: FODO Cell ###########################################################
@@ -116,7 +114,20 @@ add_impactx_test(FODO.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/fodo/analysis_fodo.py
-    examples/fodo/plot_fodo.py --save-png
+    examples/fodo/plot_fodo.py
+)
+
+# Python MADX: FODO Cell ######################################################
+#
+# copy MAD-X lattice file
+file(COPY ${ImpactX_SOURCE_DIR}/examples/fodo/fodo.madx DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.MADX.py)
+
+add_impactx_test(FODO.MADX.py
+    examples/fodo/run_fodo_madx.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/fodo/analysis_fodo.py
+    examples/fodo/plot_fodo.py
 )
 
 # Python: MPI-parallel FODO Cell ##############################################
@@ -126,7 +137,7 @@ add_impactx_test(FODO.py.MPI
       ON  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/fodo/analysis_fodo.py
-    examples/fodo/plot_fodo.py --save-png
+    examples/fodo/plot_fodo.py
 )
 
 # Chicane #####################################################################
@@ -136,7 +147,7 @@ add_impactx_test(chicane
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/chicane/analysis_chicane.py
-    examples/chicane/plot_chicane.py --save-png
+    examples/chicane/plot_chicane.py
 )
 
 # Python: Chicane #####################################################################
@@ -146,7 +157,20 @@ add_impactx_test(chicane.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/chicane/analysis_chicane.py
-    examples/chicane/plot_chicane.py --save-png
+    examples/chicane/plot_chicane.py
+)
+
+# Python MADX: Chicane ######################################################
+#
+# copy MAD-X lattice file
+file(COPY ${ImpactX_SOURCE_DIR}/examples/chicane/chicane.madx DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chicane.MADX.py)
+
+add_impactx_test(chicane.MADX.py
+    examples/chicane/run_chicane_madx.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/chicane/analysis_chicane.py
+    examples/chicane/plot_chicane.py
 )
 
 # Constant Focusing Channel ###################################################
@@ -156,7 +180,17 @@ add_impactx_test(cfchannel
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/cfchannel/analysis_cfchannel.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
+)
+
+# Python: Constant Focusing Channel ###########################################
+#
+add_impactx_test(cfchannel.py
+    examples/cfchannel/run_cfchannel.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/cfchannel/analysis_cfchannel.py
+    OFF  # no plot script yet
 )
 
 # Kurth Distribution Test ###################################################
@@ -166,7 +200,7 @@ add_impactx_test(kurth
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/kurth/analysis_kurth.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # Python: Kurth Distribution Test ##################################################
@@ -186,7 +220,7 @@ add_impactx_test(gaussian
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/distgen/analysis_gaussian.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # K-V Distribution Test ############################################################
@@ -196,7 +230,7 @@ add_impactx_test(kvdist
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/distgen/analysis_kvdist.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # FODO Cell with RF ###################################################################
@@ -206,7 +240,17 @@ add_impactx_test(FODO_RF
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/fodo_rf/analysis_fodo_rf.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
+)
+
+# Python: FODO Cell with RF ###################################################
+#
+add_impactx_test(FODO_RF.py
+    examples/fodo_rf/run_fodo_rf.py
+      OFF  # ImpactX MPI-parallel
+      ON  # ImpactX Python interface
+    examples/fodo_rf/analysis_fodo_rf.py
+    OFF  # no plot script yet
 )
 
 # 4D Kurth Distribution Test ############################################################
@@ -216,7 +260,7 @@ add_impactx_test(kurth4d
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/distgen/analysis_kurth4d.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # Semi-Gaussian Distribution Test ############################################################
@@ -226,7 +270,7 @@ add_impactx_test(semigaussian
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/distgen/analysis_semigaussian.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # Chain of Multipoles Test ############################################################
@@ -236,7 +280,27 @@ add_impactx_test(multipole
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/multipole/analysis_multipole.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
+)
+
+# Expanding Beam Test #################################################################
+#
+add_impactx_test(expanding_beam
+    examples/expanding_beam/input_expanding.in
+      OFF  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/expanding_beam/analysis_expanding.py
+    OFF  # no plot script yet
+)
+
+# Python: Expanding Beam Test #########################################################
+#
+add_impactx_test(expanding_beam.py
+    examples/expanding_beam/run_expanding.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/expanding_beam/analysis_expanding.py
+    OFF  # no plot script yet
 )
 
 # Python: Chain of Multipoles Test #########################################################
@@ -256,7 +320,7 @@ add_impactx_test(iotalens
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/iota_lens/analysis_iotalens.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 # Python: IOTA Nonlinear Focusing Channel Test #####################################
@@ -276,7 +340,7 @@ add_impactx_test(iotalattice.MPI
       ON   # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/iota_lattice/analysis_iotalattice.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )
 
 
@@ -287,5 +351,5 @@ add_impactx_test(iotalattice.py.MPI
       ON   # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/iota_lattice/analysis_iotalattice.py
-    OFF  # not plotting script yet
+    OFF  # no plot script yet
 )

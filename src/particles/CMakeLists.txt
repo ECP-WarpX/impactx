@@ -5,6 +5,7 @@ target_sources(ImpactX
     Push.cpp
 )
 
-add_subdirectory(transformation)
 add_subdirectory(diagnostics)
 add_subdirectory(integrators)
+add_subdirectory(spacecharge)
+add_subdirectory(transformation)

@@ -66,8 +66,8 @@ namespace impactx
                     //auto const rel_ref_ratio = ref_ratio.at(depos_lev) / ref_ratio.at(lev);
                     amrex::ignore_unused(ref_ratio);
 
-                    amrex::ParticleReal const q_e = 1.60217662e-19;  // TODO move out
-                    amrex::ParticleReal const charge = q_e;
+                    // in SI [C]
+                    amrex::ParticleReal const charge = m_refpart.charge;
 
                     // cell size of the mesh to deposit to
                     std::array<amrex::Real, 3> const & AMREX_RESTRICT dx = {gm.CellSize(0), gm.CellSize(1), gm.CellSize(2)};

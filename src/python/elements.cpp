@@ -31,25 +31,34 @@ void init_elements(py::module& m)
             return v;
         }))
 
-        .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(el); })
+        .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(el); },
+             "Add a single element to the list.")
 
-        .def("extend", [](KnownElementsList &v, KnownElementsList l) {
-            for (auto const & el : l)
-                v.push_back(el);
-            return v;
-        })
-        .def("extend", [](KnownElementsList &v, py::list l) {
-            for (auto const & handle : l)
-            {
-                auto el = handle.cast<KnownElements>();
-                v.push_back(el);
-            }
-            return v;
-        })
+        .def("extend",
+             [](KnownElementsList &v, KnownElementsList l) {
+                 for (auto const & el : l)
+                    v.push_back(el);
+                 return v;
+             },
+             "Add a list of elements to the list.")
+        .def("extend",
+             [](KnownElementsList &v, py::list l) {
+                 for (auto const & handle : l)
+                 {
+                    auto el = handle.cast<KnownElements>();
+                    v.push_back(el);
+                 }
+                 return v;
+             },
+             "Add a list of elements to the list."
+         )
 
-        .def("clear", &KnownElementsList::clear)
-        .def("pop_back", &KnownElementsList::pop_back)
-        .def("__len__", [](const KnownElementsList &v) { return v.size(); })
+        .def("clear", &KnownElementsList::clear,
+             "Clear the list to become empty.")
+        .def("pop_back", &KnownElementsList::pop_back,
+             "Return and remove the last element of the list.")
+        .def("__len__", [](const KnownElementsList &v) { return v.size(); },
+             "The length of the list.")
         .def("__iter__", [](KnownElementsList &v) {
             return py::make_iterator(v.begin(), v.end());
         }, py::keep_alive<0, 1>()) /* Keep list alive while iterator is used */
@@ -66,6 +75,7 @@ void init_elements(py::module& m)
              "A linear Constant Focusing element."
         )
         .def_property_readonly("nslice", &ConstF::nslice)
+        .def_property_readonly("ds", &ConstF::ds)
     ;
 
     py::class_<DipEdge>(me, "DipEdge")
@@ -78,6 +88,7 @@ void init_elements(py::module& m)
              "Edge focusing associated with bend entry or exit."
         )
         .def_property_readonly("nslice", &DipEdge::nslice)
+        .def_property_readonly("ds", &DipEdge::ds)
     ;
 
     py::class_<Drift>(me, "Drift")
@@ -88,6 +99,7 @@ void init_elements(py::module& m)
              "A drift."
         )
         .def_property_readonly("nslice", &Drift::nslice)
+        .def_property_readonly("ds", &Drift::ds)
     ;
 
     py::class_<Multipole>(me, "Multipole")
@@ -99,6 +111,7 @@ void init_elements(py::module& m)
              "A general thin multipole element."
         )
         .def_property_readonly("nslice", &Multipole::nslice)
+        .def_property_readonly("ds", &Multipole::ds)
     ;
 
     py::class_<None>(me, "None")
@@ -106,6 +119,7 @@ void init_elements(py::module& m)
              "This element does nothing."
         )
         .def_property_readonly("nslice", &None::nslice)
+        .def_property_readonly("ds", &None::ds)
     ;
 
     py::class_<NonlinearLens>(me, "NonlinearLens")
@@ -116,6 +130,7 @@ void init_elements(py::module& m)
              "Single short segment of the nonlinear magnetic insert element."
         )
         .def_property_readonly("nslice", &NonlinearLens::nslice)
+        .def_property_readonly("ds", &NonlinearLens::ds)
     ;
 
     py::class_<Quad>(me, "Quad")
@@ -127,6 +142,7 @@ void init_elements(py::module& m)
              "A Quadrupole magnet."
         )
         .def_property_readonly("nslice", &Quad::nslice)
+        .def_property_readonly("ds", &Quad::ds)
     ;
 
     py::class_<Sbend>(me, "Sbend")
@@ -138,6 +154,7 @@ void init_elements(py::module& m)
              "An ideal sector bend."
         )
         .def_property_readonly("nslice", &Sbend::nslice)
+        .def_property_readonly("ds", &Sbend::ds)
     ;
 
     py::class_<ShortRF>(me, "ShortRF")
@@ -148,5 +165,6 @@ void init_elements(py::module& m)
              "A short RF cavity element at zero crossing for bunching."
         )
         .def_property_readonly("nslice", &ShortRF::nslice)
+        .def_property_readonly("ds", &ShortRF::ds)
     ;
 }

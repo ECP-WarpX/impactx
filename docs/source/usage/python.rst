@@ -12,9 +12,9 @@ General
 
    This is the central simulation class.
 
-   .. py:method:: set_particle_shape(order)
+   .. py:property:: particle_shape
 
-      Set the particle B-spline order.
+      Control the particle B-spline order.
 
       The order of the shape factors (splines) for the macro-particles along all spatial directions: `1` for linear, `2` for quadratic, `3` for cubic.
       Low-order shape factors result in faster simulations, but may lead to more noisy results.
@@ -23,39 +23,50 @@ General
 
       :param int order: B-spline order ``1``, ``2``, or ``3``
 
+   .. py:property:: n_cell
 
-   .. py:method:: set_space_charge(enable)
+      The number of grid points along each direction on the coarsest level.
 
-      Enable or disable space charge calculations (default: enabled).
+   .. py:property:: domain
+
+      The physical extent of the full simulation domain, relative to the reference particle position, in meters.
+      When set, turns ``dynamic_size`` to ``False``.
+
+      Note: particles that move outside the simulation domain are removed.
+
+   .. py:property:: prob_relative
+
+      The field mesh is expanded beyond the physical extent of particles by this factor.
+      When set, turns ``dynamic_size`` to ``True``.
+
+   .. py:property:: dynamic_size
+
+      Use dynamic (``True``) resizing of the field mesh or static sizing (``False``).
+
+   .. py:property:: space_charge
+
+      Enable (``True``) or disable (``False``) space charge calculations (default: ``True``).
 
       Whether to calculate space charge effects.
       This is in-development.
       At the moment, this flag only activates coordinate transformations and charge deposition.
 
-      :param bool enable: enable (true) or disable (false) space charge
+   .. py:property:: diagnostics
 
-   .. py:method:: set_diagnostics(enable)
-
-      Enable or disable diagnostics generally (default: enabled).
+      Enable (``True``) or disable (``False``) diagnostics generally (default: ``True``).
       Disabling this is mostly used for benchmarking.
 
-      :param bool enable: enable (true) or disable (false) all diagnostics
+   .. py:property:: slice_step_diagnostics
 
-   .. py:method:: set_slice_step_diagnostics(enable)
-
-      Enable or disable diagnostics every slice step in elements (default: disabled).
+      Enable (``True``) or disable (``False``) diagnostics every slice step in elements  (default: ``True``).
 
       By default, diagnostics is performed at the beginning and end of the simulation.
       Enabling this flag will write diagnostics every step and slice step.
 
-      :param bool enable: enable (true) or disable (false) all diagnostics
+   .. py:property:: diag_file_min_digits
 
-   .. py:method:: set_diag_file_min_digits(file_min_digits)
-
-      The minimum number of digits (default: 6) used for the step
+      The minimum number of digits (default: ``6``) used for the step
       number appended to the diagnostic file names.
-
-      :param int file_min_digits: number of digits in filenames
 
    .. py:method:: init_grids()
 
@@ -63,13 +74,13 @@ General
 
       This must come first, before particle beams and lattice elements are initialized.
 
-   .. py:method:: add_particles(qm_qeeV, charge_C, distr, npart)
+   .. py:method:: add_particles(charge_C, distr, npart)
 
       Generate and add n particles to the particle container.
+      Note: Set the reference particle properties (charge, mass, energy) first.
 
       Will also resize the geometry based on the updated particle distribution's extent and then redistribute particles in according AMReX grid boxes.
 
-      :param float qm_qeeV: charge/mass ratio (q_e/eV)
       :param float charge_C: bunch charge (C)
       :param distr: distribution function to draw from (object from :py:mod:`impactx.distribution`)
       :param int npart: number of particles to draw
@@ -82,6 +93,21 @@ General
 
       Access the elements in the accelerator lattice.
       See :py:mod:`impactx.elements` for lattice elements.
+
+   .. py:property:: abort_on_warning_threshold
+
+      (optional) Set to "low", "medium" or "high".
+      Cause the code to abort if a warning is raised that exceeds the warning threshold.
+
+   .. py:property:: abort_on_unused_inputs
+
+      Set to ``1`` to cause the simulation to fail *after* its completion if there were unused parameters. (default: ``0`` for false)
+      It is mainly intended for continuous integration and automated testing to check that all tests and inputs are adapted to API changes.
+
+   .. py:property:: always_warn_immediately
+
+      If set to ``1``, ImpactX immediately prints every warning message as soon as it is generated. (default: ``0`` for false)
+      It is mainly intended for debug purposes, in case a simulation crashes before a global warning report can be printed.
 
    .. py:method:: evolve()
 
@@ -224,9 +250,27 @@ Particles
 
       Read-only: Get reference particle beta*gamma
 
-   .. py:method:: set_energy_MeV(energy_MeV, massE_MeV)
+   .. py:property:: qm_qeeV
+
+      Read-only: Get reference particle charge to mass ratio (elementary charge/eV)
+
+   .. py:method:: set_charge_qe(charge_qe)
+
+      Write-only: Set reference particle charge in (positive) elementary charges.
+
+   .. py:method:: set_mass_MeV(massE)
+
+      Write-only: Set reference particle rest mass (MeV/c^2).
+
+   .. py:method:: set_energy_MeV(energy_MeV)
 
       Write-only: Set reference particle energy.
+
+   .. py:method:: load_file(madx_file)
+
+      Load reference particle information from a MAD-X file.
+
+      :param madx_file: file name to MAD-X file with a ``BEAM`` entry
 
 
 Initial Beam Distributions
@@ -292,6 +336,25 @@ This module provides elements for the accelerator lattice.
 .. py:class:: impactx.elements.KnownElementsList
 
    An iterable, ``list``-like type of elements.
+
+   .. py:method:: clear()
+
+      Clear the list to become empty.
+
+   .. py:method:: extend(list)
+
+      Add a list of elements to the list.
+
+   .. py:method:: append(element)
+
+      Add a single element to the list.
+
+   .. py:method:: load_file(madx_file, nslice=1)
+
+      Load and append an accelerator lattice description from a MAD-X file.
+
+      :param madx_file: file name to MAD-X file with beamline elements
+      :param nslice: number of slices used for the application of space charge
 
 .. py:class:: impactx.elements.ConstF(ds, kx, ky, kt, nslice=1)
 

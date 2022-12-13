@@ -71,22 +71,36 @@ namespace impactx
          * distribution's extent and then redistribute particles in according
          * AMReX grid boxes.
          *
-         * @param qm charge/mass ratio (q_e/eV)
          * @param bunch_charge bunch charge (C)
          * @param distr distribution function to draw from (object)
          * @param npart number of particles to draw
          */
         void
         add_particles (
-            amrex::ParticleReal qm,
             amrex::ParticleReal bunch_charge,
             distribution::KnownDistributions distr,
             int npart
         );
 
+        /** Validate the simulation is ready to run via @see evolve
+         */
+        void validate ();
+
+        /** Check inputs for unused parameters (e.g. typos) after step 1
+         *
+         * @return true if successful
+         */
+        bool early_param_check ();
+
         /** Run the main simulation loop for a number of steps
          */
         void evolve ();
+
+        /** Query input for warning logger variables and set up warning logger accordingly
+         *
+         * Input variables are: ``always_warn_immediately`` and ``abort_on_warning_threshold``.
+         */
+        void init_warning_logger ();
 
       private:
         //! Tag cells for refinement.  TagBoxArray tags is built on level lev grids.
@@ -122,8 +136,12 @@ namespace impactx
         /** these are the physical/beam particles of the simulation */
         std::unique_ptr<ImpactXParticleContainer> m_particle_container;
 
-        /** charge per level */
+        /** charge density per level */
         std::unordered_map<int, amrex::MultiFab> m_rho;
+        /** scalar potential per level */
+        std::unordered_map<int, amrex::MultiFab> m_phi;
+        /** space charge field (vector) per level */
+        std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > m_space_charge_field;
 
         /** these are elements defining the accelerator lattice */
         std::list<KnownElements> m_lattice;

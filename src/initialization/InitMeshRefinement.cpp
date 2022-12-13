@@ -8,14 +8,18 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "ImpactX.H"
+#include "initialization/InitAmrCore.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/distribution/Waterbag.H"
+
+#include <ablastr/warn_manager/WarnManager.H>
 
 #include <AMReX.H>
 #include <AMReX_BLProfiler.H>
 #include <AMReX_REAL.H>
 #include <AMReX_Utility.H>
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -35,13 +39,11 @@ namespace impactx
     /** Make a new level from scratch using provided BoxArray and DistributionMapping.
      *
      * Only used during initialization.
-     *
-     * @todo this function is not (yet) implemented.
      */
     void ImpactX::MakeNewLevelFromScratch (int lev, amrex::Real time, const amrex::BoxArray& ba,
                                           const amrex::DistributionMapping& dm)
     {
-        amrex::ignore_unused(time, ba, dm);
+        amrex::ignore_unused(time);
 
         // set human-readable tag for each MultiFab
         auto const tag = [lev]( std::string tagname ) {
@@ -66,8 +68,35 @@ namespace impactx
         else  // odd shape orders
             num_guards_rho = (particle_shape + 1) / 2;
 
-        m_rho.emplace(lev,
-                      amrex::MultiFab{amrex::convert(cba, rho_nodal_flag), dm, num_components_rho, num_guards_rho, tag("rho")});
+        m_rho.emplace(
+            lev,
+            amrex::MultiFab{amrex::convert(cba, rho_nodal_flag), dm, num_components_rho, num_guards_rho, tag("rho")});
+
+        // scalar potential
+        auto const phi_nodal_flag = rho_nodal_flag;
+        int const num_components_phi = 1;
+        int const num_guards_phi = num_guards_rho + 1; // todo: I think this just depends on max(MLMG, force calc)
+        m_phi.emplace(
+            lev,
+            amrex::MultiFab{amrex::convert(cba, phi_nodal_flag), dm, num_components_phi, num_guards_phi, tag("phi")});
+
+        // space charge force
+        std::unordered_map<std::string, amrex::MultiFab> f_comp;
+        for (std::string const comp : {"x", "y", "z"})
+        {
+            std::string const str_tag = "space_charge_field_" + comp;
+            f_comp.emplace(
+                comp,
+                amrex::MultiFab{
+                    amrex::convert(cba, rho_nodal_flag),
+                    dm,
+                    num_components_rho,
+                    num_guards_rho,
+                    tag(str_tag)
+                }
+            );
+        }
+        m_space_charge_field.emplace(lev, std::move(f_comp));
     }
 
     /** Make a new level using provided BoxArray and DistributionMapping and fill
@@ -95,12 +124,12 @@ namespace impactx
     }
 
     /** Delete level data
-     *
-     * @todo this function is not (yet) implemented.
      */
     void ImpactX::ClearLevel (int lev)
     {
         m_rho.erase(lev);
+        m_phi.erase(lev);
+        m_space_charge_field.erase(lev);
     }
 
     void ImpactX::ResizeMesh ()
@@ -109,13 +138,64 @@ namespace impactx
 
         // Extract the min and max of the particle positions
         auto const [x_min, y_min, z_min, x_max, y_max, z_max] = m_particle_container->MinAndMaxPositions();
+
+        // guard for flat beams:
+        //   https://github.com/ECP-WarpX/impactx/issues/44
+        if (x_min == x_max || y_min == y_max || z_min == z_max)
+            throw std::runtime_error("Flat beam detected. This is not yet supported: https://github.com/ECP-WarpX/impactx/issues/44");
+
+        amrex::ParmParse pp_geometry("geometry");
+        bool dynamic_size = true;
+        pp_geometry.query("dynamic_size", dynamic_size);
+
+        amrex::RealBox rb;
+        if (dynamic_size)
+        {
+            // The box is expanded beyond the min and max of particles.
+            // This controlled by the variable `frac` below.
+            amrex::Real frac = 1.0;
+            pp_geometry.query("prob_relative", frac);
+
+            if (frac < 1.0)
+                ablastr::warn_manager::WMRecordWarning(
+                    "ImpactX::ResizeMesh",
+                    "Dynamic resizing of the mesh uses a geometry.prob_relative "
+                    "padding of less than 1. This might result in boundary "
+                    "artifacts for space charge calculation. "
+                    "There is no minimum good value for this parameter, consider "
+                    "doing a convergence test.",
+                    ablastr::warn_manager::WarnPriority::high
+                );
+
+            if (frac < 0.0)
+                throw std::runtime_error("geometry.prob_relative must be positive");
+
+            rb = {
+                {x_min - frac * (x_max - x_min), y_min - frac * (y_max - y_min),
+                 z_min - frac * (z_max - z_min)}, // Low bound
+                {x_max + frac * (x_max - x_min), y_max + frac * (y_max - y_min),
+                 z_max + frac * (z_max - z_min)}  // High bound
+            };
+        }
+        else
+        {
+            // note: we read and set the size again because an interactive /
+            //       Python user might have changed it between steps
+            amrex::Vector<amrex::Real> prob_lo;
+            amrex::Vector<amrex::Real> prob_hi;
+            pp_geometry.getarr("prob_lo", prob_lo);
+            pp_geometry.getarr("prob_hi", prob_hi);
+
+            rb = {prob_lo.data(), prob_hi.data()};
+        }
+
+        // updating geometry.prob_lo/hi for consistency
+        amrex::Vector<amrex::Real> const prob_lo = {rb.lo()[0], rb.lo()[1], rb.lo()[2]};
+        amrex::Vector<amrex::Real> const prob_hi = {rb.hi()[0], rb.hi()[1], rb.hi()[2]};
+        pp_geometry.addarr("prob_lo", prob_lo);
+        pp_geometry.addarr("prob_hi", prob_hi);
+
         // Resize the domain size
-        // The box is expanded slightly beyond the min and max of particles.
-        // This controlled by the variable `frac` below.
-        const amrex::Real frac=0.1;
-        amrex::RealBox rb(
-            {x_min-frac*(x_max-x_min), y_min-frac*(y_max-y_min), z_min-frac*(z_max-z_min)}, // Low bound
-            {x_max+frac*(x_max-x_min), y_max+frac*(y_max-y_min), z_max+frac*(z_max-z_min)}); // High bound
         amrex::Geometry::ResetDefaultProbDomain(rb);
         for (int lev = 0; lev <= this->max_level; ++lev) {
             amrex::Geometry g = Geom(lev);
