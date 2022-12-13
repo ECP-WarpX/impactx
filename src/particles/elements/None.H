@@ -43,7 +43,7 @@ namespace impactx
                 [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT px,
                 [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT py,
                 [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT pt,
-                [[maybe_unused]] RefPart const refpart) const
+                [[maybe_unused]] RefPart const & refpart) const
         {
             // nothing to do
         }
@@ -53,8 +53,7 @@ namespace impactx
          * @param[in,out] refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void operator() (
-                [[maybe_unused]] RefPart & AMREX_RESTRICT refpart) const {
+        void operator() ([[maybe_unused]] RefPart & AMREX_RESTRICT refpart) const {
 
             // nothing to do: this is a zero-length element
 
