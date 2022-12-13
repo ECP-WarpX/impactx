@@ -23,34 +23,31 @@
 
 namespace impactx
 {
-
     struct RFCavity
     {
         static constexpr auto name = "RFCavity";
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** An RF cavity (with solenoid field)
+        /** An RF cavity
          *
          * @param ds Segment length in m
-         * @param Escale Scaling factor for on-axis RF electric field
+         * @param escale Scaling factor for on-axis RF electric field
          * @param freq RF frequency in Hz
          * @param phase RF driven phase in deg
-         * @param Bzsol Strength of solenoid field in T
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
          */
         RFCavity(
             amrex::ParticleReal const ds,
-            amrex::ParticleReal const Escale,
+            amrex::ParticleReal const escale,
             amrex::ParticleReal const freq,
             amrex::ParticleReal const phase,
-            amrex::ParticleReal const Bzsol,
             int const mapsteps,
             int const nslice
         )
-          : m_ds(ds), m_Escale(Escale), m_freq(freq), m_phase(phase),
-            m_Bzsol(Bzsol), m_mapsteps(mapsteps), m_nslice(nslice)
+          : m_ds(ds), m_escale(escale), m_freq(freq), m_phase(phase),
+            m_mapsteps(mapsteps), m_nslice(nslice)
         {
         }
 
@@ -296,7 +293,7 @@ namespace impactx
             amrex::ParticleReal const c = 2.99792458e8;
             amrex::ParticleReal const k = 2.0_prt*pi*m_freq/c;
             amrex::ParticleReal const phi = m_phase*pi/180.0_prt;
-            amrex::ParticleReal const E0 = m_Escale;
+            amrex::ParticleReal const E0 = m_escale;
 
             // push the reference particle
             [[maybe_unused]] auto [ez, ezp, ezint] = RF_Efield(zeval);
@@ -335,7 +332,7 @@ namespace impactx
             amrex::ParticleReal const c = 2.99792458e8;
             amrex::ParticleReal const k = 2.0_prt*pi*m_freq/c;
             amrex::ParticleReal const phi = m_phase*pi/180.0_prt;
-            amrex::ParticleReal const E0 = m_Escale;
+            amrex::ParticleReal const E0 = m_escale;
 
             // push the reference particle
             [[maybe_unused]] auto [ez, ezp, ezint] = RF_Efield(z);
@@ -382,10 +379,9 @@ namespace impactx
 
     private:
         amrex::ParticleReal m_ds; //! segment length in m
-        amrex::ParticleReal m_Escale; //! scaling factor for RF electric field
+        amrex::ParticleReal m_escale; //! scaling factor for RF electric field
         amrex::ParticleReal m_freq; //! RF frequency in Hz
         amrex::ParticleReal m_phase; //! RF driven phase in deg
-        amrex::ParticleReal m_Bzsol; //! strength of solenoid field in T
         int m_mapsteps; //! number of map integration steps per slice
         int m_nslice; //! number of slices used for the application of space charge
     };
