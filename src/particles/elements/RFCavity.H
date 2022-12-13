@@ -83,7 +83,7 @@ namespace impactx
             // write the linear map
 /*            for (int i=1; i<7; i++) {
                for (int j=1; j<7; j++) {
-                  amrex::AllPrintToFile("mapout") << "R" << " " << i << " " 
+                  amrex::AllPrintToFile("mapout") << "R" << " " << i << " "
                      << j << " " << R(i,j) << "\n";
                }
             }
@@ -133,7 +133,7 @@ namespace impactx
             amrex::ParticleReal const sedge = refpart.sedge;
 
             // initialize linear map (deviation) values
-            
+
             for (int i=1; i<7; i++) {
                for (int j=1; j<7; j++) {
                   if (i == j)
@@ -177,18 +177,18 @@ namespace impactx
 
             for (int i=1; i<7; i++) {
                for (int j=1; j<7; j++) {
-                   if( i % 2 == 0) 
+                   if( i % 2 == 0)
                       scale_fin = bgf;
                    else
                       scale_fin = 1.0_prt;
-                   if( j % 2 == 0) 
+                   if( j % 2 == 0)
                       scale_in = bgi;
                    else
                       scale_in = 1.0_prt;
                    refpart.map(i,j) = refpart.map(i,j)*scale_in/scale_fin;
                }
             }
-            
+
             // advance integrated path length
             refpart.s = s + slice_ds;
 
@@ -249,7 +249,7 @@ namespace impactx
                efieldint = z*efield;
                for(int j=1; j < ncoef; ++j)
                {
-                 efield = efield + cos_coef[j]*cos(j*2*pi*z/zlen) + 
+                 efield = efield + cos_coef[j]*cos(j*2*pi*z/zlen) +
                       sin_coef[j]*sin(j*2*pi*z/zlen);
                  efieldp = efieldp-j*2*pi*cos_coef[j]*sin(j*2*pi*z/zlen)/zlen +
                       j*2*pi*sin_coef[j]*cos(j*2*pi*z/zlen)/zlen;
@@ -319,7 +319,7 @@ namespace impactx
                zeval = zeval;
 
                // push the linear map equations
- 
+
               amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
               amrex::ParticleReal const s = tau/refpart.beta_gamma();
               amrex::ParticleReal const L = E0*ezp*sin(k*t+phi)/(2.0_prt*k);
@@ -365,7 +365,7 @@ namespace impactx
                amrex::AllPrintToFile("rfout") << z << " " << ez << "\n";
 
                // push the linear map equations
- 
+
               amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
               amrex::ParticleReal const M = E0*(ezintf-ezint)*k*sin(k*t+phi);
               amrex::ParticleReal const L = E0*(ezpf-ezp)*sin(k*t+phi)/(2.0_prt*k)+M/2.0_prt;
