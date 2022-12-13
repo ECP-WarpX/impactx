@@ -54,7 +54,7 @@ namespace impactx
                 amrex::ParticleReal & AMREX_RESTRICT px,
                 amrex::ParticleReal & AMREX_RESTRICT py,
                 amrex::ParticleReal & AMREX_RESTRICT pt,
-                RefPart const refpart) const {
+                RefPart const & refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
 
@@ -112,8 +112,7 @@ namespace impactx
          * @param[in,out] refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void operator() (
-                RefPart & AMREX_RESTRICT refpart) const {
+        void operator() (RefPart & AMREX_RESTRICT refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
 
@@ -142,7 +141,6 @@ namespace impactx
 
             // advance integrated path length
             refpart.s = s + slice_ds;
-
         }
 
         /** Number of slices used for the application of space charge
