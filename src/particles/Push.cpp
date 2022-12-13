@@ -53,7 +53,7 @@ namespace detail
                             amrex::ParticleReal* AMREX_RESTRICT part_py,
                             amrex::ParticleReal* AMREX_RESTRICT part_pt,
                             RefPart ref_part)
-            : m_element(element), m_aos_ptr(aos_ptr),
+            : m_element(std::move(element)), m_aos_ptr(aos_ptr),
               m_part_px(part_px), m_part_py(part_py), m_part_pt(part_pt),
               m_ref_part(std::move(ref_part))
         {
