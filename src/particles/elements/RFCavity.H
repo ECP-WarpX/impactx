@@ -83,7 +83,7 @@ namespace impactx
 
             // get the linear map
             amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
-            
+
             // symplectic linear map for the RF cavity is computed using the
             // Hamiltonian formalism as described in:
             // https://uspas.fnal.gov/materials/09UNM/ComputationalMethods.pdf.
@@ -203,12 +203,12 @@ namespace impactx
             // specify Fourier coefficients
             amrex::ParticleReal cos_coef [ncoef] = {};
             amrex::ParticleReal sin_coef [ncoef] = {};
-            
+
             // Fourier coefficients for the on-axis longitudinal
             // electric field Ez of the 9-cell TESLA superconducting
             // cavity (default cavity model):
             https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.3.092001.
-            
+
             // May be superseded by user-provided input values (to do).
 
             // recall array indexing begins with 0
