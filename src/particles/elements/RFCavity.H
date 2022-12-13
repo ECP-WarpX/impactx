@@ -207,7 +207,7 @@ namespace impactx
             // Fourier coefficients for the on-axis longitudinal
             // electric field Ez of the 9-cell TESLA superconducting
             // cavity (default cavity model):
-            https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.3.092001.
+            // https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.3.092001.
 
             // May be superseded by user-provided input values (to do).
 
