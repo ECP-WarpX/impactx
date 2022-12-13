@@ -143,7 +143,6 @@ namespace impactx
             // call integrator to advance (t,pt)
             amrex::ParticleReal const zin = s - sedge;
             amrex::ParticleReal const zout = zin + slice_ds;
-            std::string element_type = "rfcavity";
             int const nsteps = m_mapsteps;
 
             integrators::symp2_integrate_split3(refpart,zin,zout,nsteps,*this);
