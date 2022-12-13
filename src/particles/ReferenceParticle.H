@@ -12,6 +12,7 @@
 
 #include <ablastr/constant.H>
 
+#include <AMReX_Array.H>
 #include <AMReX_BLassert.H>
 #include <AMReX_Extension.H>
 #include <AMReX_GpuQualifiers.H>
