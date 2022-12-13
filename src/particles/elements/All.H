@@ -10,16 +10,16 @@
 #ifndef IMPACTX_ELEMENTS_ALL_H
 #define IMPACTX_ELEMENTS_ALL_H
 
-#include "Drift.H"
-#include "Sbend.H"
-#include "Quad.H"
-#include "DipEdge.H"
 #include "ConstF.H"
-#include "ShortRF.H"
+#include "DipEdge.H"
+#include "Drift.H"
 #include "Multipole.H"
 #include "None.H"
 #include "NonlinearLens.H"
+#include "Quad.H"
 #include "RFCavity.H"
+#include "Sbend.H"
+#include "ShortRF.H"
 
 #include <variant>
 
@@ -29,7 +29,7 @@ namespace impactx
     using KnownElements = std::variant<
         None, /* must be first, so KnownElements creates a default constructor */
         ConstF, DipEdge, Drift, Multipole, NonlinearLens,
-        Quad, Sbend, ShortRF, RFCavity>;
+        Quad, RFCavity, Sbend, ShortRF>;
 
 } // namespace impactx
 

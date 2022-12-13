@@ -56,8 +56,8 @@ rf = elements.RFCavity(
     escale=62.0,
     freq=1.3e9,
     phase=85.5,
-    nslice=4,
     mapsteps=100,
+    nslice=4,
 )
 
 sim.lattice.extend([dr1, dr2, rf, dr2, dr2, rf, dr2, dr2, rf, dr2, dr2, rf, dr2])

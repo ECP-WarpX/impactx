@@ -36,8 +36,8 @@ rf.ds = 1.31879807
 rf.escale = 62.0
 rf.freq = 1.3e9
 rf.phase = 85.5
-rf.nslice = 4
 rf.mapsteps = 100
+rf.nslice = 4
 
 ###############################################################################
 # Algorithms
