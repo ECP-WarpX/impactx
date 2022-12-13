@@ -64,12 +64,13 @@ namespace impactx
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
-                amrex::ParticleReal & AMREX_RESTRICT px,
-                amrex::ParticleReal & AMREX_RESTRICT py,
-                amrex::ParticleReal & AMREX_RESTRICT pt,
-                [[maybe_unused]] RefPart const & refpart) const {
-
+            PType& AMREX_RESTRICT p,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            [[maybe_unused]] RefPart const & refpart
+        ) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
@@ -99,7 +100,6 @@ namespace impactx
             */
 
             // push particles using the linear map
-
             p.pos(0) = R(1,1)*x + R(1,2)*px + R(1,3)*y
                      + R(1,4)*py + R(1,5)*t + R(1,6)*pt;
             pxout = R(2,1)*x + R(2,2)*px + R(2,3)*y
@@ -117,7 +117,6 @@ namespace impactx
             px = pxout;
             py = pyout;
             pt = ptout;
-
         }
 
         /** This pushes the reference particle.
@@ -199,7 +198,6 @@ namespace impactx
 
             // advance integrated path length
             refpart.s = s + slice_ds;
-
         }
 
         std::tuple<amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal>
@@ -270,8 +268,9 @@ namespace impactx
             return std::make_tuple(efield,efieldp,efieldint);
         }
 
-        void map3 (amrex::ParticleReal const tau, RefPart & refpart,
-                               amrex::ParticleReal & zeval) const
+        void map3 (amrex::ParticleReal const tau,
+                   RefPart & refpart,
+                   amrex::ParticleReal & zeval) const
         {
 
             using namespace amrex::literals; // for _rt and _prt
@@ -301,8 +300,9 @@ namespace impactx
               refpart.map(5,6) = R(5,6) + tau*R(6,6)/pow(betgam,3);
         }
 
-        void map2 (amrex::ParticleReal const tau, RefPart & refpart,
-                               amrex::ParticleReal & zeval) const
+        void map2 (amrex::ParticleReal const tau,
+                   RefPart & refpart,
+                   amrex::ParticleReal & zeval) const
         {
 
             using namespace amrex::literals; // for _rt and _prt
@@ -344,8 +344,9 @@ namespace impactx
 
         }
 
-        void map1 (amrex::ParticleReal const tau, RefPart & refpart,
-                               amrex::ParticleReal & zeval) const
+        void map1 (amrex::ParticleReal const tau,
+                   RefPart & refpart,
+                   amrex::ParticleReal & zeval) const
         {
 
             using namespace amrex::literals; // for _rt and _prt
@@ -389,7 +390,6 @@ namespace impactx
 
         }
 
-
         /** Number of slices used for the application of space charge
          *
          * @return positive integer
@@ -400,6 +400,15 @@ namespace impactx
             return m_nslice;
         }
 
+        /** Return the segment length
+         *
+         * @return value in meters
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        amrex::ParticleReal ds () const
+        {
+            return m_ds;
+        }
 
     private:
         amrex::ParticleReal m_ds; //! segment length in m
