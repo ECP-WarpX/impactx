@@ -424,6 +424,18 @@ This module provides elements for the accelerator lattice.
               k < 0 horizontal defocusing
    :param nslice: number of slices used for the application of space charge
 
+.. py:class:: impactx.elements.RFCavity(ds, escale, freq, phase, mapsteps, nslice)
+
+   A radiofrequency cavity.
+
+   :param ds: Segment length in m.
+   :param escale: scaling factor for on-axis RF electric field in 1/m
+                  = (peak on-axis electric field Ez in MV/m) / (particle rest energy in MeV)
+   :param freq: RF frequency in Hz
+   :param phase: RF driven phase in degrees
+   :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
+   :param nslice: number of slices used for the application of space charge
+
 .. py:class:: impactx.elements.Sbend(ds, rc, nslice=1)
 
    An ideal sector bend.

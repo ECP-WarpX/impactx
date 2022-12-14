@@ -12,6 +12,7 @@
 
 #include <ablastr/constant.H>
 
+#include <AMReX_Array.H>
 #include <AMReX_BLassert.H>
 #include <AMReX_Extension.H>
 #include <AMReX_GpuQualifiers.H>
@@ -38,6 +39,9 @@ namespace impactx
         amrex::ParticleReal pt = 0.0; ///< energy deviation, normalized by rest energy
         amrex::ParticleReal mass = 0.0; ///< reference rest mass, in kg
         amrex::ParticleReal charge = 0.0; ///< reference charge, in C
+
+        amrex::ParticleReal sedge = 0.0;  ///< value of s at entrance of the current beamline element
+        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> map; ///< linearized map
 
         /** Get reference particle relativistic gamma
          *

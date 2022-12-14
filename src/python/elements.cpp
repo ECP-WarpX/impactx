@@ -145,6 +145,24 @@ void init_elements(py::module& m)
         .def_property_readonly("ds", &Quad::ds)
     ;
 
+    py::class_<RFCavity>(me, "RFCavity")
+        .def(py::init<
+                amrex::ParticleReal const,
+                amrex::ParticleReal const,
+                amrex::ParticleReal const,
+                amrex::ParticleReal const,
+                int const,
+                int const
+             >(),
+             py::arg("ds"), py::arg("escale"), py::arg("freq"),
+             py::arg("phase"),
+             py::arg("mapsteps"), py::arg("nslice") = 1,
+             "An RF cavity (with solenoid field)."
+        )
+        .def_property_readonly("nslice", &RFCavity::nslice)
+        .def_property_readonly("ds", &RFCavity::ds)
+    ;
+
     py::class_<Sbend>(me, "Sbend")
         .def(py::init<
                 amrex::ParticleReal const,

@@ -150,7 +150,7 @@ add_impactx_test(chicane
     examples/chicane/plot_chicane.py
 )
 
-# Python: Chicane #####################################################################
+# Python: Chicane #############################################################
 #
 add_impactx_test(chicane.py
     examples/chicane/run_chicane.py
@@ -160,7 +160,7 @@ add_impactx_test(chicane.py
     examples/chicane/plot_chicane.py
 )
 
-# Python MADX: Chicane ######################################################
+# Python MADX: Chicane ########################################################
 #
 # copy MAD-X lattice file
 file(COPY ${ImpactX_SOURCE_DIR}/examples/chicane/chicane.madx DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chicane.MADX.py)
@@ -193,7 +193,7 @@ add_impactx_test(cfchannel.py
     OFF  # no plot script yet
 )
 
-# Kurth Distribution Test ###################################################
+# Kurth Distribution Test #####################################################
 #
 add_impactx_test(kurth
     examples/kurth/input_kurth.in
@@ -203,7 +203,7 @@ add_impactx_test(kurth
     OFF  # no plot script yet
 )
 
-# Python: Kurth Distribution Test ##################################################
+# Python: Kurth Distribution Test #############################################
 #
 add_impactx_test(kurth.py
     examples/kurth/run_kurth.py
@@ -213,7 +213,7 @@ add_impactx_test(kurth.py
     OFF  # not plotting script yet
 )
 
-# 6D Gaussian Distribution Test ###################################################
+# 6D Gaussian Distribution Test ###############################################
 #
 add_impactx_test(gaussian
     examples/distgen/input_gaussian.in
@@ -223,7 +223,7 @@ add_impactx_test(gaussian
     OFF  # no plot script yet
 )
 
-# K-V Distribution Test ############################################################
+# K-V Distribution Test #######################################################
 #
 add_impactx_test(kvdist
     examples/distgen/input_kvdist.in
@@ -233,7 +233,7 @@ add_impactx_test(kvdist
     OFF  # no plot script yet
 )
 
-# FODO Cell with RF ###################################################################
+# FODO Cell with RF ###########################################################
 #
 add_impactx_test(FODO_RF
     examples/fodo_rf/input_fodo_rf.in
@@ -253,7 +253,7 @@ add_impactx_test(FODO_RF.py
     OFF  # no plot script yet
 )
 
-# 4D Kurth Distribution Test ############################################################
+# 4D Kurth Distribution Test ##################################################
 #
 add_impactx_test(kurth4d
     examples/distgen/input_kurth4d.in
@@ -263,7 +263,7 @@ add_impactx_test(kurth4d
     OFF  # no plot script yet
 )
 
-# Semi-Gaussian Distribution Test ############################################################
+# Semi-Gaussian Distribution Test #############################################
 #
 add_impactx_test(semigaussian
     examples/distgen/input_semigaussian.in
@@ -273,7 +273,7 @@ add_impactx_test(semigaussian
     OFF  # no plot script yet
 )
 
-# Chain of Multipoles Test ############################################################
+# Chain of Multipoles Test ####################################################
 #
 add_impactx_test(multipole
     examples/multipole/input_multipole.in
@@ -283,7 +283,7 @@ add_impactx_test(multipole
     OFF  # no plot script yet
 )
 
-# Expanding Beam Test #################################################################
+# Expanding Beam Test #########################################################
 #
 add_impactx_test(expanding_beam
     examples/expanding_beam/input_expanding.in
@@ -293,7 +293,7 @@ add_impactx_test(expanding_beam
     OFF  # no plot script yet
 )
 
-# Python: Expanding Beam Test #########################################################
+# Python: Expanding Beam Test #################################################
 #
 add_impactx_test(expanding_beam.py
     examples/expanding_beam/run_expanding.py
@@ -303,7 +303,7 @@ add_impactx_test(expanding_beam.py
     OFF  # no plot script yet
 )
 
-# Python: Chain of Multipoles Test #########################################################
+# Python: Chain of Multipoles Test ############################################
 #
 add_impactx_test(multipole.py
     examples/multipole/run_multipole.py
@@ -313,7 +313,7 @@ add_impactx_test(multipole.py
     OFF  # not plotting script yet
 )
 
-# IOTA Nonlinear Focusing Channel Test ############################################################
+# IOTA Nonlinear Focusing Channel Test ########################################
 #
 add_impactx_test(iotalens
     examples/iota_lens/input_iotalens.in
@@ -323,7 +323,7 @@ add_impactx_test(iotalens
     OFF  # no plot script yet
 )
 
-# Python: IOTA Nonlinear Focusing Channel Test #####################################
+# Python: IOTA Nonlinear Focusing Channel Test ################################
 #
 add_impactx_test(iotalens.py
     examples/iota_lens/run_iotalens.py
@@ -333,7 +333,7 @@ add_impactx_test(iotalens.py
     OFF  # not plotting script yet
 )
 
-# IOTA Linear Lattice Test ############################################################
+# IOTA Linear Lattice Test ####################################################
 #
 add_impactx_test(iotalattice.MPI
     examples/iota_lattice/input_iotalattice.in
@@ -351,5 +351,27 @@ add_impactx_test(iotalattice.py.MPI
       ON   # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/iota_lattice/analysis_iotalattice.py
+    OFF  # no plot script yet
+)
+
+
+# Acceleration by RF Cavities #################################################
+#
+add_impactx_test(rfcavity.MPI
+    examples/rfcavity/input_rfcavity.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/rfcavity/analysis_rfcavity.py
+    OFF  # no plot script yet
+)
+
+
+# Python: Acceleration by RF Cavities #########################################
+#
+add_impactx_test(rfcavity.py.MPI
+    examples/rfcavity/run_rfcavity.py
+      ON   # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/rfcavity/analysis_rfcavity.py
     OFF  # no plot script yet
 )

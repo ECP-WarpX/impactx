@@ -38,6 +38,9 @@ namespace impactx
         int nslice_default = 1;
         pp_lattice.query("nslice", nslice_default);
 
+        // Default number of map integration steps per slice
+        int mapsteps_default = 10;  // used only in RF cavity
+
         // Loop through lattice elements
         for (std::string const & element_name : lattice_elements) {
             // Check the element type
@@ -99,6 +102,17 @@ namespace impactx
                 pp_element.get("knll", knll);
                 pp_element.get("cnll", cnll);
                 m_lattice.emplace_back( NonlinearLens(knll, cnll) );
+            } else if (element_type == "rfcavity") {
+                amrex::Real ds, escale, freq, phase;
+                int nslice = nslice_default;
+                int mapsteps = mapsteps_default;
+                pp_element.get("ds", ds);
+                pp_element.get("escale", escale);
+                pp_element.get("freq", freq);
+                pp_element.get("phase", phase);
+                pp_element.queryAdd("mapsteps", mapsteps);
+                pp_element.queryAdd("nslice", nslice);
+                m_lattice.emplace_back( RFCavity(ds, escale, freq, phase, mapsteps, nslice) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }
