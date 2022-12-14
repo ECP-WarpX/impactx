@@ -272,8 +272,8 @@ namespace impactx
             return std::make_tuple(efield, efieldp, efieldint);
         }
 
-        /** This pushes the reference particle and the linear map matrix 
-         *  elements for an RF cavity through the symplectic map associated 
+        /** This pushes the reference particle and the linear map matrix
+         *  elements for an RF cavity through the symplectic map associated
          *  with H_3 in the Hamiltonian splitting H = H_1 + H_2 + H_3.
          *
          * @param tau Map step size in m
@@ -308,8 +308,8 @@ namespace impactx
             refpart.map(5,6) = R(5,6) + tau*R(6,6)/pow(betgam,3);
         }
 
-        /** This pushes the reference particle and the linear map matrix 
-         *  elements for an RF cavity through the symplectic map associated 
+        /** This pushes the reference particle and the linear map matrix
+         *  elements for an RF cavity through the symplectic map associated
          *  with H_2 in the Hamiltonian splitting H = H_1 + H_2 + H_3.
          *
          * @param tau Map step size in m
@@ -356,8 +356,8 @@ namespace impactx
             refpart.map(4,4) = -s*pow(L,2)*R(3,4) + (1.0_prt+s*L)*R(4,4);
         }
 
-        /** This pushes the reference particle and the linear map matrix 
-         *  elements for an RF cavity through the symplectic map associated 
+        /** This pushes the reference particle and the linear map matrix
+         *  elements for an RF cavity through the symplectic map associated
          *  with H_1 in the Hamiltonian splitting H = H_1 + H_2 + H_3.
          *
          * @param tau Map step size in m
