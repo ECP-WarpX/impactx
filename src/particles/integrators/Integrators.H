@@ -21,6 +21,7 @@ namespace impactx::integrators
 {
 
     template <typename T_Element>
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     void symp2_integrate (
         RefPart & refpart,
         amrex::ParticleReal const zin,
@@ -49,6 +50,7 @@ namespace impactx::integrators
     }
 
     template <typename T_Element>
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     void symp2_integrate_split3 (
         RefPart & refpart,
         amrex::ParticleReal const zin,
@@ -80,6 +82,7 @@ namespace impactx::integrators
     }
 
     template <typename T_Element>
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     void symp4_integrate (
         RefPart & refpart,
         amrex::ParticleReal const zin,
