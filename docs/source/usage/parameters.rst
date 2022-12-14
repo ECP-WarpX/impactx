@@ -255,6 +255,21 @@ Lattice Elements
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
+        * ``rfcavity`` a radiofrequency cavity
+          This requires these additional parameters:
+
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
+
+            * ``<element_name>.escale`` (``float``, in 1/m) scaling factor for on-axis RF electric field
+
+            * ``<element_name>.freq`` (``float``, in Hz) RF frequency
+
+            * ``<element_name>.phase`` (``float``, in degrees) RF driven phase
+
+            * ``<element_name>.mapsteps`` (``integer``) number of integration steps per slice used for map and reference particle push in applied fields
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
+
         * ``shortrf`` for a short RF (bunching) cavity element.
           This requires these additional parameters:
 

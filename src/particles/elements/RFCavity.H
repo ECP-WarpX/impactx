@@ -35,7 +35,7 @@ namespace impactx
         /** An RF cavity
          *
          * @param ds Segment length in m
-         * @param escale Scaling factor for on-axis RF electric field
+         * @param escale Scaling factor for on-axis RF electric field in 1/m
          * @param freq RF frequency in Hz
          * @param phase RF driven phase in deg
          * @param mapsteps number of integration steps per slice used for
