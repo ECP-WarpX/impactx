@@ -104,7 +104,7 @@ namespace impactx::integrators
         amrex::ParticleReal zeval = zin;
 
         // loop over integration steps
-        for(int j=0; j < nsteps; ++j)
+        for (int j=0; j < nsteps; ++j)
         {
             element.map1(tau1,refpart,zeval);
             element.map2(tau2,refpart,zeval);
@@ -115,7 +115,6 @@ namespace impactx::integrators
             element.map1(tau1,refpart,zeval);
         }
     }
-
 } // namespace impactx::integrators
 
-#endif
+#endif // IMPACTX_INTEGRATORS_H_

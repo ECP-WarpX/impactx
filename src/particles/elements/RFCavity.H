@@ -13,11 +13,14 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/integrators/Integrators.H"
 
+#include <ablastr/constant.H>
+
 #include <AMReX.H>
 #include <AMReX_Array.H>
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
 
+#include <array>
 #include <cmath>
 #include <tuple>
 
@@ -116,8 +119,8 @@ namespace impactx
          * @param[in,out] refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void operator() (RefPart & AMREX_RESTRICT refpart) const {
-
+        void operator() (RefPart & AMREX_RESTRICT refpart) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
             // assign input reference particle values
@@ -135,9 +138,9 @@ namespace impactx
             for (int i=1; i<7; i++) {
                for (int j=1; j<7; j++) {
                   if (i == j)
-                      refpart.map(i,j) = 1.0_prt;
+                      refpart.map(i, j) = 1.0_prt;
                   else
-                      refpart.map(i,j) = 0.0_prt;
+                      refpart.map(i, j) = 0.0_prt;
                }
             }
 
@@ -145,7 +148,7 @@ namespace impactx
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // compute intial value of beta*gamma
-            amrex::ParticleReal const bgi = sqrt(pow(pt,2)-1.0_prt);
+            amrex::ParticleReal const bgi = sqrt(pow(pt, 2) - 1.0_prt);
 
             // call integrator to advance (t,pt)
             amrex::ParticleReal const zin = s - sedge;
@@ -161,7 +164,7 @@ namespace impactx
             refpart.z = z + slice_ds*pz/bgi;
 
             // compute final value of beta*gamma
-            amrex::ParticleReal const bgf = sqrt(pow(ptf,2)-1.0_prt);
+            amrex::ParticleReal const bgf = sqrt(pow(ptf, 2) - 1.0_prt);
 
             // advance momentum (px,py,pz)
             refpart.px = px*bgf/bgi;
@@ -182,7 +185,7 @@ namespace impactx
                       scale_in = bgi;
                    else
                       scale_in = 1.0_prt;
-                   refpart.map(i,j) = refpart.map(i,j)*scale_in/scale_fin;
+                   refpart.map(i, j) = refpart.map(i, j) * scale_in / scale_fin;
                }
             }
 
@@ -197,48 +200,45 @@ namespace impactx
             using namespace amrex::literals; // for _rt and _prt
 
             // specify constants
-            amrex::ParticleReal const pi = 3.141592653589793_prt;
-            amrex::ParticleReal const zlen = 1.31879807_prt;
-            amrex::ParticleReal const zmid = zlen/2.0_prt;
-            int const ncoef = 25;
+            using ablastr::constant::math::pi;
+            constexpr amrex::ParticleReal zlen = 1.31879807_prt;
+            constexpr amrex::ParticleReal zmid = zlen / 2.0_prt;
+            constexpr int ncoef = 25;
 
-            // specify Fourier coefficients
-            amrex::ParticleReal cos_coef [ncoef] = {};
-            amrex::ParticleReal sin_coef [ncoef] = {};
-
-            // Fourier coefficients for the on-axis longitudinal
-            // electric field Ez of the 9-cell TESLA superconducting
-            // cavity (default cavity model):
-            // https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.3.092001.
-
+            // specify Fourier coefficients:
+            //   Fourier coefficients for the on-axis longitudinal
+            //   electric field Ez of the 9-cell TESLA superconducting
+            //   cavity (default cavity model):
+            //   https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.3.092001.
             // May be superseded by user-provided input values (to do).
-
-            // recall array indexing begins with 0
-            cos_coef[0] = 0.1644024074311037;
-            cos_coef[1] = -0.1324009958969339;
-            cos_coef[2] = 4.3443060026047219E-002;
-            cos_coef[3] = 8.5602654094946495E-002;
-            cos_coef[4] = -0.2433578169042885;
-            cos_coef[5] = 0.5297150596779437;
-            cos_coef[6] = 0.7164884680963959;
-            cos_coef[7] = -5.2579522442877296E-003;
-            cos_coef[8] = -5.5025369142193678E-002;
-            cos_coef[9] = 4.6845673335028933E-002;
-            cos_coef[10] = -2.3279346335638568E-002;
-            cos_coef[11] = 4.0800777539657775E-003;
-            cos_coef[12] = 4.1378326533752169E-003;
-            cos_coef[13] = -2.5040533340490805E-003;
-            cos_coef[14] = -4.0654981400000964E-003;
-            cos_coef[15] = 9.6630592067498289E-003;
-            cos_coef[16] = -8.5275895985990214E-003;
-            cos_coef[17] = -5.8078747006425020E-002;
-            cos_coef[18] = -2.4044337836660403E-002;
-            cos_coef[19] = 1.0968240064697212E-002;
-            cos_coef[20] = -3.4461179858301418E-003;
-            cos_coef[21] = -8.1201564869443749E-004;
-            cos_coef[22] = 2.1438992904959380E-003;
-            cos_coef[23] = -1.4997753525697276E-003;
-            cos_coef[24] = 1.8685171825676386E-004;
+            constexpr std::array<amrex::ParticleReal, ncoef> cos_coef = {
+                0.1644024074311037,
+                -0.1324009958969339,
+                4.3443060026047219e-002,
+                8.5602654094946495e-002,
+                -0.2433578169042885,
+                0.5297150596779437,
+                0.7164884680963959,
+                -5.2579522442877296e-003,
+                -5.5025369142193678e-002,
+                4.6845673335028933e-002,
+                -2.3279346335638568e-002,
+                4.0800777539657775e-003,
+                4.1378326533752169e-003,
+                -2.5040533340490805e-003,
+                -4.0654981400000964e-003,
+                9.6630592067498289e-003,
+                -8.5275895985990214e-003,
+                -5.8078747006425020e-002,
+                -2.4044337836660403e-002,
+                1.0968240064697212e-002,
+                -3.4461179858301418e-003,
+                -8.1201564869443749e-004,
+                2.1438992904959380e-003,
+                -1.4997753525697276e-003,
+                1.8685171825676386e-004
+            };
+            constexpr std::array<amrex::ParticleReal, ncoef> sin_coef = {};  // all zero
 
             // compute on-axis electric field (z is relative to cavity midpoint)
             amrex::ParticleReal efield = 0.0;
@@ -251,7 +251,7 @@ namespace impactx
             {
                efield = 0.5_prt*cos_coef[0];
                efieldint = z*efield;
-               for(int j=1; j < ncoef; ++j)
+               for (int j=1; j < ncoef; ++j)
                {
                  efield = efield + cos_coef[j]*cos(j*2*pi*z/zlen) +
                       sin_coef[j]*sin(j*2*pi*z/zlen);
@@ -263,7 +263,7 @@ namespace impactx
                       zlen*sin_coef[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
                }
             }
-            return std::make_tuple(efield,efieldp,efieldint);
+            return std::make_tuple(efield, efieldp, efieldint);
         }
 
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
@@ -278,7 +278,7 @@ namespace impactx
             amrex::ParticleReal const pt = refpart.pt;
 
             if (pt < -1.0_prt) {
-                refpart.t = t + tau/sqrt(1.0_prt - pow(pt,-2));
+                refpart.t = t + tau/sqrt(1.0_prt - pow(pt, -2));
                 refpart.pt = pt;
             }
             else {
@@ -305,10 +305,10 @@ namespace impactx
             amrex::ParticleReal const pt = refpart.pt;
 
             // Define parameters and intermediate constants
-            amrex::ParticleReal const pi = 3.141592653589793_prt;
-            amrex::ParticleReal const c = 2.99792458e8;
-            amrex::ParticleReal const k = 2.0_prt*pi*m_freq/c;
-            amrex::ParticleReal const phi = m_phase*pi/180.0_prt;
+            using ablastr::constant::math::pi;
+            using ablastr::constant::SI::c;
+            amrex::ParticleReal const k = (2.0_prt*pi/c)*m_freq;
+            amrex::ParticleReal const phi = m_phase*(pi/180.0_prt);
             amrex::ParticleReal const E0 = m_escale;
 
             // push the reference particle
@@ -319,7 +319,7 @@ namespace impactx
             refpart.pt = pt;
 
             // push the linear map equations
-            amrex::Array2D<amrex::ParticleReal,1,6,1,6> const R = refpart.map;
+            amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
             amrex::ParticleReal const s = tau/refpart.beta_gamma();
             amrex::ParticleReal const L = E0*ezp*sin(k*t+phi)/(2.0_prt*k);
 
@@ -346,10 +346,10 @@ namespace impactx
             amrex::ParticleReal const z = zeval;
 
             // Define parameters and intermediate constants
-            amrex::ParticleReal const pi = 3.141592653589793_prt;
-            amrex::ParticleReal const c = 2.99792458e8;
-            amrex::ParticleReal const k = 2.0_prt*pi*m_freq/c;
-            amrex::ParticleReal const phi = m_phase*pi/180.0_prt;
+            using ablastr::constant::math::pi;
+            using ablastr::constant::SI::c;
+            amrex::ParticleReal const k = (2.0_prt*pi/c)*m_freq;
+            amrex::ParticleReal const phi = m_phase*(pi/180.0_prt);
             amrex::ParticleReal const E0 = m_escale;
 
             // push the reference particle
