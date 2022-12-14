@@ -14,7 +14,6 @@
 
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_REAL.H>       // for ParticleReal
-#include <AMReX_Print.H>      // for PrintToFile
 
 
 namespace impactx::integrators

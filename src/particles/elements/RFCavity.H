@@ -189,7 +189,8 @@ namespace impactx
             refpart.s = s + slice_ds;
         }
 
-        std::tuple<amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal>
+        std::tuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         RF_Efield (amrex::ParticleReal const zeval) const
         {
             using namespace amrex::literals; // for _rt and _prt
@@ -264,6 +265,7 @@ namespace impactx
             return std::make_tuple(efield,efieldp,efieldint);
         }
 
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void map3 (amrex::ParticleReal const tau,
                    RefPart & refpart,
                    [[maybe_unused]] amrex::ParticleReal & zeval) const
@@ -291,6 +293,7 @@ namespace impactx
             refpart.map(5,6) = R(5,6) + tau*R(6,6)/pow(betgam,3);
         }
 
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void map2 (amrex::ParticleReal const tau,
                    RefPart & refpart,
                    amrex::ParticleReal & zeval) const
@@ -330,6 +333,7 @@ namespace impactx
             refpart.map(4,4) = -s*pow(L,2)*R(3,4) + (1.0_prt+s*L)*R(4,4);
         }
 
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void map1 (amrex::ParticleReal const tau,
                    RefPart & refpart,
                    amrex::ParticleReal & zeval) const
