@@ -13,6 +13,7 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/integrators/Integrators.H"
 
+#include <AMReX.H>
 #include <AMReX_Array.H>
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -311,8 +312,8 @@ namespace impactx
             amrex::ParticleReal const E0 = m_escale;
 
             // push the reference particle
-            amrex::ParticleReal ezp;
-            std::tie(std::ignore, ezp, std::ignore) = RF_Efield(zeval);
+            auto [ez, ezp, ezint] = RF_Efield(zeval);
+            amrex::ignore_unused(ez, ezint);
 
             refpart.t = t;
             refpart.pt = pt;
@@ -352,11 +353,11 @@ namespace impactx
             amrex::ParticleReal const E0 = m_escale;
 
             // push the reference particle
-            amrex::ParticleReal ezp, ezint;
-            std::tie(std::ignore, ezp, ezint) = RF_Efield(z);
+            auto [ez, ezp, ezint] = RF_Efield(z);
+            amrex::ignore_unused(ez);
             zeval = z + tau;
-            amrex::ParticleReal ezpf, ezintf;
-            std::tie(std::ignore, ezpf, ezintf) = RF_Efield(zeval);
+            auto [ezf, ezpf, ezintf] = RF_Efield(zeval);
+            amrex::ignore_unused(ezf);
 
             refpart.t = t;
             refpart.pt = pt - E0*(ezintf-ezint)*cos(k*t+phi);
