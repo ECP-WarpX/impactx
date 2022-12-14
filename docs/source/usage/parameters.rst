@@ -255,12 +255,14 @@ Lattice Elements
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
-        * ``rfcavity`` a radiofrequency cavity
+        * ``rfcavity`` a radiofrequency cavity.
           This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
             * ``<element_name>.escale`` (``float``, in 1/m) scaling factor for on-axis RF electric field
+
+                = (peak on-axis electric field Ez in MV/m) / (particle rest energy in MeV)
 
             * ``<element_name>.freq`` (``float``, in Hz) RF frequency
 
