@@ -12,9 +12,9 @@ General
 
    This is the central simulation class.
 
-   .. py:method:: set_particle_shape(order)
+   .. py:property:: particle_shape
 
-      Set the particle B-spline order.
+      Control the particle B-spline order.
 
       The order of the shape factors (splines) for the macro-particles along all spatial directions: `1` for linear, `2` for quadratic, `3` for cubic.
       Low-order shape factors result in faster simulations, but may lead to more noisy results.
@@ -43,38 +43,30 @@ General
 
       Use dynamic (``True``) resizing of the field mesh or static sizing (``False``).
 
-   .. py:method:: set_space_charge(enable)
+   .. py:property:: space_charge
 
-      Enable or disable space charge calculations (default: enabled).
+      Enable (``True``) or disable (``False``) space charge calculations (default: ``True``).
 
       Whether to calculate space charge effects.
       This is in-development.
       At the moment, this flag only activates coordinate transformations and charge deposition.
 
-      :param bool enable: enable (true) or disable (false) space charge
+   .. py:property:: diagnostics
 
-   .. py:method:: set_diagnostics(enable)
-
-      Enable or disable diagnostics generally (default: enabled).
+      Enable (``True``) or disable (``False``) diagnostics generally (default: ``True``).
       Disabling this is mostly used for benchmarking.
 
-      :param bool enable: enable (true) or disable (false) all diagnostics
+   .. py:property:: slice_step_diagnostics
 
-   .. py:method:: set_slice_step_diagnostics(enable)
-
-      Enable or disable diagnostics every slice step in elements (default: disabled).
+      Enable (``True``) or disable (``False``) diagnostics every slice step in elements  (default: ``True``).
 
       By default, diagnostics is performed at the beginning and end of the simulation.
       Enabling this flag will write diagnostics every step and slice step.
 
-      :param bool enable: enable (true) or disable (false) all diagnostics
+   .. py:property:: diag_file_min_digits
 
-   .. py:method:: set_diag_file_min_digits(file_min_digits)
-
-      The minimum number of digits (default: 6) used for the step
+      The minimum number of digits (default: ``6``) used for the step
       number appended to the diagnostic file names.
-
-      :param int file_min_digits: number of digits in filenames
 
    .. py:method:: init_grids()
 
@@ -101,6 +93,21 @@ General
 
       Access the elements in the accelerator lattice.
       See :py:mod:`impactx.elements` for lattice elements.
+
+   .. py:property:: abort_on_warning_threshold
+
+      (optional) Set to "low", "medium" or "high".
+      Cause the code to abort if a warning is raised that exceeds the warning threshold.
+
+   .. py:property:: abort_on_unused_inputs
+
+      Set to ``1`` to cause the simulation to fail *after* its completion if there were unused parameters. (default: ``0`` for false)
+      It is mainly intended for continuous integration and automated testing to check that all tests and inputs are adapted to API changes.
+
+   .. py:property:: always_warn_immediately
+
+      If set to ``1``, ImpactX immediately prints every warning message as soon as it is generated. (default: ``0`` for false)
+      It is mainly intended for debug purposes, in case a simulation crashes before a global warning report can be printed.
 
    .. py:method:: evolve()
 
@@ -415,6 +422,18 @@ This module provides elements for the accelerator lattice.
               = (gradient in T/m) / (rigidity in T-m)
               k > 0 horizontal focusing
               k < 0 horizontal defocusing
+   :param nslice: number of slices used for the application of space charge
+
+.. py:class:: impactx.elements.RFCavity(ds, escale, freq, phase, mapsteps, nslice)
+
+   A radiofrequency cavity.
+
+   :param ds: Segment length in m.
+   :param escale: scaling factor for on-axis RF electric field in 1/m
+                  = (peak on-axis electric field Ez in MV/m) / (particle rest energy in MeV)
+   :param freq: RF frequency in Hz
+   :param phase: RF driven phase in degrees
+   :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
 
 .. py:class:: impactx.elements.Sbend(ds, rc, nslice=1)

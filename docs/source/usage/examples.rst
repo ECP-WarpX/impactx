@@ -13,9 +13,10 @@ This section allows you to **download input files** that correspond to different
    examples/cfchannel/README.rst
    examples/expanding_beam/README.rst
    examples/kurth/README.rst
+   examples/rfcavity/README.rst
    examples/fodo_rf/README.rst
    examples/multipole/README.rst
    examples/iota_lens/README.rst
    examples/iota_lattice/README.rst
 
-For every change of the ImpactX ode base, each of these examples are continuously tested and benchmarked.
+For every change of the ImpactX code base, each of these examples are continuously tested and benchmarked.

@@ -1,0 +1,52 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000  # outside tests, use 1e5 or more
+beam.units = static
+beam.energy = 230
+beam.charge = 1.0e-10
+beam.particle = electron
+beam.distribution = waterbag
+beam.sigmaX = 0.352498964601e-3
+beam.sigmaY = 0.207443478142e-3
+beam.sigmaT = 0.70399950746e-4
+beam.sigmaPx = 5.161852770e-6
+beam.sigmaPy = 9.163582894e-6
+beam.sigmaPt = 0.260528852031e-3
+beam.muxpx = 0.5712386101751441
+beam.muypy = -0.514495755427526
+beam.mutpt = -5.05773e-10
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = dr1 dr2 rf dr2 dr2 rf dr2 dr2 rf dr2 dr2 rf dr2
+
+dr1.type = drift
+dr1.ds = 0.4
+dr1.nslice = 1
+
+dr2.type = drift
+dr2.ds = 0.032997
+dr1.nslice = 1
+
+rf.type = rfcavity
+rf.ds = 1.31879807
+rf.escale = 62.0
+rf.freq = 1.3e9
+rf.phase = 85.5
+rf.mapsteps = 100
+rf.nslice = 4
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = false

@@ -3,11 +3,6 @@
 Introduction
 ============
 
-.. note::
-
-   TODO
-
-
 Assumptions
 -----------
 

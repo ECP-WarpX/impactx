@@ -11,7 +11,6 @@ import re
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
-import numpy as np
 import pandas as pd
 from scipy.stats import moment
 
@@ -116,8 +115,6 @@ emittance_t = list(map(lambda step_val: step_val[1][5] * nm_rad, moments))
 
 
 # print beam transversal size over steps
-f = plt.figure(figsize=(9, 4.8))
-
 f, axs = plt.subplots(
     2, 1, figsize=(9, 4.8), sharex=True, gridspec_kw={"height_ratios": [1, 2]}
 )

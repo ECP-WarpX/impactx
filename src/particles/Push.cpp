@@ -13,6 +13,8 @@
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_REAL.H>       // for ParticleReal
 
+#include <utility>
+
 
 namespace impactx
 {
@@ -51,9 +53,9 @@ namespace detail
                             amrex::ParticleReal* AMREX_RESTRICT part_py,
                             amrex::ParticleReal* AMREX_RESTRICT part_pt,
                             RefPart ref_part)
-            : m_element(element), m_aos_ptr(aos_ptr),
+            : m_element(std::move(element)), m_aos_ptr(aos_ptr),
               m_part_px(part_px), m_part_py(part_py), m_part_pt(part_pt),
-              m_ref_part(ref_part)
+              m_ref_part(std::move(ref_part))
         {
         }
 
@@ -118,6 +120,9 @@ namespace detail
 
             // loop over all particle boxes
             using ParIt = ImpactXParticleContainer::iterator;
+#ifdef AMREX_USE_OMP
+#pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
+#endif
             for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
                 const int np = pti.numParticles();
                 //const auto t_lev = pti.GetLevel();
@@ -138,14 +143,14 @@ namespace detail
                 // here we just access the element by its respective type
                 std::visit(
                     [=, &ref_part](auto element) {
+                        // push reference particle in global coordinates
+                        element(ref_part);
+
                         // push beam particles relative to reference particle
                         detail::PushSingleParticle<decltype(element)> const pushSingleParticle(
                             element, aos_ptr, part_px, part_py, part_pt, ref_part);
                         //   loop over beam particles in the box
                         amrex::ParallelFor(np, pushSingleParticle);
-
-                        // push reference particle in global coordinates
-                        element(ref_part);
                     },
                     element_variant
                 );

@@ -6,7 +6,7 @@ Testing
 Preparation
 -----------
 
-Prepare for running tests of ImpactX by :ref:`buildind ImpactX from source <install-developers>`.
+Prepare for running tests of ImpactX by :ref:`building ImpactX from source <install-developers>`.
 
 In order to run our tests, you need to have a few :ref:`Python packages installed <install-dependencies>`:
 

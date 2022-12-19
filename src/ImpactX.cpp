@@ -17,6 +17,8 @@
 #include "particles/spacecharge/PoissonSolve.H"
 #include "particles/transformation/CoordinateTransformation.H"
 
+#include <ablastr/warn_manager/WarnManager.H>
+
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
 #include <AMReX_BLProfiler.H>
@@ -36,6 +38,9 @@ namespace impactx
 
         // todo: if charge deposition and/or space charge are requested, require
         //       amr.n_cells from user inputs
+
+        // query input for warning logger variables and set up warning logger accordingly
+        init_warning_logger();
     }
 
     void ImpactX::initGrids ()
@@ -63,6 +68,9 @@ namespace impactx
         // a global step for diagnostics including space charge slice steps in elements
         //   before we start the evolve loop, we are in "step 0" (initial state)
         int global_step = 0;
+
+        // check typos in inputs after step 1
+        bool early_params_checked = false;
 
         amrex::ParmParse pp_diag("diag");
         bool diag_enable = true;
@@ -102,6 +110,9 @@ namespace impactx
         // loop over all beamline elements
         for (auto & element_variant : m_lattice)
         {
+            // update element edge of the reference particle
+            m_particle_container->SetRefParticleEdge();
+
             // number of slices used for the application of space charge
             int nslice = 1;
             amrex::ParticleReal slice_ds; // in meters
@@ -198,6 +209,9 @@ namespace impactx
                                                   true);
 
                 }
+
+                // inputs: unused parameters (e.g. typos) check after step 1 has finished
+                if (!early_params_checked) { early_params_checked = early_param_check(); }
 
             } // end in-element space-charge slice-step loop
         } // end beamline element loop

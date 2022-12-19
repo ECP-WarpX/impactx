@@ -37,6 +37,9 @@ namespace transformation {
         for (int lev = 0; lev <= nLevel; ++lev) {
             // loop over all particle boxes
             using ParIt = ImpactXParticleContainer::iterator;
+#ifdef AMREX_USE_OMP
+#pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
+#endif
             for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
                 const int np = pti.numParticles();
 
