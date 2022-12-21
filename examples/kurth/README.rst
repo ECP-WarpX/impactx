@@ -73,14 +73,17 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 Run
 ---
 
-This example can be run as an app with an input file (``impactx input_kurth_periodic.in``).
+This example can be run as a Python script (``python3 run_kurth_periodic.py``) or as an app with an input file (``impactx input_kurth_periodic.in``).
 Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
 .. tab-set::
 
-   .. tab-item:: Python Script (TODO)
+   .. tab-item:: Python Script
 
-       This one is to-do.
+       .. literalinclude:: run_kurth_periodic.py
+          :language: python3
+          :caption: You can copy this file from ``examples/kurth/run_kurth_periodic.py``.
+
 
    .. tab-item:: App Input File
 
