@@ -193,6 +193,16 @@ add_impactx_test(cfchannel_spacecharge
     OFF  # no plot script yet
 )
 
+# Python: Constant Focusing Channel with Space Charge #########################
+#
+add_impactx_test(cfchannel_spacecharge.py
+    examples/cfchannel/run_cfchannel_10nC.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/cfchannel/analysis_cfchannel_10nC.py
+    OFF  # no plot script yet
+)
+
 # Python: Constant Focusing Channel ###########################################
 #
 add_impactx_test(cfchannel.py

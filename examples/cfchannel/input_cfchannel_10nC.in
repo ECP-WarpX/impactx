@@ -2,7 +2,7 @@
 # Particle Beam(s)
 ###############################################################################
 beam.npart = 10000
-#beam.npart = 100000 #optional for increased precision
+#beam.npart = 100000  # optional for increased precision
 beam.units = static
 beam.energy = 2.0e3
 beam.charge = 1.0e-8
@@ -21,7 +21,7 @@ beam.sigmaPt = 2.4415943602685364584e-3
 ###############################################################################
 lattice.elements = constf1
 lattice.nslice = 50
-#lattice.nslice = 60 #optional for increased precision
+#lattice.nslice = 60 # optional for increased precision
 
 constf1.type = constf
 constf1.ds = 2.0

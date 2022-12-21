@@ -83,14 +83,16 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 Run
 ---
 
-This example can be run as an app with an input file (``impactx input_cfchannel_10nC.in``).
+This example can be run as a Python script (``python3 run_cfchannel_10nC.py``) or  as an app with an input file (``impactx input_cfchannel_10nC.in``).
 Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
 .. tab-set::
 
-   .. tab-item:: Python Script (TODO)
+   .. tab-item:: Python Script
 
-       This one is to-do.
+       .. literalinclude:: run_cfchannel_10nC.py
+          :language: python3
+          :caption: You can copy this file from ``examples/cfchannel/run_cfchannel_10nC.py``.
 
    .. tab-item:: App Input File
 
