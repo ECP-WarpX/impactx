@@ -213,26 +213,6 @@ add_impactx_test(cfchannel.py
     OFF  # no plot script yet
 )
 
-# Kurth Distribution Test #####################################################
-#
-add_impactx_test(kurth
-    examples/kurth/input_kurth.in
-      OFF  # ImpactX MPI-parallel
-      OFF  # ImpactX Python interface
-    examples/kurth/analysis_kurth.py
-    OFF  # no plot script yet
-)
-
-# Python: Kurth Distribution Test #############################################
-#
-add_impactx_test(kurth.py
-    examples/kurth/run_kurth.py
-      OFF  # ImpactX MPI-parallel
-      ON  # ImpactX Python interface
-    examples/kurth/analysis_kurth.py
-    OFF  # not plotting script yet
-)
-
 # 6D Gaussian Distribution Test ###############################################
 #
 add_impactx_test(gaussian
@@ -400,15 +380,6 @@ add_impactx_test(kurth_10nC_periodic
     OFF  # no plot script yet
 )
 
-# w/ space charge
-add_impactx_test(kurth_10nC
-    examples/kurth/input_kurth_10nC.in
-      OFF  # ImpactX MPI-parallel
-      OFF  # ImpactX Python interface
-    examples/kurth/analysis_kurth_10nC.py
-    OFF  # no plot script yet
-)
-
 # Acceleration by RF Cavities #################################################
 #
 add_impactx_test(rfcavity.MPI
@@ -418,7 +389,6 @@ add_impactx_test(rfcavity.MPI
     examples/rfcavity/analysis_rfcavity.py
     OFF  # no plot script yet
 )
-
 
 # Python: Acceleration by RF Cavities #########################################
 #
