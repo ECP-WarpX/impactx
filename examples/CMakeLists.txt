@@ -379,6 +379,13 @@ add_impactx_test(kurth_10nC_periodic
     examples/kurth/analysis_kurth_10nC_periodic.py
     OFF  # no plot script yet
 )
+add_impactx_test(kurth_10nC_periodic.py
+    examples/kurth/run_kurth_10nC_periodic.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/kurth/analysis_kurth_10nC_periodic.py
+    OFF  # no plot script yet
+)
 
 # Acceleration by RF Cavities #################################################
 #
