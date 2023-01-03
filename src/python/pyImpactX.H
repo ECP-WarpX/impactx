@@ -1,4 +1,4 @@
-/* Copyright 2021-2022 The ImpactX Community
+/* Copyright 2021-2023 The ImpactX Community
  *
  * This header is used to centrally define classes that shall not violate the
  * C++ one-definition-rule (ODR) for various Python translation units.

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 #
-# Copyright 2020-2021 Axel Huebl
+# Copyright 2020-2023 The ImpactX Community
 #
 # License: BSD-3-Clause-LBNL
+# Authors: Axel Huebl
 
 set -eu -o pipefail
 

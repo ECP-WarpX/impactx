@@ -1,4 +1,4 @@
-# Copyright 2019 Axel Huebl, Maxence Thevenet
+# Copyright 2019-2023 Axel Huebl, Maxence Thevenet
 #
 # This file is part of WarpX.
 #
