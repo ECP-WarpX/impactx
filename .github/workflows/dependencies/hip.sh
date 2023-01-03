@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2022 The ImpactX Community
+# Copyright 2022-2023 The ImpactX Community
 #
 # License: BSD-3-Clause-LBNL
 # Authors: Axel Huebl

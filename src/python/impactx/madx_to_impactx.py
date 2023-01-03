@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright 2022 ImpactX contributors
+# Copyright 2022-2023 ImpactX contributors
 # Authors: Marco Garten
 # License: BSD-3-Clause-LBNL
 #

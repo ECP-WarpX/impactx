@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-# Copyright 2019 Maxence Thevenet
+# Copyright 2019-2023 Maxence Thevenet
 #
 # This file is part of ImpactX.
 #
