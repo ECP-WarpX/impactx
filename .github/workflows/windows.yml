@@ -46,8 +46,10 @@ jobs:
         if(!$?) { Exit $LASTEXITCODE }
         cmake --build build --config RelWithDebInfo --parallel 2
         if(!$?) { Exit $LASTEXITCODE }
-    - name: Install Python
+    - name: Install
       run: |
+        cmake --build build --config RelWithDebInfo --target install
+        if(!$?) { Exit $LASTEXITCODE }
         cmake --build build --config RelWithDebInfo --target pip_install
         if(!$?) { Exit $LASTEXITCODE }
 
@@ -55,10 +57,15 @@ jobs:
       shell: bash
       run: echo "C:\\Program Files (x86)\\Windows Kits\\10\\Debuggers\\x64" >> $GITHUB_PATH
 
+    - name: Add install .dll location to the PATH
+      shell: bash
+      run: echo "C:\\Program Files (x86)\\ImpactX\\bin" >> $GITHUB_PATH
+
     - name: Test
       run: |
+          (Get-Command python3).Path
           gflags /i (Get-Command python3).Path +sls
-          python3 D:\a\impactx\impactx\examples\fodo\run_fodo.py
+          cdb -c "g;q" python3 D:\a\impactx\impactx\examples\fodo\run_fodo.py
           if(!$?) { Exit $LASTEXITCODE }
 
           gflags /i (Get-Command ctest).Path +sls
