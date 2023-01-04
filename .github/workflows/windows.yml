@@ -8,7 +8,7 @@ concurrency:
 
 jobs:
   build_win_msvc:
-    name: MSVC C++17 w/o MPI
+    name: MSVC C++17 w/o MPI shared
     runs-on: windows-latest
     if: github.event.pull_request.draft == false
     steps:
@@ -36,7 +36,7 @@ jobs:
         python3 -m pip install -r examples/requirements.txt
 
         cmake -S . -B build               `
-              -DBUILD_SHARED_LIBS=OFF     `
+              -DBUILD_SHARED_LIBS=ON      `
               -DCMAKE_BUILD_TYPE=RelWithDebInfo  `
               -DCMAKE_VERBOSE_MAKEFILE=ON `
               -DImpactX_COMPUTE=NOACC     `
