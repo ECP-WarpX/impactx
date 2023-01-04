@@ -8,7 +8,7 @@ concurrency:
 
 jobs:
   build_win_msvc:
-    name: MSVC C++17 w/o MPI shared
+    name: MSVC w/o MPI shared
     runs-on: windows-latest
     if: github.event.pull_request.draft == false
     steps:
@@ -48,34 +48,18 @@ jobs:
         if(!$?) { Exit $LASTEXITCODE }
     - name: Install
       run: |
-        type build\cmake_install.cmake
-
         cmake --build build --config RelWithDebInfo --target install
         if(!$?) { Exit $LASTEXITCODE }
         cmake --build build --config RelWithDebInfo --target pip_install
         if(!$?) { Exit $LASTEXITCODE }
 
-    - name: Add debugger to the PATH
-      shell: bash
-      run: echo "C:\\Program Files (x86)\\Windows Kits\\10\\Debuggers\\x64" >> $GITHUB_PATH
-
-    - name: Add install .dll location to the PATH
-      shell: bash
-      run: echo "C:\\Program Files (x86)\\ImpactX\\bin" >> $GITHUB_PATH
-
     - name: Test
       run: |
-          (Get-Command python3).Path
-          gflags /i (Get-Command python3).Path +sls
-          cdb -c "g;q" python3 D:\a\impactx\impactx\examples\fodo\run_fodo.py
-          if(!$?) { Exit $LASTEXITCODE }
-
-          gflags /i (Get-Command ctest).Path +sls
-          cdb -c "g;q" ctest --test-dir build --build-config RelWithDebInfo --output-on-failure -E AMReX  -R py
-          if(!$?) { Exit $LASTEXITCODE }
+        ctest --test-dir build --build-config RelWithDebInfo --output-on-failure -E AMReX
+        if(!$?) { Exit $LASTEXITCODE }
 
   build_win_clang:
-    name: Clang C++17 w/ OMP w/o MPI
+    name: Clang w/ OMP w/o MPI
     runs-on: windows-2019
     if: github.event.pull_request.draft == false
     steps:
@@ -123,9 +107,6 @@ jobs:
       shell: cmd
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
-
-        type build\cmake_install.cmake
-
         cmake --build build --config Release --target install
         if errorlevel 1 exit 1
         cmake --build build --config Release --target pip_install
@@ -134,5 +115,5 @@ jobs:
       shell: cmd
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
-        ctest --test-dir build --build-config Release --output-on-failure -E AMReX -R py
+        ctest --test-dir build --build-config Release --output-on-failure -E AMReX
         if errorlevel 1 exit 1
