@@ -344,13 +344,16 @@ install(TARGETS ${ImpactX_INSTALL_TARGET_NAMES}
 # simplified library alias
 if(ImpactX_LIB)
     if(IS_ABSOLUTE ${CMAKE_INSTALL_LIBDIR})
-        set(ABS_INSTALL_LIB_DIR ${CMAKE_INSTALL_LIBDIR})
+        set(ABS_INSTALL_LIB_DIR "${CMAKE_INSTALL_LIBDIR}")
     else()
-        set(ABS_INSTALL_LIB_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
+        set(ABS_INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
     endif()
+    # escape spaces for generated cmake_install.cmake file
+    file(TO_CMAKE_PATH "${ABS_INSTALL_LIB_DIR}" ABS_INSTALL_LIB_DIR)
+
     install(CODE "file(CREATE_LINK
         $<TARGET_FILE_NAME:lib>
-        ${ABS_INSTALL_LIB_DIR}/libImpactX$<TARGET_FILE_SUFFIX:lib>
+        \"${ABS_INSTALL_LIB_DIR}/libImpactX$<TARGET_FILE_SUFFIX:lib>\"
         COPY_ON_ERROR SYMBOLIC)")
 endif()
 

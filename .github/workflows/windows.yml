@@ -48,6 +48,8 @@ jobs:
         if(!$?) { Exit $LASTEXITCODE }
     - name: Install
       run: |
+        type build\cmake_install.cmake
+
         cmake --build build --config RelWithDebInfo --target install
         if(!$?) { Exit $LASTEXITCODE }
         cmake --build build --config RelWithDebInfo --target pip_install
@@ -117,15 +119,20 @@ jobs:
         if errorlevel 1 exit 1
         cmake --build build --config Release --parallel 2
         if errorlevel 1 exit 1
-    - name: Install Python
+    - name: Install
       shell: cmd
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
+
+        type build\cmake_install.cmake
+
+        cmake --build build --config Release --target install
+        if errorlevel 1 exit 1
         cmake --build build --config Release --target pip_install
         if errorlevel 1 exit 1
     - name: Test
       shell: cmd
       run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
-          ctest --test-dir build --build-config Release --output-on-failure -E AMReX -R py
-          if errorlevel 1 exit 1
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
+        ctest --test-dir build --build-config Release --output-on-failure -E AMReX -R py
+        if errorlevel 1 exit 1

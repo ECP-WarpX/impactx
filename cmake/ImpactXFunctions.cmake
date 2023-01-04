@@ -140,7 +140,7 @@ function(impactx_test_set_pythonpath test_name)
         set_property(TEST ${test_name}
             APPEND PROPERTY ENVIRONMENT
                 "PYTHONPATH=${WIN_PYTHON_OUTPUT_DIRECTORY}\;${WIN_PYTHONPATH}"
-                "PATH=$<TARGET_FILE_DIR:lib>\;${WIN_PATH}$"
+                "PATH=$<TARGET_FILE_DIR:lib>\;${WIN_PATH}"
         )
     else()
         set_property(TEST ${test_name}
