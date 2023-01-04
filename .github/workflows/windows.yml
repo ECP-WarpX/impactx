@@ -50,9 +50,19 @@ jobs:
       run: |
         cmake --build build --config RelWithDebInfo --target pip_install
         if(!$?) { Exit $LASTEXITCODE }
+
+    - name: Add debugger to the PATH
+      shell: bash
+      run: echo "C:\\Program Files (x86)\\Windows Kits\\10\\Debuggers\\x64" >> $GITHUB_PATH
+
     - name: Test
       run: |
-          ctest --test-dir build --build-config RelWithDebInfo --output-on-failure -E AMReX  -R py
+          gflags /i (Get-Command python3).Path +sls
+          python3 D:\a\impactx\impactx\examples\fodo\run_fodo.py
+          if(!$?) { Exit $LASTEXITCODE }
+
+          gflags /i (Get-Command ctest).Path +sls
+          cdb -c "g;q" ctest --test-dir build --build-config RelWithDebInfo --output-on-failure -E AMReX  -R py
           if(!$?) { Exit $LASTEXITCODE }
 
   build_win_clang:
