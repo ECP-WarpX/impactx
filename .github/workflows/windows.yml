@@ -103,6 +103,7 @@ jobs:
     - name: Install Python
       shell: cmd
       run: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
         cmake --build build --config Release --target pip_install
         if errorlevel 1 exit 1
     - name: Test
