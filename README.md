@@ -43,12 +43,10 @@ Now ``cd`` to your ImpactX source directory.
 
 ```bash
 module load cmake/3.22.0
-module swap PrgEnv-nvidia PrgEnv-gnu
-module load cudatoolkit
-module load cray-hdf5-parallel/1.12.1.1
+module load cray-hdf5-parallel/1.12.2.1
 
 # Python
-module load cray-python/3.9.7.1
+module load cray-python/3.9.13.1
 if [ -d "$HOME/sw/perlmutter/venvs/impactx" ]
 then
   source $HOME/sw/perlmutter/venvs/impactx/bin/activate

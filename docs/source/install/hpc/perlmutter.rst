@@ -40,15 +40,13 @@ We use the following modules and environments on the system (``$HOME/perlmutter_
 
    # required dependencies
    module load cmake/3.22.0
-   module swap PrgEnv-nvidia PrgEnv-gnu
-   module load cudatoolkit
-   module load cray-hdf5-parallel/1.12.1.1
+   module load cray-hdf5-parallel/1.12.2.1
 
    # optional: just an additional text editor
-   # module load nano  # TODO: request from support
+   #module load nano  # TODO: request from support
 
    # Python
-   module load cray-python/3.9.7.1
+   module load cray-python/3.9.13.1
    if [ -d "$HOME/sw/perlmutter/venvs/impactx" ]
    then
        source $HOME/sw/perlmutter/venvs/impactx/bin/activate
