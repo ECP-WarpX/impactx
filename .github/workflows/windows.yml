@@ -8,7 +8,7 @@ concurrency:
 
 jobs:
   build_win_msvc:
-    name: MSVC C++17 w/o MPI
+    name: MSVC w/o MPI shared
     runs-on: windows-latest
     if: github.event.pull_request.draft == false
     steps:
@@ -29,30 +29,36 @@ jobs:
         restore-keys: |
           ccache-windows-winmsvc-${{ hashFiles('.github/workflows/windows.yml') }}-
           ccache-windows-winmsvc-
-    - name: Build & Install
+    - name: Build
       run: |
         python3 -m pip install -U pip setuptools wheel pytest
         python3 -m pip install -r requirements.txt
         python3 -m pip install -r examples/requirements.txt
 
         cmake -S . -B build               `
-              -DBUILD_SHARED_LIBS=OFF        `
-              -DCMAKE_BUILD_TYPE=RelWithDebInfo    `
+              -DBUILD_SHARED_LIBS=ON      `
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo  `
               -DCMAKE_VERBOSE_MAKEFILE=ON `
               -DImpactX_COMPUTE=NOACC     `
               -DImpactX_MPI=OFF           `
-              -DImpactX_PYTHON=ON
+              -DImpactX_PYTHON=ON         `
+              -DPython_EXECUTABLE=python3
         if(!$?) { Exit $LASTEXITCODE }
         cmake --build build --config RelWithDebInfo --parallel 2
+        if(!$?) { Exit $LASTEXITCODE }
+    - name: Test
+      run: |
+        ctest --test-dir build --build-config RelWithDebInfo --output-on-failure -E AMReX
+        if(!$?) { Exit $LASTEXITCODE }
+    - name: Install
+      run: |
+        cmake --build build --config RelWithDebInfo --target install
         if(!$?) { Exit $LASTEXITCODE }
         cmake --build build --config RelWithDebInfo --target pip_install
         if(!$?) { Exit $LASTEXITCODE }
 
-        ctest --test-dir build --build-config RelWithDebInfo --output-on-failure -E "(AMReX|py|pytest|analysis|plot)"
-        if(!$?) { Exit $LASTEXITCODE }
-
   build_win_clang:
-    name: Clang C++17 w/ OMP w/o MPI
+    name: Clang w/ OMP w/o MPI
     runs-on: windows-2019
     if: github.event.pull_request.draft == false
     steps:
@@ -74,7 +80,7 @@ jobs:
           ccache-windows-winclang-${{ hashFiles('.github/workflows/windows.yml') }}-
           ccache-windows-winclang-
     - uses: seanmiddleditch/gha-setup-ninja@master
-    - name: Build & Install
+    - name: Build
       shell: cmd
       run: |
         python3 -m pip install -U pip setuptools wheel pytest
@@ -86,17 +92,27 @@ jobs:
               -G "Ninja"      ^
               -DCMAKE_C_COMPILER=clang-cl   ^
               -DCMAKE_CXX_COMPILER=clang-cl ^
-              -DBUILD_SHARED_LIBS=OFF           ^
+              -DBUILD_SHARED_LIBS=OFF       ^
               -DCMAKE_BUILD_TYPE=Release    ^
               -DCMAKE_VERBOSE_MAKEFILE=ON   ^
               -DImpactX_COMPUTE=OMP         ^
               -DImpactX_MPI=OFF             ^
-              -DImpactX_PYTHON=ON
+              -DImpactX_PYTHON=ON           ^
+              -DPython_EXECUTABLE=python3
         if errorlevel 1 exit 1
         cmake --build build --config Release --parallel 2
         if errorlevel 1 exit 1
-        cmake --build build --config Release --target pip_install
+    - name: Test
+      shell: cmd
+      run: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
+        ctest --test-dir build --build-config Release --output-on-failure -E AMReX
         if errorlevel 1 exit 1
-
-        ctest --test-dir build --build-config Release --output-on-failure -E "(AMReX|py|pytest|analysis|plot)"
+    - name: Install
+      shell: cmd
+      run: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
+        cmake --build build --config Release --target install
+        if errorlevel 1 exit 1
+        cmake --build build --config Release --target pip_install
         if errorlevel 1 exit 1

@@ -124,15 +124,23 @@ macro(impactx_set_default_install_dirs_python)
 endmacro()
 
 
-# function to set the PYTHONPATH on a test
+# function to set the PYTHONPATH and PATH (for .dll files) on a test
 # this avoids that we need to install our python packages to run ctest
 #
 function(impactx_test_set_pythonpath test_name)
     if(WIN32)
         string(REPLACE ";" "\\;" WIN_PYTHONPATH "$ENV{PYTHONPATH}")
+        string(REPLACE ";" "\\;" WIN_PATH "$ENV{PATH}")  # DLLs
         string(REGEX REPLACE "/" "\\\\" WIN_PYTHON_OUTPUT_DIRECTORY ${CMAKE_PYTHON_OUTPUT_DIRECTORY})
+        # shared library note:
+        #   For Windows Python 3.8+, this also needs to be injected via
+        #   os.add_dll_directory.
+        #   https://github.com/python/cpython/issues/80266
+        #   https://docs.python.org/3.8/library/os.html#os.add_dll_directory
         set_property(TEST ${test_name}
-            APPEND PROPERTY ENVIRONMENT "PYTHONPATH=${WIN_PYTHON_OUTPUT_DIRECTORY}\;${WIN_PYTHONPATH}"
+            APPEND PROPERTY ENVIRONMENT
+                "PYTHONPATH=${WIN_PYTHON_OUTPUT_DIRECTORY}\;${WIN_PYTHONPATH}"
+                "PATH=$<TARGET_FILE_DIR:lib>\;$<TARGET_FILE_DIR:WarpX::ablastr>\;$<TARGET_FILE_DIR:AMReX::amrex>\;${WIN_PATH}"
         )
     else()
         set_property(TEST ${test_name}
@@ -241,9 +249,9 @@ function(impactx_set_binary_name)
         list(APPEND ImpactX_bin_names app)
     endif()
     if(ImpactX_LIB)
-        list(APPEND ImpactX_bin_names shared)
+        list(APPEND ImpactX_bin_names lib)
     endif()
-    foreach(tgt IN LISTS _ALL_TARGETS)
+    foreach(tgt IN LISTS ImpactX_bin_names)
         set_target_properties(${tgt} PROPERTIES OUTPUT_NAME "impactx")
 
         if(ImpactX_MPI)
@@ -287,15 +295,10 @@ function(impactx_set_binary_name)
         )
     endif()
     if(ImpactX_LIB)
-        if(WIN32)  # TODO: handle static lib extensions
-            set(mod_ext "dll")
-        else()
-            set(mod_ext "so")
-        endif()
         add_custom_command(TARGET lib POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E create_symlink
                 $<TARGET_FILE_NAME:lib>
-                $<TARGET_FILE_DIR:lib>/libimpactx.${mod_ext}
+                $<TARGET_FILE_DIR:lib>/libimpactx$<TARGET_FILE_SUFFIX:lib>
         )
     endif()
 endfunction()

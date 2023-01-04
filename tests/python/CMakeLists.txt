@@ -17,5 +17,5 @@ add_test(NAME ${pytest_name}
     WORKING_DIRECTORY ${pytest_rundir}
 )
 
-#   set PYTHONPATH
+#   set PYTHONPATH and PATH (for .dll files)
 impactx_test_set_pythonpath(${pytest_name})
