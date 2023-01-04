@@ -124,7 +124,7 @@ macro(impactx_set_default_install_dirs_python)
 endmacro()
 
 
-# function to set the PYTHONPATH on a test
+# function to set the PYTHONPATH and PATH (for .dll files) on a test
 # this avoids that we need to install our python packages to run ctest
 #
 function(impactx_test_set_pythonpath test_name)
