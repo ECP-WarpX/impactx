@@ -46,16 +46,15 @@ jobs:
         if(!$?) { Exit $LASTEXITCODE }
         cmake --build build --config RelWithDebInfo --parallel 2
         if(!$?) { Exit $LASTEXITCODE }
+    - name: Test
+      run: |
+        ctest --test-dir build --build-config RelWithDebInfo --output-on-failure -E AMReX
+        if(!$?) { Exit $LASTEXITCODE }
     - name: Install
       run: |
         cmake --build build --config RelWithDebInfo --target install
         if(!$?) { Exit $LASTEXITCODE }
         cmake --build build --config RelWithDebInfo --target pip_install
-        if(!$?) { Exit $LASTEXITCODE }
-
-    - name: Test
-      run: |
-        ctest --test-dir build --build-config RelWithDebInfo --output-on-failure -E AMReX
         if(!$?) { Exit $LASTEXITCODE }
 
   build_win_clang:
@@ -103,6 +102,12 @@ jobs:
         if errorlevel 1 exit 1
         cmake --build build --config Release --parallel 2
         if errorlevel 1 exit 1
+    - name: Test
+      shell: cmd
+      run: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
+        ctest --test-dir build --build-config Release --output-on-failure -E AMReX
+        if errorlevel 1 exit 1
     - name: Install
       shell: cmd
       run: |
@@ -110,10 +115,4 @@ jobs:
         cmake --build build --config Release --target install
         if errorlevel 1 exit 1
         cmake --build build --config Release --target pip_install
-        if errorlevel 1 exit 1
-    - name: Test
-      shell: cmd
-      run: |
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
-        ctest --test-dir build --build-config Release --output-on-failure -E AMReX
         if errorlevel 1 exit 1
