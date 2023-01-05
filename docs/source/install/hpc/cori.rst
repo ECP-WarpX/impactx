@@ -65,7 +65,9 @@ For PICMI and Python workflows, also install a virtual environment:
 
    python3 -m pip install --upgrade pip
    MPICC="cc -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
+   python3 -m pip install --upgrade pytest
    python3 -m pip install -r $HOME/src/impactx/requirements.txt
+   python3 -m pip install -r $HOME/src/impactx/examples/requirements.txt
 
 Haswell
 ^^^^^^^

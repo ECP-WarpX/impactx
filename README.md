@@ -58,7 +58,9 @@ else
 
   python3 -m pip install --upgrade pip
   MPICC="cc -target-accel=nvidia80 -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
+  python3 -m pip install --upgrade pytest
   python3 -m pip install -r requirements.txt
+  python3 -m pip install -r examples/requirements.txt
 fi
 
 # GPU-aware MPI
@@ -79,18 +81,21 @@ export CUDAHOSTCXX=CC
 ```
 
 ```bash
+# work on an interactive node
+salloc -N 1 --ntasks-per-node=4 -t 1:00:00 -C gpu --gpu-bind=single:1 -c 32 -G 4 --qos=interactive -A m3906_g
+
 # configure
-cmake -S . -B build_perlmutter -DImpactX_COMPUTE=CUDA
+cmake -S . -B build_perlmutter -DImpactX_COMPUTE=CUDA -DImpactX_PYTHON=ON
 
 # compile
-cmake --build build_perlmutter -j 10
+cmake --build build_perlmutter -j 64
 
 # test
-srun -N 1 --ntasks-per-gpu=1 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ctest --test-dir build_perlmutter --output-on-failure
+ctest --test-dir build_perlmutter -E AMReX --output-on-failure
 
 # run
 cd build_perlmutter/bin
-srun -N 1 --ntasks-per-gpu=1 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ./impactx ../../examples/fodo/input_fodo.in
+srun ./impactx ../../examples/fodo/input_fodo.in
 ```
 
 ### Cori KNL (NERSC)
@@ -121,7 +126,9 @@ else
 
   python3 -m pip install --upgrade pip
   MPICC="cc -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
+  python3 -m pip install --upgrade pytest
   python3 -m pip install -r requirements.txt
+  python3 -m pip install -r examples/requirements.txt
 fi
 
 # tune exactly for KNL sub-architecture
