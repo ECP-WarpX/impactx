@@ -95,7 +95,9 @@ For Python workflows & tests, also install a virtual environment:
 
    python3 -m pip install --upgrade pip
    MPICC="cc -target-accel=nvidia80 -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
+   python3 -m pip install --upgrade pytest
    python3 -m pip install -r $HOME/src/impactx/requirements.txt
+   python3 -m pip install -r $HOME/src/impactx/examples/requirements.txt
 
 Then, ``cd`` into the directory ``$HOME/src/impactx`` and use the following commands to compile:
 
@@ -104,14 +106,18 @@ Then, ``cd`` into the directory ``$HOME/src/impactx`` and use the following comm
    cd $HOME/src/impactx
    rm -rf build
 
-   cmake -S . -B build -DImpactX_OPENPMD=ON -DImpactX_COMPUTE=CUDA
-   cmake --build build -j 32
+   cmake -S . -B build_perlmutter -DImpactX_COMPUTE=CUDA -DImpactX_PYTHON=ON
+   cmake --build build_perlmutter -j 32
 
 To run all tests, do:
 
 .. code-block:: bash
 
-   srun -N 1 --ntasks-per-gpu=1 -t 0:10:00 -C gpu -c 32 -G 4 --qos=debug -A m3906_g ctest --test-dir build_perlmutter --output-on-failure
+   # work on an interactive node
+   salloc -N 1 --ntasks-per-node=4 -t 1:00:00 -C gpu --gpu-bind=single:1 -c 32 -G 4 --qos=interactive -A m3906_g
+
+   # test
+   ctest --test-dir build_perlmutter -E AMReX --output-on-failure
 
 The general :ref:`cmake compile-time options <building-cmake>` apply as usual.
 
