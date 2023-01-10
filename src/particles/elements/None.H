@@ -11,6 +11,7 @@
 #define IMPACTX_NONE_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/thin.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -19,6 +20,7 @@
 namespace impactx
 {
     struct None
+    : public elements::Thin
     {
         static constexpr auto name = "None";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -56,37 +58,8 @@ namespace impactx
             // nothing to do
         }
 
-        /** This pushes the reference particle.
-         *
-         * @param[in,out] refpart reference particle
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void operator() ([[maybe_unused]] RefPart & AMREX_RESTRICT refpart) const {
-
-            // nothing to do: this is a zero-length element
-
-        }
-
-        /** Number of slices used for the application of space charge
-         *
-         * @return one, because this is a zero-length element
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        int nslice () const
-        {
-            return 1;
-        }
-
-        /** Return the segment length
-         *
-         * @return zero, because this is a zero-length element
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        amrex::ParticleReal ds () const
-        {
-            using namespace amrex::literals;
-            return 0.0_prt;
-        }
+        /** This pushes the reference particle. */
+        using Thin::operator();
     };
 
 } // namespace impactx
