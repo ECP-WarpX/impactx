@@ -11,7 +11,7 @@
 #define IMPACTX_SHORTRF_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "mixin/regular.H"
+#include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 
 #include <AMReX_Extension.H>
@@ -23,7 +23,7 @@
 namespace impactx
 {
     struct ShortRF
-    : public elements::Regular<ShortRF>,
+    : public elements::BeamOptic<ShortRF>,
       public elements::Thin
     {
         static constexpr auto name = "ShortRF";
@@ -40,7 +40,7 @@ namespace impactx
         }
 
         /** Push all particles */
-        using Regular::operator();
+        using BeamOptic::operator();
 
         /** This is a shortrf functor, so that a variable of this type can be used like a
          *  shortrf function.

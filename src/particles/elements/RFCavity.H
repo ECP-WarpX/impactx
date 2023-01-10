@@ -12,7 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/integrators/Integrators.H"
-#include "mixin/regular.H"
+#include "mixin/beamoptic.H"
 #include "mixin/finite.H"
 
 #include <ablastr/constant.H>
@@ -30,7 +30,7 @@
 namespace impactx
 {
     struct RFCavity
-    : public elements::Regular<RFCavity>,
+    : public elements::BeamOptic<RFCavity>,
       public elements::Finite
     {
         static constexpr auto name = "RFCavity";
@@ -60,7 +60,7 @@ namespace impactx
         }
 
         /** Push all particles */
-        using Regular::operator();
+        using BeamOptic::operator();
 
         /** This is an RF cavity functor, so that a variable of this type can be used like
          *  an RF cavity function.

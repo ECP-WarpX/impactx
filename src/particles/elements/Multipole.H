@@ -11,7 +11,7 @@
 #define IMPACTX_MULTIPOLE_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "mixin/regular.H"
+#include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 
 #include <AMReX_Extension.H>
@@ -23,7 +23,7 @@
 namespace impactx
 {
     struct Multipole
-    : public elements::Regular<Multipole>,
+    : public elements::BeamOptic<Multipole>,
       public elements::Thin
     {
         static constexpr auto name = "Multipole";
@@ -49,7 +49,7 @@ namespace impactx
         }
 
         /** Push all particles */
-        using Regular::operator();
+        using BeamOptic::operator();
 
         /** This is a multipole functor, so that a variable of this type can be used like a
          *  multipole function.

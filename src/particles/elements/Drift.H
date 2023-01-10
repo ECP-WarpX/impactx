@@ -11,7 +11,7 @@
 #define IMPACTX_DRIFT_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "mixin/regular.H"
+#include "mixin/beamoptic.H"
 #include "mixin/finite.H"
 
 #include <AMReX_Extension.H>
@@ -23,7 +23,7 @@
 namespace impactx
 {
     struct Drift
-    : public elements::Regular<Drift>,
+    : public elements::BeamOptic<Drift>,
       public elements::Finite
     {
         static constexpr auto name = "Drift";
@@ -40,7 +40,7 @@ namespace impactx
         }
 
         /** Push all particles */
-        using Regular::operator();
+        using BeamOptic::operator();
 
         /** This is a drift functor, so that a variable of this type can be used like a drift function.
          *

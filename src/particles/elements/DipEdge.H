@@ -11,7 +11,7 @@
 #define IMPACTX_DIPEDGE_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "mixin/regular.H"
+#include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 
 #include <AMReX_Extension.H>
@@ -23,7 +23,7 @@
 namespace impactx
 {
     struct DipEdge
-    : public elements::Regular<DipEdge>,
+    : public elements::BeamOptic<DipEdge>,
       public elements::Thin
     {
         static constexpr auto name = "DipEdge";
@@ -50,7 +50,7 @@ namespace impactx
         }
 
         /** Push all particles */
-        using Regular::operator();
+        using BeamOptic::operator();
 
         /** This is a dipedge functor, so that a variable of this type can be used like a
          *  dipedge function.

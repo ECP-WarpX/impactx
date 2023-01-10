@@ -11,7 +11,7 @@
 #define IMPACTX_NONLINEARLENS_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "mixin/regular.H"
+#include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 
 #include <AMReX_Extension.H>
@@ -23,7 +23,7 @@
 namespace impactx
 {
     struct NonlinearLens
-    : public elements::Regular<NonlinearLens>,
+    : public elements::BeamOptic<NonlinearLens>,
       public elements::Thin
     {
         static constexpr auto name = "NonlinearLens";
@@ -46,7 +46,7 @@ namespace impactx
         }
 
         /** Push all particles */
-        using Regular::operator();
+        using BeamOptic::operator();
 
         /** This is a nonlinear lens functor, so that a variable of this type
          *  can be used like a nonlinear lens function.

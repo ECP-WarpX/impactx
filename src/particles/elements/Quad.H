@@ -11,8 +11,8 @@
 #define IMPACTX_QUAD_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "mixin/regular.H"
-#include "mixin/regular.H"
+#include "mixin/beamoptic.H"
+#include "mixin/beamoptic.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -23,7 +23,7 @@
 namespace impactx
 {
     struct Quad
-    : public elements::Regular<Quad>,
+    : public elements::BeamOptic<Quad>,
       public elements::Finite
     {
         static constexpr auto name = "Quad";
@@ -45,7 +45,7 @@ namespace impactx
         }
 
         /** Push all particles */
-        using Regular::operator();
+        using BeamOptic::operator();
 
         /** This is a quad functor, so that a variable of this type can be used like a quad function.
          *

@@ -11,7 +11,7 @@
 #define IMPACTX_CONSTF_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "mixin/regular.H"
+#include "mixin/beamoptic.H"
 #include "mixin/finite.H"
 
 #include <AMReX_Extension.H>
@@ -23,7 +23,7 @@
 namespace impactx
 {
     struct ConstF
-    : public elements::Regular<ConstF>,
+    : public elements::BeamOptic<ConstF>,
       public elements::Finite
     {
         static constexpr auto name = "ConstF";
@@ -45,7 +45,7 @@ namespace impactx
         }
 
         /** Push all particles */
-        using Regular::operator();
+        using BeamOptic::operator();
 
         /** This pushes a single particle, relative to the reference particle
          *

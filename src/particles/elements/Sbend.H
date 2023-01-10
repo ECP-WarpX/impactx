@@ -11,7 +11,7 @@
 #define IMPACTX_SBEND_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "mixin/regular.H"
+#include "mixin/beamoptic.H"
 #include "mixin/finite.H"
 
 #include <AMReX_Extension.H>
@@ -23,7 +23,7 @@
 namespace impactx
 {
     struct Sbend
-    : public elements::Regular<Sbend>,
+    : public elements::BeamOptic<Sbend>,
       public elements::Finite
     {
         static constexpr auto name = "Sbend";
@@ -42,7 +42,7 @@ namespace impactx
         }
 
         /** Push all particles */
-        using Regular::operator();
+        using BeamOptic::operator();
 
         /** This is a sbend functor, so that a variable of this type can be used like a sbend function.
          *

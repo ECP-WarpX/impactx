@@ -7,8 +7,8 @@
  * Authors: Axel Huebl
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_ELEMENTS_MIXIN_REGULAR_H
-#define IMPACTX_ELEMENTS_MIXIN_REGULAR_H
+#ifndef IMPACTX_ELEMENTS_MIXIN_BEAMOPTIC_H
+#define IMPACTX_ELEMENTS_MIXIN_BEAMOPTIC_H
 
 #include "particles/ImpactXParticleContainer.H"
 
@@ -103,9 +103,6 @@ namespace detail
             T_Element & element
     ) {
         const int np = pti.numParticles();
-        //const auto t_lev = pti.GetLevel();
-        //const auto index = pti.GetPairIndex();
-        // ...
 
         // preparing access to particle data: AoS
         using PType = ImpactXParticleContainer::ParticleType;
@@ -125,8 +122,13 @@ namespace detail
     }
 } // namespace detail
 
+    /** Mixin class for a regular beam optics lattice element.
+     *
+     * This element pushes particles relative to a reference particle.
+     * All particles are pushed independently with the same logic.
+     */
     template<typename T_Element>
-    struct Regular
+    struct BeamOptic
     {
         /** This pushes the particles on a particle iterator tile or box.
          *
@@ -146,4 +148,4 @@ namespace detail
 
 } // namespace impactx::elements
 
-#endif // IMPACTX_ELEMENTS_MIXIN_REGULAR_H
+#endif // IMPACTX_ELEMENTS_MIXIN_BEAMOPTIC_H
