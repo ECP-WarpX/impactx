@@ -13,6 +13,7 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/integrators/Integrators.H"
 #include "mixin/regular.H"
+#include "mixin/finite.H"
 
 #include <ablastr/constant.H>
 
@@ -29,7 +30,8 @@
 namespace impactx
 {
     struct RFCavity
-    : public elements::Regular<RFCavity>
+    : public elements::Regular<RFCavity>,
+      public elements::Finite
     {
         static constexpr auto name = "RFCavity";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -52,8 +54,8 @@ namespace impactx
             int const mapsteps,
             int const nslice
         )
-          : m_ds(ds), m_escale(escale), m_freq(freq), m_phase(phase),
-            m_mapsteps(mapsteps), m_nslice(nslice)
+          : Finite(ds, nslice),
+            m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps)
         {
         }
 
@@ -412,33 +414,11 @@ namespace impactx
             refpart.map(6,6) = M*R(5,6) + R(6,6);
         }
 
-        /** Number of slices used for the application of space charge
-         *
-         * @return positive integer
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        int nslice () const
-        {
-            return m_nslice;
-        }
-
-        /** Return the segment length
-         *
-         * @return value in meters
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        amrex::ParticleReal ds () const
-        {
-            return m_ds;
-        }
-
     private:
-        amrex::ParticleReal m_ds; //! segment length in m
         amrex::ParticleReal m_escale; //! scaling factor for RF electric field
         amrex::ParticleReal m_freq; //! RF frequency in Hz
         amrex::ParticleReal m_phase; //! RF driven phase in deg
         int m_mapsteps; //! number of map integration steps per slice
-        int m_nslice; //! number of slices used for the application of space charge
     };
 
 } // namespace impactx

@@ -12,6 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "mixin/regular.H"
+#include "mixin/finite.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -22,7 +23,8 @@
 namespace impactx
 {
     struct ConstF
-    : public elements::Regular<ConstF>
+    : public elements::Regular<ConstF>,
+      public elements::Finite
     {
         static constexpr auto name = "ConstF";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -38,7 +40,7 @@ namespace impactx
         ConstF( amrex::ParticleReal const ds, amrex::ParticleReal const kx,
                 amrex::ParticleReal const ky, amrex::ParticleReal const kt,
                 int const nslice )
-        : m_ds(ds), m_kx(kx), m_ky(ky), m_kt(kt), m_nslice(nslice)
+        : Finite(ds, nslice), m_kx(kx), m_ky(ky), m_kt(kt)
         {
         }
 
@@ -134,32 +136,10 @@ namespace impactx
 
         }
 
-        /** Number of slices used for the application of space charge
-         *
-         * @return positive integer
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        int nslice () const
-        {
-            return m_nslice;
-        }
-
-        /** Return the segment length
-         *
-         * @return value in meters
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        amrex::ParticleReal ds () const
-        {
-            return m_ds;
-        }
-
     private:
-        amrex::ParticleReal m_ds; //! segment length in m
         amrex::ParticleReal m_kx; //! focusing x strength in 1/m
         amrex::ParticleReal m_ky; //! focusing y strength in 1/m
         amrex::ParticleReal m_kt; //! focusing t strength in 1/m
-        int m_nslice; //! number of slices used for the application of space charge
     };
 
 } // namespace impactx
