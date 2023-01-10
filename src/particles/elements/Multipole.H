@@ -11,6 +11,7 @@
 #define IMPACTX_MULTIPOLE_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/regular.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -21,6 +22,7 @@
 namespace impactx
 {
     struct Multipole
+    : public elements::Regular<Multipole>
     {
         static constexpr auto name = "Multipole";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -43,6 +45,9 @@ namespace impactx
                m_mfactorial *= n;
             }
         }
+
+        /** Push all particles */
+        using Regular::operator();
 
         /** This is a multipole functor, so that a variable of this type can be used like a
          *  multipole function.

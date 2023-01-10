@@ -11,6 +11,7 @@
 #define IMPACTX_DRIFT_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/regular.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -21,6 +22,7 @@
 namespace impactx
 {
     struct Drift
+    : public elements::Regular<Drift>
     {
         static constexpr auto name = "Drift";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -34,6 +36,9 @@ namespace impactx
         : m_ds(ds), m_nslice(nslice)
         {
         }
+
+        /** Push all particles */
+        using Regular::operator();
 
         /** This is a drift functor, so that a variable of this type can be used like a drift function.
          *

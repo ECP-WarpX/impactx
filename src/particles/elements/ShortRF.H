@@ -11,6 +11,7 @@
 #define IMPACTX_SHORTRF_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/regular.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -21,6 +22,7 @@
 namespace impactx
 {
     struct ShortRF
+    : public elements::Regular<ShortRF>
     {
         static constexpr auto name = "ShortRF";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -34,6 +36,9 @@ namespace impactx
         : m_V(V), m_k(k)
         {
         }
+
+        /** Push all particles */
+        using Regular::operator();
 
         /** This is a shortrf functor, so that a variable of this type can be used like a
          *  shortrf function.

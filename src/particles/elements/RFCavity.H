@@ -12,6 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/integrators/Integrators.H"
+#include "mixin/regular.H"
 
 #include <ablastr/constant.H>
 
@@ -28,6 +29,7 @@
 namespace impactx
 {
     struct RFCavity
+    : public elements::Regular<RFCavity>
     {
         static constexpr auto name = "RFCavity";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -54,6 +56,9 @@ namespace impactx
             m_mapsteps(mapsteps), m_nslice(nslice)
         {
         }
+
+        /** Push all particles */
+        using Regular::operator();
 
         /** This is an RF cavity functor, so that a variable of this type can be used like
          *  an RF cavity function.

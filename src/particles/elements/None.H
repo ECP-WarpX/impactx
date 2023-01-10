@@ -29,6 +29,14 @@ namespace impactx
         {
         }
 
+        /** Push all particles - nothing to do here */
+        void operator() (
+            ImpactXParticleContainer::iterator & /* pti */,
+            RefPart & AMREX_RESTRICT /* ref_part */
+        ) {
+            // nothing to do
+        }
+
         /** Does nothing to a particle.
          *
          * @param p Particle AoS data for positions and cpu/id

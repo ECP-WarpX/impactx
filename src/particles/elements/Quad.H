@@ -11,6 +11,7 @@
 #define IMPACTX_QUAD_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/regular.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -21,6 +22,7 @@
 namespace impactx
 {
     struct Quad
+    : public elements::Regular<Quad>
     {
         static constexpr auto name = "Quad";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -39,6 +41,9 @@ namespace impactx
         : m_ds(ds), m_k(k), m_nslice(nslice)
         {
         }
+
+        /** Push all particles */
+        using Regular::operator();
 
         /** This is a quad functor, so that a variable of this type can be used like a quad function.
          *

@@ -11,6 +11,7 @@
 #define IMPACTX_SBEND_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/regular.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -21,6 +22,7 @@
 namespace impactx
 {
     struct Sbend
+    : public elements::Regular<Sbend>
     {
         static constexpr auto name = "Sbend";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -36,6 +38,9 @@ namespace impactx
         : m_ds(ds), m_rc(rc), m_nslice(nslice)
         {
         }
+
+        /** Push all particles */
+        using Regular::operator();
 
         /** This is a sbend functor, so that a variable of this type can be used like a sbend function.
          *

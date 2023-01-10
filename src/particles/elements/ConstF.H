@@ -11,6 +11,7 @@
 #define IMPACTX_CONSTF_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/regular.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -21,6 +22,7 @@
 namespace impactx
 {
     struct ConstF
+    : public elements::Regular<ConstF>
     {
         static constexpr auto name = "ConstF";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -40,8 +42,10 @@ namespace impactx
         {
         }
 
-        /** This is a constf functor, so that a variable of this type can be used like a
-         *  constf function.
+        /** Push all particles */
+        using Regular::operator();
+
+        /** This pushes a single particle, relative to the reference particle
          *
          * @param p Particle AoS data for positions and cpu/id
          * @param px particle momentum in x

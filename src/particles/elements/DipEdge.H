@@ -11,6 +11,7 @@
 #define IMPACTX_DIPEDGE_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/regular.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -21,6 +22,7 @@
 namespace impactx
 {
     struct DipEdge
+    : public elements::Regular<DipEdge>
     {
         static constexpr auto name = "DipEdge";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -44,6 +46,9 @@ namespace impactx
         : m_psi(psi), m_rc(rc), m_g(g), m_K2(K2)
         {
         }
+
+        /** Push all particles */
+        using Regular::operator();
 
         /** This is a dipedge functor, so that a variable of this type can be used like a
          *  dipedge function.
