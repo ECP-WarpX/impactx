@@ -56,7 +56,7 @@ include(CMakeDependentOption)
 option(ImpactX_APP           "Build the ImpactX executable application"     ON)
 option(ImpactX_LIB           "Build ImpactX as a library"                   OFF)
 option(ImpactX_MPI           "Multi-node support (message-passing)"         ON)
-option(ImpactX_OPENPMD       "openPMD I/O (HDF5, ADIOS)"                    OFF)
+option(ImpactX_OPENPMD       "openPMD I/O (HDF5, ADIOS)"                    ON)
 option(ImpactX_PYTHON        "Python bindings"                              OFF)
 
 set(ImpactX_PRECISION_VALUES SINGLE DOUBLE)
@@ -78,6 +78,7 @@ mark_as_advanced(ImpactX_MPI_THREAD_MULTIPLE)
 
 option(ImpactX_ablastr_internal                  "Download & build ABLASTR" ON)
 option(ImpactX_amrex_internal                    "Download & build AMReX" ON)
+option(ImpactX_openpmd_internal                  "Download & build openPMD-api" ON)
 option(ImpactX_pyamrex_internal                  "Download & build pyAMReX" ON)
 
 set(pyImpactX_VERSION_INFO "" CACHE STRING
@@ -250,7 +251,6 @@ if(ImpactX_PYTHON)
 endif()
 
 if(ImpactX_OPENPMD)
-    target_compile_definitions(ImpactX PUBLIC ImpactX_USE_OPENPMD)
     target_link_libraries(ImpactX PUBLIC openPMD::openPMD)
 endif()
 
