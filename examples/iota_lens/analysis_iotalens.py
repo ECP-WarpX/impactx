@@ -5,49 +5,45 @@
 # License: BSD-3-Clause-LBNL
 #
 
-import glob
-
 import numpy as np
-import pandas as pd
+import openpmd_api as io
 from scipy.stats import moment
 
 
 def get_moments(beam):
-    """Calculate mean and std dev of functions defining the IOTA invariants
+    """Calculate standard deviations of beam position & momenta
+    and emittance values
 
     Returns
     -------
-    meanH, sigH, meanI, sigI
+    sigx, sigy, sigt, emittance_x, emittance_y, emittance_t
     """
-    meanH = np.mean(beam["H"])
-    sigH = moment(beam["H"], moment=2) ** 0.5
-    meanI = np.mean(beam["I"])
-    sigI = moment(beam["I"], moment=2) ** 0.5
+    sigx = moment(beam["position_x"], moment=2) ** 0.5  # variance -> std dev.
+    sigpx = moment(beam["momentum_x"], moment=2) ** 0.5
+    sigy = moment(beam["position_y"], moment=2) ** 0.5
+    sigpy = moment(beam["momentum_y"], moment=2) ** 0.5
+    sigt = moment(beam["position_ct"], moment=2) ** 0.5
+    sigpt = moment(beam["momentum_t"], moment=2) ** 0.5
 
-    return (meanH, sigH, meanI, sigI)
+    epstrms = beam.cov(ddof=0)
+    emittance_x = (
+        sigx**2 * sigpx**2 - epstrms["position_x"]["momentum_x"] ** 2
+    ) ** 0.5
+    emittance_y = (
+        sigy**2 * sigpy**2 - epstrms["position_y"]["momentum_y"] ** 2
+    ) ** 0.5
+    emittance_t = (
+        sigt**2 * sigpt**2 - epstrms["position_ct"]["momentum_t"] ** 2
+    ) ** 0.5
 
-
-def read_all_files(file_pattern):
-    """Read in all CSV files from each MPI rank (and potentially OpenMP
-    thread). Concatenate into one Pandas dataframe.
-
-    Returns
-    -------
-    pandas.DataFrame
-    """
-    return pd.concat(
-        (
-            pd.read_csv(filename, delimiter=r"\s+")
-            for filename in glob.glob(file_pattern)
-        ),
-        axis=0,
-        ignore_index=True,
-    ).set_index("id")
+    return (sigx, sigy, sigt, emittance_x, emittance_y, emittance_t)
 
 
-# initial/final beam on rank zero
-initial = read_all_files("diags/nonlinear_lens_invariants_000000.*")
-final = read_all_files("diags/nonlinear_lens_invariants_final.*")
+# initial/final beam
+series = io.Series("diags/openPMD/beam_monitor.h5", io.Access.read_only)
+last_step = list(series.iterations)[-1]
+initial = series.iterations[1].particles["beam"].to_df()
+final = series.iterations[last_step].particles["beam"].to_df()
 
 # compare number of particles
 num_particles = 10000

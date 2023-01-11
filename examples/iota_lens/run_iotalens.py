@@ -40,15 +40,21 @@ distr = distribution.Waterbag(
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
+# add beam diagnostics
+beam_monitor = elements.BeamMonitor("beam_monitor", "h5")
+
+# design the accelerator lattice
 constEnd = elements.ConstF(ds=0.0025, kx=1.0, ky=1.0, kt=1.0e-12)
 nllens = elements.NonlinearLens(knll=2.0e-7, cnll=0.01)
 const = elements.ConstF(ds=0.005, kx=1.0, ky=1.0, kt=1.0e-12)
-# design the accelerator lattice
+
 num_lenses = 10
 nllens_lattice = [constEnd] + [nllens, const] * (num_lenses - 1) + [nllens, constEnd]
 
 # add elements to the lattice segment
+sim.lattice.append(beam_monitor)
 sim.lattice.extend(nllens_lattice)
+sim.lattice.append(beam_monitor)
 
 # run simulation
 sim.evolve()

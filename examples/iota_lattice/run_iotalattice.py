@@ -40,6 +40,9 @@ distr = distribution.Waterbag(
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", "h5")
+
 # init accelerator lattice
 ns = 10  # number of slices per ds in the element
 
@@ -107,10 +110,12 @@ lattice_half = [
     edge30, sbend30, edge30, dre1, qe1, dre2, qe2, dre3
 ]
 # fmt:on
+sim.lattice.append(monitor)
 sim.lattice.extend(lattice_half)
 sim.lattice.append(qe3)
 lattice_half.reverse()
 sim.lattice.extend(lattice_half)
+sim.lattice.append(monitor)
 
 # run simulation
 sim.evolve()

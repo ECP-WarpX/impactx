@@ -65,6 +65,9 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
         set_property(TEST ${name}.run APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=2")
     endif()
 
+    # make HDF5 I/O more robust on various filesystems
+    set_property(TEST ${name}.run APPEND PROPERTY ENVIRONMENT "HDF5_USE_FILE_LOCKING=FALSE")
+
     # analysis and plots
     set(THIS_Python_SCRIPT_EXE)
     if(is_python OR WIN32)

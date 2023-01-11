@@ -44,6 +44,9 @@ distr = distribution.Waterbag(
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", "h5")
+
 # design the accelerator lattice
 ns = 1  # number of slices per ds in the element
 
@@ -69,7 +72,7 @@ drift1 = elements.Drift(ds=0.25, nslice=ns)
 drift2 = elements.Drift(ds=0.5, nslice=ns)
 
 # assign a fodo segment
-sim.lattice.extend([drift1, quad1, drift2, quad2, drift1])
+sim.lattice.extend([monitor, drift1, quad1, drift2, quad2, drift1, monitor])
 
 # run simulation
 sim.evolve()

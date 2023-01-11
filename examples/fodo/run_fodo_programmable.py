@@ -148,13 +148,22 @@ pge2.beam_particles = lambda pti, refpart: my_drift(pge2, pti, refpart)
 pge2.ref_particle = lambda refpart: my_ref_drift(pge2, refpart)
 pge2.ds = 0.5
 
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", "h5")
+
 # design the accelerator lattice
 fodo = [
+    monitor,
     pge1,  # equivalent to elements.Drift(ds=0.25, nslice=ns)
+    monitor,
     elements.Quad(ds=1.0, k=1.0, nslice=ns),
+    monitor,
     pge2,  # equivalent to elements.Drift(ds=0.5, nslice=ns)
+    monitor,
     elements.Quad(ds=1.0, k=-1.0, nslice=ns),
+    monitor,
     pge1,  # equivalent to elements.Drift(ds=0.25, nslice=ns)
+    monitor,
 ]
 # assign a fodo segment
 sim.lattice.extend(fodo)
