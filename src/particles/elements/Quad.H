@@ -24,7 +24,7 @@ namespace impactx
 {
     struct Quad
     : public elements::BeamOptic<Quad>,
-      public elements::Finite
+      public elements::Thick
     {
         static constexpr auto name = "Quad";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -40,7 +40,7 @@ namespace impactx
          */
         Quad( amrex::ParticleReal const ds, amrex::ParticleReal const k,
               int const nslice )
-        : Finite(ds, nslice), m_k(k)
+        : Thick(ds, nslice), m_k(k)
         {
         }
 

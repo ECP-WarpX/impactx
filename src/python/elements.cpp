@@ -66,7 +66,7 @@ void init_elements(py::module& m)
 
     // mixin classes
 
-    py::class_<elements::Finite>(me, "Finite")
+    py::class_<elements::Thick>(me, "Thick")
         .def(py::init<
                  amrex::ParticleReal const,
                  amrex::ParticleReal const
@@ -74,8 +74,8 @@ void init_elements(py::module& m)
              py::arg("ds"), py::arg("nslice") = 1,
              "Mixin class for lattice elements with finite length."
         )
-        .def_property_readonly("nslice", &elements::Finite::nslice)
-        .def_property_readonly("ds", &elements::Finite::ds)
+        .def_property_readonly("nslice", &elements::Thick::nslice)
+        .def_property_readonly("ds", &elements::Thick::ds)
     ;
 
     py::class_<elements::Thin>(me, "Thin")
@@ -88,7 +88,7 @@ void init_elements(py::module& m)
 
     // beam optics below
 
-    py::class_<ConstF, elements::Finite>(me, "ConstF")
+    py::class_<ConstF, elements::Thick>(me, "ConstF")
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
@@ -111,7 +111,7 @@ void init_elements(py::module& m)
         )
     ;
 
-    py::class_<Drift, elements::Finite>(me, "Drift")
+    py::class_<Drift, elements::Thick>(me, "Drift")
         .def(py::init<
                 amrex::ParticleReal const,
                 int const >(),
@@ -145,7 +145,7 @@ void init_elements(py::module& m)
         )
     ;
 
-    py::class_<Quad, elements::Finite>(me, "Quad")
+    py::class_<Quad, elements::Thick>(me, "Quad")
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
@@ -155,7 +155,7 @@ void init_elements(py::module& m)
         )
     ;
 
-    py::class_<RFCavity, elements::Finite>(me, "RFCavity")
+    py::class_<RFCavity, elements::Thick>(me, "RFCavity")
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
@@ -171,7 +171,7 @@ void init_elements(py::module& m)
         )
     ;
 
-    py::class_<Sbend, elements::Finite>(me, "Sbend")
+    py::class_<Sbend, elements::Thick>(me, "Sbend")
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,

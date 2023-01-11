@@ -13,7 +13,7 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/integrators/Integrators.H"
 #include "mixin/beamoptic.H"
-#include "mixin/finite.H"
+#include "mixin/thick.H"
 
 #include <ablastr/constant.H>
 
@@ -31,7 +31,7 @@ namespace impactx
 {
     struct RFCavity
     : public elements::BeamOptic<RFCavity>,
-      public elements::Finite
+      public elements::Thick
     {
         static constexpr auto name = "RFCavity";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -54,7 +54,7 @@ namespace impactx
             int const mapsteps,
             int const nslice
         )
-          : Finite(ds, nslice),
+          : Thick(ds, nslice),
             m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps)
         {
         }

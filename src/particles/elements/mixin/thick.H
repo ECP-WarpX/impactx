@@ -7,8 +7,8 @@
  * Authors: Axel Huebl
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_ELEMENTS_MIXIN_FINITE_H
-#define IMPACTX_ELEMENTS_MIXIN_FINITE_H
+#ifndef IMPACTX_ELEMENTS_MIXIN_THICK_H
+#define IMPACTX_ELEMENTS_MIXIN_THICK_H
 
 #include "particles/ImpactXParticleContainer.H"
 
@@ -20,14 +20,14 @@ namespace impactx::elements
 {
     /** This is a helper class for lattice elements with finite length
      */
-    struct Finite
+    struct Thick
     {
         /** A finite-length element
          *
          * @param ds Segment length in m
          * @param nslice number of slices used for the application of space charge
          */
-        Finite( amrex::ParticleReal const ds, int const nslice )
+        Thick(amrex::ParticleReal const ds, int const nslice )
         : m_ds(ds), m_nslice(nslice)
         {
         }
@@ -59,4 +59,4 @@ namespace impactx::elements
 
 } // namespace impactx::elements
 
-#endif // IMPACTX_ELEMENTS_MIXIN_FINITE_H
+#endif // IMPACTX_ELEMENTS_MIXIN_THICK_H

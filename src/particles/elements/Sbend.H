@@ -12,7 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "mixin/beamoptic.H"
-#include "mixin/finite.H"
+#include "mixin/thick.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -24,7 +24,7 @@ namespace impactx
 {
     struct Sbend
     : public elements::BeamOptic<Sbend>,
-      public elements::Finite
+      public elements::Thick
     {
         static constexpr auto name = "Sbend";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -37,7 +37,7 @@ namespace impactx
          */
         Sbend( amrex::ParticleReal const ds, amrex::ParticleReal const rc,
                int const nslice)
-        : Finite(ds, nslice), m_rc(rc)
+        : Thick(ds, nslice), m_rc(rc)
         {
         }
 

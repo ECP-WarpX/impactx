@@ -12,7 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "mixin/beamoptic.H"
-#include "mixin/finite.H"
+#include "mixin/thick.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -24,7 +24,7 @@ namespace impactx
 {
     struct Drift
     : public elements::BeamOptic<Drift>,
-      public elements::Finite
+      public elements::Thick
     {
         static constexpr auto name = "Drift";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -35,7 +35,7 @@ namespace impactx
          * @param nslice number of slices used for the application of space charge
          */
         Drift( amrex::ParticleReal const ds, int const nslice )
-        : Finite(ds, nslice)
+        : Thick(ds, nslice)
         {
         }
 
