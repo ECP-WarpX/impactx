@@ -6,6 +6,6 @@ target_sources(ImpactX
 )
 
 add_subdirectory(diagnostics)
-#add_subdirectory(integrators)
+add_subdirectory(elements)
 add_subdirectory(spacecharge)
 add_subdirectory(transformation)
