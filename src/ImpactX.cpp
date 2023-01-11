@@ -41,6 +41,9 @@ namespace impactx
 
         // query input for warning logger variables and set up warning logger accordingly
         init_warning_logger();
+
+        // move old diagnostics out of the way
+        amrex::UtilCreateCleanDirectory("diags", true);
     }
 
     void ImpactX::initGrids ()
@@ -54,9 +57,6 @@ namespace impactx
         // init blocks / grids & MultiFabs
         AmrCore::InitFromScratch(0.0);
         amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
-
-        // move old diagnostics out of the way
-        amrex::UtilCreateCleanDirectory("diags", true);
     }
 
     void ImpactX::evolve ()
@@ -235,6 +235,14 @@ namespace impactx
                                           diagnostics::OutputType::PrintNonlinearLensInvariants,
                                           "diags/nonlinear_lens_invariants_final",
                                           global_step);
+        }
+
+        // loop over all beamline elements & finalize them
+        for (auto & element_variant : m_lattice)
+        {
+            auto bd = std::get_if<diagnostics::BeamMonitor>(&element_variant);
+            if (bd)
+                bd->finalize();
         }
 
     }

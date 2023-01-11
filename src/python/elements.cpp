@@ -88,6 +88,15 @@ void init_elements(py::module& m)
         .def_property_readonly("ds", &elements::Thin::ds)
     ;
 
+    // diagnostics
+
+    py::class_<diagnostics::BeamMonitor, elements::Thin>(me, "BeamMonitor")
+        .def(py::init<std::string, std::string, std::string>(),
+             py::arg("name"), py::arg("backend")="default", py::arg("encoding")="g",
+             "This element writes the particle beam out to openPMD data."
+        )
+    ;
+
     // beam optics
 
     py::class_<ConstF, elements::Thick>(me, "ConstF")
