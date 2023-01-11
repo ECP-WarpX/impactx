@@ -403,7 +403,7 @@ This module provides elements for the accelerator lattice.
 
 .. py:class:: impactx.elements.NonlinearLens(knll, cnll)
 
-   Single short segment of the nonlinear magnetic insert element
+   Single short segment of the nonlinear magnetic insert element.
 
    A thin lens associated with a single short segment of the
    nonlinear magnetic insert described by V. Danilov and
@@ -412,6 +412,32 @@ This module provides elements for the accelerator lattice.
 
    :param knll: integrated strength of the nonlinear lens (m)
    :param cnll: distance of singularities from the origin (m)
+
+.. py:class:: impactx.elements.Programmable
+
+   A programmable beam optics element.
+
+   This element can be programmed to receive callback hooks into Python functions.
+
+   .. py:property:: beam_particles
+
+      This is a function hook for pushing all beam particles.
+      This accepts a function or lambda with the following arguments:
+
+      .. py:method:: user_defined_function(pti: ImpactXParIter, refpart: RefPart)
+
+         This function is called repeatedly for all particle tiles or boxes in the beam particle container.
+         Particles can be pushed and are relative to the reference particle
+
+   .. py:property:: ref_particle
+
+      This is a function hook for pushing the reference particle.
+      This accepts a function or lambda with the following argument:
+
+      .. py:method:: another_user_defined_function(refpart: RefPart)
+
+         This function is called for the reference particle as it passes through the element.
+         The reference particle is updated *before* the beam particles are pushed.
 
 .. py:class:: impactx.elements.Quad(ds, k, nslice=1)
 
