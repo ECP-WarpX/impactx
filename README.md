@@ -5,7 +5,7 @@
 [![License ImpactX](https://img.shields.io/badge/license-BSD--3--Clause--LBNL-blue.svg)](https://spdx.org/licenses/BSD-3-Clause-LBNL.html)
 [![Supported Platforms](https://img.shields.io/badge/platforms-linux%20|%20osx%20|%20win-blue)](https://impactx.readthedocs.io/en/latest/install/users.html)  
 [![DOI (source)](https://img.shields.io/badge/DOI%20(source)-10.5281/zenodo.6954922-blue.svg)](https://doi.org/10.5281/zenodo.6954922)
-[![DOI (paper)](https://img.shields.io/badge/DOI%20(paper)-10.48550/arXiv.2208.02382-blue.svg)](https://doi.org/10.48550/arXiv.2208.02382)  
+[![DOI (paper)](https://img.shields.io/badge/DOI%20(paper)-10.18429%2FJACoW--NAPAC2022--TUYE2-blue.svg)](https://doi.org/10.18429/JACoW-NAPAC2022-TUYE2)  
 [![Development Status](https://img.shields.io/badge/development%20status-beta-orange.svg)](https://en.wikipedia.org/wiki/Software_release_life_cycle)
 [![Language: C++17](https://img.shields.io/badge/language-C%2B%2B17-orange.svg)](https://isocpp.org/)
 [![Language: Python](https://img.shields.io/badge/language-Python-orange.svg)](https://python.org/)

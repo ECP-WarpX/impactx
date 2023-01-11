@@ -35,5 +35,6 @@ If your project leads to a scientific publication, please consider citing the pa
 
 - Huebl A, Lehe R, Mitchell C E, Qiang J, Ryne R D, Sandberg R T, Vay JL.
   **Next Generation Computational Tools for the Modeling and Design of Particle Accelerators at Exascale**.
-  *NAPAC'22*, 2022.
-  `arXiv:2208.02382 <https://arxiv.org/abs/2208.02382>`__
+  2022 North American Particle Accelerator Conference (NAPAC'22), TUYE2, pp. 302-306, 2022.
+  `arXiv:2208.02382 <https://arxiv.org/abs/2208.02382>`__,
+  `DOI:10.18429/JACoW-NAPAC2022-TUYE2 <https://doi.org/10.18429/JACoW-NAPAC2022-TUYE2>`__
