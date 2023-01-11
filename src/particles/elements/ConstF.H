@@ -11,6 +11,8 @@
 #define IMPACTX_CONSTF_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/beamoptic.H"
+#include "mixin/thick.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -21,6 +23,8 @@
 namespace impactx
 {
     struct ConstF
+    : public elements::BeamOptic<ConstF>,
+      public elements::Thick
     {
         static constexpr auto name = "ConstF";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -36,12 +40,14 @@ namespace impactx
         ConstF( amrex::ParticleReal const ds, amrex::ParticleReal const kx,
                 amrex::ParticleReal const ky, amrex::ParticleReal const kt,
                 int const nslice )
-        : m_ds(ds), m_kx(kx), m_ky(ky), m_kt(kt), m_nslice(nslice)
+        : Thick(ds, nslice), m_kx(kx), m_ky(ky), m_kt(kt)
         {
         }
 
-        /** This is a constf functor, so that a variable of this type can be used like a
-         *  constf function.
+        /** Push all particles */
+        using BeamOptic::operator();
+
+        /** This pushes a single particle, relative to the reference particle
          *
          * @param p Particle AoS data for positions and cpu/id
          * @param px particle momentum in x
@@ -130,32 +136,10 @@ namespace impactx
 
         }
 
-        /** Number of slices used for the application of space charge
-         *
-         * @return positive integer
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        int nslice () const
-        {
-            return m_nslice;
-        }
-
-        /** Return the segment length
-         *
-         * @return value in meters
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        amrex::ParticleReal ds () const
-        {
-            return m_ds;
-        }
-
     private:
-        amrex::ParticleReal m_ds; //! segment length in m
         amrex::ParticleReal m_kx; //! focusing x strength in 1/m
         amrex::ParticleReal m_ky; //! focusing y strength in 1/m
         amrex::ParticleReal m_kt; //! focusing t strength in 1/m
-        int m_nslice; //! number of slices used for the application of space charge
     };
 
 } // namespace impactx

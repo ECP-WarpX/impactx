@@ -11,6 +11,8 @@
 #define IMPACTX_SBEND_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/beamoptic.H"
+#include "mixin/thick.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -21,6 +23,8 @@
 namespace impactx
 {
     struct Sbend
+    : public elements::BeamOptic<Sbend>,
+      public elements::Thick
     {
         static constexpr auto name = "Sbend";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -33,9 +37,12 @@ namespace impactx
          */
         Sbend( amrex::ParticleReal const ds, amrex::ParticleReal const rc,
                int const nslice)
-        : m_ds(ds), m_rc(rc), m_nslice(nslice)
+        : Thick(ds, nslice), m_rc(rc)
         {
         }
+
+        /** Push all particles */
+        using BeamOptic::operator();
 
         /** This is a sbend functor, so that a variable of this type can be used like a sbend function.
          *
@@ -149,30 +156,8 @@ namespace impactx
 
         }
 
-        /** Number of slices used for the application of space charge
-         *
-         * @return positive integer
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        int nslice () const
-        {
-            return m_nslice;
-        }
-
-        /** Return the segment length
-         *
-         * @return value in meters
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        amrex::ParticleReal ds () const
-        {
-            return m_ds;
-        }
-
     private:
-        amrex::ParticleReal m_ds; //! segment length in m
         amrex::ParticleReal m_rc; //! bend radius in m
-        int m_nslice; //! number of slices used for the application of space charge
     };
 
 } // namespace impactx

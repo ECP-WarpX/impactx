@@ -11,6 +11,8 @@
 #define IMPACTX_SHORTRF_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/beamoptic.H"
+#include "mixin/thin.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -21,6 +23,8 @@
 namespace impactx
 {
     struct ShortRF
+    : public elements::BeamOptic<ShortRF>,
+      public elements::Thin
     {
         static constexpr auto name = "ShortRF";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -34,6 +38,9 @@ namespace impactx
         : m_V(V), m_k(k)
         {
         }
+
+        /** Push all particles */
+        using BeamOptic::operator();
 
         /** This is a shortrf functor, so that a variable of this type can be used like a
          *  shortrf function.
@@ -85,37 +92,8 @@ namespace impactx
 
         }
 
-        /** This pushes the reference particle.
-         *
-         * @param[in,out] refpart reference particle
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void operator() ([[maybe_unused]] RefPart & AMREX_RESTRICT refpart) const {
-
-            // nothing to do: this is a zero-length element
-
-        }
-
-        /** Number of slices used for the application of space charge
-         *
-         * @return one, because this is a zero-length element
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        int nslice () const
-        {
-            return 1;
-        }
-
-        /** Return the segment length
-         *
-         * @return zero, because this is a zero-length element
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        amrex::ParticleReal ds () const
-        {
-            using namespace amrex::literals;
-            return 0.0_prt;
-        }
+        /** This pushes the reference particle. */
+        using Thin::operator();
 
     private:
         amrex::ParticleReal m_V; //! normalized (max) RF voltage drop.

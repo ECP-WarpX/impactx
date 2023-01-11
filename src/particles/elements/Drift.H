@@ -11,6 +11,8 @@
 #define IMPACTX_DRIFT_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/beamoptic.H"
+#include "mixin/thick.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -21,6 +23,8 @@
 namespace impactx
 {
     struct Drift
+    : public elements::BeamOptic<Drift>,
+      public elements::Thick
     {
         static constexpr auto name = "Drift";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -31,9 +35,12 @@ namespace impactx
          * @param nslice number of slices used for the application of space charge
          */
         Drift( amrex::ParticleReal const ds, int const nslice )
-        : m_ds(ds), m_nslice(nslice)
+        : Thick(ds, nslice)
         {
         }
+
+        /** Push all particles */
+        using BeamOptic::operator();
 
         /** This is a drift functor, so that a variable of this type can be used like a drift function.
          *
@@ -121,30 +128,6 @@ namespace impactx
             refpart.s = s + slice_ds;
 
         }
-
-        /** Number of slices used for the application of space charge
-         *
-         * @return positive integer
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        int nslice () const
-        {
-            return m_nslice;
-        }
-
-        /** Return the segment length
-         *
-         * @return value in meters
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        amrex::ParticleReal ds () const
-        {
-            return m_ds;
-        }
-
-    private:
-        amrex::ParticleReal m_ds; //! segment length in m
-        int m_nslice; //! number of slices used for the application of space charge
     };
 
 } // namespace impactx
