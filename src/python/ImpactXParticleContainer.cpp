@@ -16,6 +16,16 @@ using namespace impactx;
 void init_impactxparticlecontainer(py::module& m)
 {
     py::class_<
+        ParIter,
+        amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
+    >(m, "ImpactXParIter");
+
+    py::class_<
+        ParConstIter,
+        amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
+    >(m, "ImpactXParConstIter");
+
+    py::class_<
         ImpactXParticleContainer,
         amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>
     >(m, "ImpactXParticleContainer")

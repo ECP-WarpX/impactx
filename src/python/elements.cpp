@@ -145,6 +145,32 @@ void init_elements(py::module& m)
         )
     ;
 
+    py::class_<Programmable>(me, "Programmable")
+        .def(py::init<>(),
+             "A programmable beam optics element."
+        )
+        .def_property("nslice",
+            [](Programmable & p) { return p.nslice(); },
+            [](Programmable & p, int nslice) { p.m_nslice = nslice; }
+        )
+        .def_property("ds",
+              [](Programmable & p) { return p.ds(); },
+              [](Programmable & p, amrex::ParticleReal ds) { p.m_ds = ds; }
+        )
+        .def_property("beam_particles",
+              [](Programmable & p) { return p.m_beam_particles; },
+              [](Programmable & p,
+                 std::function<void(ImpactXParticleContainer::iterator *, RefPart &)> new_hook
+              ) { p.m_beam_particles = new_hook; }
+        )
+        .def_property("ref_particle",
+              [](Programmable & p) { return p.m_ref_particle; },
+              [](Programmable & p,
+                 std::function<void(RefPart &)> new_hook
+              ) { p.m_ref_particle = new_hook; }
+        )
+    ;
+
     py::class_<Quad, elements::Thick>(me, "Quad")
         .def(py::init<
                 amrex::ParticleReal const,
