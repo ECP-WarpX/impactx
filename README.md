@@ -45,6 +45,9 @@ Now ``cd`` to your ImpactX source directory.
 module load cmake/3.22.0
 module load cray-hdf5-parallel/1.12.2.1
 
+# CCache for faster rebuilds
+export PATH=/global/common/software/spackecp/perlmutter/e4s-22.05/78535/spack/opt/spack/cray-sles15-zen3/gcc-11.2.0/ccache-4.5.1-ybl7xefvggn6hov4dsdxxnztji74tolj/bin:$PATH
+
 # Python
 module load cray-python/3.9.13.1
 if [ -d "$HOME/sw/perlmutter/venvs/impactx" ]

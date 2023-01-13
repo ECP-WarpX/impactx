@@ -45,6 +45,9 @@ We use the following modules and environments on the system (``$HOME/perlmutter_
    # optional: just an additional text editor
    #module load nano  # TODO: request from support
 
+   # optional: CCache for faster rebuilds
+   export PATH=/global/common/software/spackecp/perlmutter/e4s-22.05/78535/spack/opt/spack/cray-sles15-zen3/gcc-11.2.0/ccache-4.5.1-ybl7xefvggn6hov4dsdxxnztji74tolj/bin:$PATH
+
    # Python
    module load cray-python/3.9.13.1
    if [ -d "$HOME/sw/perlmutter/venvs/impactx" ]
