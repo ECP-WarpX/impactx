@@ -215,4 +215,14 @@ void init_elements(py::module& m)
              "A short RF cavity element at zero crossing for bunching."
         )
     ;
+
+    py::class_<Sol, elements::Thick>(me, "Sol")
+        .def(py::init<
+                amrex::ParticleReal const,
+                amrex::ParticleReal const,
+                int const>(),
+             py::arg("ds"), py::arg("ks"), py::arg("nslice") = 1,
+             "An ideal hard-edge Solenoid magnet."
+        )
+    ;
 }
