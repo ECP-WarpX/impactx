@@ -14,7 +14,7 @@ The matched Twiss parameters at entry are:
 
 We use a 250 MeV proton beam with initial unnormalized rms emittance of 1 micron
 in the horizontal plane, and 2 micron in the vertical plane.
- 
+
 The solenoid magnetic field corresponds to B = 2 T.
 
 The second moments of the particle distribution after the solenoid channel are rotated by 90 degrees:  the final horizontal moments should coincide with the
@@ -54,4 +54,3 @@ We run the following script to analyze correctness:
    .. literalinclude:: analysis_solenoid.py
       :language: python3
       :caption: You can copy this file from ``examples/solenoid/analysis_solenoid.py``.
-
