@@ -75,7 +75,7 @@ namespace impactx
             amrex::ParticleReal const pt_ref = refpart.pt;
             amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
 
-            // compute phase advance per unit length (in rad/m) and 
+            // compute phase advance per unit length (in rad/m) and
             // rotation angle (in rad)
             amrex::ParticleReal const alpha = m_ks/2.0_prt;
             amrex::ParticleReal const theta = alpha*slice_ds;
