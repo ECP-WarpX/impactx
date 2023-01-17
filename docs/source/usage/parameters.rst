@@ -233,6 +233,16 @@ Lattice Elements
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
+        * ``solenoid`` for an ideal hard-edge solenoid magnet. This requires these additional parameters:
+
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
+
+            * ``<element_name>.ks`` (``float``, in meters) Solenoid strength in m^(-1) (MADX convention)
+
+                  = (magnetic field Bz in T) / (rigidity in T-m)
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
+
         * ``dipedge`` for dipole edge focusing. This requires these additional parameters:
 
             * ``<element_name>.psi`` (``float``, in radians) the pole face rotation angle
