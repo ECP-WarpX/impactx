@@ -416,3 +416,21 @@ add_impactx_test(rfcavity.py.MPI
     examples/rfcavity/analysis_rfcavity.py
     OFF  # no plot script yet
 )
+
+# Ideal, Hard-Edge Solenoid ###################################################
+#
+# w/o space charge
+add_impactx_test(solenoid
+    examples/solenoid/input_solenoid.in
+      OFF  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/solenoid/analysis_solenoid.py
+    OFF  # no plot script yet
+)
+add_impactx_test(solenoid.py
+    examples/solenoid/run_solenoid.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/solenoid/analysis_solenoid.py
+    OFF  # no plot script yet
+)

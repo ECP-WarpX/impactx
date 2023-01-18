@@ -476,3 +476,11 @@ This module provides elements for the accelerator lattice.
 
    :param V: Normalized RF voltage drop V = Emax*L/(c*Brho)
    :param k: Wavenumber of RF in 1/m
+
+.. py:class:: impactx.elements.Sol(ds, ks, nslice=1)
+
+   An ideal hard-edge Solenoid magnet.
+
+   :param ds: Segment length in m.
+   :param ks: Solenoid strength in m^(-1) (MADX convention) in (magnetic field Bz in T) / (rigidity in T-m)
+   :param nslice: number of slices used for the application of space charge
