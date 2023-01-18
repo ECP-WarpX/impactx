@@ -130,7 +130,8 @@ add_impactx_test(FODO.programmable.py
 # Python MADX: FODO Cell ######################################################
 #
 # copy MAD-X lattice file
-file(COPY ${ImpactX_SOURCE_DIR}/examples/fodo/fodo.madx DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.MADX.py)
+file(COPY ${ImpactX_SOURCE_DIR}/examples/fodo/fodo.madx
+     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/FODO.MADX.py)
 
 add_impactx_test(FODO.MADX.py
     examples/fodo/run_fodo_madx.py
@@ -429,6 +430,17 @@ add_impactx_test(solenoid
 )
 add_impactx_test(solenoid.py
     examples/solenoid/run_solenoid.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/solenoid/analysis_solenoid.py
+    OFF  # no plot script yet
+)
+
+# copy MAD-X lattice file
+file(COPY ${ImpactX_SOURCE_DIR}/examples/solenoid/solenoid.madx
+     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/solenoid.MADX.py)
+add_impactx_test(solenoid.MADX.py
+    examples/solenoid/run_solenoid_madx.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/solenoid/analysis_solenoid.py
