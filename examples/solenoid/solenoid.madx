@@ -1,0 +1,6 @@
+beam, particle=proton, energy=0.250;
+
+SOL1: solenoid, L=3.820395, KS=0.8223219329893234;
+
+THICKSOL: Line=(SOL1);
+USE, SEQUENCE = THICKSOL;

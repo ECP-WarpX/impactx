@@ -23,13 +23,11 @@ sim.init_grids()
 # load a 250 MeV proton beam with an initial
 # horizontal rms emittance of 1 um and an
 # initial vertical rms emittance of 2 um
-energy_MeV = 250.0  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
 npart = 10000  # number of macro particles
 
 #   reference particle
-ref = sim.particle_container().ref_particle()
-ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_energy_MeV(energy_MeV)
+ref = sim.particle_container().ref_particle().load_file("solenoid.madx")
 
 #   particle bunch
 distr = distribution.Waterbag(
@@ -43,7 +41,7 @@ distr = distribution.Waterbag(
 sim.add_particles(bunch_charge_C, distr, npart)
 
 # design the accelerator lattice
-sim.lattice.append(elements.Sol(ds=3.820395, ks=0.8223219329893234))
+sim.lattice.load_file("solenoid.madx", nslice=1)
 
 # run simulation
 sim.evolve()
