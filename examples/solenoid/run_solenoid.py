@@ -21,7 +21,8 @@ sim.slice_step_diagnostics = True
 sim.init_grids()
 
 # load a 250 MeV proton beam with an initial
-# normalized transverse rms emittance of 1 um
+# horizontal rms emittance of 1 um and an
+# initial vertical rms emittance of 2 um
 energy_MeV = 250.0  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
 npart = 10000  # number of macro particles
