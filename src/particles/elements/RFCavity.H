@@ -29,6 +29,46 @@
 
 namespace impactx
 {
+    struct RF_field_data
+    {
+       //   Default:
+       //   Fourier coefficients for the on-axis longitudinal
+       //   electric field Ez of the 9-cell TESLA superconducting
+       //   cavity (default cavity model):
+       //   https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.3.092001.
+       //   Superseded by user-provided input values.
+
+       int ncoef = 25;
+       std::array<amrex::ParticleReal, 25> cos_coef = {
+                0.1644024074311037,
+                -0.1324009958969339,
+                4.3443060026047219e-002,
+                8.5602654094946495e-002,
+                -0.2433578169042885,
+                0.5297150596779437,
+                0.7164884680963959,
+                -5.2579522442877296e-003,
+                -5.5025369142193678e-002,
+                4.6845673335028933e-002,
+                -2.3279346335638568e-002,
+                4.0800777539657775e-003,
+                4.1378326533752169e-003,
+                -2.5040533340490805e-003,
+                -4.0654981400000964e-003,
+                9.6630592067498289e-003,
+                -8.5275895985990214e-003,
+                -5.8078747006425020e-002,
+                -2.4044337836660403e-002,
+                1.0968240064697212e-002,
+                -3.4461179858301418e-003,
+                -8.1201564869443749e-004,
+                2.1438992904959380e-003,
+                -1.4997753525697276e-003,
+                1.8685171825676386e-004
+                };
+       std::array<amrex::ParticleReal, 25> sin_coef = {};
+    };
+
     struct RFCavity
     : public elements::BeamOptic<RFCavity>,
       public elements::Thick
@@ -52,10 +92,11 @@ namespace impactx
             amrex::ParticleReal const freq,
             amrex::ParticleReal const phase,
             int const mapsteps,
-            int const nslice
+            int const nslice,
+            RF_field_data const & ezdata
         )
           : Thick(ds, nslice),
-            m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps)
+            m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps), m_ez(ezdata)
         {
         }
 
@@ -216,42 +257,6 @@ namespace impactx
             using ablastr::constant::math::pi;
             constexpr amrex::ParticleReal zlen = 1.31879807_prt;
             constexpr amrex::ParticleReal zmid = zlen / 2.0_prt;
-            constexpr int ncoef = 25;
-
-            // specify Fourier coefficients:
-            //   Fourier coefficients for the on-axis longitudinal
-            //   electric field Ez of the 9-cell TESLA superconducting
-            //   cavity (default cavity model):
-            //   https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.3.092001.
-            // May be superseded by user-provided input values (to do).
-            constexpr std::array<amrex::ParticleReal, ncoef> cos_coef = {
-                0.1644024074311037,
-                -0.1324009958969339,
-                4.3443060026047219e-002,
-                8.5602654094946495e-002,
-                -0.2433578169042885,
-                0.5297150596779437,
-                0.7164884680963959,
-                -5.2579522442877296e-003,
-                -5.5025369142193678e-002,
-                4.6845673335028933e-002,
-                -2.3279346335638568e-002,
-                4.0800777539657775e-003,
-                4.1378326533752169e-003,
-                -2.5040533340490805e-003,
-                -4.0654981400000964e-003,
-                9.6630592067498289e-003,
-                -8.5275895985990214e-003,
-                -5.8078747006425020e-002,
-                -2.4044337836660403e-002,
-                1.0968240064697212e-002,
-                -3.4461179858301418e-003,
-                -8.1201564869443749e-004,
-                2.1438992904959380e-003,
-                -1.4997753525697276e-003,
-                1.8685171825676386e-004
-            };
-            constexpr std::array<amrex::ParticleReal, ncoef> sin_coef = {};  // all zero
 
             // compute on-axis electric field (z is relative to cavity midpoint)
             amrex::ParticleReal efield = 0.0;
@@ -262,18 +267,18 @@ namespace impactx
 
             if (abs(z)<=zmid)
             {
-               efield = 0.5_prt*cos_coef[0];
+               efield = 0.5_prt*m_ez.cos_coef[0];
                efieldint = z*efield;
-               for (int j=1; j < ncoef; ++j)
+               for (int j=1; j < m_ez.ncoef; ++j)
                {
-                 efield = efield + cos_coef[j]*cos(j*2*pi*z/zlen) +
-                      sin_coef[j]*sin(j*2*pi*z/zlen);
-                 efieldp = efieldp-j*2*pi*cos_coef[j]*sin(j*2*pi*z/zlen)/zlen +
-                      j*2*pi*sin_coef[j]*cos(j*2*pi*z/zlen)/zlen;
-                 efieldpp = efieldpp- pow(j*2*pi*cos_coef[j]/zlen,2) *cos(j*2*pi*z/zlen) -
-                      pow(j*2*pi*sin_coef[j]/zlen,2) *sin(j*2*pi*z/zlen);
-                 efieldint = efieldint + zlen*cos_coef[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
-                      zlen*sin_coef[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
+                 efield = efield + m_ez.cos_coef[j]*cos(j*2*pi*z/zlen) +
+                      m_ez.sin_coef[j]*sin(j*2*pi*z/zlen);
+                 efieldp = efieldp-j*2*pi*m_ez.cos_coef[j]*sin(j*2*pi*z/zlen)/zlen +
+                      j*2*pi*m_ez.sin_coef[j]*cos(j*2*pi*z/zlen)/zlen;
+                 efieldpp = efieldpp- pow(j*2*pi*m_ez.cos_coef[j]/zlen,2) *cos(j*2*pi*z/zlen) -
+                      pow(j*2*pi*m_ez.sin_coef[j]/zlen,2) *sin(j*2*pi*z/zlen);
+                 efieldint = efieldint + zlen*m_ez.cos_coef[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
+                      zlen*m_ez.sin_coef[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
                }
             }
             return std::make_tuple(efield, efieldp, efieldint);
@@ -419,6 +424,7 @@ namespace impactx
         amrex::ParticleReal m_freq; //! RF frequency in Hz
         amrex::ParticleReal m_phase; //! RF driven phase in deg
         int m_mapsteps; //! number of map integration steps per slice
+        impactx::RF_field_data m_ez; //coefficients of RF field Ez
     };
 
 } // namespace impactx

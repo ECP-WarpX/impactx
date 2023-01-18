@@ -104,6 +104,8 @@ namespace impactx
                 m_lattice.emplace_back( NonlinearLens(knll, cnll) );
             } else if (element_type == "rfcavity") {
                 amrex::Real ds, escale, freq, phase;
+                std::string field_file;
+                impactx::RF_field_data ezdata;
                 int nslice = nslice_default;
                 int mapsteps = mapsteps_default;
                 pp_element.get("ds", ds);
@@ -112,7 +114,8 @@ namespace impactx
                 pp_element.get("phase", phase);
                 pp_element.queryAdd("mapsteps", mapsteps);
                 pp_element.queryAdd("nslice", nslice);
-                m_lattice.emplace_back( RFCavity(ds, escale, freq, phase, mapsteps, nslice) );
+                pp_element.queryAdd("file", field_file);
+                m_lattice.emplace_back( RFCavity(ds, escale, freq, phase, mapsteps, nslice, ezdata) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }
