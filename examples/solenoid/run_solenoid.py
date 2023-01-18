@@ -42,7 +42,7 @@ distr = distribution.Waterbag(
 sim.add_particles(bunch_charge_C, distr, npart)
 
 # design the accelerator lattice
-sim.lattice.append(elements.ConstF(ds=3.820395, ks=0.8223219329893234))
+sim.lattice.append(elements.Sol(ds=3.820395, ks=0.8223219329893234))
 
 # run simulation
 sim.evolve()
