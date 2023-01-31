@@ -27,7 +27,8 @@ import subprocess
 import sys
 import urllib.request
 
-import sphinx_rtd_theme
+# https://sphinx-rtd-theme.readthedocs.io/en/stable/installing.html
+import sphinx_rtd_theme  # noqa
 
 sys.path.insert(0, os.path.join(os.path.abspath(__file__), "../Python"))
 
@@ -45,6 +46,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "sphinx_design",
+    "sphinx_rtd_theme",
     "breathe",
 ]
 
