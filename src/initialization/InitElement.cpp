@@ -120,6 +120,15 @@ namespace impactx
                 pp_element.get("ks", ks);
                 pp_element.queryAdd("nslice", nslice);
                 m_lattice.emplace_back( Sol(ds, ks, nslice) );
+            } else if (element_type == "solenoid_softedge") {
+                amrex::Real ds, bscale;
+                int nslice = nslice_default;
+                int mapsteps = mapsteps_default;
+                pp_element.get("ds", ds);
+                pp_element.get("bscale", bscale);
+                pp_element.queryAdd("mapsteps", mapsteps);
+                pp_element.queryAdd("nslice", nslice);
+                m_lattice.emplace_back( SoftSolenoid(ds, bscale, mapsteps, nslice) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }
