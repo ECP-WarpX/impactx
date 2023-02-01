@@ -164,7 +164,7 @@ namespace impactx
             // print computed linear map:
             //for(int i=1; i<7; ++i){
             //   for(int j=1; j<7; ++j){
-            //      amrex::PrintToFile("SolMap.txt") << i << " " << 
+            //      amrex::PrintToFile("SolMap.txt") << i << " " <<
             //      j << " " << refpart.map(i,j) << "\n";
             //   }
             //}
