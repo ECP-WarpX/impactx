@@ -91,7 +91,7 @@ namespace impactx
             // get the linear map
             amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
 
-            // symplectic linear map for the RF cavity is computed using the
+            // symplectic linear map for a solenoid is computed using the
             // Hamiltonian formalism as described in:
             // https://uspas.fnal.gov/materials/09UNM/ComputationalMethods.pdf.
             // R denotes the transfer matrix in the basis (x,px,y,py,t,pt),
@@ -161,6 +161,14 @@ namespace impactx
             integrators::symp2_integrate_split3(refpart,zin,zout,nsteps,*this);
             amrex::ParticleReal const ptf = refpart.pt;
 
+            // print computed linear map:
+            //for(int i=1; i<7; ++i){
+            //   for(int j=1; j<7; ++j){
+            //      amrex::PrintToFile("SolMap.txt") << i << " " << 
+            //      j << " " << refpart.map(i,j) << "\n";
+            //   }
+            //}
+
             // advance position (x,y,z)
             refpart.x = x + slice_ds*px/bgi;
             refpart.y = y + slice_ds*py/bgi;
@@ -173,24 +181,6 @@ namespace impactx
             refpart.px = px*bgf/bgi;
             refpart.py = py*bgf/bgi;
             refpart.pz = pz*bgf/bgi;
-
-            // convert linear map from dynamic to static units
-            amrex::ParticleReal scale_in = 1.0_prt;
-            amrex::ParticleReal scale_fin = 1.0_prt;
-
-            for (int i=1; i<7; i++) {
-               for (int j=1; j<7; j++) {
-                   if( i % 2 == 0)
-                      scale_fin = bgf;
-                   else
-                      scale_fin = 1.0_prt;
-                   if( j % 2 == 0)
-                      scale_in = bgi;
-                   else
-                      scale_in = 1.0_prt;
-                   refpart.map(i, j) = refpart.map(i, j) * scale_in / scale_fin;
-               }
-            }
 
             // advance integrated path length
             refpart.s = s + slice_ds;
@@ -210,7 +200,7 @@ namespace impactx
 
             // specify constants
             using ablastr::constant::math::pi;
-            constexpr amrex::ParticleReal zlen = 1.31879807_prt;
+            constexpr amrex::ParticleReal zlen = 3.820395_prt;
             constexpr amrex::ParticleReal zmid = zlen / 2.0_prt;
             constexpr int ncoef = 2;
 
@@ -219,8 +209,8 @@ namespace impactx
             //   magnetic field Bz of ..... (default solenoid model).
             // May be superseded by user-provided input values (to do).
             constexpr std::array<amrex::ParticleReal, ncoef> cos_coef = {
-                1.00000000000000000,
-                -1.00000000000000000
+                2.00000000000000000,
+                0.0
             };
             constexpr std::array<amrex::ParticleReal, ncoef> sin_coef = {};  // all zero
 
@@ -251,7 +241,7 @@ namespace impactx
         }
 
         /** This pushes the reference particle and the linear map matrix
-         *  elements for an RF cavity through the symplectic map associated
+         *  elements for a solenoid through the symplectic map associated
          *  with H_3 in the Hamiltonian splitting H = H_1 + H_2 + H_3.
          *
          * @param tau Map step size in m
@@ -259,7 +249,7 @@ namespace impactx
          * @param[in,out] zeval Longitudinal on-axis location in m
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void map3 (amrex::ParticleReal const tau,
+        void map1 (amrex::ParticleReal const tau,
                    RefPart & refpart,
                    [[maybe_unused]] amrex::ParticleReal & zeval) const
         {
@@ -287,10 +277,17 @@ namespace impactx
 
             refpart.map(1,1) = R(1,1) + tau*R(2,1);
             refpart.map(1,2) = R(1,2) + tau*R(2,2);
+            refpart.map(1,3) = R(1,3) + tau*R(2,3);
+            refpart.map(1,4) = R(1,4) + tau*R(2,4);
+
+            refpart.map(3,1) = R(3,1) + tau*R(4,1);
+            refpart.map(3,2) = R(3,2) + tau*R(4,2);
             refpart.map(3,3) = R(3,3) + tau*R(4,3);
             refpart.map(3,4) = R(3,4) + tau*R(4,4);
+
             refpart.map(5,5) = R(5,5) + tau*R(6,5)/pow(betgam,2);
             refpart.map(5,6) = R(5,6) + tau*R(6,6)/pow(betgam,2);
+
         }
 
         /** This pushes the reference particle and the linear map matrix
@@ -328,9 +325,14 @@ namespace impactx
 
             refpart.map(2,1) = R(2,1) - tau*alpha2*R(1,1);
             refpart.map(2,2) = R(2,2) - tau*alpha2*R(1,2);
+            refpart.map(2,3) = R(2,3) - tau*alpha2*R(1,3);
+            refpart.map(2,4) = R(2,4) - tau*alpha2*R(1,4);
 
+            refpart.map(4,1) = R(4,1) - tau*alpha2*R(3,1);
+            refpart.map(4,2) = R(4,2) - tau*alpha2*R(3,2);
             refpart.map(4,3) = R(4,3) - tau*alpha2*R(3,3);
             refpart.map(4,4) = R(4,4) - tau*alpha2*R(3,4);
+
         }
 
         /** This pushes the reference particle and the linear map matrix
@@ -342,7 +344,7 @@ namespace impactx
          * @param[in,out] zeval Longitudinal on-axis location in m
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void map1 (amrex::ParticleReal const tau,
+        void map3 (amrex::ParticleReal const tau,
                    RefPart & refpart,
                    amrex::ParticleReal & zeval) const
         {
@@ -391,10 +393,10 @@ namespace impactx
         }
 
     private:
-        amrex::ParticleReal m_bscale; //! scaling factor for RF electric field
+        amrex::ParticleReal m_bscale; //! scaling factor for solenoid Bz field
         int m_mapsteps; //! number of map integration steps per slice
     };
 
 } // namespace impactx
 
-#endif // IMPACTX_RFCAVITY_H
+#endif // IMPACTX_SOFTSOL_H
