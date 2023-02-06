@@ -216,6 +216,17 @@ void init_elements(py::module& m)
         )
     ;
 
+    py::class_<SoftSolenoid, elements::Thick>(me, "SoftSolenoid")
+        .def(py::init<
+                 amrex::ParticleReal const,
+                 amrex::ParticleReal const,
+                 int const,
+                 int const>(),
+             py::arg("ds"), py::arg("bscale"), py::arg("mapsteps"), py::arg("nslice") = 1,
+             "A soft-edge solenoid."
+        )
+    ;
+
     py::class_<Sol, elements::Thick>(me, "Sol")
         .def(py::init<
                 amrex::ParticleReal const,
