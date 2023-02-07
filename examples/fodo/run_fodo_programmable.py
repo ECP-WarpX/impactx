@@ -56,6 +56,7 @@ sim.add_particles(bunch_charge_C, distr, npart)
 # number of slices per ds in each lattice element
 ns = 25
 
+
 # build a custom, Pythonic beam optical element
 def my_drift(pge, pti, refpart):
     """This pushes the beam particles as a drift.
