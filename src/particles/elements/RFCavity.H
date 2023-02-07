@@ -25,7 +25,7 @@
 #include <array>
 #include <cmath>
 #include <tuple>
-
+#include <vector>
 
 namespace impactx
 {
@@ -38,8 +38,7 @@ namespace impactx
        //   https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.3.092001.
        //   Superseded by user-provided input values.
 
-       int ncoef = 25;
-       std::array<amrex::ParticleReal, 25> cos_coef = {
+       std::vector<double> default_cos_coef = {
                 0.1644024074311037,
                 -0.1324009958969339,
                 4.3443060026047219e-002,
@@ -66,7 +65,7 @@ namespace impactx
                 -1.4997753525697276e-003,
                 1.8685171825676386e-004
                 };
-       std::array<amrex::ParticleReal, 25> sin_coef = {};
+       std::vector<double> default_sin_coef = {};
     };
 
     struct RFCavity
@@ -93,10 +92,12 @@ namespace impactx
             amrex::ParticleReal const phase,
             int const mapsteps,
             int const nslice,
-            RF_field_data const & ezdata
+            std::vector<double> cos_coef,
+            std::vector<double> sin_coef
         )
           : Thick(ds, nslice),
-            m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps), m_ez(ezdata)
+            m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps),
+            m_cos_coef(cos_coef), m_sin_coef(sin_coef)
         {
         }
 
@@ -264,21 +265,22 @@ namespace impactx
             amrex::ParticleReal efieldpp = 0.0;
             amrex::ParticleReal efieldint = 0.0;
             amrex::ParticleReal const z = zeval - zmid;
+            int const ncoef = m_cos_coef.size();
 
             if (abs(z)<=zmid)
             {
-               efield = 0.5_prt*m_ez.cos_coef[0];
+               efield = 0.5_prt*m_cos_coef[0];
                efieldint = z*efield;
-               for (int j=1; j < m_ez.ncoef; ++j)
+               for (int j=1; j < ncoef; ++j)
                {
-                 efield = efield + m_ez.cos_coef[j]*cos(j*2*pi*z/zlen) +
-                      m_ez.sin_coef[j]*sin(j*2*pi*z/zlen);
-                 efieldp = efieldp-j*2*pi*m_ez.cos_coef[j]*sin(j*2*pi*z/zlen)/zlen +
-                      j*2*pi*m_ez.sin_coef[j]*cos(j*2*pi*z/zlen)/zlen;
-                 efieldpp = efieldpp- pow(j*2*pi*m_ez.cos_coef[j]/zlen,2) *cos(j*2*pi*z/zlen) -
-                      pow(j*2*pi*m_ez.sin_coef[j]/zlen,2) *sin(j*2*pi*z/zlen);
-                 efieldint = efieldint + zlen*m_ez.cos_coef[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
-                      zlen*m_ez.sin_coef[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
+                 efield = efield + m_cos_coef[j]*cos(j*2*pi*z/zlen) +
+                      m_sin_coef[j]*sin(j*2*pi*z/zlen);
+                 efieldp = efieldp-j*2*pi*m_cos_coef[j]*sin(j*2*pi*z/zlen)/zlen +
+                      j*2*pi*m_sin_coef[j]*cos(j*2*pi*z/zlen)/zlen;
+                 efieldpp = efieldpp- pow(j*2*pi*m_cos_coef[j]/zlen,2) *cos(j*2*pi*z/zlen) -
+                      pow(j*2*pi*m_sin_coef[j]/zlen,2) *sin(j*2*pi*z/zlen);
+                 efieldint = efieldint + zlen*m_cos_coef[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
+                      zlen*m_sin_coef[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
                }
             }
             return std::make_tuple(efield, efieldp, efieldint);
@@ -424,7 +426,8 @@ namespace impactx
         amrex::ParticleReal m_freq; //! RF frequency in Hz
         amrex::ParticleReal m_phase; //! RF driven phase in deg
         int m_mapsteps; //! number of map integration steps per slice
-        impactx::RF_field_data m_ez; //coefficients of RF field Ez
+        std::vector<double> m_cos_coef;
+        std::vector<double> m_sin_coef;
     };
 
 } // namespace impactx
