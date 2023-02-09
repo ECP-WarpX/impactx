@@ -41,9 +41,7 @@ def lattice(parsed_beamline, nslice=1):
     impactx_beamline = []
 
     for d in parsed_beamline:
-
         if d["type"] in [k.casefold() for k in list(madx_to_impactx_dict.keys())]:
-
             if d["type"] == "drift":
                 impactx_beamline.append(elements.Drift(ds=d["l"], nslice=nslice))
             elif d["type"] == "quadrupole":
