@@ -29,6 +29,23 @@
 
 namespace impactx
 {
+    struct Sol_field_data
+    {
+       //   Default:
+       //   Fourier coefficients for the on-axis longitudinal
+       //   magnetic field Bz of the 9-cell TESLA superconducting
+       //   cavity (default cavity model):
+       //   https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.3.092001.
+       //   Superseded by user-provided input values.
+
+       std::vector<double> default_cos_coef = {
+                2.0, 0.0
+                };
+       std::vector<double> default_sin_coef = {
+                0.0, 0.0
+                };
+    };
+
     struct SoftSolenoid
     : public elements::BeamOptic<SoftSolenoid>,
       public elements::Thick
@@ -48,10 +65,13 @@ namespace impactx
             amrex::ParticleReal const ds,
             amrex::ParticleReal const bscale,
             int const mapsteps,
-            int const nslice
+            int const nslice,
+            std::vector<double> cos_coef,
+            std::vector<double> sin_coef
         )
           : Thick(ds, nslice),
-            m_bscale(bscale), m_mapsteps(mapsteps)
+            m_bscale(bscale), m_mapsteps(mapsteps), m_cos_coef(cos_coef),
+            m_sin_coef(sin_coef)
         {
         }
 
@@ -202,17 +222,6 @@ namespace impactx
             using ablastr::constant::math::pi;
             constexpr amrex::ParticleReal zlen = 3.820395_prt;
             constexpr amrex::ParticleReal zmid = zlen / 2.0_prt;
-            constexpr int ncoef = 2;
-
-            // specify Fourier coefficients:
-            //   Fourier coefficients for the on-axis longitudinal
-            //   magnetic field Bz of ..... (default solenoid model).
-            // May be superseded by user-provided input values (to do).
-            constexpr std::array<amrex::ParticleReal, ncoef> cos_coef = {
-                2.00000000000000000,
-                0.0
-            };
-            constexpr std::array<amrex::ParticleReal, ncoef> sin_coef = {};  // all zero
 
             // compute on-axis magnetic field (z is relative to cavity midpoint)
             amrex::ParticleReal bfield = 0.0;
@@ -220,21 +229,22 @@ namespace impactx
             amrex::ParticleReal bfieldpp = 0.0;
             amrex::ParticleReal bfieldint = 0.0;
             amrex::ParticleReal const z = zeval - zmid;
+            int const ncoef = m_cos_coef.size();
 
             if (abs(z)<=zmid)
             {
-               bfield = 0.5_prt*cos_coef[0];
+               bfield = 0.5_prt*m_cos_coef[0];
                bfieldint = z*bfield;
                for (int j=1; j < ncoef; ++j)
                {
-                 bfield = bfield + cos_coef[j]*cos(j*2*pi*z/zlen) +
-                      sin_coef[j]*sin(j*2*pi*z/zlen);
-                 bfieldp = bfieldp-j*2*pi*cos_coef[j]*sin(j*2*pi*z/zlen)/zlen +
-                      j*2*pi*sin_coef[j]*cos(j*2*pi*z/zlen)/zlen;
-                 bfieldpp = bfieldpp- pow(j*2*pi*cos_coef[j]/zlen,2) *cos(j*2*pi*z/zlen) -
-                      pow(j*2*pi*sin_coef[j]/zlen,2) *sin(j*2*pi*z/zlen);
-                 bfieldint = bfieldint + zlen*cos_coef[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
-                      zlen*sin_coef[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
+                 bfield = bfield + m_cos_coef[j]*cos(j*2*pi*z/zlen) +
+                      m_sin_coef[j]*sin(j*2*pi*z/zlen);
+                 bfieldp = bfieldp-j*2*pi*m_cos_coef[j]*sin(j*2*pi*z/zlen)/zlen +
+                      j*2*pi*m_sin_coef[j]*cos(j*2*pi*z/zlen)/zlen;
+                 bfieldpp = bfieldpp- pow(j*2*pi*m_cos_coef[j]/zlen,2) *cos(j*2*pi*z/zlen) -
+                      pow(j*2*pi*m_sin_coef[j]/zlen,2) *sin(j*2*pi*z/zlen);
+                 bfieldint = bfieldint + zlen*m_cos_coef[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
+                      zlen*m_sin_coef[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
                }
             }
             return std::make_tuple(bfield, bfieldp, bfieldint);
@@ -395,6 +405,8 @@ namespace impactx
     private:
         amrex::ParticleReal m_bscale; //! scaling factor for solenoid Bz field
         int m_mapsteps; //! number of map integration steps per slice
+        std::vector<double> m_cos_coef;
+        std::vector<double> m_sin_coef;
     };
 
 } // namespace impactx

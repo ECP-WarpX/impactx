@@ -124,11 +124,16 @@ namespace impactx
                 amrex::Real ds, bscale;
                 int nslice = nslice_default;
                 int mapsteps = mapsteps_default;
+                Sol_field_data bz;
+                std::vector<double> cos_coef = bz.default_cos_coef;
+                std::vector<double> sin_coef = bz.default_sin_coef;
                 pp_element.get("ds", ds);
                 pp_element.get("bscale", bscale);
                 pp_element.queryAdd("mapsteps", mapsteps);
                 pp_element.queryAdd("nslice", nslice);
-                m_lattice.emplace_back( SoftSolenoid(ds, bscale, mapsteps, nslice) );
+                pp_element.queryAdd("cos_coefficients", cos_coef);
+                pp_element.queryAdd("sin_coefficients", sin_coef);
+                m_lattice.emplace_back( SoftSolenoid(ds, bscale, mapsteps, nslice, cos_coef, sin_coef) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }

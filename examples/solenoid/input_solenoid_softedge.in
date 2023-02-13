@@ -28,6 +28,8 @@ sol1.type = solenoid_softedge
 sol1.ds = 3.820395
 sol1.bscale = 0.8223219329893234
 sol1.mapsteps = 200
+sol1.cos_coefficients = 2.0 0.0
+sol1.sin_coefficients = 0.0 0.0
 
 ###############################################################################
 # Algorithms
