@@ -260,8 +260,8 @@ namespace impactx
 
             // specify constants
             using ablastr::constant::math::pi;
-            constexpr amrex::ParticleReal zlen = 1.31879807_prt;
-            constexpr amrex::ParticleReal zmid = zlen / 2.0_prt;
+            amrex::ParticleReal const zlen = m_ds;
+            amrex::ParticleReal const zmid = zlen / 2.0_prt;
 
             // compute on-axis electric field (z is relative to cavity midpoint)
             amrex::ParticleReal efield = 0.0;
