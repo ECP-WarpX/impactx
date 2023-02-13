@@ -33,17 +33,42 @@ namespace impactx
     {
        //   Default:
        //   Fourier coefficients for the on-axis longitudinal
-       //   magnetic field Bz of the 9-cell TESLA superconducting
-       //   cavity (default cavity model):
-       //   https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.3.092001.
+       //   magnetic field Bz of a soft-edge solenoid based on
+       //   the design used in the LCLS-II photoinjector.
        //   Superseded by user-provided input values.
 
        std::vector<double> default_cos_coef = {
-                2.0, 0.0
-                };
+            0.537354892644806,
+            0.405516997152622,
+            0.204379467431097,
+            8.818833164290837E-002,
+            2.990035664995536E-002,
+            8.103036020221078E-003,
+           -3.457107719342389E-004,
+           -1.506042059246567E-003,
+           -1.684741337807429E-003,
+           -7.496351690988198E-004,
+           -5.231073743536983E-004,
+           -3.074520833708134E-005,
+           -8.136367978784272E-005,
+            1.041748970155938E-004,
+           -2.263763170923048E-005,
+            7.351686613338790E-005,
+           -3.220999221920476E-005,
+            4.158432715586470E-005,
+           -3.417704589118791E-005,
+            2.861088103131010E-005,
+           -2.787178123388915E-005,
+            2.282090995044119E-005,
+           -2.181003508883439E-005,
+            1.963104345689975E-005,
+           -1.626901477387445E-005,
+            };
        std::vector<double> default_sin_coef = {
-                0.0, 0.0
-                };
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0
+            };
     };
 
     struct SoftSolenoid
@@ -220,8 +245,8 @@ namespace impactx
 
             // specify constants
             using ablastr::constant::math::pi;
-            constexpr amrex::ParticleReal zlen = 3.820395_prt;
-            constexpr amrex::ParticleReal zmid = zlen / 2.0_prt;
+            amrex::ParticleReal const zlen = m_ds;
+            amrex::ParticleReal const zmid = zlen / 2.0_prt;
 
             // compute on-axis magnetic field (z is relative to cavity midpoint)
             amrex::ParticleReal bfield = 0.0;
@@ -247,6 +272,7 @@ namespace impactx
                       zlen*m_sin_coef[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
                }
             }
+            amrex::PrintToFile("Bfield.txt") << z << " " << bfield << "\n";
             return std::make_tuple(bfield, bfieldp, bfieldint);
         }
 
