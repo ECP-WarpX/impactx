@@ -104,18 +104,19 @@ namespace impactx
                 m_lattice.emplace_back( NonlinearLens(knll, cnll) );
             } else if (element_type == "rfcavity") {
                 amrex::Real ds, escale, freq, phase;
-                std::vector<double> cos_coef;
-                std::vector<double> sin_coef;
                 int nslice = nslice_default;
                 int mapsteps = mapsteps_default;
+                RF_field_data ez;
+                std::vector<double> cos_coef = ez.default_cos_coef;
+                std::vector<double> sin_coef = ez.default_sin_coef;
                 pp_element.get("ds", ds);
                 pp_element.get("escale", escale);
                 pp_element.get("freq", freq);
                 pp_element.get("phase", phase);
                 pp_element.queryAdd("mapsteps", mapsteps);
                 pp_element.queryAdd("nslice", nslice);
-                pp_element.queryarr("cos_coefficients", cos_coef);
-                pp_element.queryarr("sin_coefficients", sin_coef);
+                pp_element.queryAdd("cos_coefficients", cos_coef);
+                pp_element.queryAdd("sin_coefficients", sin_coef);
                 m_lattice.emplace_back( RFCavity(ds, escale, freq, phase, mapsteps, nslice, cos_coef, sin_coef) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);

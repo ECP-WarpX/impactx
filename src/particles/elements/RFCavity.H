@@ -65,7 +65,11 @@ namespace impactx
                 -1.4997753525697276e-003,
                 1.8685171825676386e-004
                 };
-       std::vector<double> default_sin_coef = {};
+       std::vector<double> default_sin_coef = {
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0
+                };
     };
 
     struct RFCavity
