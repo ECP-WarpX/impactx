@@ -206,13 +206,14 @@ namespace impactx
             integrators::symp2_integrate_split3(refpart,zin,zout,nsteps,*this);
             amrex::ParticleReal const ptf = refpart.pt;
 
-            // print computed linear map:
-            //for(int i=1; i<7; ++i){
-            //   for(int j=1; j<7; ++j){
-            //      amrex::PrintToFile("SolMap.txt") << i << " " <<
-            //      j << " " << refpart.map(i,j) << "\n";
-            //   }
-            //}
+            /* print computed linear map:
+               for(int i=1; i<7; ++i){
+                 for(int j=1; j<7; ++j){
+                    amrex::PrintToFile("SolMap.txt") << i << " " <<
+                    j << " " << refpart.map(i,j) << "\n";
+                 }
+               } 
+            */
 
             // advance position (x,y,z)
             refpart.x = x + slice_ds*px/bgi;
