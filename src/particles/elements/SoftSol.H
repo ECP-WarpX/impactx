@@ -185,10 +185,8 @@ namespace impactx
             // initialize linear map (deviation) values
             for (int i=1; i<7; i++) {
                for (int j=1; j<7; j++) {
-                  if (i == j)
-                      refpart.map(i, j) = 1.0_prt;
-                  else
-                      refpart.map(i, j) = 0.0_prt;
+                  auto const default_value = (i == j) ? 1.0_prt : 0.0_prt;
+                  refpart.map(i, j) = default_value;
                }
             }
 
