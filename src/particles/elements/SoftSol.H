@@ -210,7 +210,7 @@ namespace impactx
                     amrex::PrintToFile("SolMap.txt") << i << " " <<
                     j << " " << refpart.map(i,j) << "\n";
                  }
-               } 
+               }
             */
 
             // advance position (x,y,z)
