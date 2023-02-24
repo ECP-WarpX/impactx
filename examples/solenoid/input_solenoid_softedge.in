@@ -29,9 +29,9 @@ dr1.ds = 0.1
 dr1.nslice = 1
 
 sol1.type = solenoid_softedge
-sol1.ds = 3.820395
+sol1.ds = 3.0
 sol1.bscale = 0.8223219329893234
-sol1.mapsteps = 200
+sol1.mapsteps = 400
 
 ###############################################################################
 # Algorithms

@@ -34,37 +34,53 @@ namespace impactx
        //   Default:
        //   Fourier coefficients for the on-axis longitudinal
        //   magnetic field Bz of a soft-edge solenoid based on
-       //   the design used in the LCLS-II photoinjector.
+       //   a thin-shell model of the solenoid as a cylinder
+       //   of current, as described in:
+       //   https://doi.org/10.1016/j.nima.2022.166706
+       //   Parameters correspond to an aspect ratio of
+       //   cylinder diameter / length = 1/3.
        //   Superseded by user-provided input values.
 
        std::vector<double> default_cos_coef = {
-            0.537354892644806,
-            0.405516997152622,
-            0.204379467431097,
-            8.818833164290837E-002,
-            2.990035664995536E-002,
-            8.103036020221078E-003,
-           -3.457107719342389E-004,
-           -1.506042059246567E-003,
-           -1.684741337807429E-003,
-           -7.496351690988198E-004,
-           -5.231073743536983E-004,
-           -3.074520833708134E-005,
-           -8.136367978784272E-005,
-            1.041748970155938E-004,
-           -2.263763170923048E-005,
-            7.351686613338790E-005,
-           -3.220999221920476E-005,
-            4.158432715586470E-005,
-           -3.417704589118791E-005,
-            2.861088103131010E-005,
-           -2.787178123388915E-005,
-            2.282090995044119E-005,
-           -2.181003508883439E-005,
-            1.963104345689975E-005,
-           -1.626901477387445E-005,
+             0.350807812299706,
+             0.323554693720069,
+             0.260320578919415,
+             0.182848575294969,
+             0.106921016050403,
+             4.409581845710694E-002,
+            -9.416427163897508E-006,
+            -2.459452716865687E-002,
+            -3.272762575737291E-002,
+            -2.936414401076162E-002,
+            -1.995780078926890E-002,
+            -9.102893342953847E-003,
+            -2.456410658713271E-006,
+             5.788233017324325E-003,
+             8.040408292420691E-003,
+             7.480064552867431E-003,
+             5.230254569468851E-003,
+             2.447614547094685E-003,
+            -1.095525090532255E-006,
+            -1.614586867387170E-003,
+            -2.281365457438345E-003,
+            -2.148709081338292E-003,
+            -1.522541739363011E-003,
+            -7.185505862719508E-004,
+            -6.171194824600157E-007,
+             4.842109305036943E-004,
+             6.874508102002901E-004,
+             6.535550288205728E-004,
+             4.648795813759210E-004,
+             2.216564722797528E-004,
+            -4.100982995210341E-007,
+            -1.499332112463395E-004,
+            -2.151538438342482E-004,
+            -2.044590946652016E-004,
+            -1.468242784844341E-004
             };
+
        std::vector<double> default_sin_coef = {
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0
@@ -250,7 +266,6 @@ namespace impactx
             // compute on-axis magnetic field (z is relative to cavity midpoint)
             amrex::ParticleReal bfield = 0.0;
             amrex::ParticleReal bfieldp = 0.0;
-            amrex::ParticleReal bfieldpp = 0.0;
             amrex::ParticleReal bfieldint = 0.0;
             amrex::ParticleReal const z = zeval - zmid;
             int const ncoef = m_cos_coef.size();
@@ -265,8 +280,6 @@ namespace impactx
                       m_sin_coef[j]*sin(j*2*pi*z/zlen);
                  bfieldp = bfieldp-j*2*pi*m_cos_coef[j]*sin(j*2*pi*z/zlen)/zlen +
                       j*2*pi*m_sin_coef[j]*cos(j*2*pi*z/zlen)/zlen;
-                 bfieldpp = bfieldpp- pow(j*2*pi*m_cos_coef[j]/zlen,2) *cos(j*2*pi*z/zlen) -
-                      pow(j*2*pi*m_sin_coef[j]/zlen,2) *sin(j*2*pi*z/zlen);
                  bfieldint = bfieldint + zlen*m_cos_coef[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
                       zlen*m_sin_coef[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
                }
