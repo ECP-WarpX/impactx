@@ -6,8 +6,10 @@ Soft-edge solenoid
 Proton beam propagating through a 6 m region containing a soft-edge
 solenoid.
 
-The solenoid model used is the default thin-shell model described in
-
+The solenoid model used is the default thin-shell model described in:
+P. Granum et al, "Efficient calculations of magnetic fields of solenoids for simulations,"
+NIMA 1034, 166706 (2022)
+https://doi.org/10.1016/j.nima.2022.166706
 
 The solenoid is a cylindrical current sheet with a length of 1 m and a
 radius of 0.1667 m, corresponding to an aspect ratio diameter/length = 1/3.
