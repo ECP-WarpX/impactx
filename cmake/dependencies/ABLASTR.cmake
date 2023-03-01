@@ -138,7 +138,7 @@ macro(find_ablastr)
         set(COMPONENT_DIM 3D)
         set(COMPONENT_PRECISION ${ImpactX_PRECISION} P${ImpactX_PRECISION})
 
-        find_package(ABLASTR 23.02 CONFIG REQUIRED COMPONENTS ${COMPONENT_DIM})
+        find_package(ABLASTR 23.04 CONFIG REQUIRED COMPONENTS ${COMPONENT_DIM})
         message(STATUS "ABLASTR: Found version '${ABLASTR_VERSION}'")
     endif()
 
@@ -149,7 +149,7 @@ macro(find_ablastr)
         else()
             set(COMPONENT_WMPI NOMPI)
         endif()
-        find_package(openPMD 0.15.0 CONFIG REQUIRED COMPONENTS ${COMPONENT_WMPI})
+        find_package(openPMD 0.15.1 CONFIG REQUIRED COMPONENTS ${COMPONENT_WMPI})
         message(STATUS "openPMD-api: Found version '${openPMD_VERSION}'")
     endif()
 endmacro()
@@ -169,7 +169,7 @@ set(ImpactX_openpmd_src ""
 set(ImpactX_ablastr_repo "https://github.com/ECP-WarpX/WarpX.git"
     CACHE STRING
     "Repository URI to pull and build ABLASTR from if(ImpactX_ablastr_internal)")
-set(ImpactX_ablastr_branch "12be0f989c912dd17fb53640e1006ea33d170ea4"
+set(ImpactX_ablastr_branch "23.04"
     CACHE STRING
     "Repository branch for ImpactX_ablastr_repo if(ImpactX_ablastr_internal)")
 
@@ -185,7 +185,7 @@ set(ImpactX_amrex_branch ""
 set(ImpactX_openpmd_repo "https://github.com/openPMD/openPMD-api.git"
     CACHE STRING
     "Repository URI to pull and build openPMD-api from if(ImpactX_openpmd_internal)")
-set(ImpactX_openpmd_branch "7813b6f26c37216aaedda300cfd1c201f7adad25"
+set(ImpactX_openpmd_branch "0.15.1"
     CACHE STRING
     "Repository branch for ImpactX_openPMD_repo if(ImpactX_openpmd_internal)")
 
