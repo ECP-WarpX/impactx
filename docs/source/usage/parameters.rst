@@ -252,7 +252,7 @@ Lattice Elements
             * ``<element_name>.mapsteps`` (``integer``) number of integration steps per slice used for map and reference particle push in applied fields
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
-            
+
             * ``<element_name>.cos_coefficients`` (``vector``) array of cos coefficients in Fourier expansion of the on-axis magnetic field Bz (optional)
 
             * ``<element_name>.sin_coefficients`` (``vector``) array of sin coefficients in Fourier expansion of the on-axis magnetic field Bz (optional)
