@@ -485,6 +485,8 @@ This module provides elements for the accelerator lattice.
    :param bscale: Scaling factor for on-axis magnetic field Bz in inverse meters
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
+   :param cos_coefficients: cosine coefficients in Fourier expansion of on-axis magnetic field Bz (optional)
+   :param sin_coefficients: sine coefficients in Fourier expansion of on-axis magnetic field Bz (optional)
 
 .. py:class:: impactx.elements.Sol(ds, ks, nslice=1)
 
