@@ -20,7 +20,7 @@ jobs:
 
     - name: install dependencies
       run: |
-        .github/workflows/dependencies/gcc.sh
+        .github/workflows/dependencies/gcc-openmpi.sh
 
     - name: CCache Cache
       uses: actions/cache@v3
@@ -39,6 +39,7 @@ jobs:
       run: |
         cmake -S . -B build            \
           -DCMAKE_BUILD_TYPE=Debug     \
+          -DBUILD_SHARED_LIBS=ON       \
           -DCMAKE_INSTALL_PREFIX=/usr  \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
           -DImpactX_PYTHON=ON
@@ -96,6 +97,7 @@ jobs:
     - name: build ImpactX
       run: |
         cmake -S . -B build            \
+          -DBUILD_SHARED_LIBS=ON       \
           -DCMAKE_BUILD_TYPE=Debug     \
           -DCMAKE_INSTALL_PREFIX=/usr  \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \

@@ -19,7 +19,7 @@ jobs:
 
     - name: install dependencies
       shell: bash
-      run: .github/workflows/dependencies/hip.sh
+      run: .github/workflows/dependencies/hip-openmpi.sh
 
     - name: CCache Cache
       uses: actions/cache@v3

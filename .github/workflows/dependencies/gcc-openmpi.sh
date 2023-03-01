@@ -12,12 +12,9 @@ sudo apt-get install -y \
     build-essential     \
     ca-certificates     \
     ccache              \
-    clang               \
     cmake               \
     gnupg               \
-    libc++-dev          \
-    libc++abi-dev       \
-    libomp-dev          \
+    libhdf5-openmpi-dev \
     libopenmpi-dev      \
     ninja-build         \
     pkg-config          \
