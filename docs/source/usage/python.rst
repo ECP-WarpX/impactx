@@ -491,5 +491,3 @@ This module provides elements for the accelerator lattice.
 
    :param phi_in: angle of the reference particle with respect to the longitudinal (z) axis in the original frame in degrees
    :param phi_out: angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame in degrees
-
-
