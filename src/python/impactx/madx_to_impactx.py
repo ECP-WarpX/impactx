@@ -23,10 +23,12 @@ def lattice(parsed_beamline, nslice=1):
     :return: list of translated dictionaries
     """
 
+    # mapping is "MAD-X": "ImpactX",
     madx_to_impactx_dict = {
         "MARKER": "None",
         "DRIFT": "Drift",
         "SBEND": "Sbend",  # Sector Bending Magnet
+        "SOLENOID": "Sol",  # Ideal, thick Solenoid: MAD-X user guide 10.9 p78
         "QUADRUPOLE": "Quad",  # Quadrupole
         "DIPEDGE": "DipEdge",
         "MULTIPOLE": "Multipole",
@@ -39,9 +41,7 @@ def lattice(parsed_beamline, nslice=1):
     impactx_beamline = []
 
     for d in parsed_beamline:
-
         if d["type"] in [k.casefold() for k in list(madx_to_impactx_dict.keys())]:
-
             if d["type"] == "drift":
                 impactx_beamline.append(elements.Drift(ds=d["l"], nslice=nslice))
             elif d["type"] == "quadrupole":
@@ -51,6 +51,10 @@ def lattice(parsed_beamline, nslice=1):
             elif d["type"] == "sbend":
                 impactx_beamline.append(
                     elements.Sbend(ds=d["l"], rc=d["l"] / d["angle"], nslice=nslice)
+                )
+            elif d["type"] == "solenoid":
+                impactx_beamline.append(
+                    elements.Sol(ds=d["l"], ks=d["ks"], nslice=nslice)
                 )
             elif d["type"] == "dipedge":
                 impactx_beamline.append(
