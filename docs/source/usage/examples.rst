@@ -19,5 +19,6 @@ This section allows you to **download input files** that correspond to different
    examples/iota_lens/README.rst
    examples/iota_lattice/README.rst
    examples/solenoid/README.rst
+   examples/rotation/README.rst
 
 For every change of the ImpactX code base, each of these examples are continuously tested and benchmarked.

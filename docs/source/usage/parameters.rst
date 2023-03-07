@@ -317,6 +317,12 @@ Lattice Elements
 
                 = c parameter * sqrt(Twiss beta)
 
+        * ``prot`` for an exact pole-face rotation in the x-z plane. This requires these additional parameters:
+
+            * ``<element_name>.phi_in`` (``float``, in degrees) angle of the reference particle with respect to the longitudinal (z) axis in the original frame
+
+            * ``<element_name>.phi_out`` (``float``, in degrees) angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame
+
 
 .. _running-cpp-parameters-parallelization:
 
