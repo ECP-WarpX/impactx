@@ -29,47 +29,50 @@
 
 namespace impactx
 {
+    /** Default Fourier coefficients
+     *
+     * Fourier coefficients for the on-axis longitudinal
+     * electric field Ez of the 9-cell TESLA superconducting
+     * cavity (default cavity model):
+     * https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.3.092001.
+     *
+     * Usually superseded by user-provided input values.
+     */
     struct RF_field_data
     {
-       //   Default:
-       //   Fourier coefficients for the on-axis longitudinal
-       //   electric field Ez of the 9-cell TESLA superconducting
-       //   cavity (default cavity model):
-       //   https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.3.092001.
-       //   Superseded by user-provided input values.
+        amrex::Vector<amrex::ParticleReal> default_cos_coef = {
+            0.1644024074311037,
+            -0.1324009958969339,
+            4.3443060026047219e-002,
+            8.5602654094946495e-002,
+            -0.2433578169042885,
+            0.5297150596779437,
+            0.7164884680963959,
+            -5.2579522442877296e-003,
+            -5.5025369142193678e-002,
+            4.6845673335028933e-002,
+            -2.3279346335638568e-002,
+            4.0800777539657775e-003,
+            4.1378326533752169e-003,
+            -2.5040533340490805e-003,
+            -4.0654981400000964e-003,
+            9.6630592067498289e-003,
+            -8.5275895985990214e-003,
+            -5.8078747006425020e-002,
+            -2.4044337836660403e-002,
+            1.0968240064697212e-002,
+            -3.4461179858301418e-003,
+            -8.1201564869443749e-004,
+            2.1438992904959380e-003,
+            -1.4997753525697276e-003,
+            1.8685171825676386e-004
+        };
 
-       std::vector<double> default_cos_coef = {
-                0.1644024074311037,
-                -0.1324009958969339,
-                4.3443060026047219e-002,
-                8.5602654094946495e-002,
-                -0.2433578169042885,
-                0.5297150596779437,
-                0.7164884680963959,
-                -5.2579522442877296e-003,
-                -5.5025369142193678e-002,
-                4.6845673335028933e-002,
-                -2.3279346335638568e-002,
-                4.0800777539657775e-003,
-                4.1378326533752169e-003,
-                -2.5040533340490805e-003,
-                -4.0654981400000964e-003,
-                9.6630592067498289e-003,
-                -8.5275895985990214e-003,
-                -5.8078747006425020e-002,
-                -2.4044337836660403e-002,
-                1.0968240064697212e-002,
-                -3.4461179858301418e-003,
-                -8.1201564869443749e-004,
-                2.1438992904959380e-003,
-                -1.4997753525697276e-003,
-                1.8685171825676386e-004
-                };
-       std::vector<double> default_sin_coef = {
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0
-                };
+        amrex::Vector<amrex::ParticleReal> default_sin_coef = {
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0
+        };
     };
 
     struct RFCavity
