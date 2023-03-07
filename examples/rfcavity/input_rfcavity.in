@@ -38,7 +38,7 @@ rf.freq = 1.3e9
 rf.phase = 85.5
 rf.mapsteps = 100
 rf.nslice = 4
-rf.cos_coefficients = 
+rf.cos_coefficients =
                 0.1644024074311037
                 -0.1324009958969339
                 4.3443060026047219e-002
