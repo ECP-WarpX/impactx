@@ -107,8 +107,8 @@ namespace impactx
                 int nslice = nslice_default;
                 int mapsteps = mapsteps_default;
                 RF_field_data ez;
-                std::vector<double> cos_coef = ez.default_cos_coef;
-                std::vector<double> sin_coef = ez.default_sin_coef;
+                amrex::Vector<amrex::ParticleReal> cos_coef = ez.default_cos_coef;
+                amrex::Vector<amrex::ParticleReal> sin_coef = ez.default_sin_coef;
                 pp_element.get("ds", ds);
                 pp_element.get("escale", escale);
                 pp_element.get("freq", freq);

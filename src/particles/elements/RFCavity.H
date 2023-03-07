@@ -88,6 +88,8 @@ namespace impactx
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
+         * @param cos_coef TODO
+         * @param sin_coef TODO
          */
         RFCavity(
             amrex::ParticleReal const ds,
@@ -96,13 +98,19 @@ namespace impactx
             amrex::ParticleReal const phase,
             int const mapsteps,
             int const nslice,
-            std::vector<double> cos_coef,
-            std::vector<double> sin_coef
+            amrex::Vector<amrex::ParticleReal> cos_coef,
+            amrex::Vector<amrex::ParticleReal> sin_coef
         )
           : Thick(ds, nslice),
-            m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps),
-            m_cos_coef(cos_coef), m_sin_coef(sin_coef)
+            m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps)
         {
+            amrex::Gpu::copyAsync(amrex::Gpu::hostToDevice,
+                                  cos_coef.begin(), cos_coef.end(),
+                                  m_cos_coef.begin());
+            amrex::Gpu::copyAsync(amrex::Gpu::hostToDevice,
+                                  sin_coef.begin(), sin_coef.end(),
+                                  m_sin_coef.begin());
+            amrex::Gpu::synchronize();
         }
 
         /** Push all particles */
@@ -430,8 +438,8 @@ namespace impactx
         amrex::ParticleReal m_freq; //! RF frequency in Hz
         amrex::ParticleReal m_phase; //! RF driven phase in deg
         int m_mapsteps; //! number of map integration steps per slice
-        std::vector<double> m_cos_coef;
-        std::vector<double> m_sin_coef;
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> m_cos_coef;
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> m_sin_coef;
     };
 
 } // namespace impactx
