@@ -120,6 +120,13 @@ namespace impactx
                 pp_element.get("ks", ks);
                 pp_element.queryAdd("nslice", nslice);
                 m_lattice.emplace_back( Sol(ds, ks, nslice) );
+            } else if (element_type == "prot") {
+                amrex::Real phi_in,phi_out;
+                pp_element.get("phi_in", phi_in);
+                pp_element.get("phi_out", phi_out);
+                phi_in = phi_in*ablastr::constant::math::pi/180.0;
+                phi_out = phi_out*ablastr::constant::math::pi/180.0;
+                m_lattice.emplace_back( PROT(phi_in, phi_out) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }

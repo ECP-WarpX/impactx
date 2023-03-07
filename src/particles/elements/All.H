@@ -22,6 +22,7 @@
 #include "Sbend.H"
 #include "ShortRF.H"
 #include "Sol.H"
+#include "PROT.H"
 
 #include <variant>
 
@@ -32,7 +33,7 @@ namespace impactx
         None, /* must be first, so KnownElements creates a default constructor */
         ConstF, DipEdge, Drift, Multipole, NonlinearLens,
         Programmable,
-        Quad, RFCavity, Sbend, ShortRF, Sol>;
+        Quad, RFCavity, Sbend, ShortRF, Sol, PROT>;
 
 } // namespace impactx
 
