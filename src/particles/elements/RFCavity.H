@@ -24,6 +24,7 @@
 
 #include <array>
 #include <cmath>
+#include <stdexcept>
 #include <tuple>
 #include <vector>
 
@@ -94,6 +95,7 @@ namespace impactx
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
          */
+        AMREX_GPU_HOST
         RFCavity(
             amrex::ParticleReal const ds,
             amrex::ParticleReal const escale,
@@ -107,8 +109,13 @@ namespace impactx
           : Thick(ds, nslice),
             m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps)
         {
-            m_cos_coef.resize(cos_coef.size());
-            m_sin_coef.resize(sin_coef.size());
+            m_cos_size = cos_coef.size();
+            m_sin_size = sin_coef.size();
+            if (m_cos_size != m_sin_size)
+                throw std::runtime_error("RFCavity: cos and sin coefficients must have same length!");
+
+            m_cos_coef.resize(m_cos_size);
+            m_sin_coef.resize(m_sin_size);
             amrex::Gpu::copyAsync(amrex::Gpu::hostToDevice,
                                   cos_coef.begin(), cos_coef.end(),
                                   m_cos_coef.begin());
@@ -116,13 +123,14 @@ namespace impactx
                                   sin_coef.begin(), sin_coef.end(),
                                   m_sin_coef.begin());
             amrex::Gpu::synchronize();
+
+            // low-level objects we can use on device
+            m_cos_data = m_cos_coef.data();
+            m_sin_data = m_sin_coef.data();
         }
 
-        // TODO: needed?
-        RFCavity(RFCavity const &) = default;
-        RFCavity(RFCavity &&) = default;
-        RFCavity& operator=(RFCavity const &) = default;
-        RFCavity& operator=(RFCavity &&) = default;
+        AMREX_GPU_HOST
+        ~RFCavity() = default;
 
         /** Push all particles */
         using BeamOptic::operator();
@@ -288,22 +296,22 @@ namespace impactx
             amrex::ParticleReal efieldpp = 0.0;
             amrex::ParticleReal efieldint = 0.0;
             amrex::ParticleReal const z = zeval - zmid;
-            int const ncoef = m_cos_coef.size();
+            int const ncoef = m_cos_size;
 
             if (abs(z)<=zmid)
             {
-               efield = 0.5_prt*m_cos_coef[0];
+               efield = 0.5_prt*m_cos_data[0];
                efieldint = z*efield;
                for (int j=1; j < ncoef; ++j)
                {
-                 efield = efield + m_cos_coef[j]*cos(j*2*pi*z/zlen) +
-                      m_sin_coef[j]*sin(j*2*pi*z/zlen);
-                 efieldp = efieldp-j*2*pi*m_cos_coef[j]*sin(j*2*pi*z/zlen)/zlen +
-                      j*2*pi*m_sin_coef[j]*cos(j*2*pi*z/zlen)/zlen;
-                 efieldpp = efieldpp- pow(j*2*pi*m_cos_coef[j]/zlen,2) *cos(j*2*pi*z/zlen) -
-                      pow(j*2*pi*m_sin_coef[j]/zlen,2) *sin(j*2*pi*z/zlen);
-                 efieldint = efieldint + zlen*m_cos_coef[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
-                      zlen*m_sin_coef[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
+                 efield = efield + m_cos_data[j]*cos(j*2*pi*z/zlen) +
+                      m_sin_data[j]*sin(j*2*pi*z/zlen);
+                 efieldp = efieldp-j*2*pi*m_cos_data[j]*sin(j*2*pi*z/zlen)/zlen +
+                      j*2*pi*m_sin_data[j]*cos(j*2*pi*z/zlen)/zlen;
+                 efieldpp = efieldpp- pow(j*2*pi*m_cos_data[j]/zlen,2) *cos(j*2*pi*z/zlen) -
+                      pow(j*2*pi*m_sin_data[j]/zlen,2) *sin(j*2*pi*z/zlen);
+                 efieldint = efieldint + zlen*m_cos_data[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
+                      zlen*m_sin_data[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
                }
             }
             return std::make_tuple(efield, efieldp, efieldint);
@@ -449,8 +457,14 @@ namespace impactx
         amrex::ParticleReal m_freq; //! RF frequency in Hz
         amrex::ParticleReal m_phase; //! RF driven phase in deg
         int m_mapsteps; //! number of map integration steps per slice
-        amrex::Gpu::DeviceVector<amrex::ParticleReal> m_cos_coef;
-        amrex::Gpu::DeviceVector<amrex::ParticleReal> m_sin_coef;
+
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> m_cos_coef; //! cosine coefficients in Fourier expansion of on-axis electric field Ez
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> m_sin_coef; //! sine coefficients in Fourier expansion of on-axis electric field Ez
+        // low-level objects we can use on device
+        int m_cos_size = 0;
+        amrex::ParticleReal* m_cos_data = nullptr;
+        int m_sin_size = 0;
+        amrex::ParticleReal* m_sin_data = nullptr;
     };
 
 } // namespace impactx
