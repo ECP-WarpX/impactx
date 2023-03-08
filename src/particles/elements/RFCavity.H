@@ -99,14 +99,16 @@ namespace impactx
             amrex::ParticleReal const escale,
             amrex::ParticleReal const freq,
             amrex::ParticleReal const phase,
-            amrex::Vector<amrex::ParticleReal> cos_coef,
-            amrex::Vector<amrex::ParticleReal> sin_coef,
+            std::vector<amrex::ParticleReal> cos_coef,
+            std::vector<amrex::ParticleReal> sin_coef,
             int mapsteps = 1,
             int nslice = 1
         )
           : Thick(ds, nslice),
             m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps)
         {
+            m_cos_coef.resize(cos_coef.size());
+            m_sin_coef.resize(sin_coef.size());
             amrex::Gpu::copyAsync(amrex::Gpu::hostToDevice,
                                   cos_coef.begin(), cos_coef.end(),
                                   m_cos_coef.begin());

@@ -187,8 +187,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
-                amrex::Vector<amrex::ParticleReal>,
-                amrex::Vector<amrex::ParticleReal>,
+                std::vector<amrex::ParticleReal>,
+                std::vector<amrex::ParticleReal>,
                 int const,
                 int const
              >(),
