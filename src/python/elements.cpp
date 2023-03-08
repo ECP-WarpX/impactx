@@ -225,7 +225,8 @@ void init_elements(py::module& m)
                  int const,
                  int const
              >(),
-             py::arg("ds"), py::arg("bscale"), py::arg("cos_coefficients"), py::arg("sin_coefficients"),
+             py::arg("ds"), py::arg("bscale"),
+             py::arg("cos_coefficients"), py::arg("sin_coefficients"),
              py::arg("mapsteps") = 1, py::arg("nslice") = 1,
              "A soft-edge solenoid."
         )
