@@ -249,13 +249,15 @@ Lattice Elements
 
             * ``<element_name>.bscale`` (``float``, in inverse meters) Scaling factor for on-axis magnetic field Bz
 
-            * ``<element_name>.mapsteps`` (``integer``) number of integration steps per slice used for map and reference particle push in applied fields
+            * ``<element_name>.cos_coefficients`` (array of ``float``) cos coefficients in Fourier expansion of the on-axis magnetic field Bz
+              (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
+
+            * ``<element_name>.sin_coefficients`` (array of ``float``) sin coefficients in Fourier expansion of the on-axis magnetic field Bz
+              (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
+
+            * ``<element_name>.mapsteps`` (``integer``) number of integration steps per slice used for map and reference particle push in applied fields (default: ``1``)
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
-
-            * ``<element_name>.cos_coefficients`` (``vector``) array of cos coefficients in Fourier expansion of the on-axis magnetic field Bz (optional)
-
-            * ``<element_name>.sin_coefficients`` (``vector``) array of sin coefficients in Fourier expansion of the on-axis magnetic field Bz (optional)
 
         * ``dipedge`` for dipole edge focusing. This requires these additional parameters:
 
