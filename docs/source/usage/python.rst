@@ -459,6 +459,9 @@ This module provides elements for the accelerator lattice.
                   = (peak on-axis electric field Ez in MV/m) / (particle rest energy in MeV)
    :param freq: RF frequency in Hz
    :param phase: RF driven phase in degrees
+   :param cos_coefficients: array of ``float`` cosine coefficients in Fourier expansion of on-axis electric field Ez (optional); default is a 9-cell TESLA superconducting cavity model from `DOI:10.1103/PhysRevSTAB.3.092001 <https://doi.org/10.1103/PhysRevSTAB.3.092001>`__
+
+   :param cos_coefficients: array of ``float`` sine coefficients in Fourier expansion of on-axis electric field Ez (optional); default is a 9-cell TESLA superconducting cavity model from `DOI:10.1103/PhysRevSTAB.3.092001 <https://doi.org/10.1103/PhysRevSTAB.3.092001>`__
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
 
