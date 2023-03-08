@@ -24,24 +24,28 @@
 
 #include <array>
 #include <cmath>
+#include <stdexcept>
 #include <tuple>
+#include <vector>
 
 
 namespace impactx
 {
+   /** Default Fourier coefficients
+    *
+    * Fourier coefficients for the on-axis longitudinal
+    * magnetic field Bz of a soft-edge solenoid based on
+    * a thin-shell model of the solenoid as a cylinder
+    * of current, as described in:
+    * https://doi.org/10.1016/j.nima.2022.166706.
+    * Parameters correspond to an aspect ratio of
+    * cylinder diameter / length = 1/3.
+    *
+    * Usually superseded by user-provided input values.
+    */
     struct Sol_field_data
     {
-       //   Default:
-       //   Fourier coefficients for the on-axis longitudinal
-       //   magnetic field Bz of a soft-edge solenoid based on
-       //   a thin-shell model of the solenoid as a cylinder
-       //   of current, as described in:
-       //   https://doi.org/10.1016/j.nima.2022.166706
-       //   Parameters correspond to an aspect ratio of
-       //   cylinder diameter / length = 1/3.
-       //   Superseded by user-provided input values.
-
-       std::vector<double> default_cos_coef = {
+       amrex::Vector<amrex::ParticleReal> default_cos_coef = {
              0.350807812299706,
              0.323554693720069,
              0.260320578919415,
@@ -79,7 +83,7 @@ namespace impactx
             -1.468242784844341E-004
             };
 
-       std::vector<double> default_sin_coef = {
+       amrex::Vector<amrex::ParticleReal> default_sin_coef = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -98,23 +102,46 @@ namespace impactx
          *
          * @param ds Segment length in m
          * @param bscale Scaling factor for on-axis magnetic field Bz in 1/m
+         * @param cos_coef TODO
+         * @param sin_coef TODO
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
          */
+        AMREX_GPU_HOST
         SoftSolenoid(
             amrex::ParticleReal const ds,
             amrex::ParticleReal const bscale,
-            int const mapsteps,
-            int const nslice,
-            std::vector<double> cos_coef,
-            std::vector<double> sin_coef
+            std::vector<amrex::ParticleReal> cos_coef,
+            std::vector<amrex::ParticleReal> sin_coef,
+            int mapsteps = 1,
+            int nslice = 1
         )
           : Thick(ds, nslice),
-            m_bscale(bscale), m_mapsteps(mapsteps), m_cos_coef(cos_coef),
-            m_sin_coef(sin_coef)
-        {
+            m_bscale(bscale), m_mapsteps(mapsteps)
+       {
+            m_cos_size = cos_coef.size();
+            m_sin_size = sin_coef.size();
+            if (m_cos_size != m_sin_size)
+                throw std::runtime_error("RFCavity: cos and sin coefficients must have same length!");
+
+            m_cos_coef.resize(m_cos_size);
+            m_sin_coef.resize(m_sin_size);
+            amrex::Gpu::copyAsync(amrex::Gpu::hostToDevice,
+                                  cos_coef.begin(), cos_coef.end(),
+                                  m_cos_coef.begin());
+            amrex::Gpu::copyAsync(amrex::Gpu::hostToDevice,
+                                  sin_coef.begin(), sin_coef.end(),
+                                  m_sin_coef.begin());
+            amrex::Gpu::synchronize();
+
+            // low-level objects we can use on device
+            m_cos_data = m_cos_coef.data();
+            m_sin_data = m_sin_coef.data();
         }
+
+        AMREX_GPU_HOST
+        ~SoftSolenoid() = default;
 
         /** Push all particles */
         using BeamOptic::operator();
@@ -263,28 +290,27 @@ namespace impactx
             amrex::ParticleReal const zlen = m_ds;
             amrex::ParticleReal const zmid = zlen / 2.0_prt;
 
-            // compute on-axis magnetic field (z is relative to cavity midpoint)
+            // compute on-axis magnetic field (z is relative to solenoid midpoint)
             amrex::ParticleReal bfield = 0.0;
             amrex::ParticleReal bfieldp = 0.0;
             amrex::ParticleReal bfieldint = 0.0;
             amrex::ParticleReal const z = zeval - zmid;
-            int const ncoef = m_cos_coef.size();
+            int const ncoef = m_cos_size;
 
             if (abs(z)<=zmid)
             {
-               bfield = 0.5_prt*m_cos_coef[0];
+               bfield = 0.5_prt*m_cos_data[0];
                bfieldint = z*bfield;
                for (int j=1; j < ncoef; ++j)
                {
-                 bfield = bfield + m_cos_coef[j]*cos(j*2*pi*z/zlen) +
-                      m_sin_coef[j]*sin(j*2*pi*z/zlen);
-                 bfieldp = bfieldp-j*2*pi*m_cos_coef[j]*sin(j*2*pi*z/zlen)/zlen +
-                      j*2*pi*m_sin_coef[j]*cos(j*2*pi*z/zlen)/zlen;
-                 bfieldint = bfieldint + zlen*m_cos_coef[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
-                      zlen*m_sin_coef[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
+                 bfield = bfield + m_cos_data[j]*cos(j*2*pi*z/zlen) +
+                      m_sin_data[j]*sin(j*2*pi*z/zlen);
+                 bfieldp = bfieldp-j*2*pi*m_cos_data[j]*sin(j*2*pi*z/zlen)/zlen +
+                      j*2*pi*m_sin_data[j]*cos(j*2*pi*z/zlen)/zlen;
+                 bfieldint = bfieldint + zlen*m_cos_data[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
+                      zlen*m_sin_data[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
                }
             }
-            amrex::PrintToFile("Bfield.txt") << z << " " << bfield << "\n";
             return std::make_tuple(bfield, bfieldp, bfieldint);
         }
 
@@ -443,8 +469,14 @@ namespace impactx
     private:
         amrex::ParticleReal m_bscale; //! scaling factor for solenoid Bz field
         int m_mapsteps; //! number of map integration steps per slice
-        std::vector<double> m_cos_coef;
-        std::vector<double> m_sin_coef;
+
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> m_cos_coef; //! cosine coefficients in Fourier expansion of on-axis magnetic field Bz
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> m_sin_coef; //! sine coefficients in Fourier expansion of on-axis magnetic  field Bz
+        // low-level objects we can use on device
+        int m_cos_size = 0;
+        amrex::ParticleReal* m_cos_data = nullptr;
+        int m_sin_size = 0;
+        amrex::ParticleReal* m_sin_data = nullptr;
     };
 
 } // namespace impactx

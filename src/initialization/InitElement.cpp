@@ -133,7 +133,7 @@ namespace impactx
                 pp_element.queryAdd("nslice", nslice);
                 pp_element.queryAdd("cos_coefficients", cos_coef);
                 pp_element.queryAdd("sin_coefficients", sin_coef);
-                m_lattice.emplace_back( SoftSolenoid(ds, bscale, mapsteps, nslice, cos_coef, sin_coef) );
+                m_lattice.emplace_back( SoftSolenoid(ds, bscale, cos_coef, sin_coef, mapsteps, nslice) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }
