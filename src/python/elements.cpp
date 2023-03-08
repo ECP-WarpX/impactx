@@ -220,9 +220,13 @@ void init_elements(py::module& m)
         .def(py::init<
                  amrex::ParticleReal const,
                  amrex::ParticleReal const,
+                 amrex::Vector<amrex::ParticleReal>,
+                 amrex::Vector<amrex::ParticleReal>,
                  int const,
-                 int const>(),
-             py::arg("ds"), py::arg("bscale"), py::arg("mapsteps"), py::arg("nslice") = 1,
+                 int const
+             >(),
+             py::arg("ds"), py::arg("bscale"), py::arg("cos_coef"), py::arg("sin_coef"),
+             py::arg("mapsteps") = 1, py::arg("nslice") = 1,
              "A soft-edge solenoid."
         )
     ;
