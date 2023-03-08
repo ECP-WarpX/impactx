@@ -88,21 +88,21 @@ namespace impactx
          * @param escale Scaling factor for on-axis RF electric field in 1/m
          * @param freq RF frequency in Hz
          * @param phase RF driven phase in deg
+         * @param cos_coef TODO
+         * @param sin_coef TODO
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
-         * @param cos_coef TODO
-         * @param sin_coef TODO
          */
         RFCavity(
             amrex::ParticleReal const ds,
             amrex::ParticleReal const escale,
             amrex::ParticleReal const freq,
             amrex::ParticleReal const phase,
-            int const mapsteps,
-            int const nslice,
             amrex::Vector<amrex::ParticleReal> cos_coef,
-            amrex::Vector<amrex::ParticleReal> sin_coef
+            amrex::Vector<amrex::ParticleReal> sin_coef,
+            int mapsteps = 1,
+            int nslice = 1
         )
           : Thick(ds, nslice),
             m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps)
@@ -115,6 +115,12 @@ namespace impactx
                                   m_sin_coef.begin());
             amrex::Gpu::synchronize();
         }
+
+        // TODO: needed?
+        RFCavity(RFCavity const &) = default;
+        RFCavity(RFCavity &&) = default;
+        RFCavity& operator=(RFCavity const &) = default;
+        RFCavity& operator=(RFCavity &&) = default;
 
         /** Push all particles */
         using BeamOptic::operator();

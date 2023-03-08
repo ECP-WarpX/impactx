@@ -187,13 +187,15 @@ void init_elements(py::module& m)
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
+                amrex::Vector<amrex::ParticleReal>,
+                amrex::Vector<amrex::ParticleReal>,
                 int const,
                 int const
              >(),
              py::arg("ds"), py::arg("escale"), py::arg("freq"),
-             py::arg("phase"),
-             py::arg("mapsteps"), py::arg("nslice") = 1,
-             "An RF cavity (with solenoid field)."
+             py::arg("phase"), py::arg("cos_coefficients"), py::arg("sin_coefficients"),
+             py::arg("mapsteps") = 1, py::arg("nslice") = 1,
+             "An RF cavity."
         )
     ;
 

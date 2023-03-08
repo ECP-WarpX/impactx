@@ -117,7 +117,7 @@ namespace impactx
                 pp_element.queryAdd("nslice", nslice);
                 pp_element.queryAdd("cos_coefficients", cos_coef);
                 pp_element.queryAdd("sin_coefficients", sin_coef);
-                m_lattice.emplace_back( RFCavity(ds, escale, freq, phase, mapsteps, nslice, cos_coef, sin_coef) );
+                m_lattice.emplace_back( RFCavity(ds, escale, freq, phase, cos_coef, sin_coef, mapsteps, nslice) );
             } else if (element_type == "solenoid") {
                 amrex::Real ds, ks;
                 int nslice = nslice_default;
