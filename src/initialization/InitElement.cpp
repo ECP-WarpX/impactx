@@ -106,13 +106,18 @@ namespace impactx
                 amrex::Real ds, escale, freq, phase;
                 int nslice = nslice_default;
                 int mapsteps = mapsteps_default;
+                RF_field_data ez;
+                std::vector<amrex::ParticleReal> cos_coef = ez.default_cos_coef;
+                std::vector<amrex::ParticleReal> sin_coef = ez.default_sin_coef;
                 pp_element.get("ds", ds);
                 pp_element.get("escale", escale);
                 pp_element.get("freq", freq);
                 pp_element.get("phase", phase);
                 pp_element.queryAdd("mapsteps", mapsteps);
                 pp_element.queryAdd("nslice", nslice);
-                m_lattice.emplace_back( RFCavity(ds, escale, freq, phase, mapsteps, nslice) );
+                pp_element.queryAdd("cos_coefficients", cos_coef);
+                pp_element.queryAdd("sin_coefficients", sin_coef);
+                m_lattice.emplace_back( RFCavity(ds, escale, freq, phase, cos_coef, sin_coef, mapsteps, nslice) );
             } else if (element_type == "solenoid") {
                 amrex::Real ds, ks;
                 int nslice = nslice_default;

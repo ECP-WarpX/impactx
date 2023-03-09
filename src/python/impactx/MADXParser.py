@@ -35,7 +35,6 @@ class MADXParser:
     """
 
     def __init__(self):
-
         self.__drift = {"name": "", "l": 0.0, "type": "drift"}
 
         self.__drift_pattern = r"(.*):drift,(.*)=(.*);"
@@ -148,7 +147,6 @@ class MADXParser:
                     # this is a comment
                     pass
                 elif "drift" in line:
-
                     obj = re.match(self.__drift_pattern, line)
 
                     # first tag is name
@@ -171,7 +169,6 @@ class MADXParser:
                     self.__elements.append(self.__drift.copy())
 
                 elif "quadrupole" in line:
-
                     obj = re.match(self.quad_pattern, line)
 
                     # first tag is name
@@ -195,14 +192,12 @@ class MADXParser:
                     self.__elements.append(self.__quadrupole.copy())
 
                 elif "sbend" in line:
-
                     obj = re.match(self.__sbend_pattern, line)
 
                     # first tag is name
                     self.__sbend["name"] = obj.group(1)
 
                     for i in range(2, self.__nDipole + 2, 2):
-
                         if obj.group(i) in self.__sbend:
                             self.__sbend[obj.group(i)] = float(obj.group(i + 1))
                         else:
@@ -220,14 +215,12 @@ class MADXParser:
                     self.__elements.append(self.__sbend.copy())
 
                 elif "solenoid" in line:
-
                     obj = re.match(self.__sol_pattern, line)
 
                     # first tag is name
                     self.__sol["name"] = obj.group(1)
 
                     for i in range(2, self.__nSol + 2, 2):
-
                         if obj.group(i) in self.__sol:
                             self.__sol[obj.group(i)] = float(obj.group(i + 1))
                         else:
@@ -245,14 +238,12 @@ class MADXParser:
                     self.__elements.append(self.__sol.copy())
 
                 elif "dipedge" in line:
-
                     obj = re.match(self.__dipedge_pattern, line)
 
                     # first tag is name
                     self.__dipedge["name"] = obj.group(1)
 
                     for i in range(2, self.__nDipedge + 2, 2):
-
                         if obj.group(i) in self.__dipedge:
                             self.__dipedge[obj.group(i)] = float(obj.group(i + 1))
                         else:
@@ -273,7 +264,6 @@ class MADXParser:
                     pass
 
                 elif "beam" in line:
-
                     obj = re.match(self.beam_pattern, line)
 
                     for i in range(1, self.__nBeam, 2):
@@ -296,7 +286,6 @@ class MADXParser:
                             )
 
                 elif "line" in line:
-
                     obj = re.match(self.__line_pattern, line)
 
                     self.__line["name"] = obj.group(1)
@@ -329,7 +318,6 @@ class MADXParser:
                     self.__lines.append(self.__line.copy())
 
                 elif "use" in line and "sequence" in line:
-
                     obj = re.match(self.seq_pattern, line)
 
                     self.sequence["name"] = obj.group(1)
@@ -395,7 +383,6 @@ class MADXParser:
         return string.replace(" ", "")
 
     def __str__(self):
-
         if self.__lattice:
             length = 0.0
 
@@ -461,7 +448,6 @@ class MADXParser:
 
     def getBeamline(self):
         if self.__lattice:
-
             beamline = []
 
             for elem in self.__lattice["elem"]:
