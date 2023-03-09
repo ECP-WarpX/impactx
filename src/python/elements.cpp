@@ -8,6 +8,8 @@
 #include <particles/elements/All.H>
 #include <AMReX.H>
 
+#include <vector>
+
 namespace py = pybind11;
 using namespace impactx;
 
@@ -218,12 +220,12 @@ void init_elements(py::module& m)
 
     py::class_<SoftSolenoid, elements::Thick>(me, "SoftSolenoid")
         .def(py::init<
-                 amrex::ParticleReal const,
-                 amrex::ParticleReal const,
-                 amrex::Vector<amrex::ParticleReal>,
-                 amrex::Vector<amrex::ParticleReal>,
-                 int const,
-                 int const
+                 amrex::ParticleReal,
+                 amrex::ParticleReal,
+                 std::vector<amrex::ParticleReal>,
+                 std::vector<amrex::ParticleReal>,
+                 int,
+                 int
              >(),
              py::arg("ds"), py::arg("bscale"),
              py::arg("cos_coefficients"), py::arg("sin_coefficients"),
