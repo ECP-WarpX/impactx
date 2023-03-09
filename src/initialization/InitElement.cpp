@@ -130,8 +130,8 @@ namespace impactx
                 int nslice = nslice_default;
                 int mapsteps = mapsteps_default;
                 Sol_field_data bz;
-                std::vector<double> cos_coef = bz.default_cos_coef;
-                std::vector<double> sin_coef = bz.default_sin_coef;
+                std::vector<amrex::ParticleReal> cos_coef = bz.default_cos_coef;
+                std::vector<amrex::ParticleReal> sin_coef = bz.default_sin_coef;
                 pp_element.get("ds", ds);
                 pp_element.get("bscale", bscale);
                 pp_element.queryAdd("mapsteps", mapsteps);

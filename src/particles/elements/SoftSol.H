@@ -45,7 +45,7 @@ namespace impactx
     */
     struct Sol_field_data
     {
-       amrex::Vector<amrex::ParticleReal> default_cos_coef = {
+       std::vector<amrex::ParticleReal> default_cos_coef = {
              0.350807812299706,
              0.323554693720069,
              0.260320578919415,
@@ -83,7 +83,7 @@ namespace impactx
             -1.468242784844341E-004
             };
 
-       amrex::Vector<amrex::ParticleReal> default_sin_coef = {
+       std::vector<amrex::ParticleReal> default_sin_coef = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

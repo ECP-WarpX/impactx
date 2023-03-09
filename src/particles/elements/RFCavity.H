@@ -28,6 +28,7 @@
 #include <tuple>
 #include <vector>
 
+
 namespace impactx
 {
     /** Default Fourier coefficients
@@ -41,7 +42,7 @@ namespace impactx
      */
     struct RF_field_data
     {
-        amrex::Vector<amrex::ParticleReal> default_cos_coef = {
+        std::vector<amrex::ParticleReal> default_cos_coef = {
             0.1644024074311037,
             -0.1324009958969339,
             4.3443060026047219e-002,
@@ -69,7 +70,7 @@ namespace impactx
             1.8685171825676386e-004
         };
 
-        amrex::Vector<amrex::ParticleReal> default_sin_coef = {
+        std::vector<amrex::ParticleReal> default_sin_coef = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0
