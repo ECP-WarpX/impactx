@@ -110,8 +110,8 @@ namespace impactx
          */
         AMREX_GPU_HOST
         SoftSolenoid(
-            amrex::ParticleReal ds,
-            amrex::ParticleReal bscale,
+            amrex::ParticleReal const ds,
+            amrex::ParticleReal const bscale,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
             int mapsteps = 1,
