@@ -222,12 +222,12 @@ void init_elements(py::module& m)
 
     py::class_<SoftSolenoid, elements::Thick>(me, "SoftSolenoid")
         .def(py::init<
-                 amrex::ParticleReal,
-                 amrex::ParticleReal,
+                 amrex::ParticleReal const,
+                 amrex::ParticleReal const,
                  std::vector<amrex::ParticleReal>,
                  std::vector<amrex::ParticleReal>,
-                 int,
-                 int
+		 int const,
+                 int const
              >(),
              py::arg("ds"), py::arg("bscale"),
              py::arg("cos_coefficients"), py::arg("sin_coefficients"),
