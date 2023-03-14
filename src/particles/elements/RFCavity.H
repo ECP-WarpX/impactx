@@ -28,6 +28,7 @@
 #include <tuple>
 #include <vector>
 
+
 namespace impactx
 {
     /** Default Fourier coefficients
@@ -76,9 +77,40 @@ namespace impactx
         };
     };
 
+namespace data
+{
+    /** Data members we can copy to device with a memcpy.
+     */
+    struct RFCavity_device_copyable
+    {
+        amrex::ParticleReal m_escale; //! scaling factor for RF electric field
+        amrex::ParticleReal m_freq; //! RF frequency in Hz
+        amrex::ParticleReal m_phase; //! RF driven phase in deg
+        int m_mapsteps; //! number of map integration steps per slice
+
+        int m_ncoef = 0; //! number of Fourier coefficients
+        amrex::ParticleReal* m_cos_data = nullptr; //! non-owning pointer to device cosine coefficients
+        amrex::ParticleReal* m_sin_data = nullptr; //! non-owning pointer to device sine coefficients
+
+        RFCavity_device_copyable(
+            amrex::ParticleReal escale,
+            amrex::ParticleReal freq,
+            amrex::ParticleReal phase,
+            int mapsteps = 1
+        ) : m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps)
+        {}
+
+        RFCavity_device_copyable(RFCavity_device_copyable const &) = default;
+        RFCavity_device_copyable& operator=(RFCavity_device_copyable const &) = default;
+        RFCavity_device_copyable(RFCavity_device_copyable &&) = default;
+        RFCavity_device_copyable& operator=(RFCavity_device_copyable &&) = default;
+    };
+} // namespace details
+
     struct RFCavity
     : public elements::BeamOptic<RFCavity>,
-      public elements::Thick
+      public elements::Thick,
+      public data::RFCavity_device_copyable
     {
         static constexpr auto name = "RFCavity";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -97,25 +129,24 @@ namespace impactx
          */
         AMREX_GPU_HOST
         RFCavity(
-            amrex::ParticleReal const ds,
-            amrex::ParticleReal const escale,
-            amrex::ParticleReal const freq,
-            amrex::ParticleReal const phase,
+            amrex::ParticleReal ds,
+            amrex::ParticleReal escale,
+            amrex::ParticleReal freq,
+            amrex::ParticleReal phase,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
             int mapsteps = 1,
             int nslice = 1
         )
           : Thick(ds, nslice),
-            m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps)
+            RFCavity_device_copyable(escale, freq, phase, mapsteps)
         {
-            m_cos_size = cos_coef.size();
-            m_sin_size = sin_coef.size();
-            if (m_cos_size != m_sin_size)
+            m_ncoef = cos_coef.size();
+            if (m_ncoef !=  int(sin_coef.size()))
                 throw std::runtime_error("RFCavity: cos and sin coefficients must have same length!");
 
-            m_cos_coef.resize(m_cos_size);
-            m_sin_coef.resize(m_sin_size);
+            m_cos_coef.resize(m_ncoef);
+            m_sin_coef.resize(m_ncoef);
             amrex::Gpu::copyAsync(amrex::Gpu::hostToDevice,
                                   cos_coef.begin(), cos_coef.end(),
                                   m_cos_coef.begin());
@@ -124,10 +155,45 @@ namespace impactx
                                   m_sin_coef.begin());
             amrex::Gpu::synchronize();
 
-            // low-level objects we can use on device
             m_cos_data = m_cos_coef.data();
             m_sin_data = m_sin_coef.data();
         }
+
+        // copy and move constructors
+        RFCavity(RFCavity const & other)
+            : Thick(other.m_ds, other.m_nslice),
+              RFCavity_device_copyable(other.m_escale, other.m_freq, other.m_phase, other.m_mapsteps)
+        {
+#if !AMREX_DEVICE_COMPILE
+            // copy the data container if we copy the host element
+            m_cos_coef = other.m_cos_coef;
+            m_sin_coef = other.m_sin_coef;
+            amrex::Gpu::synchronize();
+#endif
+            m_ncoef = m_cos_coef.size();
+            m_cos_data = m_cos_coef.data();
+            m_sin_data = m_sin_coef.data();
+        }
+        RFCavity& operator=(RFCavity const& other)
+        {
+            if (this == &other)
+                return *this;
+
+            Thick::operator=(other);
+            RFCavity_device_copyable::operator=(other);
+#if !AMREX_DEVICE_COMPILE
+            // copy the data container if we copy the host element
+            m_cos_coef = other.m_cos_coef;
+            m_sin_coef = other.m_sin_coef;
+            amrex::Gpu::synchronize();
+#endif
+            m_ncoef = m_cos_coef.size();
+            m_cos_data = m_cos_coef.data();
+            m_sin_data = m_sin_coef.data();
+            return *this;
+        }
+        RFCavity(RFCavity && other) = default;
+        RFCavity& operator=(RFCavity && other) = default;
 
         AMREX_GPU_HOST
         ~RFCavity() = default;
@@ -296,13 +362,12 @@ namespace impactx
             amrex::ParticleReal efieldpp = 0.0;
             amrex::ParticleReal efieldint = 0.0;
             amrex::ParticleReal const z = zeval - zmid;
-            int const ncoef = m_cos_size;
 
             if (abs(z)<=zmid)
             {
                efield = 0.5_prt*m_cos_data[0];
                efieldint = z*efield;
-               for (int j=1; j < ncoef; ++j)
+               for (int j=1; j < m_ncoef; ++j)
                {
                  efield = efield + m_cos_data[j]*cos(j*2*pi*z/zlen) +
                       m_sin_data[j]*sin(j*2*pi*z/zlen);
@@ -453,18 +518,9 @@ namespace impactx
         }
 
     private:
-        amrex::ParticleReal m_escale; //! scaling factor for RF electric field
-        amrex::ParticleReal m_freq; //! RF frequency in Hz
-        amrex::ParticleReal m_phase; //! RF driven phase in deg
-        int m_mapsteps; //! number of map integration steps per slice
-
+        // we cannot copy these to device with a memcpy when we copy the element class
         amrex::Gpu::DeviceVector<amrex::ParticleReal> m_cos_coef; //! cosine coefficients in Fourier expansion of on-axis electric field Ez
         amrex::Gpu::DeviceVector<amrex::ParticleReal> m_sin_coef; //! sine coefficients in Fourier expansion of on-axis electric field Ez
-        // low-level objects we can use on device
-        int m_cos_size = 0;
-        amrex::ParticleReal* m_cos_data = nullptr;
-        int m_sin_size = 0;
-        amrex::ParticleReal* m_sin_data = nullptr;
     };
 
 } // namespace impactx
