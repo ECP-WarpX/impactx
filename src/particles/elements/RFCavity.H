@@ -105,7 +105,7 @@ namespace data
         RFCavity_device_copyable(RFCavity_device_copyable &&) = default;
         RFCavity_device_copyable& operator=(RFCavity_device_copyable &&) = default;
     };
-} // namespace details
+} // namespace data
 
     struct RFCavity
     : public elements::BeamOptic<RFCavity>,
