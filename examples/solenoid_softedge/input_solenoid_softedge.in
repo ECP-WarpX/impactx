@@ -1,0 +1,42 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.energy = 250.0
+beam.charge = 1.0e-9
+beam.particle = proton
+beam.distribution = waterbag
+beam.sigmaX = 1.559531175539e-3
+beam.sigmaY = 2.205510139392e-3
+beam.sigmaT = 1.0e-3
+beam.sigmaPx = 6.41218345413e-4
+beam.sigmaPy = 9.06819680526e-4
+beam.sigmaPt = 1.0e-3
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = sol1
+lattice.nslice = 1
+
+sol1.type = solenoid_softedge
+sol1.ds = 6.0
+sol1.bscale = 1.233482899483985
+sol1.mapsteps = 800
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = false

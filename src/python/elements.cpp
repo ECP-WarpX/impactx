@@ -8,6 +8,8 @@
 #include <particles/elements/All.H>
 #include <AMReX.H>
 
+#include <vector>
+
 namespace py = pybind11;
 using namespace impactx;
 
@@ -215,6 +217,22 @@ void init_elements(py::module& m)
                 amrex::ParticleReal const>(),
              py::arg("V"), py::arg("k"),
              "A short RF cavity element at zero crossing for bunching."
+        )
+    ;
+
+    py::class_<SoftSolenoid, elements::Thick>(me, "SoftSolenoid")
+        .def(py::init<
+                 amrex::ParticleReal const,
+                 amrex::ParticleReal const,
+                 std::vector<amrex::ParticleReal>,
+                 std::vector<amrex::ParticleReal>,
+         int const,
+                 int const
+             >(),
+             py::arg("ds"), py::arg("bscale"),
+             py::arg("cos_coefficients"), py::arg("sin_coefficients"),
+             py::arg("mapsteps") = 1, py::arg("nslice") = 1,
+             "A soft-edge solenoid."
         )
     ;
 

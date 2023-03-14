@@ -446,3 +446,21 @@ add_impactx_test(solenoid.MADX.py
     examples/solenoid/analysis_solenoid.py
     OFF  # no plot script yet
 )
+
+# Soft-Edge Solenoid ###################################################
+#
+# w/o space charge
+add_impactx_test(solenoid_softedge
+    examples/solenoid_softedge/input_solenoid_softedge.in
+      OFF  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/solenoid_softedge/analysis_solenoid_softedge.py
+    OFF  # no plot script yet
+)
+add_impactx_test(solenoid_softedge.py
+    examples/solenoid_softedge/run_solenoid_softedge.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/solenoid_softedge/analysis_solenoid_softedge.py
+    OFF  # no plot script yet
+)
