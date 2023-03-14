@@ -185,14 +185,14 @@ void init_elements(py::module& m)
 
     py::class_<RFCavity, elements::Thick>(me, "RFCavity")
         .def(py::init<
-                amrex::ParticleReal const,
-                amrex::ParticleReal const,
-                amrex::ParticleReal const,
-                amrex::ParticleReal const,
+                amrex::ParticleReal,
+                amrex::ParticleReal,
+                amrex::ParticleReal,
+                amrex::ParticleReal,
                 std::vector<amrex::ParticleReal>,
                 std::vector<amrex::ParticleReal>,
-                int const,
-                int const
+                int,
+                int
              >(),
              py::arg("ds"), py::arg("escale"), py::arg("freq"),
              py::arg("phase"), py::arg("cos_coefficients"), py::arg("sin_coefficients"),
