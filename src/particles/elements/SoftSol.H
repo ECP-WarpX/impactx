@@ -91,9 +91,37 @@ namespace impactx
             };
     };
 
+namespace data
+{
+    /** Data members we can copy to device with a memcpy.
+     */
+    struct SoftSolenoid_device_copyable
+    {
+        amrex::ParticleReal m_bscale; //! scaling factor for solenoid Bz field
+        int m_mapsteps; //! number of map integration steps per slice
+
+        int m_ncoef = 0; //! number of Fourier coefficients
+        amrex::ParticleReal* m_cos_data = nullptr; //! non-owning pointer to device cosine coefficients
+        amrex::ParticleReal* m_sin_data = nullptr; //! non-owning pointer to device sine coefficients
+
+        SoftSolenoid_device_copyable(
+            amrex::ParticleReal bscale,
+            int mapsteps = 1
+        ) : m_bscale(bscale), m_mapsteps(mapsteps)
+        {}
+
+        SoftSolenoid_device_copyable(SoftSolenoid_device_copyable const &) = default;
+        SoftSolenoid_device_copyable& operator=(SoftSolenoid_device_copyable const &) = default;
+        SoftSolenoid_device_copyable(SoftSolenoid_device_copyable &&) = default;
+        SoftSolenoid_device_copyable& operator=(SoftSolenoid_device_copyable &&) = default;
+
+    };
+} // namespace data
+
     struct SoftSolenoid
     : public elements::BeamOptic<SoftSolenoid>,
-      public elements::Thick
+      public elements::Thick,
+      public data::SoftSolenoid_device_copyable
     {
         static constexpr auto name = "SoftSolenoid";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -118,15 +146,14 @@ namespace impactx
             int nslice = 1
         )
           : Thick(ds, nslice),
-            m_bscale(bscale), m_mapsteps(mapsteps)
+            SoftSolenoid_device_copyable(bscale, mapsteps)
        {
-            m_cos_size = cos_coef.size();
-            m_sin_size = sin_coef.size();
-            if (m_cos_size != m_sin_size)
-                throw std::runtime_error("RFCavity: cos and sin coefficients must have same length!");
+           m_ncoef = cos_coef.size();
+           if (m_ncoef !=  int(sin_coef.size()))
+                throw std::runtime_error("SoftSolenoid: cos and sin coefficients must have same length!");
 
-            m_cos_coef.resize(m_cos_size);
-            m_sin_coef.resize(m_sin_size);
+            m_cos_coef.resize(m_ncoef);
+            m_sin_coef.resize(m_ncoef);
             amrex::Gpu::copyAsync(amrex::Gpu::hostToDevice,
                                   cos_coef.begin(), cos_coef.end(),
                                   m_cos_coef.begin());
@@ -139,6 +166,42 @@ namespace impactx
             m_cos_data = m_cos_coef.data();
             m_sin_data = m_sin_coef.data();
         }
+
+        // copy and move constructors
+        SoftSolenoid(SoftSolenoid const & other)
+          : Thick(other.m_ds, other.m_nslice),
+            SoftSolenoid_device_copyable(other.m_bscale, other.m_mapsteps)
+        {
+#if !AMREX_DEVICE_COMPILE
+            // copy the data container if we copy the host element
+            m_cos_coef = other.m_cos_coef;
+            m_sin_coef = other.m_sin_coef;
+            amrex::Gpu::synchronize();
+#endif
+            m_ncoef = m_cos_coef.size();
+            m_cos_data = m_cos_coef.data();
+            m_sin_data = m_sin_coef.data();
+        }
+        SoftSolenoid& operator=(SoftSolenoid const& other)
+        {
+            if (this == &other)
+                return *this;
+
+            Thick::operator=(other);
+            SoftSolenoid_device_copyable::operator=(other);
+#if !AMREX_DEVICE_COMPILE
+            // copy the data container if we copy the host element
+            m_cos_coef = other.m_cos_coef;
+            m_sin_coef = other.m_sin_coef;
+            amrex::Gpu::synchronize();
+#endif
+            m_ncoef = m_cos_coef.size();
+            m_cos_data = m_cos_coef.data();
+            m_sin_data = m_sin_coef.data();
+            return *this;
+        }
+        SoftSolenoid(SoftSolenoid && other) = default;
+        SoftSolenoid& operator=(SoftSolenoid && other) = default;
 
         AMREX_GPU_HOST
         ~SoftSolenoid() = default;
@@ -295,13 +358,12 @@ namespace impactx
             amrex::ParticleReal bfieldp = 0.0;
             amrex::ParticleReal bfieldint = 0.0;
             amrex::ParticleReal const z = zeval - zmid;
-            int const ncoef = m_cos_size;
 
             if (abs(z)<=zmid)
             {
                bfield = 0.5_prt*m_cos_data[0];
                bfieldint = z*bfield;
-               for (int j=1; j < ncoef; ++j)
+               for (int j=1; j < m_ncoef; ++j)
                {
                  bfield = bfield + m_cos_data[j]*cos(j*2*pi*z/zlen) +
                       m_sin_data[j]*sin(j*2*pi*z/zlen);
@@ -467,16 +529,9 @@ namespace impactx
         }
 
     private:
-        amrex::ParticleReal m_bscale; //! scaling factor for solenoid Bz field
-        int m_mapsteps; //! number of map integration steps per slice
-
+        // we cannot copy these to device with a memcpy when we copy the element class
         amrex::Gpu::DeviceVector<amrex::ParticleReal> m_cos_coef; //! cosine coefficients in Fourier expansion of on-axis magnetic field Bz
         amrex::Gpu::DeviceVector<amrex::ParticleReal> m_sin_coef; //! sine coefficients in Fourier expansion of on-axis magnetic  field Bz
-        // low-level objects we can use on device
-        int m_cos_size = 0;
-        amrex::ParticleReal* m_cos_data = nullptr;
-        int m_sin_size = 0;
-        amrex::ParticleReal* m_sin_data = nullptr;
     };
 
 } // namespace impactx
