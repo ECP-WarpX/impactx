@@ -482,4 +482,3 @@ add_impactx_test(quadrupole_softedge.py
     examples/quadrupole_softedge/analysis_quadrupole_softedge.py
     OFF  # no plot script yet
 )
-

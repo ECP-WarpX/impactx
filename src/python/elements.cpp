@@ -245,7 +245,7 @@ void init_elements(py::module& m)
              "An ideal hard-edge Solenoid magnet."
         )
     ;
-    
+
     py::class_<SoftQuadrupole, elements::Thick>(me, "SoftQuadrupole")
         .def(py::init<
                  amrex::ParticleReal const,
@@ -261,5 +261,5 @@ void init_elements(py::module& m)
              "A soft-edge quadrupole."
         )
     ;
-    
+
 }
