@@ -139,6 +139,20 @@ namespace impactx
                 pp_element.queryAdd("cos_coefficients", cos_coef);
                 pp_element.queryAdd("sin_coefficients", sin_coef);
                 m_lattice.emplace_back( SoftSolenoid(ds, bscale, cos_coef, sin_coef, mapsteps, nslice) );
+            } else if (element_type == "quadrupole_softedge") {
+                amrex::Real ds, gscale;
+                int nslice = nslice_default;
+                int mapsteps = mapsteps_default;
+                Quad_field_data gz;
+                std::vector<amrex::ParticleReal> cos_coef = gz.default_cos_coef;
+                std::vector<amrex::ParticleReal> sin_coef = gz.default_sin_coef;
+                pp_element.get("ds", ds);
+                pp_element.get("gscale", gscale);
+                pp_element.queryAdd("mapsteps", mapsteps);
+                pp_element.queryAdd("nslice", nslice);
+                pp_element.queryAdd("cos_coefficients", cos_coef);
+                pp_element.queryAdd("sin_coefficients", sin_coef);
+                m_lattice.emplace_back( SoftQuadrupole(ds, gscale, cos_coef, sin_coef, mapsteps, nslice) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }
