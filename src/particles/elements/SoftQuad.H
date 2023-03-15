@@ -302,7 +302,7 @@ namespace data
             amrex::ParticleReal const zout = zin + slice_ds;
             int const nsteps = m_mapsteps;
 
-            integrators::symp2_integrate_split3(refpart,zin,zout,nsteps,*this);
+            integrators::symp2_integrate(refpart,zin,zout,nsteps,*this);
             amrex::ParticleReal const ptf = refpart.pt;
 
             /* print computed linear map:
@@ -373,7 +373,7 @@ namespace data
 
         /** This pushes the reference particle and the linear map matrix
          *  elements for a quadrupole through the symplectic map associated
-         *  with H_3 in the Hamiltonian splitting H = H_1 + H_2 + H_3.
+         *  with H_1 in the Hamiltonian splitting H = H_1 + H_2.
          *
          * @param tau Map step size in m
          * @param[in,out] refpart reference particle
@@ -423,7 +423,7 @@ namespace data
 
         /** This pushes the reference particle and the linear map matrix
          *  elements for a quadrupole through the symplectic map associated
-         *  with H_2 in the Hamiltonian splitting H = H_1 + H_2 + H_3.
+         *  with H_2 in the Hamiltonian splitting H = H_1 + H_2.
          *
          * @param tau Map step size in m
          * @param[in,out] refpart reference particle
@@ -451,7 +451,7 @@ namespace data
 
             // push the linear map equations
             amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
-            amrex::ParticleReal const alpha = G0*bz/2.0_prt;
+            amrex::ParticleReal const alpha = G0*bz;
             amrex::ParticleReal const alpha2 = pow(alpha,2);
 
             refpart.map(2,1) = R(2,1) - tau*alpha2*R(1,1);
@@ -459,69 +459,13 @@ namespace data
             refpart.map(2,3) = R(2,3) - tau*alpha2*R(1,3);
             refpart.map(2,4) = R(2,4) - tau*alpha2*R(1,4);
 
-            refpart.map(4,1) = R(4,1) - tau*alpha2*R(3,1);
-            refpart.map(4,2) = R(4,2) - tau*alpha2*R(3,2);
-            refpart.map(4,3) = R(4,3) - tau*alpha2*R(3,3);
-            refpart.map(4,4) = R(4,4) - tau*alpha2*R(3,4);
+            refpart.map(4,1) = R(4,1) + tau*alpha2*R(3,1);
+            refpart.map(4,2) = R(4,2) + tau*alpha2*R(3,2);
+            refpart.map(4,3) = R(4,3) + tau*alpha2*R(3,3);
+            refpart.map(4,4) = R(4,4) + tau*alpha2*R(3,4);
 
         }
 
-        /** This pushes the reference particle and the linear map matrix
-         *  elements for a quadrupole through the symplectic map associated
-         *  with H_1 in the Hamiltonian splitting H = H_1 + H_2 + H_3.
-         *
-         * @param tau Map step size in m
-         * @param[in,out] refpart reference particle
-         * @param[in,out] zeval Longitudinal on-axis location in m
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void map3 (amrex::ParticleReal const tau,
-                   RefPart & refpart,
-                   amrex::ParticleReal & zeval) const
-        {
-            using namespace amrex::literals; // for _rt and _prt
-
-            amrex::ParticleReal const t = refpart.t;
-            amrex::ParticleReal const pt = refpart.pt;
-            amrex::ParticleReal const z = zeval;
-
-            // Define parameters and intermediate constants
-            amrex::ParticleReal const G0 = m_gscale;
-
-            // push the reference particle
-            auto [bz, bzp, bzint] = Quad_Bfield(z);
-            amrex::ignore_unused(bzp, bzint);
-
-            refpart.t = t;
-            refpart.pt = pt;
-
-            // push the linear map equations
-            amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
-            amrex::ParticleReal const theta = tau*G0*bz/2.0_prt;
-            amrex::ParticleReal const cs = cos(theta);
-            amrex::ParticleReal const sn = sin(theta);
-
-            refpart.map(1,1) = R(1,1)*cs + R(3,1)*sn;
-            refpart.map(1,2) = R(1,2)*cs + R(3,2)*sn;
-            refpart.map(1,3) = R(1,3)*cs + R(3,3)*sn;
-            refpart.map(1,4) = R(1,4)*cs + R(3,4)*sn;
-
-            refpart.map(2,1) = R(2,1)*cs + R(4,1)*sn;
-            refpart.map(2,2) = R(2,2)*cs + R(4,2)*sn;
-            refpart.map(2,3) = R(2,3)*cs + R(4,3)*sn;
-            refpart.map(2,4) = R(2,4)*cs + R(4,4)*sn;
-
-            refpart.map(3,1) = R(3,1)*cs - R(1,1)*sn;
-            refpart.map(3,2) = R(3,2)*cs - R(1,2)*sn;
-            refpart.map(3,3) = R(3,3)*cs - R(1,3)*sn;
-            refpart.map(3,4) = R(3,4)*cs - R(1,4)*sn;
-
-            refpart.map(4,1) = R(4,1)*cs - R(2,1)*sn;
-            refpart.map(4,2) = R(4,2)*cs - R(2,2)*sn;
-            refpart.map(4,3) = R(4,3)*cs - R(2,3)*sn;
-            refpart.map(4,4) = R(4,4)*cs - R(2,4)*sn;
-
-        }
 
     private:
         // we cannot copy these to device with a memcpy when we copy the element class
