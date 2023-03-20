@@ -124,7 +124,7 @@ namespace data
         /** A soft-edge quadrupole
          *
          * @param ds Segment length in m
-         * @param gscale Scaling factor for on-axis field gradient Bz in 1/m
+         * @param gscale Scaling factor for on-axis field gradient Bz in 1/m^2
          * @param cos_coef TODO
          * @param sin_coef TODO
          * @param mapsteps number of integration steps per slice used for
@@ -305,14 +305,14 @@ namespace data
             integrators::symp2_integrate(refpart,zin,zout,nsteps,*this);
             amrex::ParticleReal const ptf = refpart.pt;
 
-            /* print computed linear map:
+            // print computed linear map:
                for(int i=1; i<7; ++i){
                  for(int j=1; j<7; ++j){
                     amrex::PrintToFile("QuadMap.txt") << i << " " <<
                     j << " " << refpart.map(i,j) << "\n";
                  }
                }
-            */
+            //
 
             // advance position (x,y,z)
             refpart.x = x + slice_ds*px/bgi;
@@ -452,17 +452,16 @@ namespace data
             // push the linear map equations
             amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
             amrex::ParticleReal const alpha = G0*bz;
-            amrex::ParticleReal const alpha2 = pow(alpha,2);
 
-            refpart.map(2,1) = R(2,1) - tau*alpha2*R(1,1);
-            refpart.map(2,2) = R(2,2) - tau*alpha2*R(1,2);
-            refpart.map(2,3) = R(2,3) - tau*alpha2*R(1,3);
-            refpart.map(2,4) = R(2,4) - tau*alpha2*R(1,4);
+            refpart.map(2,1) = R(2,1) - tau*alpha*R(1,1);
+            refpart.map(2,2) = R(2,2) - tau*alpha*R(1,2);
+            refpart.map(2,3) = R(2,3) - tau*alpha*R(1,3);
+            refpart.map(2,4) = R(2,4) - tau*alpha*R(1,4);
 
-            refpart.map(4,1) = R(4,1) + tau*alpha2*R(3,1);
-            refpart.map(4,2) = R(4,2) + tau*alpha2*R(3,2);
-            refpart.map(4,3) = R(4,3) + tau*alpha2*R(3,3);
-            refpart.map(4,4) = R(4,4) + tau*alpha2*R(3,4);
+            refpart.map(4,1) = R(4,1) + tau*alpha*R(3,1);
+            refpart.map(4,2) = R(4,2) + tau*alpha*R(3,2);
+            refpart.map(4,3) = R(4,3) + tau*alpha*R(3,3);
+            refpart.map(4,4) = R(4,4) + tau*alpha*R(3,4);
 
         }
 

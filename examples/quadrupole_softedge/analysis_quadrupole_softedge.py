@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Copyright 2022-2023 ImpactX contributors
-# Authors: Chad Mitchell, Axel Huebl
+# Authors: Axel Huebl, Chad Mitchell
 # License: BSD-3-Clause-LBNL
 #
 
@@ -70,18 +70,18 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = 20000.0 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
     [sigx, sigy, sigt, emittance_x, emittance_y, emittance_t],
     [
-        1.559531175539e-3,
-        2.205510139392e-3,
-        1.0e-3,
-        1.0e-6,
-        2.0e-6,
-        1.0e-6,
+        7.5451170454175073e-005,
+        7.5441588239210947e-005,
+        9.9775878164077539e-004,
+        1.9959540393751392e-009,
+        2.0175015289132990e-009,
+        2.0013820193294972e-006,
     ],
     rtol=rtol,
     atol=atol,
@@ -97,18 +97,18 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = 20000.0 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
     [sigx, sigy, sigt, emittance_x, emittance_y, emittance_t],
     [
-        2.425578906459e-3,
-        2.654015302646e-3,
-        9.985897906860e-3,
-        1.365357890e-6,
-        1.634641555e-6,
-        1.000000000e-6,
+        7.4790118496224206e-005,
+        7.5357525169680140e-005,
+        9.9775879288128088e-004,
+        1.9959539836392703e-009,
+        2.0175014668882125e-009,
+        2.0013820380883801e-006,
     ],
     rtol=rtol,
     atol=atol,
