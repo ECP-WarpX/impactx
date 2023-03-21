@@ -3,16 +3,12 @@
 Soft-Edge Quadrupole
 ===================
 
-Proton beam propagating through a 6 m region containing a soft-edge
-quadrupole.
+This is a modification of the test for a matched electron beam propagating through a stable
+FODO cell, in which the quadrupoles have been replaced with soft-edge quadrupole
+elements.  The on-axis field profile in this example has been chosen to correspond
+to the hard-edge limit, so the two tests should coincide.
 
-The quadrupole model used is the default thin-shell model described in (to modify):
-P. Granum et al, "Efficient calculations of magnetic fields of solenoids for simulations,"
-NIMA 1034, 166706 (2022)
-`DOI:10.1016/j.nima.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
-
-We use a 250 MeV proton beam with initial unnormalized rms emittance of 1 micron
-in the horizontal plane, and 2 micron in the vertical plane.
+We use a 2 GeV electron beam with initial unnormalized rms emittance of 2 nm.
 
 In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
