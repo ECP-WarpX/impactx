@@ -225,4 +225,14 @@ void init_elements(py::module& m)
              "An ideal hard-edge Solenoid magnet."
         )
     ;
+
+    py::class_<Sol, elements::Thick>(me, "PRot")
+        .def(py::init<
+                amrex::ParticleReal const,
+                amrex::ParticleReal const>(),
+             py::arg("phi_in"), py::arg("phi_out"),
+             "An exact pole-face rotation in the x-z plane."
+        )
+    ;
+    
 }
