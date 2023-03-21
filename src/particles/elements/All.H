@@ -33,7 +33,7 @@ namespace impactx
         None, /* must be first, so KnownElements creates a default constructor */
         ConstF, DipEdge, Drift, Multipole, NonlinearLens,
         Programmable,
-        Quad, RFCavity, Sbend, ShortRF, Sol, PROT>;
+        Quad, RFCavity, Sbend, ShortRF, Sol, PRot>;
 
 } // namespace impactx
 
