@@ -1,7 +1,7 @@
 .. _examples-rotation:
 
-Drift using PROT
-========================
+Drift using a Pole-Face Rotation
+================================
 
 A drift that takes place in a rotated frame, using initial and final
 applications of PROT.
