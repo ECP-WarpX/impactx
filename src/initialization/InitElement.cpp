@@ -131,7 +131,7 @@ namespace impactx
                 pp_element.get("phi_out", phi_out);
                 phi_in = phi_in*ablastr::constant::math::pi/180.0;
                 phi_out = phi_out*ablastr::constant::math::pi/180.0;
-                m_lattice.emplace_back( PROT(phi_in, phi_out) );
+                m_lattice.emplace_back( PRot(phi_in, phi_out) );
             } else if (element_type == "solenoid_softedge") {
                 amrex::Real ds, bscale;
                 int nslice = nslice_default;
