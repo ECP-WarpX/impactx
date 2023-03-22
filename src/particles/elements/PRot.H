@@ -22,11 +22,11 @@
 
 namespace impactx
 {
-    struct PROT
-    : public elements::BeamOptic<PROT>,
+    struct PRot
+    : public elements::BeamOptic<PRot>,
       public elements::Thin
     {
-        static constexpr auto name = "PROT";
+        static constexpr auto name = "PRot";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** An exact pole face rotation in the x-z plane, from a frame
@@ -37,7 +37,7 @@ namespace impactx
          * @param phi_in Initial angle of reference trajectory w/r/t z (rad)
          * @param phi_out Final angle of reference trajectory w/r/t/ z (rad)
          */
-        PROT( amrex::ParticleReal const phi_in, amrex::ParticleReal const phi_out )
+        PRot( amrex::ParticleReal const phi_in, amrex::ParticleReal const phi_out )
         : m_phi_in(phi_in), m_phi_out(phi_out)
         {
         }
