@@ -41,9 +41,9 @@ namespace impactx
     * quadrupole, and g is the full gap parameter.  Here the
     * parameters are chosen so that g/L = 1/10.  This is
     * based on a similar model used for soft-edge elements
-    * in MaryLie and ML/I, eg. 
+    * in MaryLie and ML/I, eg.
     * http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf
-    * 
+    *
     * This is equivalent to a single-parameter Enge model for
     * the fields in the fringe region.
     *
