@@ -33,53 +33,53 @@ namespace impactx
 {
    /** Default Fourier coefficients
     *
-    * Fourier coefficients for the on-axis longitudinal
-    * magnetic field Bz of a soft-edge quadrupole based on
+    * Fourier coefficients for the on-axis quadrupole field gradient
+    * k = 1/(Brho)*dBy/dx as a function of longitudinal position z.
+    * The default on-axis gradient is described by the function:
+    * k(z) = gscale/2*(tanh((z-zi)/g) - tanh((z-zf)/g)),
+    * where zf = -zi = L/2, L is the magnetic length of the
+    * quadrupole, and g is the full gap parameter.  Here the
+    * parameters are chosen so that g/L = 1/10.  This is
+    * based on a similar model used for soft-edge elements
+    * in MaryLie and ML/I, eg. 
+    * http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf
+    * 
+    * This is equivalent to a single-parameter Enge model for
+    * the fields in the fringe region.
     *
     * Usually superseded by user-provided input values.
     */
     struct Quad_field_data
     {
        amrex::Vector<amrex::ParticleReal> default_cos_coef = {
-             0.350807812299706,
-             0.323554693720069,
-             0.260320578919415,
-             0.182848575294969,
-             0.106921016050403,
-             4.409581845710694E-002,
-            -9.416427163897508E-006,
-            -2.459452716865687E-002,
-            -3.272762575737291E-002,
-            -2.936414401076162E-002,
-            -1.995780078926890E-002,
-            -9.102893342953847E-003,
-            -2.456410658713271E-006,
-             5.788233017324325E-003,
-             8.040408292420691E-003,
-             7.480064552867431E-003,
-             5.230254569468851E-003,
-             2.447614547094685E-003,
-            -1.095525090532255E-006,
-            -1.614586867387170E-003,
-            -2.281365457438345E-003,
-            -2.148709081338292E-003,
-            -1.522541739363011E-003,
-            -7.185505862719508E-004,
-            -6.171194824600157E-007,
-             4.842109305036943E-004,
-             6.874508102002901E-004,
-             6.535550288205728E-004,
-             4.648795813759210E-004,
-             2.216564722797528E-004,
-            -4.100982995210341E-007,
-            -1.499332112463395E-004,
-            -2.151538438342482E-004,
-            -2.044590946652016E-004,
-            -1.468242784844341E-004
+             0.834166514794446,
+             0.598104328994702,
+             0.141852844428785,
+            -0.118211272182381,
+            -9.056149864743113E-002,
+             1.803476331179615E-002,
+             4.464887700797893E-002,
+             7.364410636252136E-003,
+            -1.697541023436736E-002,
+            -9.012679515542771E-003,
+             4.367667630047725E-003,
+             5.444030542119803E-003,
+            -5.889959910931886E-005,
+            -2.409098101409192E-003,
+            -7.962712154165590E-004,
+             7.855814707106538E-004,
+             6.174930463182168E-004,
+            -1.340154094301854E-004,
+            -3.167213724698439E-004,
+            -4.925292460592617E-005,
+             1.221580597451921E-004,
+             6.331025910961789E-005,
+            -3.202416719002774E-005,
+            -3.872103053895529E-005,
+             8.212882937116278E-007
             };
 
        amrex::Vector<amrex::ParticleReal> default_sin_coef = {
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0
