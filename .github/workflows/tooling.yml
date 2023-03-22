@@ -1,0 +1,54 @@
+name: 🐧 Tooling
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.head_ref }}-tooling
+  cancel-in-progress: true
+
+jobs:
+  clangsanitizer:
+    name: Clang ASAN UBSAN
+    runs-on: ubuntu-22.04
+    if: github.event.pull_request.draft == false
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: install dependencies
+      run: |
+        .github/workflows/dependencies/clang-san.sh
+
+    - name: CCache Cache
+      uses: actions/cache@v3
+      # - once stored under a key, they become immutable (even if local cache path content changes)
+      # - for a refresh the key has to change, e.g., hash of a tracked file in the key
+      with:
+        path: |
+          ~/.ccache
+          ~/.cache/ccache
+        key: ccache-openmp-clangsan-${{ hashFiles('.github/workflows/ubuntu.yml') }}-${{ hashFiles('cmake/dependencies/ABLASTR.cmake') }}
+        restore-keys: |
+          ccache-openmp-clangsan-${{ hashFiles('.github/workflows/ubuntu.yml') }}-
+          ccache-openmp-clangsan-
+
+    - name: build ImpactX
+      env: {CC: mpicc, CXX: mpic++, OMPI_CC: clang, OMPI_CXX: clang++, CXXFLAGS: -Werror}
+      run: |
+        export LDFLAGS="${LDFLAGS} -fsanitize=address,undefined -shared-libsan"
+        export CXXFLAGS="${CXXFLAGS} -fsanitize=address,undefined -shared-libsan"
+        cmake -S . -B build                  \
+          -DImpactX_PYTHON=ON                \
+          -DCMAKE_BUILD_TYPE=RelWithDebInfo  \
+          -DCMAKE_VERBOSE_MAKEFILE=ON
+        cmake --build build --parallel 2
+
+    - name: run tests
+      run: |
+        SOURCEPATH="$(pwd)"
+        export ASAN_OPTIONS=detect_stack_use_after_return=1:detect_leaks=1:check_initialization_order=true:strict_init_order=true:detect_stack_use_after_scope=1:fast_unwind_on_malloc=0
+        export LSAN_OPTIONS=suppressions="$SOURCEPATH/.github/ci/sanitizer/clang/Leak.supp:use_tls=0"
+        export LD_PRELOAD=/usr/lib/clang/14/lib/linux/libclang_rt.asan-x86_64.so
+        ctest --test-dir build -E AMReX --output-on-failure
+
+# note: use_tls=0 because of glibc 3.23 on GitHub actions
+# https://github.com/google/sanitizers/issues/1342

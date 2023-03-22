@@ -7,8 +7,8 @@
  * Authors: Chad Mitchell, Axel Huebl
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_RFCAVITY_H
-#define IMPACTX_RFCAVITY_H
+#ifndef IMPACTX_SOFTSOL_H
+#define IMPACTX_SOFTSOL_H
 
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/integrators/Integrators.H"
@@ -31,96 +31,105 @@
 
 namespace impactx
 {
-    /** Default Fourier coefficients
-     *
-     * Fourier coefficients for the on-axis longitudinal
-     * electric field Ez of the 9-cell TESLA superconducting
-     * cavity (default cavity model):
-     * https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.3.092001.
-     *
-     * Usually superseded by user-provided input values.
-     */
-    struct RF_field_data
+   /** Default Fourier coefficients
+    *
+    * Fourier coefficients for the on-axis longitudinal
+    * magnetic field Bz of a soft-edge solenoid based on
+    * a thin-shell model of the solenoid as a cylinder
+    * of current, as described in:
+    * https://doi.org/10.1016/j.nima.2022.166706.
+    * Parameters correspond to an aspect ratio of
+    * cylinder diameter / length = 1/3.
+    *
+    * Usually superseded by user-provided input values.
+    */
+    struct Sol_field_data
     {
-        amrex::Vector<amrex::ParticleReal> default_cos_coef = {
-            0.1644024074311037,
-            -0.1324009958969339,
-            4.3443060026047219e-002,
-            8.5602654094946495e-002,
-            -0.2433578169042885,
-            0.5297150596779437,
-            0.7164884680963959,
-            -5.2579522442877296e-003,
-            -5.5025369142193678e-002,
-            4.6845673335028933e-002,
-            -2.3279346335638568e-002,
-            4.0800777539657775e-003,
-            4.1378326533752169e-003,
-            -2.5040533340490805e-003,
-            -4.0654981400000964e-003,
-            9.6630592067498289e-003,
-            -8.5275895985990214e-003,
-            -5.8078747006425020e-002,
-            -2.4044337836660403e-002,
-            1.0968240064697212e-002,
-            -3.4461179858301418e-003,
-            -8.1201564869443749e-004,
-            2.1438992904959380e-003,
-            -1.4997753525697276e-003,
-            1.8685171825676386e-004
-        };
+       amrex::Vector<amrex::ParticleReal> default_cos_coef = {
+             0.350807812299706,
+             0.323554693720069,
+             0.260320578919415,
+             0.182848575294969,
+             0.106921016050403,
+             4.409581845710694E-002,
+            -9.416427163897508E-006,
+            -2.459452716865687E-002,
+            -3.272762575737291E-002,
+            -2.936414401076162E-002,
+            -1.995780078926890E-002,
+            -9.102893342953847E-003,
+            -2.456410658713271E-006,
+             5.788233017324325E-003,
+             8.040408292420691E-003,
+             7.480064552867431E-003,
+             5.230254569468851E-003,
+             2.447614547094685E-003,
+            -1.095525090532255E-006,
+            -1.614586867387170E-003,
+            -2.281365457438345E-003,
+            -2.148709081338292E-003,
+            -1.522541739363011E-003,
+            -7.185505862719508E-004,
+            -6.171194824600157E-007,
+             4.842109305036943E-004,
+             6.874508102002901E-004,
+             6.535550288205728E-004,
+             4.648795813759210E-004,
+             2.216564722797528E-004,
+            -4.100982995210341E-007,
+            -1.499332112463395E-004,
+            -2.151538438342482E-004,
+            -2.044590946652016E-004,
+            -1.468242784844341E-004
+            };
 
-        amrex::Vector<amrex::ParticleReal> default_sin_coef = {
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0
-        };
+       amrex::Vector<amrex::ParticleReal> default_sin_coef = {
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0
+            };
     };
 
 namespace data
 {
     /** Data members we can copy to device with a memcpy.
      */
-    struct RFCavity_device_copyable
+    struct SoftSolenoid_device_copyable
     {
-        amrex::ParticleReal m_escale; //! scaling factor for RF electric field
-        amrex::ParticleReal m_freq; //! RF frequency in Hz
-        amrex::ParticleReal m_phase; //! RF driven phase in deg
+        amrex::ParticleReal m_bscale; //! scaling factor for solenoid Bz field
         int m_mapsteps; //! number of map integration steps per slice
 
         int m_ncoef = 0; //! number of Fourier coefficients
         amrex::ParticleReal* m_cos_data = nullptr; //! non-owning pointer to device cosine coefficients
         amrex::ParticleReal* m_sin_data = nullptr; //! non-owning pointer to device sine coefficients
 
-        RFCavity_device_copyable(
-            amrex::ParticleReal escale,
-            amrex::ParticleReal freq,
-            amrex::ParticleReal phase,
+        SoftSolenoid_device_copyable(
+            amrex::ParticleReal bscale,
             int mapsteps = 1
-        ) : m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps)
+        ) : m_bscale(bscale), m_mapsteps(mapsteps)
         {}
 
-        RFCavity_device_copyable(RFCavity_device_copyable const &) = default;
-        RFCavity_device_copyable& operator=(RFCavity_device_copyable const &) = default;
-        RFCavity_device_copyable(RFCavity_device_copyable &&) = default;
-        RFCavity_device_copyable& operator=(RFCavity_device_copyable &&) = default;
+        SoftSolenoid_device_copyable(SoftSolenoid_device_copyable const &) = default;
+        SoftSolenoid_device_copyable& operator=(SoftSolenoid_device_copyable const &) = default;
+        SoftSolenoid_device_copyable(SoftSolenoid_device_copyable &&) = default;
+        SoftSolenoid_device_copyable& operator=(SoftSolenoid_device_copyable &&) = default;
+
     };
 } // namespace data
 
-    struct RFCavity
-    : public elements::BeamOptic<RFCavity>,
+    struct SoftSolenoid
+    : public elements::BeamOptic<SoftSolenoid>,
       public elements::Thick,
-      public data::RFCavity_device_copyable
+      public data::SoftSolenoid_device_copyable
     {
-        static constexpr auto name = "RFCavity";
+        static constexpr auto name = "SoftSolenoid";
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** An RF cavity
+        /** A soft-edge solenoid
          *
          * @param ds Segment length in m
-         * @param escale Scaling factor for on-axis RF electric field in 1/m
-         * @param freq RF frequency in Hz
-         * @param phase RF driven phase in deg
+         * @param bscale Scaling factor for on-axis magnetic field Bz in 1/m
          * @param cos_coef TODO
          * @param sin_coef TODO
          * @param mapsteps number of integration steps per slice used for
@@ -128,22 +137,20 @@ namespace data
          * @param nslice number of slices used for the application of space charge
          */
         AMREX_GPU_HOST
-        RFCavity(
+        SoftSolenoid(
             amrex::ParticleReal ds,
-            amrex::ParticleReal escale,
-            amrex::ParticleReal freq,
-            amrex::ParticleReal phase,
+            amrex::ParticleReal bscale,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
             int mapsteps = 1,
             int nslice = 1
         )
           : Thick(ds, nslice),
-            RFCavity_device_copyable(escale, freq, phase, mapsteps)
-        {
-            m_ncoef = cos_coef.size();
-            if (m_ncoef !=  int(sin_coef.size()))
-                throw std::runtime_error("RFCavity: cos and sin coefficients must have same length!");
+            SoftSolenoid_device_copyable(bscale, mapsteps)
+       {
+           m_ncoef = cos_coef.size();
+           if (m_ncoef !=  int(sin_coef.size()))
+                throw std::runtime_error("SoftSolenoid: cos and sin coefficients must have same length!");
 
             m_cos_coef.resize(m_ncoef);
             m_sin_coef.resize(m_ncoef);
@@ -155,14 +162,15 @@ namespace data
                                   m_sin_coef.begin());
             amrex::Gpu::synchronize();
 
+            // low-level objects we can use on device
             m_cos_data = m_cos_coef.data();
             m_sin_data = m_sin_coef.data();
         }
 
         // copy and move constructors
-        RFCavity(RFCavity const & other)
-            : Thick(other.m_ds, other.m_nslice),
-              RFCavity_device_copyable(other.m_escale, other.m_freq, other.m_phase, other.m_mapsteps)
+        SoftSolenoid(SoftSolenoid const & other)
+          : Thick(other.m_ds, other.m_nslice),
+            SoftSolenoid_device_copyable(other.m_bscale, other.m_mapsteps)
         {
 #if !AMREX_DEVICE_COMPILE
             // copy the data container if we copy the host element
@@ -174,13 +182,13 @@ namespace data
             m_cos_data = m_cos_coef.data();
             m_sin_data = m_sin_coef.data();
         }
-        RFCavity& operator=(RFCavity const& other)
+        SoftSolenoid& operator=(SoftSolenoid const& other)
         {
             if (this == &other)
                 return *this;
 
             Thick::operator=(other);
-            RFCavity_device_copyable::operator=(other);
+            SoftSolenoid_device_copyable::operator=(other);
 #if !AMREX_DEVICE_COMPILE
             // copy the data container if we copy the host element
             m_cos_coef = other.m_cos_coef;
@@ -192,17 +200,17 @@ namespace data
             m_sin_data = m_sin_coef.data();
             return *this;
         }
-        RFCavity(RFCavity && other) = default;
-        RFCavity& operator=(RFCavity && other) = default;
+        SoftSolenoid(SoftSolenoid && other) = default;
+        SoftSolenoid& operator=(SoftSolenoid && other) = default;
 
         AMREX_GPU_HOST
-        ~RFCavity() = default;
+        ~SoftSolenoid() = default;
 
         /** Push all particles */
         using BeamOptic::operator();
 
-        /** This is an RF cavity functor, so that a variable of this type can be used like
-         *  an RF cavity function.
+        /** This is a soft-edge solenoid functor, so that a variable of this type can be used
+         *  like a soft-edge solenoid function.
          *
          * @param p Particle AoS data for positions and cpu/id
          * @param px particle momentum in x
@@ -234,7 +242,7 @@ namespace data
             // get the linear map
             amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
 
-            // symplectic linear map for the RF cavity is computed using the
+            // symplectic linear map for a solenoid is computed using the
             // Hamiltonian formalism as described in:
             // https://uspas.fnal.gov/materials/09UNM/ComputationalMethods.pdf.
             // R denotes the transfer matrix in the basis (x,px,y,py,t,pt),
@@ -283,10 +291,8 @@ namespace data
             // initialize linear map (deviation) values
             for (int i=1; i<7; i++) {
                for (int j=1; j<7; j++) {
-                  if (i == j)
-                      refpart.map(i, j) = 1.0_prt;
-                  else
-                      refpart.map(i, j) = 0.0_prt;
+                  auto const default_value = (i == j) ? 1.0_prt : 0.0_prt;
+                  refpart.map(i, j) = default_value;
                }
             }
 
@@ -304,6 +310,15 @@ namespace data
             integrators::symp2_integrate_split3(refpart,zin,zout,nsteps,*this);
             amrex::ParticleReal const ptf = refpart.pt;
 
+            /* print computed linear map:
+               for(int i=1; i<7; ++i){
+                 for(int j=1; j<7; ++j){
+                    amrex::PrintToFile("SolMap.txt") << i << " " <<
+                    j << " " << refpart.map(i,j) << "\n";
+                 }
+               }
+            */
+
             // advance position (x,y,z)
             refpart.x = x + slice_ds*px/bgi;
             refpart.y = y + slice_ds*py/bgi;
@@ -317,29 +332,11 @@ namespace data
             refpart.py = py*bgf/bgi;
             refpart.pz = pz*bgf/bgi;
 
-            // convert linear map from dynamic to static units
-            amrex::ParticleReal scale_in = 1.0_prt;
-            amrex::ParticleReal scale_fin = 1.0_prt;
-
-            for (int i=1; i<7; i++) {
-               for (int j=1; j<7; j++) {
-                   if( i % 2 == 0)
-                      scale_fin = bgf;
-                   else
-                      scale_fin = 1.0_prt;
-                   if( j % 2 == 0)
-                      scale_in = bgi;
-                   else
-                      scale_in = 1.0_prt;
-                   refpart.map(i, j) = refpart.map(i, j) * scale_in / scale_fin;
-               }
-            }
-
             // advance integrated path length
             refpart.s = s + slice_ds;
         }
 
-        /** This evaluates the on-axis RF electric field at a fixed location
+        /** This evaluates the on-axis magnetic field Bz at a fixed location
          *  z, together with certain required integrals and derivatives.
          *  The field returned is normalized to a peak value of 1.
          *
@@ -347,7 +344,7 @@ namespace data
          */
         std::tuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        RF_Efield (amrex::ParticleReal const zeval) const
+        Sol_Bfield (amrex::ParticleReal const zeval) const
         {
             using namespace amrex::literals; // for _rt and _prt
 
@@ -356,34 +353,31 @@ namespace data
             amrex::ParticleReal const zlen = m_ds;
             amrex::ParticleReal const zmid = zlen / 2.0_prt;
 
-            // compute on-axis electric field (z is relative to cavity midpoint)
-            amrex::ParticleReal efield = 0.0;
-            amrex::ParticleReal efieldp = 0.0;
-            amrex::ParticleReal efieldpp = 0.0;
-            amrex::ParticleReal efieldint = 0.0;
+            // compute on-axis magnetic field (z is relative to solenoid midpoint)
+            amrex::ParticleReal bfield = 0.0;
+            amrex::ParticleReal bfieldp = 0.0;
+            amrex::ParticleReal bfieldint = 0.0;
             amrex::ParticleReal const z = zeval - zmid;
 
             if (abs(z)<=zmid)
             {
-               efield = 0.5_prt*m_cos_data[0];
-               efieldint = z*efield;
+               bfield = 0.5_prt*m_cos_data[0];
+               bfieldint = z*bfield;
                for (int j=1; j < m_ncoef; ++j)
                {
-                 efield = efield + m_cos_data[j]*cos(j*2*pi*z/zlen) +
+                 bfield = bfield + m_cos_data[j]*cos(j*2*pi*z/zlen) +
                       m_sin_data[j]*sin(j*2*pi*z/zlen);
-                 efieldp = efieldp-j*2*pi*m_cos_data[j]*sin(j*2*pi*z/zlen)/zlen +
+                 bfieldp = bfieldp-j*2*pi*m_cos_data[j]*sin(j*2*pi*z/zlen)/zlen +
                       j*2*pi*m_sin_data[j]*cos(j*2*pi*z/zlen)/zlen;
-                 efieldpp = efieldpp- pow(j*2*pi*m_cos_data[j]/zlen,2) *cos(j*2*pi*z/zlen) -
-                      pow(j*2*pi*m_sin_data[j]/zlen,2) *sin(j*2*pi*z/zlen);
-                 efieldint = efieldint + zlen*m_cos_data[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
+                 bfieldint = bfieldint + zlen*m_cos_data[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
                       zlen*m_sin_data[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
                }
             }
-            return std::make_tuple(efield, efieldp, efieldint);
+            return std::make_tuple(bfield, bfieldp, bfieldint);
         }
 
         /** This pushes the reference particle and the linear map matrix
-         *  elements for an RF cavity through the symplectic map associated
+         *  elements for a solenoid through the symplectic map associated
          *  with H_3 in the Hamiltonian splitting H = H_1 + H_2 + H_3.
          *
          * @param tau Map step size in m
@@ -391,7 +385,7 @@ namespace data
          * @param[in,out] zeval Longitudinal on-axis location in m
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void map3 (amrex::ParticleReal const tau,
+        void map1 (amrex::ParticleReal const tau,
                    RefPart & refpart,
                    [[maybe_unused]] amrex::ParticleReal & zeval) const
         {
@@ -400,6 +394,7 @@ namespace data
             // push the reference particle
             amrex::ParticleReal const t = refpart.t;
             amrex::ParticleReal const pt = refpart.pt;
+            amrex::ParticleReal const z = zeval;
 
             if (pt < -1.0_prt) {
                 refpart.t = t + tau/sqrt(1.0_prt - pow(pt, -2));
@@ -410,16 +405,29 @@ namespace data
                 refpart.pt = pt;
             }
 
+            zeval = z + tau;
+
             // push the linear map equations
             amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
             amrex::ParticleReal const betgam = refpart.beta_gamma();
 
-            refpart.map(5,5) = R(5,5) + tau*R(6,5)/pow(betgam,3);
-            refpart.map(5,6) = R(5,6) + tau*R(6,6)/pow(betgam,3);
+            refpart.map(1,1) = R(1,1) + tau*R(2,1);
+            refpart.map(1,2) = R(1,2) + tau*R(2,2);
+            refpart.map(1,3) = R(1,3) + tau*R(2,3);
+            refpart.map(1,4) = R(1,4) + tau*R(2,4);
+
+            refpart.map(3,1) = R(3,1) + tau*R(4,1);
+            refpart.map(3,2) = R(3,2) + tau*R(4,2);
+            refpart.map(3,3) = R(3,3) + tau*R(4,3);
+            refpart.map(3,4) = R(3,4) + tau*R(4,4);
+
+            refpart.map(5,5) = R(5,5) + tau*R(6,5)/pow(betgam,2);
+            refpart.map(5,6) = R(5,6) + tau*R(6,6)/pow(betgam,2);
+
         }
 
         /** This pushes the reference particle and the linear map matrix
-         *  elements for an RF cavity through the symplectic map associated
+         *  elements for a solenoid through the symplectic map associated
          *  with H_2 in the Hamiltonian splitting H = H_1 + H_2 + H_3.
          *
          * @param tau Map step size in m
@@ -437,37 +445,34 @@ namespace data
             amrex::ParticleReal const pt = refpart.pt;
 
             // Define parameters and intermediate constants
-            using ablastr::constant::math::pi;
-            using ablastr::constant::SI::c;
-            amrex::ParticleReal const k = (2.0_prt*pi/c)*m_freq;
-            amrex::ParticleReal const phi = m_phase*(pi/180.0_prt);
-            amrex::ParticleReal const E0 = m_escale;
+            amrex::ParticleReal const B0 = m_bscale;
 
             // push the reference particle
-            auto [ez, ezp, ezint] = RF_Efield(zeval);
-            amrex::ignore_unused(ez, ezint);
+            auto [bz, bzp, bzint] = Sol_Bfield(zeval);
+            amrex::ignore_unused(bzp, bzint);
 
             refpart.t = t;
             refpart.pt = pt;
 
             // push the linear map equations
             amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
-            amrex::ParticleReal const s = tau/refpart.beta_gamma();
-            amrex::ParticleReal const L = E0*ezp*sin(k*t+phi)/(2.0_prt*k);
+            amrex::ParticleReal const alpha = B0*bz/2.0_prt;
+            amrex::ParticleReal const alpha2 = pow(alpha,2);
 
-            refpart.map(1,1) = (1.0_prt-s*L)*R(1,1) + s*R(2,1);
-            refpart.map(1,2) = (1.0_prt-s*L)*R(1,2) + s*R(2,2);
-            refpart.map(2,1) = -s*pow(L,2)*R(1,1) + (1.0_prt+s*L)*R(2,1);
-            refpart.map(2,2) = -s*pow(L,2)*R(1,2) + (1.0_prt+s*L)*R(2,2);
+            refpart.map(2,1) = R(2,1) - tau*alpha2*R(1,1);
+            refpart.map(2,2) = R(2,2) - tau*alpha2*R(1,2);
+            refpart.map(2,3) = R(2,3) - tau*alpha2*R(1,3);
+            refpart.map(2,4) = R(2,4) - tau*alpha2*R(1,4);
 
-            refpart.map(3,3) = (1.0_prt-s*L)*R(3,3) + s*R(4,3);
-            refpart.map(3,4) = (1.0_prt-s*L)*R(3,4) + s*R(4,4);
-            refpart.map(4,3) = -s*pow(L,2)*R(3,3) + (1.0_prt+s*L)*R(4,3);
-            refpart.map(4,4) = -s*pow(L,2)*R(3,4) + (1.0_prt+s*L)*R(4,4);
+            refpart.map(4,1) = R(4,1) - tau*alpha2*R(3,1);
+            refpart.map(4,2) = R(4,2) - tau*alpha2*R(3,2);
+            refpart.map(4,3) = R(4,3) - tau*alpha2*R(3,3);
+            refpart.map(4,4) = R(4,4) - tau*alpha2*R(3,4);
+
         }
 
         /** This pushes the reference particle and the linear map matrix
-         *  elements for an RF cavity through the symplectic map associated
+         *  elements for a solenoid through the symplectic map associated
          *  with H_1 in the Hamiltonian splitting H = H_1 + H_2 + H_3.
          *
          * @param tau Map step size in m
@@ -475,7 +480,7 @@ namespace data
          * @param[in,out] zeval Longitudinal on-axis location in m
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void map1 (amrex::ParticleReal const tau,
+        void map3 (amrex::ParticleReal const tau,
                    RefPart & refpart,
                    amrex::ParticleReal & zeval) const
         {
@@ -486,43 +491,49 @@ namespace data
             amrex::ParticleReal const z = zeval;
 
             // Define parameters and intermediate constants
-            using ablastr::constant::math::pi;
-            using ablastr::constant::SI::c;
-            amrex::ParticleReal const k = (2.0_prt*pi/c)*m_freq;
-            amrex::ParticleReal const phi = m_phase*(pi/180.0_prt);
-            amrex::ParticleReal const E0 = m_escale;
+            amrex::ParticleReal const B0 = m_bscale;
 
             // push the reference particle
-            auto [ez, ezp, ezint] = RF_Efield(z);
-            amrex::ignore_unused(ez);
-            zeval = z + tau;
-            auto [ezf, ezpf, ezintf] = RF_Efield(zeval);
-            amrex::ignore_unused(ezf);
+            auto [bz, bzp, bzint] = Sol_Bfield(z);
+            amrex::ignore_unused(bzp, bzint);
 
             refpart.t = t;
-            refpart.pt = pt - E0*(ezintf-ezint)*cos(k*t+phi);
+            refpart.pt = pt;
 
             // push the linear map equations
             amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
-            amrex::ParticleReal const M = E0*(ezintf-ezint)*k*sin(k*t+phi);
-            amrex::ParticleReal const L = E0*(ezpf-ezp)*sin(k*t+phi)/(2.0_prt*k)+M/2.0_prt;
+            amrex::ParticleReal const theta = tau*B0*bz/2.0_prt;
+            amrex::ParticleReal const cs = cos(theta);
+            amrex::ParticleReal const sn = sin(theta);
 
-            refpart.map(2,1) = L*R(1,1) + R(2,1);
-            refpart.map(2,2) = L*R(1,2) + R(2,2);
+            refpart.map(1,1) = R(1,1)*cs + R(3,1)*sn;
+            refpart.map(1,2) = R(1,2)*cs + R(3,2)*sn;
+            refpart.map(1,3) = R(1,3)*cs + R(3,3)*sn;
+            refpart.map(1,4) = R(1,4)*cs + R(3,4)*sn;
 
-            refpart.map(4,3) = L*R(3,3) + R(4,3);
-            refpart.map(4,4) = L*R(3,4) + R(4,4);
+            refpart.map(2,1) = R(2,1)*cs + R(4,1)*sn;
+            refpart.map(2,2) = R(2,2)*cs + R(4,2)*sn;
+            refpart.map(2,3) = R(2,3)*cs + R(4,3)*sn;
+            refpart.map(2,4) = R(2,4)*cs + R(4,4)*sn;
 
-            refpart.map(6,5) = M*R(5,5) + R(6,5);
-            refpart.map(6,6) = M*R(5,6) + R(6,6);
+            refpart.map(3,1) = R(3,1)*cs - R(1,1)*sn;
+            refpart.map(3,2) = R(3,2)*cs - R(1,2)*sn;
+            refpart.map(3,3) = R(3,3)*cs - R(1,3)*sn;
+            refpart.map(3,4) = R(3,4)*cs - R(1,4)*sn;
+
+            refpart.map(4,1) = R(4,1)*cs - R(2,1)*sn;
+            refpart.map(4,2) = R(4,2)*cs - R(2,2)*sn;
+            refpart.map(4,3) = R(4,3)*cs - R(2,3)*sn;
+            refpart.map(4,4) = R(4,4)*cs - R(2,4)*sn;
+
         }
 
     private:
         // we cannot copy these to device with a memcpy when we copy the element class
-        amrex::Gpu::DeviceVector<amrex::ParticleReal> m_cos_coef; //! cosine coefficients in Fourier expansion of on-axis electric field Ez
-        amrex::Gpu::DeviceVector<amrex::ParticleReal> m_sin_coef; //! sine coefficients in Fourier expansion of on-axis electric field Ez
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> m_cos_coef; //! cosine coefficients in Fourier expansion of on-axis magnetic field Bz
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> m_sin_coef; //! sine coefficients in Fourier expansion of on-axis magnetic  field Bz
     };
 
 } // namespace impactx
 
-#endif // IMPACTX_RFCAVITY_H
+#endif // IMPACTX_SOFTSOL_H
