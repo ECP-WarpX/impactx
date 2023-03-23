@@ -246,7 +246,7 @@ void init_elements(py::module& m)
         )
     ;
 
-    py::class_<Sol, elements::Thick>(me, "PRot")
+    py::class_<PRot, elements::Thin>(me, "PRot")
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const>(),
