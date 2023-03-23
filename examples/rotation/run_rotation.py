@@ -48,7 +48,7 @@ rotated_drift = [
     elements.PRot(phi_in=-5.0, phi_out=0.0),
 ]
 # assign a lattice segment
-sim.lattice.extend(multipole)
+sim.lattice.extend(rotated_drift)
 
 # run simulation
 sim.evolve()
