@@ -14,7 +14,7 @@ sudo apt-get install -y \
     ccache              \
     cmake               \
     gnupg               \
-    libopenmpi-dev      \
+    libhdf5-dev         \
     ninja-build         \
     pkg-config          \
     python3             \
@@ -23,5 +23,4 @@ sudo apt-get install -y \
 
 python3 -m pip install -U pip setuptools wheel
 python3 -m pip install -U cmake pytest
-python3 -m pip install -r requirements_mpi.txt
 python3 -m pip install -r examples/requirements.txt

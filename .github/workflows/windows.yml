@@ -29,12 +29,22 @@ jobs:
         restore-keys: |
           ccache-windows-winmsvc-${{ hashFiles('.github/workflows/windows.yml') }}-
           ccache-windows-winmsvc-
+    - name: install dependencies
+      run: |
+        Invoke-WebRequest https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.tar.gz -OutFile hdf5-1_12_2.tar.gz
+        7z.exe x -r hdf5-1_12_2.tar.gz
+        7z.exe x -r hdf5-1_12_2.tar
+        cmake -S hdf5-hdf5-1_12_2 -B build_hdf5 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTING=OFF -DHDF5_BUILD_EXAMPLES=OFF
+        if(!$?) { Exit $LASTEXITCODE }
+        cmake --build build_hdf5 --config RelWithDebInfo --target install --parallel 2
+        if(!$?) { Exit $LASTEXITCODE }
     - name: Build
       run: |
         python3 -m pip install -U pip setuptools wheel pytest
         python3 -m pip install -r requirements.txt
         python3 -m pip install -r examples/requirements.txt
 
+        $env:HDF5_DIR = "C:/Program Files (x86)/hdf5/"
         cmake -S . -B build               `
               -DBUILD_SHARED_LIBS=ON      `
               -DCMAKE_BUILD_TYPE=RelWithDebInfo  `
@@ -80,6 +90,15 @@ jobs:
           ccache-windows-winclang-${{ hashFiles('.github/workflows/windows.yml') }}-
           ccache-windows-winclang-
     - uses: seanmiddleditch/gha-setup-ninja@master
+    - name: install dependencies
+      run: |
+        Invoke-WebRequest https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.tar.gz -OutFile hdf5-1_12_2.tar.gz
+        7z.exe x -r hdf5-1_12_2.tar.gz
+        7z.exe x -r hdf5-1_12_2.tar
+        cmake -S hdf5-hdf5-1_12_2 -B build_hdf5 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTING=OFF -DHDF5_BUILD_EXAMPLES=OFF
+        if(!$?) { Exit $LASTEXITCODE }
+        cmake --build build_hdf5 --config RelWithDebInfo --target install --parallel 2
+        if(!$?) { Exit $LASTEXITCODE }
     - name: Build
       shell: cmd
       run: |
@@ -88,6 +107,8 @@ jobs:
         python3 -m pip install -r examples/requirements.txt
 
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
+
+        set "HDF5_DIR=C:/Program Files (x86)/hdf5/"
         cmake -S . -B build   ^
               -G "Ninja"      ^
               -DCMAKE_C_COMPILER=clang-cl   ^

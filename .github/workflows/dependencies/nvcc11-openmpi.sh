@@ -13,6 +13,7 @@ sudo apt-get install -y \
     ca-certificates     \
     cmake               \
     gnupg               \
+    libhdf5-openmpi-dev \
     libhiredis-dev      \
     libopenmpi-dev      \
     libzstd-dev         \

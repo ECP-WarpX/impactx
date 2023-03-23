@@ -13,9 +13,10 @@ sudo apt-get install -y \
     ca-certificates     \
     ccache              \
     clang               \
-    clang-tidy          \
     cmake               \
     gnupg               \
+    libc++-dev          \
+    libc++abi-dev       \
     libhdf5-openmpi-dev \
     libomp-dev          \
     libopenmpi-dev      \

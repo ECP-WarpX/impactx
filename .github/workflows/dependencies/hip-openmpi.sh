@@ -26,6 +26,7 @@ sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
     build-essential \
     gfortran        \
+    libhdf5-openmpi-dev \
     libhiredis-dev  \
     libnuma-dev     \
     libopenmpi-dev  \
