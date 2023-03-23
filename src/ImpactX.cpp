@@ -82,12 +82,6 @@ namespace impactx
         {
             pp_diag.queryAdd("file_min_digits", file_min_digits);
 
-            // print initial particle distribution to file
-            std::string diag_name = amrex::Concatenate("diags/beam_", global_step, file_min_digits);
-            diagnostics::DiagnosticOutput(*m_particle_container,
-                                          diagnostics::OutputType::PrintParticles,
-                                          diag_name);
-
             // print initial reference particle to file
             diagnostics::DiagnosticOutput(*m_particle_container,
                                           diagnostics::OutputType::PrintRefParticle,
@@ -95,7 +89,7 @@ namespace impactx
                                           global_step);
 
             // print the initial values of the two invariants H and I
-            diag_name = amrex::Concatenate("diags/nonlinear_lens_invariants_", global_step, file_min_digits);
+            std::string diag_name = amrex::Concatenate("diags/nonlinear_lens_invariants_", global_step, file_min_digits);
             diagnostics::DiagnosticOutput(*m_particle_container,
                                           diagnostics::OutputType::PrintNonlinearLensInvariants,
                                           diag_name);
@@ -194,13 +188,6 @@ namespace impactx
 
                 if (diag_enable && slice_step_diagnostics)
                 {
-                    // print slice step particle distribution to file
-                    std::string diag_name = amrex::Concatenate("diags/beam_", global_step, file_min_digits);
-                    diagnostics::DiagnosticOutput(*m_particle_container,
-                                                  diagnostics::OutputType::PrintParticles,
-                                                  diag_name,
-                                                  global_step);
-
                     // print slice step reference particle to file
                     diagnostics::DiagnosticOutput(*m_particle_container,
                                                   diagnostics::OutputType::PrintRefParticle,
@@ -218,12 +205,6 @@ namespace impactx
 
         if (diag_enable)
         {
-            // print final particle distribution to file
-            diagnostics::DiagnosticOutput(*m_particle_container,
-                                          diagnostics::OutputType::PrintParticles,
-                                          "diags/beam_final",
-                                          global_step);
-
             // print final reference particle to file
             diagnostics::DiagnosticOutput(*m_particle_container,
                                           diagnostics::OutputType::PrintRefParticle,
