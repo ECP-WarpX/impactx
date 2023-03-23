@@ -43,9 +43,9 @@ sim.add_particles(bunch_charge_C, distr, npart)
 
 # design the accelerator lattice
 rotated_drift = [
-    elements.PRot(phi_in = 0.0, phi_out = -5.0),
-    elements.Drift(ds = 2.0, nslice = 1),
-    elements.PRot(phi_in = -5.0, phi_out = 0.0),
+    elements.PRot(phi_in=0.0, phi_out=-5.0),
+    elements.Drift(ds=2.0, nslice=1),
+    elements.PRot(phi_in=-5.0, phi_out=0.0),
 ]
 # assign a lattice segment
 sim.lattice.extend(multipole)
