@@ -354,6 +354,20 @@ Lattice Elements
 
                 = c parameter * sqrt(Twiss beta)
 
+        * ``BeamMonitor`` a beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
+          If the same element name is used multiple times, then an output series is created with multiple outputs.
+
+            * ``<element_name>.backend`` (``string``, default value: ``default``)
+
+                `I/O backend <https://openpmd-api.readthedocs.io/en/latest/backends/overview.html>`_ for `openPMD <https://www.openPMD.org>`_ data dumps.
+                ``bp`` is the `ADIOS2 I/O library <https://csmd.ornl.gov/adios>`_, ``h5`` is the `HDF5 format <https://www.hdfgroup.org/solutions/hdf5/>`_, and ``json`` is a `simple text format <https://en.wikipedia.org/wiki/JSON>`_.
+                ``json`` only works with serial/single-rank jobs.
+                By default, the first available backend in the order given above is taken.
+
+            * ``<element_name>.encoding`` (``string``, default value: ``g``)
+
+                openPMD `iteration encoding <https://openpmd-api.readthedocs.io/en/0.14.0/usage/concepts.html#iteration-and-series>`__: (v)ariable based, (f)ile based, (g)roup based (default)
+                variable based is an `experimental feature with ADIOS2 <https://openpmd-api.readthedocs.io/en/0.14.0/backends/adios2.html#experimental-new-adios2-schema>`__.
 
 .. _running-cpp-parameters-parallelization:
 
@@ -464,6 +478,8 @@ Diagnostics and output
 * ``diag.enable`` (``boolean``, optional, default: ``true``)
   Enable or disable diagnostics generally.
   Disabling this is mostly used for benchmarking.
+
+  This option is ignored for the openPMD output elements (remove them from the lattice to disable).
 
 * ``diag.slice_step_diagnostics`` (``boolean``, optional, default: ``false``)
   By default, diagnostics is performed at the beginning and end of the simulation.

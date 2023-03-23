@@ -208,7 +208,7 @@ In new terminals, re-activate the environment with `spack env activate impactx-d
 ### Conda (Linux/macOS/Windows)
 
 ```bash
-conda create -n impactx-dev -c conda-forge adios2 ccache cmake compilers git hdf5 fftw matplotlib ninja numpy pandas pytest scipy
+conda create -n impactx-dev -c conda-forge adios2 ccache cmake compilers git hdf5 fftw matplotlib ninja numpy openpmd-api pandas pytest scipy
 conda activate impactx-dev
 
 # compile with -DImpactX_MPI=OFF
