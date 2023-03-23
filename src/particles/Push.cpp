@@ -10,56 +10,30 @@
 #include "Push.H"
 
 #include <AMReX_BLProfiler.H>
-#include <AMReX_Extension.H>  // for AMREX_RESTRICT
-#include <AMReX_REAL.H>       // for ParticleReal
 
-#include <utility>
+#include <string>
+#include <variant>
 
 
 namespace impactx
 {
     void Push (ImpactXParticleContainer & pc,
-               KnownElements const & element_variant)
+               KnownElements & element_variant,
+               int step)
     {
-        // performance profiling per element
-        std::string element_name;
-        std::visit([&element_name](auto&& element){ element_name = element.name; }, element_variant);
-        std::string const profile_name = "impactx::Push::" + element_name;
-        BL_PROFILE("impactx::Push");
-        BL_PROFILE(profile_name);
-
-        using namespace amrex::literals; // for _rt and _prt
-
-        // preparing to access reference particle data: RefPart
-        RefPart & ref_part = pc.GetRefParticle();
-
-        // loop over refinement levels
-        int const nLevel = pc.finestLevel();
-        for (int lev = 0; lev <= nLevel; ++lev)
+        // here we just access the element by its respective type
+        std::visit([&pc, step](auto&& element)
         {
-            // get simulation geometry information
-            //const amrex::Geometry& gm = this->Geom(lev);
-            //const auto prob_lo = gm.ProbLo();
+            // performance profiling per element
+            std::string element_name;
+            element_name = element.name;
+            std::string const profile_name = "impactx::Push::" + element_name;
+            BL_PROFILE("impactx::Push");
+            BL_PROFILE(profile_name);
 
-            // loop over all particle boxes
-            using ParIt = ImpactXParticleContainer::iterator;
-#ifdef AMREX_USE_OMP
-#pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
-#endif
-            for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
-                // here we just access the element by its respective type
-                std::visit(
-                    [&pti, &ref_part](auto element) {
-                        // push reference particle in global coordinates
-                        element(ref_part);
-
-                        // push beam particles relative to reference particle
-                        element(pti, ref_part);
-                    },
-                    element_variant
-                );
-            } // end loop over all particle boxes
-        } // env mesh-refinement level loop
+            // push reference particle & all particles
+            element(pc, step);
+        }, element_variant);
     }
 
 } // namespace impactx

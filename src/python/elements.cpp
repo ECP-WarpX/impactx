@@ -88,7 +88,7 @@ void init_elements(py::module& m)
         .def_property_readonly("ds", &elements::Thin::ds)
     ;
 
-    // beam optics below
+    // beam optics
 
     py::class_<ConstF, elements::Thick>(me, "ConstF")
         .def(py::init<
@@ -148,7 +148,10 @@ void init_elements(py::module& m)
     ;
 
     py::class_<Programmable>(me, "Programmable")
-        .def(py::init<>(),
+        .def(py::init<
+                 amrex::ParticleReal,
+                 int>(),
+             py::arg("ds") = 0.0, py::arg("nslice") = 1,
              "A programmable beam optics element."
         )
         .def_property("nslice",
@@ -159,17 +162,26 @@ void init_elements(py::module& m)
               [](Programmable & p) { return p.ds(); },
               [](Programmable & p, amrex::ParticleReal ds) { p.m_ds = ds; }
         )
+        .def_property("push",
+              [](Programmable & p) { return p.m_push; },
+              [](Programmable & p,
+                 std::function<void(ImpactXParticleContainer *, int)> new_hook
+              ) { p.m_push = new_hook; },
+              "hook for push of whole container (pc, step)"
+        )
         .def_property("beam_particles",
               [](Programmable & p) { return p.m_beam_particles; },
               [](Programmable & p,
                  std::function<void(ImpactXParticleContainer::iterator *, RefPart &)> new_hook
-              ) { p.m_beam_particles = new_hook; }
+              ) { p.m_beam_particles = new_hook; },
+              "hook for beam particles (pti, RefPart)"
         )
         .def_property("ref_particle",
               [](Programmable & p) { return p.m_ref_particle; },
               [](Programmable & p,
                  std::function<void(RefPart &)> new_hook
-              ) { p.m_ref_particle = new_hook; }
+              ) { p.m_ref_particle = new_hook; },
+              "hook for reference particle (RefPart)"
         )
     ;
 
