@@ -183,7 +183,7 @@ namespace impactx
                 // assuming that the distribution did not change
 
                 // push all particles with external maps
-                Push(*m_particle_container, element_variant);
+                Push(*m_particle_container, element_variant, global_step);
 
                 // just prints an empty newline at the end of the slice_step
                 amrex::Print() << "\n";

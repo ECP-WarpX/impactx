@@ -9,10 +9,25 @@
  */
 
 #include "Programmable.H"
+#include "particles/PushAll.H"
 
 
 namespace impactx
 {
+    void
+    Programmable::operator() (
+        ImpactXParticleContainer & pc,
+        int step
+    ) const
+    {
+        if (m_push == nullptr) {
+            push_all(pc, *this, step);
+        }
+        else {
+            m_push(&pc, step);
+        }
+    }
+
     void
     Programmable::operator() (
         ImpactXParticleContainer::iterator & pti,
@@ -20,6 +35,7 @@ namespace impactx
     ) const
     {
         if (m_beam_particles == nullptr)
+            // TODO: only if verbose mode is set
             amrex::AllPrint() << "Programmable element - all particles: NO HOOK\n";
         else
             m_beam_particles(&pti, ref_part);
@@ -29,6 +45,7 @@ namespace impactx
     Programmable::operator() (RefPart & ref_part) const
     {
         if (m_ref_particle == nullptr)
+            // TODO: only if verbose mode is set
             amrex::AllPrint() << "Programmable element - ref particles: NO HOOK\n";
         else
             m_ref_particle(ref_part);

@@ -11,9 +11,12 @@
 #define IMPACTX_ELEMENTS_MIXIN_BEAMOPTIC_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "particles/PushAll.H"
 
-#include <AMReX_Extension.H>
+#include <AMReX_Extension.H> // for AMREX_RESTRICT
 #include <AMReX_REAL.H>
+
+#include <type_traits>
 
 
 namespace impactx::elements
@@ -130,6 +133,21 @@ namespace detail
     template<typename T_Element>
     struct BeamOptic
     {
+        /** Push first the reference particle, then all other particles */
+        void operator() (
+            ImpactXParticleContainer & pc,
+            int step
+        )
+        {
+            static_assert(
+                std::is_base_of_v<BeamOptic, T_Element>,
+                "BeamOptic can only be used as a mixin class!"
+            );
+
+            T_Element& element = *static_cast<T_Element*>(this);
+            push_all(pc, element, step);
+        }
+
         /** This pushes the particles on a particle iterator tile or box.
          *
          * Particles are relative to the reference particle.
@@ -140,7 +158,13 @@ namespace detail
          void operator() (
             ImpactXParticleContainer::iterator & pti,
             RefPart & AMREX_RESTRICT ref_part
-         ) {
+         )
+         {
+            static_assert(
+                std::is_base_of_v<BeamOptic, T_Element>,
+                "BeamOptic can only be used as a mixin class!"
+            );
+
             T_Element& element = *static_cast<T_Element*>(this);
             detail::push_all_particles<T_Element>(pti, ref_part, element);
          }
