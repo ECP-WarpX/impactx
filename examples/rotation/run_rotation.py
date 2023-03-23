@@ -42,12 +42,12 @@ distr = distribution.Waterbag(
 sim.add_particles(bunch_charge_C, distr, npart)
 
 # design the accelerator lattice
-multipole = [
-    elements.Multipole(multiple=2, K_normal=3.0, K_skew=0.0),
-    elements.Multipole(multiple=3, K_normal=100.0, K_skew=-50.0),
-    elements.Multipole(multiple=4, K_normal=65.0, K_skew=6.0),
+rotated_drift = [
+    elements.PRot(phi_in = 0.0, phi_out = -5.0),
+    elements.Drift(ds = 2.0, nslice = 1),
+    elements.PRot(phi_in = -5.0, phi_out = 0.0),
 ]
-# assign a fodo segment
+# assign a lattice segment
 sim.lattice.extend(multipole)
 
 # run simulation
