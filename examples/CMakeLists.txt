@@ -452,7 +452,7 @@ add_impactx_test(solenoid.MADX.py
 # w/o space charge
 add_impactx_test(rotation
     examples/rotation/input_rotation.in
-      OFF  # ImpactX MPI-parallel
+      ON  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/rotation/analysis_rotation.py
     OFF  # no plot script yet
