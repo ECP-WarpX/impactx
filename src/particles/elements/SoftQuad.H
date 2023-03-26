@@ -305,6 +305,7 @@ namespace data
             integrators::symp2_integrate(refpart,zin,zout,nsteps,*this);
             amrex::ParticleReal const ptf = refpart.pt;
 
+            /*
             // print computed linear map:
                for(int i=1; i<7; ++i){
                  for(int j=1; j<7; ++j){
@@ -313,6 +314,7 @@ namespace data
                  }
                }
             //
+            */
 
             // advance position (x,y,z)
             refpart.x = x + slice_ds*px/bgi;
