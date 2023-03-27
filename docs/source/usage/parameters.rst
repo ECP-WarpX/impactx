@@ -232,10 +232,10 @@ Lattice Elements
             * ``<element_name>.gscale`` (``float``, in inverse meters) Scaling factor for on-axis magnetic field gradient
 
             * ``<element_name>.cos_coefficients`` (array of ``float``) cos coefficients in Fourier expansion of the on-axis field gradient
-              (optional); default is a tanh fringe field model from `<http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
+              (optional); default is a tanh fringe field model from `MaryLie 3.0 <http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
 
             * ``<element_name>.sin_coefficients`` (array of ``float``) sin coefficients in Fourier expansion of the on-axis field gradient
-              (optional); default is a tanh fringe field model from `<http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
+              (optional); default is a tanh fringe field model from `MaryLie 3.0 <http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
 
             * ``<element_name>.mapsteps`` (``integer``) number of integration steps per slice used for map and reference particle push in applied fields (de
 

@@ -239,7 +239,7 @@ namespace data
 
             // symplectic linear map for a quadrupole is computed using the
             // Hamiltonian formalism as described in:
-            // https://uspas.fnal.gov/materials/09UNM/ComputationalMethods.pdf.
+            // https://uspas.fnal.gov/materials/09UNM/ComputationalMethods.pdf .
             // R denotes the transfer matrix in the basis (x,px,y,py,t,pt),
             // so that, e.g., R(3,4) = dyf/dpyi.
 

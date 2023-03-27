@@ -1,10 +1,10 @@
 .. _examples-quadrupole-softedge:
 
 Soft-Edge Quadrupole
-===================
+====================
 
-This is a modification of the test for a matched electron beam propagating through a stable
-FODO cell, in which the quadrupoles have been replaced with soft-edge quadrupole
+This is a modification of :ref:`the test for a matched electron beam propagating through a stable FODO cell <examples-fodo>`,
+in which the quadrupoles have been replaced with soft-edge quadrupole
 elements.  The on-axis field profile in this example has been chosen to correspond
 to the hard-edge limit, so the two tests should coincide.
 
