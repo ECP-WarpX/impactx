@@ -35,6 +35,9 @@ namespace impactx
         // preparing to access reference particle data: RefPart
         RefPart & ref_part = pc.GetRefParticle();
 
+        // push reference particle in global coordinates
+        element(ref_part);
+
         // loop over refinement levels
         int const nLevel = pc.finestLevel();
         for (int lev = 0; lev <= nLevel; ++lev)
@@ -45,9 +48,6 @@ namespace impactx
 #pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
 #endif
             for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
-                // push reference particle in global coordinates
-                element(ref_part);
-
                 // push beam particles relative to reference particle
                 element(pti, ref_part);
             } // end loop over all particle boxes
