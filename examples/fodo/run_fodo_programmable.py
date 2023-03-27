@@ -139,6 +139,7 @@ pge1.nslice = ns
 pge1.beam_particles = lambda pti, refpart: my_drift(pge1, pti, refpart)
 pge1.ref_particle = lambda refpart: my_ref_drift(pge1, refpart)
 pge1.ds = 0.25
+pge1.threadsafe = True  # allow OpenMP threading for speed
 
 # attention: assignment is a reference for pge2 = pge1
 
@@ -147,6 +148,7 @@ pge2.nslice = ns
 pge2.beam_particles = lambda pti, refpart: my_drift(pge2, pti, refpart)
 pge2.ref_particle = lambda refpart: my_ref_drift(pge2, refpart)
 pge2.ds = 0.5
+pge2.threadsafe = True  # allow OpenMP threading for speed
 
 # design the accelerator lattice
 fodo = [
