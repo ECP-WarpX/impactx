@@ -48,8 +48,16 @@ drift2.ds = 0.5
 quad2.type = quadrupole_softedge
 quad2.ds = 1.0
 quad2.gscale = -1.0
-quad2.cos_coefficients = 2.0
-quad2.sin_coefficients = 0.0
+quad2.cos_coefficients =
+          2.0 0 0 0 0 0 0 0 0 0
+            0 0 0 0 0 0 0 0 0 0
+            0 0 0 0 0 0 0 0 0 0
+            0 0 0 0 0
+quad2.sin_coefficients =
+            0 0 0 0 0 0 0 0 0 0
+            0 0 0 0 0 0 0 0 0 0
+            0 0 0 0 0 0 0 0 0 0
+            0 0 0 0 0
 quad2.mapsteps = 400
 
 
