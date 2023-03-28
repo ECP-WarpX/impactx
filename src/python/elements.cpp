@@ -257,4 +257,21 @@ void init_elements(py::module& m)
              "An ideal hard-edge Solenoid magnet."
         )
     ;
+
+    py::class_<SoftQuadrupole, elements::Thick>(me, "SoftQuadrupole")
+        .def(py::init<
+                 amrex::ParticleReal,
+                 amrex::ParticleReal,
+                 std::vector<amrex::ParticleReal>,
+                 std::vector<amrex::ParticleReal>,
+                 int,
+                 int
+             >(),
+             py::arg("ds"), py::arg("gscale"),
+             py::arg("cos_coefficients"), py::arg("sin_coefficients"),
+             py::arg("mapsteps") = 1, py::arg("nslice") = 1,
+             "A soft-edge quadrupole."
+        )
+    ;
+
 }

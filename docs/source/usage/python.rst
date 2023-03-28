@@ -500,3 +500,16 @@ This module provides elements for the accelerator lattice.
    :param ds: Segment length in m.
    :param ks: Solenoid strength in m^(-1) (MADX convention) in (magnetic field Bz in T) / (rigidity in T-m)
    :param nslice: number of slices used for the application of space charge
+
+.. py:class:: impactx.elements.SoftQuadrupole(ds, gscale, cos_coefficients, sin_coefficients, nslice=1)
+
+   A soft-edge quadrupole.
+
+   :param ds: Segment length in m.
+   :param gscale: Scaling factor for on-axis field gradient in inverse meters
+   :param cos_coefficients: array of ``float`` cosine coefficients in Fourier expansion of on-axis field gradient
+            (optional); default is a tanh fringe field model based on `<http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
+   :param sin_coefficients: array of ``float`` sine coefficients in Fourier expansion of on-axis field gradient
+            (optional); default is a tanh fringe field model based on `<http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
+   :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
+   :param nslice: number of slices used for the application of space charge
