@@ -22,6 +22,32 @@
 
 namespace impactx
 {
+namespace detail
+{    /** Resizing version of amrex::ParmParse::queryAdd
+     *
+     * Work-around for https://github.com/AMReX-Codes/amrex/pull/3220
+     *
+     * @tparam T vector type
+     * @param[inout] pp the parameter parser on the element to query
+     * @param[in] name key name
+     * @param[inout] ref vector with default values
+     * @return indicates if key existed previously
+     */
+    template <typename T>
+    int queryAddResize (amrex::ParmParse& pp, const char* name, std::vector<T>& ref) {
+        std::vector<T> empty;
+        int exist = pp.queryarr(name, empty);
+        if (exist) {
+            ref.resize(empty.size());
+            pp.queryarr(name, ref);
+        }
+        if (!exist && !ref.empty()) {
+            pp.addarr(name, ref);
+        }
+        return exist;
+    }
+} // namespace detail
+
     void ImpactX::initLatticeElementsFromInputs ()
     {
         BL_PROFILE("ImpactX::initLatticeElementsFromInputs");
@@ -115,8 +141,8 @@ namespace impactx
                 pp_element.get("phase", phase);
                 pp_element.queryAdd("mapsteps", mapsteps);
                 pp_element.queryAdd("nslice", nslice);
-                pp_element.queryAdd("cos_coefficients", cos_coef);
-                pp_element.queryAdd("sin_coefficients", sin_coef);
+                detail::queryAddResize(pp_element, "cos_coefficients", cos_coef);
+                detail::queryAddResize(pp_element, "sin_coefficients", sin_coef);
                 m_lattice.emplace_back( RFCavity(ds, escale, freq, phase, cos_coef, sin_coef, mapsteps, nslice) );
             } else if (element_type == "solenoid") {
                 amrex::Real ds, ks;
@@ -136,8 +162,8 @@ namespace impactx
                 pp_element.get("bscale", bscale);
                 pp_element.queryAdd("mapsteps", mapsteps);
                 pp_element.queryAdd("nslice", nslice);
-                pp_element.queryAdd("cos_coefficients", cos_coef);
-                pp_element.queryAdd("sin_coefficients", sin_coef);
+                detail::queryAddResize(pp_element, "cos_coefficients", cos_coef);
+                detail::queryAddResize(pp_element, "sin_coefficients", sin_coef);
                 m_lattice.emplace_back( SoftSolenoid(ds, bscale, cos_coef, sin_coef, mapsteps, nslice) );
             } else if (element_type == "quadrupole_softedge") {
                 amrex::Real ds, gscale;
@@ -150,8 +176,8 @@ namespace impactx
                 pp_element.get("gscale", gscale);
                 pp_element.queryAdd("mapsteps", mapsteps);
                 pp_element.queryAdd("nslice", nslice);
-                pp_element.queryAdd("cos_coefficients", cos_coef);
-                pp_element.queryAdd("sin_coefficients", sin_coef);
+                detail::queryAddResize(pp_element, "cos_coefficients", cos_coef);
+                detail::queryAddResize(pp_element, "sin_coefficients", sin_coef);
                 m_lattice.emplace_back( SoftQuadrupole(ds, gscale, cos_coef, sin_coef, mapsteps, nslice) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
