@@ -185,7 +185,7 @@ set(ImpactX_amrex_branch ""
 set(ImpactX_openpmd_repo "https://github.com/openPMD/openPMD-api.git"
     CACHE STRING
     "Repository URI to pull and build openPMD-api from if(ImpactX_openpmd_internal)")
-set(ImpactX_openpmd_branch "0.15.0"
+set(ImpactX_openpmd_branch "7813b6f26c37216aaedda300cfd1c201f7adad25"
     CACHE STRING
     "Repository branch for ImpactX_openPMD_repo if(ImpactX_openpmd_internal)")
 
