@@ -354,8 +354,13 @@ Lattice Elements
 
                 = c parameter * sqrt(Twiss beta)
 
-        * ``BeamMonitor`` a beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
+        * ``beam_monitor`` a beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
           If the same element name is used multiple times, then an output series is created with multiple outputs.
+
+            * ``<element_name>.name`` (``string``, default value: ``<element_name>``)
+
+                The output series name to use.
+                By default, output is created under ``diags/openPMD/<element_name>.<backend>``.
 
             * ``<element_name>.backend`` (``string``, default value: ``default``)
 
