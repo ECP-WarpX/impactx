@@ -44,6 +44,9 @@ distr = distribution.Waterbag(
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", "h5")
+
 # design the accelerator lattice
 ns = 25  # number of slices per ds in the element
 rc = 10.35  # bend radius (meters)
@@ -64,12 +67,14 @@ dipedge2 = elements.DipEdge(psi=psi, rc=rc, g=0.0, K2=0.0)
 
 lattice_half = [sbend1, dipedge1, dr1, dipedge2, sbend2]
 # assign a segment with the first half of the lattice
+sim.lattice.append(monitor)
 sim.lattice.extend(lattice_half)
 sim.lattice.append(dr2)
 lattice_half.reverse()
 # extend the lattice by a reversed half
 sim.lattice.extend(lattice_half)
 sim.lattice.append(dr3)
+sim.lattice.append(monitor)
 
 # run simulation
 sim.evolve()

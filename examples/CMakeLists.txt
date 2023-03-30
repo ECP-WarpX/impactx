@@ -76,6 +76,9 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
                  WORKING_DIRECTORY ${THIS_WORKING_DIR}
         )
         set_property(TEST ${name}.analysis APPEND PROPERTY DEPENDS "${name}.run")
+
+        # make HDF5 I/O more robust on various filesystems
+        set_property(TEST ${name}.analysis APPEND PROPERTY ENVIRONMENT "HDF5_USE_FILE_LOCKING=FALSE")
     endif()
     if(plot_script)
         add_test(NAME ${name}.plot
@@ -83,6 +86,9 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
                  WORKING_DIRECTORY ${THIS_WORKING_DIR}
         )
         set_property(TEST ${name}.plot APPEND PROPERTY DEPENDS "${name}.run")
+
+        # make HDF5 I/O more robust on various filesystems
+        set_property(TEST ${name}.plot APPEND PROPERTY ENVIRONMENT "HDF5_USE_FILE_LOCKING=FALSE")
     endif()
 endfunction()
 

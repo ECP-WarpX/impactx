@@ -39,6 +39,12 @@ class MADXParser:
 
         self.__drift_pattern = r"(.*):drift,(.*)=(.*);"
 
+        self.__monitor = {"name": "", "l": 0.0, "type": "monitor"}
+
+        self.__monitor_pattern = (
+            r"(.*):monitor,(.*)=(.*);"  # note: L is optional, default is 0m
+        )
+
         self.__quadrupole = {"name": "", "l": 0.0, "k1": 0.0, "type": "quadrupole"}
 
         # don't count name and type --> len - 2
@@ -140,12 +146,14 @@ class MADXParser:
 
         with open(fn, "r") as f:
             for line in self.nonblank_lines_to_lowercase(f):
+                # print(line)
                 nLine += 1
                 line = self._noWhitespace(line)
 
                 if line[0] == "!":
                     # this is a comment
                     pass
+
                 elif "drift" in line:
                     obj = re.match(self.__drift_pattern, line)
 
@@ -167,6 +175,28 @@ class MADXParser:
                         )
 
                     self.__elements.append(self.__drift.copy())
+
+                elif "monitor" in line:
+                    obj = re.match(self.__monitor_pattern, line)
+
+                    # first tag is name
+                    self.__monitor["name"] = obj.group(1)
+
+                    if obj.group(2) in self.__monitor:
+                        self.__monitor[obj.group(2)] = float(obj.group(3))
+                    else:
+                        raise MADXInputError(
+                            "Monitor",
+                            "Line "
+                            + str(nLine)
+                            + ": Parameter "
+                            + "'"
+                            + obj.group(2)
+                            + "'"
+                            + " does not exist for monitor.",
+                        )
+
+                    self.__elements.append(self.__monitor.copy())
 
                 elif "quadrupole" in line:
                     obj = re.match(self.quad_pattern, line)
@@ -386,24 +416,27 @@ class MADXParser:
         if self.__lattice:
             length = 0.0
 
-            # drift, dipole, solenoid, quadrupole, dipedge
-            nTypes = [0, 0, 0, 0, 0]
+            # drift, monitor, dipole, solenoid, quadrupole, dipedge
+            nTypes = [0, 0, 0, 0, 0, 0]
 
             for elem in self.__lattice["elem"]:
                 for e in self.__elements:
                     if elem == e["name"]:
-                        length += e["l"]
+                        if "l" in e:
+                            length += e["l"]
 
                         if e["type"] == "drift":
                             nTypes[0] += 1
-                        elif e["type"] == "sbend":
+                        elif e["type"] == "monitor":
                             nTypes[1] += 1
-                        elif e["type"] == "solenoid":
+                        elif e["type"] == "sbend":
                             nTypes[2] += 1
-                        elif e["type"] == "quadrupole":
+                        elif e["type"] == "solenoid":
                             nTypes[3] += 1
-                        elif e["type"] == "dipedge":
+                        elif e["type"] == "quadrupole":
                             nTypes[4] += 1
+                        elif e["type"] == "dipedge":
+                            nTypes[5] += 1
                         break
 
             sign = "*" * 70
@@ -420,17 +453,20 @@ class MADXParser:
                 + "            *       #drift:\t"
                 + str(nTypes[0])
                 + "\n"
-                + "            *      #dipole:\t"
+                + "            *       #monitor:\t"
                 + str(nTypes[1])
                 + "\n"
-                + "            *      #solenoid:\t"
+                + "            *      #dipole:\t"
                 + str(nTypes[2])
                 + "\n"
-                + "            *  #quadrupole:\t"
+                + "            *      #solenoid:\t"
                 + str(nTypes[3])
                 + "\n"
-                + "            *     #dipedge:\t"
+                + "            *  #quadrupole:\t"
                 + str(nTypes[4])
+                + "\n"
+                + "            *     #dipedge:\t"
+                + str(nTypes[5])
                 + "\n"
                 + "           beam:\t\n"
                 + "            *     particle:\t"
@@ -455,6 +491,9 @@ class MADXParser:
                     if elem == e["name"]:
                         if e["type"] == "drift":
                             # print("Drift L= " + str(e["l"]))
+                            beamline.append(e)
+                        elif e["type"] == "monitor":
+                            # print("BeamMonitor L= " + str(e["l"]))
                             beamline.append(e)
                         elif e["type"] == "sbend":
                             # print("Sbend L= ", e["l"], " angle = ", e["angle"])

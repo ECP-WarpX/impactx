@@ -31,6 +31,9 @@ def lattice(parsed_beamline, nslice=1):
         "SOLENOID": "Sol",  # Ideal, thick Solenoid: MAD-X user guide 10.9 p78
         "QUADRUPOLE": "Quad",  # Quadrupole
         "DIPEDGE": "DipEdge",
+        # note: in MAD-X, this keeps track only of the beam centroid,
+        # "In addition it serves to record the beam position for closed orbit correction."
+        "MONITOR": "BeamMonitor",  # drift + output diagnostics
         "MULTIPOLE": "Multipole",
         "NLLENS": "NonlinearLens",
         # TODO Figure out how to identify these
@@ -41,6 +44,7 @@ def lattice(parsed_beamline, nslice=1):
     impactx_beamline = []
 
     for d in parsed_beamline:
+        # print(d)
         if d["type"] in [k.casefold() for k in list(madx_to_impactx_dict.keys())]:
             if d["type"] == "drift":
                 impactx_beamline.append(elements.Drift(ds=d["l"], nslice=nslice))
@@ -66,6 +70,10 @@ def lattice(parsed_beamline, nslice=1):
                         K2=d["fint"],
                     )
                 )
+            elif d["type"] == "monitor":
+                if d["l"] > 0:
+                    impactx_beamline.append(elements.Drift(ds=d["l"], nslice=nslice))
+                impactx_beamline.append(elements.BeamMonitor("monitor", "h5"))
         else:
             raise NotImplementedError(
                 "The beamline element named ",
@@ -89,6 +97,7 @@ def read_lattice(madx_file, nslice=1):
     madx = MADXParser()
     madx.parse(madx_file)
     beamline = madx.getBeamline()
+    # print(madx)
 
     return lattice(beamline, nslice)
 

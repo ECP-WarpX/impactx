@@ -21,7 +21,10 @@ beam.mutpt = -5.05773e-10
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
-lattice.elements = dr1 dr2 rf dr2 dr2 rf dr2 dr2 rf dr2 dr2 rf dr2
+lattice.elements = monitor dr1 dr2 rf dr2 dr2 rf dr2 dr2 rf dr2 dr2 rf dr2 monitor
+
+monitor.type = beam_monitor
+monitor.backend = h5
 
 dr1.type = drift
 dr1.ds = 0.4
@@ -66,6 +69,7 @@ rf.cos_coefficients =
                 1.8685171825676386e-004
 rf.sin_coefficients = 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
                 0 0 0 0 0 0 0
+
 
 ###############################################################################
 # Algorithms

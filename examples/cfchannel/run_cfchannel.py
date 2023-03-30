@@ -41,8 +41,17 @@ distr = distribution.Waterbag(
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", "h5")
+
 # design the accelerator lattice
-sim.lattice.append(elements.ConstF(ds=2.0, kx=1.0, ky=1.0, kt=1.0))
+sim.lattice.extend(
+    [
+        monitor,
+        elements.ConstF(ds=2.0, kx=1.0, ky=1.0, kt=1.0),
+        monitor,
+    ]
+)
 
 # run simulation
 sim.evolve()

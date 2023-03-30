@@ -42,7 +42,15 @@ namespace impactx
             x,  ///< position in x [m] (at fixed t OR fixed s)
             y,  ///< position in y [m] (at fixed t OR fixed s)
             z,  ///< position in z [m] (at fixed t) OR time-of-flight ct [m] (at fixed s)
+            nattribs ///< the number of attributes above (always last)
         };
+
+        //! named labels for fixed t
+        static constexpr auto names_t = { "position_x", "position_y", "position_z" };
+        //! named labels for fixed s
+        static constexpr auto names_s = { "position_x", "position_y", "position_ct" };
+        static_assert(names_t.size() == nattribs);
+        static_assert(names_s.size() == nattribs);
     };
 
     /** This struct indexes the additional Real attributes
@@ -55,10 +63,17 @@ namespace impactx
             ux,  ///< momentum in x, scaled by the magnitude of the reference momentum [unitless] (at fixed t or s)
             uy,  ///< momentum in y, scaled by the magnitude of the reference momentum [unitless] (at fixed t or s)
             pt,  ///< momentum in z, scaled by the magnitude of the reference momentum [unitless] (at fixed t) OR energy deviation, scaled by speed of light * the magnitude of the reference momentum [unitless] (at fixed s)
-            m_qm, ///< charge to mass ratio, in q_e/m_e (q_e/eV)
+            m_qm, ///< charge to mass ratio, in q_e/m_e (q_e/eV) TODO: rename to qm_m
             w,   ///< particle weight, unitless
             nattribs ///< the number of attributes above (always last)
         };
+
+        //! named labels for fixed t
+        static constexpr auto names_t = { "momentum_x", "momentum_y", "momentum_z", "qmm", "weighting" };
+        //! named labels for fixed s
+        static constexpr auto names_s = { "momentum_x", "momentum_y", "momentum_t", "qmm", "weighting" };
+        static_assert(names_t.size() == nattribs);
+        static_assert(names_s.size() == nattribs);
     };
 
     /** This struct indexes the additional Integer attributes

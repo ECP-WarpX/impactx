@@ -45,11 +45,14 @@ distr = distribution.Kurth6D(
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
-# design the accelerator lattice: here we just assign a single element
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", "h5")
+
+# design the accelerator lattice
 nslice = 20  # use 30 for increased precision
 constf1 = elements.ConstF(ds=2.0, kx=0.7, ky=0.7, kt=0.7, nslice=nslice)
 drift1 = elements.Drift(ds=1.0, nslice=nslice)
-sim.lattice.extend([drift1, constf1, drift1])
+sim.lattice.extend([monitor, drift1, constf1, drift1, monitor])
 
 # run simulation
 sim.evolve()

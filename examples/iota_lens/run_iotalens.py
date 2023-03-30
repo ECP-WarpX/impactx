@@ -40,10 +40,11 @@ distr = distribution.Waterbag(
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
+# design the accelerator lattice
 constEnd = elements.ConstF(ds=0.0025, kx=1.0, ky=1.0, kt=1.0e-12)
 nllens = elements.NonlinearLens(knll=2.0e-7, cnll=0.01)
 const = elements.ConstF(ds=0.005, kx=1.0, ky=1.0, kt=1.0e-12)
-# design the accelerator lattice
+
 num_lenses = 10
 nllens_lattice = [constEnd] + [nllens, const] * (num_lenses - 1) + [nllens, constEnd]
 

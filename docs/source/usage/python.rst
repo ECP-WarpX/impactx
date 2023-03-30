@@ -413,6 +413,24 @@ This module provides elements for the accelerator lattice.
    :param knll: integrated strength of the nonlinear lens (m)
    :param cnll: distance of singularities from the origin (m)
 
+.. py:class:: impactx.elements.BeamMonitor(name, backend="default", encoding="g")
+
+   A beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
+
+   If the same element ``name`` is used multiple times, then an output series is created with multiple outputs.
+
+   The `I/O backend <https://openpmd-api.readthedocs.io/en/latest/backends/overview.html>`_ for `openPMD <https://www.openPMD.org>`_ data dumps.
+   ``bp`` is the `ADIOS2 I/O library <https://csmd.ornl.gov/adios>`_, ``h5`` is the `HDF5 format <https://www.hdfgroup.org/solutions/hdf5/>`_, and ``json`` is a `simple text format <https://en.wikipedia.org/wiki/JSON>`_.
+   ``json`` only works with serial/single-rank jobs.
+   By default, the first available backend in the order given above is taken.
+
+   openPMD `iteration encoding <https://openpmd-api.readthedocs.io/en/0.14.0/usage/concepts.html#iteration-and-series>`__ determines if multiple files are created for individual output steps or not.
+   Variable based is an `experimental feature with ADIOS2 <https://openpmd-api.readthedocs.io/en/0.14.0/backends/adios2.html#experimental-new-adios2-schema>`__.
+
+   :param name: name of the series
+   :param backend: I/O backend, e.g., ``bp``, ``h5``, ``json``
+   :param encoding: openPMD iteration encoding: (v)ariable based, (f)ile based, (g)roup based (default)
+
 .. py:class:: impactx.elements.Programmable
 
    A programmable beam optics element.

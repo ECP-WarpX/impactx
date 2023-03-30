@@ -22,8 +22,8 @@ beam.mutpt = 0.0
 # Beamline: lattice elements and segments
 ###############################################################################
 lattice.elements = const_end nllens const nllens const nllens const nllens const
-                   nllens const nllens const nllens const nllens const nllens const nllens
-                   const_end
+                   nllens const nllens const nllens const nllens const nllens
+                   const nllens const_end
 
 nllens.type = nonlinear_lens
 nllens.knll = 2.0e-7
