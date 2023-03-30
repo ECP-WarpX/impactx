@@ -73,7 +73,7 @@ def lattice(parsed_beamline, nslice=1):
             elif d["type"] == "monitor":
                 if d["l"] > 0:
                     impactx_beamline.append(elements.Drift(ds=d["l"], nslice=nslice))
-                impactx_beamline.append(elements.BeamMonitor("monitor", "h5"))
+                impactx_beamline.append(elements.BeamMonitor("monitor", backend="h5"))
         else:
             raise NotImplementedError(
                 "The beamline element named ",

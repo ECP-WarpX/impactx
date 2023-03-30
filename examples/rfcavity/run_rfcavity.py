@@ -115,7 +115,7 @@ rf = elements.RFCavity(
 )
 
 # add beam diagnostics
-monitor = elements.BeamMonitor("monitor", "h5")
+monitor = elements.BeamMonitor("monitor", backend="h5")
 
 sim.lattice.extend(
     [

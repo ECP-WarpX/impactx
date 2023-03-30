@@ -151,7 +151,7 @@ pge2.ds = 0.5
 pge2.threadsafe = True  # allow OpenMP threading for speed
 
 # add beam diagnostics
-monitor = elements.BeamMonitor("monitor", "h5")
+monitor = elements.BeamMonitor("monitor", backend="h5")
 
 # design the accelerator lattice
 fodo = [
