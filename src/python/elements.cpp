@@ -171,6 +171,11 @@ void init_elements(py::module& m)
               [](Programmable & p) { return p.ds(); },
               [](Programmable & p, amrex::ParticleReal ds) { p.m_ds = ds; }
         )
+        .def_property("threadsafe",
+            [](Programmable & p) { return p.m_threadsafe; },
+            [](Programmable & p, bool threadsafe) { p.m_threadsafe = threadsafe; },
+            "allow threading via OpenMP for the particle iterator loop, default=False (note: if OMP backend is active)"
+        )
         .def_property("push",
               [](Programmable & p) { return p.m_push; },
               [](Programmable & p,

@@ -24,12 +24,14 @@ namespace impactx
      * @param[in,out] pc particle container to push
      * @param[in,out] element the beamline element
      * @param[in] step global step for diagnostics
+     * @param[in] omp_parallel allow threading via OpenMP for the particle iterator loop (note: if OMP backend is active)
      */
     template<typename T_Element>
     void push_all (
             ImpactXParticleContainer & pc,
             T_Element & element,
-            [[maybe_unused]] int step
+            [[maybe_unused]] int step,
+            [[maybe_unused]] bool omp_parallel = true
     )
     {
         // preparing to access reference particle data: RefPart
@@ -45,7 +47,7 @@ namespace impactx
             // loop over all particle boxes
             using ParIt = ImpactXParticleContainer::iterator;
 #ifdef AMREX_USE_OMP
-#pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
+#pragma omp parallel if (amrex::Gpu::notInLaunchRegion() && omp_parallel)
 #endif
             for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
                 // push beam particles relative to reference particle

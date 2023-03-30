@@ -21,7 +21,7 @@ namespace impactx
     ) const
     {
         if (m_push == nullptr) {
-            push_all(pc, *this, step);
+            push_all(pc, *this, step, m_threadsafe);
         }
         else {
             m_push(&pc, step);
