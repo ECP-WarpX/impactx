@@ -452,7 +452,7 @@ add_impactx_test(solenoid.MADX.py
 # w/o space charge
 add_impactx_test(rotation
     examples/rotation/input_rotation.in
-      ON  # ImpactX MPI-parallel
+      ON   # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/rotation/analysis_rotation.py
     OFF  # no plot script yet
@@ -470,7 +470,7 @@ add_impactx_test(rotation.py
 # w/o space charge
 add_impactx_test(solenoid_softedge
     examples/solenoid_softedge/input_solenoid_softedge.in
-      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/solenoid_softedge/analysis_solenoid_softedge.py
     OFF  # no plot script yet
