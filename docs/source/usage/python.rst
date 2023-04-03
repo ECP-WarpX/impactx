@@ -519,7 +519,7 @@ This module provides elements for the accelerator lattice.
    :param ks: Solenoid strength in m^(-1) (MADX convention) in (magnetic field Bz in T) / (rigidity in T-m)
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.PROT(phi_in, phi_out)
+.. py:class:: impactx.elements.PRot(phi_in, phi_out)
 
    Exact map for a pole-face rotation in the x-z plane.
 

@@ -4,7 +4,7 @@ Drift using a Pole-Face Rotation
 ================================
 
 A drift that takes place in a rotated frame, using initial and final
-applications of PROT.
+applications of a pole rotation (``prot``).
 
 We use a 2 GeV electron beam.
 
