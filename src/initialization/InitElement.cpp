@@ -180,11 +180,13 @@ namespace detail
                 detail::queryAddResize(pp_element, "sin_coefficients", sin_coef);
                 m_lattice.emplace_back( SoftQuadrupole(ds, gscale, cos_coef, sin_coef, mapsteps, nslice) );
             } else if (element_type == "beam_monitor") {
+                std::string openpmd_name = element_name;
+                pp_element.queryAdd("name", openpmd_name);
                 std::string openpmd_backend = "default";
                 pp_element.queryAdd("backend", openpmd_backend);
                 std::string  openpmd_encoding {"g"};
                 pp_element.queryAdd("encoding", openpmd_encoding);
-                m_lattice.emplace_back( diagnostics::BeamMonitor(element_name, openpmd_backend, openpmd_encoding) );
+                m_lattice.emplace_back( diagnostics::BeamMonitor(openpmd_name, openpmd_backend, openpmd_encoding) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }
