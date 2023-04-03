@@ -41,11 +41,16 @@ distr = distribution.Waterbag(
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", backend="h5")
+
 # design the accelerator lattice
 rotated_drift = [
+    monitor,
     elements.PRot(phi_in=0.0, phi_out=-5.0),
     elements.Drift(ds=2.0, nslice=1),
     elements.PRot(phi_in=-5.0, phi_out=0.0),
+    monitor,
 ]
 # assign a lattice segment
 sim.lattice.extend(rotated_drift)
