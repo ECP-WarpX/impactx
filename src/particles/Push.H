@@ -20,11 +20,13 @@ namespace impactx
 {
     /** Push particles
      *
-     * @param pc container of the particles to push
-     * @param element_variant a single element to push the particles through
+     * @param[inout] pc container of the particles to push
+     * @param[inout] element_variant a single element to push the particles through
+     * @param[in] step global step for diagnostics
      */
     void Push (ImpactXParticleContainer & pc,
-               KnownElements const & element_variant);
+               KnownElements & element_variant,
+               int step);
 
 } // namespace impactx
 

@@ -22,6 +22,32 @@
 
 namespace impactx
 {
+namespace detail
+{    /** Resizing version of amrex::ParmParse::queryAdd
+     *
+     * Work-around for https://github.com/AMReX-Codes/amrex/pull/3220
+     *
+     * @tparam T vector type
+     * @param[inout] pp the parameter parser on the element to query
+     * @param[in] name key name
+     * @param[inout] ref vector with default values
+     * @return indicates if key existed previously
+     */
+    template <typename T>
+    int queryAddResize (amrex::ParmParse& pp, const char* name, std::vector<T>& ref) {
+        std::vector<T> empty;
+        int exist = pp.queryarr(name, empty);
+        if (exist) {
+            ref.resize(empty.size());
+            pp.queryarr(name, ref);
+        }
+        if (!exist && !ref.empty()) {
+            pp.addarr(name, ref);
+        }
+        return exist;
+    }
+} // namespace detail
+
     void ImpactX::initLatticeElementsFromInputs ()
     {
         BL_PROFILE("ImpactX::initLatticeElementsFromInputs");
@@ -115,8 +141,8 @@ namespace impactx
                 pp_element.get("phase", phase);
                 pp_element.queryAdd("mapsteps", mapsteps);
                 pp_element.queryAdd("nslice", nslice);
-                pp_element.queryAdd("cos_coefficients", cos_coef);
-                pp_element.queryAdd("sin_coefficients", sin_coef);
+                detail::queryAddResize(pp_element, "cos_coefficients", cos_coef);
+                detail::queryAddResize(pp_element, "sin_coefficients", sin_coef);
                 m_lattice.emplace_back( RFCavity(ds, escale, freq, phase, cos_coef, sin_coef, mapsteps, nslice) );
             } else if (element_type == "solenoid") {
                 amrex::Real ds, ks;
@@ -143,9 +169,31 @@ namespace impactx
                 pp_element.get("bscale", bscale);
                 pp_element.queryAdd("mapsteps", mapsteps);
                 pp_element.queryAdd("nslice", nslice);
-                pp_element.queryAdd("cos_coefficients", cos_coef);
-                pp_element.queryAdd("sin_coefficients", sin_coef);
+                detail::queryAddResize(pp_element, "cos_coefficients", cos_coef);
+                detail::queryAddResize(pp_element, "sin_coefficients", sin_coef);
                 m_lattice.emplace_back( SoftSolenoid(ds, bscale, cos_coef, sin_coef, mapsteps, nslice) );
+            } else if (element_type == "quadrupole_softedge") {
+                amrex::Real ds, gscale;
+                int nslice = nslice_default;
+                int mapsteps = mapsteps_default;
+                Quad_field_data gz;
+                std::vector<amrex::ParticleReal> cos_coef = gz.default_cos_coef;
+                std::vector<amrex::ParticleReal> sin_coef = gz.default_sin_coef;
+                pp_element.get("ds", ds);
+                pp_element.get("gscale", gscale);
+                pp_element.queryAdd("mapsteps", mapsteps);
+                pp_element.queryAdd("nslice", nslice);
+                detail::queryAddResize(pp_element, "cos_coefficients", cos_coef);
+                detail::queryAddResize(pp_element, "sin_coefficients", sin_coef);
+                m_lattice.emplace_back( SoftQuadrupole(ds, gscale, cos_coef, sin_coef, mapsteps, nslice) );
+            } else if (element_type == "beam_monitor") {
+                std::string openpmd_name = element_name;
+                pp_element.queryAdd("name", openpmd_name);
+                std::string openpmd_backend = "default";
+                pp_element.queryAdd("backend", openpmd_backend);
+                std::string  openpmd_encoding {"g"};
+                pp_element.queryAdd("encoding", openpmd_encoding);
+                m_lattice.emplace_back( diagnostics::BeamMonitor(openpmd_name, openpmd_backend, openpmd_encoding) );
             } else {
                 amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
             }

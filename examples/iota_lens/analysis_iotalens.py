@@ -4,7 +4,6 @@
 # Authors: Axel Huebl, Chad Mitchell
 # License: BSD-3-Clause-LBNL
 #
-
 import glob
 
 import numpy as np
@@ -14,7 +13,6 @@ from scipy.stats import moment
 
 def get_moments(beam):
     """Calculate mean and std dev of functions defining the IOTA invariants
-
     Returns
     -------
     meanH, sigH, meanI, sigI
@@ -30,7 +28,6 @@ def get_moments(beam):
 def read_all_files(file_pattern):
     """Read in all CSV files from each MPI rank (and potentially OpenMP
     thread). Concatenate into one Pandas dataframe.
-
     Returns
     -------
     pandas.DataFrame
@@ -45,7 +42,7 @@ def read_all_files(file_pattern):
     ).set_index("id")
 
 
-# initial/final beam on rank zero
+# initial/final beam
 initial = read_all_files("diags/nonlinear_lens_invariants_000000.*")
 final = read_all_files("diags/nonlinear_lens_invariants_final.*")
 

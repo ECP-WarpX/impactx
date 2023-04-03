@@ -107,6 +107,7 @@ CMake Option                    Default & Values                             Des
 ``ImpactX_LIB``                 ON/**OFF**                                   Build ImpactX as a library (shared or static)
 ``ImpactX_MPI``                 **ON**/OFF                                   Multi-node support (message-passing)
 ``ImpactX_MPI_THREAD_MULTIPLE`` **ON**/OFF                                   MPI thread-multiple support, i.e. for ``async_io``
+``ImpactX_OPENPMD``             **ON**/OFF                                   openPMD I/O (HDF5, ADIOS)
 ``ImpactX_PRECISION``           SINGLE/**DOUBLE**                            Floating point precision (single/double)
 ``ImpactX_PYTHON``              ON/**OFF**                                   Python bindings
 ``Python_EXECUTABLE``           (newest found)                               Path to Python executable
@@ -120,6 +121,7 @@ By default, the most important dependencies of ImpactX are automatically downloa
 ============================= ============================================== ===========================================================
 CMake Option                  Default & Values                               Description
 ============================= ============================================== ===========================================================
+``BUILD_SHARED_LIBS``         ON/**OFF**                                     Build shared libraries for dependencies
 ``CCACHE_PROGRAM``            First found ``ccache`` executable.             Set to ``-DCCACHE_PROGRAM=NO`` to disable CCache.
 ``ImpactX_ablastr_src``       *None*                                         Path to ABLASTR source directory (preferred if set)
 ``ImpactX_ablastr_repo``      ``https://github.com/ECP-WarpX/WarpX.git``     Repository URI to pull and build ABLASTR from
@@ -129,6 +131,10 @@ CMake Option                  Default & Values                               Des
 ``ImpactX_amrex_repo``        ``https://github.com/AMReX-Codes/amrex.git``   Repository URI to pull and build AMReX from
 ``ImpactX_amrex_branch``      *we set and maintain a compatible commit*      Repository branch for ``ImpactX_amrex_repo``
 ``ImpactX_amrex_internal``    **ON**/OFF                                     Needs a pre-installed AMReX library if set to ``OFF``
+``ImpactX_openpmd_src``       *None*                                         Path to openPMD-api source directory (preferred if set)
+``ImpactX_openpmd_repo``      ``https://github.com/openPMD/openPMD-api.git`` Repository URI to pull and build openPMD-api from
+``ImpactX_openpmd_branch``    *we set and maintain a compatible commit*                                     Repository branch for ``ImpactX_openpmd_repo``
+``ImpactX_openpmd_internal``  **ON**/OFF                                     Needs a pre-installed openPMD-api library if set to ``OFF``
 ``ImpactX_pyamrex_src``       *None*                                         Path to AMReX source directory (preferred if set)
 ``ImpactX_pyamrex_repo``      ``https://github.com/AMReX-Codes/pyamrex.git`` Repository URI to pull and build pyAMReX from
 ``ImpactX_pyamrex_branch``    *we set and maintain a compatible commit*      Repository branch for ``ImpactX_pyamrex_repo``

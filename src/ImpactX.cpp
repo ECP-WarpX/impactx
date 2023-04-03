@@ -41,6 +41,9 @@ namespace impactx
 
         // query input for warning logger variables and set up warning logger accordingly
         init_warning_logger();
+
+        // move old diagnostics out of the way
+        amrex::UtilCreateCleanDirectory("diags", true);
     }
 
     void ImpactX::initGrids ()
@@ -54,9 +57,6 @@ namespace impactx
         // init blocks / grids & MultiFabs
         AmrCore::InitFromScratch(0.0);
         amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
-
-        // move old diagnostics out of the way
-        amrex::UtilCreateCleanDirectory("diags", true);
     }
 
     void ImpactX::evolve ()
@@ -82,12 +82,6 @@ namespace impactx
         {
             pp_diag.queryAdd("file_min_digits", file_min_digits);
 
-            // print initial particle distribution to file
-            std::string diag_name = amrex::Concatenate("diags/beam_", global_step, file_min_digits);
-            diagnostics::DiagnosticOutput(*m_particle_container,
-                                          diagnostics::OutputType::PrintParticles,
-                                          diag_name);
-
             // print initial reference particle to file
             diagnostics::DiagnosticOutput(*m_particle_container,
                                           diagnostics::OutputType::PrintRefParticle,
@@ -95,7 +89,7 @@ namespace impactx
                                           global_step);
 
             // print the initial values of the two invariants H and I
-            diag_name = amrex::Concatenate("diags/nonlinear_lens_invariants_", global_step, file_min_digits);
+            std::string diag_name = amrex::Concatenate("diags/nonlinear_lens_invariants_", global_step, file_min_digits);
             diagnostics::DiagnosticOutput(*m_particle_container,
                                           diagnostics::OutputType::PrintNonlinearLensInvariants,
                                           diag_name);
@@ -183,7 +177,7 @@ namespace impactx
                 // assuming that the distribution did not change
 
                 // push all particles with external maps
-                Push(*m_particle_container, element_variant);
+                Push(*m_particle_container, element_variant, global_step);
 
                 // just prints an empty newline at the end of the slice_step
                 amrex::Print() << "\n";
@@ -194,13 +188,6 @@ namespace impactx
 
                 if (diag_enable && slice_step_diagnostics)
                 {
-                    // print slice step particle distribution to file
-                    std::string diag_name = amrex::Concatenate("diags/beam_", global_step, file_min_digits);
-                    diagnostics::DiagnosticOutput(*m_particle_container,
-                                                  diagnostics::OutputType::PrintParticles,
-                                                  diag_name,
-                                                  global_step);
-
                     // print slice step reference particle to file
                     diagnostics::DiagnosticOutput(*m_particle_container,
                                                   diagnostics::OutputType::PrintRefParticle,
@@ -218,12 +205,6 @@ namespace impactx
 
         if (diag_enable)
         {
-            // print final particle distribution to file
-            diagnostics::DiagnosticOutput(*m_particle_container,
-                                          diagnostics::OutputType::PrintParticles,
-                                          "diags/beam_final",
-                                          global_step);
-
             // print final reference particle to file
             diagnostics::DiagnosticOutput(*m_particle_container,
                                           diagnostics::OutputType::PrintRefParticle,
@@ -235,6 +216,14 @@ namespace impactx
                                           diagnostics::OutputType::PrintNonlinearLensInvariants,
                                           "diags/nonlinear_lens_invariants_final",
                                           global_step);
+        }
+
+        // loop over all beamline elements & finalize them
+        for (auto & element_variant : m_lattice)
+        {
+            auto bd = std::get_if<diagnostics::BeamMonitor>(&element_variant);
+            if (bd)
+                bd->finalize();
         }
 
     }

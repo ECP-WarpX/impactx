@@ -29,19 +29,44 @@ jobs:
         restore-keys: |
           ccache-windows-winmsvc-${{ hashFiles('.github/workflows/windows.yml') }}-
           ccache-windows-winmsvc-
-    - name: Build
+    - name: Download Dependencies
       run: |
+        Invoke-WebRequest https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.tar.gz -OutFile hdf5-1_12_2.tar.gz
+        7z.exe x -r hdf5-1_12_2.tar.gz
+        7z.exe x -r hdf5-1_12_2.tar
+    - name: Install Dependencies
+      run: |
+        cmake -S hdf5-hdf5-1_12_2 -B build_hdf5  `
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo  `
+              -DBUILD_SHARED_LIBS=OFF            `
+              -DBUILD_TESTING=OFF                `
+              -DHDF5_BUILD_HL_LIB=OFF            `
+              -DHDF5_BUILD_TOOLS=OFF             `
+              -DHDF5_BUILD_EXAMPLES=OFF          `
+              -DHDF5_ENABLE_SZIP_SUPPORT=OFF     `
+              -DHDF5_ENABLE_Z_LIB_SUPPORT=OFF
+        if(!$?) { Exit $LASTEXITCODE }
+        cmake --build build_hdf5 --config RelWithDebInfo --target install --parallel 2
+        if(!$?) { Exit $LASTEXITCODE }
+
+        $env:HDF5_DIR = "C:/Program Files/HDF_Group/HDF5/1.12.2/cmake/"
+        $env:HDF5_USE_STATIC_LIBRARIES = "ON"
+
         python3 -m pip install -U pip setuptools wheel pytest
         python3 -m pip install -r requirements.txt
         python3 -m pip install -r examples/requirements.txt
-
+    - name: Build
+      run: |
+        $env:HDF5_DIR = "C:/Program Files/HDF_Group/HDF5/1.12.2/cmake/"
         cmake -S . -B build               `
               -DBUILD_SHARED_LIBS=ON      `
               -DCMAKE_BUILD_TYPE=RelWithDebInfo  `
-              -DCMAKE_VERBOSE_MAKEFILE=ON `
+              -DCMAKE_VERBOSE_MAKEFILE=ON    `
+              -DHDF5_USE_STATIC_LIBRARIES=ON `
               -DImpactX_COMPUTE=NOACC     `
               -DImpactX_MPI=OFF           `
               -DImpactX_PYTHON=ON         `
+              -DopenPMD_USE_HDF5=ON       `
               -DPython_EXECUTABLE=python3
         if(!$?) { Exit $LASTEXITCODE }
         cmake --build build --config RelWithDebInfo --parallel 2
@@ -80,39 +105,73 @@ jobs:
           ccache-windows-winclang-${{ hashFiles('.github/workflows/windows.yml') }}-
           ccache-windows-winclang-
     - uses: seanmiddleditch/gha-setup-ninja@master
-    - name: Build
+    - name: Download Dependencies
+      run: |
+        Invoke-WebRequest https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.tar.gz -OutFile hdf5-1_12_2.tar.gz
+        7z.exe x -r hdf5-1_12_2.tar.gz
+        7z.exe x -r hdf5-1_12_2.tar
+    - name: Install Dependencies
       shell: cmd
       run: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
+
+        cmake -S hdf5-hdf5-1_12_2 -B build_hdf5 ^
+            -G "Ninja"                          ^
+            -DCMAKE_C_COMPILER=clang-cl         ^
+            -DCMAKE_CXX_COMPILER=clang-cl       ^
+            -DCMAKE_BUILD_TYPE=Release          ^
+            -DBUILD_SHARED_LIBS=OFF             ^
+            -DBUILD_TESTING=OFF                 ^
+            -DHDF5_BUILD_HL_LIB=OFF             ^
+            -DHDF5_BUILD_TOOLS=OFF              ^
+            -DHDF5_BUILD_EXAMPLES=OFF           ^
+            -DHDF5_ENABLE_SZIP_SUPPORT=OFF      ^
+            -DHDF5_ENABLE_Z_LIB_SUPPORT=OFF
+        if errorlevel 1 exit 1
+        cmake --build build_hdf5 --config Release --target install --parallel 2
+        if errorlevel 1 exit 1
+
+        set "HDF5_DIR=C:/Program Files/HDF_Group/HDF5/1.12.2/cmake/"
+        set "HDF5_USE_STATIC_LIBRARIES=ON"
+
         python3 -m pip install -U pip setuptools wheel pytest
         python3 -m pip install -r requirements.txt
         python3 -m pip install -r examples/requirements.txt
-
+    - name: Build
+      shell: cmd
+      run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
+
+        set "HDF5_DIR=C:/Program Files/HDF_Group/HDF5/1.12.2/cmake/"
         cmake -S . -B build   ^
               -G "Ninja"      ^
-              -DCMAKE_C_COMPILER=clang-cl   ^
-              -DCMAKE_CXX_COMPILER=clang-cl ^
-              -DBUILD_SHARED_LIBS=OFF       ^
-              -DCMAKE_BUILD_TYPE=Release    ^
-              -DCMAKE_VERBOSE_MAKEFILE=ON   ^
-              -DImpactX_COMPUTE=OMP         ^
-              -DImpactX_MPI=OFF             ^
-              -DImpactX_PYTHON=ON           ^
+              -DCMAKE_C_COMPILER=clang-cl    ^
+              -DCMAKE_CXX_COMPILER=clang-cl  ^
+              -DBUILD_SHARED_LIBS=OFF        ^
+              -DCMAKE_BUILD_TYPE=Release     ^
+              -DCMAKE_VERBOSE_MAKEFILE=ON    ^
+              -DHDF5_USE_STATIC_LIBRARIES=ON ^
+              -DImpactX_COMPUTE=OMP          ^
+              -DImpactX_MPI=OFF              ^
+              -DImpactX_PYTHON=ON            ^
+              -DopenPMD_USE_HDF5=ON          ^
               -DPython_EXECUTABLE=python3
         if errorlevel 1 exit 1
-        cmake --build build --config Release --parallel 2
+        cmake --build build --parallel 2
         if errorlevel 1 exit 1
     - name: Test
       shell: cmd
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
-        ctest --test-dir build --build-config Release --output-on-failure -E AMReX
+        ctest --test-dir build --output-on-failure -E AMReX
         if errorlevel 1 exit 1
-    - name: Install
-      shell: cmd
-      run: |
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
-        cmake --build build --config Release --target install
-        if errorlevel 1 exit 1
-        cmake --build build --config Release --target pip_install
-        if errorlevel 1 exit 1
+#    - name: Install
+#      shell: cmd
+#      run: |
+#        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
+#        set "HDF5_DIR=C:/Program Files/HDF_Group/HDF5/1.12.2/cmake/"
+#
+#        cmake --build build --target install
+#        if errorlevel 1 exit 1
+#        cmake --build build --target pip_install
+#        if errorlevel 1 exit 1

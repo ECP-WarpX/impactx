@@ -41,11 +41,16 @@ distr = distribution.Waterbag(
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", backend="h5")
+
 # design the accelerator lattice
 multipole = [
+    monitor,
     elements.Multipole(multiple=2, K_normal=3.0, K_skew=0.0),
     elements.Multipole(multiple=3, K_normal=100.0, K_skew=-50.0),
     elements.Multipole(multiple=4, K_normal=65.0, K_skew=6.0),
+    monitor,
 ]
 # assign a fodo segment
 sim.lattice.extend(multipole)

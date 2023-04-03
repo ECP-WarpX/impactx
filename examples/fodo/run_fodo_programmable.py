@@ -139,6 +139,7 @@ pge1.nslice = ns
 pge1.beam_particles = lambda pti, refpart: my_drift(pge1, pti, refpart)
 pge1.ref_particle = lambda refpart: my_ref_drift(pge1, refpart)
 pge1.ds = 0.25
+pge1.threadsafe = True  # allow OpenMP threading for speed
 
 # attention: assignment is a reference for pge2 = pge1
 
@@ -147,14 +148,24 @@ pge2.nslice = ns
 pge2.beam_particles = lambda pti, refpart: my_drift(pge2, pti, refpart)
 pge2.ref_particle = lambda refpart: my_ref_drift(pge2, refpart)
 pge2.ds = 0.5
+pge2.threadsafe = True  # allow OpenMP threading for speed
+
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", backend="h5")
 
 # design the accelerator lattice
 fodo = [
+    monitor,
     pge1,  # equivalent to elements.Drift(ds=0.25, nslice=ns)
+    monitor,
     elements.Quad(ds=1.0, k=1.0, nslice=ns),
+    monitor,
     pge2,  # equivalent to elements.Drift(ds=0.5, nslice=ns)
+    monitor,
     elements.Quad(ds=1.0, k=-1.0, nslice=ns),
+    monitor,
     pge1,  # equivalent to elements.Drift(ds=0.25, nslice=ns)
+    monitor,
 ]
 # assign a fodo segment
 sim.lattice.extend(fodo)

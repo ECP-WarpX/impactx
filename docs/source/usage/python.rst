@@ -413,6 +413,24 @@ This module provides elements for the accelerator lattice.
    :param knll: integrated strength of the nonlinear lens (m)
    :param cnll: distance of singularities from the origin (m)
 
+.. py:class:: impactx.elements.BeamMonitor(name, backend="default", encoding="g")
+
+   A beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
+
+   If the same element ``name`` is used multiple times, then an output series is created with multiple outputs.
+
+   The `I/O backend <https://openpmd-api.readthedocs.io/en/latest/backends/overview.html>`_ for `openPMD <https://www.openPMD.org>`_ data dumps.
+   ``bp`` is the `ADIOS2 I/O library <https://csmd.ornl.gov/adios>`_, ``h5`` is the `HDF5 format <https://www.hdfgroup.org/solutions/hdf5/>`_, and ``json`` is a `simple text format <https://en.wikipedia.org/wiki/JSON>`_.
+   ``json`` only works with serial/single-rank jobs.
+   By default, the first available backend in the order given above is taken.
+
+   openPMD `iteration encoding <https://openpmd-api.readthedocs.io/en/0.14.0/usage/concepts.html#iteration-and-series>`__ determines if multiple files are created for individual output steps or not.
+   Variable based is an `experimental feature with ADIOS2 <https://openpmd-api.readthedocs.io/en/0.14.0/backends/adios2.html#experimental-new-adios2-schema>`__.
+
+   :param name: name of the series
+   :param backend: I/O backend, e.g., ``bp``, ``h5``, ``json``
+   :param encoding: openPMD iteration encoding: (v)ariable based, (f)ile based, (g)roup based (default)
+
 .. py:class:: impactx.elements.Programmable
 
    A programmable beam optics element.
@@ -507,3 +525,16 @@ This module provides elements for the accelerator lattice.
 
    :param phi_in: angle of the reference particle with respect to the longitudinal (z) axis in the original frame in degrees
    :param phi_out: angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame in degrees
+
+.. py:class:: impactx.elements.SoftQuadrupole(ds, gscale, cos_coefficients, sin_coefficients, nslice=1)
+
+   A soft-edge quadrupole.
+
+   :param ds: Segment length in m.
+   :param gscale: Scaling factor for on-axis field gradient in inverse meters
+   :param cos_coefficients: array of ``float`` cosine coefficients in Fourier expansion of on-axis field gradient
+            (optional); default is a tanh fringe field model based on `<http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
+   :param sin_coefficients: array of ``float`` sine coefficients in Fourier expansion of on-axis field gradient
+            (optional); default is a tanh fringe field model based on `<http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
+   :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
+   :param nslice: number of slices used for the application of space charge

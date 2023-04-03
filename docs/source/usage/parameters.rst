@@ -225,6 +225,23 @@ Lattice Elements
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
+        * ``quadrupole_softedge`` for a soft-edge quadrupole. This requires these additional parameters:
+
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
+
+            * ``<element_name>.gscale`` (``float``, in inverse meters) Scaling factor for on-axis magnetic field gradient
+
+            * ``<element_name>.cos_coefficients`` (array of ``float``) cos coefficients in Fourier expansion of the on-axis field gradient
+              (optional); default is a tanh fringe field model from `MaryLie 3.0 <http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
+
+            * ``<element_name>.sin_coefficients`` (array of ``float``) sin coefficients in Fourier expansion of the on-axis field gradient
+              (optional); default is a tanh fringe field model from `MaryLie 3.0 <http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
+
+            * ``<element_name>.mapsteps`` (``integer``) number of integration steps per slice used for map and reference particle push in applied fields
+               (default: ``1``)
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
+
         * ``sbend`` for a bending magnet. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
@@ -343,6 +360,26 @@ Lattice Elements
 
             * ``<element_name>.phi_out`` (``float``, in degrees) angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame
 
+        * ``beam_monitor`` a beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
+          If the same element name is used multiple times, then an output series is created with multiple outputs.
+
+            * ``<element_name>.name`` (``string``, default value: ``<element_name>``)
+
+                The output series name to use.
+                By default, output is created under ``diags/openPMD/<element_name>.<backend>``.
+
+            * ``<element_name>.backend`` (``string``, default value: ``default``)
+
+                `I/O backend <https://openpmd-api.readthedocs.io/en/latest/backends/overview.html>`_ for `openPMD <https://www.openPMD.org>`_ data dumps.
+                ``bp`` is the `ADIOS2 I/O library <https://csmd.ornl.gov/adios>`_, ``h5`` is the `HDF5 format <https://www.hdfgroup.org/solutions/hdf5/>`_, and ``json`` is a `simple text format <https://en.wikipedia.org/wiki/JSON>`_.
+                ``json`` only works with serial/single-rank jobs.
+                By default, the first available backend in the order given above is taken.
+
+            * ``<element_name>.encoding`` (``string``, default value: ``g``)
+
+                openPMD `iteration encoding <https://openpmd-api.readthedocs.io/en/0.14.0/usage/concepts.html#iteration-and-series>`__: (v)ariable based, (f)ile based, (g)roup based (default)
+                variable based is an `experimental feature with ADIOS2 <https://openpmd-api.readthedocs.io/en/0.14.0/backends/adios2.html#experimental-new-adios2-schema>`__.
+
 
 .. _running-cpp-parameters-parallelization:
 
@@ -453,6 +490,8 @@ Diagnostics and output
 * ``diag.enable`` (``boolean``, optional, default: ``true``)
   Enable or disable diagnostics generally.
   Disabling this is mostly used for benchmarking.
+
+  This option is ignored for the openPMD output elements (remove them from the lattice to disable).
 
 * ``diag.slice_step_diagnostics`` (``boolean``, optional, default: ``false``)
   By default, diagnostics is performed at the beginning and end of the simulation.

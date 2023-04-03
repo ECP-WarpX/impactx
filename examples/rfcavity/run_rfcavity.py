@@ -114,7 +114,28 @@ rf = elements.RFCavity(
     nslice=4,
 )
 
-sim.lattice.extend([dr1, dr2, rf, dr2, dr2, rf, dr2, dr2, rf, dr2, dr2, rf, dr2])
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", backend="h5")
+
+sim.lattice.extend(
+    [
+        monitor,
+        dr1,
+        dr2,
+        rf,
+        dr2,
+        dr2,
+        rf,
+        dr2,
+        dr2,
+        rf,
+        dr2,
+        dr2,
+        rf,
+        dr2,
+        monitor,
+    ]
+)
 
 # run simulation
 sim.evolve()

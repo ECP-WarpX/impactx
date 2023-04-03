@@ -15,6 +15,9 @@ curl -L -o amrex-doxygen-web.tag.xml \
 curl -L -o warpx-doxygen-web.tag.xml \
   https://warpx.readthedocs.io/en/latest/_static/doxyhtml/warpx-doxygen-web.tag.xml
 
+curl -L -o openpmd-api-doxygen-web.tag.xml \
+  https://openpmd-api.readthedocs.io/en/latest/_static/doxyhtml/openpmd-api-doxygen-web.tag.xml
+
 # treat all warnings as errors
 echo "WARN_AS_ERROR = YES" >> Doxyfile
 

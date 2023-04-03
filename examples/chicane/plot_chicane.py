@@ -11,6 +11,7 @@ import re
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
+import openpmd_api as io
 import pandas as pd
 from scipy.stats import moment
 
@@ -23,17 +24,23 @@ def get_moments(beam):
     -------
     sigx, sigy, sigt, emittance_x, emittance_y, emittance_t
     """
-    sigx = moment(beam["x"], moment=2) ** 0.5  # variance -> std dev.
-    sigpx = moment(beam["px"], moment=2) ** 0.5
-    sigy = moment(beam["y"], moment=2) ** 0.5
-    sigpy = moment(beam["py"], moment=2) ** 0.5
-    sigt = moment(beam["t"], moment=2) ** 0.5
-    sigpt = moment(beam["pt"], moment=2) ** 0.5
+    sigx = moment(beam["position_x"], moment=2) ** 0.5  # variance -> std dev.
+    sigpx = moment(beam["momentum_x"], moment=2) ** 0.5
+    sigy = moment(beam["position_y"], moment=2) ** 0.5
+    sigpy = moment(beam["momentum_y"], moment=2) ** 0.5
+    sigt = moment(beam["position_ct"], moment=2) ** 0.5
+    sigpt = moment(beam["momentum_t"], moment=2) ** 0.5
 
     epstrms = beam.cov(ddof=0)
-    emittance_x = (sigx**2 * sigpx**2 - epstrms["x"]["px"] ** 2) ** 0.5
-    emittance_y = (sigy**2 * sigpy**2 - epstrms["y"]["py"] ** 2) ** 0.5
-    emittance_t = (sigt**2 * sigpt**2 - epstrms["t"]["pt"] ** 2) ** 0.5
+    emittance_x = (
+        sigx**2 * sigpx**2 - epstrms["position_x"]["momentum_x"] ** 2
+    ) ** 0.5
+    emittance_y = (
+        sigy**2 * sigpy**2 - epstrms["position_y"]["momentum_y"] ** 2
+    ) ** 0.5
+    emittance_t = (
+        sigt**2 * sigpt**2 - epstrms["position_ct"]["momentum_t"] ** 2
+    ) ** 0.5
 
     return (sigx, sigy, sigt, emittance_x, emittance_y, emittance_t)
 
@@ -70,11 +77,12 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-# initial/final beam on rank zero
-beam = read_time_series("diags/beam_[0-9]*.*")
+# initial/final beam
+series = io.Series("diags/openPMD/monitor.h5", io.Access.read_only)
+last_step = list(series.iterations)[-1]
+initial = series.iterations[1].particles["beam"].to_df()
+final = series.iterations[last_step].particles["beam"].to_df()
 ref_particle = read_time_series("diags/ref_particle.*")
-# print(beam)
-# print(ref_particle)
 
 # scaling to units
 millimeter = 1.0e3  # m->mm
@@ -90,9 +98,7 @@ nm_rad = 1.0e9
 
 
 # steps & corresponding z
-steps = beam.step.unique()
-steps.sort()
-# print(f"steps={steps}")
+steps = list(series.iterations)
 
 z = list(
     map(lambda step: ref_particle[ref_particle["step"] == step].z.values[0], steps)
@@ -104,7 +110,15 @@ x = list(
 
 
 # beam transversal size & emittance over steps
-moments = list(map(lambda step: (step, get_moments(beam[beam["step"] == step])), steps))
+moments = list(
+    map(
+        lambda step: (
+            step,
+            get_moments(series.iterations[step].particles["beam"].to_df()),
+        ),
+        steps,
+    )
+)
 # print(moments)
 sigx = list(map(lambda step_val: step_val[1][0] * millimeter, moments))
 sigt = list(map(lambda step_val: step_val[1][2] * millimeter, moments))
@@ -150,56 +164,57 @@ else:
 
 
 # beam transversal scatter plot over steps
-plot_ever_nstep = 25  # this is lattice.nslice in inputs
-# entry and exit dipedge are part of each bending element
-# lattice.elements = sbend1 dipedge1 drift1 dipedge2 sbend2 drift2 sbend2
-#                    dipedge2 drift1 dipedge1 sbend1 drift3
-# lattice.nslice = 25
-print_steps = [0, 26, 51, 77, 102, 128, 153, 179, 204]
-num_plots_per_row = len(print_steps)
+num_plots_per_row = len(steps)
 fig, axs = plt.subplots(
     4, num_plots_per_row, figsize=(9, 6.4), sharex="row", sharey="row"
 )
 
 ncol_ax = -1
-for step in print_steps:
+for step in steps:
     # plot initial distribution & at exit of each element
-    print(step)
     ncol_ax += 1
 
     # t-pt
     ax = axs[(0, ncol_ax)]
-    beam_at_step = beam[beam["step"] == step]
+    beam_at_step = series.iterations[step].particles["beam"].to_df()
     ax.scatter(
-        beam_at_step.t.multiply(millimeter), beam_at_step.pt.multiply(mrad), s=0.01
+        beam_at_step.position_ct.multiply(millimeter),
+        beam_at_step.momentum_t.multiply(mrad),
+        s=0.01,
     )
     ax.set_xlabel(r"$ct$ [mm]")
     z_unit = ""
     if ncol_ax == num_plots_per_row - 1:
         z_unit = " [m]"
-    ax.set_title(f"$z={z[step]:.1f}${z_unit}")
+    ax.set_title(f"$z={z[ncol_ax]:.1f}${z_unit}")
 
     # x-px
     ax = axs[(1, ncol_ax)]
-    beam_at_step = beam[beam["step"] == step]
+    beam_at_step = series.iterations[step].particles["beam"].to_df()
     ax.scatter(
-        beam_at_step.x.multiply(millimeter), beam_at_step.px.multiply(mrad), s=0.01
+        beam_at_step.position_x.multiply(millimeter),
+        beam_at_step.momentum_x.multiply(mrad),
+        s=0.01,
     )
     ax.set_xlabel(r"$x$ [mm]")
 
     # t-x
     ax = axs[(2, ncol_ax)]
-    beam_at_step = beam[beam["step"] == step]
+    beam_at_step = series.iterations[step].particles["beam"].to_df()
     ax.scatter(
-        beam_at_step.t.multiply(millimeter), beam_at_step.x.multiply(millimeter), s=0.01
+        beam_at_step.position_ct.multiply(millimeter),
+        beam_at_step.position_x.multiply(millimeter),
+        s=0.01,
     )
     ax.set_xlabel(r"$ct$ [mm]")
 
     # t-px
     ax = axs[(3, ncol_ax)]
-    beam_at_step = beam[beam["step"] == step]
+    beam_at_step = series.iterations[step].particles["beam"].to_df()
     ax.scatter(
-        beam_at_step.t.multiply(millimeter), beam_at_step.px.multiply(mrad), s=0.01
+        beam_at_step.position_ct.multiply(millimeter),
+        beam_at_step.momentum_x.multiply(mrad),
+        s=0.01,
     )
     ax.set_xlabel(r"$ct$ [mm]")
 

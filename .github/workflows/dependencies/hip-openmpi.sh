@@ -26,6 +26,7 @@ sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
     build-essential \
     gfortran        \
+    libhdf5-openmpi-dev \
     libhiredis-dev  \
     libnuma-dev     \
     libopenmpi-dev  \
@@ -46,7 +47,7 @@ which clang++
 
 # cmake-easyinstall
 #
-sudo curl -L -o /usr/local/bin/cmake-easyinstall https://git.io/JvLxY
+sudo curl -L -o /usr/local/bin/cmake-easyinstall https://raw.githubusercontent.com/ax3l/cmake-easyinstall/main/cmake-easyinstall
 sudo chmod a+x /usr/local/bin/cmake-easyinstall
 export CEI_SUDO="sudo"
 export CEI_TMP="/tmp/cei"

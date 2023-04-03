@@ -2335,7 +2335,8 @@ SKIP_FUNCTION_MACROS   = YES
 # run, you must also specify the path to the tagfile here.
 
 TAGFILES               = amrex-doxygen-web.tag.xml=https://amrex-codes.github.io/amrex/doxygen/  \
-                         warpx-doxygen-web.tag.xml=https://warpx.readthedocs.io/en/latest/_static/doxyhtml/
+                         warpx-doxygen-web.tag.xml=https://warpx.readthedocs.io/en/latest/_static/doxyhtml/  \
+                         openpmd-api-doxygen-web.tag.xml=https://openpmd-api.readthedocs.io/en/latest/_static/doxyhtml/
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create a
 # tag file that is based on the input files it reads. See section "Linking to

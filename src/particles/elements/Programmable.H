@@ -26,9 +26,21 @@ namespace impactx
         static constexpr auto name = "Programmable";
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** This element writes the particle beam out to openPMD data.
+        /** This element can be programmed
          */
-        Programmable () {}
+        Programmable (amrex::ParticleReal ds=0.0, int nslice=1)
+            : m_ds(ds), m_nslice(nslice)
+        {}
+
+        /** Push all particles relative to the reference particle
+         *
+         * @param[in,out] pc particle container to push
+         * @param[in] step global step for diagnostics
+         */
+        void operator() (
+            ImpactXParticleContainer & pc,
+            int step
+        ) const;
 
         /** Push all particles relative to the reference particle */
         void operator() (
@@ -68,6 +80,16 @@ namespace impactx
         amrex::ParticleReal m_ds = 0.0; //! segment length in m
         int m_nslice = 1; //! number of slices used for the application of space charge
 
+        /** Allow threading via OpenMP for the particle iterator loop
+         *
+         * This will only affect threading if the OMP backend is active.
+         *
+         * The default value is false to do the safe thing by default. Users
+         * must opt-in their guarantee that their code is thread-safe.
+         */
+        bool m_threadsafe = false;
+
+        std::function<void(ImpactXParticleContainer *, int)> m_push; //! hook for push of whole container
         std::function<void(ImpactXParticleContainer::iterator *, RefPart &)> m_beam_particles; //! hook for beam particles
         std::function<void(RefPart &)> m_ref_particle; //! hook for reference particle
     };

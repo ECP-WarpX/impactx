@@ -42,22 +42,27 @@ distr = distribution.Waterbag(
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
-# design the accelerator lattice
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", backend="h5")
 
-# Quad elements
+# design the accelerator lattice
+sim.lattice.append(monitor)
+#   Quad elements
 quad1 = elements.Quad(ds=0.15, k=2.5)
 quad2 = elements.Quad(ds=0.3, k=-2.5)
-# Drift element
+#   Drift element
 drift1 = elements.Drift(ds=1.0)
-# Short RF cavity element
+#   Short RF cavity element
 shortrf1 = elements.ShortRF(V=0.01, k=15.0)
 
 lattice_no_drifts = [quad1, shortrf1, quad2, shortrf1, quad1]
-# set first lattice element
+#   set first lattice element
 sim.lattice.append(lattice_no_drifts[0])
-# intersperse all remaining elements of the lattice with a drift element
+#   intersperse all remaining elements of the lattice with a drift element
 for element in lattice_no_drifts[1:]:
     sim.lattice.extend([drift1, element])
+
+sim.lattice.append(monitor)
 
 # run simulation
 sim.evolve()

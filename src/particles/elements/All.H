@@ -24,6 +24,8 @@
 #include "Sol.H"
 #include "PRot.H"
 #include "SoftSol.H"
+#include "SoftQuad.H"
+#include "diagnostics/openPMD.H"
 
 #include <variant>
 
@@ -33,8 +35,8 @@ namespace impactx
     using KnownElements = std::variant<
         None, /* must be first, so KnownElements creates a default constructor */
         ConstF, DipEdge, Drift, Multipole, NonlinearLens,
-        Programmable,
-        Quad, RFCavity, Sbend, ShortRF, Sol, PRot, SoftSolenoid>;
+        diagnostics::BeamMonitor, Programmable,
+        Quad, RFCavity, Sbend, ShortRF, Sol, PRot, SoftSolenoid, SoftQuadrupole>;
 
 } // namespace impactx
 

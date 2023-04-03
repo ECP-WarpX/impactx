@@ -16,6 +16,7 @@ sudo apt-get install -y \
     clang-tidy          \
     cmake               \
     gnupg               \
+    libhdf5-openmpi-dev \
     libomp-dev          \
     libopenmpi-dev      \
     ninja-build         \
@@ -28,3 +29,10 @@ python3 -m pip install -U pip setuptools wheel
 python3 -m pip install -U cmake pytest
 python3 -m pip install -r requirements_mpi.txt
 python3 -m pip install -r examples/requirements.txt
+
+# cmake-easyinstall
+#
+sudo curl -L -o /usr/local/bin/cmake-easyinstall https://raw.githubusercontent.com/ax3l/cmake-easyinstall/main/cmake-easyinstall
+sudo chmod a+x /usr/local/bin/cmake-easyinstall
+export CEI_SUDO="sudo"
+export CEI_TMP="/tmp/cei"

@@ -20,7 +20,7 @@ jobs:
 
     - name: install dependencies
       run: |
-        .github/workflows/dependencies/gcc.sh
+        .github/workflows/dependencies/gcc-openmpi.sh
 
     - name: CCache Cache
       uses: actions/cache@v3
@@ -39,6 +39,7 @@ jobs:
       run: |
         cmake -S . -B build            \
           -DCMAKE_BUILD_TYPE=Debug     \
+          -DBUILD_SHARED_LIBS=ON       \
           -DCMAKE_INSTALL_PREFIX=/usr  \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
           -DImpactX_PYTHON=ON
@@ -52,11 +53,11 @@ jobs:
       run: |
         sudo cmake --build build --target install
 
-        impactx.MPI.OMP.DP.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 1 || \
+        impactx.MPI.OMP.DP.OPMD.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 1 || \
         { cat Backtrace.0.0; exit 1; }
-        impactx.MPI.OMP.DP.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 2 || \
+        impactx.MPI.OMP.DP.OPMD.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 2 || \
         { cat Backtrace.0.0; exit 1; }
-        impactx.MPI.OMP.DP.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 3 || \
+        impactx.MPI.OMP.DP.OPMD.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 3 || \
         { cat Backtrace.0.0; exit 1; }
 
     - name: run installed python module
@@ -96,6 +97,7 @@ jobs:
     - name: build ImpactX
       run: |
         cmake -S . -B build            \
+          -DBUILD_SHARED_LIBS=ON       \
           -DCMAKE_BUILD_TYPE=Debug     \
           -DCMAKE_INSTALL_PREFIX=/usr  \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
@@ -111,11 +113,11 @@ jobs:
       run: |
         sudo cmake --build build --target install
 
-        impactx.NOMPI.OMP.DP.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 1 || \
+        impactx.NOMPI.OMP.DP.OPMD.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 1 || \
         { cat Backtrace.0.0; exit 1; }
-        impactx.NOMPI.OMP.DP.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 2 || \
+        impactx.NOMPI.OMP.DP.OPMD.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 2 || \
         { cat Backtrace.0.0; exit 1; }
-        impactx.NOMPI.OMP.DP.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 3 || \
+        impactx.NOMPI.OMP.DP.OPMD.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 3 || \
         { cat Backtrace.0.0; exit 1; }
 
     - name: run installed python module

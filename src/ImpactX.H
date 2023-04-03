@@ -36,8 +36,6 @@ namespace impactx
          */
         ImpactX ();
 
-        ~ImpactX () = default;
-
         // removed constructors/assignments
         ImpactX (ImpactX const&) = delete;
         ImpactX (ImpactX &&) = delete;

@@ -13,6 +13,7 @@ sudo apt-get install -y \
     ca-certificates     \
     cmake               \
     gnupg               \
+    libhdf5-openmpi-dev \
     libhiredis-dev      \
     libopenmpi-dev      \
     libzstd-dev         \
@@ -21,8 +22,8 @@ sudo apt-get install -y \
     pkg-config          \
     wget
 
-sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
-echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64 /" \
+sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
+echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64 /" \
     | sudo tee /etc/apt/sources.list.d/cuda.list
 
 sudo apt-get update
@@ -39,7 +40,7 @@ sudo ln -s cuda-11.0 /usr/local/cuda
 
 # cmake-easyinstall
 #
-sudo curl -L -o /usr/local/bin/cmake-easyinstall https://git.io/JvLxY
+sudo curl -L -o /usr/local/bin/cmake-easyinstall https://raw.githubusercontent.com/ax3l/cmake-easyinstall/main/cmake-easyinstall
 sudo chmod a+x /usr/local/bin/cmake-easyinstall
 export CEI_SUDO="sudo"
 export CEI_TMP="/tmp/cei"

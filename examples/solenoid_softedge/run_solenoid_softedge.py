@@ -124,7 +124,16 @@ sol = elements.SoftSolenoid(
     nslice=4,
 )
 
-sim.lattice.extend([sol])
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", backend="h5")
+
+sim.lattice.extend(
+    [
+        monitor,
+        sol,
+        monitor,
+    ]
+)
 
 # run simulation
 sim.evolve()
