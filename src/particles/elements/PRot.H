@@ -28,7 +28,7 @@ namespace impactx
     {
         static constexpr auto name = "PRot";
         using PType = ImpactXParticleContainer::ParticleType;
-        
+
         constexpr amrex::ParticleReal degree2rad = ablastr::constant::math::pi / 180.0;
 
         /** An exact pole face rotation in the x-z plane, from a frame
