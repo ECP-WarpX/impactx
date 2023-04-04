@@ -465,7 +465,7 @@ add_impactx_test(rotation
 )
 add_impactx_test(rotation.py
     examples/rotation/run_rotation.py
-      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/rotation/analysis_rotation.py
     OFF  # no plot script yet
