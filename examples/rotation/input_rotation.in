@@ -13,9 +13,6 @@ beam.sigmaT = 1.0e-3
 beam.sigmaPx = 3.0e-4
 beam.sigmaPy = 3.0e-4
 beam.sigmaPt = 2.0e-3
-beam.muxpx = 0.0
-beam.muypy = 0.0
-beam.mutpt = 0.0
 
 
 ###############################################################################
