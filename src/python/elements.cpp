@@ -272,6 +272,15 @@ void init_elements(py::module& m)
         )
     ;
 
+    py::class_<PRot, elements::Thin>(me, "PRot")
+        .def(py::init<
+                amrex::ParticleReal const,
+                amrex::ParticleReal const>(),
+             py::arg("phi_in"), py::arg("phi_out"),
+             "An exact pole-face rotation in the x-z plane. Both angles are in degrees."
+        )
+    ;
+
     py::class_<SoftQuadrupole, elements::Thick>(me, "SoftQuadrupole")
         .def(py::init<
                  amrex::ParticleReal,

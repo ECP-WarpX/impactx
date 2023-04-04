@@ -22,6 +22,7 @@
 #include "Sbend.H"
 #include "ShortRF.H"
 #include "Sol.H"
+#include "PRot.H"
 #include "SoftSol.H"
 #include "SoftQuad.H"
 #include "diagnostics/openPMD.H"
@@ -35,7 +36,7 @@ namespace impactx
         None, /* must be first, so KnownElements creates a default constructor */
         ConstF, DipEdge, Drift, Multipole, NonlinearLens,
         diagnostics::BeamMonitor, Programmable,
-        Quad, RFCavity, Sbend, ShortRF, Sol, SoftSolenoid, SoftQuadrupole>;
+        Quad, RFCavity, Sbend, ShortRF, Sol, PRot, SoftSolenoid, SoftQuadrupole>;
 
 } // namespace impactx
 

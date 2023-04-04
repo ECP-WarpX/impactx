@@ -519,6 +519,13 @@ This module provides elements for the accelerator lattice.
    :param ks: Solenoid strength in m^(-1) (MADX convention) in (magnetic field Bz in T) / (rigidity in T-m)
    :param nslice: number of slices used for the application of space charge
 
+.. py:class:: impactx.elements.PRot(phi_in, phi_out)
+
+   Exact map for a pole-face rotation in the x-z plane.
+
+   :param phi_in: angle of the reference particle with respect to the longitudinal (z) axis in the original frame in degrees
+   :param phi_out: angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame in degrees
+
 .. py:class:: impactx.elements.SoftQuadrupole(ds, gscale, cos_coefficients, sin_coefficients, nslice=1)
 
    A soft-edge quadrupole.

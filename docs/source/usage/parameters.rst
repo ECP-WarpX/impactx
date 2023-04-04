@@ -354,6 +354,12 @@ Lattice Elements
 
                 = c parameter * sqrt(Twiss beta)
 
+        * ``prot`` for an exact pole-face rotation in the x-z plane. This requires these additional parameters:
+
+            * ``<element_name>.phi_in`` (``float``, in degrees) angle of the reference particle with respect to the longitudinal (z) axis in the original frame
+
+            * ``<element_name>.phi_out`` (``float``, in degrees) angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame
+
         * ``beam_monitor`` a beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
           If the same element name is used multiple times, then an output series is created with multiple outputs.
 
@@ -373,6 +379,7 @@ Lattice Elements
 
                 openPMD `iteration encoding <https://openpmd-api.readthedocs.io/en/0.14.0/usage/concepts.html#iteration-and-series>`__: (v)ariable based, (f)ile based, (g)roup based (default)
                 variable based is an `experimental feature with ADIOS2 <https://openpmd-api.readthedocs.io/en/0.14.0/backends/adios2.html#experimental-new-adios2-schema>`__.
+
 
 .. _running-cpp-parameters-parallelization:
 

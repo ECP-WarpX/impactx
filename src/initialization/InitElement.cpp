@@ -151,6 +151,11 @@ namespace detail
                 pp_element.get("ks", ks);
                 pp_element.queryAdd("nslice", nslice);
                 m_lattice.emplace_back( Sol(ds, ks, nslice) );
+            } else if (element_type == "prot") {
+                amrex::ParticleReal phi_in, phi_out;
+                pp_element.get("phi_in", phi_in);
+                pp_element.get("phi_out", phi_out);
+                m_lattice.emplace_back( PRot(phi_in, phi_out) );
             } else if (element_type == "solenoid_softedge") {
                 amrex::Real ds, bscale;
                 int nslice = nslice_default;

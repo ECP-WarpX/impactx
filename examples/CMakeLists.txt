@@ -453,6 +453,24 @@ add_impactx_test(solenoid.MADX.py
     OFF  # no plot script yet
 )
 
+# Pole-face rotation ###################################################
+#
+# w/o space charge
+add_impactx_test(rotation
+    examples/rotation/input_rotation.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/rotation/analysis_rotation.py
+    OFF  # no plot script yet
+)
+add_impactx_test(rotation.py
+    examples/rotation/run_rotation.py
+      ON   # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/rotation/analysis_rotation.py
+    OFF  # no plot script yet
+)
+
 # Soft-Edge Solenoid ###################################################
 #
 # w/o space charge
