@@ -152,11 +152,9 @@ namespace detail
                 pp_element.queryAdd("nslice", nslice);
                 m_lattice.emplace_back( Sol(ds, ks, nslice) );
             } else if (element_type == "prot") {
-                amrex::Real phi_in,phi_out;
+                amrex::ParticleReal phi_in, phi_out;
                 pp_element.get("phi_in", phi_in);
                 pp_element.get("phi_out", phi_out);
-                phi_in = phi_in*ablastr::constant::math::pi/180.0;
-                phi_out = phi_out*ablastr::constant::math::pi/180.0;
                 m_lattice.emplace_back( PRot(phi_in, phi_out) );
             } else if (element_type == "solenoid_softedge") {
                 amrex::Real ds, bscale;

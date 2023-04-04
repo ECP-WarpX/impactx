@@ -28,17 +28,19 @@ namespace impactx
     {
         static constexpr auto name = "PRot";
         using PType = ImpactXParticleContainer::ParticleType;
+        
+        constexpr amrex::ParticleReal degree2rad = ablastr::constant::math::pi / 180.0;
 
         /** An exact pole face rotation in the x-z plane, from a frame
          *  in which the reference orbit has angle phi_in with the z-axis,
          *  to a frame in which the reference orbit has angle phi_out
          *  with the z-axis.  The net rotation angle is phi_out - phi_in.
          *
-         * @param phi_in Initial angle of reference trajectory w/r/t z (rad)
-         * @param phi_out Final angle of reference trajectory w/r/t/ z (rad)
+         * @param phi_in Initial angle of reference trajectory w/r/t z (degrees)
+         * @param phi_out Final angle of reference trajectory w/r/t/ z (degrees)
          */
         PRot( amrex::ParticleReal const phi_in, amrex::ParticleReal const phi_out )
-        : m_phi_in(phi_in), m_phi_out(phi_out)
+        : m_phi_in(phi_in * degree2rad), m_phi_out(phi_out * degree2rad)
         {
         }
 
