@@ -14,6 +14,8 @@
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 
+#include <ablastr/constant.H>
+
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
 
@@ -29,7 +31,7 @@ namespace impactx
         static constexpr auto name = "PRot";
         using PType = ImpactXParticleContainer::ParticleType;
 
-        constexpr amrex::ParticleReal degree2rad = ablastr::constant::math::pi / 180.0;
+        static constexpr amrex::ParticleReal degree2rad = ablastr::constant::math::pi / 180.0;
 
         /** An exact pole face rotation in the x-z plane, from a frame
          *  in which the reference orbit has angle phi_in with the z-axis,
