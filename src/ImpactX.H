@@ -100,6 +100,12 @@ namespace impactx
          */
         void init_warning_logger ();
 
+        /** Compute momenta of the beam distribution and print them out
+         *
+         * TODO: document input variables
+         */
+        void compute_beam_relevant (ImpactXParticleContainer const & pc, int const step);
+
       private:
         //! Tag cells for refinement.  TagBoxArray tags is built on level lev grids.
         void ErrorEst (int lev, amrex::TagBoxArray& tags, amrex::Real time,

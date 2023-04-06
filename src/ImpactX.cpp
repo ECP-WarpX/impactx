@@ -11,6 +11,7 @@
 #include "initialization/InitAmrCore.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
+#include "particles/diagnostics/BeamRelevant.H"
 #include "particles/diagnostics/DiagnosticOutput.H"
 #include "particles/spacecharge/ForceFromSelfFields.H"
 #include "particles/spacecharge/GatherAndPush.H"
@@ -201,6 +202,10 @@ namespace impactx
                 if (!early_params_checked) { early_params_checked = early_param_check(); }
 
             } // end in-element space-charge slice-step loop
+
+            // print out reduced beam diagnostics
+            diagnostics::compute_beam_relevant(*m_particle_container, global_step);
+
         } // end beamline element loop
 
         if (diag_enable)
