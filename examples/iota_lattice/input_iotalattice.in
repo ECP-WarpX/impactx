@@ -22,20 +22,30 @@ beam.mutpt = 0.0
 # Beamline: lattice elements and segments
 ###############################################################################
 lattice.elements = monitor
-                   dra1 qa1 dra2 qa2 dra3 qa3 dra4 qa4 dra5
-                   edge30 sbend30 edge30 drb1 qb1 drb2 qb2 drb2 qb3
-                   drb3 dnll drb3 qb4 drb2 qb5 drb2 qb6 drb4
-                   edge60 sbend60 edge60 drc1 qc1 drc2 qc2 drc2 qc3 drc1
-                   edge60 sbend60 edge60 drd1 qd1 drd2 qd2 drd3 qd3 drd2 qd4 drd4
-                   edge30 sbend30 edge30 dre1 qe1 dre2 qe2 dre3 qe3
-                   dre3 qe2 dre2 qe1 dre1 edge30 sbend30 edge30
-                   drd4 qd4 drd2 qd3 drd3 qd2 drd2 qd1 drd1 edge60 sbend60 edge60
-                   drc1 qc3 drc2 qc2 drc2 qc1 drc1 edge60 sbend60 edge60
-                   drb4 qb6 drb2 qb5 drb2 qb4 drb3 dnll drb3
-                   qb3 drb2 qb2 drb2 qb1 drb1 edge30 sbend30 edge30
-                   dra5 qa4 dra4 qa3 dra3 qa2 dra2 qa1 dra1
+                   first_half
+                   qe3
+                   second_half
                    monitor
 
+# lines
+first_half.type = line
+first_half.elements = dra1 qa1 dra2 qa2 dra3 qa3 dra4 qa4 dra5
+                      edge30 sbend30 edge30 drb1 qb1 drb2 qb2 drb2 qb3
+                      drb3 dnll drb3 qb4 drb2 qb5 drb2 qb6 drb4
+                      edge60 sbend60 edge60 drc1 qc1 drc2 qc2 drc2 qc3 drc1
+                      edge60 sbend60 edge60 drd1 qd1 drd2 qd2 drd3 qd3 drd2 qd4 drd4
+                      edge30 sbend30 edge30 dre1 qe1 dre2 qe2 dre3
+
+second_half.type = line
+second_half.reverse = true
+second_half.elements = dra1 qa1 dra2 qa2 dra3 qa3 dra4 qa4 dra5
+                       edge30 sbend30 edge30 drb1 qb1 drb2 qb2 drb2 qb3
+                       drb3 dnll drb3 qb4 drb2 qb5 drb2 qb6 drb4
+                       edge60 sbend60 edge60 drc1 qc1 drc2 qc2 drc2 qc3 drc1
+                       edge60 sbend60 edge60 drd1 qd1 drd2 qd2 drd3 qd3 drd2 qd4 drd4
+                       edge30 sbend30 edge30 dre1 qe1 dre2 qe2 dre3
+
+# thick element splitting for space charge
 lattice.nslice = 10
 
 
