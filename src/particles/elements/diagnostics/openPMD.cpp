@@ -196,6 +196,7 @@ namespace detail
 #   if openPMD_HAVE_MPI==1
                 , amrex::ParallelDescriptor::Communicator()
 #   endif
+                , "adios2.engine.usesteps = true"
             );
             series.setIterationEncoding( series_encoding );
             m_series = series;
