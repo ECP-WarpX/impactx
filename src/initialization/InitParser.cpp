@@ -20,8 +20,10 @@ namespace impactx::initialization
 
         // https://amrex-codes.github.io/amrex/docs_html/GPU.html#inputs-parameters
         bool abort_on_out_of_gpu_memory = true; // AMReX' default: false
-        pp_amrex.query("abort_on_out_of_gpu_memory", abort_on_out_of_gpu_memory);
-        pp_amrex.add("abort_on_out_of_gpu_memory", abort_on_out_of_gpu_memory);
+        pp_amrex.queryAdd("abort_on_out_of_gpu_memory", abort_on_out_of_gpu_memory);
+
+        bool the_arena_is_managed = false; // AMReX' default: true
+        pp_amrex.queryAdd("the_arena_is_managed", the_arena_is_managed);
 
         // Here we override the default tiling option for particles, which is always
         // "false" in AMReX, to "false" if compiling for GPU execution and "true"
