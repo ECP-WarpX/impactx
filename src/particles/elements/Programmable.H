@@ -76,7 +76,11 @@ namespace impactx
             return m_ds;
         }
 
-    public:
+        /** Close and deallocate all data and handles.
+         */
+        void
+        finalize ();
+
         amrex::ParticleReal m_ds = 0.0; //! segment length in m
         int m_nslice = 1; //! number of slices used for the application of space charge
 
@@ -92,6 +96,7 @@ namespace impactx
         std::function<void(ImpactXParticleContainer *, int)> m_push; //! hook for push of whole container
         std::function<void(ImpactXParticleContainer::iterator *, RefPart &)> m_beam_particles; //! hook for beam particles
         std::function<void(RefPart &)> m_ref_particle; //! hook for reference particle
+        std::function<void()> m_finalize; //! hook for finalize cleanup
     };
 
 } // namespace impactx
