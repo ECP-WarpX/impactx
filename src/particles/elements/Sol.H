@@ -12,7 +12,8 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "mixin/beamoptic.H"
-#include "mixin/beamoptic.H"
+#include "mixin/thick.H"
+#include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -24,7 +25,8 @@ namespace impactx
 {
     struct Sol
     : public elements::BeamOptic<Sol>,
-      public elements::Thick
+      public elements::Thick,
+      public elements::NoFinalize
     {
         static constexpr auto name = "Sol";
         using PType = ImpactXParticleContainer::ParticleType;

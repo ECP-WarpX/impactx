@@ -13,6 +13,7 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -24,7 +25,8 @@ namespace impactx
 {
     struct NonlinearLens
     : public elements::BeamOptic<NonlinearLens>,
-      public elements::Thin
+      public elements::Thin,
+      public elements::NoFinalize
     {
         static constexpr auto name = "NonlinearLens";
         using PType = ImpactXParticleContainer::ParticleType;

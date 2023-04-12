@@ -221,9 +221,9 @@ namespace impactx
         // loop over all beamline elements & finalize them
         for (auto & element_variant : m_lattice)
         {
-            auto bd = std::get_if<diagnostics::BeamMonitor>(&element_variant);
-            if (bd)
-                bd->finalize();
+            std::visit([](auto&& element){
+                element.finalize();
+            }, element_variant);
         }
 
     }
