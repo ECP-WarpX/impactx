@@ -12,6 +12,8 @@
 
 #include "particles/ImpactXParticleContainer.H"
 
+#include <AMReX_BLProfiler.H>
+
 
 namespace impactx
 {
@@ -38,7 +40,10 @@ namespace impactx
         RefPart & ref_part = pc.GetRefParticle();
 
         // push reference particle in global coordinates
-        element(ref_part);
+        {
+            BL_PROFILE("impactx::Push::RefPart");
+            element(ref_part);
+        }
 
         // loop over refinement levels
         int const nLevel = pc.finestLevel();
