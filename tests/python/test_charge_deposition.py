@@ -63,7 +63,7 @@ def test_charge_deposition(save_png=True):
         bx = mfi.validbox()
         rbx = amrex.RealBox(bx, dr, gm.ProbLo())
 
-        arr = rho.array(mfi)
+        arr = rho.array(mfi)  # TODO: explicit device-to-host memory copy
         arr_np = np.array(arr, copy=False)  # indices: comp, z, y, x
 
         # shift box to zero-based local mfi index space
