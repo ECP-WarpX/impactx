@@ -56,17 +56,20 @@ def test_charge_deposition(save_png=True):
 
     half_z = sim.n_cell[2] // 2  # order: x,y,z
 
-    # copy data from device to host
-    rho_host = amrex.MultiFab(
-        rho.box_array(),
-        rho.dm(),
-        rho.n_comp(),
-        rho.n_grow_vect(),
-        amrex.MFInfo().set_arena(amrex.The_Pinned_Arena()),
-    )
+    # for GPU runs, copy data from device to host for plotting
+    if impactx.Config.have_gpu:
+        rho_host = amrex.MultiFab(
+            rho.box_array(),
+            rho.dm(),
+            rho.n_comp(),
+            rho.n_grow_vect(),
+            amrex.MFInfo().set_arena(amrex.The_Pinned_Arena()),
+        )
+        amrex.dtoh_memcpy(rho_host, rho)
+    else:
+        rho_host = rho
 
-    amrex.dtoh_memcpy(rho_host, rho)
-
+    # plot data slices
     f = plt.figure()
     ax = f.gca()
     ng = rho_host.nGrowVect
