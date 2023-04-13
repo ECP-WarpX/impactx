@@ -21,6 +21,7 @@ namespace impactx
     ) const
     {
         if (m_push == nullptr) {
+            // TODO: print if verbose mode is set
             push_all(pc, *this, step, m_threadsafe);
         }
         else {
@@ -49,6 +50,14 @@ namespace impactx
             amrex::AllPrint() << "Programmable element - ref particles: NO HOOK\n";
         else
             m_ref_particle(ref_part);
+    }
+
+    void
+    Programmable::finalize ()
+    {
+        if (m_finalize != nullptr)
+            m_finalize();
+        // TODO: else - print if verbose mode is set
     }
 
 } // namespace impactx

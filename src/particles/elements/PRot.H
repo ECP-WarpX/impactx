@@ -13,6 +13,7 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/nofinalize.H"
 
 #include <ablastr/constant.H>
 
@@ -26,7 +27,8 @@ namespace impactx
 {
     struct PRot
     : public elements::BeamOptic<PRot>,
-      public elements::Thin
+      public elements::Thin,
+      public elements::NoFinalize
     {
         static constexpr auto name = "PRot";
         using PType = ImpactXParticleContainer::ParticleType;
