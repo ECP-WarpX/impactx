@@ -135,7 +135,7 @@ if(NOT ImpactX_APP AND NOT ImpactX_LIB)
 endif()
 
 # collect all objects for compilation
-add_library(ImpactX OBJECT src/particles/diagnostics/BeamRelevant.cpp)
+add_library(ImpactX OBJECT)
 set(_ALL_TARGETS ImpactX)
 
 # executable application
