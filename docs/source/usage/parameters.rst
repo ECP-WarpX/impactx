@@ -202,8 +202,10 @@ Lattice Elements
 ----------------
 
 * ``lattice.elements`` (``list of strings``) optional (default: no elements)
-    A list of names (one name per lattice element), in the order that they
-    appear in the lattice.
+    A list of names (one name per lattice element), in the order that they appear in the lattice.
+
+* ``lattice.reverse`` (``boolean``) optional (default: ``false``)
+    Reverse the list of elements in the lattice.
 
 * ``lattice.nslice`` (``integer``) optional (default: ``1``)
     A positive integer specifying the number of slices used for the application of
@@ -385,6 +387,14 @@ Lattice Elements
 
                 openPMD `iteration encoding <https://openpmd-api.readthedocs.io/en/0.14.0/usage/concepts.html#iteration-and-series>`__: (v)ariable based, (f)ile based, (g)roup based (default)
                 variable based is an `experimental feature with ADIOS2 <https://openpmd-api.readthedocs.io/en/0.14.0/backends/adios2.html#experimental-new-adios2-schema>`__.
+
+        * ``line`` a sub-lattice (line) of elements to append to the lattice.
+
+            * ``<element_name>.elements`` (``list of strings``) optional (default: no elements)
+              A list of names (one name per lattice element), in the order that they appear in the lattice.
+
+            * ``<element_name>.reverse`` (``boolean``) optional (default: ``false``)
+              Reverse the list of elements in the line before appending to the lattice.
 
 
 .. _running-cpp-parameters-parallelization:
