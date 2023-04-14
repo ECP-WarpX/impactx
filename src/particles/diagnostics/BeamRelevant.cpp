@@ -31,14 +31,9 @@ namespace impactx
 
             BL_PROFILE("impactX::diagnostics::compute_beam_relevant");
 
-            // physical constants and reference quantities
-            amrex::ParticleReal constexpr c0_SI = 2.99792458e8;  // TODO move out
-            // inverse of speed of light squared
-            amrex::Real constexpr inv_c2 = 1.0_rt / (c0_SI * c0_SI);
-
             // preparing to access reference particle data: RefPart
             RefPart const ref_part = pc.GetRefParticle();
-
+            // reference particle charge in units of positive elementary charge
             ParticleReal const q_qe = ref_part.charge_qe();
 
             // preparing access to particle data: AoS and SoA
