@@ -7,6 +7,7 @@
 
 #include <particles/ImpactXParticleContainer.H>
 #include <AMReX.H>
+#include <AMReX_MFIter.H>
 #include <AMReX_ParticleContainer.H>
 
 namespace py = pybind11;
@@ -18,12 +19,22 @@ void init_impactxparticlecontainer(py::module& m)
     py::class_<
         ParIter,
         amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
-    >(m, "ImpactXParIter");
+    >(m, "ImpactXParIter")
+        .def(py::init<ParIter::ContainerType&, int>(),
+             py::arg("particle_container"), py::arg("level"))
+        .def(py::init<ParIter::ContainerType&, int, amrex::MFItInfo&>(),
+             py::arg("particle_container"), py::arg("level"), py::arg("info"))
+    ;
 
     py::class_<
         ParConstIter,
         amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
-    >(m, "ImpactXParConstIter");
+    >(m, "ImpactXParConstIter")
+        .def(py::init<ParConstIter::ContainerType&, int>(),
+             py::arg("particle_container"), py::arg("level"))
+        .def(py::init<ParConstIter::ContainerType&, int, amrex::MFItInfo&>(),
+             py::arg("particle_container"), py::arg("level"), py::arg("info"))
+    ;
 
     py::class_<
         ImpactXParticleContainer,
