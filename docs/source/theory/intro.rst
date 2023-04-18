@@ -9,8 +9,11 @@ Concepts
 Reference Trajectory
 """"""""""""""""""""
 
-ImpactX is an *s*-based beam dynamics code, evolving particles *relative* to a reference trajectory.
+ImpactX is an *s*-based beam dynamics code, tracking particles using the longitudinal accelerator lattice position :math:`s` as the independent dynamical variable.
+Particle phase space coordinates are specified relative to a nominal reference trajectory.
 
+The reference trajectory plays an important role in ImpactX.
+In addition to specifying the nominal machine orbit, it specifies the relationship between the local beam coordinate system and the global lab coordinate system.
 A reference trajectory is favorable instead of, e.g., differences to the beam centroid, because:
 
 #. the reference trajectory is the ideal single-particle orbit used as part of the optics design, so it is better that it can be computed independently of the beam distribution,
