@@ -26,11 +26,22 @@ The reference values of :math:`z=ct` and :math:`s` should be identical until rea
 Also, the reference value of :math:`ct` coincides with the value of :math:`s` in the ultrarelativistic limit.
 More generally, the derivative :math:`ds/d(ct) = \beta`, where the relativistic :math:`\beta = \sqrt{1-\frac{1}{p_t^2}}`.
 
+Collective Effects
+""""""""""""""""""
+
+Collective effects from space charge of the particle beam are solved between steps in :math:`s`.
+One can set the number of slice steps through each lattice element for the application of the space charge push.
+
+.. note::
+
+   Currently, space charge kicks are calculated in 3D.
+   A 2D space-charge solver for purely transversal effects will be added in the future.
+
 
 Assumptions
 -----------
 
-This is a work-in-progress list of physical assumptions implemented in the numerics of ImpactX.
+This is an overview of physical assumptions implemented in the numerics of ImpactX.
 
 
 Tracking and Lattice Optics
