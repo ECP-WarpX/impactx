@@ -111,8 +111,11 @@ namespace impactx
          * is then copied to the permanent tile which is stored on the particle
          * (particle_tile).
          */
-        using PinnedTile = amrex::ParticleTile<NStructReal, NStructInt, NArrayReal, NArrayInt,
-                amrex::PinnedArenaAllocator>;
+        using PinnedTile = amrex::ParticleTile<
+            amrex::Particle<NStructReal, NStructInt>,
+            NArrayReal, NArrayInt,
+            amrex::PinnedArenaAllocator
+        >;
         PinnedTile pinned_tile;
         pinned_tile.define(NumRuntimeRealComps(), NumRuntimeIntComps());
 
