@@ -48,6 +48,7 @@ jobs:
         brew install ninja
         brew install open-mpi
         brew install pkg-config
+        python3 -m pip install --upgrade pip setuptools wheel pytest
         python3 -m pip install --upgrade pytest
         python3 -m pip install -r requirements_mpi.txt
         python3 -m pip install -r examples/requirements.txt
