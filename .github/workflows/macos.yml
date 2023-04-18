@@ -74,16 +74,17 @@ jobs:
       run: |
         ctest --test-dir build --output-on-failure -E pytest.AMReX
 
-    - name: run installed app
-      run: |
-        cmake --build build --target install
-
-        impactx.NOMPI.OMP.DP.OPMD.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 1 || \
-        { cat Backtrace.0.0; exit 1; }
-        impactx.NOMPI.OMP.DP.OPMD.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 2 || \
-        { cat Backtrace.0.0; exit 1; }
-        impactx.NOMPI.OMP.DP.OPMD.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 3 || \
-        { cat Backtrace.0.0; exit 1; }
+# https://gitlab.kitware.com/cmake/cmake/-/issues/24822
+#    - name: run installed app
+#      run: |
+#        cmake --build build --target install
+#
+#        impactx.NOMPI.OMP.DP.OPMD.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 1 || \
+#        { cat Backtrace.0.0; exit 1; }
+#        impactx.NOMPI.OMP.DP.OPMD.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 2 || \
+#        { cat Backtrace.0.0; exit 1; }
+#        impactx.NOMPI.OMP.DP.OPMD.DEBUG examples/fodo/input_fodo.in algo.particle_shape = 3 || \
+#        { cat Backtrace.0.0; exit 1; }
 
     - name: run installed python module
       run: |
