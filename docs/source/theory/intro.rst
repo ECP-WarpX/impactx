@@ -9,7 +9,8 @@ Concepts
 Reference Trajectory
 """"""""""""""""""""
 
-ImpactX is an *s*-based beam dynamics code, tracking particles using the longitudinal accelerator lattice position :math:`s` as the independent dynamical variable.
+ImpactX is an *s*-based beam dynamics code with space charge.
+Particles are tracked using the longitudinal accelerator lattice position :math:`s` as the independent dynamical variable.
 Particle phase space coordinates are specified relative to a nominal reference trajectory.
 
 The reference trajectory plays an important role in ImpactX.
