@@ -9,8 +9,9 @@
  */
 
 #include "ImpactX.H"
-#include <Particles/NamedComponentParticleContainer.H>
+#include "particles/NamedComponentParticleContainer.H"
 #include "particles/ImpactXParticleContainer.H"
+#include "particles/diagnostics/ReducedBeamCharacteristics.H"
 
 #include <AMReX_ParallelDescriptor.H>   // for ParallelDescriptor
 #include <AMReX_REAL.H>                 // for ParticleReal
@@ -27,9 +28,9 @@ namespace impactx
     namespace diagnostics{
 
 
-        void compute_beam_relevant(ImpactXParticleContainer const & pc, int const step) {
+        ReducedBeamCharacteristics compute_reduced_beam_characteristics(ImpactXParticleContainer const & pc) {
 
-            BL_PROFILE("impactX::diagnostics::compute_beam_relevant");
+            BL_PROFILE("impactX::diagnostics::compute_reduced_beam_characteristics");
 
             // preparing to access reference particle data: RefPart
             RefPart const ref_part = pc.GetRefParticle();
@@ -185,31 +186,21 @@ namespace impactx
             // Courant-Snyder (Twiss) beta-function
             ParticleReal beta_x = x_ms / emittance_x;
             ParticleReal beta_y = y_ms / emittance_y;
+            ParticleReal beta_t = t_ms / emittance_t;
             // Courant-Snyder (Twiss) alpha
             ParticleReal alpha_x = - xux / emittance_x;
             ParticleReal alpha_y = - yuy / emittance_y;
+            ParticleReal alpha_t = - tut / emittance_t;
 
-            amrex::AllPrint() << "step" << " " << "s" << " " << "ref_part.beta_gamma()" << " "
-                              << "x_mean" << " " << "y_mean" << " " << "t_mean" << " "
-                              << "sig_x" << " " << "sig_y" << " " << "sig_t" << " "
-                              << "ux_mean" << " " << "uy_mean" << " " << "ut_mean" << " "
-                              << "sig_px" << " " << "sig_py" << " " << "sig_pt" << " "
-                              << "emittance_x" << " " << "emittance_y" << " " << "emittance_t" << " "
-                              << "alpha_x" << " " << "alpha_y" << " "
-                              << "beta_x" << " " << "beta_y" << " "
-                              << "charge" << " "
-                              << "\n";
-
-            amrex::AllPrint() << step << " " << ref_part.s << " " << ref_part.beta_gamma() << " "
-                              << x_mean << " " << y_mean << " " << t_mean << " "
-                              << sig_x << " " << sig_y << " " << sig_t << " "
-                              << ux_mean << " " << uy_mean << " " << ut_mean << " "
-                              << sig_px << " " << sig_py << " " << sig_pt << " "
-                              << emittance_x << " " << emittance_y << " " << emittance_t << " "
-                              << alpha_x << " " << alpha_y << " "
-                              << beta_x << " " << beta_y << " "
-                              << charge << " "
-                              << "\n";
+            return {
+                ref_part.s, ref_part.beta_gamma(), x_mean, y_mean, t_mean,
+                sig_x, sig_y, sig_t, ux_mean, uy_mean, ut_mean,
+                sig_px, sig_py, sig_pt,
+                emittance_x, emittance_y, emittance_t,
+                alpha_x, alpha_y, alpha_t,
+                beta_x, beta_y, beta_t,
+                charge
+            };
 
         }
 

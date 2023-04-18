@@ -1,5 +1,5 @@
 target_sources(ImpactX
   PRIVATE
-    BeamRelevant.cpp
+    ReducedBeamCharacteristics.cpp
     DiagnosticOutput.cpp
 )
