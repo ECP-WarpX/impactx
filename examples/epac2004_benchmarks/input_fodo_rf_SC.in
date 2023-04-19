@@ -125,4 +125,4 @@ geometry.prob_relative = 4.0
 ###############################################################################
 # Diagnostics
 ###############################################################################
-diag.slice_step_diagnostics = true
+diag.slice_step_diagnostics = false

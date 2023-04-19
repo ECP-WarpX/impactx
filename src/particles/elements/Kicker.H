@@ -68,29 +68,36 @@ namespace impactx
         /** This is a transverse kicker functor, so that a variable of this type can be
          * used like a function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle (unused)
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-            PType& AMREX_RESTRICT p,
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            amrex::ParticleReal & AMREX_RESTRICT t,
             amrex::ParticleReal & AMREX_RESTRICT px,
             amrex::ParticleReal & AMREX_RESTRICT py,
             amrex::ParticleReal & AMREX_RESTRICT pt,
-            [[maybe_unused]] RefPart const & refpart) const
+            [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
+            [[maybe_unused]] RefPart const & refpart
+        ) const
         {
             using namespace amrex::literals; // for _rt and _prt
 
             // shift due to alignment errors of the element
-            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_in(x, y, px, py);
 
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-            amrex::ParticleReal const t = p.pos(RealAoS::t);
+            // access position data
+            amrex::ParticleReal const xout = x;
+            amrex::ParticleReal const yout = y;
+            amrex::ParticleReal const tout = t;
 
             // normalize quad units to MAD-X convention if needed
             amrex::ParticleReal dpx = m_xkick;
@@ -106,13 +113,13 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // advance position and momentum
-            p.pos(RealAoS::x) = x;
+            x = xout;
             pxout = px + dpx;
 
-            p.pos(RealAoS::y) = y;
+            y = yout;
             pyout = py + dpy;
 
-            p.pos(RealAoS::t) = t;
+            t = tout;
             ptout = pt;
 
             // assign updated momenta
@@ -121,7 +128,7 @@ namespace impactx
             pt = ptout;
 
             // undo shift due to alignment errors of the element
-            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle. */

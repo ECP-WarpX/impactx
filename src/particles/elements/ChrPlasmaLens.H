@@ -70,30 +70,31 @@ namespace impactx
 
         /** This is a chrplasmalens functor, so that a variable of this type can be used like a chrplasmalens function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-            PType& AMREX_RESTRICT p,
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            amrex::ParticleReal & AMREX_RESTRICT t,
             amrex::ParticleReal & AMREX_RESTRICT px,
             amrex::ParticleReal & AMREX_RESTRICT py,
             amrex::ParticleReal & AMREX_RESTRICT pt,
+            [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
             RefPart const & refpart
         ) const
         {
             using namespace amrex::literals; // for _rt and _prt
 
             // shift due to alignment errors of the element
-            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
-
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-            amrex::ParticleReal const t = p.pos(RealAoS::t);
+            shift_in(x, y, px, py);
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
@@ -116,6 +117,10 @@ namespace impactx
             // chromatic dependence on delta is included
             amrex::ParticleReal const omega = sqrt(std::abs(g)/delta1);
 
+            // initialize output values
+            amrex::ParticleReal xout = x;
+            amrex::ParticleReal yout = y;
+
             // intialize output values of momenta
             amrex::ParticleReal pxout = px;
             amrex::ParticleReal pyout = py;
@@ -127,14 +132,14 @@ namespace impactx
             amrex::ParticleReal p1 = px;
             amrex::ParticleReal p2 = py;
 
-            // advance transverse position and momentum (focusing)
-            p.pos(RealAoS::x) = cos(omega*slice_ds)*x +
-                                sin(omega*slice_ds)/(omega*delta1)*px;
-            pxout = -omega*delta1*sin(omega*slice_ds)*x + cos(omega*slice_ds)*px;
+            auto const [sin_ods, cos_ods] = amrex::Math::sincos(omega*slice_ds);
 
-            p.pos(RealAoS::y) = cos(omega*slice_ds)*y +
-                                sin(omega*slice_ds)/(omega*delta1)*py;
-            pyout = -omega*delta1*sin(omega*slice_ds)*y + cos(omega*slice_ds)*py;
+            // advance transverse position and momentum (focusing)
+            xout = cos_ods * x + sin_ods / (omega * delta1) * px;
+            pxout = -omega * delta1 * sin_ods * x + cos_ods * px;
+
+            yout = cos_ods * y + sin_ods / (omega * delta1) * py;
+            pyout = -omega * delta1 * sin_ods * y + cos_ods * py;
 
             // advance longitudinal position and momentum
 
@@ -149,18 +154,20 @@ namespace impactx
             amrex::ParticleReal const term4 = -2_prt*q1*p1*w*cos(2_prt*slice_ds*omega);
             amrex::ParticleReal const term5 = 2_prt*omega*(q1*p1*delta1 + q2*p2*delta1
                                         -(pow(p1,2)+pow(p2,2))*slice_ds - (pow(q1,2)+pow(q2,2))*pow(w,2)*slice_ds);
-            p.pos(RealAoS::t) = t0 + (-1_prt+bet*pt)/(8_prt*bet*pow(delta1,3)*omega)
-                                        *(term1+term2+term3+term4+term5);
+            t = t0 + (-1_prt+bet*pt)/(8_prt*bet*pow(delta1,3)*omega)
+                     *(term1+term2+term3+term4+term5);
 
             // ptout = pt;
 
-            // assign updated momenta
+            // assign updated position & momenta
+            x = xout;
+            y = yout;
             px = pxout;
             py = pyout;
             pt = ptout;
 
             // undo shift due to alignment errors of the element
-            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle.

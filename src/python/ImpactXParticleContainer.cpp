@@ -28,35 +28,31 @@ void init_impactxparticlecontainer(py::module& m)
         .export_values();
 
     py::class_<
-        ParIter,
-        amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
+        ParIterSoA,
+        amrex::ParIterSoA<RealSoA::nattribs, IntSoA::nattribs>
     >(m, "ImpactXParIter")
-        .def(py::init<ParIter::ContainerType&, int>(),
+        .def(py::init<ParIterSoA::ContainerType&, int>(),
              py::arg("particle_container"), py::arg("level"))
-        .def(py::init<ParIter::ContainerType&, int, amrex::MFItInfo&>(),
+        .def(py::init<ParIterSoA::ContainerType&, int, amrex::MFItInfo&>(),
              py::arg("particle_container"), py::arg("level"), py::arg("info"))
     ;
 
     py::class_<
-        ParConstIter,
-        amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
+        ParConstIterSoA,
+        amrex::ParConstIterSoA<RealSoA::nattribs, IntSoA::nattribs>
     >(m, "ImpactXParConstIter")
-        .def(py::init<ParConstIter::ContainerType&, int>(),
+        .def(py::init<ParConstIterSoA::ContainerType&, int>(),
              py::arg("particle_container"), py::arg("level"))
-        .def(py::init<ParConstIter::ContainerType&, int, amrex::MFItInfo&>(),
+        .def(py::init<ParConstIterSoA::ContainerType&, int, amrex::MFItInfo&>(),
              py::arg("particle_container"), py::arg("level"), py::arg("info"))
     ;
 
     py::class_<
         ImpactXParticleContainer,
-        amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>
+        amrex::ParticleContainerPureSoA<RealSoA::nattribs, IntSoA::nattribs>
     >(m, "ImpactXParticleContainer")
         //.def(py::init<>())
 
-        .def_property_readonly_static("RealAoS",
-            [](py::object /* pc */){ return py::type::of<RealAoS>(); },
-            "RealAoS attribute name labels"
-        )
         .def_property_readonly_static("RealSoA",
             [](py::object /* pc */){ return py::type::of<RealSoA>(); },
             "RealSoA attribute name labels"
@@ -65,6 +61,19 @@ void init_impactxparticlecontainer(py::module& m)
         .def_property_readonly("coord_system",
             &ImpactXParticleContainer::GetCoordSystem,
             "Get the current coordinate system of particles in this container"
+        )
+
+        // simpler particle iterator loops: return types of this particle box
+        // note: overwritten to return ImpactX instead of (py)AMReX iterators
+        .def_property_readonly_static(
+            "iterator",
+            [](py::object /* pc */){ return py::type::of<impactx::ParIterSoA>(); },
+            "ImpactX iterator for particle boxes"
+        )
+        .def_property_readonly_static(
+            "const_iterator",
+            [](py::object /* pc */){ return py::type::of<impactx::ParConstIterSoA>(); },
+            "ImpactX constant iterator for particle boxes (read-only)"
         )
 
         .def("add_n_particles",
@@ -125,17 +134,11 @@ void init_impactxparticlecontainer(py::module& m)
         )
         */
 
-        .def_property_readonly("RealAoS_names", &ImpactXParticleContainer::RealAoS_names,
-              "Get the name of each Real AoS component")
-
         .def_property_readonly("RealSoA_names", &ImpactXParticleContainer::RealSoA_names,
               "Get the name of each ParticleReal SoA component")
         .def_property_readonly("intSoA_names", &ImpactXParticleContainer::intSoA_names,
                "Get the name of each int SoA component")
     ;
-
-    m.def("get_RealAoS_names", &get_RealAoS_names,
-          "Get the name of each Real AoS component");
 
     m.def("get_RealSoA_names", &get_RealSoA_names,
           py::arg("num_real_comps"),

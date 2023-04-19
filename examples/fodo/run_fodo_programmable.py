@@ -77,16 +77,16 @@ def my_drift(pge, pti, refpart):
 
     else:
         array = np.array
-    # access AoS data such as positions and cpu/id
-    aos = pti.aos()
-    aos_arr = array(aos, copy=False)
 
-    # access SoA data such as momentum
+    # access particle attributes
     soa = pti.soa()
-    real_arrays = soa.GetRealData()
-    px = array(real_arrays[0], copy=False)
-    py = array(real_arrays[1], copy=False)
-    pt = array(real_arrays[2], copy=False)
+    real_arrays = soa.get_real_data()
+    x = array(real_arrays[0], copy=False)
+    y = array(real_arrays[1], copy=False)
+    t = array(real_arrays[2], copy=False)
+    px = array(real_arrays[3], copy=False)
+    py = array(real_arrays[4], copy=False)
+    pt = array(real_arrays[5], copy=False)
 
     # length of the current slice
     slice_ds = pge.ds / pge.nslice
@@ -96,9 +96,9 @@ def my_drift(pge, pti, refpart):
     betgam2 = pt_ref**2 - 1.0
 
     # advance position and momentum (drift)
-    aos_arr[:]["x"] += slice_ds * px[:]
-    aos_arr[:]["y"] += slice_ds * py[:]
-    aos_arr[:]["z"] += (slice_ds / betgam2) * pt[:]
+    x[:] += slice_ds * px[:]
+    y[:] += slice_ds * py[:]
+    t[:] += (slice_ds / betgam2) * pt[:]
 
 
 def my_ref_drift(pge, refpart):

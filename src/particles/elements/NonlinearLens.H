@@ -64,38 +64,43 @@ namespace impactx
         /** This is a nonlinear lens functor, so that a variable of this type
          *  can be used like a nonlinear lens function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle (unused)
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
-                amrex::ParticleReal & AMREX_RESTRICT px,
-                amrex::ParticleReal & AMREX_RESTRICT py,
-                amrex::ParticleReal & AMREX_RESTRICT pt,
-                [[maybe_unused]] RefPart const & refpart) const {
-
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT t,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
+            [[maybe_unused]] RefPart const & refpart
+        ) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
             // a complex type with two amrex::ParticleReal
             using Complex = amrex::GpuComplex<amrex::ParticleReal>;
 
             // shift due to alignment errors of the element
-            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
-
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-            amrex::ParticleReal const t = p.pos(RealAoS::t);
+            shift_in(x, y, px, py);
 
             // access reference particle values to find (beta*gamma)^2
             //amrex::ParticleReal const pt_ref = refpart.pt;
             //amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
 
-            // intialize output values of momenta
+            // intialize output values
+            amrex::ParticleReal xout = x;
+            amrex::ParticleReal yout = y;
+            amrex::ParticleReal tout = t;
             amrex::ParticleReal pxout = px;
             amrex::ParticleReal pyout = py;
             amrex::ParticleReal ptout = pt;
@@ -125,22 +130,25 @@ namespace impactx
             amrex::ParticleReal const dpy = -kick*dF.m_imag;
 
             // advance position and momentum
-            p.pos(RealAoS::x) = x;
+            // xout = x;
             pxout = px + dpx;
 
-            p.pos(RealAoS::y) = y;
+            // yout = y;
             pyout = py + dpy;
 
-            p.pos(RealAoS::t) = t;
+            // tout = t;
             ptout = pt;
 
-            // assign updated momenta
+            // assign updated values
+            x = xout;
+            y = yout;
+            t = tout;
             px = pxout;
             py = pyout;
             pt = ptout;
 
             // undo shift due to alignment errors of the element
-            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle. */

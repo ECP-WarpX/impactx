@@ -64,29 +64,36 @@ namespace impactx
         /** This is a multipole functor, so that a variable of this type can be used like a
          *  multipole function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
-                amrex::ParticleReal & AMREX_RESTRICT px,
-                amrex::ParticleReal & AMREX_RESTRICT py,
-                amrex::ParticleReal & AMREX_RESTRICT pt,
-                RefPart const & refpart) const {
-
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            amrex::ParticleReal & AMREX_RESTRICT t,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
+            RefPart const & refpart
+        ) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
             // shift due to alignment errors of the element
-            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_in(x, y, px, py);
 
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-            amrex::ParticleReal const t = p.pos(RealAoS::t);
+            // access position data
+            amrex::ParticleReal const xout = x;
+            amrex::ParticleReal const yout = y;
+            amrex::ParticleReal const tout = t;
 
             // access reference particle to find relativistic beta
             amrex::ParticleReal const beta_ref = refpart.beta();
@@ -105,13 +112,13 @@ namespace impactx
             amrex::ParticleReal kx = 1.0_prt/m_rc;
 
             // advance position and momentum
-            p.pos(RealAoS::x) = x;
-            pxout = px - pow(kx,2)*ds*x + kx*ds*f; //eq (3.2b)
+            x = xout;
+            pxout = px - pow(kx,2) * ds * xout + kx * ds * f; //eq (3.2b)
 
-            p.pos(RealAoS::y) = y;
+            y = yout;
             pyout = py;
 
-            p.pos(RealAoS::t) = t + kx*x*ds*fprime; //eq (3.2e)
+            t = tout + kx * xout * ds * fprime; //eq (3.2e)
             ptout = pt;
 
             // assign updated momenta
@@ -120,7 +127,7 @@ namespace impactx
             pt = ptout;
 
             // undo shift due to alignment errors of the element
-            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle. */
