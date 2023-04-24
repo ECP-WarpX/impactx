@@ -253,6 +253,19 @@ namespace detail
                 getComponentRecord(component_name).resetDataset(d_fl);
             }
         }
+
+        // openPMD coarse position
+        {
+            using vs = std::vector<std::string>;
+            vs const positionComponents{"x", "y", "ct"}; // TODO: generalize
+            for (auto currDim = 0; currDim < AMREX_SPACEDIM; currDim++) {
+                using namespace amrex::literals;
+                std::string const positionComponent = positionComponents[currDim];
+                beam["positionOffset"][positionComponent].resetDataset(d_fl);
+                beam["positionOffset"][positionComponent].makeConstant(0_prt); // TODO: make this the reference particle position?
+            }
+        }
+
         // AoS: Int
         beam["id"][scalar].resetDataset(d_ui);
 
@@ -320,6 +333,8 @@ namespace detail
         auto series = std::any_cast<io::Series>(m_series);
         io::WriteIterations iterations = series.writeIterations();
         io::Iteration iteration = iterations[m_step];
+
+        // close iteration
         iteration.close();
     }
 
