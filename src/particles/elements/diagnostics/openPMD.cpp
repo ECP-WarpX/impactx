@@ -211,6 +211,7 @@ namespace detail
 
     void BeamMonitor::prepare (
         PinnedContainer & pc,
+        RefPart const & ref_part,
         int step
     ) {
 #ifdef ImpactX_USE_OPENPMD
@@ -256,14 +257,12 @@ namespace detail
 
         // openPMD coarse position
         {
-            using vs = std::vector<std::string>;
-            vs const positionComponents{"x", "y", "ct"}; // TODO: generalize
-            for (auto currDim = 0; currDim < AMREX_SPACEDIM; currDim++) {
-                using namespace amrex::literals;
-                std::string const positionComponent = positionComponents[currDim];
-                beam["positionOffset"][positionComponent].resetDataset(d_fl);
-                beam["positionOffset"][positionComponent].makeConstant(0_prt); // TODO: make this the reference particle position?
-            }
+            beam["positionOffset"]["x"].resetDataset(d_fl);
+            beam["positionOffset"]["x"].makeConstant(ref_part.x);
+            beam["positionOffset"]["y"].resetDataset(d_fl);
+            beam["positionOffset"]["y"].makeConstant(ref_part.y);
+            beam["positionOffset"]["ct"].resetDataset(d_fl);
+            beam["positionOffset"]["ct"].makeConstant(ref_part.t);
         }
 
         // AoS: Int
@@ -311,7 +310,7 @@ namespace detail
         */
 
         // prepare element access
-        this->prepare(pinned_pc, step);
+        this->prepare(pinned_pc, ref_part, step);
 
         // loop over refinement levels
         int const nLevel = pinned_pc.finestLevel();
