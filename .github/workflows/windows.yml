@@ -55,6 +55,7 @@ jobs:
         python3 -m pip install -U pip setuptools wheel pytest
         python3 -m pip install -r requirements.txt
         python3 -m pip install -r examples/requirements.txt
+        python3 -m pip install -U openPMD-validator
     - name: Build
       run: |
         $env:HDF5_DIR = "C:/Program Files/HDF_Group/HDF5/1.12.2/cmake/"
@@ -137,6 +138,7 @@ jobs:
         python3 -m pip install -U pip setuptools wheel pytest
         python3 -m pip install -r requirements.txt
         python3 -m pip install -r examples/requirements.txt
+        python3 -m pip install -U openPMD-validator
     - name: Build
       shell: cmd
       run: |
@@ -175,3 +177,6 @@ jobs:
 #        if errorlevel 1 exit 1
 #        cmake --build build --target pip_install
 #        if errorlevel 1 exit 1
+
+    - name: validate created openPMD files
+      run: find build -name *.h5 | xargs -n1 -I{} openPMD_check_h5 -i {}

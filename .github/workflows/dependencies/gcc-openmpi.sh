@@ -26,3 +26,5 @@ python3 -m pip install -U pip setuptools wheel
 python3 -m pip install -U cmake pytest
 python3 -m pip install -r requirements_mpi.txt
 python3 -m pip install -r examples/requirements.txt
+
+python3 -m pip install -U openPMD-validator

@@ -54,6 +54,7 @@ jobs:
         python3 -m pip install --upgrade pytest
         python3 -m pip install -r requirements_mpi.txt
         python3 -m pip install -r examples/requirements.txt
+        python3 -m pip install --upgrade openPMD-validator
         set -e
     - name: CCache Cache
       uses: actions/cache@v3
@@ -93,3 +94,6 @@ jobs:
         { cat Backtrace.0.0; exit 1; }
         impactx.MPI.OMP.DP.OPMD examples/fodo/input_fodo.in algo.particle_shape = 3 || \
         { cat Backtrace.0.0; exit 1; }
+
+    - name: validate created openPMD files
+      run: find build -name *.h5 | xargs -n1 -I{} openPMD_check_h5 -i {}

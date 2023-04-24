@@ -66,6 +66,9 @@ jobs:
 
         python3 examples/fodo/run_fodo.py
 
+    - name: validate created openPMD files
+      run: find build -name *.h5 | xargs -n1 -I{} openPMD_check_h5 -i {}
+
   build_gcc_python:
     name: GCC w/o MPI w/ Python
     runs-on: ubuntu-20.04
@@ -125,3 +128,6 @@ jobs:
         cmake --build build --target pip_install
 
         python3 examples/fodo/run_fodo.py
+
+    - name: validate created openPMD files
+      run: find build -name *.h5 | xargs -n1 -I{} openPMD_check_h5 -i {}
