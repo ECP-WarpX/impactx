@@ -23,7 +23,7 @@ namespace distribution
     struct KVdist
     {
         /** A K-V distribution transversely + a uniform distribution
-         *  it t + a Gaussian distribution in pt
+         *  in t + a Gaussian distribution in pt
          *
          * Return sampling from a K-V + uniform distribution.
          *

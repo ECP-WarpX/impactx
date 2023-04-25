@@ -218,7 +218,7 @@ Particles
 
       longitudinal position y, in meters
 
-   .. py:property:: t
+   .. py:property:: ct
 
       clock time * c in meters
 
@@ -298,7 +298,7 @@ This module provides particle beam distributions that can be used to initialize 
 .. py:class:: impactx.distribution.Kurth4D(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A 4D Kurth distribution transversely + a uniform distribution
-   it t + a Gaussian distribution in pt.
+   in t + a Gaussian distribution in pt.
 
 .. py:class:: impactx.distribution.Kurth6D(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
@@ -310,7 +310,7 @@ This module provides particle beam distributions that can be used to initialize 
 .. py:class:: impactx.distribution.KVdist(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A K-V distribution transversely + a uniform distribution
-   it t + a Gaussian distribution in pt.
+   in t + a Gaussian distribution in pt.
 
 .. py:class:: impactx.distribution.None
 

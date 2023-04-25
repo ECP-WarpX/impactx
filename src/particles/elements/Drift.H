@@ -110,7 +110,7 @@ namespace impactx
             amrex::ParticleReal const py = refpart.py;
             amrex::ParticleReal const z = refpart.z;
             amrex::ParticleReal const pz = refpart.pz;
-            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const ct = refpart.ct;
             amrex::ParticleReal const pt = refpart.pt;
             amrex::ParticleReal const s = refpart.s;
 
@@ -124,7 +124,7 @@ namespace impactx
             refpart.x = x + step*px;
             refpart.y = y + step*py;
             refpart.z = z + step*pz;
-            refpart.t = t - step*pt;
+            refpart.ct = ct - step * pt;
 
             // advance integrated path length
             refpart.s = s + slice_ds;

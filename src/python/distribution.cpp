@@ -45,7 +45,7 @@ void init_distribution(py::module& m)
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
              py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0,
              "A 4D Kurth distribution transversely + a uniform distribution\n"
-             "it t + a Gaussian distribution in pt"
+             "in t + a Gaussian distribution in pt"
         );
 
     py::class_<distribution::Kurth6D>(md, "Kurth6D")
@@ -72,7 +72,7 @@ void init_distribution(py::module& m)
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
              py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0,
              "A K-V distribution transversely + a uniform distribution\n"
-             "it t + a Gaussian distribution in pt"
+             "in t + a Gaussian distribution in pt"
         );
 
     py::class_<distribution::None>(md, "None")

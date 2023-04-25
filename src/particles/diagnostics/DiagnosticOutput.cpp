@@ -37,11 +37,11 @@ namespace impactx::diagnostics
         // write file header per MPI RANK
         if (!append) {
             if (otype == OutputType::PrintParticles) {
-                file_handler << "id x y t px py pt\n";
+                file_handler << "id x y ct px py pt\n";
             } else if (otype == OutputType::PrintNonlinearLensInvariants) {
                 file_handler << "id H I\n";
             } else if (otype == OutputType::PrintRefParticle) {
-                file_handler << "step s x y z t px py pz pt\n";
+                file_handler << "step s x y z ct px py pz pt\n";
             }
         }
 
@@ -151,7 +151,7 @@ namespace impactx::diagnostics
                     amrex::ParticleReal const x = ref_part.x;
                     amrex::ParticleReal const y = ref_part.y;
                     amrex::ParticleReal const z = ref_part.z;
-                    amrex::ParticleReal const t = ref_part.t;
+                    amrex::ParticleReal const ct = ref_part.ct;
                     amrex::ParticleReal const px = ref_part.px;
                     amrex::ParticleReal const py = ref_part.py;
                     amrex::ParticleReal const pz = ref_part.pz;
@@ -160,7 +160,7 @@ namespace impactx::diagnostics
                     // write particle data to file
                     file_handler
                             << step << " " << s << " "
-                            << x << " " << y << " " << z << " " << t << " "
+                            << x << " " << y << " " << z << " " << ct << " "
                             << px << " " << py << " " << pz << " " << pt << "\n";
                 } // if( otype == OutputType::PrintRefParticle)
             } // end loop over all particle boxes

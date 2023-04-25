@@ -23,7 +23,7 @@ namespace distribution
     struct Kurth4D
     {
         /** A 4D Kurth distribution transversely + a uniform distribution
-         *  it t + a Gaussian distribution in pt
+         *  in t + a Gaussian distribution in pt
          *
          * Return sampling from a 4D Kurth + uniform distribution.
          *

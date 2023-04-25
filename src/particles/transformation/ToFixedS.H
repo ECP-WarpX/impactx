@@ -77,13 +77,13 @@ namespace transformation
             AMREX_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pt arg (<=0)");
             amrex::ParticleReal const ptf = arg > 0.0_prt ? -sqrt(arg) : -1.0_prt;
 
-            // transform position and momentum (from fixed t to fixed s)
+            // transform position and momentum (from fixed ct to fixed s)
 
             p.pos(0) = x - px*t/(m_pzd+pt);
             // px = px;
             p.pos(1) = y - py*t/(m_pzd+pt);
             // py = py;
-            p.pos(2) = ptf*t/(m_pzd+pt);  // This now represents t.
+            p.pos(2) = ptf*t/(m_pzd+pt);  // This now represents ct.
             pt = ptf - ptdf;                    // This now represents pt.
 
             // transform momenta to static units (eg, so that momenta are

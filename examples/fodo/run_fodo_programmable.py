@@ -114,7 +114,7 @@ def my_ref_drift(pge, refpart):
     py = refpart.py
     z = refpart.z
     pz = refpart.pz
-    t = refpart.t
+    ct = refpart.ct
     pt = refpart.pt
     s = refpart.s
 
@@ -128,7 +128,7 @@ def my_ref_drift(pge, refpart):
     refpart.x = x + step * px
     refpart.y = y + step * py
     refpart.z = z + step * pz
-    refpart.t = t - step * pt
+    refpart.ct = ct - step * pt
 
     # advance integrated path length
     refpart.s = s + slice_ds

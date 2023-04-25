@@ -372,15 +372,15 @@ namespace RFCavityData
             using namespace amrex::literals; // for _rt and _prt
 
             // push the reference particle
-            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const ct = refpart.ct;
             amrex::ParticleReal const pt = refpart.pt;
 
             if (pt < -1.0_prt) {
-                refpart.t = t + tau/sqrt(1.0_prt - pow(pt, -2));
+                refpart.ct = ct + tau / sqrt(1.0_prt - pow(pt, -2));
                 refpart.pt = pt;
             }
             else {
-                refpart.t = t;
+                refpart.ct = ct;
                 refpart.pt = pt;
             }
 
@@ -407,7 +407,7 @@ namespace RFCavityData
         {
             using namespace amrex::literals; // for _rt and _prt
 
-            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const ct = refpart.ct;
             amrex::ParticleReal const pt = refpart.pt;
 
             // Define parameters and intermediate constants
@@ -421,13 +421,13 @@ namespace RFCavityData
             auto [ez, ezp, ezint] = RF_Efield(zeval);
             amrex::ignore_unused(ez, ezint);
 
-            refpart.t = t;
+            refpart.ct = ct;
             refpart.pt = pt;
 
             // push the linear map equations
             amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
             amrex::ParticleReal const s = tau/refpart.beta_gamma();
-            amrex::ParticleReal const L = E0*ezp*sin(k*t+phi)/(2.0_prt*k);
+            amrex::ParticleReal const L = E0 * ezp * sin(k * ct + phi) / (2.0_prt * k);
 
             refpart.map(1,1) = (1.0_prt-s*L)*R(1,1) + s*R(2,1);
             refpart.map(1,2) = (1.0_prt-s*L)*R(1,2) + s*R(2,2);
@@ -455,7 +455,7 @@ namespace RFCavityData
         {
             using namespace amrex::literals; // for _rt and _prt
 
-            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const ct = refpart.ct;
             amrex::ParticleReal const pt = refpart.pt;
             amrex::ParticleReal const z = zeval;
 
@@ -473,13 +473,13 @@ namespace RFCavityData
             auto [ezf, ezpf, ezintf] = RF_Efield(zeval);
             amrex::ignore_unused(ezf);
 
-            refpart.t = t;
-            refpart.pt = pt - E0*(ezintf-ezint)*cos(k*t+phi);
+            refpart.ct = ct;
+            refpart.pt = pt - E0*(ezintf-ezint)*cos(k * ct + phi);
 
             // push the linear map equations
             amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
-            amrex::ParticleReal const M = E0*(ezintf-ezint)*k*sin(k*t+phi);
-            amrex::ParticleReal const L = E0*(ezpf-ezp)*sin(k*t+phi)/(2.0_prt*k)+M/2.0_prt;
+            amrex::ParticleReal const M = E0*(ezintf-ezint)*k*sin(k * ct + phi);
+            amrex::ParticleReal const L = E0 * (ezpf-ezp) * sin(k * ct + phi) / (2.0_prt * k) + M / 2.0_prt;
 
             refpart.map(2,1) = L*R(1,1) + R(2,1);
             refpart.map(2,2) = L*R(1,2) + R(2,2);

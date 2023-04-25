@@ -262,7 +262,7 @@ namespace detail
             beam["positionOffset"]["y"].resetDataset(d_fl);
             beam["positionOffset"]["y"].makeConstant(ref_part.y);
             beam["positionOffset"]["ct"].resetDataset(d_fl);
-            beam["positionOffset"]["ct"].makeConstant(ref_part.t);
+            beam["positionOffset"]["ct"].makeConstant(ref_part.ct);
         }
 
         // AoS: Int

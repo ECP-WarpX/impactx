@@ -365,16 +365,16 @@ namespace SoftQuadrupoleData
             using namespace amrex::literals; // for _rt and _prt
 
             // push the reference particle
-            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const ct = refpart.ct;
             amrex::ParticleReal const pt = refpart.pt;
             amrex::ParticleReal const z = zeval;
 
             if (pt < -1.0_prt) {
-                refpart.t = t + tau/sqrt(1.0_prt - pow(pt, -2));
+                refpart.ct = ct + tau / sqrt(1.0_prt - pow(pt, -2));
                 refpart.pt = pt;
             }
             else {
-                refpart.t = t;
+                refpart.ct = ct;
                 refpart.pt = pt;
             }
 
@@ -414,7 +414,7 @@ namespace SoftQuadrupoleData
         {
             using namespace amrex::literals; // for _rt and _prt
 
-            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const ct = refpart.ct;
             amrex::ParticleReal const pt = refpart.pt;
 
             // Define parameters and intermediate constants
@@ -424,7 +424,7 @@ namespace SoftQuadrupoleData
             auto [bz, bzp, bzint] = Quad_Bfield(zeval);
             amrex::ignore_unused(bzp, bzint);
 
-            refpart.t = t;
+            refpart.ct = ct;
             refpart.pt = pt;
 
             // push the linear map equations
