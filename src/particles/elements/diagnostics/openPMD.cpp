@@ -211,6 +211,7 @@ namespace detail
 
     void BeamMonitor::prepare (
         PinnedContainer & pc,
+        RefPart const & ref_part,
         int step
     ) {
 #ifdef ImpactX_USE_OPENPMD
@@ -253,6 +254,17 @@ namespace detail
                 getComponentRecord(component_name).resetDataset(d_fl);
             }
         }
+
+        // openPMD coarse position
+        {
+            beam["positionOffset"]["x"].resetDataset(d_fl);
+            beam["positionOffset"]["x"].makeConstant(ref_part.x);
+            beam["positionOffset"]["y"].resetDataset(d_fl);
+            beam["positionOffset"]["y"].makeConstant(ref_part.y);
+            beam["positionOffset"]["ct"].resetDataset(d_fl);
+            beam["positionOffset"]["ct"].makeConstant(ref_part.t);
+        }
+
         // AoS: Int
         beam["id"][scalar].resetDataset(d_ui);
 
@@ -298,7 +310,7 @@ namespace detail
         */
 
         // prepare element access
-        this->prepare(pinned_pc, step);
+        this->prepare(pinned_pc, ref_part, step);
 
         // loop over refinement levels
         int const nLevel = pinned_pc.finestLevel();
@@ -320,6 +332,8 @@ namespace detail
         auto series = std::any_cast<io::Series>(m_series);
         io::WriteIterations iterations = series.writeIterations();
         io::Iteration iteration = iterations[m_step];
+
+        // close iteration
         iteration.close();
     }
 

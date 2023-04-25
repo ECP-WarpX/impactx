@@ -83,11 +83,13 @@ namespace detail
 
         /** Prepare entering the element before starting push logic.
          *
-         * @param[in] pc particle container.
+         * @param[in] pc particle container
+         * @param[in] ref_part reference particle
          * @param[in] step global step for diagnostics
          */
         void prepare (
             PinnedContainer & pc,
+            RefPart const & ref_part,
             int step
         );
 

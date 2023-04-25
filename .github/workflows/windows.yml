@@ -55,6 +55,7 @@ jobs:
         python3 -m pip install -U pip setuptools wheel pytest
         python3 -m pip install -r requirements.txt
         python3 -m pip install -r examples/requirements.txt
+        python3 -m pip install -U openPMD-validator
     - name: Build
       run: |
         $env:HDF5_DIR = "C:/Program Files/HDF_Group/HDF5/1.12.2/cmake/"
@@ -81,6 +82,8 @@ jobs:
         if(!$?) { Exit $LASTEXITCODE }
         cmake --build build --config RelWithDebInfo --target pip_install
         if(!$?) { Exit $LASTEXITCODE }
+    - name: validate created openPMD files
+      run: Get-ChildItem -Path build -Recurse -Filter *.h5 | %{openPMD_check_h5 -i $_}
 
   build_win_clang:
     name: Clang w/ OMP w/o MPI
@@ -137,6 +140,7 @@ jobs:
         python3 -m pip install -U pip setuptools wheel pytest
         python3 -m pip install -r requirements.txt
         python3 -m pip install -r examples/requirements.txt
+        python3 -m pip install -U openPMD-validator
     - name: Build
       shell: cmd
       run: |
@@ -175,3 +179,6 @@ jobs:
 #        if errorlevel 1 exit 1
 #        cmake --build build --target pip_install
 #        if errorlevel 1 exit 1
+
+    - name: validate created openPMD files
+      run: Get-ChildItem -Path build -Recurse -Filter *.h5 | %{openPMD_check_h5 -i $_}
