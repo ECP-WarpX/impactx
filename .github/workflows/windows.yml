@@ -82,6 +82,8 @@ jobs:
         if(!$?) { Exit $LASTEXITCODE }
         cmake --build build --config RelWithDebInfo --target pip_install
         if(!$?) { Exit $LASTEXITCODE }
+    - name: validate created openPMD files
+      run: Get-ChildItem -Path build -Recurse -Filter *.h5 | %{openPMD_check_h5 -i $_}
 
   build_win_clang:
     name: Clang w/ OMP w/o MPI
@@ -179,4 +181,4 @@ jobs:
 #        if errorlevel 1 exit 1
 
     - name: validate created openPMD files
-      run: find build -name *.h5 | xargs -n1 -I{} openPMD_check_h5 -i {}
+      run: Get-ChildItem -Path build -Recurse -Filter *.h5 | %{openPMD_check_h5 -i $_}
