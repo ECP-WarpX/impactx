@@ -90,7 +90,7 @@ namespace impactx::spacecharge
                     // force gather
                     amrex::GpuArray<amrex::Real, 3> const field_interp =
                         ablastr::particles::doGatherVectorFieldNodal (
-                            p.pos(0), p.pos(1), p.pos(2),
+                            p.pos(RealAoS::x), p.pos(RealAoS::y), p.pos(RealAoS::t),
                             scf_arr_x, scf_arr_y, scf_arr_z,
                             invdr,
                             prob_lo);

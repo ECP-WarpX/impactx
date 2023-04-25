@@ -74,8 +74,8 @@ namespace impactx
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(0);
-            amrex::ParticleReal const y = p.pos(1);
+            amrex::ParticleReal const x = p.pos(RealAoS::x);
+            amrex::ParticleReal const y = p.pos(RealAoS::y);
 
             // access reference particle values if needed
 

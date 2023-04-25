@@ -57,9 +57,9 @@ namespace transformation
             using namespace amrex::literals;
 
             // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(0);
-            amrex::ParticleReal const y = p.pos(1);
-            amrex::ParticleReal const t = p.pos(2);
+            amrex::ParticleReal const x = p.pos(RealAoS::x);
+            amrex::ParticleReal const y = p.pos(RealAoS::y);
+            amrex::ParticleReal const t = p.pos(RealAoS::t);
 
             // compute value of reference pzd = beta*gamma
             amrex::ParticleReal const argd = -1.0_prt + pow(m_ptd, 2);
@@ -79,11 +79,11 @@ namespace transformation
 
             // transform position and momentum (from fixed s to fixed t)
 
-            p.pos(0) = x + px*t/(m_ptd+pt);
+            p.pos(RealAoS::x) = x + px*t/(m_ptd+pt);
             // px = px;
-            p.pos(1) = y + py*t/(m_ptd+pt);
+            p.pos(RealAoS::y) = y + py*t/(m_ptd+pt);
             // py = py;
-            p.pos(2) = pz*t/(m_ptd+pt);  // This now represents z.
+            p.pos(RealAoS::t) = pz*t/(m_ptd+pt);  // This now represents z.
             pt = pz - pzd;                     // This now represents pz.
 
             // transform momenta to static units (eg, so that momenta are

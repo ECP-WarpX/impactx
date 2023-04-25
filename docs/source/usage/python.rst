@@ -167,9 +167,9 @@ Particles
 
    This class stores particles, distributed over MPI ranks.
 
-   .. py:method:: add_n_particles(lev, x, y, z, px, py, pyz, qm, bchchg)
+   .. py:method:: add_n_particles(lev, x, y, t, px, py, pyz, qm, bchchg)
 
-      Add new particles to the container
+      Add new particles to the container for fixed s.
 
       Note: This can only be used *after* the initialization (grids) have
             been created, meaning after the call to :py:meth:`ImpactX.init_grids`
@@ -178,7 +178,7 @@ Particles
       :param lev: mesh-refinement level
       :param x: positions in x
       :param y: positions in y
-      :param z: positions in z
+      :param t: positions as time-of-flight in c*t
       :param px: momentum in x
       :param py: momentum in y
       :param pz: momentum in z

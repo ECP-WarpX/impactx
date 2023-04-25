@@ -68,9 +68,9 @@ namespace impactx
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(0);
-            amrex::ParticleReal const y = p.pos(1);
-            amrex::ParticleReal const t = p.pos(2);
+            amrex::ParticleReal const x = p.pos(RealAoS::x);
+            amrex::ParticleReal const y = p.pos(RealAoS::y);
+            amrex::ParticleReal const t = p.pos(RealAoS::t);
 
             // access reference particle values to find beta*gamma^2
             amrex::ParticleReal const pt_ref = refpart.pt;
@@ -85,13 +85,13 @@ namespace impactx
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // advance position and momentum
-            p.pos(0) = cos(m_kx*slice_ds)*x + sin(m_kx*slice_ds)/m_kx*px;
+            p.pos(RealAoS::x) = cos(m_kx*slice_ds)*x + sin(m_kx*slice_ds)/m_kx*px;
             pxout = -m_kx*sin(m_kx*slice_ds)*x + cos(m_kx*slice_ds)*px;
 
-            p.pos(1) = cos(m_ky*slice_ds)*y + sin(m_ky*slice_ds)/m_ky*py;
+            p.pos(RealAoS::y) = cos(m_ky*slice_ds)*y + sin(m_ky*slice_ds)/m_ky*py;
             pyout = -m_ky*sin(m_ky*slice_ds)*y + cos(m_ky*slice_ds)*py;
 
-            p.pos(2) = cos(m_kt*slice_ds)*t + sin(m_kt*slice_ds)/(betgam2*m_kt)*pt;
+            p.pos(RealAoS::t) = cos(m_kt*slice_ds)*t + sin(m_kt*slice_ds)/(betgam2*m_kt)*pt;
             ptout = -(m_kt*betgam2)*sin(m_kt*slice_ds)*t + cos(m_kt*slice_ds)*pt;
 
             // assign updated momenta

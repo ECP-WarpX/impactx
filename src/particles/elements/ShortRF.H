@@ -64,9 +64,9 @@ namespace impactx
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(0);
-            amrex::ParticleReal const y = p.pos(1);
-            amrex::ParticleReal const t = p.pos(2);
+            amrex::ParticleReal const x = p.pos(RealAoS::x);
+            amrex::ParticleReal const y = p.pos(RealAoS::y);
+            amrex::ParticleReal const t = p.pos(RealAoS::t);
 
             // access reference particle values to find (beta*gamma)^2
             amrex::ParticleReal const pt_ref = refpart.pt;
@@ -78,13 +78,13 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // advance position and momentum
-            p.pos(0) = x;
+            p.pos(RealAoS::x) = x;
             pxout = px + m_k*m_V/(2.0_prt*betgam2)*x;
 
-            p.pos(1) = y;
+            p.pos(RealAoS::y) = y;
             pyout = py + m_k*m_V/(2.0_prt*betgam2)*y;
 
-            p.pos(2) = t;
+            p.pos(RealAoS::t) = t;
             ptout = pt - m_k*m_V*t;
 
             // assign updated momenta

@@ -261,8 +261,8 @@ namespace detail
             beam["positionOffset"]["x"].makeConstant(ref_part.x);
             beam["positionOffset"]["y"].resetDataset(d_fl);
             beam["positionOffset"]["y"].makeConstant(ref_part.y);
-            beam["positionOffset"]["ct"].resetDataset(d_fl);
-            beam["positionOffset"]["ct"].makeConstant(ref_part.t);
+            beam["positionOffset"]["t"].resetDataset(d_fl);
+            beam["positionOffset"]["t"].makeConstant(ref_part.t);
         }
 
         // AoS: Int
@@ -374,7 +374,7 @@ namespace detail
         // AoS: position and particle ID
         {
             using vs = std::vector<std::string>;
-            vs const positionComponents{"x", "y", "ct"}; // TODO: generalize
+            vs const positionComponents{"x", "y", "t"}; // TODO: generalize
             for (auto currDim = 0; currDim < AMREX_SPACEDIM; currDim++) {
                 std::shared_ptr<amrex::ParticleReal> curr(
                     new amrex::ParticleReal[numParticleOnTile],

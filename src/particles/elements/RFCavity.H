@@ -186,9 +186,9 @@ namespace RFCavityData
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(0);
-            amrex::ParticleReal const y = p.pos(1);
-            amrex::ParticleReal const t = p.pos(2);
+            amrex::ParticleReal const x = p.pos(RealAoS::x);
+            amrex::ParticleReal const y = p.pos(RealAoS::y);
+            amrex::ParticleReal const t = p.pos(RealAoS::t);
 
             // initialize output values of momenta
             amrex::ParticleReal pxout = px;
@@ -205,15 +205,15 @@ namespace RFCavityData
             // so that, e.g., R(3,4) = dyf/dpyi.
 
             // push particles using the linear map
-            p.pos(0) = R(1,1)*x + R(1,2)*px + R(1,3)*y
+            p.pos(RealAoS::x) = R(1,1)*x + R(1,2)*px + R(1,3)*y
                      + R(1,4)*py + R(1,5)*t + R(1,6)*pt;
             pxout = R(2,1)*x + R(2,2)*px + R(2,3)*y
                   + R(2,4)*py + R(2,5)*t + R(2,6)*pt;
-            p.pos(1) = R(3,1)*x + R(3,2)*px + R(3,3)*y
+            p.pos(RealAoS::y) = R(3,1)*x + R(3,2)*px + R(3,3)*y
                      + R(3,4)*py + R(3,5)*t + R(3,6)*pt;
             pyout = R(4,1)*x + R(4,2)*px + R(4,3)*y
                   + R(4,4)*py + R(4,5)*t + R(4,6)*pt;
-            p.pos(2) = R(5,1)*x + R(5,2)*px + R(5,3)*y
+            p.pos(RealAoS::t) = R(5,1)*x + R(5,2)*px + R(5,3)*y
                      + R(5,4)*py + R(5,5)*t + R(5,6)*pt;
             ptout = R(6,1)*x + R(6,2)*px + R(6,3)*y
                   + R(6,4)*py + R(6,5)*t + R(6,6)*pt;

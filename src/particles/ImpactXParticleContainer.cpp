@@ -81,7 +81,7 @@ namespace impactx
     ImpactXParticleContainer::AddNParticles (int lev,
                                              amrex::Vector<amrex::ParticleReal> const & x,
                                              amrex::Vector<amrex::ParticleReal> const & y,
-                                             amrex::Vector<amrex::ParticleReal> const & z,
+                                             amrex::Vector<amrex::ParticleReal> const & t,
                                              amrex::Vector<amrex::ParticleReal> const & px,
                                              amrex::Vector<amrex::ParticleReal> const & py,
                                              amrex::Vector<amrex::ParticleReal> const & pz,
@@ -92,7 +92,7 @@ namespace impactx
 
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(lev == 0, "AddNParticles: only lev=0 is supported yet.");
         AMREX_ALWAYS_ASSERT(x.size() == y.size());
-        AMREX_ALWAYS_ASSERT(x.size() == z.size());
+        AMREX_ALWAYS_ASSERT(x.size() == t.size());
         AMREX_ALWAYS_ASSERT(x.size() == px.size());
         AMREX_ALWAYS_ASSERT(x.size() == py.size());
         AMREX_ALWAYS_ASSERT(x.size() == pz.size());
@@ -124,9 +124,9 @@ namespace impactx
             ParticleType p;
             p.id() = ParticleType::NextID();
             p.cpu() = amrex::ParallelDescriptor::MyProc();
-            p.pos(0) = x[i];
-            p.pos(1) = y[i];
-            p.pos(2) = z[i];
+            p.pos(RealAoS::x) = x[i];
+            p.pos(RealAoS::y) = y[i];
+            p.pos(RealAoS::t) = t[i];
             // write position, creating cpu id, and particle id
             pinned_tile.push_back(p);
         }
@@ -137,7 +137,7 @@ namespace impactx
         pinned_tile.push_back_real(RealSoA::ux, px);
         pinned_tile.push_back_real(RealSoA::uy, py);
         pinned_tile.push_back_real(RealSoA::pt, pz);
-        pinned_tile.push_back_real(RealSoA::m_qm, np, qm);
+        pinned_tile.push_back_real(RealSoA::qm, np, qm);
         pinned_tile.push_back_real(RealSoA::w, np, bchchg/ablastr::constant::SI::q_e/np);
 
         /* Redistributes particles to their respective tiles (spatial bucket

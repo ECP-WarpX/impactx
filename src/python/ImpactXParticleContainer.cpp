@@ -44,17 +44,17 @@ void init_impactxparticlecontainer(py::module& m)
         .def("add_n_particles",
              &ImpactXParticleContainer::AddNParticles,
              py::arg("lev"),
-             py::arg("x"), py::arg("y"), py::arg("z"),
+             py::arg("x"), py::arg("y"), py::arg("t"),
              py::arg("px"), py::arg("py"), py::arg("pz"),
              py::arg("qm"), py::arg("bchchg"),
-             "Add new particles to the container\n\n"
+             "Add new particles to the container for fixed s.\n\n"
              "Note: This can only be used *after* the initialization (grids) have\n"
              "      been created, meaning after the call to ImpactX.init_grids\n"
              "      has been made in the ImpactX class.\n\n"
              ":param lev: mesh-refinement level\n"
              ":param x: positions in x\n"
              ":param y: positions in y\n"
-             ":param z: positions in z\n"
+             ":param t: positions as time-of-flight in c*t\n"
              ":param px: momentum in x\n"
              ":param py: momentum in y\n"
              ":param pz: momentum in z\n"
