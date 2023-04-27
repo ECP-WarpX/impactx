@@ -34,7 +34,7 @@ namespace transformation
          *
          * @param ptd Design value of pt/mc2 = -gamma.
          */
-        ToFixedT( amrex::ParticleReal const ptd )
+        ToFixedT (amrex::ParticleReal const ptd)
         : m_ptd(ptd)
         {
         }
@@ -42,17 +42,17 @@ namespace transformation
         /** This is a s-to-t map, so that a variable of this type can be used like a
          *  s-to-t function.
          *
-         * @param p Particle AoS data for positions and cpu/id
-         * @param px particle momentum in x
-         * @param py particle momentum in y
-         * @param pt particle momentum in t
+         * @param[inout] p Particle AoS data for positions and cpu/id
+         * @param[inout] px particle momentum in x
+         * @param[inout] py particle momentum in y
+         * @param[inout] pt particle momentum in t (in), in z (out)
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& p,
-                amrex::ParticleReal & px,
-                amrex::ParticleReal & py,
-                amrex::ParticleReal & pt) const
+            PType& p,
+            amrex::ParticleReal & px,
+            amrex::ParticleReal & py,
+            amrex::ParticleReal & pt) const
         {
             using namespace amrex::literals;
 
@@ -88,9 +88,9 @@ namespace transformation
 
             // transform momenta to static units (eg, so that momenta are
             // normalized by pzd):
-            px = px/pzd;
-            py = py/pzd;
-            pt = pt/pzd;
+            px = px / pzd;
+            py = py / pzd;
+            pt = pt / pzd;  // This now represents pz.
 
         }
 

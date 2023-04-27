@@ -34,7 +34,7 @@ namespace transformation
          *
          * @param pzd Design value of pz/mc = beta*gamma.
          */
-        ToFixedS( amrex::ParticleReal const pzd )
+        ToFixedS (amrex::ParticleReal const pzd)
         : m_pzd(pzd)
         {
         }
@@ -42,17 +42,17 @@ namespace transformation
         /** This is a t-to-s map, so that a variable of this type can be used like a
          *  t-to-s function.
          *
-         * @param p Particle AoS data for positions and cpu/id
-         * @param px particle momentum in x
-         * @param py particle momentum in y
-         * @param pt particle momentum in t
+         * @param[inout] p Particle AoS data for positions and cpu/id
+         * @param[inout] px particle momentum in x
+         * @param[inout] py particle momentum in y
+         * @param[inout] pz particle momentum in z (in), in t (out)
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& p,
-                amrex::ParticleReal & px,
-                amrex::ParticleReal & py,
-                amrex::ParticleReal & pt) const
+            PType& p,
+            amrex::ParticleReal & px,
+            amrex::ParticleReal & py,
+            amrex::ParticleReal & pz) const
         {
             using namespace amrex::literals;
 
@@ -68,30 +68,29 @@ namespace transformation
 
             // transform momenta to dynamic units (e.g., so that momenta are
             // normalized by mc):
-            px = px*m_pzd;
-            py = py*m_pzd;
-            pt = pt*m_pzd;
+            px = px * m_pzd;
+            py = py * m_pzd;
+            pz = pz * m_pzd;
 
             // compute value of particle pt = -gamma
-            amrex::ParticleReal const arg = 1.0_prt + pow(m_pzd+pt, 2) + pow(px, 2) + pow(py, 2);
+            amrex::ParticleReal const arg = 1.0_prt + pow(m_pzd + pz, 2) + pow(px, 2) + pow(py, 2);
             AMREX_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pt arg (<=0)");
             amrex::ParticleReal const ptf = arg > 0.0_prt ? -sqrt(arg) : -1.0_prt;
 
             // transform position and momentum (from fixed t to fixed s)
 
-            p.pos(RealAoS::x) = x - px * z / (m_pzd + pt);
+            p.pos(RealAoS::x) = x - px * z / (m_pzd + pz);
             // px = px;
-            p.pos(RealAoS::y) = y - py * z / (m_pzd + pt);
+            p.pos(RealAoS::y) = y - py * z / (m_pzd + pz);
             // py = py;
-            p.pos(RealAoS::t) = ptf * z / (m_pzd + pt);  // This now represents t.
-            pt = ptf - ptdf;                    // This now represents pt.
+            p.pos(RealAoS::t) = ptf * z / (m_pzd + pz);  // This now represents t.
+            pz = ptf - ptdf;                    // This now represents pt.
 
             // transform momenta to static units (eg, so that momenta are
             // normalized by pzd):
-            px = px/m_pzd;
-            py = py/m_pzd;
-            pt = pt/m_pzd;
-
+            px = px / m_pzd;
+            py = py / m_pzd;
+            pz = pz / m_pzd;  // This now represents pt.
         }
 
     private:
