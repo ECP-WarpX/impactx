@@ -73,9 +73,9 @@ namespace impactx
             using Complex = amrex::GpuComplex<amrex::ParticleReal>;
 
             // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(0);
-            amrex::ParticleReal const y = p.pos(1);
-            amrex::ParticleReal const t = p.pos(2);
+            amrex::ParticleReal const x = p.pos(RealAoS::x);
+            amrex::ParticleReal const y = p.pos(RealAoS::y);
+            amrex::ParticleReal const t = p.pos(RealAoS::t);
 
             // access reference particle values to find (beta*gamma)^2
             //amrex::ParticleReal const pt_ref = refpart.pt;
@@ -110,13 +110,13 @@ namespace impactx
             amrex::ParticleReal dpy = -kick*dF.m_imag;
 
             // advance position and momentum
-            p.pos(0) = x;
+            p.pos(RealAoS::x) = x;
             pxout = px + dpx;
 
-            p.pos(1) = y;
+            p.pos(RealAoS::y) = y;
             pyout = py + dpy;
 
-            p.pos(2) = t;
+            p.pos(RealAoS::t) = t;
             ptout = pt;
 
             // assign updated momenta

@@ -78,9 +78,9 @@ namespace impactx::diagnostics
 
                         // access AoS data such as positions and cpu/id
                         PType const &p = aos_ptr[i];
-                        amrex::ParticleReal const x = p.pos(0);
-                        amrex::ParticleReal const y = p.pos(1);
-                        amrex::ParticleReal const t = p.pos(2);
+                        amrex::ParticleReal const x = p.pos(RealAoS::x);
+                        amrex::ParticleReal const y = p.pos(RealAoS::y);
+                        amrex::ParticleReal const t = p.pos(RealAoS::t);
                         uint64_t const global_id = ablastr::particles::localIDtoGlobal(p.id(), p.cpu());
 
                         // access SoA Real data
@@ -122,8 +122,8 @@ namespace impactx::diagnostics
 
                         // access AoS data such as positions and cpu/id
                         PType const &p = aos_ptr[i];
-                        amrex::ParticleReal const x = p.pos(0);
-                        amrex::ParticleReal const y = p.pos(1);
+                        amrex::ParticleReal const x = p.pos(RealAoS::x);
+                        amrex::ParticleReal const y = p.pos(RealAoS::y);
                         uint64_t const global_id = ablastr::particles::localIDtoGlobal(p.id(), p.cpu());
 
                         // access SoA Real data

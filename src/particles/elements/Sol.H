@@ -66,9 +66,9 @@ namespace impactx
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(0);
-            amrex::ParticleReal const y = p.pos(1);
-            amrex::ParticleReal const t = p.pos(2);
+            amrex::ParticleReal const x = p.pos(RealAoS::x);
+            amrex::ParticleReal const y = p.pos(RealAoS::y);
+            amrex::ParticleReal const t = p.pos(RealAoS::t);
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
@@ -106,13 +106,13 @@ namespace impactx
             pt = ptout;
 
             // advance positions and momenta using map for rotation
-            p.pos(0) = cos(theta)*xout + sin(theta)*yout;
+            p.pos(RealAoS::x) = cos(theta)*xout + sin(theta)*yout;
             pxout = cos(theta)*px + sin(theta)*py;
 
-            p.pos(1) = -sin(theta)*xout + cos(theta)*yout;
+            p.pos(RealAoS::y) = -sin(theta)*xout + cos(theta)*yout;
             pyout = -sin(theta)*px + cos(theta)*py;
 
-            p.pos(2) = tout;
+            p.pos(RealAoS::t) = tout;
             ptout = pt;
 
             // assign updated momenta

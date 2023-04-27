@@ -63,9 +63,9 @@ namespace impactx
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(0);
-            amrex::ParticleReal const y = p.pos(1);
-            amrex::ParticleReal const t = p.pos(2);
+            amrex::ParticleReal const x = p.pos(RealAoS::x);
+            amrex::ParticleReal const y = p.pos(RealAoS::y);
+            amrex::ParticleReal const t = p.pos(RealAoS::t);
 
             // initialize output values of momenta
             amrex::ParticleReal pxout = px;
@@ -80,11 +80,11 @@ namespace impactx
             amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
 
             // advance position and momentum (drift)
-            p.pos(0) = x + slice_ds * px;
+            p.pos(RealAoS::x) = x + slice_ds * px;
             // pxout = px;
-            p.pos(1) = y + slice_ds * py;
+            p.pos(RealAoS::y) = y + slice_ds * py;
             // pyout = py;
-            p.pos(2) = t + (slice_ds/betgam2) * pt;
+            p.pos(RealAoS::t) = t + (slice_ds/betgam2) * pt;
             // ptout = pt;
 
             // assign updated momenta

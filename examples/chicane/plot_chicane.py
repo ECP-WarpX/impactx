@@ -28,7 +28,7 @@ def get_moments(beam):
     sigpx = moment(beam["momentum_x"], moment=2) ** 0.5
     sigy = moment(beam["position_y"], moment=2) ** 0.5
     sigpy = moment(beam["momentum_y"], moment=2) ** 0.5
-    sigt = moment(beam["position_ct"], moment=2) ** 0.5
+    sigt = moment(beam["position_t"], moment=2) ** 0.5
     sigpt = moment(beam["momentum_t"], moment=2) ** 0.5
 
     epstrms = beam.cov(ddof=0)
@@ -39,7 +39,7 @@ def get_moments(beam):
         sigy**2 * sigpy**2 - epstrms["position_y"]["momentum_y"] ** 2
     ) ** 0.5
     emittance_t = (
-        sigt**2 * sigpt**2 - epstrms["position_ct"]["momentum_t"] ** 2
+        sigt**2 * sigpt**2 - epstrms["position_t"]["momentum_t"] ** 2
     ) ** 0.5
 
     return (sigx, sigy, sigt, emittance_x, emittance_y, emittance_t)
@@ -178,7 +178,7 @@ for step in steps:
     ax = axs[(0, ncol_ax)]
     beam_at_step = series.iterations[step].particles["beam"].to_df()
     ax.scatter(
-        beam_at_step.position_ct.multiply(millimeter),
+        beam_at_step.position_t.multiply(millimeter),
         beam_at_step.momentum_t.multiply(mrad),
         s=0.01,
     )
@@ -202,7 +202,7 @@ for step in steps:
     ax = axs[(2, ncol_ax)]
     beam_at_step = series.iterations[step].particles["beam"].to_df()
     ax.scatter(
-        beam_at_step.position_ct.multiply(millimeter),
+        beam_at_step.position_t.multiply(millimeter),
         beam_at_step.position_x.multiply(millimeter),
         s=0.01,
     )
@@ -212,7 +212,7 @@ for step in steps:
     ax = axs[(3, ncol_ax)]
     beam_at_step = series.iterations[step].particles["beam"].to_df()
     ax.scatter(
-        beam_at_step.position_ct.multiply(millimeter),
+        beam_at_step.position_t.multiply(millimeter),
         beam_at_step.momentum_x.multiply(mrad),
         s=0.01,
     )

@@ -31,7 +31,7 @@ namespace impactx
         amrex::ParticleReal s = 0.0;  ///< integrated orbit path length, in meters
         amrex::ParticleReal x = 0.0;  ///< horizontal position x, in meters
         amrex::ParticleReal y = 0.0;  ///< vertical position y, in meters
-        amrex::ParticleReal z = 0.0;  ///< longitudinal position y, in meters
+        amrex::ParticleReal z = 0.0;  ///< longitudinal position z, in meters
         amrex::ParticleReal t = 0.0;  ///< clock time * c in meters
         amrex::ParticleReal px = 0.0; ///< momentum in x, normalized to proper velocity
         amrex::ParticleReal py = 0.0; ///< momentum in y, normalized to proper velocity

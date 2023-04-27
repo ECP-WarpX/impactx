@@ -65,9 +65,9 @@ namespace impactx
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(0);
-            amrex::ParticleReal const y = p.pos(1);
-            amrex::ParticleReal const t = p.pos(2);
+            amrex::ParticleReal const x = p.pos(RealAoS::x);
+            amrex::ParticleReal const y = p.pos(RealAoS::y);
+            amrex::ParticleReal const t = p.pos(RealAoS::t);
 
             // initialize output values of momenta
             amrex::ParticleReal pxout = px;
@@ -89,16 +89,16 @@ namespace impactx
             amrex::ParticleReal const cos_theta = cos(theta);
 
             // advance position and momentum (sector bend)
-            p.pos(0) = cos_theta*x + m_rc*sin_theta*px
+            p.pos(RealAoS::x) = cos_theta*x + m_rc*sin_theta*px
                        - (m_rc/bet)*(1.0_prt - cos_theta)*pt;
 
             pxout = -sin_theta/m_rc*x + cos_theta*px - sin_theta/bet*pt;
 
-            p.pos(1) = y + m_rc*theta*py;
+            p.pos(RealAoS::y) = y + m_rc*theta*py;
 
             // pyout = py;
 
-            p.pos(2) = sin_theta/bet*x + m_rc/bet*(1.0_prt - cos_theta)*px + t
+            p.pos(RealAoS::t) = sin_theta/bet*x + m_rc/bet*(1.0_prt - cos_theta)*px + t
                        + m_rc*(-theta+sin_theta/(bet*bet))*pt;
 
             // ptout = pt;

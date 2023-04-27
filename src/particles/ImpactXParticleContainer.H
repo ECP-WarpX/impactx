@@ -39,18 +39,23 @@ namespace impactx
     {
         enum
         {
-            x,  ///< position in x [m] (at fixed t OR fixed s)
-            y,  ///< position in y [m] (at fixed t OR fixed s)
-            z,  ///< position in z [m] (at fixed t) OR time-of-flight ct [m] (at fixed s)
+            x,  ///< position in x [m] (at fixed s OR fixed t)
+            y,  ///< position in y [m] (at fixed s OR fixed t)
+            t,  ///< time-of-flight c*t [m] (at fixed s)
             nattribs ///< the number of attributes above (always last)
         };
 
+        // at fixed t, the third component represents the position z
+        enum {
+            z = t  ///< position in z [m] (at fixed t)
+        };
+
+        //! named labels for fixed s
+        static constexpr auto names_s = { "position_x", "position_y", "position_t" };
         //! named labels for fixed t
         static constexpr auto names_t = { "position_x", "position_y", "position_z" };
-        //! named labels for fixed s
-        static constexpr auto names_s = { "position_x", "position_y", "position_ct" };
-        static_assert(names_t.size() == nattribs);
         static_assert(names_s.size() == nattribs);
+        static_assert(names_t.size() == nattribs);
     };
 
     /** This struct indexes the additional Real attributes
@@ -60,20 +65,25 @@ namespace impactx
     {
         enum
         {
-            ux,  ///< momentum in x, scaled by the magnitude of the reference momentum [unitless] (at fixed t or s)
-            uy,  ///< momentum in y, scaled by the magnitude of the reference momentum [unitless] (at fixed t or s)
-            pt,  ///< momentum in z, scaled by the magnitude of the reference momentum [unitless] (at fixed t) OR energy deviation, scaled by speed of light * the magnitude of the reference momentum [unitless] (at fixed s)
-            m_qm, ///< charge to mass ratio, in q_e/m_e (q_e/eV) TODO: rename to qm_m
-            w,   ///< particle weight, unitless
+            ux,  ///< momentum in x, scaled by the magnitude of the reference momentum [unitless] (at fixed s or t)
+            uy,  ///< momentum in y, scaled by the magnitude of the reference momentum [unitless] (at fixed s or t)
+            pt,  ///< energy deviation, scaled by speed of light * the magnitude of the reference momentum [unitless] (at fixed s)
+            qm,  ///< charge to mass ratio, in q_e/m_e [q_e/eV]
+            w,   ///< particle weight, number of real particles represented by this macroparticle [unitless]
             nattribs ///< the number of attributes above (always last)
         };
 
-        //! named labels for fixed t
-        static constexpr auto names_t = { "momentum_x", "momentum_y", "momentum_z", "qmm", "weighting" };
+        // at fixed t, the third component represents the momentum in z
+        enum {
+            pz = pt  ///< momentum in z, scaled by the magnitude of the reference momentum [unitless] (at fixed t)
+        };
+
         //! named labels for fixed s
-        static constexpr auto names_s = { "momentum_x", "momentum_y", "momentum_t", "qmm", "weighting" };
-        static_assert(names_t.size() == nattribs);
+        static constexpr auto names_s = { "momentum_x", "momentum_y", "momentum_t", "qm", "weighting" };
+        //! named labels for fixed t
+        static constexpr auto names_t = { "momentum_x", "momentum_y", "momentum_z", "qm", "weighting" };
         static_assert(names_s.size() == nattribs);
+        static_assert(names_t.size() == nattribs);
     };
 
     /** This struct indexes the additional Integer attributes
@@ -139,7 +149,7 @@ namespace impactx
         //! Destruct a particle container
         virtual ~ImpactXParticleContainer() = default;
 
-        /** Add new particles to the container
+        /** Add new particles to the container for fixed s.
          *
          * Note: This can only be used *after* the initialization (grids) have
          *       been created, meaning after the call to AmrCore::InitFromScratch
@@ -149,10 +159,10 @@ namespace impactx
          * @param lev mesh-refinement level
          * @param x positions in x
          * @param y positions in y
-         * @param z positions in z
+         * @param t positions as time-of-flight in c*t
          * @param px momentum in x
          * @param py momentum in y
-         * @param pz momentum in z
+         * @param pt momentum in t
          * @param qm charge over mass in 1/eV
          * @param bchchg total charge within a bunch in C
          */
@@ -160,10 +170,10 @@ namespace impactx
         AddNParticles (int lev,
                        amrex::Vector<amrex::ParticleReal> const & x,
                        amrex::Vector<amrex::ParticleReal> const & y,
-                       amrex::Vector<amrex::ParticleReal> const & z,
+                       amrex::Vector<amrex::ParticleReal> const & t,
                        amrex::Vector<amrex::ParticleReal> const & px,
                        amrex::Vector<amrex::ParticleReal> const & py,
-                       amrex::Vector<amrex::ParticleReal> const & pz,
+                       amrex::Vector<amrex::ParticleReal> const & pt,
                        amrex::ParticleReal const & qm,
                        amrex::ParticleReal const & bchchg);
 

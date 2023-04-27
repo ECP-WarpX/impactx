@@ -68,9 +68,9 @@ namespace impactx
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(0);
-            amrex::ParticleReal const y = p.pos(1);
-            amrex::ParticleReal const t = p.pos(2);
+            amrex::ParticleReal const x = p.pos(RealAoS::x);
+            amrex::ParticleReal const y = p.pos(RealAoS::y);
+            amrex::ParticleReal const t = p.pos(RealAoS::t);
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
@@ -89,23 +89,23 @@ namespace impactx
 
             if(m_k > 0.0) {
                // advance position and momentum (focusing quad)
-               p.pos(0) = cos(omega*slice_ds)*x + sin(omega*slice_ds)/omega*px;
+               p.pos(RealAoS::x) = cos(omega*slice_ds)*x + sin(omega*slice_ds)/omega*px;
                pxout = -omega*sin(omega*slice_ds)*x + cos(omega*slice_ds)*px;
 
-               p.pos(1) = cosh(omega*slice_ds)*y + sinh(omega*slice_ds)/omega*py;
+               p.pos(RealAoS::y) = cosh(omega*slice_ds)*y + sinh(omega*slice_ds)/omega*py;
                pyout = omega*sinh(omega*slice_ds)*y + cosh(omega*slice_ds)*py;
 
-               p.pos(2) = t + (slice_ds/betgam2)*pt;
+               p.pos(RealAoS::t) = t + (slice_ds/betgam2)*pt;
                // ptout = pt;
             } else {
                // advance position and momentum (defocusing quad)
-               p.pos(0) = cosh(omega*slice_ds)*x + sinh(omega*slice_ds)/omega*px;
+               p.pos(RealAoS::x) = cosh(omega*slice_ds)*x + sinh(omega*slice_ds)/omega*px;
                pxout = omega*sinh(omega*slice_ds)*x + cosh(omega*slice_ds)*px;
 
-               p.pos(1) = cos(omega*slice_ds)*y + sin(omega*slice_ds)/omega*py;
+               p.pos(RealAoS::y) = cos(omega*slice_ds)*y + sin(omega*slice_ds)/omega*py;
                pyout = -omega*sin(omega*slice_ds)*y + cos(omega*slice_ds)*py;
 
-               p.pos(2) = t + (slice_ds/betgam2)*pt;
+               p.pos(RealAoS::t) = t + (slice_ds/betgam2)*pt;
                // ptout = pt;
             }
 
