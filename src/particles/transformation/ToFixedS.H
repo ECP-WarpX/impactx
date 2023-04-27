@@ -82,14 +82,15 @@ namespace transformation
             // px = px;
             p.pos(RealAoS::y) = y - py * z / (m_pzd + pz);
             // py = py;
-            p.pos(RealAoS::t) = ptf * z / (m_pzd + pz);  // This now represents t.
-            pz = ptf - ptdf;                                   // This now represents pt.
+            p.pos(RealAoS::t) = ptf * z / (m_pzd + pz);
+            auto & pt = pz;  // We store pt in the same memory slot as pz.
+            pt = ptf - ptdf;
 
             // transform momenta to static units (eg, so that momenta are
             // normalized by pzd):
             px = px / m_pzd;
             py = py / m_pzd;
-            pz = pz / m_pzd;  // This represents pt.
+            pt = pz / m_pzd;
         }
 
     private:
