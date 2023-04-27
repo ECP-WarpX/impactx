@@ -68,9 +68,9 @@ namespace transformation
 
             // transform momenta to dynamic units (eg, so that momenta are
             // normalized by mc):
-            px = px*pzd;
-            py = py*pzd;
-            pt = pt*pzd;
+            px = px * pzd;
+            py = py * pzd;
+            pt = pt * pzd;
 
             // compute value of particle pz = beta*gamma
             amrex::ParticleReal const arg = -1.0_prt + pow(m_ptd+pt, 2) - pow(px, 2) - pow(py, 2);
@@ -84,13 +84,13 @@ namespace transformation
             p.pos(RealAoS::y) = y + py*t/(m_ptd+pt);
             // py = py;
             p.pos(RealAoS::t) = pz*t/(m_ptd+pt);  // This now represents z.
-            pt = pz - pzd;                     // This now represents pz.
+            pt = pz - pzd;                              // This now represents pz.
 
             // transform momenta to static units (eg, so that momenta are
             // normalized by pzd):
             px = px / pzd;
             py = py / pzd;
-            pt = pt / pzd;  // This now represents pz.
+            pt = pt / pzd;  // This represents pz.
 
         }
 

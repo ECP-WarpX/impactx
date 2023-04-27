@@ -84,13 +84,13 @@ namespace transformation
             p.pos(RealAoS::y) = y - py * z / (m_pzd + pz);
             // py = py;
             p.pos(RealAoS::t) = ptf * z / (m_pzd + pz);  // This now represents t.
-            pz = ptf - ptdf;                    // This now represents pt.
+            pz = ptf - ptdf;                                   // This now represents pt.
 
             // transform momenta to static units (eg, so that momenta are
             // normalized by pzd):
             px = px / m_pzd;
             py = py / m_pzd;
-            pz = pz / m_pzd;  // This now represents pt.
+            pz = pz / m_pzd;  // This represents pt.
         }
 
     private:
