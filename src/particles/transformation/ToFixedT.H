@@ -64,18 +64,18 @@ namespace transformation
             // compute value of reference pzd = beta*gamma
             amrex::ParticleReal const argd = -1.0_prt + pow(m_ptd, 2);
             AMREX_ASSERT_WITH_MESSAGE(argd > 0.0_prt, "invalid pzd arg (<=0)");
-            amrex::ParticleReal const pzd = argd > 0.0_prt ? sqrt(argd) : 0.0_prt;
+            amrex::ParticleReal const pzdf = argd > 0.0_prt ? sqrt(argd) : 0.0_prt;
 
             // transform momenta to dynamic units (eg, so that momenta are
             // normalized by mc):
-            px = px * pzd;
-            py = py * pzd;
-            pt = pt * pzd;
+            px = px * pzdf;
+            py = py * pzdf;
+            pt = pt * pzdf;
 
             // compute value of particle pz = beta*gamma
             amrex::ParticleReal const arg = -1.0_prt + pow(m_ptd+pt, 2) - pow(px, 2) - pow(py, 2);
             AMREX_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pz arg (<=0)");
-            amrex::ParticleReal const pz = arg > 0.0_prt ? sqrt(arg) : 0.0_prt;
+            amrex::ParticleReal const pzf = arg > 0.0_prt ? sqrt(arg) : 0.0_prt;
 
             // transform position and momentum (from fixed s to fixed t)
 
@@ -83,14 +83,14 @@ namespace transformation
             // px = px;
             p.pos(RealAoS::y) = y + py*t/(m_ptd+pt);
             // py = py;
-            p.pos(RealAoS::t) = pz*t/(m_ptd+pt);  // This now represents z.
-            pt = pz - pzd;                              // This now represents pz.
+            p.pos(RealAoS::t) = pzf * t / (m_ptd + pt);  // This now represents z.
+            pt = pzf - pzdf;                              // This now represents pz.
 
             // transform momenta to static units (eg, so that momenta are
             // normalized by pzd):
-            px = px / pzd;
-            py = py / pzd;
-            pt = pt / pzd;  // This represents pz.
+            px = px / pzdf;
+            py = py / pzdf;
+            pt = pt / pzdf;  // This represents pz.
 
         }
 
