@@ -152,7 +152,7 @@ namespace impactx
          * @param t positions as time-of-flight in c*t
          * @param px momentum in x
          * @param py momentum in y
-         * @param pz momentum in z
+         * @param pt momentum in t
          * @param qm charge over mass in 1/eV
          * @param bchchg total charge within a bunch in C
          */
@@ -163,7 +163,7 @@ namespace impactx
                        amrex::Vector<amrex::ParticleReal> const & t,
                        amrex::Vector<amrex::ParticleReal> const & px,
                        amrex::Vector<amrex::ParticleReal> const & py,
-                       amrex::Vector<amrex::ParticleReal> const & pz,
+                       amrex::Vector<amrex::ParticleReal> const & pt,
                        amrex::ParticleReal const & qm,
                        amrex::ParticleReal const & bchchg);
 

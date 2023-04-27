@@ -84,7 +84,7 @@ namespace impactx
                                              amrex::Vector<amrex::ParticleReal> const & t,
                                              amrex::Vector<amrex::ParticleReal> const & px,
                                              amrex::Vector<amrex::ParticleReal> const & py,
-                                             amrex::Vector<amrex::ParticleReal> const & pz,
+                                             amrex::Vector<amrex::ParticleReal> const & pt,
                                              amrex::ParticleReal const & qm,
                                              amrex::ParticleReal const & bchchg)
     {
@@ -95,7 +95,7 @@ namespace impactx
         AMREX_ALWAYS_ASSERT(x.size() == t.size());
         AMREX_ALWAYS_ASSERT(x.size() == px.size());
         AMREX_ALWAYS_ASSERT(x.size() == py.size());
-        AMREX_ALWAYS_ASSERT(x.size() == pz.size());
+        AMREX_ALWAYS_ASSERT(x.size() == pt.size());
 
         // number of particles to add
         int const np = x.size();
@@ -136,7 +136,7 @@ namespace impactx
 
         pinned_tile.push_back_real(RealSoA::ux, px);
         pinned_tile.push_back_real(RealSoA::uy, py);
-        pinned_tile.push_back_real(RealSoA::pt, pz);
+        pinned_tile.push_back_real(RealSoA::pt, pt);
         pinned_tile.push_back_real(RealSoA::qm, np, qm);
         pinned_tile.push_back_real(RealSoA::w, np, bchchg/ablastr::constant::SI::q_e/np);
 

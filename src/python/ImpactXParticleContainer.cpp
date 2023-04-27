@@ -45,7 +45,7 @@ void init_impactxparticlecontainer(py::module& m)
              &ImpactXParticleContainer::AddNParticles,
              py::arg("lev"),
              py::arg("x"), py::arg("y"), py::arg("t"),
-             py::arg("px"), py::arg("py"), py::arg("pz"),
+             py::arg("px"), py::arg("py"), py::arg("pt"),
              py::arg("qm"), py::arg("bchchg"),
              "Add new particles to the container for fixed s.\n\n"
              "Note: This can only be used *after* the initialization (grids) have\n"
@@ -57,7 +57,7 @@ void init_impactxparticlecontainer(py::module& m)
              ":param t: positions as time-of-flight in c*t\n"
              ":param px: momentum in x\n"
              ":param py: momentum in y\n"
-             ":param pz: momentum in z\n"
+             ":param pt: momentum in t\n"
              ":param qm: charge over mass in 1/eV\n"
              ":param bchchg: total charge within a bunch in C"
         )

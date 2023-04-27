@@ -167,7 +167,7 @@ Particles
 
    This class stores particles, distributed over MPI ranks.
 
-   .. py:method:: add_n_particles(lev, x, y, t, px, py, pyz, qm, bchchg)
+   .. py:method:: add_n_particles(lev, x, y, t, px, py, pt, qm, bchchg)
 
       Add new particles to the container for fixed s.
 
@@ -181,7 +181,7 @@ Particles
       :param t: positions as time-of-flight in c*t
       :param px: momentum in x
       :param py: momentum in y
-      :param pz: momentum in z
+      :param pt: momentum in t
       :param qm: charge over mass in 1/eV
       :param bchchg: total charge within a bunch in C
 
