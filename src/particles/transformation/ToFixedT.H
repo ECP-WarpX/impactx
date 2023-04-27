@@ -78,7 +78,6 @@ namespace transformation
             amrex::ParticleReal const pzf = arg > 0.0_prt ? sqrt(arg) : 0.0_prt;
 
             // transform position and momentum (from fixed s to fixed t)
-
             p.pos(RealAoS::x) = x + px*t/(m_ptd+pt);
             // px = px;
             p.pos(RealAoS::y) = y + py*t/(m_ptd+pt);
@@ -87,15 +86,14 @@ namespace transformation
             pt = pzf - pzdf;                                   // This now represents pz.
 
             // transform momenta to static units (eg, so that momenta are
-            // normalized by pzd):
+            // normalized by pzdf):
             px = px / pzdf;
             py = py / pzdf;
             pt = pt / pzdf;  // This represents pz.
-
         }
 
     private:
-        amrex::ParticleReal m_ptd;
+        amrex::ParticleReal m_ptd;  ///< Design value of pt/mc2 = -gamma.
     };
 
 } // namespace transformation

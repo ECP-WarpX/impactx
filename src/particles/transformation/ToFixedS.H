@@ -78,7 +78,6 @@ namespace transformation
             amrex::ParticleReal const ptf = arg > 0.0_prt ? -sqrt(arg) : -1.0_prt;
 
             // transform position and momentum (from fixed t to fixed s)
-
             p.pos(RealAoS::x) = x - px * z / (m_pzd + pz);
             // px = px;
             p.pos(RealAoS::y) = y - py * z / (m_pzd + pz);
@@ -94,7 +93,7 @@ namespace transformation
         }
 
     private:
-        amrex::ParticleReal m_pzd;
+        amrex::ParticleReal m_pzd;  ///< Design value of pz/mc = beta*gamma.
     };
 
 } // namespace transformation
