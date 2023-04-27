@@ -52,10 +52,12 @@ namespace transformation {
                 auto &soa_real = pti.GetStructOfArrays().GetRealData();
                 amrex::ParticleReal *const AMREX_RESTRICT part_px = soa_real[RealSoA::ux].dataPtr();
                 amrex::ParticleReal *const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
-                amrex::ParticleReal *const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
 
                 if( direction == Direction::to_fixed_s) {
                     BL_PROFILE("impactx::transformation::CoordinateTransformation::to_fixed_s");
+
+                    amrex::ParticleReal *const AMREX_RESTRICT part_pz = soa_real[RealSoA::pz].dataPtr();
+
                     // Design value of pz/mc = beta*gamma
                     amrex::ParticleReal const pzd = sqrt(pow(pd, 2) - 1.0);
 
@@ -67,12 +69,15 @@ namespace transformation {
                         // access SoA Real data
                         amrex::ParticleReal &px = part_px[i];
                         amrex::ParticleReal &py = part_py[i];
-                        amrex::ParticleReal &pz = part_pt[i];
+                        amrex::ParticleReal &pz = part_pz[i];
 
                         to_s(p, px, py, pz);
                     });
                 } else {
                     BL_PROFILE("impactx::transformation::CoordinateTransformation::to_fixed_t");
+
+                    amrex::ParticleReal *const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
+
                     amrex::ParticleReal const ptd = pd;  // Design value of pt/mc2 = -gamma.
                     ToFixedT const to_t(ptd);
                     amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE(long i) {

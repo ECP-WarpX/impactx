@@ -19,10 +19,10 @@
 namespace impactx::spacecharge
 {
     void GatherAndPush (
-            ImpactXParticleContainer & pc,
-            std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > const & space_charge_field,
-            const amrex::Vector<amrex::Geometry>& geom,
-            amrex::ParticleReal const slice_ds
+        ImpactXParticleContainer & pc,
+        std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > const & space_charge_field,
+        const amrex::Vector<amrex::Geometry>& geom,
+        amrex::ParticleReal const slice_ds
     )
     {
         BL_PROFILE("impactx::spacecharge::GatherAndPush");
@@ -72,7 +72,7 @@ namespace impactx::spacecharge
                 auto& soa_real = pti.GetStructOfArrays().GetRealData();
                 amrex::ParticleReal* const AMREX_RESTRICT part_px = soa_real[RealSoA::ux].dataPtr();
                 amrex::ParticleReal* const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
-                amrex::ParticleReal* const AMREX_RESTRICT part_pz = soa_real[RealSoA::pt].dataPtr(); // note: currently in z
+                amrex::ParticleReal* const AMREX_RESTRICT part_pz = soa_real[RealSoA::pz].dataPtr(); // note: currently for a fixed t
 
                 // group together constants for the momentum push
                 amrex::ParticleReal const push_consts = dt * charge * inv_gamma2 / pz_ref_SI;

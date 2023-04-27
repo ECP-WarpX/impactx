@@ -59,7 +59,7 @@ namespace transformation
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
             amrex::ParticleReal const y = p.pos(RealAoS::y);
-            amrex::ParticleReal const z = p.pos(RealAoS::t);
+            amrex::ParticleReal const z = p.pos(RealAoS::z);
 
             // compute value of reference ptd = -gamma
             amrex::ParticleReal const argd = 1.0_prt + pow(m_pzd, 2);

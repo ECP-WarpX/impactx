@@ -45,6 +45,11 @@ namespace impactx
             nattribs ///< the number of attributes above (always last)
         };
 
+        // this is just an alias for fixed t
+        enum {
+            z = t
+        };
+
         //! named labels for fixed t
         static constexpr auto names_t = { "position_x", "position_y", "position_z" };
         //! named labels for fixed s
@@ -66,6 +71,11 @@ namespace impactx
             qm,  ///< charge to mass ratio, in q_e/m_e [q_e/eV]
             w,   ///< particle weight, number of real particles represented by this macroparticle [unitless]
             nattribs ///< the number of attributes above (always last)
+        };
+
+        // this is just an alias for fixed t
+        enum {
+            pz = pt
         };
 
         //! named labels for fixed t
