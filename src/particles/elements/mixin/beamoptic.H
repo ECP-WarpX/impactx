@@ -114,8 +114,8 @@ namespace detail
 
         // preparing access to particle data: SoA of Reals
         auto& soa_real = pti.GetStructOfArrays().GetRealData();
-        amrex::ParticleReal* const AMREX_RESTRICT part_px = soa_real[RealSoA::ux].dataPtr();
-        amrex::ParticleReal* const AMREX_RESTRICT part_py = soa_real[RealSoA::uy].dataPtr();
+        amrex::ParticleReal* const AMREX_RESTRICT part_px = soa_real[RealSoA::px].dataPtr();
+        amrex::ParticleReal* const AMREX_RESTRICT part_py = soa_real[RealSoA::py].dataPtr();
         amrex::ParticleReal* const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
 
         detail::PushSingleParticle<T_Element> const pushSingleParticle(
