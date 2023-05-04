@@ -41,7 +41,7 @@ namespace impactx
         {
             x,  ///< position in x [m] (at fixed s OR fixed t)
             y,  ///< position in y [m] (at fixed s OR fixed t)
-            t,  ///< time-of-flight c*t [m] (at fixed s)
+            t,  ///< c * time-of-flight [m] (at fixed s)
             nattribs ///< the number of attributes above (always last)
         };
 
@@ -65,8 +65,8 @@ namespace impactx
     {
         enum
         {
-            ux,  ///< momentum in x, scaled by the magnitude of the reference momentum [unitless] (at fixed s or t)
-            uy,  ///< momentum in y, scaled by the magnitude of the reference momentum [unitless] (at fixed s or t)
+            px,  ///< momentum in x, scaled by the magnitude of the reference momentum [unitless] (at fixed s or t)
+            py,  ///< momentum in y, scaled by the magnitude of the reference momentum [unitless] (at fixed s or t)
             pt,  ///< energy deviation, scaled by speed of light * the magnitude of the reference momentum [unitless] (at fixed s)
             qm,  ///< charge to mass ratio, in q_e/m_e [q_e/eV]
             w,   ///< particle weight, number of real particles represented by this macroparticle [unitless]

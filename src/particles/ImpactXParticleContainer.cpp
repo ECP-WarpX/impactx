@@ -134,8 +134,8 @@ namespace impactx
         // write Real attributes (SoA) to particle initialized zero
         DefineAndReturnParticleTile(0, 0, 0);
 
-        pinned_tile.push_back_real(RealSoA::ux, px);
-        pinned_tile.push_back_real(RealSoA::uy, py);
+        pinned_tile.push_back_real(RealSoA::px, px);
+        pinned_tile.push_back_real(RealSoA::py, py);
         pinned_tile.push_back_real(RealSoA::pt, pt);
         pinned_tile.push_back_real(RealSoA::qm, np, qm);
         pinned_tile.push_back_real(RealSoA::w, np, bchchg/ablastr::constant::SI::q_e/np);
