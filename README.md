@@ -62,8 +62,8 @@ else
   python3 -m pip install --upgrade pip
   MPICC="cc -target-accel=nvidia80 -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
   python3 -m pip install --upgrade pytest
-  python3 -m pip install -r requirements.txt
-  python3 -m pip install -r examples/requirements.txt
+  python3 -m pip install --upgrade -r requirements.txt
+  python3 -m pip install --upgrade -r examples/requirements.txt
 fi
 
 # GPU-aware MPI
@@ -130,8 +130,8 @@ else
   python3 -m pip install --upgrade pip
   MPICC="cc -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
   python3 -m pip install --upgrade pytest
-  python3 -m pip install -r requirements.txt
-  python3 -m pip install -r examples/requirements.txt
+  python3 -m pip install --upgrade -r requirements.txt
+  python3 -m pip install --upgrade -r examples/requirements.txt
 fi
 
 # tune exactly for KNL sub-architecture
@@ -303,8 +303,8 @@ Examples:
 
 In order to run our tests, you need to have a few Python packages installed:
 ```console
-python3 -m pip install -U pip setuptools wheel pytest
-python3 -m pip install -r examples/requirements.txt
+python3 -m pip install --upgrade pip setuptools wheel pytest
+python3 -m pip install --upgrade -r examples/requirements.txt
 ```
 
 You can run all our tests with:
