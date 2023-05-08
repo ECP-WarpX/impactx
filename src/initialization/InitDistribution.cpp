@@ -271,6 +271,27 @@ namespace impactx
             muxpx, muypy, mutpt));
 
           add_particles(bunch_charge, semigaussian, npart);
+
+        } else if (distribution_type == "triangle") {
+          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
+          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
+          pp_dist.get("sigmaX", sigx);
+          pp_dist.get("sigmaY", sigy);
+          pp_dist.get("sigmaT", sigt);
+          pp_dist.get("sigmaPx", sigpx);
+          pp_dist.get("sigmaPy", sigpy);
+          pp_dist.get("sigmaPt", sigpt);
+          pp_dist.query("muxpx", muxpx);
+          pp_dist.query("muypy", muypy);
+          pp_dist.query("mutpt", mutpt);
+
+          distribution::KnownDistributions triangle(distribution::Triangle(
+            sigx, sigy, sigt,
+            sigpx, sigpy, sigpt,
+            muxpx, muypy, mutpt));
+
+          add_particles(bunch_charge, triangle, npart);
+
         } else {
             amrex::Abort("Unknown distribution: " + distribution_type);
         }
