@@ -34,9 +34,22 @@ namespace impactx
 {
     using KnownElements = std::variant<
         None, /* must be first, so KnownElements creates a default constructor */
-        ConstF, DipEdge, Drift, Multipole, NonlinearLens,
-        diagnostics::BeamMonitor, Programmable,
-        Quad, RFCavity, Sbend, ShortRF, Sol, PRot, SoftSolenoid, SoftQuadrupole>;
+        ConstF,
+        diagnostics::BeamMonitor,
+        DipEdge,
+        Drift,
+        Multipole,
+        NonlinearLens,
+        Programmable,
+        PRot,
+        Quad,
+        RFCavity,
+        Sbend,
+        ShortRF,
+        SoftSolenoid,
+        SoftQuadrupole,
+        Sol
+    >;
 
 } // namespace impactx
 
