@@ -178,6 +178,19 @@ namespace detail
             detail::queryAddResize(pp_element, "cos_coefficients", cos_coef);
             detail::queryAddResize(pp_element, "sin_coefficients", sin_coef);
             m_lattice.emplace_back( SoftQuadrupole(ds, gscale, cos_coef, sin_coef, mapsteps, nslice) );
+        } else if (element_type == "drift_chromatic") {
+            amrex::Real ds;
+            int nslice = nslice_default;
+            pp_element.get("ds", ds);
+            pp_element.queryAdd("nslice", nslice);
+            m_lattice.emplace_back( ChrDrift(ds, nslice) );
+        } else if (element_type == "quad_chromatic") {
+            amrex::Real ds, k;
+            int nslice = nslice_default;
+            pp_element.get("ds", ds);
+            pp_element.get("k", k);
+            pp_element.queryAdd("nslice", nslice);
+            m_lattice.emplace_back( ChrQuad(ds, k, nslice) );
         } else if (element_type == "beam_monitor") {
             std::string openpmd_name = element_name;
             pp_element.queryAdd("name", openpmd_name);
