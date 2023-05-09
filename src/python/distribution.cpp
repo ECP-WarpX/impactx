@@ -92,6 +92,20 @@ void init_distribution(py::module& m)
              "A 6D Semi-Gaussian distribution (uniform in position, Gaussian in momentum)."
         );
 
+    py::class_<distribution::Triangle>(md, "Triangle")
+        .def(py::init<
+                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
+                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
+                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+             >(),
+             py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
+             py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
+             py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0,
+             "A triangle distribution for laser-plasma acceleration related applications.\n\n"
+             "A ramped, triangular current profile with a Gaussian energy spread (possibly correlated).\n"
+             "The transverse distribution is a 4D waterbag."
+        );
+
     py::class_<distribution::Waterbag>(md, "Waterbag")
         .def(py::init<
                  amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,

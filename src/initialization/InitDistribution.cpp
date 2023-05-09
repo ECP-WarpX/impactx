@@ -273,7 +273,7 @@ namespace impactx
           add_particles(bunch_charge, semigaussian, npart);
 
         } else if (distribution_type == "triangle") {
-          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
+          amrex::ParticleReal sigx, sigy, sigt, sigpx, sigpy, sigpt;
           amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
           pp_dist.get("sigmaX", sigx);
           pp_dist.get("sigmaY", sigy);

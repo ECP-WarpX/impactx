@@ -16,6 +16,7 @@
 #include "KVdist.H"
 #include "None.H"
 #include "Semigaussian.H"
+#include "Triangle.H"
 #include "Waterbag.H"
 #include "Triangle.H"
 
@@ -28,7 +29,7 @@ namespace distribution
 {
     using KnownDistributions = std::variant<
             None, /* must be first, so KnownDistributions creates a default constructor */
-            Gaussian, Kurth4D, Kurth6D, KVdist, Semigaussian, Waterbag, Triangle>;
+            Gaussian, Kurth4D, Kurth6D, KVdist, Triangle, Semigaussian, Waterbag>;
 
 } // namespace distribution
 } // namespace impactx

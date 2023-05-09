@@ -10,6 +10,8 @@
 #ifndef IMPACTX_DISTRIBUTION_TRIANGLE
 #define IMPACTX_DISTRIBUTION_TRIANGLE
 
+#include <ablastr/constant.H>
+
 #include <AMReX_Random.H>
 #include <AMReX_REAL.H>
 
@@ -29,20 +31,21 @@ namespace distribution
          * transverse distribution is a 4D waterbag.
          *
          * @param sigx,sigy,sigt for zero correlation, these are the related
-         *                                   RMS sizes (in meters)
+         *                       RMS sizes (in meters)
          * @param sigpx,sigpy,sigpt RMS momentum
          * @param muxpx,muypy,mutpt correlation length-momentum
          */
-         Triangle(amrex::ParticleReal const sigx, amrex::ParticleReal const sigy,
-         amrex::ParticleReal const sigt,amrex::ParticleReal const sigpx,
-         amrex::ParticleReal const sigpy,amrex::ParticleReal const sigpt,
-         amrex::ParticleReal const muxpx=0.0, amrex::ParticleReal const muypy=0.0,
-         amrex::ParticleReal const mutpt=0.0
-         )
-          : m_sigmaX(sigx),m_sigmaY(sigy),m_sigmaT(sigt),m_sigmaPx(sigpx),m_sigmaPy(sigpy),
-            m_sigmaPt(sigpt),m_muxpx(muxpx),m_muypy(muypy),m_mutpt(mutpt)
-          {
-          }
+        Triangle (
+            amrex::ParticleReal const sigx, amrex::ParticleReal const sigy,
+            amrex::ParticleReal const sigt, amrex::ParticleReal const sigpx,
+            amrex::ParticleReal const sigpy, amrex::ParticleReal const sigpt,
+            amrex::ParticleReal const muxpx=0.0, amrex::ParticleReal const muypy=0.0,
+            amrex::ParticleReal const mutpt=0.0
+        )
+          : m_sigmaX(sigx), m_sigmaY(sigy), m_sigmaT(sigt), m_sigmaPx(sigpx), m_sigmaPy(sigpy),
+            m_sigmaPt(sigpt), m_muxpx(muxpx), m_muypy(muypy), m_mutpt(mutpt)
+        {
+        }
 
         /** Return 1 6D particle coordinate
          *
@@ -56,21 +59,22 @@ namespace distribution
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                amrex::ParticleReal & x,
-                amrex::ParticleReal & y,
-                amrex::ParticleReal & t,
-                amrex::ParticleReal & px,
-                amrex::ParticleReal & py,
-                amrex::ParticleReal & pt,
-                amrex::RandomEngine const& engine) const {
+            amrex::ParticleReal & x,
+            amrex::ParticleReal & y,
+            amrex::ParticleReal & t,
+            amrex::ParticleReal & px,
+            amrex::ParticleReal & py,
+            amrex::ParticleReal & pt,
+            amrex::RandomEngine const& engine
+        ) const
+        {
 
             using namespace amrex::literals;
+            using ablastr::constant::math::pi;
 
-            amrex::ParticleReal ln1,norm,u0,u1,u2;
-            amrex::ParticleReal g1,g2,g3,g4,g5;
-            amrex::ParticleReal d,root,a1,a2;
-
-            constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
+            amrex::ParticleReal ln1, norm, u0, u1, u2;
+            amrex::ParticleReal g1, g2, g3, g4, g5;
+            amrex::ParticleReal d, root, a1, a2;
 
             // Sample the t coordinate for a ramped triangular profile (unit
             // variance):
@@ -104,8 +108,8 @@ namespace distribution
             g4 /= norm;
 
             // Scale to produce uniform samples in a 4D ball (unit variance):
-            d = 4_prt;  //unit ball dimension
-            u1 = amrex::Random(engine);   //uniform sample
+            d = 4_prt;  // unit ball dimension
+            u1 = amrex::Random(engine);   // uniform sample
             u2 = sqrt(d+2_prt)*pow(u1,1_prt/d);
             x = g1*u2;
             y = g2*u2;
@@ -130,12 +134,12 @@ namespace distribution
             pt = a2;
         }
     private:
-        amrex::ParticleReal m_sigmaX,m_sigmaY,m_sigmaT; //! related RMS sizes (length)
-        amrex::ParticleReal m_sigmaPx,m_sigmaPy,m_sigmaPt; //! RMS momentum
-        amrex::ParticleReal m_muxpx,m_muypy,m_mutpt; //! correlation length-momentum
+        amrex::ParticleReal m_sigmaX, m_sigmaY, m_sigmaT; //! related RMS sizes (length)
+        amrex::ParticleReal m_sigmaPx, m_sigmaPy, m_sigmaPt; //! RMS momentum
+        amrex::ParticleReal m_muxpx, m_muypy, m_mutpt; //! correlation length-momentum
     };
 
 } // namespace distribution
 } // namespace impactx
 
-#endif // IMPACTX_DISTRIBUTION_WATERBAG
+#endif // IMPACTX_DISTRIBUTION_TRIANGLE

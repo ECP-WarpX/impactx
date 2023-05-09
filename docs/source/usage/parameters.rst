@@ -196,6 +196,21 @@ Initial Beam Distributions
         * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
+    * ``triangle`` a triangle distribution for laser-plasma acceleration related applications.
+      A ramped, triangular current profile with a Gaussian energy spread (possibly correlated).
+      The transverse distribution is a 4D waterbag.
+      With additional parameters:
+
+        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
+        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
+        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
+        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
+        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
+        * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
+        * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
+        * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
+
 .. _running-cpp-parameters-lattice:
 
 Lattice Elements
