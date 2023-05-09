@@ -320,6 +320,13 @@ This module provides particle beam distributions that can be used to initialize 
 
    A 6D Semi-Gaussian distribution (uniform in position, Gaussian in momentum).
 
+.. py:class:: impactx.distribution.Triangle(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
+
+   A triangle distribution for laser-plasma acceleration related applications.
+
+   A ramped, triangular current profile with a Gaussian energy spread (possibly correlated).
+   The transverse distribution is a 4D waterbag.
+
 .. py:class:: impactx.distribution.Waterbag(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A 6D Waterbag distribution.
