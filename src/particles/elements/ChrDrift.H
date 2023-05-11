@@ -82,6 +82,7 @@ namespace impactx
             // compute particle momentum deviation delta + 1
             amrex::ParticleReal delta1;
             delta1 = sqrt(1_prt - 2_prt*pt/bet + pow(pt,2));
+            amrex::ParticleReal delta = delta1 - 1_prt;
 
             // advance transverse position and momentum (drift)
             p.pos(RealAoS::x) = x + slice_ds * px / delta1;
@@ -93,8 +94,11 @@ namespace impactx
             amrex::ParticleReal term = 2_prt*pow(pt,2)+pow(px,2)+pow(py,2);
             term = 2_prt - 4_prt*bet*pt + pow(bet,2)*term;
             term = -2_prt + pow(gam,2)*term;
-            term = gam*(-1_prt+bet*pt)*term;
-            p.pos(RealAoS::t) = t - term*slice_ds/delta1;
+            term = (-1_prt+bet*pt)*term;
+	    term = term/(2_prt*pow(bet,3)*pow(gam,2));
+	    p.pos(RealAoS::t) = t - slice_ds*(1_prt/bet + term/pow(delta1,3));
+            // term = pt + delta/bet;
+	    //p.pos(RealAoS::t) = t - term*slice_ds/delta1;
             // ptout = pt;
 
             // assign updated momenta
