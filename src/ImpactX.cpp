@@ -11,7 +11,6 @@
 #include "initialization/InitAmrCore.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
-#include "particles/diagnostics/ReducedBeamCharacteristics.H"
 #include "particles/diagnostics/DiagnosticOutput.H"
 #include "particles/spacecharge/ForceFromSelfFields.H"
 #include "particles/spacecharge/GatherAndPush.H"

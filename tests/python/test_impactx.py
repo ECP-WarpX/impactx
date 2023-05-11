@@ -8,6 +8,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
+import numpy as np
 
 import amrex
 from impactx import ImpactX, RefPart, distribution, elements
@@ -25,12 +26,32 @@ def test_impactx_fodo_file():
     sim.init_beam_distribution_from_inputs()
     sim.init_lattice_elements_from_inputs()
 
+    num_particles = sim.particle_container().TotalNumberOfParticles()
+    atol = 0.0  # ignored
+    rtol = num_particles**-0.5  # from random sampling of a smooth distribution
+
     sim.evolve()
     # test calculation of reduced beam characteristics
-    reduced_beam_data = sim.reduced_beam_characteristics()
+    rbc = sim.reduced_beam_characteristics()
 
-    for key in reduced_beam_data:
-        print(key, ":", reduced_beam_data[key])
+    for key in rbc:
+        print(key, ":", rbc[key])
+
+        print(f"  rtol={rtol} (ignored: atol~={atol})")
+
+    assert np.allclose(
+        [rbc['sig_x'], rbc['sig_y'], rbc['sig_t'], rbc['emittance_x'], rbc['emittance_y'], rbc['emittance_t']],
+        [
+            7.4790118496224206e-005,
+            7.5357525169680140e-005,
+            9.9775879288128088e-004,
+            1.9959539836392703e-009,
+            2.0175014668882125e-009,
+            2.0013820380883801e-006,
+        ],
+        rtol=rtol,
+        atol=atol,
+    )
 
 
 def test_impactx_nofile():
