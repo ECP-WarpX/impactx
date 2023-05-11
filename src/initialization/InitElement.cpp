@@ -191,7 +191,7 @@ namespace detail
             pp_element.get("k", k);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( ChrQuad(ds, k, nslice) );
-        } else if (element_type == "exact_drift") {
+        } else if (element_type == "drift_exact") {
             amrex::Real ds;
             int nslice = nslice_default;
             pp_element.get("ds", ds);
