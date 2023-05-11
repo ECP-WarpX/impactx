@@ -27,6 +27,8 @@
 #include "SoftQuad.H"
 #include "ChrQuad.H"
 #include "ChrDrift.H"
+#include "ExactDrift.H"
+#include "ChrUniformAcc.H"
 #include "diagnostics/openPMD.H"
 
 #include <variant>
@@ -38,6 +40,7 @@ namespace impactx
         None, /* must be first, so KnownElements creates a default constructor */
         ConstF, DipEdge, Drift, Multipole, NonlinearLens,
         diagnostics::BeamMonitor, Programmable, ChrQuad, ChrDrift,
+        ExactDrift, ChrAcc,
         Quad, RFCavity, Sbend, ShortRF, Sol, PRot, SoftSolenoid, SoftQuadrupole>;
 
 } // namespace impactx

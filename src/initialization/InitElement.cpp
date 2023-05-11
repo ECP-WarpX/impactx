@@ -191,6 +191,20 @@ namespace detail
             pp_element.get("k", k);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( ChrQuad(ds, k, nslice) );
+        } else if (element_type == "exact_drift") {
+            amrex::Real ds;
+            int nslice = nslice_default;
+            pp_element.get("ds", ds);
+            pp_element.queryAdd("nslice", nslice);
+            m_lattice.emplace_back( ExactDrift(ds, nslice) );
+        } else if (element_type == "uniform_acc_chromatic") {
+            amrex::Real ds, ez, bz;
+            int nslice = nslice_default;
+            pp_element.get("ds", ds);
+            pp_element.get("ez", ez);
+            pp_element.get("bz", bz);
+            pp_element.queryAdd("nslice", nslice);
+            m_lattice.emplace_back( ChrAcc(ds, ez, bz, nslice) );
         } else if (element_type == "beam_monitor") {
             std::string openpmd_name = element_name;
             pp_element.queryAdd("name", openpmd_name);
