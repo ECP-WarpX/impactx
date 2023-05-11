@@ -31,9 +31,9 @@ namespace impactx
         static constexpr auto name = "ChrAcc";
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** Acceleration in a uniform field Ez, with a uniform 
+        /** Acceleration in a uniform field Ez, with a uniform
          *  solenoidal field Bz.  The Hamiltonian is expanded to
-         *  second order in the transverse variables (x,px,y,py), 
+         *  second order in the transverse variables (x,px,y,py),
          *  while the exact pt dependence is retained.
          *
          * @param ds Segment length in m.
@@ -79,7 +79,7 @@ namespace impactx
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // access reference particle values (final, initial):
-            amrex::ParticleReal const ptf_ref = refpart.pt; 
+            amrex::ParticleReal const ptf_ref = refpart.pt;
             amrex::ParticleReal const pti_ref = ptf_ref + m_ez*slice_ds;
             amrex::ParticleReal const bgf = sqrt(pow(ptf_ref, 2) - 1.0_prt);
             amrex::ParticleReal const bgi = sqrt(pow(pti_ref, 2) - 1.0_prt);
@@ -96,7 +96,7 @@ namespace impactx
                                                 sqrt(pow(ptf_tot,2)-1_prt);
             amrex::ParticleReal const denom = -pti_tot +
                                                 sqrt(pow(pti_tot,2)-1_prt);
-          
+
             // compute focusing constant (1/m) and rotation angle (in rad)
             amrex::ParticleReal const alpha = m_bz/2.0_prt;
             amrex::ParticleReal const theta = alpha/m_ez*log(numer/denom);
