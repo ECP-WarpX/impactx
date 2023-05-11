@@ -26,6 +26,11 @@ def test_impactx_fodo_file():
     sim.init_lattice_elements_from_inputs()
 
     sim.evolve()
+    # test calculation of reduced beam characteristics
+    reduced_beam_data = sim.reduced_beam_characteristics()
+
+    for key in reduced_beam_data:
+        print(key, ":", reduced_beam_data[key])
 
 
 def test_impactx_nofile():

@@ -58,17 +58,18 @@ namespace impactx::diagnostics
         }
 
         if (otype == OutputType::PrintReducedBeamCharacteristics) {
-            ReducedBeamCharacteristics const rbc = diagnostics::compute_reduced_beam_characteristics(pc);
+            std::unordered_map<std::string, amrex::ParticleReal> const rbc = diagnostics::reduced_beam_characteristics(
+                    pc);
 
-            file_handler << step << " " << rbc.s << " " << rbc.beta_gamma << " "
-                         << rbc.x_mean << " " << rbc.y_mean << " " << rbc.t_mean << " "
-                         << rbc.sig_x << " " << rbc.sig_y << " " << rbc.sig_t << " "
-                         << rbc.ux_mean << " " << rbc.uy_mean << " " << rbc.ut_mean << " "
-                         << rbc.sig_px << " " << rbc.sig_py << " " << rbc.sig_pt << " "
-                         << rbc.emittance_x << " " << rbc.emittance_y << " " << rbc.emittance_t << " "
-                         << rbc.alpha_x << " " << rbc.alpha_y << " " << rbc.alpha_t << " "
-                         << rbc.beta_x << " " << rbc.beta_y << " " << rbc.beta_t << " "
-                         << rbc.charge << "\n";
+            file_handler << step << " " << rbc.at("s") << " " << rbc.at("beta_gamma") << " "
+                         << rbc.at("x_mean") << " " << rbc.at("y_mean") << " " << rbc.at("t_mean") << " "
+                         << rbc.at("sig_x") << " " << rbc.at("sig_y") << " " << rbc.at("sig_t") << " "
+                         << rbc.at("ux_mean") << " " << rbc.at("uy_mean") << " " << rbc.at("ut_mean") << " "
+                         << rbc.at("sig_px") << " " << rbc.at("sig_py") << " " << rbc.at("sig_pt") << " "
+                         << rbc.at("emittance_x") << " " << rbc.at("emittance_y") << " " << rbc.at("emittance_t") << " "
+                         << rbc.at("alpha_x") << " " << rbc.at("alpha_y") << " " << rbc.at("alpha_t") << " "
+                         << rbc.at("beta_x") << " " << rbc.at("beta_y") << " " << rbc.at("beta_t") << " "
+                         << rbc.at("charge") << "\n";
         } // if( otype == OutputType::PrintReducedBeamCharacteristics)
 
         // create a host-side particle buffer
