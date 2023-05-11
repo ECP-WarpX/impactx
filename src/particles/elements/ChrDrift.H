@@ -97,8 +97,6 @@ namespace impactx
             term = (-1_prt+bet*pt)*term;
 	    term = term/(2_prt*pow(bet,3)*pow(gam,2));
 	    p.pos(RealAoS::t) = t - slice_ds*(1_prt/bet + term/pow(delta1,3));
-            // term = pt + delta/bet;
-	    //p.pos(RealAoS::t) = t - term*slice_ds/delta1;
             // ptout = pt;
 
             // assign updated momenta
