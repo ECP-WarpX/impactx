@@ -82,6 +82,7 @@ namespace impactx
             // compute particle momentum deviation delta + 1
             amrex::ParticleReal delta1;
             delta1 = sqrt(1_prt - 2_prt*pt/bet + pow(pt,2));
+            amrex::ParticleReal delta = delta1 - 1_prt;
 
             // compute phase advance per unit length in s (in rad/m)
             // chromatic dependence on delta is included
@@ -117,13 +118,20 @@ namespace impactx
             // advance longitudinal position and momentum
 
             // the corresponding symplectic update to t
-            amrex::ParticleReal term = 2_prt*pow(pt,2)+pow(px,2)+pow(py,2);
-            term = 2_prt - 4_prt*bet*pt + pow(bet,2)*term;
-            term = -2_prt + pow(gam,2)*term;
-            term = gam*(-1_prt+bet*pt)*term;
-            p.pos(RealAoS::t) = t - term*slice_ds/delta1;
+            amrex::ParticleReal term = pt + delta/bet;
+	    amrex::ParticleReal t0 = t - term*slice_ds/delta1;
+ 
+	    amrex::ParticleReal w = omega*delta1;
+            amrex::ParticleReal term1 = -(pow(py,2)+pow(y,2)*pow(w,2))*sinh(2_prt*slice_ds*omega);
+	    amrex::ParticleReal term2 = -(pow(px,2)-pow(x,2)*pow(w,2))*sin(2_prt*slice_ds*omega);
+	    amrex::ParticleReal term3 = -2_prt*y*py*w*cosh(2_prt*slice_ds*omega);
+	    amrex::ParticleReal term4 = -2_prt*x*px*w*cos(2_prt*slice_ds*omega);
+            amrex::ParticleReal term5 = 2_prt*omega*(x*px*delta1 + y*py*delta1
+			    -(pow(px,2)+pow(py,2))*slice_ds - (pow(x,2)-pow(y,2))*pow(w,2)*slice_ds);
+            p.pos(RealAoS::t) = t0 + (-1_prt+bet*pt)/(8_prt*bet*pow(delta1,3)*omega)
+                                        *(term1+term2+term3+term4+term5);
 
-            // ptout = pt;
+	    // ptout = pt;
 
             // assign updated momenta
             px = pxout;
