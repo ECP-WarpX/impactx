@@ -18,7 +18,6 @@
 #include "Semigaussian.H"
 #include "Triangle.H"
 #include "Waterbag.H"
-#include "Triangle.H"
 
 #include <variant>
 
