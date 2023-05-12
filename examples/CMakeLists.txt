@@ -517,3 +517,11 @@ add_impactx_test(fodo_chromatic
     examples/fodo_chromatic/analysis_fodo_chr.py
     OFF  # no plot script yet
 )
+add_impactx_test(fodo_chromatic.py
+    examples/fodo_chromatic/run_fodo_chr.py
+      OFF  # ImpactX MPI-parallel
+      ON  # ImpactX Python interface
+    examples/fodo_chromatic/analysis_fodo_chr.py
+    OFF  # no plot script yet
+)
+
