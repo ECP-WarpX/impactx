@@ -118,7 +118,7 @@ void init_elements(py::module& m)
         )
     ;
 
-    py::class_<ChrUniformAcc, elements::Thick>(me, "ChrUniformAcc")
+    py::class_<ChrAcc, elements::Thick>(me, "ChrAcc")
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
