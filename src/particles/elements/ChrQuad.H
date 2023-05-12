@@ -75,9 +75,8 @@ namespace impactx
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
-            // access reference particle values to find beta, gamma
+            // access reference particle values to find beta
             amrex::ParticleReal const bet = refpart.beta();
-            amrex::ParticleReal const gam = refpart.gamma();
 
             // compute particle momentum deviation delta + 1
             amrex::ParticleReal delta1;
