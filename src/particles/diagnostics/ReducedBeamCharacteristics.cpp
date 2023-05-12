@@ -23,10 +23,9 @@
 namespace impactx
 {
 
-    namespace diagnostics{
+    namespace diagnostics
+    {
 
-
-        //ReducedBeamCharacteristics reduced_beam_characteristics(ImpactXParticleContainer const & pc) {
         std::unordered_map<std::string, amrex::ParticleReal> reduced_beam_characteristics(ImpactXParticleContainer const & pc) {
 
             BL_PROFILE("impactX::diagnostics::reduced_beam_characteristics");
