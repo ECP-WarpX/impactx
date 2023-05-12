@@ -536,7 +536,7 @@ This module provides elements for the accelerator lattice.
 
 .. py:class:: impactx.elements.ChrUniformAcc(ds, k, nslice=1)
 
-   A region of constant Ez and Bz for uniform acceleration, with chromatic effects included.  
+   A region of constant Ez and Bz for uniform acceleration, with chromatic effects included.
    The Hamiltonian is expanded through second order in the transverse variables (x,px,y,py), with the exact pt
    dependence retained.
 
