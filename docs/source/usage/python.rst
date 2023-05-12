@@ -113,6 +113,11 @@ General
 
       Run the main simulation loop for a number of steps.
 
+   .. py:method:: reduced_beam_characteristics()
+
+      Compute reduced beam characteristics like the position and momentum moments of the particle distribution, as well as emittance and Twiss parameters.
+
+
 .. py:class:: impactx.Config
 
       Configuration information on ImpactX that were set at compile-time.
