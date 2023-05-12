@@ -59,7 +59,7 @@ namespace impactx
                         const amrex::ParticleReal p_w = ptd.m_rdata[RealSoA::w][i];
                         const amrex::ParticleReal p_px = ptd.m_rdata[RealSoA::px][i];
                         const amrex::ParticleReal p_py = ptd.m_rdata[RealSoA::py][i];
-                        const amrex::ParticleReal p_ut = ptd.m_rdata[RealSoA::pt][i];
+                        const amrex::ParticleReal p_pt = ptd.m_rdata[RealSoA::pt][i];
 
                         // prepare mean position values
                         const amrex::ParticleReal p_x_mean = p_pos0*p_w;
@@ -68,11 +68,11 @@ namespace impactx
 
                         const amrex::ParticleReal p_px_mean = p_px*p_w;
                         const amrex::ParticleReal p_py_mean = p_py*p_w;
-                        const amrex::ParticleReal p_ut_mean = p_ut*p_w;;
+                        const amrex::ParticleReal p_pt_mean = p_pt*p_w;;
 
                         return {p_w,
                                 p_x_mean, p_y_mean, p_t_mean,
-                                p_px_mean, p_py_mean, p_ut_mean};
+                                p_px_mean, p_py_mean, p_pt_mean};
                     },
                     reduce_ops);
 
@@ -80,10 +80,10 @@ namespace impactx
                     amrex::get<0>(r), // w
                     amrex::get<1>(r), // x_mean
                     amrex::get<2>(r), // y_mean
-                    amrex::get<3>(r), // z_mean
+                    amrex::get<3>(r), // t_mean
                     amrex::get<4>(r), // px_mean
                     amrex::get<5>(r), // py_mean
-                    amrex::get<6>(r), // ut_mean
+                    amrex::get<6>(r), // pt_mean
             };
 
             // reduced sum over mpi ranks (allreduce)
@@ -96,7 +96,7 @@ namespace impactx
             amrex::ParticleReal t_mean  = values_per_rank_1st.at(3) /= w_sum;
             amrex::ParticleReal px_mean = values_per_rank_1st.at(4) /= w_sum;
             amrex::ParticleReal py_mean = values_per_rank_1st.at(5) /= w_sum;
-            amrex::ParticleReal ut_mean = values_per_rank_1st.at(6) /= w_sum;
+            amrex::ParticleReal pt_mean = values_per_rank_1st.at(6) /= w_sum;
 
 
             amrex::ReduceOps<amrex::ReduceOpSum,amrex::ReduceOpSum,amrex::ReduceOpSum,amrex::ReduceOpSum,amrex::ReduceOpSum,
@@ -113,7 +113,7 @@ namespace impactx
                     {
                         const amrex::ParticleReal p_px = ptd.m_rdata[RealSoA::px][i];
                         const amrex::ParticleReal p_py = ptd.m_rdata[RealSoA::py][i];
-                        const amrex::ParticleReal p_ut = ptd.m_rdata[RealSoA::pt][i];
+                        const amrex::ParticleReal p_pt = ptd.m_rdata[RealSoA::pt][i];
                         const amrex::ParticleReal p_w = ptd.m_rdata[RealSoA::w][i];
 
                         const amrex::ParticleReal p_pos0 = ptd.m_aos[i].pos(0);
@@ -129,17 +129,17 @@ namespace impactx
                         // prepare mean square for momenta
                         const amrex::ParticleReal p_px_ms = (p_px-px_mean)*(p_px-px_mean)*p_w;
                         const amrex::ParticleReal p_py_ms = (p_py-py_mean)*(p_py-py_mean)*p_w;
-                        const amrex::ParticleReal p_ut_ms = (p_ut-ut_mean)*(p_ut-ut_mean)*p_w;
+                        const amrex::ParticleReal p_pt_ms = (p_pt-pt_mean)*(p_pt-pt_mean)*p_w;
 
                         const amrex::ParticleReal p_xpx = (p_x-x_mean)*(p_px-px_mean)*p_w;
                         const amrex::ParticleReal p_ypy = (p_y-y_mean)*(p_py-py_mean)*p_w;
-                        const amrex::ParticleReal p_zuz = (p_t-t_mean)*(p_ut-ut_mean)*p_w;
+                        const amrex::ParticleReal p_tpt = (p_t-t_mean)*(p_pt-pt_mean)*p_w;
 
                         const amrex::ParticleReal p_charge = q_qe*p_w;
 
                         return {p_x_ms, p_y_ms, p_t_ms,
-                                p_px_ms, p_py_ms, p_ut_ms,
-                                p_xpx, p_ypy, p_zuz,
+                                p_px_ms, p_py_ms, p_pt_ms,
+                                p_xpx, p_ypy, p_tpt,
                                 p_charge};
                     },
                     reduce_ops2);
@@ -150,10 +150,10 @@ namespace impactx
                     amrex::get<2>(r2), // t_ms
                     amrex::get<3>(r2), // px_ms
                     amrex::get<4>(r2), // py_ms
-                    amrex::get<5>(r2), // ut_ms
+                    amrex::get<5>(r2), // pt_ms
                     amrex::get<6>(r2), // xpx
                     amrex::get<7>(r2), // ypy
-                    amrex::get<8>(r2), // tut
+                    amrex::get<8>(r2), // tpt
                     amrex::get<9>(r2) // charge
             };
 
@@ -166,10 +166,10 @@ namespace impactx
             amrex::ParticleReal t_ms   = values_per_rank_2nd.at(2) /= w_sum;
             amrex::ParticleReal px_ms  = values_per_rank_2nd.at(3) /= w_sum;
             amrex::ParticleReal py_ms  = values_per_rank_2nd.at(4) /= w_sum;
-            amrex::ParticleReal ut_ms  = values_per_rank_2nd.at(5) /= w_sum;
+            amrex::ParticleReal pt_ms  = values_per_rank_2nd.at(5) /= w_sum;
             amrex::ParticleReal xpx    = values_per_rank_2nd.at(6) /= w_sum;
             amrex::ParticleReal ypy    = values_per_rank_2nd.at(7) /= w_sum;
-            amrex::ParticleReal tut    = values_per_rank_2nd.at(8) /= w_sum;
+            amrex::ParticleReal tpt    = values_per_rank_2nd.at(8) /= w_sum;
             amrex::ParticleReal charge = values_per_rank_2nd.at(9);
             // standard deviations of positions
             amrex::ParticleReal sig_x = std::sqrt(x_ms);
@@ -178,11 +178,11 @@ namespace impactx
             // standard deviations of momenta
             amrex::ParticleReal sig_px = std::sqrt(px_ms);
             amrex::ParticleReal sig_py = std::sqrt(py_ms);
-            amrex::ParticleReal sig_pt = std::sqrt(ut_ms);
+            amrex::ParticleReal sig_pt = std::sqrt(pt_ms);
             // RMS emittances
             amrex::ParticleReal emittance_x = std::sqrt(x_ms*px_ms-xpx*xpx);
             amrex::ParticleReal emittance_y = std::sqrt(y_ms*py_ms-ypy*ypy);
-            amrex::ParticleReal emittance_t = std::sqrt(t_ms*ut_ms-tut*tut);
+            amrex::ParticleReal emittance_t = std::sqrt(t_ms*pt_ms-tpt*tpt);
             // Courant-Snyder (Twiss) beta-function
             amrex::ParticleReal beta_x = x_ms / emittance_x;
             amrex::ParticleReal beta_y = y_ms / emittance_y;
@@ -190,7 +190,7 @@ namespace impactx
             // Courant-Snyder (Twiss) alpha
             amrex::ParticleReal alpha_x = - xpx / emittance_x;
             amrex::ParticleReal alpha_y = - ypy / emittance_y;
-            amrex::ParticleReal alpha_t = - tut / emittance_t;
+            amrex::ParticleReal alpha_t = - tpt / emittance_t;
 
             std::unordered_map<std::string, amrex::ParticleReal> data;
             data["s"] = ref_part.s;  // TODO: remove when the output gets rerouted to openPMD
@@ -203,7 +203,7 @@ namespace impactx
             data["sig_t"] = sig_t;
             data["px_mean"] = px_mean;
             data["py_mean"] = py_mean;
-            data["ut_mean"] = ut_mean;
+            data["pt_mean"] = pt_mean;
             data["sig_px"] = sig_px;
             data["sig_py"] = sig_py;
             data["sig_pt"] = sig_pt;
