@@ -7,8 +7,8 @@
 #
 # -*- coding: utf-8 -*-
 
-import pytest
 import numpy as np
+import pytest
 
 import amrex
 from impactx import ImpactX, RefPart, distribution, elements
@@ -40,7 +40,14 @@ def test_impactx_fodo_file():
         print(f"  rtol={rtol} (ignored: atol~={atol})")
 
     assert np.allclose(
-        [rbc['sig_x'], rbc['sig_y'], rbc['sig_t'], rbc['emittance_x'], rbc['emittance_y'], rbc['emittance_t']],
+        [
+            rbc["sig_x"],
+            rbc["sig_y"],
+            rbc["sig_t"],
+            rbc["emittance_x"],
+            rbc["emittance_y"],
+            rbc["emittance_t"],
+        ],
         [
             7.4790118496224206e-005,
             7.5357525169680140e-005,
