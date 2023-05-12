@@ -9,7 +9,6 @@
  */
 
 #include "ImpactX.H"
-#include "particles/NamedComponentParticleContainer.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/diagnostics/ReducedBeamCharacteristics.H"
 
