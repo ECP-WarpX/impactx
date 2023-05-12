@@ -524,4 +524,3 @@ add_impactx_test(fodo_chromatic.py
     examples/fodo_chromatic/analysis_fodo_chr.py
     OFF  # no plot script yet
 )
-
