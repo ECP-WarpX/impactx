@@ -10,9 +10,13 @@
 #ifndef IMPACTX_ELEMENTS_ALL_H
 #define IMPACTX_ELEMENTS_ALL_H
 
+#include "ChrDrift.H"
+#include "ChrQuad.H"
+#include "ChrUniformAcc.H"
 #include "ConstF.H"
 #include "DipEdge.H"
 #include "Drift.H"
+#include "ExactDrift.H"
 #include "Multipole.H"
 #include "None.H"
 #include "NonlinearLens.H"
@@ -25,10 +29,6 @@
 #include "PRot.H"
 #include "SoftSol.H"
 #include "SoftQuad.H"
-#include "ChrQuad.H"
-#include "ChrDrift.H"
-#include "ExactDrift.H"
-#include "ChrUniformAcc.H"
 #include "diagnostics/openPMD.H"
 
 #include <variant>
@@ -38,10 +38,26 @@ namespace impactx
 {
     using KnownElements = std::variant<
         None, /* must be first, so KnownElements creates a default constructor */
-        ConstF, DipEdge, Drift, Multipole, NonlinearLens,
-        diagnostics::BeamMonitor, Programmable, ChrQuad, ChrDrift,
-        ExactDrift, ChrAcc,
-        Quad, RFCavity, Sbend, ShortRF, Sol, PRot, SoftSolenoid, SoftQuadrupole>;
+        ChrAcc,
+        ChrDrift,
+        ChrQuad,
+        ConstF,
+        diagnostics::BeamMonitor,
+        DipEdge,
+        Drift,
+        ExactDrift,
+        Multipole,
+        NonlinearLens,
+        Programmable,
+        PRot,
+        Quad,
+        RFCavity,
+        Sbend,
+        ShortRF,
+        SoftSolenoid,
+        SoftQuadrupole,
+        Sol
+    >;
 
 } // namespace impactx
 
