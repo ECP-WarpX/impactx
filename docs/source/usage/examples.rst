@@ -15,6 +15,7 @@ This section allows you to **download input files** that correspond to different
    examples/kurth/README.rst
    examples/rfcavity/README.rst
    examples/fodo_rf/README.rst
+   examples/fodo_chromatic/README.rst
    examples/multipole/README.rst
    examples/iota_lens/README.rst
    examples/iota_lattice/README.rst

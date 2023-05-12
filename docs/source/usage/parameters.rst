@@ -229,13 +229,38 @@ Lattice Elements
 * ``<element_name>.type`` (``string``)
     Indicates the element type for this lattice element. This should be one of:
 
-        * ``drift`` for free drift. This requires these additional parameters:
+        * ``drift`` for a free drift. This requires these additional parameters:
+
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
+
+        * ``drift_chromatic`` for a free drift, with chromatic effects included. This requires these additional parameters:
+
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
+
+        * ``drift_exact`` for a free drift, using the exact nonlinear map. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``quad`` for a quadrupole. This requires these additional parameters:
+
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
+
+            * ``<element_name>.k`` (``float``, in inverse meters squared) the quadrupole strength
+
+                = (magnetic field gradient in T/m) / (magnetic rigidity in T-m)
+
+              * k > 0 horizontal focusing
+              * k < 0 horizontal defocusing
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
+
+        * ``quad_chromatic`` for a quadrupole, with chromatic effects included. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
@@ -352,6 +377,20 @@ Lattice Elements
             * ``<element_name>.k`` (``float``, in 1/meters) the RF wavenumber
 
                 = 2*pi/(RF wavelength in m)
+
+        * ``uniform_acc_chromatic`` for a region of uniform acceleration, with chromatic effects included. This requires these additional parameters:
+
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
+
+            * ``<element_name>.ez`` (``float``, in inverse meters) the electric field strength
+
+                = (particle charge in C * electric field Ez in V/m) / (particle mass in kg * (speed of light in m/s)^2)
+
+            * ``<element_name>.bz`` (``float``, in inverse meters) the magnetic field strength
+
+                = (particle charge in C * magnetic field Bz in T) / (particle mass in kg * speed of light in m/s)
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``multipole`` for a thin multipole element.
           This requires these additional parameters:
