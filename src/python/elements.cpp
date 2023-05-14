@@ -113,7 +113,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
                 int const,
-		int const>(),
+        int const>(),
              py::arg("ds"), py::arg("k"), py::arg("units") = 0, py::arg("nslice") = 1,
              "A Quadrupole magnet with chromatic effects included."
         )

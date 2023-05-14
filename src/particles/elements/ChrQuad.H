@@ -87,7 +87,7 @@ namespace impactx
             amrex::ParticleReal g = m_k;
             if (m_unit == 1) {
                   g = m_k/refpart.rigidity_Tm();
-	    };
+        };
 
             // compute particle momentum deviation delta + 1
             amrex::ParticleReal delta1;
