@@ -17,6 +17,7 @@
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
+#include <AMReX_Print.H>      // for PrintToFile
 
 #include <cmath>
 
@@ -36,13 +37,17 @@ namespace impactx
          * @param ds Segment length in m.
          * @param k  Quadrupole strength in m^(-2) (MADX convention)
          *           = (gradient in T/m) / (rigidity in T-m)
+         *        OR Quadrupole strength in T/m (MaryLie convention)
          *           k > 0 horizontal focusing
          *           k < 0 horizontal defocusing
+         * @param unit  Unit specification
+         *           unit = 0 MADX convention (default)
+         *           unit = 1 MaryLie convention
          * @param nslice number of slices used for the application of space charge
          */
         ChrQuad( amrex::ParticleReal const ds, amrex::ParticleReal const k,
-              int const nslice )
-        : Thick(ds, nslice), m_k(k)
+              int const unit, int const nslice )
+        : Thick(ds, nslice), m_k(k), m_unit(unit)
         {
         }
 
@@ -78,6 +83,12 @@ namespace impactx
             // access reference particle values to find beta
             amrex::ParticleReal const bet = refpart.beta();
 
+            // normalize quad units to MAD-X convention if needed
+            amrex::ParticleReal g = m_k;
+            if (m_unit == 1) {
+                  g = m_k/refpart.rigidity_Tm();
+	    };
+
             // compute particle momentum deviation delta + 1
             amrex::ParticleReal delta1;
             delta1 = sqrt(1_prt - 2_prt*pt/bet + pow(pt,2));
@@ -85,14 +96,14 @@ namespace impactx
 
             // compute phase advance per unit length in s (in rad/m)
             // chromatic dependence on delta is included
-            amrex::ParticleReal const omega = sqrt(std::abs(m_k)/delta1);
+            amrex::ParticleReal const omega = sqrt(std::abs(g)/delta1);
 
             // intialize output values of momenta
             amrex::ParticleReal pxout = px;
             amrex::ParticleReal pyout = py;
             amrex::ParticleReal ptout = pt;
 
-            if(m_k > 0.0) {
+            if(g > 0.0) {
                // advance transverse position and momentum (focusing quad)
                p.pos(RealAoS::x) = cos(omega*slice_ds)*x +
                                    sin(omega*slice_ds)/(omega*delta1)*px;
@@ -176,7 +187,8 @@ namespace impactx
         }
 
     private:
-        amrex::ParticleReal m_k; //! quadrupole strength in 1/m
+        amrex::ParticleReal m_k; //! quadrupole strength in 1/m^2 (or T/m)
+        int m_unit; //! unit specification for quad strength
     };
 
 } // namespace impactx

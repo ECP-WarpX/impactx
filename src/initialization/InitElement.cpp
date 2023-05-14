@@ -186,11 +186,13 @@ namespace detail
             m_lattice.emplace_back( ChrDrift(ds, nslice) );
         } else if (element_type == "quad_chromatic") {
             amrex::Real ds, k;
+            int units = 0;
             int nslice = nslice_default;
             pp_element.get("ds", ds);
             pp_element.get("k", k);
+            pp_element.queryAdd("units", units);
             pp_element.queryAdd("nslice", nslice);
-            m_lattice.emplace_back( ChrQuad(ds, k, nslice) );
+            m_lattice.emplace_back( ChrQuad(ds, k, units, nslice) );
         } else if (element_type == "drift_exact") {
             amrex::Real ds;
             int nslice = nslice_default;
