@@ -491,17 +491,19 @@ This module provides elements for the accelerator lattice.
               k < 0 horizontal defocusing
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.ChrQuad(ds, k, nslice=1)
+.. py:class:: impactx.elements.ChrQuad(ds, k, units, nslice=1)
 
    A Quadrupole magnet, with chromatic effects included.  The Hamiltonian is expanded
    through second order in the transverse variables (x,px,y,py), with the exact pt
    dependence retained.
 
    :param ds: Segment length in m.
-   :param k:  Quadrupole strength in m^(-2) (MADX convention)
+   :param k:  Quadrupole strength in m^(-2) (MADX convention, if units = 0)
               = (gradient in T/m) / (rigidity in T-m)
+          OR  Quadrupole strength in T/m (MaryLie convention, if units = 1)
               k > 0 horizontal focusing
               k < 0 horizontal defocusing
+   :param units: specification of units for quadrupole field strength          
    :param nslice: number of slices used for the application of space charge
 
 .. py:class:: impactx.elements.RFCavity(ds, escale, freq, phase, mapsteps, nslice)
