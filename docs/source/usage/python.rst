@@ -503,7 +503,7 @@ This module provides elements for the accelerator lattice.
           OR  Quadrupole strength in T/m (MaryLie convention, if units = 1)
               k > 0 horizontal focusing
               k < 0 horizontal defocusing
-   :param units: specification of units for quadrupole field strength          
+   :param units: specification of units for quadrupole field strength
    :param nslice: number of slices used for the application of space charge
 
 .. py:class:: impactx.elements.RFCavity(ds, escale, freq, phase, mapsteps, nslice)
