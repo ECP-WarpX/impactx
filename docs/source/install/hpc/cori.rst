@@ -64,10 +64,10 @@ For PICMI and Python workflows, also install a virtual environment:
    source $HOME/sw/knl/venvs/impactx/bin/activate
 
    python3 -m pip install --upgrade pip
-   MPICC="cc -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
+   MPICC="cc -shared" python3 -m pip install --upgrade --no-cache-dir -v mpi4py
    python3 -m pip install --upgrade pytest
-   python3 -m pip install -r $HOME/src/impactx/requirements.txt
-   python3 -m pip install -r $HOME/src/impactx/examples/requirements.txt
+   python3 -m pip install --upgrade -r $HOME/src/impactx/requirements.txt
+   python3 -m pip install --upgrade -r $HOME/src/impactx/examples/requirements.txt
 
 Haswell
 ^^^^^^^
@@ -102,8 +102,8 @@ For PICMI and Python workflows, also install a virtual environment:
    source $HOME/sw/haswell/venvs/impactx/bin/activate
 
    python3 -m pip install --upgrade pip
-   MPICC="cc -shared" python3 -m pip install -U --no-cache-dir -v mpi4py
-   python3 -m pip install -r $HOME/src/impactx/requirements.txt
+   MPICC="cc -shared" python3 -m pip install --upgrade --no-cache-dir -v mpi4py
+   python3 -m pip install --upgrade -r $HOME/src/impactx/requirements.txt
 
 GPU (V100)
 ^^^^^^^^^^
@@ -157,8 +157,8 @@ For PICMI and Python workflows, also install a virtual environment:
    source $HOME/sw/cori_gpu/venvs/impactx/bin/activate
 
    python3 -m pip install --upgrade pip
-   python3 -m pip install -U --no-cache-dir -v mpi4py
-   python3 -m pip install -r $HOME/src/impactx/requirements.txt
+   python3 -m pip install --upgrade --no-cache-dir -v mpi4py
+   python3 -m pip install --upgrade -r $HOME/src/impactx/requirements.txt
 
 Building ImpactX
 ----------------
