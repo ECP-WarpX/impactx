@@ -267,12 +267,12 @@ Lattice Elements
             * ``<element_name>.k`` (``float``, in inverse meters squared OR in T/m) the quadrupole strength
 
                 = (magnetic field gradient in T/m) / (magnetic rigidity in T-m) - if units = 0
-                
+
              OR = magnetic field gradient in T/m - if units = 1
 
               * k > 0 horizontal focusing
               * k < 0 horizontal defocusing
-              
+
             * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
