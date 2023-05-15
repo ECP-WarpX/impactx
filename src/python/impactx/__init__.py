@@ -34,4 +34,4 @@ elements.KnownElementsList.load_file = lambda self, madx_file, nslice=1: self.ex
 )  # noqa
 
 # MAD-X file reader for reference particle
-RefPart.load_file = lambda self, madx_file: read_beam(self, madx_file)  # noqa
+RefPart.load_file = read_beam  # noqa
