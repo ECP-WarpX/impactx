@@ -36,7 +36,7 @@ namespace impactx
             amrex::ParticleReal const q_qe = ref_part.charge_qe();
 
             // preparing access to particle data: AoS and SoA
-            using PTDType = typename ImpactXParticleContainer::ParticleTileType::ConstParticleTileDataType;
+            using PType = typename ImpactXParticleContainer::SuperParticleType;
 
             amrex::ReduceOps<amrex::ReduceOpSum,amrex::ReduceOpSum,amrex::ReduceOpSum,amrex::ReduceOpSum,amrex::ReduceOpSum,
             amrex::ReduceOpSum,amrex::ReduceOpSum> reduce_ops;
@@ -44,20 +44,21 @@ namespace impactx
             auto r = amrex::ParticleReduce<amrex::ReduceData<amrex::ParticleReal,amrex::ParticleReal,
             amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal>>(
                     pc,
-                    [=] AMREX_GPU_DEVICE(const PTDType& ptd, const int i) noexcept -> amrex::GpuTuple
+                    [=] AMREX_GPU_DEVICE(const PType& p) noexcept -> amrex::GpuTuple
                             <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,
                             amrex::ParticleReal,amrex::ParticleReal>
                     {
+
                         // access AoS particle position data
-                        const amrex::ParticleReal p_pos0 = ptd.m_aos[i].pos(0);
-                        const amrex::ParticleReal p_pos1 = ptd.m_aos[i].pos(1);
-                        const amrex::ParticleReal p_pos2 = ptd.m_aos[i].pos(2);
+                        const amrex::ParticleReal p_pos0 = p.pos(0);
+                        const amrex::ParticleReal p_pos1 = p.pos(1);
+                        const amrex::ParticleReal p_pos2 = p.pos(2);
 
                         // access SoA particle momentum data and weighting
-                        const amrex::ParticleReal p_w = ptd.m_rdata[RealSoA::w][i];
-                        const amrex::ParticleReal p_px = ptd.m_rdata[RealSoA::px][i];
-                        const amrex::ParticleReal p_py = ptd.m_rdata[RealSoA::py][i];
-                        const amrex::ParticleReal p_pt = ptd.m_rdata[RealSoA::pt][i];
+                        const amrex::ParticleReal p_w = p.rdata(RealSoA::w);
+                        const amrex::ParticleReal p_px = p.rdata(RealSoA::px);
+                        const amrex::ParticleReal p_py = p.rdata(RealSoA::py);
+                        const amrex::ParticleReal p_pt = p.rdata(RealSoA::pt);
 
                         // prepare mean position values
                         const amrex::ParticleReal p_x_mean = p_pos0*p_w;
@@ -105,18 +106,19 @@ namespace impactx
                     amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,
                     amrex::ParticleReal,amrex::ParticleReal>>(
                     pc,
-                    [=] AMREX_GPU_DEVICE(const PTDType& ptd, const int i) noexcept -> amrex::GpuTuple
+                    [=] AMREX_GPU_DEVICE(const PType& p) noexcept -> amrex::GpuTuple
                             <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,
                                     amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal>
                     {
-                        const amrex::ParticleReal p_px = ptd.m_rdata[RealSoA::px][i];
-                        const amrex::ParticleReal p_py = ptd.m_rdata[RealSoA::py][i];
-                        const amrex::ParticleReal p_pt = ptd.m_rdata[RealSoA::pt][i];
-                        const amrex::ParticleReal p_w = ptd.m_rdata[RealSoA::w][i];
-
-                        const amrex::ParticleReal p_pos0 = ptd.m_aos[i].pos(0);
-                        const amrex::ParticleReal p_pos1 = ptd.m_aos[i].pos(1);
-                        const amrex::ParticleReal p_pos2 = ptd.m_aos[i].pos(2);
+                        // access SoA particle momentum data and weighting
+                        const amrex::ParticleReal p_w = p.rdata(RealSoA::w);
+                        const amrex::ParticleReal p_px = p.rdata(RealSoA::px);
+                        const amrex::ParticleReal p_py = p.rdata(RealSoA::py);
+                        const amrex::ParticleReal p_pt = p.rdata(RealSoA::pt);
+                        // access AoS particle position data
+                        const amrex::ParticleReal p_pos0 = p.pos(0);
+                        const amrex::ParticleReal p_pos1 = p.pos(1);
+                        const amrex::ParticleReal p_pos2 = p.pos(2);
                         const amrex::ParticleReal p_x = p_pos0;
                         const amrex::ParticleReal p_y = p_pos1;
                         const amrex::ParticleReal p_t = p_pos2;
