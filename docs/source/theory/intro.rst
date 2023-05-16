@@ -53,7 +53,7 @@ The elements supported currently fall into one of three categories:
 
 * **ideal (thick) elements** using a hard-edge fringe field approximation, such as drifts, quadrupoles, and dipoles
 * **zero-length (thin) elements**, such as multipole kicks and coordinate transformations
-* **soft-edge elements** described by :math:`s`-dependent user-provided field data
+* **soft-edge elements** described by :math:`s`-dependent, user-provided field data
 
 Transport may be performed using one of three possible levels of approximation to the underlying Hamiltonian:
 
