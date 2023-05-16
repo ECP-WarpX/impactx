@@ -49,11 +49,12 @@ Tracking and Lattice Optics
 """""""""""""""""""""""""""
 
 Tracking through lattice optics in ImpactX is performed by updating the canonical phase space variables (x,px,y,py,t,pt) using symplectic transport.
-The elements supported currently fall into one of three categories:
+The elements supported currently fall into one of the following categories:
 
-* **ideal (thick) elements** using a hard-edge fringe field approximation, such as drifts, quadrupoles, and dipoles
 * **zero-length (thin) elements**, such as multipole kicks and coordinate transformations
-* **soft-edge elements** described by :math:`s`-dependent, user-provided field data
+* **ideal (thick) elements** using a hard-edge fringe field approximation, such as drifts, quadrupoles, and dipoles
+* **soft-edge elements** described by :math:`s`-dependent, user-provided field data, such as RF cavities
+* **ML surrogate models** using a trained neural network (not necessarily symplectic)
 
 Transport may be performed using one of three possible levels of approximation to the underlying Hamiltonian:
 
@@ -61,12 +62,10 @@ Transport may be performed using one of three possible levels of approximation t
 * **chromatic or paraxial approximation:** obtained by expanding the Hamiltonian through terms of degree 2 in the transverse phase space variables, while retaining the nonlinear dependence on the energy variable pt
 * **exact Hamiltonian:** obtained using the exact nonlinear Hamiltonian
 
-* **tracking through lattice optics:** is treated through linear order with respect to the reference particle
-
-  * **velocity spread:** the above linearization implies that, when solving space-charge effects, we assume that the relative spread of velocities of particles in the beam is negligible compared to the velocity of the reference particle
-
 
 Space Charge (Poisson Solver)
 """""""""""""""""""""""""""""
+
+  * **velocity spread:** when solving space-charge effects, we assume that the relative spread of velocities of particles in the beam is negligible compared to the velocity of the reference particle
 
 * **electrostatic in the bunch frame:** we assume there are no retardation effects and we solve the Poisson equation in the bunch frame
