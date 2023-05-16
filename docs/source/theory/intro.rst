@@ -66,6 +66,6 @@ Transport may be performed using one of three possible levels of approximation t
 Space Charge (Poisson Solver)
 """""""""""""""""""""""""""""
 
-  * **velocity spread:** when solving space-charge effects, we assume that the relative spread of velocities of particles in the beam is negligible compared to the velocity of the reference particle
+  * **velocity spread:** when solving for space-charge effects, we assume that the relative spread of velocities of particles in the beam is negligible compared to the velocity of the reference particle, so that in the bunch frame (rest frame of the reference particle) particle velocities are nonrelativistic
 
 * **electrostatic in the bunch frame:** we assume there are no retardation effects and we solve the Poisson equation in the bunch frame
