@@ -17,6 +17,8 @@
 #include <AMReX_GpuComplex.H>
 
 #include <cmath>
+#include <string>
+#include <unordered_map>
 
 namespace impactx::diagnostics
 {

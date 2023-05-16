@@ -6,7 +6,7 @@
 #include "pyImpactX.H"
 
 #include <ImpactX.H>
-#include "particles/diagnostics/ReducedBeamCharacteristics.H"
+#include <particles/diagnostics/ReducedBeamCharacteristics.H>
 #include <particles/distribution/Gaussian.H>
 #include <particles/distribution/Kurth4D.H>
 #include <particles/distribution/Kurth6D.H>
