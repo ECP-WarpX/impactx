@@ -99,6 +99,37 @@ void init_elements(py::module& m)
 
     // beam optics
 
+    py::class_<ChrDrift, elements::Thick>(me, "ChrDrift")
+        .def(py::init<
+                amrex::ParticleReal const,
+                int const >(),
+             py::arg("ds"), py::arg("nslice") = 1,
+             "A Drift with chromatic effects included."
+        )
+    ;
+
+    py::class_<ChrQuad, elements::Thick>(me, "ChrQuad")
+        .def(py::init<
+                amrex::ParticleReal const,
+                amrex::ParticleReal const,
+                int const,
+        int const>(),
+             py::arg("ds"), py::arg("k"), py::arg("units") = 0, py::arg("nslice") = 1,
+             "A Quadrupole magnet with chromatic effects included."
+        )
+    ;
+
+    py::class_<ChrAcc, elements::Thick>(me, "ChrAcc")
+        .def(py::init<
+                amrex::ParticleReal const,
+                amrex::ParticleReal const,
+                amrex::ParticleReal const,
+                int const>(),
+             py::arg("ds"), py::arg("ez"), py::arg("bz"), py::arg("nslice") = 1,
+             "A region of Uniform Acceleration, with chromatic effects included."
+        )
+    ;
+
     py::class_<ConstF, elements::Thick>(me, "ConstF")
         .def(py::init<
                 amrex::ParticleReal const,
@@ -128,6 +159,15 @@ void init_elements(py::module& m)
                 int const >(),
              py::arg("ds"), py::arg("nslice") = 1,
              "A drift."
+        )
+    ;
+
+    py::class_<ExactDrift, elements::Thick>(me, "ExactDrift")
+        .def(py::init<
+                amrex::ParticleReal const,
+                int const >(),
+             py::arg("ds"), py::arg("nslice") = 1,
+             "A Drift using the exact nonlinear map."
         )
     ;
 

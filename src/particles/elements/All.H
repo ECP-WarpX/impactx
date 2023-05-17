@@ -10,9 +10,13 @@
 #ifndef IMPACTX_ELEMENTS_ALL_H
 #define IMPACTX_ELEMENTS_ALL_H
 
+#include "ChrDrift.H"
+#include "ChrQuad.H"
+#include "ChrUniformAcc.H"
 #include "ConstF.H"
 #include "DipEdge.H"
 #include "Drift.H"
+#include "ExactDrift.H"
 #include "Multipole.H"
 #include "None.H"
 #include "NonlinearLens.H"
@@ -34,10 +38,14 @@ namespace impactx
 {
     using KnownElements = std::variant<
         None, /* must be first, so KnownElements creates a default constructor */
+        ChrAcc,
+        ChrDrift,
+        ChrQuad,
         ConstF,
         diagnostics::BeamMonitor,
         DipEdge,
         Drift,
+        ExactDrift,
         Multipole,
         NonlinearLens,
         Programmable,

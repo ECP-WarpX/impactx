@@ -404,6 +404,22 @@ This module provides elements for the accelerator lattice.
    :param ds: Segment length in m
    :param nslice: number of slices used for the application of space charge
 
+.. py:class:: impactx.elements.ChrDrift(ds, nslice=1)
+
+   A drift with chromatic effects included.  The Hamiltonian is expanded
+   through second order in the transverse variables (x,px,y,py), with the exact pt
+   dependence retained.
+
+   :param ds: Segment length in m
+   :param nslice: number of slices used for the application of space charge
+
+.. py:class:: impactx.elements.ExactDrift(ds, nslice=1)
+
+   A drift using the exact nonlinear transfer map.
+
+   :param ds: Segment length in m
+   :param nslice: number of slices used for the application of space charge
+
 .. py:class:: impactx.elements.Multipole(multipole, K_normal, K_skew)
 
    A general thin multipole element.
@@ -483,6 +499,21 @@ This module provides elements for the accelerator lattice.
               k < 0 horizontal defocusing
    :param nslice: number of slices used for the application of space charge
 
+.. py:class:: impactx.elements.ChrQuad(ds, k, units, nslice=1)
+
+   A Quadrupole magnet, with chromatic effects included.  The Hamiltonian is expanded
+   through second order in the transverse variables (x,px,y,py), with the exact pt
+   dependence retained.
+
+   :param ds: Segment length in m.
+   :param k:  Quadrupole strength in m^(-2) (MADX convention, if units = 0)
+              = (gradient in T/m) / (rigidity in T-m)
+          OR  Quadrupole strength in T/m (MaryLie convention, if units = 1)
+              k > 0 horizontal focusing
+              k < 0 horizontal defocusing
+   :param units: specification of units for quadrupole field strength
+   :param nslice: number of slices used for the application of space charge
+
 .. py:class:: impactx.elements.RFCavity(ds, escale, freq, phase, mapsteps, nslice)
 
    A radiofrequency cavity.
@@ -512,6 +543,20 @@ This module provides elements for the accelerator lattice.
 
    :param V: Normalized RF voltage drop V = Emax*L/(c*Brho)
    :param k: Wavenumber of RF in 1/m
+
+.. py:class:: impactx.elements.ChrUniformAcc(ds, k, nslice=1)
+
+   A region of constant Ez and Bz for uniform acceleration, with chromatic effects included.
+   The Hamiltonian is expanded through second order in the transverse variables (x,px,y,py),
+   with the exact pt dependence retained.
+
+   :param ds: Segment length in m.
+   :param ez: Electric field strength in m^(-1)
+              = (particle charge in C * field Ez in V/m) / (particle mass in kg * (speed of light in m/s)^2)
+   :param bz: Magnetic field strength in m^(-1)
+              = (particle charge in C * field Bz in T) / (particle mass in kg * speed of light in m/s)
+
+   :param nslice: number of slices used for the application of space charge
 
 .. py:class:: impactx.elements.SoftSolenoid(ds, bscale, cos_coefficients, sin_coefficients, nslice=1)
 

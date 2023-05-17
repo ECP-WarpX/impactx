@@ -126,6 +126,9 @@ namespace impactx
         if (particle_type == "electron") {
             qe = -1.0;
             massE = ablastr::constant::SI::m_e / ablastr::constant::SI::MeV_invc2;
+        } else if (particle_type == "positron") {
+            qe = 1.0;
+            massE = ablastr::constant::SI::m_e / ablastr::constant::SI::MeV_invc2;
         } else if (particle_type == "proton") {
             qe = 1.0;
             massE = ablastr::constant::SI::m_p / ablastr::constant::SI::MeV_invc2;

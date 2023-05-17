@@ -160,6 +160,23 @@ namespace impactx
             return *this;
         }
 
+        /** Get reference particle magnetic rigidity
+         *
+         * @returns magnetic rigidity Brho in T*m
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        amrex::ParticleReal
+        rigidity_Tm () const
+        {
+            using namespace amrex::literals;
+
+            amrex::ParticleReal const ref_gamma = -pt;
+            amrex::ParticleReal const ref_betagamma = sqrt(pow(ref_gamma, 2) - 1.0_prt);
+            //amrex::ParticleReal const ref_rigidity = mass*ref_betagamma*(ablastr::constant::SI::c)/charge; //fails due to "charge"
+            amrex::ParticleReal const ref_rigidity = mass*ref_betagamma*(ablastr::constant::SI::c)/(ablastr::constant::SI::q_e);
+            return ref_rigidity;
+        }
+
         /** Get reference particle charge
          *
          * @returns charge in multiples of the (positive) elementary charge
