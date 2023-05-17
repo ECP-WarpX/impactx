@@ -29,8 +29,8 @@ namespace impactx::diagnostics
 
         // preparing to access reference particle data: RefPart
         RefPart const ref_part = pc.GetRefParticle();
-        // reference particle charge in units of positive elementary charge
-        amrex::ParticleReal const q_qe = ref_part.charge_qe();
+        // reference particle charge in C
+        amrex::ParticleReal const q_C = ref_part.charge;
 
         // preparing access to particle data: AoS and SoA
         using PType = typename ImpactXParticleContainer::SuperParticleType;
@@ -159,7 +159,7 @@ namespace impactx::diagnostics
                 const amrex::ParticleReal p_ypy = (p_y-y_mean)*(p_py-py_mean)*p_w;
                 const amrex::ParticleReal p_tpt = (p_t-t_mean)*(p_pt-pt_mean)*p_w;
 
-                const amrex::ParticleReal p_charge = q_qe*p_w;
+                const amrex::ParticleReal p_charge = q_C*p_w;
 
                 return {p_x_ms, p_y_ms, p_t_ms,
                         p_px_ms, p_py_ms, p_pt_ms,
@@ -244,7 +244,7 @@ namespace impactx::diagnostics
         data["beta_x"] = beta_x;
         data["beta_y"] = beta_y;
         data["beta_t"] = beta_t;
-        data["charge"] = charge;  // TODO: remove when the output gets rerouted to openPMD
+        data["charge_C"] = charge;  // TODO: remove when the output gets rerouted to openPMD
 
         return data;
     }

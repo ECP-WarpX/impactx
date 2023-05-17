@@ -31,7 +31,7 @@ The code writes out the values in an ASCII file prefixed ``reduced_beam_characte
 * ``beta_x``, ``beta_y``, ``beta_t``
     Twiss beta
 * ``charge``
-    Cumulated beam charge
+    Cumulated beam charge in C
 
 .. note::
 
