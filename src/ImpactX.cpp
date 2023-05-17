@@ -94,6 +94,11 @@ namespace impactx
                                           diagnostics::OutputType::PrintNonlinearLensInvariants,
                                           diag_name);
 
+            // print the initial values of reduced beam characteristics
+            diagnostics::DiagnosticOutput(*m_particle_container,
+                                          diagnostics::OutputType::PrintReducedBeamCharacteristics,
+                                          "diags/reduced_beam_characteristics");
+
         }
 
         amrex::ParmParse pp_algo("algo");
@@ -195,12 +200,20 @@ namespace impactx
                                                   global_step,
                                                   true);
 
+                    // print slice step reduced beam characteristics to file
+                    diagnostics::DiagnosticOutput(*m_particle_container,
+                                                  diagnostics::OutputType::PrintReducedBeamCharacteristics,
+                                                  "diags/reduced_beam_characteristics",
+                                                  global_step,
+                                                  true);
+
                 }
 
                 // inputs: unused parameters (e.g. typos) check after step 1 has finished
                 if (!early_params_checked) { early_params_checked = early_param_check(); }
 
             } // end in-element space-charge slice-step loop
+
         } // end beamline element loop
 
         if (diag_enable)
@@ -215,6 +228,12 @@ namespace impactx
             diagnostics::DiagnosticOutput(*m_particle_container,
                                           diagnostics::OutputType::PrintNonlinearLensInvariants,
                                           "diags/nonlinear_lens_invariants_final",
+                                          global_step);
+
+            // print the final values of the reduced beam characteristics
+            diagnostics::DiagnosticOutput(*m_particle_container,
+                                          diagnostics::OutputType::PrintReducedBeamCharacteristics,
+                                          "diags/reduced_beam_characteristics_final",
                                           global_step);
         }
 

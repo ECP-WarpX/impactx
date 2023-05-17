@@ -9,6 +9,7 @@
  */
 #include "DiagnosticOutput.H"
 #include "NonlinearLensInvariants.H"
+#include "ReducedBeamCharacteristics.H"
 
 #include <ablastr/particles/IndexHandling.H>
 
@@ -42,8 +43,34 @@ namespace impactx::diagnostics
                 file_handler << "id H I\n";
             } else if (otype == OutputType::PrintRefParticle) {
                 file_handler << "step s x y z t px py pz pt\n";
+            } else if (otype == OutputType::PrintReducedBeamCharacteristics) {
+                file_handler << "step" << " " << "s" << " " << "ref_beta_gamma" << " "
+                             << "x_mean" << " " << "y_mean" << " " << "t_mean" << " "
+                             << "sig_x" << " " << "sig_y" << " " << "sig_t" << " "
+                             << "px_mean" << " " << "py_mean" << " " << "pt_mean" << " "
+                             << "sig_px" << " " << "sig_py" << " " << "sig_pt" << " "
+                             << "emittance_x" << " " << "emittance_y" << " " << "emittance_t" << " "
+                             << "alpha_x" << " " << "alpha_y" << " " << "alpha_t" << " "
+                             << "beta_x" << " " << "beta_y" << " " << "beta_t" << " "
+                             << "charge_C" << " "
+                             << "\n";
             }
         }
+
+        if (otype == OutputType::PrintReducedBeamCharacteristics) {
+            std::unordered_map<std::string, amrex::ParticleReal> const rbc = diagnostics::reduced_beam_characteristics(
+                    pc);
+
+            file_handler << step << " " << rbc.at("s") << " " << rbc.at("ref_beta_gamma") << " "
+                         << rbc.at("x_mean") << " " << rbc.at("y_mean") << " " << rbc.at("t_mean") << " "
+                         << rbc.at("sig_x") << " " << rbc.at("sig_y") << " " << rbc.at("sig_t") << " "
+                         << rbc.at("px_mean") << " " << rbc.at("py_mean") << " " << rbc.at("pt_mean") << " "
+                         << rbc.at("sig_px") << " " << rbc.at("sig_py") << " " << rbc.at("sig_pt") << " "
+                         << rbc.at("emittance_x") << " " << rbc.at("emittance_y") << " " << rbc.at("emittance_t") << " "
+                         << rbc.at("alpha_x") << " " << rbc.at("alpha_y") << " " << rbc.at("alpha_t") << " "
+                         << rbc.at("beta_x") << " " << rbc.at("beta_y") << " " << rbc.at("beta_t") << " "
+                         << rbc.at("charge_C") << "\n";
+        } // if( otype == OutputType::PrintReducedBeamCharacteristics)
 
         // create a host-side particle buffer
         auto tmp = pc.make_alike<amrex::PinnedArenaAllocator>();

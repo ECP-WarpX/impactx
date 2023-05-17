@@ -7,6 +7,7 @@
 #
 # -*- coding: utf-8 -*-
 
+import numpy as np
 import pytest
 
 import amrex
@@ -26,6 +27,40 @@ def test_impactx_fodo_file():
     sim.init_lattice_elements_from_inputs()
 
     sim.evolve()
+
+    # validate the results
+    num_particles = sim.particle_container().TotalNumberOfParticles()
+    assert num_particles == 10000
+    atol = 0.0  # ignored
+    rtol = num_particles**-0.5  # from random sampling of a smooth distribution
+
+    # in situ calculate the reduced beam characteristics
+    rbc = sim.reduced_beam_characteristics()
+
+    # see examples/fodo/analysis_fodo.py
+    print("charge=", rbc["charge_C"])
+    assert np.allclose(
+        [
+            rbc["sig_x"],
+            rbc["sig_y"],
+            rbc["sig_t"],
+            rbc["emittance_x"],
+            rbc["emittance_y"],
+            rbc["emittance_t"],
+            rbc["charge_C"],
+        ],
+        [
+            7.5451170454175073e-005,
+            7.5441588239210947e-005,
+            9.9775878164077539e-004,
+            1.9959540393751392e-009,
+            2.0175015289132990e-009,
+            2.0013820193294972e-006,
+            -1.0e-9,
+        ],
+        rtol=rtol,
+        atol=atol,
+    )
 
 
 def test_impactx_nofile():

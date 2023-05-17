@@ -6,6 +6,7 @@
 #include "pyImpactX.H"
 
 #include <ImpactX.H>
+#include <particles/diagnostics/ReducedBeamCharacteristics.H>
 #include <particles/distribution/Gaussian.H>
 #include <particles/distribution/Kurth4D.H>
 #include <particles/distribution/Kurth6D.H>
@@ -280,6 +281,12 @@ void init_ImpactX (py::module& m)
              },
              py::return_value_policy::reference_internal,
              "Access the beam particle container."
+        )
+        .def("reduced_beam_characteristics",
+             [](ImpactX & ix) {
+                return diagnostics::reduced_beam_characteristics(*ix.m_particle_container);
+            },
+            "Compute reduced beam characteristics like the position and momentum moments of the particle distribution, as well as emittance and Twiss parameters."
         )
         .def(
             "rho",
