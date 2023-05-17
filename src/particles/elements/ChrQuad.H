@@ -103,6 +103,12 @@ namespace impactx
             amrex::ParticleReal pyout = py;
             amrex::ParticleReal ptout = pt;
 
+            // paceholder variables
+	    amrex::ParticleReal q1 = x;
+	    amrex::ParticleReal q2 = y;
+	    amrex::ParticleReal p1 = px;
+	    amrex::ParticleReal p2 = py;
+
             if(g > 0.0) {
                // advance transverse position and momentum (focusing quad)
                p.pos(RealAoS::x) = cos(omega*slice_ds)*x +
@@ -123,6 +129,11 @@ namespace impactx
                                    sin(omega*slice_ds)/(omega*delta1)*py;
                pyout = -omega*delta1*sin(omega*slice_ds)*y + cos(omega*slice_ds)*py;
 
+               q1 = y;
+               q2 = x;
+               p1 = py;
+               p2 = px;
+
             }
 
             // advance longitudinal position and momentum
@@ -132,12 +143,12 @@ namespace impactx
             amrex::ParticleReal t0 = t - term*slice_ds/delta1;
 
             amrex::ParticleReal w = omega*delta1;
-            amrex::ParticleReal term1 = -(pow(py,2)+pow(y,2)*pow(w,2))*sinh(2_prt*slice_ds*omega);
-            amrex::ParticleReal term2 = -(pow(px,2)-pow(x,2)*pow(w,2))*sin(2_prt*slice_ds*omega);
-            amrex::ParticleReal term3 = -2_prt*y*py*w*cosh(2_prt*slice_ds*omega);
-            amrex::ParticleReal term4 = -2_prt*x*px*w*cos(2_prt*slice_ds*omega);
-            amrex::ParticleReal term5 = 2_prt*omega*(x*px*delta1 + y*py*delta1
-                                        -(pow(px,2)+pow(py,2))*slice_ds - (pow(x,2)-pow(y,2))*pow(w,2)*slice_ds);
+            amrex::ParticleReal term1 = -(pow(p2,2)+pow(q2,2)*pow(w,2))*sinh(2_prt*slice_ds*omega);
+            amrex::ParticleReal term2 = -(pow(p1,2)-pow(q1,2)*pow(w,2))*sin(2_prt*slice_ds*omega);
+            amrex::ParticleReal term3 = -2_prt*q2*p2*w*cosh(2_prt*slice_ds*omega);
+            amrex::ParticleReal term4 = -2_prt*q1*p1*w*cos(2_prt*slice_ds*omega);
+            amrex::ParticleReal term5 = 2_prt*omega*(q1*p1*delta1 + q2*p2*delta1
+                                        -(pow(p1,2)+pow(p2,2))*slice_ds - (pow(q1,2)-pow(q2,2))*pow(w,2)*slice_ds);
             p.pos(RealAoS::t) = t0 + (-1_prt+bet*pt)/(8_prt*bet*pow(delta1,3)*omega)
                                         *(term1+term2+term3+term4+term5);
 
