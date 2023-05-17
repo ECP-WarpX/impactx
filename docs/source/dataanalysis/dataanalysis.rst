@@ -35,6 +35,6 @@ The code writes out the values in an ASCII file prefixed ``reduced_beam_characte
 
 .. note::
 
-   TODO :-)
+   openPMD beam monitor output: TODO :-)
 
    For further information, please see https://warpx.readthedocs.io/en/latest/dataanalysis/formats.html.

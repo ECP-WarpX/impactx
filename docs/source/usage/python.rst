@@ -117,6 +117,9 @@ General
 
       Compute reduced beam characteristics like the position and momentum moments of the particle distribution, as well as emittance and Twiss parameters.
 
+      :return: beam properties with string keywords
+      :rtype: dict
+
 
 .. py:class:: impactx.Config
 
