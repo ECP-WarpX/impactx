@@ -49,7 +49,7 @@ namespace impactx::diagnostics
             >
         >(
             pc,
-            [=] AMREX_GPU_DEVICE (const PType& p) /* noexcept // NVBUG 3447924 CUDA < 12.0 */
+            [=] AMREX_GPU_DEVICE (const PType& p) noexcept
             -> amrex::GpuTuple<
                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
@@ -126,7 +126,7 @@ namespace impactx::diagnostics
             >
         >(
             pc,
-            [=] AMREX_GPU_DEVICE(const PType& p) /* noexcept // NVBUG 3447924 CUDA < 12.0 */
+            [=] AMREX_GPU_DEVICE(const PType& p) noexcept
             -> amrex::GpuTuple<
                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
