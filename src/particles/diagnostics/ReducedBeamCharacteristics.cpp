@@ -8,9 +8,10 @@
  * License: BSD-3-Clause-LBNL
  */
 
-#include "ImpactX.H"
+#include "ReducedBeamCharacteristics.H"
+
 #include "particles/ImpactXParticleContainer.H"
-#include "particles/diagnostics/ReducedBeamCharacteristics.H"
+#include "particles/ReferenceParticle.H"
 
 #include <AMReX_BLProfiler.H>           // for TinyProfiler
 #include <AMReX_GpuQualifiers.H>        // for AMREX_GPU_DEVICE
