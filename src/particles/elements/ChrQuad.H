@@ -34,6 +34,9 @@ namespace impactx
 
         /** A Quadrupole magnet with chromatic focusing
          *
+         * The Hamiltonian is expanded through second order in the
+         * transverse variables (x,px,y,py), with the exact pt dependence retained.
+         *
          * @param ds Segment length in m.
          * @param k  Quadrupole strength in m^(-2) (MADX convention)
          *           = (gradient in T/m) / (rigidity in T-m)
@@ -86,8 +89,8 @@ namespace impactx
             // normalize quad units to MAD-X convention if needed
             amrex::ParticleReal g = m_k;
             if (m_unit == 1) {
-                  g = m_k/refpart.rigidity_Tm();
-        };
+                  g = m_k / refpart.rigidity_Tm();
+            }
 
             // compute particle momentum deviation delta + 1
             amrex::ParticleReal delta1;
@@ -104,10 +107,10 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // paceholder variables
-        amrex::ParticleReal q1 = x;
-        amrex::ParticleReal q2 = y;
-        amrex::ParticleReal p1 = px;
-        amrex::ParticleReal p2 = py;
+            amrex::ParticleReal q1 = x;
+            amrex::ParticleReal q2 = y;
+            amrex::ParticleReal p1 = px;
+            amrex::ParticleReal p2 = py;
 
             if(g > 0.0) {
                // advance transverse position and momentum (focusing quad)

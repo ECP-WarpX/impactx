@@ -31,10 +31,10 @@ namespace impactx
         static constexpr auto name = "ChrAcc";
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** Acceleration in a uniform field Ez, with a uniform
-         *  solenoidal field Bz.  The Hamiltonian is expanded to
-         *  second order in the transverse variables (x,px,y,py),
-         *  while the exact pt dependence is retained.
+        /** Acceleration in a uniform field Ez, with a uniform solenoidal field Bz.
+         *
+         * The Hamiltonian is expanded through second order in the
+         * transverse variables (x,px,y,py), with the exact pt dependence retained.
          *
          * @param ds Segment length in m.
          * @param ez electric field strength in m^(-1)

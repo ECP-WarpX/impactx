@@ -33,6 +33,9 @@ namespace impactx
 
         /** A drift with chromatic effects included
          *
+         * The Hamiltonian is expanded through second order in the
+         * transverse variables (x,px,y,py), with the exact pt dependence retained.
+         *
          * @param ds Segment length in m
          * @param nslice number of slices used for the application of space charge
          */

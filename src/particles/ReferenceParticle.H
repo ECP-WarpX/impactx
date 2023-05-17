@@ -162,7 +162,7 @@ namespace impactx
 
         /** Get reference particle magnetic rigidity
          *
-         * @returns magnetic rigidity Brho in T-m
+         * @returns magnetic rigidity Brho in T*m
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         amrex::ParticleReal

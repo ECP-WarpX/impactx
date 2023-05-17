@@ -539,13 +539,13 @@ This module provides elements for the accelerator lattice.
 .. py:class:: impactx.elements.ChrUniformAcc(ds, k, nslice=1)
 
    A region of constant Ez and Bz for uniform acceleration, with chromatic effects included.
-   The Hamiltonian is expanded through second order in the transverse variables (x,px,y,py), with the exact pt
-   dependence retained.
+   The Hamiltonian is expanded through second order in the transverse variables (x,px,y,py),
+   with the exact pt dependence retained.
 
    :param ds: Segment length in m.
-   :param ez:  Electric field strength in m^(-1)
+   :param ez: Electric field strength in m^(-1)
               = (particle charge in C * field Ez in V/m) / (particle mass in kg * (speed of light in m/s)^2)
-   :param bz:  Magnetic field strength in m^(-1)
+   :param bz: Magnetic field strength in m^(-1)
               = (particle charge in C * field Bz in T) / (particle mass in kg * speed of light in m/s)
 
    :param nslice: number of slices used for the application of space charge

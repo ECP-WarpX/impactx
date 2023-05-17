@@ -235,7 +235,9 @@ Lattice Elements
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
-        * ``drift_chromatic`` for a free drift, with chromatic effects included. This requires these additional parameters:
+        * ``drift_chromatic`` for a free drift, with chromatic effects included.
+           The Hamiltonian is expanded through second order in the transverse variables (x,px,y,py), with the exact pt dependence retained.
+           This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
@@ -260,7 +262,9 @@ Lattice Elements
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
-        * ``quad_chromatic`` for a quadrupole, with chromatic effects included. This requires these additional parameters:
+        * ``quad_chromatic`` for A Quadrupole magnet, with chromatic effects included.
+           The Hamiltonian is expanded through second order in the transverse variables (x,px,y,py), with the exact pt dependence retained.
+           This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
@@ -382,7 +386,9 @@ Lattice Elements
 
                 = 2*pi/(RF wavelength in m)
 
-        * ``uniform_acc_chromatic`` for a region of uniform acceleration, with chromatic effects included. This requires these additional parameters:
+        * ``uniform_acc_chromatic`` for a region of uniform acceleration, with chromatic effects included.
+           The Hamiltonian is expanded through second order in the transverse variables (x,px,y,py), with the exact pt dependence retained.
+           This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
