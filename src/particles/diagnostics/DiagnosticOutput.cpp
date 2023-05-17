@@ -44,7 +44,7 @@ namespace impactx::diagnostics
             } else if (otype == OutputType::PrintRefParticle) {
                 file_handler << "step s x y z t px py pz pt\n";
             } else if (otype == OutputType::PrintReducedBeamCharacteristics) {
-                file_handler << "step" << " " << "s_ref_part" << " " << "beta_gamma_ref_part" << " "
+                file_handler << "step" << " " << "s" << " " << "ref_beta_gamma" << " "
                              << "x_mean" << " " << "y_mean" << " " << "t_mean" << " "
                              << "sig_x" << " " << "sig_y" << " " << "sig_t" << " "
                              << "px_mean" << " " << "py_mean" << " " << "pt_mean" << " "
@@ -61,7 +61,7 @@ namespace impactx::diagnostics
             std::unordered_map<std::string, amrex::ParticleReal> const rbc = diagnostics::reduced_beam_characteristics(
                     pc);
 
-            file_handler << step << " " << rbc.at("s") << " " << rbc.at("beta_gamma") << " "
+            file_handler << step << " " << rbc.at("s") << " " << rbc.at("ref_beta_gamma") << " "
                          << rbc.at("x_mean") << " " << rbc.at("y_mean") << " " << rbc.at("t_mean") << " "
                          << rbc.at("sig_x") << " " << rbc.at("sig_y") << " " << rbc.at("sig_t") << " "
                          << rbc.at("px_mean") << " " << rbc.at("py_mean") << " " << rbc.at("pt_mean") << " "

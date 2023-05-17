@@ -14,7 +14,7 @@ The code writes out the values in an ASCII file prefixed ``reduced_beam_characte
 
 * ``step``
     Iteration within the simulation
-* ``s_ref_part``, ``beta_gamma_ref_part``
+* ``s``, ``ref_beta_gamma``
     Reference particle coordinate ``s`` and relativistic momentum normalized by the particle mass and the speed of light
 * ``x_mean``, ``y_mean``, ``t_mean``
     Average beam particle position in the dimensions of ``x``, ``y`` (transverse coordinates), and ``t`` (normalized time difference)
