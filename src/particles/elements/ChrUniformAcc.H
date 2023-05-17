@@ -93,11 +93,11 @@ namespace impactx
             amrex::ParticleReal const pti_tot = pti_ref + pt;
             amrex::ParticleReal const ptf_tot = ptf_ref + pt;
             amrex::ParticleReal const pzi_tot = sqrt(pow(pti_tot,2)-1_prt);
-	    amrex::ParticleReal const pzf_tot = sqrt(pow(ptf_tot,2)-1_prt);
+        amrex::ParticleReal const pzf_tot = sqrt(pow(ptf_tot,2)-1_prt);
             amrex::ParticleReal const pzi_ref = sqrt(pow(pti_ref,2)-1_prt);
-	    amrex::ParticleReal const pzf_ref = sqrt(pow(ptf_ref,2)-1_prt);
-						 
-	    amrex::ParticleReal const numer = -ptf_tot + pzf_tot;
+        amrex::ParticleReal const pzf_ref = sqrt(pow(ptf_ref,2)-1_prt);
+
+        amrex::ParticleReal const numer = -ptf_tot + pzf_tot;
             amrex::ParticleReal const denom = -pti_tot + pzi_tot;
 
             // compute focusing constant (1/m) and rotation angle (in rad)
@@ -121,8 +121,8 @@ namespace impactx
 
             // the correct symplectic update for t
             tout = t + (pzf_tot - pzf_ref - pzi_tot + pzi_ref)/m_ez;
-	    tout = tout + (1_prt/pzi_tot - 1_prt/pzf_tot)*(pow(py-alpha*x,2)+pow(px+alpha*y,2))/(2_prt*m_ez);
-	    ptout = pt;
+        tout = tout + (1_prt/pzi_tot - 1_prt/pzf_tot)*(pow(py-alpha*x,2)+pow(px+alpha*y,2))/(2_prt*m_ez);
+        ptout = pt;
 
             // assign intermediate momenta
             px = pxout;

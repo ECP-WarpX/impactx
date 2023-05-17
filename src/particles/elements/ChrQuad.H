@@ -104,10 +104,10 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // paceholder variables
-	    amrex::ParticleReal q1 = x;
-	    amrex::ParticleReal q2 = y;
-	    amrex::ParticleReal p1 = px;
-	    amrex::ParticleReal p2 = py;
+        amrex::ParticleReal q1 = x;
+        amrex::ParticleReal q2 = y;
+        amrex::ParticleReal p1 = px;
+        amrex::ParticleReal p2 = py;
 
             if(g > 0.0) {
                // advance transverse position and momentum (focusing quad)
