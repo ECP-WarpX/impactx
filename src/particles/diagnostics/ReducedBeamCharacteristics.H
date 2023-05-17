@@ -12,21 +12,19 @@
 
 #include "particles/ImpactXParticleContainer.H"
 
-#include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
-#include <AMReX_GpuComplex.H>
 
-#include <cmath>
 #include <string>
 #include <unordered_map>
 
+
 namespace impactx::diagnostics
 {
-
-    /** Compute momenta of the beam distribution and print them out
+    /** Compute momenta of the beam distribution
       */
-    std::unordered_map<std::string, amrex::ParticleReal> reduced_beam_characteristics (ImpactXParticleContainer const & pc);
+    std::unordered_map<std::string, amrex::ParticleReal>
+    reduced_beam_characteristics (ImpactXParticleContainer const & pc);
 
-} // namespace impactx
+} // namespace impactx::diagnostics
 
 #endif // IMPACTX_REDUCED_BEAM_CHARACTERISTICS
