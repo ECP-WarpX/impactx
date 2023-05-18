@@ -1,0 +1,64 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.energy = 10.0e3
+beam.charge = 190.0e-12
+beam.particle = positron
+beam.distribution = triangle
+beam.sigmaX = 5.028468056e-6
+beam.sigmaY = 4.976887423e-6
+beam.sigmaT = 8.4789873e-8
+beam.sigmaPx = 1.01616006e-7
+beam.sigmaPy = 1.026691578e-7
+beam.sigmaPt = 1.0e-3
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.999950003749688
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor quad1 drift1 quad2 drift1 quad1 drift2 unifacc drift2 monitor
+lattice.nslice = 25
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+quad1.type = quad_chromatic
+quad1.ds = 0.1
+quad1.k = -6.674941
+quad1.units = 1
+
+drift1.type = drift_chromatic
+drift1.ds = 0.3
+
+quad2.type = quad_chromatic
+quad2.ds = 0.2
+quad2.k = 6.674941
+quad2.units = 1
+
+drift2.type = drift_chromatic
+drift2.ds = 0.1
+
+unifacc.type = uniform_acc_chromatic
+unifacc.ds = 1.8
+unifacc.ez = 10871.950994502130424
+#unifacc.bz = 938.686726626433467
+unifacc.bz = 1.0e-3
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = true
+
+amr.n_cell = 56 56 48
+geometry.prob_relative = 1.0
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = true
