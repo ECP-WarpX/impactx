@@ -226,12 +226,34 @@ namespace impactx
         pp_geometry.addarr("prob_lo", prob_lo);
         pp_geometry.addarr("prob_hi", prob_hi);
 
-        // Resize the domain size
-        amrex::Geometry::ResetDefaultProbDomain(rb);
-        for (int lev = 0; lev <= this->max_level; ++lev) {
+        /* lev==0 */
+        {
+            // Resize the domain size
+            amrex::Geometry::ResetDefaultProbDomain(rb);
+            int const lev = 0;
+
             amrex::Geometry g = Geom(lev);
             g.ProbDomain(rb);
             amrex::AmrMesh::SetGeometry(lev, g);
+        }
+
+        for (int lev = 1; lev <= this->max_level; ++lev) {
+            // TODO: this is hard-coded to one level right now
+            amrex::Vector<amrex::Real> lo, hi;
+            pp_geometry.getarr("fine_tag_lo", lo);
+            pp_geometry.getarr("fine_tag_hi", hi);
+            amrex::RealVect fine_tag_lo = amrex::RealVect{lo};
+            amrex::RealVect fine_tag_hi = amrex::RealVect{hi};
+            amrex::RealBox rb_lvl1(fine_tag_lo.dataPtr(), fine_tag_hi.dataPtr());
+
+            amrex::Geometry g = Geom(lev);
+            g.ProbDomain(rb_lvl1);
+            amrex::AmrMesh::SetGeometry(lev, g);
+        }
+
+        if (this->max_level > 1)
+        {
+            amrex::Abort("Did not implement resize for >1 level yet");
         }
     }
 } // namespace impactx
