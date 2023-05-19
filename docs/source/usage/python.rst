@@ -45,13 +45,15 @@ General
 
    .. py:property:: prob_relative
 
+      This is a list with ``amr.max_level`` + 1 entries.
+
       By default, we dynamically extract the minimum and maximum of the particle positions in the beam.
       The field mesh spans, per direction, multiple times the maximum physical extent of beam particles, as given by this factor.
       The beam minimum and maximum extent are symmetrically padded by the mesh.
       For instance, ``1.2`` means the mesh will span 10% above and 10% below the beam;
       ``1.0`` means the beam is exactly covered with the mesh.
 
-      Default: ``3.0``.
+      Default: ``3.0 1.0 1.0 ...``.
       When set, turns ``dynamic_size`` to ``True``.
 
    .. py:property:: dynamic_size

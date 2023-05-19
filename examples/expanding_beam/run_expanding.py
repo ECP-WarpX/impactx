@@ -12,10 +12,6 @@ from impactx import ImpactX, RefPart, distribution, elements
 pp_amr = amr.ParmParse("amr")
 pp_amr.add("max_level", 1)
 pp_amr.addarr("n_cell", [56, 56, 48])
-pp_amr.addarr("prob_lo", [-15e-4, -15e-4, -3e-6])
-pp_amr.addarr("prob_hi", [15e-4, 15e-4, 3e-6])
-pp_amr.addarr("fine_tag_lo", [-7.4e-4, -7.4e-4, -1.4e-6])
-pp_amr.addarr("fine_tag_hi", [7.4e-4, 7.4e-4, 1.4e-6])
 
 sim = ImpactX()
 
@@ -23,7 +19,8 @@ sim = ImpactX()
 #sim.n_cell = [56, 56, 48]
 sim.particle_shape = 2  # B-spline order
 sim.space_charge = True
-sim.dynamic_size = False
+sim.dynamic_size = True
+sim.prob_relative = [3.0, 1.1]
 
 # beam diagnostics
 # sim.diagnostics = False  # benchmarking
@@ -81,7 +78,7 @@ ax = f.gca()
 ng = rho.nGrowVect
 for mfi in rho:
     bx = mfi.validbox()
-    rbx = amrex.RealBox(bx, dr, gm.ProbLo())
+    rbx = amr.RealBox(bx, dr, gm.ProbLo())
 
     arr = rho.array(mfi)
     arr_np = np.array(arr, copy=False)  # indices: comp, z, y, x
@@ -106,6 +103,7 @@ for mfi in rho:
     cb.set_label(r"charge density  [C/m$^3$]")
     ax.set_xlabel(r"$x$  [$\mu$m]")
     ax.set_ylabel(r"$y$  [$\mu$m]")
+    save_png = False
     if save_png:
         plt.savefig("charge_deposition.png")
     else:

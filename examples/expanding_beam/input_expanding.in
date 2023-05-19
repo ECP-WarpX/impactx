@@ -36,9 +36,4 @@ algo.space_charge = true
 
 amr.max_level = 1
 amr.n_cell = 56 56 48
-
-geometry.dynamic_size = false
-geometry.prob_lo = -15e-4 -15e-4 -3e-6
-geometry.prob_hi =  15e-4  15e-4  3e-6
-geometry.fine_tag_lo = -7.4e-4 -7.4e-4 -1.4e-6
-geometry.fine_tag_hi =  7.4e-4  7.4e-4  1.4e-6
+geometry.prob_relative = 3.0 1.1
