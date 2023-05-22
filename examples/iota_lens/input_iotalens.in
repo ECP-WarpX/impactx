@@ -23,20 +23,21 @@ beam.mutpt = 0.0
 ###############################################################################
 lattice.elements = const_end nllens const nllens const nllens const nllens const
                    nllens const nllens const nllens const nllens const nllens
-                   const nllens const_end
+                   const nllens const nllens const nllens const nllens const nllens
+                   const nllens const nllens const nllens const nllens const_end
 
 nllens.type = nonlinear_lens
-nllens.knll = 2.0e-7
+nllens.knll = 4.0e-6
 nllens.cnll = 0.01
 
 const_end.type = constf
-const_end.ds = 0.0025
+const_end.ds = 0.05
 const_end.kx = 1.0
 const_end.ky = 1.0
 const_end.kt = 1.0e-12
 
 const.type = constf
-const.ds = 0.005
+const.ds = 0.1
 const.kx = 1.0
 const.ky = 1.0
 const.kt = 1.0e-12
