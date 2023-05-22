@@ -61,7 +61,11 @@ period = [
     elements.ChrDrift(ds=0.1, nslice=ns),
     monitor,
 ]
-# assign a fodo segment
+
+num_periods = 250
+
+lattice = period * (num_periods)
+
 sim.lattice.extend(period)
 
 # run simulation
