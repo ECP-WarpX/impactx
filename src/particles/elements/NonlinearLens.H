@@ -86,8 +86,9 @@ namespace impactx
             amrex::ParticleReal pyout = py;
             amrex::ParticleReal ptout = pt;
 
-            // assign complex position zeta = x + iy
+            // assign complex position zeta = (x + iy)/cnll
             Complex zeta(x, y);
+            zeta = zeta/m_cnll;
             Complex re1(1.0_prt, 0.0_prt);
             Complex im1(0.0_prt, 1.0_prt);
 
