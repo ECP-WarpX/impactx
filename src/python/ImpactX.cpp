@@ -315,6 +315,18 @@ void init_ImpactX (py::module& m)
             &ImpactX::m_lattice,
             "Access the accelerator element lattice."
         )
+        .def_property("turns",
+              [](ImpactX & /* ix */) {
+                  return detail::get_or_throw<int>("lattice", "turns");
+              },
+              [](ImpactX & /* ix */, int turns) {
+                  AMREX_ALWAYS_ASSERT_WITH_MESSAGE(turns >= 1,
+                                                   "lattice.turns must be >= 1");
+                  amrex::ParmParse pp_lattice("lattice");
+                  pp_lattice.add("turns", turns);
+              },
+              "The number of turns through the lattice."
+        )
 
         // from AmrCore->AmrMesh
         .def("Geom",
