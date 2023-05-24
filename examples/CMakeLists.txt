@@ -48,12 +48,17 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
                  COMMAND ${THIS_MPI_TEST_EXE} ${THIS_Python_EXE} ${ImpactX_SOURCE_DIR}/${input}
                  WORKING_DIRECTORY ${THIS_WORKING_DIR}
         )
+        # TODO:
+        # amrex.throw_exception = 1
+        # amrex.signal_handling = 0
         impactx_test_set_pythonpath(${name}.run)
     else()
         add_test(NAME ${name}.run
                  COMMAND
                     ${THIS_MPI_TEST_EXE} $<TARGET_FILE:app> ${ImpactX_SOURCE_DIR}/${input}
                         amrex.abort_on_unused_inputs=1
+                        amrex.throw_exception = 1
+                        amrex.signal_handling = 0
                         impactx.always_warn_immediately=1
                         impactx.abort_on_warning_threshold=low
                  WORKING_DIRECTORY ${THIS_WORKING_DIR}
