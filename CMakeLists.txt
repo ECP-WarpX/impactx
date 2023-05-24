@@ -108,7 +108,7 @@ include(CTest)
 #   ABLASTR in turn builds AMReX from source (default) or finds an existing
 #     install
 include(${ImpactX_SOURCE_DIR}/cmake/dependencies/ABLASTR.cmake)
-impactx_make_third_party_includes_system(WarpX::ablastr ablastr)
+impactx_make_third_party_includes_system(WarpX::ablastr_3d ablastr_3d)
 
 # Python
 if(ImpactX_PYTHON)
@@ -245,7 +245,7 @@ endif()
 
 # link dependencies
 #     note: only PUBLIC because ImpactX is an OBJECT collection
-target_link_libraries(ImpactX PUBLIC ImpactX::thirdparty::ablastr)
+target_link_libraries(ImpactX PUBLIC ImpactX::thirdparty::ablastr_3d)
 if(ImpactX_PYTHON)
     target_link_libraries(pyImpactX PRIVATE pybind11::module pybind11::lto pybind11::windows_extras)
 endif()
