@@ -6,10 +6,10 @@
 #
 # -*- coding: utf-8 -*-
 
-import amrex
+import amrex.space3d as amr
 from impactx import ImpactX, RefPart, distribution, elements
 
-pp_amr = amrex.ParmParse("amr")
+pp_amr = amr.ParmParse("amr")
 pp_amr.addarr("n_cell", [56, 56, 48])
 
 sim = ImpactX()
@@ -59,4 +59,4 @@ sim.evolve()
 
 # clean shutdown
 del sim
-amrex.finalize()
+amr.finalize()
