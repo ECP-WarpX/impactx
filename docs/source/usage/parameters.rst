@@ -460,6 +460,10 @@ Lattice Elements
             * ``<element_name>.reverse`` (``boolean``) optional (default: ``false``)
               Reverse the list of elements in the line before appending to the lattice.
 
+            * ``<element_name>.repeat`` (``integer``) optional (default: ``1``)
+              Repeat the line multiple times before appending to the lattice.
+              Note: ``reverse`` is applied before ``repeat``.
+
 
 .. _running-cpp-parameters-parallelization:
 
