@@ -84,10 +84,12 @@ Setting up the field mesh
 * ``geometry.dynamic_size`` (``boolean``) optional (default: ``true`` for dynamic)
     Use dynamic (``true``) resizing of the field mesh, via ``geometry.prob_relative``, or static sizing (``false``), via ``geometry.prob_lo``/``geometry.prob_hi``.
 
-* ``geometry.prob_relative`` (positive ``float``, unitless) optional (default: ``1.0``)
+* ``geometry.prob_relative`` (positive ``float``, unitless) optional (default: ``3.0``)
     By default, we dynamically extract the minimum and maximum of the particle positions in the beam.
-    The field mesh is expanded, per direction, beyond the physical extent of particles by this factor.
-    For instance, ``0.1`` means 10% more cells above and below the beam for vacuum; ``1.0`` means twice as many cells as covered by the beam are used, per direction, for vacuum padding.
+    The field mesh spans, per direction, multiple times the maximum physical extent of beam particles, as given by this factor.
+    The beam minimum and maximum extent are symmetrically padded by the mesh.
+    For instance, ``1.2`` means the mesh will span 10% above and 10% below the beam;
+    ``1.0`` means the beam is exactly covered with the mesh.
 
 * ``geometry.prob_lo`` and ``geometry.prob_hi`` (3 floats, in meters) optional (required if ``geometry.dynamic_size`` is ``false``)
     The extent of the full simulation domain relative to the reference particle position.
