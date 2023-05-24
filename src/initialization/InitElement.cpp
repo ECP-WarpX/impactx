@@ -224,6 +224,8 @@ namespace detail
             pp_sub_lattice.queryAdd("reverse", reverse);
             int repeat = 1;
             pp_sub_lattice.queryAdd("repeat", repeat);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(repeat >= 1,
+                                             element_name + ".repeat must be >= 1");
 
             if (reverse)
                 std::reverse(sub_lattice_elements.begin(), sub_lattice_elements.end());
