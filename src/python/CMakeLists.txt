@@ -9,4 +9,5 @@ target_sources(pyImpactX
     ImpactX.cpp
     ImpactXParticleContainer.cpp
     ReferenceParticle.cpp
+    transformation.cpp
 )
