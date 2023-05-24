@@ -226,12 +226,11 @@ namespace detail
 
         // calculate & update particle offset in MPI-global particle array, per level
         auto const num_levels = pc.finestLevel() + 1;
-        m_offset.reserve(num_levels);
+        m_offset = std::vector<uint64_t>(num_levels);
         auto counter = detail::ImpactXParticleCounter(pc);
         auto const np = counter.GetTotalNumParticles();
         for (auto currentLevel = 0; currentLevel < num_levels; currentLevel++) {
-            uint64_t offset = static_cast<uint64_t>( counter.m_ParticleOffsetAtRank[currentLevel] );
-            m_offset.push_back(offset);
+            m_offset.at(currentLevel) = static_cast<uint64_t>( counter.m_ParticleOffsetAtRank[currentLevel] );
         }
 
         // helpers to parse strings to openPMD
