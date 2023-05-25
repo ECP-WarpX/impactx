@@ -160,7 +160,7 @@ namespace impactx
                 ablastr::warn_manager::WMRecordWarning(
                     "ImpactX::ResizeMesh",
                     "Dynamic resizing of the mesh uses a geometry.prob_relative "
-                    "with less than 3 the beam size. This might result in boundary "
+                    "with less than 3x the beam size. This might result in boundary "
                     "artifacts for space charge calculation. "
                     "There is no minimum good value for this parameter, consider "
                     "doing a convergence test.",
