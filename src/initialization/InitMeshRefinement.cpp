@@ -153,29 +153,31 @@ namespace impactx
         {
             // The box is expanded beyond the min and max of particles.
             // This controlled by the variable `frac` below.
-            amrex::Real frac = 1.0;
+            amrex::Real frac = 3.0;
             pp_geometry.query("prob_relative", frac);
 
-            if (frac < 1.0)
+            if (frac < 3.0)
                 ablastr::warn_manager::WMRecordWarning(
                     "ImpactX::ResizeMesh",
                     "Dynamic resizing of the mesh uses a geometry.prob_relative "
-                    "padding of less than 1. This might result in boundary "
+                    "with less than 3x the beam size. This might result in boundary "
                     "artifacts for space charge calculation. "
                     "There is no minimum good value for this parameter, consider "
                     "doing a convergence test.",
                     ablastr::warn_manager::WarnPriority::high
                 );
 
-            if (frac < 0.0)
-                throw std::runtime_error("geometry.prob_relative must be positive");
+            if (frac < 1.0)
+                throw std::runtime_error("geometry.prob_relative must be >= 1.0 (the beam size) on the coarsest level");
 
-            rb = {
-                {x_min - frac * (x_max - x_min), y_min - frac * (y_max - y_min),
-                 z_min - frac * (z_max - z_min)}, // Low bound
-                {x_max + frac * (x_max - x_min), y_max + frac * (y_max - y_min),
-                 z_max + frac * (z_max - z_min)}  // High bound
-            };
+            amrex::RealVect const beam_min(x_min, y_min, z_min);
+            amrex::RealVect const beam_max(x_max, y_max, z_max);
+            amrex::RealVect const beam_width(beam_max - beam_min);
+
+            amrex::RealVect const beam_padding = beam_width * (frac - 1.0) / 2.0;
+            //                           added to the beam extent --^         ^-- box half above/below the beam
+            rb.setLo(beam_min - beam_padding);
+            rb.setHi(beam_max + beam_padding);
         }
         else
         {

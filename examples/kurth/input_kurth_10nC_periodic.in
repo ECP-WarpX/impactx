@@ -43,5 +43,5 @@ algo.particle_shape = 2
 algo.space_charge = true
 
 amr.n_cell = 48 48 40
-#amr.n_cell = 72 72 72 #optional for increased precision
-geometry.prob_relative = 1.0
+#amr.n_cell = 72 72 72  # optional for increased precision
+geometry.prob_relative = 3.0
