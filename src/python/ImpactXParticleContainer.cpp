@@ -6,6 +6,8 @@
 #include "pyImpactX.H"
 
 #include <particles/ImpactXParticleContainer.H>
+#include <particles/diagnostics/ReducedBeamCharacteristics.H>
+
 #include <AMReX.H>
 #include <AMReX_MFIter.H>
 #include <AMReX_ParticleContainer.H>
@@ -71,5 +73,34 @@ void init_impactxparticlecontainer(py::module& m)
              py::arg("refpart"),
              "Set reference particle attributes."
         )
+        .def("min_and_max_positions",
+             &ImpactXParticleContainer::MinAndMaxPositions,
+             "Compute the min and max of the particle position in each dimension.\n\n"
+             ":return: x_min, y_min, z_min, x_max, y_max, z_max"
+        )
+        .def("mean_and_std_positions",
+             &ImpactXParticleContainer::MeanAndStdPositions,
+             "Compute the mean and std of the particle position in each dimension.\n\n"
+             ":return: x_mean, x_std, y_mean, y_std, z_mean, z_std"
+        )
+        .def("reduced_beam_characteristics",
+             [](ImpactXParticleContainer & pc) {
+                 return diagnostics::reduced_beam_characteristics(pc);
+             },
+             "Compute reduced beam characteristics like the position and momentum moments of the particle distribution, as well as emittance and Twiss parameters."
+        )
+
+        .def("redistribute",
+             &ImpactXParticleContainer::Redistribute,
+             "Redistribute particles in the current mesh in x, y, z"
+        )
+        // TODO: cleverly pass the list of rho multifabs as references
+        /*
+        .def("deposit_charge",
+             &ImpactXParticleContainer::DepositCharge,
+             py::arg("rho"), py::arg("ref_ratio"),
+             "Charge deposition"
+        )
+        */
     ;
 }

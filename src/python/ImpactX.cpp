@@ -6,13 +6,6 @@
 #include "pyImpactX.H"
 
 #include <ImpactX.H>
-#include <particles/diagnostics/ReducedBeamCharacteristics.H>
-#include <particles/distribution/Gaussian.H>
-#include <particles/distribution/Kurth4D.H>
-#include <particles/distribution/Kurth6D.H>
-#include <particles/distribution/KVdist.H>
-#include <particles/distribution/Semigaussian.H>
-#include <particles/distribution/Waterbag.H>
 
 #include <AMReX.H>
 #include <AMReX_ParmParse.H>
@@ -107,6 +100,16 @@ void init_ImpactX (py::module& m)
                 */
             },
             "The number of grid points along each direction on the coarsest level."
+        )
+
+        // from amrex::AmrMesh
+        .def_property_readonly("max_level",
+            [](ImpactX & ix){ return ix.maxLevel(); },
+            "The maximum mesh-refinement level for the simulation."
+        )
+        .def_property_readonly("finest_level",
+            [](ImpactX & ix){ return ix.finestLevel(); },
+            "The currently finest level of mesh-refinement used. This is always less or equal to max_level."
         )
 
         .def_property("domain",
@@ -272,21 +275,21 @@ void init_ImpactX (py::module& m)
              "distribution's extent and then redistribute particles in according\n"
              "AMReX grid boxes."
         )
+
         .def("evolve", &ImpactX::evolve,
              "Run the main simulation loop for a number of steps."
         )
+        // TODO: step
+        .def("resize_mesh", &ImpactX::ResizeMesh,
+             "Resize the mesh :py:attr:`~domain` based on the :py:attr:`~dynamic_size` and related parameters."
+        )
+
         .def("particle_container",
              [](ImpactX & ix) -> ImpactXParticleContainer & {
                 return *ix.m_particle_container;
              },
              py::return_value_policy::reference_internal,
              "Access the beam particle container."
-        )
-        .def("reduced_beam_characteristics",
-             [](ImpactX & ix) {
-                return diagnostics::reduced_beam_characteristics(*ix.m_particle_container);
-            },
-            "Compute reduced beam characteristics like the position and momentum moments of the particle distribution, as well as emittance and Twiss parameters."
         )
         .def(
             "rho",

@@ -27,6 +27,15 @@ General
 
       The number of grid points along each direction on the coarsest level.
 
+   .. py:property:: max_level
+
+      The maximum mesh-refinement level for the simulation.
+
+   .. py:property:: finest_level
+
+      The currently finest level of mesh-refinement used.
+      This is always less or equal to :py:attr:`~max_level`.
+
    .. py:property:: domain
 
       The physical extent of the full simulation domain, relative to the reference particle position, in meters.
@@ -119,12 +128,9 @@ General
 
       Run the main simulation loop for a number of steps.
 
-   .. py:method:: reduced_beam_characteristics()
+   .. py:method:: resize_mesh()
 
-      Compute reduced beam characteristics like the position and momentum moments of the particle distribution, as well as emittance and Twiss parameters.
-
-      :return: beam properties with string keywords
-      :rtype: dict
+      Resize the mesh :py:attr:`~domain` based on the :py:attr:`~dynamic_size` and related parameters.
 
 
 .. py:class:: impactx.Config
@@ -158,11 +164,6 @@ General
 
       Set the environment variable ``OMP_NUM_THREADS`` to control the number of threads.
 
-      .. note::
-
-         Not yet implemented.
-         Please see the progress in `issue 195 <https://github.com/ECP-WarpX/impactx/issues/195>`__.
-
       .. warning::
 
          By default, OpenMP spawns as many threads as there are available virtual cores on a host.
@@ -171,6 +172,7 @@ General
 
          By setting appropriate `environment variables for OpenMP <https://www.openmp.org/spec-html/5.0/openmpch6.html>`__, ensure that the number of MPI processes (ranks) per node multiplied with the number of OpenMP threads is equal to the number of physical (or virtual) CPU cores.
          Please see our examples in the :ref:`high-performance computing (HPC) <install-hpc>` on how to run efficiently in parallel environments such as supercomputers.
+
 
 Particles
 ---------
@@ -211,6 +213,32 @@ Particles
       Set reference particle attributes.
 
       :param impactx.RefPart refpart: a reference particle to copy all attributes from
+
+   .. py:method:: reduced_beam_characteristics()
+
+      Compute reduced beam characteristics like the position and momentum moments of the particle distribution, as well as emittance and Twiss parameters.
+
+      :return: beam properties with string keywords
+      :rtype: dict
+
+   .. py:method:: min_and_max_positions()
+
+      Compute the min and max of the particle position in each dimension.
+
+      :return: x_min, y_min, z_min, x_max, y_max, z_max
+      :rtype: Tuple[float, float, float, float, float, float]
+
+   .. py:method:: mean_and_std_positions()
+
+      Compute the mean and std of the particle position in each dimension.
+
+      :return: x_mean, x_std, y_mean, y_std, z_mean, z_std
+      :rtype: Tuple[float, float, float, float, float, float]
+
+   .. py:method:: redistribute()
+
+      Redistribute particles in the current mesh in x, y, z.
+
 
 .. py:class:: impactx.RefPart
 
