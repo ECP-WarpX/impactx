@@ -13,7 +13,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-import amrex
+import amrex.space3d as amr
 import impactx
 
 
@@ -21,7 +21,7 @@ def test_charge_deposition(save_png=True):
     """
     Deposit charge and access/plot it
     """
-    pp_amr = amrex.ParmParse("amr")
+    pp_amr = amr.ParmParse("amr")
     pp_amr.addarr("n_cell", [16, 24, 32])
 
     sim = impactx.ImpactX()
@@ -34,7 +34,7 @@ def test_charge_deposition(save_png=True):
 
     # Future:
     # sim.ncell = [25, 25, 45]
-    # sim.domain = amrex.RealBox([1., 2., 3.], [4., 5., 6.])
+    # sim.domain = amr.RealBox([1., 2., 3.], [4., 5., 6.])
     print(f"sim.n_cell={sim.n_cell}")
     print(f"sim.domain={sim.domain}")
 
@@ -58,12 +58,12 @@ def test_charge_deposition(save_png=True):
 
     # for GPU runs, copy data from device to host for plotting
     if impactx.Config.have_gpu:
-        rho_host = amrex.MultiFab(
+        rho_host = amr.MultiFab(
             rho.box_array(),
             rho.dm(),
             rho.n_comp(),
             rho.n_grow_vect(),
-            amrex.MFInfo().set_arena(amrex.The_Pinned_Arena()),
+            amr.MFInfo().set_arena(amrex.The_Pinned_Arena()),
         )
         amrex.dtoh_memcpy(rho_host, rho)
     else:
@@ -75,7 +75,7 @@ def test_charge_deposition(save_png=True):
     ng = rho_host.nGrowVect
     for mfi in rho_host:
         bx = mfi.validbox()
-        rbx = amrex.RealBox(bx, dr, gm.ProbLo())
+        rbx = amr.RealBox(bx, dr, gm.ProbLo())
 
         arr = rho_host.array(mfi)
         arr_np = np.array(arr, copy=False)  # indices: comp, z, y, x

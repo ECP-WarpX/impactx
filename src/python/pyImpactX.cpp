@@ -24,7 +24,7 @@ void init_refparticle(py::module&);
 
 PYBIND11_MODULE(impactx_pybind, m) {
     // make sure AMReX types are known
-    py::module::import("amrex");
+    py::module::import("amrex.space3d");
 
     m.doc() = R"pbdoc(
             impactx_pybind

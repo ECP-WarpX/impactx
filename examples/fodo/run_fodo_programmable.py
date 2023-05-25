@@ -15,7 +15,7 @@ try:
 except ImportError:
     cupy_available = False
 
-import amrex
+import amrex.space3d as amr
 from impactx import Config, ImpactX, RefPart, distribution, elements
 
 sim = ImpactX()
@@ -175,4 +175,4 @@ sim.evolve()
 
 # clean shutdown
 del sim
-amrex.finalize()
+amr.finalize()

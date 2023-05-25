@@ -6,7 +6,7 @@
 #
 # -*- coding: utf-8 -*-
 
-import amrex
+import amrex.space3d as amr
 from impactx import ImpactX, RefPart, distribution, elements
 
 sim = ImpactX()
@@ -70,4 +70,4 @@ sim.evolve()
 
 # clean shutdown
 del sim
-amrex.finalize()
+amr.finalize()

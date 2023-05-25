@@ -2,7 +2,7 @@
 
 import pytest
 
-import amrex
+import amrex.space3d as amr
 import impactx
 
 if impactx.Config.have_mpi:
@@ -15,7 +15,7 @@ else:
 
 @pytest.fixture(autouse=True, scope="function")
 def amrex_init():
-    amrex.initialize(
+    amr.initialize(
         [
             # print AMReX status messages
             "amrex.verbose=2",
@@ -31,4 +31,4 @@ def amrex_init():
         ]
     )
     yield
-    amrex.finalize()
+    amr.finalize()
