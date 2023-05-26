@@ -7,16 +7,15 @@
 
 #include <particles/ReferenceParticle.H>
 #include <particles/transformation/CoordinateTransformation.H>
-#include <AMReX.H>
 
 namespace py = pybind11;
 using namespace impactx;
 
 void init_transformation(py::module& m)
 {
-    m.def("coordinate_transformation", &transformation::CoordinateTransformation,
+    m.def("coordinate_transformation",
+        &transformation::CoordinateTransformation,
         "Transform coordinates."
-        // [](ImpactX)
     );
 
     py::enum_<transformation::Direction>(m, "TransformationDirection")
