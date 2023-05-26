@@ -462,7 +462,7 @@ Lattice Elements
 
             * ``<element_name>.repeat`` (``integer``) optional (default: ``1``)
               Repeat the line multiple times before appending to the lattice.
-              Note: ``reverse`` is applied before ``repeat``.
+              Note: If ``reverse`` and ``repeat`` both appear, then ``reverse`` is applied before ``repeat``.
 
 
 .. _running-cpp-parameters-parallelization:
