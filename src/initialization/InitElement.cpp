@@ -222,12 +222,18 @@ namespace detail
             pp_sub_lattice.queryarr("elements", sub_lattice_elements);
             bool reverse = false;
             pp_sub_lattice.queryAdd("reverse", reverse);
+            int repeat = 1;
+            pp_sub_lattice.queryAdd("repeat", repeat);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(repeat >= 1,
+                                             element_name + ".repeat must be >= 1");
 
             if (reverse)
                 std::reverse(sub_lattice_elements.begin(), sub_lattice_elements.end());
 
-            for (std::string const & sub_element_name : sub_lattice_elements) {
-                read_element(sub_element_name, m_lattice, nslice_default, mapsteps_default);
+            for (int n=0; n<repeat; ++n) {
+                for (std::string const &sub_element_name: sub_lattice_elements) {
+                    read_element(sub_element_name, m_lattice, nslice_default, mapsteps_default);
+                }
             }
         } else {
             amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
