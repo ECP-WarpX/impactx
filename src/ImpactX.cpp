@@ -106,11 +106,11 @@ namespace impactx
         pp_algo.queryAdd("space_charge", space_charge);
         amrex::Print() << " Space Charge effects: " << space_charge << "\n";
 
-        // turns through the lattice
-        int turns = 1;
-        amrex::ParmParse("lattice").queryAdd("turns", turns);
+        // periods through the lattice
+        int periods = 1;
+        amrex::ParmParse("lattice").queryAdd("periods", periods);
 
-        for (int turn=0; turn <turns; ++turn) {
+        for (int cycle=0; cycle < periods; ++cycle) {
             // loop over all beamline elements
             for (auto &element_variant: m_lattice) {
                 // update element edge of the reference particle
@@ -216,7 +216,7 @@ namespace impactx
                 } // end in-element space-charge slice-step loop
 
             } // end beamline element loop
-        } // end turns though the lattice loop
+        } // end periods though the lattice loop
 
         if (diag_enable)
         {

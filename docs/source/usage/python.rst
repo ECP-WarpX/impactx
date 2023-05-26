@@ -94,9 +94,9 @@ General
       Access the elements in the accelerator lattice.
       See :py:mod:`impactx.elements` for lattice elements.
 
-   .. py:property:: turns
+   .. py:property:: periods
 
-      The number of turns through the lattice.
+      The number of periods to repeat the lattice.
       Note: this does not check if the lattice is periodic.
 
    .. py:property:: abort_on_warning_threshold

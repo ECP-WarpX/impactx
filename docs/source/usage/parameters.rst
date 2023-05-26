@@ -219,13 +219,12 @@ Lattice Elements
 * ``lattice.elements`` (``list of strings``) optional (default: no elements)
     A list of names (one name per lattice element), in the order that they appear in the lattice.
 
-* ``lattice.turns`` (``integer``) optional (default: ``1``)
-    The number of turns through the lattice.
-    Note: this does not check if the lattice is periodic.
+* ``lattice.periods`` (``integer``) optional (default: ``1``)
+    The number of periods to repeat the lattice.
 
 * ``lattice.reverse`` (``boolean``) optional (default: ``false``)
     Reverse the list of elements in the lattice.
-    Note: the list of elements is reverted and then turns are applied.
+    If ``reverse`` and ``periods`` both appear, then ``reverse`` is applied before ``periods``.
 
 * ``lattice.nslice`` (``integer``) optional (default: ``1``)
     A positive integer specifying the number of slices used for the application of

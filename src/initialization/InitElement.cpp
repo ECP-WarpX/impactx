@@ -243,11 +243,11 @@ namespace detail
 
         amrex::ParmParse pp_lattice("lattice");
 
-        // turns through the lattice
-        int turns = 1;
-        pp_lattice.queryAdd("turns", turns);
-        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(turns >= 1,
-                                         "lattice.turns must be >= 1");
+        // periods through the lattice
+        int periods = 1;
+        pp_lattice.queryAdd("periods", periods);
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(periods >= 1,
+                                         "lattice.periods must be >= 1");
 
         // Parse the lattice elements
         std::vector<std::string> lattice_elements;
