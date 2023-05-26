@@ -3,6 +3,15 @@
 Data Analysis
 =============
 
+Beam Monitor
+------------
+
+ImpactX provides a zero-sized beam monitor element that can be placed in lattices to output the particle beam at multiple positions in a lattice.
+Output is written in the standardized, `open particle-mesh data schema (openPMD) <https://www.openPMD.org>`__ and is `compatible with many codes and data analysis frameworks <https://github.com/openPMD/openPMD-projects>`__.
+
+See also `WarpX' documentation on openPMD <https://warpx.readthedocs.io/en/latest/dataanalysis/formats.html>`__.
+
+
 Reduced Beam Characteristics
 ----------------------------
 
@@ -32,9 +41,3 @@ The code writes out the values in an ASCII file prefixed ``reduced_beam_characte
     Twiss beta
 * ``charge``
     Cumulated beam charge in C
-
-.. note::
-
-   openPMD beam monitor output: TODO :-)
-
-   For further information, please see https://warpx.readthedocs.io/en/latest/dataanalysis/formats.html.

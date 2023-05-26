@@ -29,13 +29,14 @@ def test_impactx_fodo_file():
     sim.evolve()
 
     # validate the results
-    num_particles = sim.particle_container().TotalNumberOfParticles()
+    beam = sim.particle_container()
+    num_particles = beam.TotalNumberOfParticles()
     assert num_particles == 10000
     atol = 0.0  # ignored
     rtol = num_particles**-0.5  # from random sampling of a smooth distribution
 
     # in situ calculate the reduced beam characteristics
-    rbc = sim.reduced_beam_characteristics()
+    rbc = beam.reduced_beam_characteristics()
 
     # see examples/fodo/analysis_fodo.py
     print("charge=", rbc["charge_C"])
