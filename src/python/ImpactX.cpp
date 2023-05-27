@@ -318,6 +318,18 @@ void init_ImpactX (py::module& m)
             &ImpactX::m_lattice,
             "Access the accelerator element lattice."
         )
+        .def_property("periods",
+              [](ImpactX & /* ix */) {
+                  return detail::get_or_throw<int>("lattice", "periods");
+              },
+              [](ImpactX & /* ix */, int periods) {
+                  AMREX_ALWAYS_ASSERT_WITH_MESSAGE(periods >= 1,
+                                                   "lattice.periods must be >= 1");
+                  amrex::ParmParse pp_lattice("lattice");
+                  pp_lattice.add("periods", periods);
+              },
+              "The number of periods to repeat the lattice."
+        )
 
         // from AmrCore->AmrMesh
         .def("Geom",

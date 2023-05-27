@@ -247,8 +247,15 @@ namespace detail
         // make sure the element sequence is empty
         m_lattice.clear();
 
-        // Parse the lattice elements
         amrex::ParmParse pp_lattice("lattice");
+
+        // periods through the lattice
+        int periods = 1;
+        pp_lattice.queryAdd("periods", periods);
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(periods >= 1,
+                                         "lattice.periods must be >= 1");
+
+        // Parse the lattice elements
         std::vector<std::string> lattice_elements;
         pp_lattice.queryarr("elements", lattice_elements);
 

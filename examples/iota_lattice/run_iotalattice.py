@@ -117,6 +117,9 @@ lattice_half.reverse()
 sim.lattice.extend(lattice_half)
 sim.lattice.append(monitor)
 
+# number of turns in the ring
+sim.periods = 5
+
 # run simulation
 sim.evolve()
 

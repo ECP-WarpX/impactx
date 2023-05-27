@@ -109,6 +109,11 @@ General
       Access the elements in the accelerator lattice.
       See :py:mod:`impactx.elements` for lattice elements.
 
+   .. py:property:: periods
+
+      The number of periods to repeat the lattice.
+
+
    .. py:property:: abort_on_warning_threshold
 
       (optional) Set to "low", "medium" or "high".
