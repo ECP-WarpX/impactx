@@ -54,6 +54,9 @@ namespace detail
                     ablastr::warn_manager::WarnPriority::high
             );
 
+        if (prob_relative[0] < 1.0)
+            throw std::runtime_error("geometry.prob_relative must be >= 1.0 (the beam size) on the coarsest level");
+
         // check that prob_relative[0] > prob_relative[1] > prob_relative[2] ...
         amrex::Real last_lev_rel = std::numeric_limits<amrex::Real>::max();
         for (int lev = 0; lev <= max_level; ++lev) {
@@ -97,7 +100,7 @@ namespace detail
         //   ref_1_hi = ref_1_lo + nx_1
         // ...
         // level n is of size in cells:
-        //   nx_n = amr.n_cell   * rb_n                         / rb_0                         * amr.ref_ratio[lvl=n-1] * amr.ref_ratio[lvl=n-2] * ... * amr.ref_ratio[lvl=0]
+        //   nx_n = amr.n_cell   * rb_n                 / rb_0                         * amr.ref_ratio[lvl=n-1] * amr.ref_ratio[lvl=n-2] * ... * amr.ref_ratio[lvl=0]
         //        = amr.n_cell   * prob_relative[lvl=n] / prob_relative[lvl=0] * amr.ref_ratio[lvl=n-1] * amr.ref_ratio[lvl=n-2] * ... * amr.ref_ratio[lvl=0]
         //        = n_cell_{n-1} * prob_relative[lvl=n] / prob_relative[lvl=0] * amr.ref_ratio[lvl=n-1]
         // level n+1 is of size in cells:
@@ -108,14 +111,15 @@ namespace detail
         //   ref_n_lo = small_end_n + nx_n_diff / 2
         //   ref_n_hi = big_end_n   - nx_n_diff / 2
 
-        const auto dom = Geom(lev).Domain();  // index space of the current level
+        const auto dom = boxArray(lev).minimalBox();  // covered index space of the current level
         auto const r_cell_n = amrex::RealVect(dom.size());  // on the current level
         amrex::RealVect const r_ref_ratio = ref_ratio[lev];
 
-        amrex::Vector<amrex::Real> const prob_relative = detail::read_mr_prob_relative();  // relative padding around beam width
+        // level width relative to beam width
+        amrex::Vector<amrex::Real> const prob_relative = detail::read_mr_prob_relative();
 
-        amrex::RealVect const n_cell_nup = prob_relative[lev+1] / prob_relative[0]
-                                           * r_ref_ratio * amrex::RealVect(r_cell_n);
+        amrex::RealVect const n_cell_nup = amrex::RealVect(r_cell_n) * r_ref_ratio
+                                           * prob_relative[lev+1] / prob_relative[0];
         amrex::RealVect const n_cell_diff = (r_cell_n - n_cell_nup / r_ref_ratio);
 
         amrex::RealVect const r_fine_tag_lo = amrex::RealVect(dom.smallEnd()) + n_cell_diff / 2.0;
@@ -128,6 +132,11 @@ namespace detail
             AMREX_D_DECL((int)std::ceil(r_fine_tag_hi[0]), (int)std::ceil(r_fine_tag_hi[1]), (int)std::ceil(r_fine_tag_hi[2]))
         };
 
+        amrex::Print() << "Err lev=" << lev << " fine_tag_lo=" << fine_tag_lo << "\n";
+        amrex::Print() << "Err lev=" << lev << " fine_tag_hi=" << fine_tag_hi << "\n";
+
+        amrex::Box const fine_tag = {fine_tag_lo, fine_tag_hi};
+
 #ifdef AMREX_USE_OMP
 #pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
 #endif
@@ -138,7 +147,7 @@ namespace detail
             ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
             {
                 amrex::IntVect const idx {AMREX_D_DECL(i, j, k)};
-                if (idx >= fine_tag_lo && idx <= fine_tag_hi) {
+                if (fine_tag.contains(idx)) {
                     fab(i,j,k) = amrex::TagBox::SET;
                 }
             });
@@ -260,34 +269,55 @@ namespace detail
         amrex::Vector<amrex::RealBox> rb(this->finestLevel() + 1);  // extent per level
         if (dynamic_size)
         {
-            // The box is expanded (or reduced) relative the min and max of particles.
+            // The coarsest level is expanded (or reduced) relative the min and max of particles.
             auto const prob_relative = detail::read_mr_prob_relative();
 
-            if (prob_relative[0] < 3.0)
-                ablastr::warn_manager::WMRecordWarning(
-                    "ImpactX::ResizeMesh",
-                    "Dynamic resizing of the mesh uses a geometry.prob_relative "
-                    "with less than 3x the beam size for level=0. This might result "
-                    "in boundary artifacts for space charge calculation. "
-                    "There is no minimum good value for this parameter, consider "
-                    "doing a convergence test.",
-                    ablastr::warn_manager::WarnPriority::high
-                );
+            amrex::Real const frac = prob_relative[0];
+            amrex::RealVect const beam_min(x_min, y_min, z_min);
+            amrex::RealVect const beam_max(x_max, y_max, z_max);
+            amrex::RealVect const beam_width(beam_max - beam_min);
 
-            if (prob_relative[0] < 1.0)
-                throw std::runtime_error("geometry.prob_relative must be >= 1.0 (the beam size) on the coarsest level");
+            amrex::RealVect const beam_padding = beam_width * (frac - 1.0) / 2.0;
+            //                           added to the beam extent --^         ^-- box half above/below the beam
+            rb[0].setLo(beam_min - beam_padding);
+            rb[0].setHi(beam_max + beam_padding);
 
-            for (int lev = 0; lev <= this->finestLevel(); ++lev)
+            // Coarser levels are NOT simply the rb[0] size scaled with prob_relative.
+            // The reason for that is that the cell tagging for refinement in ErrorEst
+            // will be founded up to full AMReX blocks of cells.
+            for (int lev = 1; lev <= this->finestLevel(); ++lev)
             {
-                amrex::Real const frac = prob_relative[lev];
-                amrex::RealVect const beam_min(x_min, y_min, z_min);
-                amrex::RealVect const beam_max(x_max, y_max, z_max);
-                amrex::RealVect const beam_width(beam_max - beam_min);
+                // covered index space of the current level and coarser level
+                amrex::Box const cov_box = boxArray(lev).minimalBox();
+                amrex::Box const cov_box_crs = boxArray(lev - 1).minimalBox();
 
-                amrex::RealVect const beam_padding = beam_width * (frac - 1.0) / 2.0;
-                //                           added to the beam extent --^         ^-- box half above/below the beam
-                rb[lev].setLo(beam_min - beam_padding);
-                rb[lev].setHi(beam_max + beam_padding);
+                // edge lengths of the covered box on current and coarser level
+                auto const r_cell_n = amrex::RealVect(cov_box.size());
+                auto const r_cell_crs = amrex::RealVect(cov_box_crs.size());
+
+                amrex::Print() << "lev=" << lev << " r_cell_n=" << r_cell_n << "\n";
+                amrex::Print() << "lev=" << lev << " r_cell_crs=" << r_cell_crs << "\n";
+
+                // based on the refinement ratio and the actual index space (domain) per level,
+                // we can calculate the size difference of the block-wise covered ProbDomains
+                amrex::RealVect const r_ref_ratio = ref_ratio[lev - 1];
+                amrex::Print() << "lev=" << lev << " r_ref_ratio=" << r_ref_ratio << "\n";
+                // difference in covered domain between levels (<=1)
+                amrex::RealVect const r_cell_ratio = (r_cell_n / r_ref_ratio) / r_cell_crs;
+                amrex::Print() << "lev=" << lev << " r_cell_ratio=" << r_cell_ratio << "\n";
+
+                amrex::RealVect const lo_crs(rb[lev - 1].lo());
+                amrex::RealVect const hi_crs(rb[lev - 1].hi());
+                amrex::RealVect const size_crs = hi_crs - lo_crs;
+
+                amrex::RealVect const size = size_crs * r_cell_ratio;
+                amrex::RealVect const size_diff = size_crs - size;
+                amrex::Print() << "lev=" << lev << " size_crs=" << size_crs << "\n";
+                amrex::Print() << "lev=" << lev << " size=" << size << "\n";
+                amrex::Print() << "lev=" << lev << " size_diff=" << size_diff << "\n";
+
+                rb[lev].setLo(lo_crs + size_diff / 2.0);
+                rb[lev].setHi(hi_crs - size_diff / 2.0);
             }
         }
         else

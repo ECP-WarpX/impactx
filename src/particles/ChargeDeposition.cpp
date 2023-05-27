@@ -28,12 +28,15 @@ namespace impactx
         std::unordered_map<int, amrex::MultiFab> & rho,
         amrex::Vector<amrex::IntVect> const & ref_ratio)
     {
-        // loop over refinement levels
+        // reset the values in rho to zero
         int const nLevel = this->finestLevel();
         for (int lev = 0; lev <= nLevel; ++lev) {
+            rho.at(lev).setVal(0.);
+        }
+
+        // loop fine-to-coarse over refinement levels
+        for (int lev = nLevel; lev >= 0; --lev) {
             amrex::MultiFab & rho_at_level = rho.at(lev);
-            // reset the values in rho to zero
-            rho_at_level.setVal(0.);
 
             // get simulation geometry information
             amrex::Geometry const & gm = this->Geom(lev);

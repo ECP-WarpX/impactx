@@ -84,7 +84,6 @@ namespace impactx
 
         // init blocks / grids & MultiFabs
         AmrCore::InitFromScratch(0.0);
-        amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
 
         // alloc particle containers
         //   the lost particles have an extra runtime attribute: s when it was lost
