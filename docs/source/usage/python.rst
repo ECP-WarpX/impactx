@@ -97,7 +97,7 @@ General
    .. py:property:: periods
 
       The number of periods to repeat the lattice.
-  
+
 
    .. py:property:: abort_on_warning_threshold
 
