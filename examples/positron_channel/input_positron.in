@@ -21,6 +21,7 @@ beam.mutpt = 0.999950003749688
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
+lattice.periods = 250
 lattice.elements = monitor quad1 drift1 quad2 drift1 quad1 drift2 unifacc drift2 monitor
 lattice.nslice = 25
 
@@ -46,14 +47,13 @@ drift2.ds = 0.1
 unifacc.type = uniform_acc_chromatic
 unifacc.ds = 1.8
 unifacc.ez = 10871.950994502130424
-#unifacc.bz = 938.686726626433467
-unifacc.bz = 1.0e-3
+unifacc.bz = 1.0e-12
 
 ###############################################################################
 # Algorithms
 ###############################################################################
 algo.particle_shape = 2
-algo.space_charge = true
+algo.space_charge = false
 
 amr.n_cell = 56 56 48
 geometry.prob_relative = 1.0
@@ -61,4 +61,4 @@ geometry.prob_relative = 1.0
 ###############################################################################
 # Diagnostics
 ###############################################################################
-diag.slice_step_diagnostics = true
+diag.slice_step_diagnostics = false

@@ -64,7 +64,7 @@ period = [
 
 num_periods = 250
 
-lattice = period * (num_periods)
+lattice = period * num_periods
 
 sim.lattice.extend(period)
 
