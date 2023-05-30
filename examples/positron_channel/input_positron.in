@@ -55,8 +55,8 @@ unifacc.bz = 1.0e-12
 algo.particle_shape = 2
 algo.space_charge = false
 
-amr.n_cell = 56 56 48
-geometry.prob_relative = 1.0
+#amr.n_cell = 56 56 48
+#geometry.prob_relative = 1.0
 
 ###############################################################################
 # Diagnostics

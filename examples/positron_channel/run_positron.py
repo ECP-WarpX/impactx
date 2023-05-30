@@ -6,7 +6,7 @@
 #
 # -*- coding: utf-8 -*-
 
-import amrex
+import amrex.space3d as amr
 from impactx import ImpactX, RefPart, distribution, elements
 
 sim = ImpactX()
@@ -15,7 +15,7 @@ sim = ImpactX()
 sim.particle_shape = 2  # B-spline order
 sim.space_charge = False
 # sim.diagnostics = False  # benchmarking
-sim.slice_step_diagnostics = True
+sim.slice_step_diagnostics = False
 
 # domain decomposition & space charge mesh
 sim.init_grids()
@@ -73,4 +73,4 @@ sim.evolve()
 
 # clean shutdown
 del sim
-amrex.finalize()
+amr.finalize()
