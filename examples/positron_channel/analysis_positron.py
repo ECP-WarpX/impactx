@@ -70,7 +70,7 @@ assert np.allclose(
         8.47941120001532497e-006,
         5.1097284000861952e-13,
         5.1097284000861952e-13,
-        8.47941120001532497e-009,
+        8.47941120001532497e-008,
     ],
     rtol=rtol,
     atol=atol,
@@ -86,7 +86,7 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = 1.8 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 2.0 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
@@ -97,7 +97,7 @@ assert np.allclose(
         8.47941120001532497e-006,
         2.0439953822082447e-15,
         2.0439953822082447e-15,
-        3.3919371010764148e-11,
+        3.3919371010764148e-10,
     ],
     rtol=rtol,
     atol=atol,

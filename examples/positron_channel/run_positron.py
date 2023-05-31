@@ -34,13 +34,13 @@ ref.set_charge_qe(1.0).set_mass_MeV(0.510998950).set_energy_MeV(energy_MeV)
 distr = distribution.Triangle(
     sigmaX=5.054566450e-6,
     sigmaY=5.054566450e-6,
-    sigmaT=7.4789873e-8,
+    sigmaT=8.43732950e-7,
     sigmaPx=1.01091329e-7,
     sigmaPy=1.01091329e-7,
-    sigmaPt=1.0e-3,
-    muxpx=-0.0,
+    sigmaPt=1.0e-2,
+    muxpx=0.0,
     muypy=0.0,
-    mutpt=0.999950003749688,
+    mutpt=0.995037190209989,
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
@@ -66,7 +66,7 @@ num_periods = 250
 
 lattice = period * num_periods
 
-sim.lattice.extend(period)
+sim.lattice.extend(lattice)
 
 # run simulation
 sim.evolve()

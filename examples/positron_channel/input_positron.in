@@ -9,13 +9,13 @@ beam.particle = positron
 beam.distribution = triangle
 beam.sigmaX = 5.054566450e-6
 beam.sigmaY = 5.054566450e-6
-beam.sigmaT = 7.4789873e-8
+beam.sigmaT = 8.43732950e-7
 beam.sigmaPx = 1.01091329e-7
 beam.sigmaPy = 1.01091329e-7
-beam.sigmaPt = 1.0e-3
+beam.sigmaPt = 1.0e-2
 beam.muxpx = 0.0
 beam.muypy = 0.0
-beam.mutpt = 0.999950003749688
+beam.mutpt = 0.995037190209989
 
 
 ###############################################################################
