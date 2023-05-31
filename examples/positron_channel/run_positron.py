@@ -20,8 +20,8 @@ sim.slice_step_diagnostics = False
 # domain decomposition & space charge mesh
 sim.init_grids()
 
-# load a 2 GeV electron beam with an initial
-# unnormalized rms emittance of 2 nm
+# load a 10 GeV positron beam with an initial
+# normalized rms emittance of 10 nm
 energy_MeV = 10.0e3  # reference energy
 bunch_charge_C = 190.0e-12  # used with space charge
 npart = 10000  # number of macro particles
@@ -48,7 +48,7 @@ sim.add_particles(bunch_charge_C, distr, npart)
 monitor = elements.BeamMonitor("monitor", backend="h5")
 
 # design the accelerator lattice)
-ns = 25  # number of slices per ds in the element
+ns = 1  # number of slices per ds in the element
 period = [
     monitor,
     elements.ChrQuad(ds=0.1, k=-6.674941, units=1, nslice=ns),
