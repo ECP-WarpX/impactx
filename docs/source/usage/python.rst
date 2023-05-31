@@ -637,3 +637,22 @@ This module provides elements for the accelerator lattice.
             (optional); default is a tanh fringe field model based on `<http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
+
+Coordinate Transformation
+---
+.. py:class:: impactx.TransformationDirection
+
+   Enumerated type indicating whether to transform to fixed `s` or fixed `t` coordinate system when applying ``impactx.coordinate_transformation``.
+
+   :param to_fixed_t:
+   :param to_fixed_s: 
+
+Function
+.. py:method:: impactx.coordinate_transformation(pc, direction)
+
+   Function to transform the coordinates of the particles in a particle container either to fixed ``t`` or to fixed ``s``.
+
+   Parameters
+   ---
+   :param pc: ``impactx.particle_container`` whose particle coordinates are to be transformed.
+   :param direction: enumerated type ``impactx.TransformationDirection``, indicates whehter to transform to fixed ``s`` or fixed ``t``.
