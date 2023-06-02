@@ -62,11 +62,10 @@ period = [
     monitor,
 ]
 
-num_periods = 250
-
-lattice = period * num_periods
-
 sim.lattice.extend(lattice)
+
+# number of periods through the lattice
+sim.periods = 250
 
 # run simulation
 sim.evolve()
