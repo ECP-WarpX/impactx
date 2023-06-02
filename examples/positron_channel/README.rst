@@ -1,7 +1,7 @@
 .. _examples-positron:
 
-Positron channel
-=================
+Positron Channel
+================
 
 Acceleration of a positron beam with large (10%) energy spread, from 10 GeV
 to 2.5 TeV, for parameters based on possible staging of a laser-wakefield accelerator.

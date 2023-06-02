@@ -458,7 +458,7 @@ add_impactx_test(solenoid.MADX.py
     OFF  # no plot script yet
 )
 
-# Pole-face rotation ###################################################
+# Pole-face rotation ##########################################################
 #
 # w/o space charge
 add_impactx_test(rotation
@@ -476,7 +476,7 @@ add_impactx_test(rotation.py
     OFF  # no plot script yet
 )
 
-# Soft-Edge Solenoid ###################################################
+# Soft-Edge Solenoid ##########################################################
 #
 # w/o space charge
 add_impactx_test(solenoid_softedge
@@ -494,7 +494,7 @@ add_impactx_test(solenoid_softedge.py
     OFF  # no plot script yet
 )
 
-# Soft-Edge Quadrupole ###################################################
+# Soft-Edge Quadrupole ########################################################
 #
 # w/o space charge
 add_impactx_test(quadrupole_softedge
@@ -512,7 +512,7 @@ add_impactx_test(quadrupole_softedge.py
     OFF  # no plot script yet
 )
 
-# FODO Cell with Chromatic Elements #################################
+# FODO Cell with Chromatic Elements ###########################################
 #
 # w/o space charge
 add_impactx_test(fodo_chromatic
@@ -530,7 +530,7 @@ add_impactx_test(fodo_chromatic.py
     OFF  # no plot script yet
 )
 
-# FODO Cell with Chromatic Elements #################################
+# Positron Channel ############################################################
 #
 # w/o space charge
 add_impactx_test(positron_channel

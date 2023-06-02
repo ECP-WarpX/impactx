@@ -4,7 +4,7 @@
 # Authors: Axel Huebl, Chad Mitchell
 # License: BSD-3-Clause-LBNL
 #
-
+# -*- coding: utf-8 -*-
 
 import numpy as np
 import openpmd_api as io
