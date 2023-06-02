@@ -62,7 +62,7 @@ period = [
     monitor,
 ]
 
-sim.lattice.extend(lattice)
+sim.lattice.extend(period)
 
 # number of periods through the lattice
 sim.periods = 250
