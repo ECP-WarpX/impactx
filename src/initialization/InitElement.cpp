@@ -199,7 +199,16 @@ namespace detail
             pp_element.get("ds", ds);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( ExactDrift(ds, nslice) );
-        } else if (element_type == "uniform_acc_chromatic") {
+        } else if (element_type == "sbend_exact") {
+            amrex::Real ds, phi;
+	    amrex::Real B = 0.0;
+            int nslice = nslice_default;
+            pp_element.get("ds", ds);
+            pp_element.get("phi", phi);
+            pp_element.queryAdd("B", B);
+            pp_element.queryAdd("nslice", nslice);
+            m_lattice.emplace_back( ExactSbend(ds, phi, B, nslice) );
+	} else if (element_type == "uniform_acc_chromatic") {
             amrex::Real ds, ez, bz;
             int nslice = nslice_default;
             pp_element.get("ds", ds);
