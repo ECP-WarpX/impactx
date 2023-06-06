@@ -36,7 +36,7 @@ namespace impactx
         /** The body of an ideal sector bend, using the exact nonlinear transfer map.
          *  The map corresponds to the map described in:
          *  D. L. Bruhwiler et al, in Proc. of EPAC 98, pp. 1171-1173 (1998).
-         *  
+         *
          *  In the ultrarelativistic limit, this is equivalent to the map described in:
          *  E. Forest et al, Part. Accel. 45, pp. 65-94 (1994).
          *
