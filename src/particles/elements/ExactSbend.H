@@ -72,9 +72,6 @@ namespace impactx
             amrex::ParticleReal const y = p.pos(RealAoS::y);
             amrex::ParticleReal const t = p.pos(RealAoS::t);
 
-            // length of the current slice
-            amrex::ParticleReal const slice_ds = m_ds / nslice();
-
             // angle of arc for the current slice
             amrex::ParticleReal const slice_phi = m_phi / nslice();
 
