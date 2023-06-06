@@ -565,4 +565,3 @@ add_impactx_test(cyclotron.py
     examples/cyclotron/analysis_cyclotron.py
     OFF  # no plot script yet
 )
-

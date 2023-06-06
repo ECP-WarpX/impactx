@@ -318,7 +318,7 @@ Lattice Elements
 
             * ``<element_name>.phi`` (``float``, in degrees) the bend angle
 
-            * ``<element_name>.B`` (``float``, in Tesla) the bend magnetic field (default = rigidity * angle in rad / length)            
+            * ``<element_name>.B`` (``float``, in Tesla) the bend magnetic field (default = rigidity * angle in rad / length)
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
