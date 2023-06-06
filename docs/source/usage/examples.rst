@@ -24,5 +24,6 @@ This section allows you to **download input files** that correspond to different
    examples/solenoid_softedge/README.rst
    examples/quadrupole_softedge/README.rst
    examples/positron_channel/README.rst
+   examples/cyclotron/README.rst
 
 For every change of the ImpactX code base, each of these examples are continuously tested and benchmarked.

@@ -170,7 +170,18 @@ void init_elements(py::module& m)
              "A Drift using the exact nonlinear map."
         )
     ;
-
+        
+    py::class_<ExactSbend, elements::Thick>(me, "ExactSbend")
+        .def(py::init<
+                amrex::ParticleReal const,
+                amrex::ParticleReal const, 
+                amrex::ParticleReal const,		
+                int const>(),
+             py::arg("ds"), py::arg("phi"), py::arg("B") = 0.0, py::arg("nslice") = 1,
+             "An ideal sector bend using the exact nonlinear map."
+        )
+    ;
+    
     py::class_<Multipole, elements::Thin>(me, "Multipole")
         .def(py::init<
                 int const,

@@ -576,6 +576,15 @@ This module provides elements for the accelerator lattice.
    :param rc: Radius of curvature in m.
    :param nslice: number of slices used for the application of space charge
 
+.. py:class:: impactx.elements.ExactSbend(ds, phi, B, nslice=1)
+
+   An ideal sector bend using the exact nonlinear map.
+
+   :param ds: Segment length in m.
+   :param phi: Bend angle in degrees.
+   :param B: Magnetic field in Tesla.
+   :param nslice: number of slices used for the application of space charge
+   
 .. py:class:: impactx.elements.ShortRF(V, k)
 
    A short RF cavity element at zero crossing for bunching.

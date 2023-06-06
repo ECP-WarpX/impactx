@@ -547,3 +547,22 @@ add_impactx_test(positron_channel.py
     examples/positron_channel/analysis_positron.py
     OFF  # no plot script yet
 )
+
+# Cyclotron ############################################################
+#
+# w/o space charge
+add_impactx_test(cyclotron
+    examples/cyclotron/input_cyclotron.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/cyclotron/analysis_cyclotron.py
+    OFF  # no plot script yet
+)
+add_impactx_test(cyclotron.py
+    examples/cyclotron/run_cyclotron.py
+      OFF  # ImpactX MPI-parallel
+      ON  # ImpactX Python interface
+    examples/cyclotron/analysis_cyclotron.py
+    OFF  # no plot script yet
+)
+
