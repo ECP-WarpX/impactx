@@ -22,8 +22,7 @@ beam.mutpt = 0.0
 # Beamline: lattice elements and segments
 ###############################################################################
 lattice.elements = monitor half half monitor
-#lattice.periods = 150
-lattice.period = 1
+lattice.periods = 150
 lattice.nslice = 25
 
 monitor.type = beam_monitor
