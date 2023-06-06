@@ -36,9 +36,9 @@ namespace impactx
         /** The body of an ideal sector bend, using the exact nonlinear transfer map.
          *
          * @param ds Segment length in m.
-     * @param phi Segment bend angle in degrees.
+         * @param phi Segment bend angle in degrees.
          * @param B Magnetic field strength in T.
-     * @param nslice number of slices used for the application of space charge
+         * @param nslice number of slices used for the application of space charge
          */
         ExactSbend( amrex::ParticleReal const ds, amrex::ParticleReal const phi,
               amrex::ParticleReal const B, int const nslice )
@@ -75,14 +75,14 @@ namespace impactx
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
-        // angle of arc for the current slice
-        amrex::ParticleReal const slice_phi = m_phi / nslice();
+            // angle of arc for the current slice
+            amrex::ParticleReal const slice_phi = m_phi / nslice();
 
             // access reference particle values to find beta
             amrex::ParticleReal const bet = refpart.beta();
 
             // reference particle's orbital radius
-        amrex::ParticleReal const rc = (m_B != 0_prt) ? refpart.rigidity_Tm() / m_B : m_ds / m_phi;
+            amrex::ParticleReal const rc = (m_B != 0_prt) ? refpart.rigidity_Tm() / m_B : m_ds / m_phi;
 
             // intialize output values of momenta
             amrex::ParticleReal pxout = px;
@@ -90,25 +90,25 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // assign intermediate quantities
-        amrex::ParticleReal pperp = sqrt(pow(pt,2)-2.0_prt/bet*pt-pow(py,2)+1.0_prt);
-        amrex::ParticleReal pzi = sqrt(pow(pperp,2)-pow(px,2));
-            amrex::ParticleReal rho = rc + x;
+            amrex::ParticleReal const pperp = sqrt(pow(pt,2)-2.0_prt/bet*pt-pow(py,2)+1.0_prt);
+            amrex::ParticleReal const pzi = sqrt(pow(pperp,2)-pow(px,2));
+            amrex::ParticleReal const rho = rc + x;
             amrex::ParticleReal const sin_phi = sin(slice_phi);
             amrex::ParticleReal const cos_phi = cos(slice_phi);
 
-        // update momenta
-        pxout = px*cos_phi + (pzi - rho/rc)*sin_phi;
-        pyout = py;
-        ptout = pt;
+            // update momenta
+            pxout = px*cos_phi + (pzi - rho/rc)*sin_phi;
+            pyout = py;
+            ptout = pt;
 
-        // angle of momentum rotation
-        amrex::ParticleReal pzf = sqrt(pow(pperp,2)-pow(pxout,2));
-        amrex::ParticleReal theta = slice_phi + asin(px/pperp) - asin(pxout/pperp);
+            // angle of momentum rotation
+            amrex::ParticleReal const pzf = sqrt(pow(pperp,2)-pow(pxout,2));
+            amrex::ParticleReal const theta = slice_phi + asin(px/pperp) - asin(pxout/pperp);
 
-        // update position coordinates
+            // update position coordinates
             p.pos(RealAoS::x) = -rc + rho*cos_phi + rc*(pzf + px*sin_phi - pzi*cos_phi);
-        p.pos(RealAoS::y) = y + theta*rc*py;
-        p.pos(RealAoS::t) = t - theta*rc*(pt - 1.0_prt/bet);
+            p.pos(RealAoS::y) = y + theta*rc*py;
+            p.pos(RealAoS::t) = t - theta*rc*(pt - 1.0_prt/bet);
 
             // assign updated momenta
             px = pxout;
@@ -142,7 +142,7 @@ namespace impactx
 
             // assign intermediate parameters
             amrex::ParticleReal const theta = m_phi / nslice();
-        amrex::ParticleReal const rc = (m_B != 0_prt) ? refpart.rigidity_Tm() / m_B : m_ds / m_phi;
+            amrex::ParticleReal const rc = (m_B != 0_prt) ? refpart.rigidity_Tm() / m_B : m_ds / m_phi;
             amrex::ParticleReal const B = refpart.beta_gamma() /rc;
 
             // calculate expensive terms once
