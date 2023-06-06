@@ -645,7 +645,7 @@ Coordinate Transformation
    Enumerated type indicating whether to transform to fixed `s` or fixed `t` coordinate system when applying ``impactx.coordinate_transformation``.
 
    :param to_fixed_t:
-   :param to_fixed_s: 
+   :param to_fixed_s:
 
 Function
 .. py:method:: impactx.coordinate_transformation(pc, direction)

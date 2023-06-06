@@ -16,11 +16,20 @@ except ImportError:
     cupy_available = False
 
 import amrex
-from impactx import Config, ImpactX, RefPart, distribution, elements, ImpactXParIter
-from impactx import coordinate_transformation, TransformationDirection
+from impactx import (
+    Config,
+    ImpactX,
+    ImpactXParIter,
+    RefPart,
+    TransformationDirection,
+    coordinate_transformation,
+    distribution,
+    elements,
+)
+
 
 def get_particle_data(pc):
-    for lvl in range(pc.finest_level+1):
+    for lvl in range(pc.finest_level + 1):
         for pti in ImpactXParIter(pc, level=lvl):
             aos = pti.aos()
             aos_arr = np.array(aos, copy=False)
@@ -30,7 +39,9 @@ def get_particle_data(pc):
             px = np.array(real_arrays[0], copy=False)
             py = np.array(real_arrays[1], copy=False)
             pt = np.array(real_arrays[2], copy=False)
-            data_arr = np.vstack([aos_arr["x"],aos_arr["y"],aos_arr["z"],real_arrays[:3]]).T
+            data_arr = np.vstack(
+                [aos_arr["x"], aos_arr["y"], aos_arr["z"], real_arrays[:3]]
+            ).T
     return data_arr
 
 
@@ -62,9 +73,9 @@ distr = distribution.Gaussian(
     sigmaX=3e-6,
     sigmaY=3e-6,
     sigmaT=1e-2,
-    sigmaPx=1.33/energy_gamma,
-    sigmaPy=1.33/energy_gamma,
-    sigmaPt=100/energy_gamma,
+    sigmaPx=1.33 / energy_gamma,
+    sigmaPy=1.33 / energy_gamma,
+    sigmaPt=100 / energy_gamma,
     muxpx=-0.5,
     muypy=0.4,
     mutpt=0.8,
@@ -84,6 +95,6 @@ del sim
 amrex.finalize()
 
 # assert that the t-based beam is different
-assert(np.max(abs(data_arr_t-data_arr_si))>0.1)
+assert np.max(abs(data_arr_t - data_arr_si)) > 0.1
 # assert that forward-inverse transformation of the beam leaves beam unchanged
-assert(np.max(abs(data_arr_s-data_arr_si))< 1e-15)
+assert np.max(abs(data_arr_s - data_arr_si)) < 1e-15
