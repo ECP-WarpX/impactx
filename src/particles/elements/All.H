@@ -47,7 +47,7 @@ namespace impactx
         DipEdge,
         Drift,
         ExactDrift,
-	ExactSbend,
+    ExactSbend,
         Multipole,
         NonlinearLens,
         Programmable,
