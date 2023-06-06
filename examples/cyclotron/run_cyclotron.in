@@ -20,7 +20,7 @@ sim.slice_step_diagnostics = True
 # domain decomposition & space charge mesh
 sim.init_grids()
 
-#load initial beam
+# load initial beam
 energy_MeV = 4.0e-3  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
 npart = 10000  # number of macro particles
@@ -53,7 +53,7 @@ period = [
     elements.ChrAcc(ds=0.038, ez=1.12188308693e-4, bz=1.0e-14, nslice=ns),
     elements.ExactSbend(ds=0.25, phi=180.0, B=1),
     elements.ChrAcc(ds=0.038, ez=1.12188308693e-4, bz=1.0e-14, nslice=ns),
-    elements.ExactSbend(ds=0.25, phi=180.0, B=1),    
+    elements.ExactSbend(ds=0.25, phi=180.0, B=1),
     monitor,
 ]
 
