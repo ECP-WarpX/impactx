@@ -642,7 +642,7 @@ Coordinate Transformation
 ---
 .. py:class:: impactx.TransformationDirection
 
-   Enumerated type indicating whether to transform to fixed `s` or fixed `t` coordinate system when applying ``impactx.coordinate_transformation``.
+   Enumerated type indicating whether to transform to fixed :math:`s` or fixed :math:`t` coordinate system when applying ``impactx.coordinate_transformation``.
 
    :param to_fixed_t:
    :param to_fixed_s:
@@ -650,9 +650,9 @@ Coordinate Transformation
 Function
 .. py:method:: impactx.coordinate_transformation(pc, direction)
 
-   Function to transform the coordinates of the particles in a particle container either to fixed ``t`` or to fixed ``s``.
+   Function to transform the coordinates of the particles in a particle container either to fixed :math:`t` or to fixed :math:`s`.
 
    Parameters
    ---
    :param pc: ``impactx.particle_container`` whose particle coordinates are to be transformed.
-   :param direction: enumerated type ``impactx.TransformationDirection``, indicates whehter to transform to fixed ``s`` or fixed ``t``.
+   :param direction: enumerated type ``impactx.TransformationDirection``, indicates whether to transform to fixed :math:`s` or fixed :math:`t`.
