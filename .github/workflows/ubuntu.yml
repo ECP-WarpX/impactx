@@ -18,6 +18,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - uses: rui314/setup-mold@v1
+
     - name: install dependencies
       run: |
         .github/workflows/dependencies/gcc-openmpi.sh
@@ -79,6 +81,8 @@ jobs:
       OMP_NUM_THREADS: 2
     steps:
     - uses: actions/checkout@v3
+
+    - uses: rui314/setup-mold@v1
 
     - name: install dependencies
       run: |
