@@ -639,7 +639,8 @@ This module provides elements for the accelerator lattice.
    :param nslice: number of slices used for the application of space charge
 
 Coordinate Transformation
----
+------------------------
+
 .. py:class:: impactx.TransformationDirection
 
    Enumerated type indicating whether to transform to fixed :math:`s` or fixed :math:`t` coordinate system when applying ``impactx.coordinate_transformation``.
@@ -652,7 +653,8 @@ Function
 
    Function to transform the coordinates of the particles in a particle container either to fixed :math:`t` or to fixed :math:`s`.
 
-   Parameters
-   ---
+
+
+
    :param pc: ``impactx.particle_container`` whose particle coordinates are to be transformed.
    :param direction: enumerated type ``impactx.TransformationDirection``, indicates whether to transform to fixed :math:`s` or fixed :math:`t`.
