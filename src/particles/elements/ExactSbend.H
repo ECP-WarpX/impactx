@@ -110,7 +110,7 @@ namespace impactx
             // update position coordinates
             p.pos(RealAoS::x) = -rc + rho*cos_phi + rc*(pzf + px*sin_phi - pzi*cos_phi);
             p.pos(RealAoS::y) = y + theta*rc*py;
-            p.pos(RealAoS::t) = t - theta*rc*(pt - 1.0_prt/bet);
+            p.pos(RealAoS::t) = t - theta*rc*(pt - 1.0_prt/bet) - m_phi*rc/bet;
 
             // assign updated momenta
             px = pxout;
