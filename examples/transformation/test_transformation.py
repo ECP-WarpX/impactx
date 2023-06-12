@@ -8,13 +8,6 @@
 
 import numpy as np
 
-try:
-    import cupy as cp
-
-    cupy_available = True
-except ImportError:
-    cupy_available = False
-
 import amrex
 from impactx import (
     Config,
@@ -36,9 +29,6 @@ def get_particle_data(pc):
 
             soa = pti.soa()
             real_arrays = soa.GetRealData()
-            px = np.array(real_arrays[0], copy=False)
-            py = np.array(real_arrays[1], copy=False)
-            pt = np.array(real_arrays[2], copy=False)
             data_arr = np.vstack(
                 [aos_arr["x"], aos_arr["y"], aos_arr["z"], real_arrays[:3]]
             ).T
