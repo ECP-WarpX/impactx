@@ -72,11 +72,19 @@ del sim
 atol = 1e-14
 rtol = 1e-10
 for key, val in rbc_s0.items():
-    if not np.isclose(val, rbc_s[key], rtol=rtol,atol=atol):
-        print(f'initial[{key}]={val}, final[{key}]={rbc_s[key]} not equal')
-    assert np.isclose(val, rbc_s[key], rtol=rtol,atol=atol)
+    if not np.isclose(val, rbc_s[key], rtol=rtol, atol=atol):
+        print(f"initial[{key}]={val}, final[{key}]={rbc_s[key]} not equal")
+    assert np.isclose(val, rbc_s[key], rtol=rtol, atol=atol)
 # assert that the t-based beam is different, at least in the following keys:
-large_st_diff_keys = ['beta_x', 'beta_y', 'emittance_y', 'emittance_x', 'sig_y', 'sig_x', 't_mean']
+large_st_diff_keys = [
+    "beta_x",
+    "beta_y",
+    "emittance_y",
+    "emittance_x",
+    "sig_y",
+    "sig_x",
+    "t_mean",
+]
 for key in large_st_diff_keys:
     rel_error = (rbc_s0[key] - rbc_t[key]) / rbc_s0[key]
     assert abs(rel_error) > 1
