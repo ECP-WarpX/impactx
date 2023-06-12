@@ -639,7 +639,7 @@ This module provides elements for the accelerator lattice.
    :param nslice: number of slices used for the application of space charge
 
 Coordinate Transformation
-------------------------
+-------------------------
 
 .. py:class:: impactx.TransformationDirection
 

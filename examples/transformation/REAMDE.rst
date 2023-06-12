@@ -1,7 +1,7 @@
-.. _examples-transformation:
+.. _tests-transformation:
 
 Transformation
-===================
+==============
 
 Test the t/s transformations on an electron beam.
 
