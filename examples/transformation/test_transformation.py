@@ -9,7 +9,7 @@
 import numpy as np
 
 import amrex
-from impactx import (
+from impactx import (  # NOQA
     Config,
     ImpactX,
     ImpactXParIter,
