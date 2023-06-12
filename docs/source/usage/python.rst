@@ -653,8 +653,5 @@ Function
 
    Function to transform the coordinates of the particles in a particle container either to fixed :math:`t` or to fixed :math:`s`.
 
-
-
-
    :param pc: ``impactx.particle_container`` whose particle coordinates are to be transformed.
    :param direction: enumerated type ``impactx.TransformationDirection``, indicates whether to transform to fixed :math:`s` or fixed :math:`t`.

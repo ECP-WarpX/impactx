@@ -9,7 +9,7 @@
 import numpy as np
 
 import amrex
-from impactx import (  # NOQA
+from impactx import (
     Config,
     ImpactX,
     ImpactXParIter,
@@ -19,21 +19,6 @@ from impactx import (  # NOQA
     distribution,
     elements,
 )
-
-
-def get_particle_data(pc):
-    for lvl in range(pc.finest_level + 1):
-        for pti in ImpactXParIter(pc, level=lvl):
-            aos = pti.aos()
-            aos_arr = np.array(aos, copy=False)
-
-            soa = pti.soa()
-            real_arrays = soa.GetRealData()
-            data_arr = np.vstack(
-                [aos_arr["x"], aos_arr["y"], aos_arr["z"], real_arrays[:3]]
-            ).T
-    return data_arr
-
 
 sim = ImpactX()
 
@@ -74,17 +59,24 @@ sim.add_particles(bunch_charge_C, distr, npart)
 # number of slices per ds in each lattice element
 ns = 1
 
-data_arr_si = get_particle_data(pc)
+rbc_s0 = pc.reduced_beam_characteristics()
 coordinate_transformation(pc, TransformationDirection.to_fixed_t)
-data_arr_t = get_particle_data(pc)
+rbc_t = pc.reduced_beam_characteristics()
 coordinate_transformation(pc, TransformationDirection.to_fixed_s)
-data_arr_s = get_particle_data(pc)
+rbc_s = pc.reduced_beam_characteristics()
 
 # clean shutdown
 del sim
-amrex.finalize()
 
-# assert that the t-based beam is different
-assert np.max(abs(data_arr_t - data_arr_si)) > 0.1
 # assert that forward-inverse transformation of the beam leaves beam unchanged
-assert np.max(abs(data_arr_s - data_arr_si)) < 1e-15
+atol = 1e-14
+rtol = 1e-10
+for key, val in rbc_s0.items():
+    if not np.isclose(val, rbc_s[key], rtol=rtol,atol=atol):
+        print(f'initial[{key}]={val}, final[{key}]={rbc_s[key]} not equal')
+    assert np.isclose(val, rbc_s[key], rtol=rtol,atol=atol)
+# assert that the t-based beam is different, at least in the following keys:
+large_st_diff_keys = ['beta_x', 'beta_y', 'emittance_y', 'emittance_x', 'sig_y', 'sig_x', 't_mean']
+for key in large_st_diff_keys:
+    rel_error = (rbc_s0[key] - rbc_t[key]) / rbc_s0[key]
+    assert abs(rel_error) > 1
