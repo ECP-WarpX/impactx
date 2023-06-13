@@ -318,7 +318,7 @@ Lattice Elements
 
             * ``<element_name>.phi`` (``float``, in degrees) the bend angle
 
-            * ``<element_name>.B`` (``float``, in Tesla) the bend magnetic field (default = rigidity * angle in rad / length)
+            * ``<element_name>.B`` (``float``, in Tesla) the bend magnetic field; when B = 0 (default), the reference bending radius is defined by r0 = length / (angle in rad), corresponding to a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
