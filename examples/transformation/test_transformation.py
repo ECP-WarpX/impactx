@@ -8,7 +8,6 @@
 
 import numpy as np
 
-import amrex
 from impactx import (
     Config,
     ImpactX,
