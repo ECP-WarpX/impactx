@@ -578,7 +578,12 @@ This module provides elements for the accelerator lattice.
 
 .. py:class:: impactx.elements.ExactSbend(ds, phi, B, nslice=1)
 
-   An ideal sector bend using the exact nonlinear map.
+   An ideal sector bend using the exact nonlinear map.  The model consists of a uniform bending field B_y with a hard edge.  Pole faces are  
+   normal to the entry and exit velocity of the reference particle.
+           
+References:
+   * D. L. Bruhwiler et al, in Proc. of EPAC 98, pp. 1171-1173 (1998).
+   * E. Forest et al, Part. Accel. 45, pp. 65-94 (1994). 
 
    :param ds: Segment length in m.
    :param phi: Bend angle in degrees.
