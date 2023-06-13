@@ -40,6 +40,9 @@ namespace impactx
          *  In the ultrarelativistic limit, this is equivalent to the map described in:
          *  E. Forest et al, Part. Accel. 45, pp. 65-94 (1994).
          *
+         *  The model consists of a uniform bending field B_y with a hard edge.
+         *  Pole faces are normal to the entry and exit velocity of the reference particle.
+         *
          * @param ds Segment length in m.
          * @param phi Segment bend angle in degrees.
          * @param B Magnetic field strength in T.
