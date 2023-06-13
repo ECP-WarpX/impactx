@@ -43,6 +43,8 @@ namespace impactx
          * @param ds Segment length in m.
          * @param phi Segment bend angle in degrees.
          * @param B Magnetic field strength in T.
+         *  When B = 0 (default), the reference bending radius is defined by r0 = length / (angle in rad), corresponding to 
+         *  a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B.
          * @param nslice number of slices used for the application of space charge
          */
         ExactSbend( amrex::ParticleReal const ds, amrex::ParticleReal const phi,
