@@ -59,18 +59,18 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = 1.0e4 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 1.8 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
     [sigx, sigy, sigt, emittance_x, emittance_y, emittance_t],
     [
-        5.05456645029333603e-006,
-        5.05456645029333603e-006,
-        8.47941120001532497e-006,
-        5.1097284000861952e-13,
-        5.1097284000861952e-13,
-        8.47941120001532497e-008,
+        1.0e-3,
+        1.0e-3,
+        3.0e-1,
+        2.0e-7,
+        2.0e-7,
+        6.0e-6,
     ],
     rtol=rtol,
     atol=atol,
@@ -86,18 +86,18 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = 1.0e4 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 1.8 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
     [sigx, sigy, sigt, emittance_x, emittance_y, emittance_t],
     [
-        5.26e-006,
-        5.26e-006,
-        8.47941120001532497e-006,
-        2.0439953822082447e-15,
-        2.0439953822082447e-15,
-        3.3919371010764148e-10,
+        1.031638e-3,
+        2.215143e-3,
+        3.420703e-01,
+        1.143528e-08,
+        1.158941e-08,
+        3.453510e-07,
     ],
     rtol=rtol,
     atol=atol,
