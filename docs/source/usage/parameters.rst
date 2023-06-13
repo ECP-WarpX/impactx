@@ -312,7 +312,10 @@ Lattice Elements
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
-        * ``sbend_exact`` for a bending magnet using the exact nonlinear map for the bend body. This requires these additional parameters:
+        * ``sbend_exact`` for a bending magnet using the exact nonlinear map for the bend body. The map corresponds to the map described in:
+            D. L. Bruhwiler et al, in Proc. of EPAC 98, pp. 1171-1173 (1998), E. Forest et al, Part. Accel. 45, pp. 65-94 (1994).  The model   
+            consists of a uniform bending field B_y with a hard edge.  Pole faces are normal to the entry and exit velocity of the reference  
+            particle.  This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
