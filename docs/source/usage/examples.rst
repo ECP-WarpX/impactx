@@ -32,6 +32,6 @@ Unit tests
 .. toctree::
    :maxdepth: 1
 
-   examples/transformation/README.rst
+   tests/python/transformation.rst
 
 For every change of the ImpactX code base, each of these examples and tests are continuously tested and benchmarked.

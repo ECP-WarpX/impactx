@@ -17,8 +17,7 @@ That is, we require that :math:`to_fixed_s` ( :math:`to_fixed_t` (initial beam))
 Run
 ---
 
-This example can be run as a Python script (``python3 test_transformation.py``)
-It can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
+This file is run from :ref:`pytest <developers-testing>`.
 
 .. tab-set::
 
@@ -26,4 +25,4 @@ It can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, su
 
        .. literalinclude:: test_transformation.py
           :language: python3
-          :caption: You can copy this file from ``examples/transformation/test_transformation.py``.
+          :caption: You can copy this file from ``tests/python/test_transformation.py``.
