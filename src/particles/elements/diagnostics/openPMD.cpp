@@ -9,6 +9,7 @@
  */
 
 #include "openPMD.H"
+#include "ImpactXVersion.H"
 #include "particles/ImpactXParticleContainer.H"
 
 #include <ablastr/particles/IndexHandling.H>
@@ -198,6 +199,7 @@ namespace detail
 #   endif
                 , "adios2.engine.usesteps = true"
             );
+            series.setSoftware("ImpactX", IMPACTX_VERSION);
             series.setIterationEncoding( series_encoding );
             m_series = series;
             m_unique_series[m_series_name] = series;
