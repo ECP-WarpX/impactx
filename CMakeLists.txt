@@ -4,12 +4,14 @@ cmake_minimum_required(VERSION 3.20.0)
 project(ImpactX VERSION 23.06)
 
 # generate compile_commands.json
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-# and place it in the source directory https://stackoverflow.com/a/60910583
-add_custom_target(
-  copy-compile-commands ALL
-  ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_CURRENT_LIST_DIR})
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+    # and place it in the source directory https://stackoverflow.com/a/60910583
+    add_custom_target(
+      copy-compile-commands ALL
+      ${CMAKE_COMMAND} -E copy_if_different
+      ${CMAKE_BINARY_DIR}/compile_commands.json ${PROJECT_SOURCE_DIR})
+endif()
 
 include(${ImpactX_SOURCE_DIR}/cmake/ImpactXFunctions.cmake)
 
