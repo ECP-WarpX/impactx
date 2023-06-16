@@ -21,6 +21,7 @@ void init_elements(py::module&);
 void init_ImpactX(py::module&);
 void init_impactxparticlecontainer(py::module&);
 void init_refparticle(py::module&);
+void init_transformation(py::module&);
 
 PYBIND11_MODULE(impactx_pybind, m) {
     // make sure AMReX types are known
@@ -43,6 +44,7 @@ PYBIND11_MODULE(impactx_pybind, m) {
     init_elements(m);
     init_refparticle(m);
     init_impactxparticlecontainer(m);
+    init_transformation(m);
     init_ImpactX(m);
 
     // API runtime version
