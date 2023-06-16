@@ -61,8 +61,6 @@ def test_transformation():
         mutpt=0.8,
     )
     sim.add_particles(bunch_charge_C, distr, npart)
-    # number of slices per ds in each lattice element
-    ns = 1
 
     rbc_s0 = pc.reduced_beam_characteristics()
     coordinate_transformation(pc, TransformationDirection.to_fixed_t)
