@@ -60,7 +60,7 @@ period = [
 sim.lattice.extend(period)
 
 # number of periods through the lattice
-sim.periods = 250
+sim.periods = 150
 
 # run simulation
 sim.evolve()
