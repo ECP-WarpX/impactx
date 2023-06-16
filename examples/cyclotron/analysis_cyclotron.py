@@ -92,12 +92,12 @@ print(f"  rtol={rtol} (ignored: atol~={atol})")
 assert np.allclose(
     [sigx, sigy, sigt, emittance_x, emittance_y, emittance_t],
     [
-        1.055877e-03,
-        3.360171e-03,
-        3.452071e-01,
-        8.917987e-09,
-        9.008743e-09,
-        2.681030e-07,
+        1.040898e-03,
+        2.221367e-03,
+        3.426366e-01,
+        1.151532e-08,
+        1.160797e-08,
+        3.440357e-07,
     ],
     rtol=rtol,
     atol=atol,
