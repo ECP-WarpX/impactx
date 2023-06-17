@@ -3,45 +3,43 @@
 ###############################################################################
 beam.npart = 10000
 beam.units = static
-beam.energy = 2.0e3
+beam.energy = 4.0e-3
 beam.charge = 1.0e-9
-beam.particle = electron
+beam.particle = proton
 beam.distribution = waterbag
-beam.sigmaX = 3.9984884770e-5
-beam.sigmaY = 3.9984884770e-5
-beam.sigmaT = 1.0e-3
-beam.sigmaPx = 2.6623538760e-5
-beam.sigmaPy = 2.6623538760e-5
-beam.sigmaPt = 2.0e-3
-beam.muxpx = -0.846574929020762
-beam.muypy = 0.846574929020762
+beam.sigmaX = 1.0e-3
+beam.sigmaY = 1.0e-3
+beam.sigmaT = 0.3
+beam.sigmaPx = 2.0e-4
+beam.sigmaPy = 2.0e-4
+beam.sigmaPt = 2.0e-5
+beam.muxpx = 0.0
+beam.muypy = 0.0
 beam.mutpt = 0.0
 
 
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
-lattice.elements = half half
-lattice.periods = 1000
+lattice.elements = monitor half half monitor
+lattice.periods = 150
 lattice.nslice = 25
+
+monitor.type = beam_monitor
+monitor.backend = h5
 
 half.type = line
 half.elements = gap bend
 
-gap.type = line
-gap.elements = shortrf drift
+gap.type = uniform_acc_chromatic
+gap.ds = 0.038
+gap.ez = 1.12188308693e-4
+gap.bz = 1.0e-14
 
-bend.type = sbend
+bend.type = sbend_exact
 bend.ds = 0.25
-bend.rc = 0.115
-
-drift.type = drift
-drift.ds = 0.25
-
-shortrf.type = shortrf
-shortrf.V = 0.01
-shortrf.k = 15.0
-
+bend.phi = 180.0
+bend.B = 1.0
 
 ###############################################################################
 # Algorithms

@@ -17,6 +17,7 @@
 #include "DipEdge.H"
 #include "Drift.H"
 #include "ExactDrift.H"
+#include "ExactSbend.H"
 #include "Multipole.H"
 #include "None.H"
 #include "NonlinearLens.H"
@@ -46,6 +47,7 @@ namespace impactx
         DipEdge,
         Drift,
         ExactDrift,
+    ExactSbend,
         Multipole,
         NonlinearLens,
         Programmable,

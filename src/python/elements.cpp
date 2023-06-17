@@ -171,6 +171,17 @@ void init_elements(py::module& m)
         )
     ;
 
+    py::class_<ExactSbend, elements::Thick>(me, "ExactSbend")
+        .def(py::init<
+                amrex::ParticleReal const,
+                amrex::ParticleReal const,
+                amrex::ParticleReal const,
+                int const>(),
+             py::arg("ds"), py::arg("phi"), py::arg("B") = 0.0, py::arg("nslice") = 1,
+             "An ideal sector bend using the exact nonlinear map.  When B = 0, the reference bending radius is defined by r0 = length / (angle in rad), corresponding to a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B."
+        )
+    ;
+
     py::class_<Multipole, elements::Thin>(me, "Multipole")
         .def(py::init<
                 int const,

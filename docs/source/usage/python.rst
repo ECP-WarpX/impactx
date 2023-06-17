@@ -576,6 +576,20 @@ This module provides elements for the accelerator lattice.
    :param rc: Radius of curvature in m.
    :param nslice: number of slices used for the application of space charge
 
+.. py:class:: impactx.elements.ExactSbend(ds, phi, B, nslice=1)
+
+   An ideal sector bend using the exact nonlinear map.  The model consists of a uniform bending field B_y with a hard edge.  Pole faces are
+   normal to the entry and exit velocity of the reference particle.
+
+References:
+   * D. L. Bruhwiler et al, in Proc. of EPAC 98, pp. 1171-1173 (1998).
+   * E. Forest et al, Part. Accel. 45, pp. 65-94 (1994).
+
+   :param ds: Segment length in m.
+   :param phi: Bend angle in degrees.
+   :param B: Magnetic field in Tesla; when B = 0 (default), the reference bending radius is defined by r0 = length / (angle in rad),   corresponding to a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B.
+   :param nslice: number of slices used for the application of space charge
+
 .. py:class:: impactx.elements.ShortRF(V, k)
 
    A short RF cavity element at zero crossing for bunching.
