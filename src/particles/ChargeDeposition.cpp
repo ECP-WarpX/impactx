@@ -118,28 +118,52 @@ namespace impactx
                 );
 
                 // add to the lower level
-                const bool do_single_precision_comms = false;
                 const amrex::Periodicity& crse_period = this->Geom(lev - 1).periodicity();
-                ablastr::utils::communication::ParallelAdd(
-                    rho[lev-1],
+
+                // On a coarse level, the data in mf_comm comes from the
+                // coarse patch of the fine level. They are unfiltered and uncommunicated.
+                // We need to add it to the fine patch of the current level.
+                amrex::MultiFab fine_lev_cp(
+                    rho[lev-1].boxArray(),
+                    rho[lev-1].DistributionMap(),
+                    1,
+                    0);
+                fine_lev_cp.setVal(0.0);
+                fine_lev_cp.ParallelAdd(
                     rho_cp,
                     0,
                     0,
                     1,
                     rho_cp.nGrowVect(),
-                    rho[lev-1].nGrowVect(),
-                    do_single_precision_comms,
+                    amrex::IntVect(0),
                     crse_period
                 );
-            }
+                // We now need to create a mask to fix the double counting.
+                auto owner_mask = amrex::OwnerMask(fine_lev_cp, crse_period);
+                auto const& mma = owner_mask->const_arrays();
+                auto const& sma = fine_lev_cp.const_arrays();
+                auto const& dma = rho[lev-1].arrays();
+                amrex::ParallelFor(
+                    fine_lev_cp,
+                    amrex::IntVect(0),
+                    ncomp,
+                    [=] AMREX_GPU_DEVICE (int bno, int i, int j, int k, int n)
+                    {
+                        if (mma[bno](i,j,k) && sma[bno](i,j,k,n) != 0.0_rt) {
+                            dma[bno](i,j,k,n) += sma[bno](i,j,k,n);
+                        }
+                    }
+                );
+            } // if (lev > 0)
 
-            // TODO: implement charge filters here
+            // charge filters
             // note: we do this after SyncRho, because the physical (dx) size of
             //       the stencil is different for each level
             // note: we might not be able to do this after SumBoundary because we would then
             //       not have valid filtered values in the guard. We access the guard
             //       when we sum contributions from particles close to the
             //       MR border between levels.
+            //ApplyFilterandSumBoundaryRho(lev, lev, rho[lev-1], 0, 1);
 
             // start async charge communication for this level
             rho_at_level.SumBoundary_nowait();

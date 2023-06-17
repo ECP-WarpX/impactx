@@ -16,7 +16,7 @@ pp_amr.addarr("n_cell", [56, 56, 48])
 sim = ImpactX()
 
 # set numerical parameters and IO control
-#sim.n_cell = [56, 56, 48]
+# sim.n_cell = [56, 56, 48]
 sim.particle_shape = 2  # B-spline order
 sim.space_charge = True
 sim.dynamic_size = True
