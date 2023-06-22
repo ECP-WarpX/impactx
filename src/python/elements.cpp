@@ -254,8 +254,9 @@ void init_elements(py::module& m)
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
+		int const,
                 int const>(),
-             py::arg("ds"), py::arg("k"), py::arg("nslice") = 1,
+             py::arg("ds"), py::arg("k"), py::arg("units") = 0, py::arg("nslice") = 1,
              "A Quadrupole magnet."
         )
     ;
@@ -303,12 +304,12 @@ void init_elements(py::module& m)
                  amrex::ParticleReal const,
                  std::vector<amrex::ParticleReal>,
                  std::vector<amrex::ParticleReal>,
-         int const,
-                 int const
-             >(),
+		 int const,
+                 int const,
+                 int const>(),
              py::arg("ds"), py::arg("bscale"),
              py::arg("cos_coefficients"), py::arg("sin_coefficients"),
-             py::arg("mapsteps") = 1, py::arg("nslice") = 1,
+             py::arg("units") = 0, py::arg("mapsteps") = 1, py::arg("nslice") = 1,
              "A soft-edge solenoid."
         )
     ;
@@ -317,8 +318,9 @@ void init_elements(py::module& m)
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
+		int const,
                 int const>(),
-             py::arg("ds"), py::arg("ks"), py::arg("nslice") = 1,
+             py::arg("ds"), py::arg("ks"), py::arg("units") = 0, py::arg("nslice") = 1,
              "An ideal hard-edge Solenoid magnet."
         )
     ;
@@ -339,11 +341,12 @@ void init_elements(py::module& m)
                  std::vector<amrex::ParticleReal>,
                  std::vector<amrex::ParticleReal>,
                  int,
+		 int,
                  int
              >(),
              py::arg("ds"), py::arg("gscale"),
              py::arg("cos_coefficients"), py::arg("sin_coefficients"),
-             py::arg("mapsteps") = 1, py::arg("nslice") = 1,
+             py::arg("units") = 0, py::arg("mapsteps") = 1, py::arg("nslice") = 1,
              "A soft-edge quadrupole."
         )
     ;

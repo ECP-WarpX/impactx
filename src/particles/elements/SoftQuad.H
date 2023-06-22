@@ -119,9 +119,10 @@ namespace SoftQuadrupoleData
         /** A soft-edge quadrupole
          *
          * @param ds Segment length in m
-         * @param gscale Scaling factor for on-axis field gradient Bz in 1/m^2
+         * @param gscale Scaling factor for on-axis field gradient Bz in 1/m^2 (unit=0) or T/m (unit=1)
          * @param cos_coef cosine coefficients in Fourier expansion of on-axis magnetic field Bz
          * @param sin_coef sine coefficients in Fourier expansion of on-axis magnetic field Bz
+	 * @param unit units describing normalization of gscale input
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
@@ -131,11 +132,12 @@ namespace SoftQuadrupoleData
             amrex::ParticleReal gscale,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
+	    int unit = 0,
             int mapsteps = 1,
             int nslice = 1
         )
           : Thick(ds, nslice),
-            m_gscale(gscale), m_mapsteps(mapsteps), m_id(SoftQuadrupoleData::next_id)
+            m_gscale(gscale), m_unit(unit), m_mapsteps(mapsteps), m_id(SoftQuadrupoleData::next_id)
         {
             // next created soft quad has another id for its data
             SoftQuadrupoleData::next_id++;
@@ -187,7 +189,7 @@ namespace SoftQuadrupoleData
             amrex::ParticleReal & AMREX_RESTRICT pt,
             [[maybe_unused]] RefPart const & refpart
         ) const
-        {
+	{
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
@@ -418,7 +420,11 @@ namespace SoftQuadrupoleData
             amrex::ParticleReal const pt = refpart.pt;
 
             // Define parameters and intermediate constants
-            amrex::ParticleReal const G0 = m_gscale;
+            // normalize quad units to MAD-X convention if needed
+            amrex::ParticleReal G0 = m_gscale;
+            if (m_unit == 1) {
+                  G0 = m_gscale / refpart.rigidity_Tm();
+            }
 
             // push the reference particle
             auto [bz, bzp, bzint] = Quad_Bfield(zeval);
@@ -462,7 +468,8 @@ namespace SoftQuadrupoleData
 
     private:
         amrex::ParticleReal m_gscale; //! scaling factor for quad field gradient
-        int m_mapsteps; //! number of map integration steps per slice
+        int m_unit; //! unit specification for quad strength
+	int m_mapsteps; //! number of map integration steps per slice
         int m_id; //! unique soft quad id used for data lookup map
 
         int m_ncoef = 0; //! number of Fourier coefficients
