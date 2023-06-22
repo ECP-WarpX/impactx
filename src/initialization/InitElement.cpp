@@ -71,11 +71,11 @@ namespace detail
         // Initialize the corresponding element according to its type
         if (element_type == "quad") {
             amrex::Real ds, k;
-	    int units = 0;
-	    int nslice = nslice_default;
+        int units = 0;
+        int nslice = nslice_default;
             pp_element.get("ds", ds);
             pp_element.get("k", k);
-	    pp_element.queryAdd("units", units);
+        pp_element.queryAdd("units", units);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( Quad(ds, k, units, nslice) );
         } else if (element_type == "drift") {
@@ -142,11 +142,11 @@ namespace detail
             m_lattice.emplace_back( RFCavity(ds, escale, freq, phase, cos_coef, sin_coef, mapsteps, nslice) );
         } else if (element_type == "solenoid") {
             amrex::Real ds, ks;
-	    int units = 0;
+        int units = 0;
             int nslice = nslice_default;
             pp_element.get("ds", ds);
             pp_element.get("ks", ks);
-	    pp_element.queryAdd("units", units);
+        pp_element.queryAdd("units", units);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( Sol(ds, ks, units, nslice) );
         } else if (element_type == "prot") {
@@ -156,7 +156,7 @@ namespace detail
             m_lattice.emplace_back( PRot(phi_in, phi_out) );
         } else if (element_type == "solenoid_softedge") {
             amrex::Real ds, bscale;
-	    int units = 0;
+        int units = 0;
             int nslice = nslice_default;
             int mapsteps = mapsteps_default;
             Sol_field_data bz;
@@ -164,7 +164,7 @@ namespace detail
             std::vector<amrex::ParticleReal> sin_coef = bz.default_sin_coef;
             pp_element.get("ds", ds);
             pp_element.get("bscale", bscale);
-	    pp_element.queryAdd("units", units);
+        pp_element.queryAdd("units", units);
             pp_element.queryAdd("mapsteps", mapsteps);
             pp_element.queryAdd("nslice", nslice);
             detail::queryAddResize(pp_element, "cos_coefficients", cos_coef);
@@ -172,7 +172,7 @@ namespace detail
             m_lattice.emplace_back( SoftSolenoid(ds, bscale, cos_coef, sin_coef, units, mapsteps, nslice) );
         } else if (element_type == "quadrupole_softedge") {
             amrex::Real ds, gscale;
-	    int units = 0;
+        int units = 0;
             int nslice = nslice_default;
             int mapsteps = mapsteps_default;
             Quad_field_data gz;
@@ -180,7 +180,7 @@ namespace detail
             std::vector<amrex::ParticleReal> sin_coef = gz.default_sin_coef;
             pp_element.get("ds", ds);
             pp_element.get("gscale", gscale);
-	    pp_element.queryAdd("units", units);
+        pp_element.queryAdd("units", units);
             pp_element.queryAdd("mapsteps", mapsteps);
             pp_element.queryAdd("nslice", nslice);
             detail::queryAddResize(pp_element, "cos_coefficients", cos_coef);

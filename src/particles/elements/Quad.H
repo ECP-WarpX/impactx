@@ -55,7 +55,7 @@ namespace impactx
 
         /** This is a quad functor, so that a variable of this type can be used like a quad function.
          *
-	 * @param p Particle AoS data for positions and cpu/id
+     * @param p Particle AoS data for positions and cpu/id
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t

@@ -129,15 +129,15 @@ namespace SoftSolenoidData
          * @param sin_coef sine coefficients in Fourier expansion of on-axis magnetic field Bz
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
-         * @param unit units describing normalization of gscale input	 
-	 * @param nslice number of slices used for the application of space charge
+         * @param unit units describing normalization of gscale input
+     * @param nslice number of slices used for the application of space charge
          */
         SoftSolenoid (
             amrex::ParticleReal ds,
             amrex::ParticleReal bscale,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
-	    int unit = 0,
+        int unit = 0,
             int mapsteps = 1,
             int nslice = 1
         )
@@ -530,7 +530,7 @@ namespace SoftSolenoidData
     private:
         amrex::ParticleReal m_bscale; //! scaling factor for solenoid Bz field
         int m_unit; //! unit specification for solenoid Bz field
-	int m_mapsteps; //! number of map integration steps per slice
+    int m_mapsteps; //! number of map integration steps per slice
         int m_id; //! unique soft solenoid id used for data lookup map
 
         int m_ncoef = 0; //! number of Fourier coefficients

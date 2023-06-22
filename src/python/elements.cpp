@@ -254,7 +254,7 @@ void init_elements(py::module& m)
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
-		int const,
+        int const,
                 int const>(),
              py::arg("ds"), py::arg("k"), py::arg("units") = 0, py::arg("nslice") = 1,
              "A Quadrupole magnet."
@@ -304,7 +304,7 @@ void init_elements(py::module& m)
                  amrex::ParticleReal const,
                  std::vector<amrex::ParticleReal>,
                  std::vector<amrex::ParticleReal>,
-		 int const,
+         int const,
                  int const,
                  int const>(),
              py::arg("ds"), py::arg("bscale"),
@@ -318,7 +318,7 @@ void init_elements(py::module& m)
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
-		int const,
+        int const,
                 int const>(),
              py::arg("ds"), py::arg("ks"), py::arg("units") = 0, py::arg("nslice") = 1,
              "An ideal hard-edge Solenoid magnet."
@@ -341,7 +341,7 @@ void init_elements(py::module& m)
                  std::vector<amrex::ParticleReal>,
                  std::vector<amrex::ParticleReal>,
                  int,
-		 int,
+         int,
                  int
              >(),
              py::arg("ds"), py::arg("gscale"),

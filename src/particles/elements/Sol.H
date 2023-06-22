@@ -40,7 +40,7 @@ namespace impactx
          * @param unit  Unit specification
          *           unit = 0 MADX convention (default)
          *           unit = 1 MaryLie convention
-	 * @param nslice number of slices used for the application of space charge
+     * @param nslice number of slices used for the application of space charge
          */
         Sol( amrex::ParticleReal const ds, amrex::ParticleReal const ks,
               int const unit, int const nslice )
@@ -170,7 +170,7 @@ namespace impactx
 
     private:
         amrex::ParticleReal m_ks; //! solenoid strength in 1/m (or T)
-	int m_unit; //! unit specification for solenoid strength
+    int m_unit; //! unit specification for solenoid strength
     };
 
 } // namespace impactx

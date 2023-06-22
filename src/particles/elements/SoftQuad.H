@@ -122,7 +122,7 @@ namespace SoftQuadrupoleData
          * @param gscale Scaling factor for on-axis field gradient Bz in 1/m^2 (unit=0) or T/m (unit=1)
          * @param cos_coef cosine coefficients in Fourier expansion of on-axis magnetic field Bz
          * @param sin_coef sine coefficients in Fourier expansion of on-axis magnetic field Bz
-	 * @param unit units describing normalization of gscale input
+     * @param unit units describing normalization of gscale input
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
@@ -132,7 +132,7 @@ namespace SoftQuadrupoleData
             amrex::ParticleReal gscale,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
-	    int unit = 0,
+        int unit = 0,
             int mapsteps = 1,
             int nslice = 1
         )
@@ -189,7 +189,7 @@ namespace SoftQuadrupoleData
             amrex::ParticleReal & AMREX_RESTRICT pt,
             [[maybe_unused]] RefPart const & refpart
         ) const
-	{
+    {
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
@@ -469,7 +469,7 @@ namespace SoftQuadrupoleData
     private:
         amrex::ParticleReal m_gscale; //! scaling factor for quad field gradient
         int m_unit; //! unit specification for quad strength
-	int m_mapsteps; //! number of map integration steps per slice
+    int m_mapsteps; //! number of map integration steps per slice
         int m_id; //! unique soft quad id used for data lookup map
 
         int m_ncoef = 0; //! number of Fourier coefficients
