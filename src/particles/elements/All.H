@@ -10,6 +10,7 @@
 #ifndef IMPACTX_ELEMENTS_ALL_H
 #define IMPACTX_ELEMENTS_ALL_H
 
+#include "CFbend.H"
 #include "ChrDrift.H"
 #include "ChrQuad.H"
 #include "ChrUniformAcc.H"
@@ -39,7 +40,8 @@ namespace impactx
 {
     using KnownElements = std::variant<
         None, /* must be first, so KnownElements creates a default constructor */
-        ChrAcc,
+        CFbend,
+  	ChrAcc,
         ChrDrift,
         ChrQuad,
         ConstF,
@@ -47,7 +49,7 @@ namespace impactx
         DipEdge,
         Drift,
         ExactDrift,
-    ExactSbend,
+        ExactSbend,
         Multipole,
         NonlinearLens,
         Programmable,
