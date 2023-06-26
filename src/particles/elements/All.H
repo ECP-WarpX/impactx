@@ -41,7 +41,7 @@ namespace impactx
     using KnownElements = std::variant<
         None, /* must be first, so KnownElements creates a default constructor */
         CFbend,
-    ChrAcc,
+        ChrAcc,
         ChrDrift,
         ChrQuad,
         ConstF,
