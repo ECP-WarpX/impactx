@@ -235,6 +235,21 @@ Lattice Elements
 * ``<element_name>.type`` (``string``)
     Indicates the element type for this lattice element. This should be one of:
 
+         * ``cfbend`` for a combined function bending magnet. This requires these additional parameters:
+
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
+
+            * ``<element_name>.rc`` (``float``, in meters) the bend radius
+
+            * ``<element_name>.k`` (``float``, in inverse meters squared) the quadrupole strength
+
+                = (magnetic field gradient in T/m) / (magnetic rigidity in T-m)
+
+              * k > 0 horizontal focusing
+              * k < 0 horizontal defocusing
+
+            * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
+
         * ``drift`` for a free drift. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
