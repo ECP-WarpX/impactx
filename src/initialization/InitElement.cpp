@@ -94,7 +94,7 @@ namespace detail
             int nslice = nslice_default;
             pp_element.get("ds", ds);
             pp_element.get("rc", rc);
-	    pp_element.get("k", k);
+        pp_element.get("k", k);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( CFbend(ds, rc, k, nslice) );
         } else if (element_type == "dipedge") {
