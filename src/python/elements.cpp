@@ -292,13 +292,13 @@ void init_elements(py::module& m)
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
-		amrex::ParticleReal const,
+        amrex::ParticleReal const,
                 int const>(),
              py::arg("ds"), py::arg("rc"), py::arg("k"), py::arg("nslice") = 1,
              "An ideal combined function bend (sector bend with quadrupole component)."
-        )    
-    ;        
-        
+        )
+    ;
+
     py::class_<ShortRF, elements::Thin>(me, "ShortRF")
         .def(py::init<
                 amrex::ParticleReal const,
