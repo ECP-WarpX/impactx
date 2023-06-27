@@ -43,7 +43,6 @@ jobs:
         brew install --overwrite python
         brew install adios2
         brew install ccache
-        brew install cmake
         brew install hdf5-mpi
         brew install libomp
         brew link --force libomp
@@ -55,6 +54,8 @@ jobs:
         python3 -m pip install -r requirements_mpi.txt
         python3 -m pip install -r examples/requirements.txt
         python3 -m pip install --upgrade openPMD-validator
+        python3 -m pip install --upgrade pipx
+        python3 -m pip install cmake
         set -e
     - name: CCache Cache
       uses: actions/cache@v3
