@@ -43,6 +43,7 @@ jobs:
         brew install --overwrite python
         brew install adios2
         brew install ccache
+        brew install cmake
         brew install hdf5-mpi
         brew install libomp
         brew link --force libomp
