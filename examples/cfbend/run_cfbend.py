@@ -32,12 +32,12 @@ ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_energy_MeV(energy_MeV)
 
 #   particle bunch
 distr = distribution.Waterbag(
-    sigmaX=5.0e-6,  #5 um
-    sigmaY=8.0e-6,  #8 um
-    sigmaT=0.0599584916,  #200 ps
-    sigmaPx=2.5543422003e-9, #exn = 50 pm-rad
-    sigmaPy=1.5964638752e-9, #eyn = 50 pm-rad
-    sigmaPt=9.0e-4,  #approximately dE/E
+    sigmaX=5.0e-6,  # 5 um
+    sigmaY=8.0e-6,  # 8 um
+    sigmaT=0.0599584916,  # 200 ps
+    sigmaPx=2.5543422003e-9,  # exn = 50 pm-rad
+    sigmaPy=1.5964638752e-9,  # eyn = 50 pm-rad
+    sigmaPt=9.0e-4,  # approximately dE/E
     muxpx=0.0,
     muypy=0.0,
     mutpt=0.0,
@@ -51,9 +51,9 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 ns = 25  # number of slices per ds in the element
 
 bend = [
-   monitor,
-   elements.CFbend(ds=0.5, rc=7.613657587094493, k=-7.057403, nslice=ns),
-   monitor,
+    monitor,
+    elements.CFbend(ds=0.5, rc=7.613657587094493, k=-7.057403, nslice=ns),
+    monitor,
 ]
 
 # assign a lattice segment

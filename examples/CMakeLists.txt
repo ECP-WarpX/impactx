@@ -583,4 +583,3 @@ add_impactx_test(cfbend.py
     examples/cfbend/analysis_cfbend.py
     OFF  # no plot script yet
 )
-

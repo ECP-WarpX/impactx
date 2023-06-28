@@ -4,7 +4,7 @@ Combined Function Bend
 =======================
 
 A single combined function bending magnet (an ideal sector bend with an upright quadrupole field component added).  The magnet
-parameters are based a single CSBEND element appearing in the ELEGANT input file for the ALS-U lattice. 
+parameters are based a single CSBEND element appearing in the ELEGANT input file for the ALS-U lattice.
 
 The beam parameters are based on:
 C. Steier et al, "Status of the Conceptual Design of ALS-U", IPAC2017, WEPAB104 (2017).
@@ -45,4 +45,3 @@ We run the following script to analyze correctness:
    .. literalinclude:: analysis_cfbend.py
       :language: python3
       :caption: You can copy this file from ``examples/cfbend/analysis_cfbend.py``.
-
