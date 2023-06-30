@@ -565,3 +565,21 @@ add_impactx_test(cyclotron.py
     examples/cyclotron/analysis_cyclotron.py
     OFF  # no plot script yet
 )
+
+# Combined-function bend ########################################################
+#
+# w/o space charge
+add_impactx_test(cfbend
+    examples/cfbend/input_cfbend.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/cfbend/analysis_cfbend.py
+    OFF  # no plot script yet
+)
+add_impactx_test(cfbend.py
+    examples/cfbend/run_cfbend.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/cfbend/analysis_cfbend.py
+    OFF  # no plot script yet
+)

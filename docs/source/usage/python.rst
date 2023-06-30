@@ -410,6 +410,18 @@ This module provides elements for the accelerator lattice.
       :param madx_file: file name to MAD-X file with beamline elements
       :param nslice: number of slices used for the application of space charge
 
+.. py:class:: impactx.elements.CFbend(ds, rc, k, nslice=1)
+
+   A combined function bending magnet.  This is an ideal Sbend with a normal quadrupole field component.
+
+   :param ds: Segment length in m.
+   :param rc: Radius of curvature in m.
+   :param k:  Quadrupole strength in m^(-2) (MADX convention)
+              = (gradient in T/m) / (rigidity in T-m)
+              k > 0 horizontal focusing
+              k < 0 horizontal defocusing
+   :param nslice: number of slices used for the application of space charge
+
 .. py:class:: impactx.elements.ConstF(ds, kx, ky, kt, nslice=1)
 
    A linear Constant Focusing element.

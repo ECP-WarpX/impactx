@@ -89,6 +89,14 @@ namespace detail
             pp_element.get("rc", rc);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( Sbend(ds, rc, nslice) );
+        } else if (element_type == "cfbend") {
+            amrex::Real ds, rc, k;
+            int nslice = nslice_default;
+            pp_element.get("ds", ds);
+            pp_element.get("rc", rc);
+        pp_element.get("k", k);
+            pp_element.queryAdd("nslice", nslice);
+            m_lattice.emplace_back( CFbend(ds, rc, k, nslice) );
         } else if (element_type == "dipedge") {
             amrex::Real psi, rc, g, K2;
             pp_element.get("psi", psi);

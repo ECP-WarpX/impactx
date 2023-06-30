@@ -1,0 +1,47 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.energy = 2.0e3  #2 GeV
+beam.charge = 1.0e-9
+beam.particle = electron
+beam.distribution = waterbag
+beam.sigmaX = 5.0e-6  #5 um
+beam.sigmaY = 8.0e-6  #8 um
+beam.sigmaT = 0.0599584916  #200 ps
+beam.sigmaPx = 2.5543422003e-9 #exn = 50 pm-rad
+beam.sigmaPy = 1.5964638752e-9 #eyn = 50 pm-rad
+beam.sigmaPt = 9.0e-4  #approximately dE/E
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor cfbend1 monitor
+
+lattice.nslice = 25
+
+cfbend1.type = cfbend
+cfbend1.ds = 0.5       # projected length 0.5 m, angle 3.76 deg
+cfbend1.rc = 7.613657587094493   # bending radius [m]
+cfbend1.k = -7.057403   # (upright) quadrupole component [m^(-2)]
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = false
