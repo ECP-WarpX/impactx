@@ -7,7 +7,7 @@ A single combined function bending magnet (an ideal sector bend with an upright 
 parameters are based a single CSBEND element appearing in the ELEGANT input file for the ALS-U lattice.
 
 The beam parameters are based on:
-C. Steier et al, "Status of the Conceptual Design of ALS-U", IPAC2017, WEPAB104 (2017).
+C. Steier et al, "Status of the Conceptual Design of ALS-U", IPAC2017, WEPAB104, `DOI:10.18429/JACoW-IPAC2017-WEPAB104 <https://doi.org/10.18429/JACoW-IPAC2017-WEPAB104>`__ (2017).
 
 A 2 GeV electron bunch with normalized transverse rms emittance of 50 pm undergoes a 3.76 deg bend.
 
