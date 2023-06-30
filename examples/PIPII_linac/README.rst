@@ -5,7 +5,7 @@ The Fermilab PIP-II Linac
 
 A version of the lattice of Fermilab's PIP-II linac, describing acceleration of a 5 mA H- / proton beam from 2.1 MeV to 800 MeV.
 
-This lattice describes propagation from the exit of the RFQ to the entry of the Booster. 
+This lattice describes propagation from the exit of the RFQ to the entry of the Booster.
 
 This file was converted from TraceWin input using a Jupyter notebook, whose corresponding script is given as "parse_lattice.py".
 

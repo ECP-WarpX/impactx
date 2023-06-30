@@ -23,11 +23,10 @@ get_ipython().run_line_magic('autoreload', '2')
 
 from tracewin import parsers
 
-
 # In[3]:
 
 
-# These are the elements that are assigned for parsing. 
+# These are the elements that are assigned for parsing.
 # Note that there are more elements in tracewin.elements
 parsers.ele_parser
 
@@ -49,7 +48,7 @@ for line in LINES:
         print('end found')
         break
     eles.append(ele)
-    
+
 # Complete set
 set(ele.ele_type for ele in eles)
 
@@ -62,7 +61,7 @@ eles[0:50]
 
 
 # # as TraceWin
-# 
+#
 # Call the `.as_tracewin` method on each element to reproduce the original input.
 
 # In[8]:
@@ -90,31 +89,31 @@ def chunks(lst, n):
 
 
 def impactx_lines(eles):
-    
+
     idrift = 0
     iquad = 0
     irfcavity = 0
     isolenoid = 0
     ifieldmap = 0
     isteer = 0
-    
+
     lines = []
     names = []
     freq = 0
-    
+
     for ele in eles:
         t = ele.ele_type
-        
+
         if t == 'drift':
             idrift += 1
             name = f'D{idrift}'
             line = f'{name}.type = drift \n{name}.ds = {ele.L/1000} \n'
-            
+
         elif t == 'quad':
             iquad += 1
             name = f'Q{iquad}'
             line = f'{name}.type = quad \n{name}.ds = {ele.L/1000} \n{name}.k = {ele.G} \n'
-            
+
         elif t == 'field_map':
             if ele.geom == 7700:
                 irfcavity += 1
@@ -129,26 +128,26 @@ def impactx_lines(eles):
                 name = 'BAD'
                 line = ''
                 continue
-            
+
         #elif t =='thin_steering':
         #    isteer += 1
         #    name = f'K{isteer}'
         #    line = f'{name}: kicker, L = 0'
-        
+
         elif t == 'freq':
             freq = ele.f
             continue
-            
+
         else:
             name = 'BAD'
             line = ''
             continue
-               
-         
+
+
         # Collect
         lines.append(line)
         names.append(name)
-    
+
     latlines = []
     for c in chunks(names, 8):
         line = ' '.join(c)
@@ -158,9 +157,9 @@ def impactx_lines(eles):
     latline += ' '
 
     lines.append(latline)
-    
+
     return lines
-            
+
 impactx_lines(eles);
 
 
@@ -179,7 +178,7 @@ get_ipython().system('head test.impactx')
 
 
 # # Fieldmaps
-# 
+#
 # TODO
 
 # In[49]:
@@ -216,7 +215,7 @@ gkeys = ('static electric field',
 def parse_geom(geom):
     return dict(zip(gkeys, list(reversed(f'{geom:05}'))))
 
-parse_geom(7700)    
+parse_geom(7700)
 
 
 # In[53]:
@@ -239,7 +238,3 @@ get_ipython().system('rm test.impactx')
 
 
 # In[ ]:
-
-
-
-
