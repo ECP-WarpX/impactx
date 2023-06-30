@@ -1,3 +1,4 @@
+###############################################################################
 # Particle Beam(s)
 ###############################################################################
 beam.npart = 10000
@@ -27,7 +28,7 @@ lattice.nslice = 25
 cfbend1.type = cfbend
 cfbend1.ds = 0.5       # projected length 0.5 m, angle 3.76 deg
 cfbend1.rc = 7.613657587094493   # bending radius [m]
-cfbend1.k = -7.057403   #(upright) quadrupole component [m^(-2)]
+cfbend1.k = -7.057403   # (upright) quadrupole component [m^(-2)]
 
 monitor.type = beam_monitor
 monitor.backend = h5

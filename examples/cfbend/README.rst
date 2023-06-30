@@ -1,7 +1,7 @@
 .. _examples-cfbend:
 
 Combined Function Bend
-=======================
+======================
 
 A single combined function bending magnet (an ideal sector bend with an upright quadrupole field component added).  The magnet
 parameters are based a single CSBEND element appearing in the ELEGANT input file for the ALS-U lattice.
