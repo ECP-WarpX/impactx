@@ -257,6 +257,11 @@ namespace detail
             }
         }
 
+        // beam mass
+        beam.setAttribute( "mass", ref_part.mass );
+        beam.setAttribute( "beta_ref", ref_part.beta() );
+        beam.setAttribute( "gamma_ref", ref_part.gamma() );
+
         // openPMD coarse position
         {
             beam["positionOffset"]["x"].resetDataset(d_fl);
