@@ -35,7 +35,7 @@ namespace impactx
         /** A thin collimator element that applies a transverse aperture boundary.
          *  Particles outside the boundary are considered lost.
          *
-         * @param type aperture type (0 rectangular, 1 elliptical)
+         * @param shape aperture shape (0 rectangular, 1 elliptical)
          * @param xmax maximum value of horizontal coordinate (m)
          * @param ymax maximum value of vertical coordinate (m)
          */
@@ -61,9 +61,9 @@ namespace impactx
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
                 PType& AMREX_RESTRICT p,
-        amrex::ParticleReal & AMREX_RESTRICT px,
-                amrex::ParticleReal & AMREX_RESTRICT py,
-                amrex::ParticleReal & AMREX_RESTRICT pt,
+                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT px,
+                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT py,
+                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT pt,
                 [[maybe_unused]] RefPart const & refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
@@ -85,7 +85,7 @@ namespace impactx
                case(0) :
                   if (pow(u,2)>1 || pow(v,2)>1){
                      p.pos(RealAoS::x) = 0.0_prt; //replace with id change of sign
-             p.pos(RealAoS::y) = 0.0_prt; //replace with id change of sign
+                     p.pos(RealAoS::y) = 0.0_prt; //replace with id change of sign
                   }
 
            // elliptical aperture
