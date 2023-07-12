@@ -123,6 +123,18 @@ void init_elements(py::module& m)
 
     // beam optics
 
+    py::class_<Aperture, elements::Thin> py_Aperture(me, "Aperture");
+    py_Aperture
+        .def(py::init<
+        int,
+                amrex::ParticleReal const,
+                amrex::ParticleReal const>(),
+             py::arg("shape") = 0, py::arg("xmax"), py::arg("ymax"),
+             "A short collimator element applying a transverse aperture boundary."
+        )
+    ;
+    register_beamoptics_push(py_Aperture);
+
     py::class_<ChrDrift, elements::Thick> py_ChrDrift(me, "ChrDrift");
     py_ChrDrift
         .def(py::init<

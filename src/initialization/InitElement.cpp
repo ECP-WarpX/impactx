@@ -248,6 +248,13 @@ namespace detail
                 Kicker::UnitSystem::dimensionless :
                 Kicker::UnitSystem::Tm;
             m_lattice.emplace_back( Kicker(xkick, ykick, units) );
+        } else if (element_type == "aperture") {
+            amrex::Real xmax, ymax;
+            int shape = 0;
+            pp_element.get("xmax", xmax);
+	        pp_element.get("ymax", ymax);
+            pp_element.queryAdd("shape", shape);
+            m_lattice.emplace_back( Aperture(shape, xmax, ymax) );
         } else if (element_type == "beam_monitor") {
             std::string openpmd_name = element_name;
             pp_element.queryAdd("name", openpmd_name);
