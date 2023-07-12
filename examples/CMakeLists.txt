@@ -619,6 +619,7 @@ add_impactx_test(kicker.py
     examples/kicker/analysis_kicker.py
     OFF  # no plot script yet
 )
+
 # copy MAD-X lattice file
 file(COPY ${ImpactX_SOURCE_DIR}/examples/kicker/kicker.madx
         DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kicker_madx.py)
@@ -655,5 +656,23 @@ add_impactx_test(thin_dipole.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/thin_dipole/analysis_thin_dipole.py
+    OFF  # no plot script yet
+)
+
+# Aperture collimation ############################################################
+#
+# w/o space charge
+add_impactx_test(aperture
+    examples/aperture/input_aperture.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/aperture/analysis_aperture.py
+    OFF  # no plot script yet
+)
+add_impactx_test(aperture.py
+    examples/aperture/run_aperture.py
+      OFF  # ImpactX MPI-parallel
+      ON  # ImpactX Python interface
+    examples/aperture/analysis_aperture.py
     OFF  # no plot script yet
 )
