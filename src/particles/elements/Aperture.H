@@ -82,18 +82,20 @@ namespace impactx
             switch(m_shape) {
 
            // rectangular aperture (default)
-               case(0) :
+               case 0 :
                   if (pow(u,2)>1 || pow(v,2)>1){
                      p.pos(RealAoS::x) = 0.0_prt; //replace with id change of sign
                      p.pos(RealAoS::y) = 0.0_prt; //replace with id change of sign
                   }
+                  break;
 
            // elliptical aperture
-               case(1) :
+               case 1 :
                   if (pow(u,2)+pow(v,2)>1){
                      p.pos(RealAoS::x) = 0.0_prt; //replace with id change of sign
                      p.pos(RealAoS::y) = 0.0_prt; //replace with id change of sign
                   }
+                  break;
 
             }
 
