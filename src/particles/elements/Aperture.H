@@ -71,6 +71,7 @@ namespace impactx
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
             amrex::ParticleReal const y = p.pos(RealAoS::y);
+            int const id = p.id();
             //uint64_t const global_id = ablastr::particles::localIDtoGlobal(p.id(), p.cpu());
 
             // scale horizontal and vertical coordinates
@@ -86,6 +87,7 @@ namespace impactx
                   if (pow(u,2)>1 || pow(v,2)>1){
                      p.pos(RealAoS::x) = 0.0_prt; //replace with id change of sign
                      p.pos(RealAoS::y) = 0.0_prt; //replace with id change of sign
+                     p.id() = -id;
                   }
                   break;
 
@@ -94,6 +96,7 @@ namespace impactx
                   if (pow(u,2)+pow(v,2)>1){
                      p.pos(RealAoS::x) = 0.0_prt; //replace with id change of sign
                      p.pos(RealAoS::y) = 0.0_prt; //replace with id change of sign
+                     p.id() = -id;
                   }
                   break;
 
