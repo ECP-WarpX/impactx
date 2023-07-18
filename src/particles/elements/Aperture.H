@@ -39,9 +39,9 @@ namespace impactx
          * @param xmax maximum value of horizontal coordinate (m)
          * @param ymax maximum value of vertical coordinate (m)
          */
-        Aperture( int const shape,
-                   amrex::ParticleReal const xmax,
-                   amrex::ParticleReal const ymax )
+        Aperture(  amrex::ParticleReal const xmax,
+                   amrex::ParticleReal const ymax,
+                   int const shape)
         : m_shape(shape), m_xmax(xmax), m_ymax(ymax)
         {
         }
