@@ -9,6 +9,7 @@
  */
 #include "PoissonSolve.H"
 
+#include <ablastr/constant.H>
 #include <ablastr/fields/PoissonSolver.H>
 
 #include <AMReX_BLProfiler.H>
@@ -103,7 +104,8 @@ namespace impactx::spacecharge
 
         // fix side effect on rho from previous call
         for (int lev=0; lev<=finest_level; lev++) {
-            rho[lev].mult(-1._rt * PhysConst::ep0);
+            using namespace ablastr::constant::SI;
+            rho[lev].mult(-1._rt * ep0);
         }
 
         // fill boundary
