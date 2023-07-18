@@ -10,6 +10,11 @@
 #include "PoissonSolve.H"
 
 #include <ablastr/constant.H>
+/* work-around for https://github.com/ECP-WarpX/WarpX/pull/4090 in ABLASTR 23.07 */
+namespace PhysConst
+{
+    using namespace ablastr::constant::SI;
+}
 #include <ablastr/fields/PoissonSolver.H>
 
 #include <AMReX_BLProfiler.H>
