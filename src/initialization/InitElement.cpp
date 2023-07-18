@@ -252,9 +252,9 @@ namespace detail
             amrex::Real xmax, ymax;
             int shape = 0;
             pp_element.get("xmax", xmax);
-	        pp_element.get("ymax", ymax);
+            pp_element.get("ymax", ymax);
             pp_element.queryAdd("shape", shape);
-            m_lattice.emplace_back( Aperture(shape, xmax, ymax) );
+            m_lattice.emplace_back( Aperture(xmax, ymax, shape) );
         } else if (element_type == "beam_monitor") {
             std::string openpmd_name = element_name;
             pp_element.queryAdd("name", openpmd_name);

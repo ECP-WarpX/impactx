@@ -1,7 +1,7 @@
 .. _examples-aperture:
 
-Aperture collimation
-=====================
+Aperture Collimation
+====================
 
 Proton beam undergoing collimation by a rectangular boundary aperture.
 

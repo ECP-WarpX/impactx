@@ -49,7 +49,7 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 sim.lattice.extend(
     [
         monitor,
-        elements.Aperture(shape=0, xmax=1.0e-3, ymax=1.5e-3),
+        elements.Aperture(xmax=1.0e-3, ymax=1.5e-3, shape=0),
         monitor,
     ]
 )
