@@ -128,8 +128,9 @@ void init_elements(py::module& m)
         .def(py::init<
         int,
                 amrex::ParticleReal const,
-                amrex::ParticleReal const>(),
-             py::arg("shape") = 0, py::arg("xmax"), py::arg("ymax"),
+                amrex::ParticleReal const,
+                int>(),
+             py::arg("xmax"), py::arg("ymax"), py::arg("shape") = 0
              "A short collimator element applying a transverse aperture boundary."
         )
     ;
