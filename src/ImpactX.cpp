@@ -50,7 +50,7 @@ namespace impactx
     {
         BL_PROFILE("ImpactX::initGrids");
 
-        // n_cells has been set using dummy values earlier. We now know the true value of
+        // n_cells has been set using temporary values earlier. We now know the true value of
         // n_cells, so we recompute the Geometry objects for each level here *if* the user
         // has set n_cells in the inputs file
         {
