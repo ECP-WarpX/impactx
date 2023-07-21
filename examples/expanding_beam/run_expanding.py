@@ -9,12 +9,10 @@
 import amrex.space3d as amr
 from impactx import ImpactX, RefPart, distribution, elements
 
-pp_amr = amr.ParmParse("amr")
-pp_amr.addarr("n_cell", [56, 56, 48])
-
 sim = ImpactX()
 
 # set numerical parameters and IO control
+sim.n_cell = [56, 56, 48]
 sim.particle_shape = 2  # B-spline order
 sim.space_charge = True
 sim.dynamic_size = True
