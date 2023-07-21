@@ -21,24 +21,21 @@ def test_charge_deposition(save_png=True):
     """
     Deposit charge and access/plot it
     """
-    pp_amr = amr.ParmParse("amr")
-    pp_amr.addarr("n_cell", [16, 24, 32])
-
     sim = impactx.ImpactX()
 
-    assert sim.n_cell == [16, 24, 32]
-
+    sim.n_cell = [16, 24, 32]
     sim.load_inputs_file("examples/fodo/input_fodo.in")
     sim.space_charge = True
     sim.slice_step_diagnostics = False
 
     # Future:
-    # sim.ncell = [25, 25, 45]
     # sim.domain = amr.RealBox([1., 2., 3.], [4., 5., 6.])
     print(f"sim.n_cell={sim.n_cell}")
     print(f"sim.domain={sim.domain}")
 
     sim.init_grids()
+    assert sim.n_cell == [16, 24, 32]
+
     sim.init_beam_distribution_from_inputs()
     sim.init_lattice_elements_from_inputs()
 
