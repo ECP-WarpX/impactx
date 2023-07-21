@@ -50,6 +50,28 @@ namespace impactx
     {
         BL_PROFILE("ImpactX::initGrids");
 
+        // n_cells has been set using dummy values earlier. We now know the true value of
+        // n_cells, so we recompute the Geometry objects for each level here *if* the user
+        // has set n_cells in the inputs file
+        {
+            amrex::Vector<int> n_cell(AMREX_SPACEDIM);
+            amrex::ParmParse pp_amr("amr");
+            pp_amr.queryarr("n_cell", n_cell);
+
+            amrex::IntVect lo(amrex::IntVect::TheZeroVector()), hi(n_cell);
+            hi -= amrex::IntVect::TheUnitVector();
+            amrex::Box index_domain(lo,hi);
+            for (int i = 0; i <= max_level; i++)
+            {
+                geom[i].Domain(index_domain);
+                if (i < max_level) {
+                    index_domain.refine(ref_ratio[i]);
+                }
+            }
+        }
+
+        // the particle container has been set to track the same Geometry as ImpactX
+
         // this is the earliest point that we need to know the particle shape,
         // so that we can initialize the guard size of our MultiFabs
         m_particle_container->SetParticleShape();
