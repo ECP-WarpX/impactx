@@ -40,7 +40,7 @@ One can set the number of slice steps through each lattice element for the appli
 
 
 Coordinates and Units
-----------------------
+---------------------
 
 Each particle in the beam is described at fixed :math:`s` by a set of 6 canonical phase space variables (x [m], px, y [m], py, t [m], pt).  Coordinates x and y denote the horizontal and
 vertical displacement from the reference particle, respectively, and describe motion in the plane transverse to the velocity of the reference particle.  The longitudinal coordinate t
