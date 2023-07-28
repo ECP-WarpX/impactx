@@ -240,15 +240,9 @@ def test_impactx_change_resolution():
     This is currently a work-around because we cannot yet change the cells
     after the simulation object as been created.
     """
-    pp_amr = amr.ParmParse("amr")
-    pp_amr.addarr("n_cell", [16, 24, 32])
-
     sim = ImpactX()
 
-    # Future:
-    # sim.ncell = [16, 24, 32]
-    # sim.domain = amr.RealBox([1., 2., 3.], [4., 5., 6.])
-
+    sim.n_cell = [16, 24, 32]
     sim.particle_shape = 2
     sim.slice_step_diagnostics = False
     sim.diagnostics = False

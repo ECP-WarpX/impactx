@@ -9,12 +9,10 @@
 import amrex.space3d as amr
 from impactx import ImpactX, distribution, elements
 
-pp_amr = amr.ParmParse("amr")
-pp_amr.addarr("n_cell", [48, 48, 40])  # use [72, 72, 72] for increased precision
-
 sim = ImpactX()
 
 # set numerical parameters and IO control
+sim.n_cell = [48, 48, 40]  # use [72, 72, 72] for increased precision
 sim.particle_shape = 2  # B-spline order
 sim.space_charge = True
 # sim.diagnostics = False  # benchmarking

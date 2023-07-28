@@ -88,9 +88,8 @@ namespace details
     {
         amrex::ParmParse pp_amr("amr");
 
-        // Domain index space
-        amrex::Vector<int> n_cell;
-        pp_amr.getarr("n_cell", n_cell);
+        // Domain index space - we use temporary values here, then fix later
+        amrex::Vector<int> n_cell = {AMREX_D_DECL(256,256,256)};
         amrex::Box domain(amrex::IntVect(0), amrex::IntVect(n_cell));
 
         // Domain physical size

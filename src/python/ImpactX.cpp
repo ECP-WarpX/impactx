@@ -83,13 +83,13 @@ void init_ImpactX (py::module& m)
                 pp_amr.getarr("n_cell", n_cell);
                 return n_cell;
             },
-            [](ImpactX & /* ix */, std::array<int, AMREX_SPACEDIM> /* n_cell */) {
-                throw std::runtime_error("setting n_cell is not yet implemented");
-                /*
+            [](ImpactX & /* ix */, std::array<int, AMREX_SPACEDIM> n_cell) {
                 amrex::ParmParse pp_amr("amr");
                 amrex::Vector<int> const n_cell_v(n_cell.begin(), n_cell.end());
                 pp_amr.addarr("n_cell", n_cell_v);
 
+                // note, this must be done *before* initGrids is called
+                /*
                 int const max_level = ix.maxLevel();
                 for (int lev=0; lev<=max_level; lev++) {
                     ix.ClearLevel(lev);
