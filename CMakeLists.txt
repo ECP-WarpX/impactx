@@ -154,11 +154,11 @@ endif()
 if(ImpactX_PYTHON)
     add_library(pyImpactX MODULE src/python/pyImpactX.cpp)
     add_library(ImpactX::pyImpactX ALIAS pyImpactX)
-    if(BUILD_SHARED_LIBS OR NOT WIN32)
+    #if(BUILD_SHARED_LIBS OR NOT WIN32)
         target_link_libraries(pyImpactX PRIVATE lib)
-    else()
-        target_link_libraries(pyImpactX PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,lib>")  # CMake 3.24+
-    endif()
+    #else()
+    #    target_link_libraries(pyImpactX PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,lib>")  # CMake 3.24+
+    #endif()
     set(_BUILDINFO_SRC pyImpactX)
     list(APPEND _ALL_TARGETS pyImpactX)
 
