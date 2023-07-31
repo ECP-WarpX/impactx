@@ -1,4 +1,4 @@
-target_sources(ImpactX
+target_sources(lib
   PRIVATE
     ChargeDeposition.cpp
     ImpactXParticleContainer.cpp

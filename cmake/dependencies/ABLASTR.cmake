@@ -63,7 +63,7 @@ macro(find_ablastr)
         set(WarpX_IPO ${ImpactX_IPO} CACHE INTERNAL "" FORCE)
 
         # shared libs, i.e. for Python bindings, need relocatable code
-        if(ImpactX_PYTHON OR (ImpactX_LIB AND BUILD_SHARED_LIBS))
+        if(ImpactX_PYTHON OR BUILD_SHARED_LIBS)
             set(AMReX_PIC ON CACHE INTERNAL
                 "Build AMReX with position independent code")
             set(ABLASTR_POSITION_INDEPENDENT_CODE ON CACHE INTERNAL
