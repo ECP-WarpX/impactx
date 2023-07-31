@@ -14,6 +14,8 @@
 #include "particles/elements/All.H"
 #include "particles/ImpactXParticleContainer.H"
 
+#include "export.H"
+
 #include <AMReX_AmrCore.H>
 #include <AMReX_MultiFab.H>
 
@@ -28,7 +30,7 @@ namespace impactx
      *
      * This is the central ImpactX simulation class
      */
-    class ImpactX final
+    class IMPACTX_EXPORT ImpactX final
         : public amrex::AmrCore
     {
       public:

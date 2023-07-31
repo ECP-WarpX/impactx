@@ -13,6 +13,8 @@
 #include "particles/elements/mixin/thin.H"
 #include "particles/ImpactXParticleContainer.H"
 
+#include "export.H"
+
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
 
@@ -59,7 +61,7 @@ namespace detail
      * This class behaves like a singleton if constructed with the
      * same series name as an existing instance.
      */
-    struct BeamMonitor
+    struct IMPACTX_EXPORT BeamMonitor
     : public elements::Thin
     {
         static constexpr auto name = "BeamMonitor";

@@ -249,7 +249,7 @@ function(impactx_set_binary_name)
         list(APPEND ImpactX_bin_names app)
     endif()
     foreach(tgt IN LISTS ImpactX_bin_names)
-        set_target_properties(${tgt} PROPERTIES OUTPUT_NAME "impactx")
+        set_target_properties(${tgt} PROPERTIES OUTPUT_NAME "impactx")  # collision for .pdb files?
 
         if(ImpactX_MPI)
             set_property(TARGET ${tgt} APPEND_STRING PROPERTY OUTPUT_NAME ".MPI")
