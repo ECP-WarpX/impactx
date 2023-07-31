@@ -200,7 +200,7 @@ if(ImpactX_PYTHON)
     else()
         pybind11_extension(pyImpactX)
     endif()
-    if(NOT MSVC AND NOT ${CMAKE_BUILD_TYPE} MATCHES Debug|RelWithDebInfo)
+    if(NOT MSVC AND NOT ${CMAKE_BUILD_TYPE} MATCHES Debug|RelWithDebInfo)  # change to NOT WIN32 AND NOT ... ?
         pybind11_strip(pyImpactX)
     endif()
 endif()
