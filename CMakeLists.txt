@@ -153,7 +153,7 @@ endif()
 if(ImpactX_LIB)
     add_library(lib)
     add_library(ImpactX::lib ALIAS lib)
-    target_link_libraries(lib PUBLIC ImpactX)
+    target_link_libraries(lib PRIVATE ImpactX)
     set(_BUILDINFO_SRC lib)
     list(APPEND _ALL_TARGETS lib)
 
