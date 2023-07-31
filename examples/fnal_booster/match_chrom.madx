@@ -1,0 +1,9 @@
+match,sequence=ring;
+show, beam;
+global,sequence=ring,DQ1=-12/beam->beta;
+global,sequence=ring,DQ2= -6/beam->beta;
+vary,name=I_DSXL;
+vary,name=I_DSXS;
+lmdif,calls=500,tolerance=1.e-8;
+  jacobian, calls=10, tolerance=1.0e-21;
+endmatch;
