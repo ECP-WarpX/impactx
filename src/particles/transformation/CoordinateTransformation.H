@@ -12,8 +12,6 @@
 
 #include "particles/ImpactXParticleContainer.H"
 
-#include "export.H"
-
 
 namespace impactx
 {
@@ -32,7 +30,7 @@ namespace transformation
      * @param pc container of the particles to push
      * @param direction the transformation (to fixed s or to fixed t)
      */
-    IMPACTX_EXPORT void CoordinateTransformation (ImpactXParticleContainer &pc,
+    void CoordinateTransformation (ImpactXParticleContainer &pc,
                                    Direction const & direction);
 
 } // namespace transformation

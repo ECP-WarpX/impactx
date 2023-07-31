@@ -123,7 +123,6 @@ endif()
 
 # Targets #####################################################################
 #
-include(GenerateExportHeader)
 
 # collect into a library (default: static)
 add_library(lib)
@@ -132,24 +131,9 @@ set(_BUILDINFO_SRC lib)
 set(_ALL_TARGETS lib)
 
 set_target_properties(lib PROPERTIES
-    # PDB & COMPILE_PDB output path?
-
     POSITION_INDEPENDENT_CODE ON
     WINDOWS_EXPORT_ALL_SYMBOLS ON
 )
-
-# Headers controlling symbol visibility (for Windows)
-generate_export_header(lib
-    BASE_NAME impactx
-    EXPORT_FILE_NAME src/export.H)
-target_compile_definitions(lib PRIVATE lib_EXPORTS)  # careful: collision potential
-# Static libs: IMPACTX_STATIC_DEFINE during build time
-# note: using a static lib in a .dll (pyImpactX) still needs the exports for
-#       dllimport at DLL build time.
-#       https://cmake.org/cmake/help/latest/prop_tgt/WINDOWS_EXPORT_ALL_SYMBOLS.html
-if(NOT BUILD_SHARED_LIBS)
-    target_compile_definitions(lib PRIVATE IMPACTX_STATIC_DEFINE)
-endif()
 
 # executable application
 #   note: we currently avoid a dependency on a core library

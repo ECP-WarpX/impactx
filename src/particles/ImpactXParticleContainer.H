@@ -12,8 +12,6 @@
 
 #include "ReferenceParticle.H"
 
-#include "export.H"
-
 #include <AMReX_AmrCoreFwd.H>
 #include <AMReX_BaseFwd.H>
 #include <AMReX_MultiFab.H>
@@ -104,7 +102,7 @@ namespace impactx
      * We subclass here to change the default threading strategy, which is
      * `static` in AMReX, to `dynamic` in ImpactX.
      */
-    class IMPACTX_EXPORT ParIter
+    class ParIter
         : public amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
     {
     public:
@@ -120,7 +118,7 @@ namespace impactx
      * We subclass here to change the default threading strategy, which is
      * `static` in AMReX, to `dynamic` in ImpactX.
      */
-    class IMPACTX_EXPORT ParConstIter
+    class ParConstIter
         : public amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
     {
     public:
@@ -135,7 +133,7 @@ namespace impactx
      *
      * This class stores particles, distributed over MPI ranks.
      */
-    class IMPACTX_EXPORT ImpactXParticleContainer
+    class ImpactXParticleContainer
         : public amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>
     {
     public:
