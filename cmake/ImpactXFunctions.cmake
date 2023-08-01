@@ -248,12 +248,17 @@ function(impactx_set_binary_name)
     if(ImpactX_APP)
         list(APPEND ImpactX_bin_names app)
     endif()
+
+    # On WIN32, the OUTPUT_NAME must not collide between lib and app!
     if(WIN32)
         set_target_properties(lib PROPERTIES OUTPUT_NAME "libimpactx")
     else()
         set_target_properties(lib PROPERTIES OUTPUT_NAME "impactx")
     endif()
-    set_target_properties(app PROPERTIES OUTPUT_NAME "impactx")
+    if(ImpactX_APP)
+        set_target_properties(app PROPERTIES OUTPUT_NAME "impactx")
+    endif()
+
     foreach(tgt IN LISTS ImpactX_bin_names)
         if(ImpactX_MPI)
             set_property(TARGET ${tgt} APPEND_STRING PROPERTY OUTPUT_NAME ".MPI")

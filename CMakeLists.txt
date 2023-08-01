@@ -1,10 +1,6 @@
 # Preamble ####################################################################
 #
-if(WIN32)
-    cmake_minimum_required(VERSION 3.24.0)
-else()
-    cmake_minimum_required(VERSION 3.20.0)
-endif()
+cmake_minimum_required(VERSION 3.20.0)
 project(ImpactX VERSION 23.07)
 
 include(${ImpactX_SOURCE_DIR}/cmake/ImpactXFunctions.cmake)
@@ -154,11 +150,7 @@ endif()
 if(ImpactX_PYTHON)
     add_library(pyImpactX MODULE src/python/pyImpactX.cpp)
     add_library(ImpactX::pyImpactX ALIAS pyImpactX)
-    #if(BUILD_SHARED_LIBS OR NOT WIN32)
-        target_link_libraries(pyImpactX PRIVATE lib)
-    #else()
-    #    target_link_libraries(pyImpactX PRIVATE "$<LINK_LIBRARY:WHOLE_ARCHIVE,lib>")  # CMake 3.24+
-    #endif()
+    target_link_libraries(pyImpactX PRIVATE lib)
     set(_BUILDINFO_SRC pyImpactX)
     list(APPEND _ALL_TARGETS pyImpactX)
 
@@ -200,7 +192,7 @@ if(ImpactX_PYTHON)
     else()
         pybind11_extension(pyImpactX)
     endif()
-    if(NOT MSVC AND NOT ${CMAKE_BUILD_TYPE} MATCHES Debug|RelWithDebInfo)  # change to NOT WIN32 AND NOT ... ?
+    if(NOT MSVC AND NOT ${CMAKE_BUILD_TYPE} MATCHES Debug|RelWithDebInfo)
         pybind11_strip(pyImpactX)
     endif()
 endif()
