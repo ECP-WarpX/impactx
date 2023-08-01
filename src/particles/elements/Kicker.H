@@ -106,9 +106,9 @@ namespace impactx
         using Thin::operator();
 
     private:
-        int m_unit; //! multipole index
         amrex::ParticleReal m_xkick; //! horizontal kick strength
         amrex::ParticleReal m_ykick; //! vertical kick strength
+        int m_unit; //! multipole index
 
     };
 
