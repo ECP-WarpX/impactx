@@ -182,7 +182,7 @@ void init_elements(py::module& m)
         )
     ;
 
-    py::class_<Multipole, elements::Thin>(me, "Kicker")
+    py::class_<Kicker, elements::Thin>(me, "Kicker")
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
