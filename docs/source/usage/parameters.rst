@@ -483,6 +483,14 @@ Lattice Elements
 
             * ``<element_name>.phi_out`` (``float``, in degrees) angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame
 
+        * ``kicker`` for a thin transverse kicker. This requires these additional parameters:
+
+            * ``<element_name>.xkick`` (``float``, dimensionless OR in T-m) the horizontal kick strength
+
+            * ``<element_name>.ykick`` (``float``, dimensionless OR in T-m) the vertical kick strength
+
+            * ``<element_name>.units`` (``integer``, dimensionless) specification of units (default: ``0``)
+
         * ``beam_monitor`` a beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
           If the same element name is used multiple times, then an output series is created with multiple outputs.
 
