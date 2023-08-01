@@ -182,6 +182,16 @@ void init_elements(py::module& m)
         )
     ;
 
+    py::class_<Multipole, elements::Thin>(me, "Kicker")
+        .def(py::init<
+                amrex::ParticleReal const,
+                amrex::ParticleReal const,
+                int const>(),
+             py::arg("xkick"), py::arg("ykick"), py::arg("units") = 0,
+             "A thin transverse kicker element"
+        )
+    ;
+
     py::class_<Multipole, elements::Thin>(me, "Multipole")
         .def(py::init<
                 int const,

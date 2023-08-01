@@ -1,0 +1,117 @@
+/* Copyright 2022-2023 The Regents of the University of California, through Lawrence
+ *           Berkeley National Laboratory (subject to receipt of any required
+ *           approvals from the U.S. Dept. of Energy). All rights reserved.
+ *
+ * This file is part of ImpactX.
+ *
+ * Authors: Chad Mitchell, Axel Huebl
+ * License: BSD-3-Clause-LBNL
+ */
+#ifndef IMPACTX_KICKER_H
+#define IMPACTX_KICKER_H
+
+#include "particles/ImpactXParticleContainer.H"
+#include "mixin/beamoptic.H"
+#include "mixin/thin.H"
+#include "mixin/nofinalize.H"
+
+#include <AMReX_Extension.H>
+#include <AMReX_REAL.H>
+#include <AMReX_GpuComplex.H>
+
+#include <cmath>
+
+namespace impactx
+{
+    struct Kicker
+    : public elements::BeamOptic<Kicker>,
+      public elements::Thin,
+      public elements::NoFinalize
+    {
+        static constexpr auto name = "Kicker";
+        using PType = ImpactXParticleContainer::ParticleType;
+
+        /** A thin transverse kicker element, inducing a transverse
+         *  momentum displacement from the reference orbit.
+         *
+         * @param xkick Strength of horizontal kick 
+         * @param ykick Strength of vertical kick
+         * @param unit (0 - dimensionless, 1 - T-m)
+         */
+        Kicker( amrex::ParticleReal const xkick,
+                amrex::ParticleReal const ykick,
+                int const unit )
+        : m_xkick(xkick), m_ykick(ykick), m_unit(unit)
+        {
+        }
+
+        /** Push all particles */
+        using BeamOptic::operator();
+
+        /** This is a multipole functor, so that a variable of this type can be used like a
+         *  multipole function.
+         *
+         * @param p Particle AoS data for positions and cpu/id
+         * @param px particle momentum in x
+         * @param py particle momentum in y
+         * @param pt particle momentum in t
+         * @param refpart reference particle (unused)
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void operator() (
+                PType& AMREX_RESTRICT p,
+                amrex::ParticleReal & AMREX_RESTRICT px,
+                amrex::ParticleReal & AMREX_RESTRICT py,
+                amrex::ParticleReal & AMREX_RESTRICT pt,
+                [[maybe_unused]] RefPart const & refpart) const {
+
+            using namespace amrex::literals; // for _rt and _prt
+
+            // access AoS data such as positions and cpu/id
+            amrex::ParticleReal const x = p.pos(RealAoS::x);
+            amrex::ParticleReal const y = p.pos(RealAoS::y);
+            amrex::ParticleReal const t = p.pos(RealAoS::t);
+
+            // normalize quad units to MAD-X convention if needed
+            amrex::ParticleReal dpx = m_xkick;
+            amrex::ParticleReal dpy = m_ykick;
+            if (m_unit == 1) {
+                  dpx = m_xkick / refpart.rigidity_Tm();
+                  dpy = m_ykick / refpart.rigidity_Tm();
+            }
+
+            // intialize output values of momenta
+            amrex::ParticleReal pxout = px;
+            amrex::ParticleReal pyout = py;
+            amrex::ParticleReal ptout = pt;
+
+            // advance position and momentum
+            p.pos(RealAoS::x) = x;
+            pxout = px + dpx;
+
+            p.pos(RealAoS::y) = y;
+            pyout = py + dpy;
+
+            p.pos(RealAoS::t) = t;
+            ptout = pt;
+
+            // assign updated momenta
+            px = pxout;
+            py = pyout;
+            pt = ptout;
+
+        }
+
+        /** This pushes the reference particle. */
+        using Thin::operator();
+
+    private:
+        int m_unit; //! multipole index
+        amrex::ParticleReal m_xkick; //! horizontal kick strength
+        amrex::ParticleReal m_ykick; //! vertical kick strength
+
+    };
+
+} // namespace impactx
+
+#endif // IMPACTX_MULTIPOLE_H
