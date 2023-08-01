@@ -34,7 +34,7 @@ namespace impactx
         /** A thin transverse kicker element, inducing a transverse
          *  momentum displacement from the reference orbit.
          *
-         * @param xkick Strength of horizontal kick 
+         * @param xkick Strength of horizontal kick
          * @param ykick Strength of vertical kick
          * @param unit (0 - dimensionless, 1 - T-m)
          */
