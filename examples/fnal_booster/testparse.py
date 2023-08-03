@@ -25,8 +25,8 @@ sequence = text[36:-45]
 
 elements = sequence.split(";")
 
-#print(elements[0])
-#print(elements[1])
+# print(elements[0])
+# print(elements[1])
 
 
 # Define some regular expressions (list to be expanded later)
@@ -37,11 +37,14 @@ rx_dict = {
     "type": re.compile(r"^\s*[\w\.]+\s+(?P<type>[\w]+)\s*\{"),  # element name
     "tag": re.compile(r"tag = (?P<tag>[\w\.]+)"),  # element tag (often same as name)
     "zloc": re.compile(r"at = (?P<zloc>.*)[\s\n\r}]+"),  # element location
-
     "body": re.compile(r"body\s*=\s*\{(?P<body>.+)\s*\}.*\}"),  # ...
     # multipole
-    "lrad": re.compile(r"lrad\s*=\s*(?P<lrad>\d*\.?\d*)[\s\n\r\}]+"),  # fictitious length
-    "kl": re.compile(r"kl\s*=\s*\[(?P<kl>.*)\]"),  # coefficients for the multipole strength
+    "lrad": re.compile(
+        r"lrad\s*=\s*(?P<lrad>\d*\.?\d*)[\s\n\r\}]+"
+    ),  # fictitious length
+    "kl": re.compile(
+        r"kl\s*=\s*\[(?P<kl>.*)\]"
+    ),  # coefficients for the multipole strength
     # dipedge
     "e1": re.compile(r"e1\s*=\s*(?P<e1>.*)\s*"),  # ...
     "e2": re.compile(r"e2\s*=\s*(?P<e2>.*)\s*"),  # ...
@@ -54,6 +57,7 @@ rx_dict = {
 
 # Basic function for parsing a single element
 
+
 def parse_one_group(element, key):
     """Returns regex match or None"""
     rx = rx_dict[key]
@@ -63,6 +67,7 @@ def parse_one_group(element, key):
         return match.group(key).strip()
     else:
         None
+
 
 def parse_element(element):
     """
@@ -76,16 +81,16 @@ def parse_element(element):
     print(f"etyp={etyp}")
     print(f"tag={tag}")
     # tag
-    
+
     # vkicker & hkicker: they all seem to be turned off in our file
     ignored_types = ["beambeam", "marker", "hkicker", "vkicker", None]
 
     if etyp in ignored_types:
         print("... ignored")
 
-    elif etyp == "multipole":      
+    elif etyp == "multipole":
         body = parse_one_group(element, "body")
-        
+
         if body is not None:
             lrad = parse_one_group(body, "lrad")
             kl = parse_one_group(body, "kl")
@@ -94,25 +99,25 @@ def parse_element(element):
                 print("... empty kl - ignored")
             else:
                 # simplify spaces to one
-                kl = re.sub(r'\s+', ' ', kl)
+                kl = re.sub(r"\s+", " ", kl)
                 # to list
                 kl = kl.split(" ")
                 # convert strings to floats
                 kl = list(map(float, kl))
                 print(f"lrad={lrad}")
                 print(f"kl={kl}")
-            
+
                 # TODO: create ImpactX.Multiple and return
         else:
             print("... empty body - ignored")
 
     elif etyp == "dipedge":
         body = parse_one_group(element, "body")
-        #print(f"body={body}")
+        # print(f"body={body}")
 
         if body is not None:
             e1 = parse_one_group(body, "e1")
-            #e2 = parse_one_group(body, "e2")
+            # e2 = parse_one_group(body, "e2")
 
             if e1 is None:
                 print("... empty e1 - ignored")
@@ -125,8 +130,8 @@ def parse_element(element):
 
     elif etyp == "rfcavity":
         body = parse_one_group(element, "body")
-        #print(f"body={body}")
-        
+        # print(f"body={body}")
+
         if body is not None:
             volt = parse_one_group(body, "volt")
             harmon = parse_one_group(body, "harmon")
@@ -144,25 +149,26 @@ def parse_element(element):
     else:
         print(f"Unknown type: {etyp}")
 
+
 # Loop over elements and store data (test keys separately for now)
 
 tagdata = []
 zlocdata = []
 lraddata = []
 
-for element in elements: #elements[0:12]:
+for element in elements:  # elements[0:12]:
     parse_element(element)
     # TODO: append returned element to a beamline (as a list)
     print()
 
-#print(len(tagdata))
-#print(tagdata)
+# print(len(tagdata))
+# print(tagdata)
 
-#print(len(zlocdata))
-#print(zlocdata)
+# print(len(zlocdata))
+# print(zlocdata)
 
-#print(len(lraddata))
-#print(lraddata)
+# print(len(lraddata))
+# print(lraddata)
 
 
 # Analyze data using Pandas
