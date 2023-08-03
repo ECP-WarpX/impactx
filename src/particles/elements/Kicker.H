@@ -48,8 +48,8 @@ namespace impactx
         /** Push all particles */
         using BeamOptic::operator();
 
-        /** This is a multipole functor, so that a variable of this type can be used like a
-         *  multipole function.
+        /** This is a transverse kicker functor, so that a variable of this type can be
+         * used like a function.
          *
          * @param p Particle AoS data for positions and cpu/id
          * @param px particle momentum in x
@@ -76,8 +76,8 @@ namespace impactx
             amrex::ParticleReal dpx = m_xkick;
             amrex::ParticleReal dpy = m_ykick;
             if (m_unit == 1) {
-                  dpx = m_xkick / refpart.rigidity_Tm();
-                  dpy = m_ykick / refpart.rigidity_Tm();
+                  dpx /= refpart.rigidity_Tm();
+                  dpy /= refpart.rigidity_Tm();
             }
 
             // intialize output values of momenta
@@ -108,10 +108,10 @@ namespace impactx
     private:
         amrex::ParticleReal m_xkick; //! horizontal kick strength
         amrex::ParticleReal m_ykick; //! vertical kick strength
-        int m_unit; //! multipole index
+        int m_unit; //! Kicks are for 0 dimensionless, or for 1 in T-m."
 
     };
 
 } // namespace impactx
 
-#endif // IMPACTX_MULTIPOLE_H
+#endif // IMPACTX_KICKER_H

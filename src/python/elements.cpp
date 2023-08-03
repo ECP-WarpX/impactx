@@ -188,7 +188,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal const,
                 int const>(),
              py::arg("xkick"), py::arg("ykick"), py::arg("units") = 0,
-             "A thin transverse kicker element"
+             "A thin transverse kicker element. Kicks are for unit 0 dimensionless, or for 1 in T-m."
         )
     ;
 
