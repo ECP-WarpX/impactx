@@ -601,3 +601,21 @@ add_impactx_test(compression.py
     examples/compression/analysis_compression.py
     OFF  # no plot script yet
 )
+
+# Kicker test ##########################################################
+#
+# w/o space charge
+add_impactx_test(kicker
+    examples/kicker/input_kicker.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/kicker/analysis_kicker.py
+    OFF  # no plot script yet
+)
+add_impactx_test(kicker.py
+    examples/kicker/run_kicker.py
+      ON   # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/kicker/analysis_kicker.py
+    OFF  # no plot script yet
+)
