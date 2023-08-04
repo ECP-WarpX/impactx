@@ -614,7 +614,7 @@ add_impactx_test(kicker
 )
 add_impactx_test(kicker.py
     examples/kicker/run_kicker.py
-      ON   # ImpactX MPI-parallel
+      OFF   # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/kicker/analysis_kicker.py
     OFF  # no plot script yet
