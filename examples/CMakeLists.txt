@@ -588,7 +588,7 @@ add_impactx_test(cfbend.py
 #
 # w/o space charge
 add_impactx_test(compression
-    examples/compression/input_compression.in 
+    examples/compression/input_compression.in
       ON  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/compression/analysis_compression.py
