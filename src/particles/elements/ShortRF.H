@@ -31,7 +31,7 @@ namespace impactx
         static constexpr auto name = "ShortRF";
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** A short RF cavity element 
+        /** A short RF cavity element
          *
          * @param V Normalized RF voltage V = maximum energy gain/(m*c^2)
          * @param freq RF frequency in Hz
