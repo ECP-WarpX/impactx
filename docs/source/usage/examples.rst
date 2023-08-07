@@ -26,6 +26,7 @@ This section allows you to **download input files** that correspond to different
    examples/positron_channel/README.rst
    examples/cyclotron/README.rst
    examples/cfbend/README.rst
+   examples/compression/README.rst
 
 
 Unit tests

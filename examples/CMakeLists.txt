@@ -583,3 +583,21 @@ add_impactx_test(cfbend.py
     examples/cfbend/analysis_cfbend.py
     OFF  # no plot script yet
 )
+
+# Ballistic compression ########################################################
+#
+# w/o space charge
+add_impactx_test(compression
+    examples/compression/input_compression.in 
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/compression/analysis_compression.py
+    OFF  # no plot script yet
+)
+add_impactx_test(compression.py
+    examples/compression/run_compression.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/compression/analysis_compression.py
+    OFF  # no plot script yet
+)
