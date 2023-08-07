@@ -602,12 +602,20 @@ References:
    :param B: Magnetic field in Tesla; when B = 0 (default), the reference bending radius is defined by r0 = length / (angle in rad),   corresponding to a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B.
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.ShortRF(V, k)
+.. py:class:: impactx.elements.Buncher(V, k)
 
-   A short RF cavity element at zero crossing for bunching.
+   A short RF cavity element at zero crossing for bunching (MaryLie model).
 
    :param V: Normalized RF voltage drop V = Emax*L/(c*Brho)
    :param k: Wavenumber of RF in 1/m
+
+.. py:class:: impactx.elements.ShortRF(V, freq, phase)
+
+   A short RF cavity element (MAD-X model). 
+   
+   :param V: Normalized RF voltage V = maximum energy gain/(m*c^2)
+   :param freq: RF frequency in Hz
+   :param phase: RF synchronous phase in degrees (phase = 0 corresponds to maximum energy gain, phase = -90 corresponds go zero energy gain for bunching)
 
 .. py:class:: impactx.elements.ChrUniformAcc(ds, k, nslice=1)
 
