@@ -120,6 +120,53 @@ namespace impactx
         /** This pushes the reference particle. */
         using Thin::operator();
 
+        /** This pushes the reference particle.
+         *
+         * @param[in,out] refpart reference particle
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void operator() (RefPart & AMREX_RESTRICT refpart) const {
+
+            using namespace amrex::literals; // for _rt and _prt
+
+            // assign input reference particle values
+            amrex::ParticleReal const x = refpart.x;
+            amrex::ParticleReal const px = refpart.px;
+            amrex::ParticleReal const y = refpart.y;
+            amrex::ParticleReal const py = refpart.py;
+            amrex::ParticleReal const z = refpart.z;
+            amrex::ParticleReal const pz = refpart.pz;
+            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const pt = refpart.pt;
+
+            // Define parameters and intermediate constants
+            using ablastr::constant::math::pi;
+            amrex::ParticleReal const phi = m_phase*(pi/180.0_prt);
+
+            // compute intial value of beta*gamma
+            amrex::ParticleReal const bgi = sqrt(pow(pt, 2) - 1.0_prt);
+
+            // advance pt
+            refpart.pt = pt - m_V*cos(phi);
+
+            // compute final value of beta*gamma
+            amrex::ParticleReal const ptf = refpart.pt;
+            amrex::ParticleReal const bgf = sqrt(pow(ptf, 2) - 1.0_prt);
+
+            // advance position (x,y,z,t)
+            refpart.x = x;
+            refpart.y = y;
+            refpart.z = z;
+            refpart.t = t;
+
+            // advance momentum (px,py,pz)
+            refpart.px = px*bgf/bgi;
+            refpart.py = py*bgf/bgi;
+            refpart.pz = pz*bgf/bgi;
+
+        }
+
+
     private:
         amrex::ParticleReal m_V; //! normalized (max) RF voltage drop.
         amrex::ParticleReal m_freq; //! RF frequency in Hz.
