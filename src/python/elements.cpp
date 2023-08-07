@@ -299,12 +299,22 @@ void init_elements(py::module& m)
         )
     ;
 
+    py::class_<Buncher, elements::Thin>(me, "Buncher")
+        .def(py::init<
+                amrex::ParticleReal const,
+                amrex::ParticleReal const>(),   
+             py::arg("V"), py::arg("k"),
+             "A short linear RF cavity element at zero-crossing for bunching."
+        )
+    ;
+
     py::class_<ShortRF, elements::Thin>(me, "ShortRF")
         .def(py::init<
                 amrex::ParticleReal const,
+                amrex::ParticleReal const,
                 amrex::ParticleReal const>(),
-             py::arg("V"), py::arg("k"),
-             "A short RF cavity element at zero crossing for bunching."
+             py::arg("V"), py::arg("freq"), py::arg("phase") = -90.0,
+             "A short RF cavity element."
         )
     ;
 

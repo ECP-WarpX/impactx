@@ -7,8 +7,8 @@
  * Authors: Chad Mitchell, Axel Huebl
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_SHORTRF_H
-#define IMPACTX_SHORTRF_H
+#ifndef IMPACTX_BUNCHER_H
+#define IMPACTX_BUNCHER_H
 
 #include "particles/ImpactXParticleContainer.H"
 #include "mixin/beamoptic.H"
@@ -23,34 +23,29 @@
 
 namespace impactx
 {
-    struct ShortRF
-    : public elements::BeamOptic<ShortRF>,
+    struct Buncher
+    : public elements::BeamOptic<Buncher>,
       public elements::Thin,
       public elements::NoFinalize
     {
-        static constexpr auto name = "ShortRF";
+        static constexpr auto name = "Buncher";
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** A short RF cavity element 
+        /** A short RF cavity element at zero crossing for bunching
          *
-         * @param V Normalized RF voltage V = maximum energy gain/(m*c^2)
-         * @param freq RF frequency in Hz
-         * @param phase RF synchronous phase of the reference particle in deg
-         *     phi = 0:  maximum energy gain (on-crest)
-         *     phi = -90 deg:  zero-crossing for bunching
-         *     phi = 90 deg:  zero-crossing for debunching
+         * @param V Normalized RF voltage drop V = Emax*L/(c*Brho)
+         * @param k Wavenumber of RF in 1/m
          */
-        ShortRF( amrex::ParticleReal const V, amrex::ParticleReal const freq,
-                 amrex::ParticleReal const phase )
-        : m_V(V), m_freq(freq), m_phase(phase)
+        Buncher( amrex::ParticleReal const V, amrex::ParticleReal const k )
+        : m_V(V), m_k(k)
         {
         }
 
         /** Push all particles */
         using BeamOptic::operator();
 
-        /** This is a shortrf functor, so that a variable of this type can be used like a
-         *  shortrf function.
+        /** This is a buncher functor, so that a variable of this type can be used like a
+         *  buncher function.
          *
          * @param p Particle AoS data for positions and cpu/id
          * @param px particle momentum in x
@@ -73,47 +68,29 @@ namespace impactx
             amrex::ParticleReal const y = p.pos(RealAoS::y);
             amrex::ParticleReal const t = p.pos(RealAoS::t);
 
-            // Define parameters and intermediate constants
-            using ablastr::constant::math::pi;
-            using ablastr::constant::SI::c;
-            amrex::ParticleReal const k = (2.0_prt*pi/c)*m_freq;
-            amrex::ParticleReal const phi = m_phase*(pi/180.0_prt);
-
-            // access reference particle values (final, initial):
-            amrex::ParticleReal const ptf_ref = refpart.pt;
-            amrex::ParticleReal const pti_ref = ptf_ref + m_V*cos(phi);
-            amrex::ParticleReal const bgf = sqrt(pow(ptf_ref, 2) - 1.0_prt);
-            amrex::ParticleReal const bgi = sqrt(pow(pti_ref, 2) - 1.0_prt);
-
-            // initial conversion from static to dynamic units:
-            px = px*bgi;
-            py = py*bgi;
-            pt = pt*bgi;
+            // access reference particle values to find (beta*gamma)^2
+            amrex::ParticleReal const pt_ref = refpart.pt;
+            amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
 
             // intialize output values of momenta
             amrex::ParticleReal pxout = px;
             amrex::ParticleReal pyout = py;
             amrex::ParticleReal ptout = pt;
 
-            // advance position and momentum in dynamic units
+            // advance position and momentum
             p.pos(RealAoS::x) = x;
-            pxout = px;
+            pxout = px + m_k*m_V/(2.0_prt*betgam2)*x;
 
             p.pos(RealAoS::y) = y;
-            pyout = py;
+            pyout = py + m_k*m_V/(2.0_prt*betgam2)*y;
 
             p.pos(RealAoS::t) = t;
-            ptout = pt - m_V*cos(k*t + phi) + m_V*cos(phi);
+            ptout = pt - m_k*m_V*t;
 
             // assign updated momenta
             px = pxout;
             py = pyout;
             pt = ptout;
-
-            // final conversion from dynamic to static units:
-            px = px/bgf;
-            py = py/bgf;
-            pt = pt/bgf;
 
         }
 
@@ -122,10 +99,9 @@ namespace impactx
 
     private:
         amrex::ParticleReal m_V; //! normalized (max) RF voltage drop.
-        amrex::ParticleReal m_freq; //! RF frequency in Hz.
-        amrex::ParticleReal m_phase; //! reference RF phase in degrees.
+        amrex::ParticleReal m_k; //! RF wavenumber in 1/m.
     };
 
 } // namespace impactx
 
-#endif // IMPACTX_SHORTRF_H
+#endif // IMPACTX_BUNCHER_H

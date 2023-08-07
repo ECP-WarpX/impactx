@@ -53,7 +53,7 @@ quad2 = elements.Quad(ds=0.3, k=-2.5)
 #   Drift element
 drift1 = elements.Drift(ds=1.0)
 #   Short RF cavity element
-shortrf1 = elements.ShortRF(V=0.01, k=15.0)
+shortrf1 = elements.Buncher(V=0.01, k=15.0)
 
 lattice_no_drifts = [quad1, shortrf1, quad2, shortrf1, quad1]
 #   set first lattice element
