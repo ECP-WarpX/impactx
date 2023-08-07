@@ -611,8 +611,8 @@ References:
 
 .. py:class:: impactx.elements.ShortRF(V, freq, phase)
 
-   A short RF cavity element (MAD-X model). 
-   
+   A short RF cavity element (MAD-X model).
+
    :param V: Normalized RF voltage V = maximum energy gain/(m*c^2)
    :param freq: RF frequency in Hz
    :param phase: RF synchronous phase in degrees (phase = 0 corresponds to maximum energy gain, phase = -90 corresponds go zero energy gain for bunching)
