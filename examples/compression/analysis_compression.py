@@ -39,11 +39,21 @@ def get_moments(beam):
     return (sigx, sigy, sigt, emittance_x, emittance_y, emittance_t)
 
 
-# initial/final beam
+# openPMD data series at the beam monitors
 series = io.Series("diags/openPMD/monitor.h5", io.Access.read_only)
-last_step = list(series.iterations)[-1]
-initial = series.iterations[1].particles["beam"].to_df()
-final = series.iterations[last_step].particles["beam"].to_df()
+
+# first and last step
+final_step = list(series.iterations)[-1]
+first_it = series.iterations[1]
+final_it = series.iterations[final_step]
+
+# initial beam & reference particle gamma
+initial = first_it.particles["beam"].to_df()
+initial_gamma_ref = first_it.particles["beam"].get_attribute("gamma_ref")
+
+# final beam & reference particle gamma
+final = final_it.particles["beam"].to_df()
+final_gamma_ref = final_it.particles["beam"].get_attribute("gamma_ref")
 
 # compare number of particles
 num_particles = 10000
@@ -75,6 +85,8 @@ assert np.allclose(
     atol=atol,
 )
 
+# TODO assert initial_gamma_ref
+
 
 print("")
 print("Final Beam:")
@@ -101,3 +113,5 @@ assert np.allclose(
     rtol=rtol,
     atol=atol,
 )
+
+# TODO assert final_gamma_ref
