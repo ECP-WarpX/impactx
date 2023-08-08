@@ -246,16 +246,22 @@ endfunction()
 # ImpactX symlink to it. Only sets options relevant for users (see summary).
 #
 function(impactx_set_binary_name)
-    set(ImpactX_bin_names)
+    set(ImpactX_bin_names lib)
     if(ImpactX_APP)
         list(APPEND ImpactX_bin_names app)
     endif()
-    if(ImpactX_LIB)
-        list(APPEND ImpactX_bin_names lib)
-    endif()
-    foreach(tgt IN LISTS ImpactX_bin_names)
-        set_target_properties(${tgt} PROPERTIES OUTPUT_NAME "impactx")
 
+    # On WIN32, the OUTPUT_NAME must not collide between lib and app!
+    if(WIN32)
+        set_target_properties(lib PROPERTIES OUTPUT_NAME "libimpactx")
+    else()
+        set_target_properties(lib PROPERTIES OUTPUT_NAME "impactx")
+    endif()
+    if(ImpactX_APP)
+        set_target_properties(app PROPERTIES OUTPUT_NAME "impactx")
+    endif()
+
+    foreach(tgt IN LISTS ImpactX_bin_names)
         if(ImpactX_MPI)
             set_property(TARGET ${tgt} APPEND_STRING PROPERTY OUTPUT_NAME ".MPI")
         else()
@@ -296,13 +302,11 @@ function(impactx_set_binary_name)
                 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/impactx
         )
     endif()
-    if(ImpactX_LIB)
-        add_custom_command(TARGET lib POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E create_symlink
-                $<TARGET_FILE_NAME:lib>
-                $<TARGET_FILE_DIR:lib>/libimpactx$<TARGET_FILE_SUFFIX:lib>
-        )
-    endif()
+    add_custom_command(TARGET lib POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E create_symlink
+            $<TARGET_FILE_NAME:lib>
+            $<TARGET_FILE_DIR:lib>/libimpactx$<TARGET_FILE_SUFFIX:lib>
+    )
 endfunction()
 
 
@@ -386,12 +390,10 @@ function(impactx_print_summary)
     endif()
     message("  Build type: ${CMAKE_BUILD_TYPE}${BLD_TYPE_UNKNOWN}")
     set(LIB_TYPE "")
-    if(ImpactX_LIB)
-        if(BUILD_SHARED_LIBS)
-            set(LIB_TYPE " (shared)")
-        else()
-            set(LIB_TYPE " (static)")
-        endif()
+    if(BUILD_SHARED_LIBS)
+        set(LIB_TYPE "shared")
+    else()
+        set(LIB_TYPE "static")
     endif()
     #message("  Testing: ${BUILD_TESTING}")
     message("  Build options:")
@@ -399,7 +401,7 @@ function(impactx_print_summary)
     #message("    ASCENT: ${ImpactX_ASCENT}")
     message("    COMPUTE: ${ImpactX_COMPUTE}")
     message("    IPO/LTO: ${ImpactX_IPO}")
-    message("    LIB: ${ImpactX_LIB}${LIB_TYPE}")
+    message("    LIB: ${LIB_TYPE}")
     message("    MPI: ${ImpactX_MPI}")
     if(MPI)
         message("    MPI (thread multiple): ${ImpactX_MPI_THREAD_MULTIPLE}")

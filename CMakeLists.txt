@@ -54,7 +54,6 @@ impactx_set_default_install_dirs()
 #
 include(CMakeDependentOption)
 option(ImpactX_APP           "Build the ImpactX executable application"     ON)
-option(ImpactX_LIB           "Build ImpactX as a library"                   OFF)
 option(ImpactX_MPI           "Multi-node support (message-passing)"         ON)
 option(ImpactX_OPENPMD       "openPMD I/O (HDF5, ADIOS)"                    ON)
 option(ImpactX_PYTHON        "Python bindings"                              OFF)
@@ -91,11 +90,6 @@ set_default_build_type("Release")
 # (also know as "link-time optimization" or "whole program optimization")
 option(ImpactX_IPO "Compile ImpactX with interprocedural optimization (will take more time)" OFF)
 
-# enforce consistency of dependent options
-if(ImpactX_PYTHON)
-    set(ImpactX_LIB ON CACHE STRING "Build ImpactX as a library" FORCE)
-endif()
-
 # this defined the variable BUILD_TESTING which is ON by default
 include(CTest)
 
@@ -129,14 +123,17 @@ endif()
 
 # Targets #####################################################################
 #
-if(NOT ImpactX_APP AND NOT ImpactX_LIB)
-    message(FATAL_ERROR "Need to build at least ImpactX app or "
-                        "library/Python bindings")
-endif()
 
-# collect all objects for compilation
-add_library(ImpactX OBJECT)
-set(_ALL_TARGETS ImpactX)
+# collect into a library (default: static)
+add_library(lib)
+add_library(ImpactX::lib ALIAS lib)
+set(_BUILDINFO_SRC lib)
+set(_ALL_TARGETS lib)
+
+set_target_properties(lib PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+    WINDOWS_EXPORT_ALL_SYMBOLS ON
+)
 
 # executable application
 #   note: we currently avoid a dependency on a core library
@@ -144,30 +141,16 @@ set(_ALL_TARGETS ImpactX)
 if(ImpactX_APP)
     add_executable(app)
     add_executable(ImpactX::app ALIAS app)
-    target_link_libraries(app PRIVATE ImpactX)
+    target_link_libraries(app PRIVATE lib)
     set(_BUILDINFO_SRC app)
     list(APPEND _ALL_TARGETS app)
-endif()
-
-# link into a library (shared or static)
-if(ImpactX_LIB)
-    add_library(lib)
-    add_library(ImpactX::lib ALIAS lib)
-    target_link_libraries(lib PUBLIC ImpactX)
-    set(_BUILDINFO_SRC lib)
-    list(APPEND _ALL_TARGETS lib)
-
-    set_target_properties(ImpactX lib PROPERTIES
-        POSITION_INDEPENDENT_CODE ON
-        WINDOWS_EXPORT_ALL_SYMBOLS ON
-    )
 endif()
 
 # build Python module (this is always a shared library)
 if(ImpactX_PYTHON)
     add_library(pyImpactX MODULE src/python/pyImpactX.cpp)
     add_library(ImpactX::pyImpactX ALIAS pyImpactX)
-    target_link_libraries(pyImpactX PUBLIC lib)
+    target_link_libraries(pyImpactX PRIVATE lib)
     set(_BUILDINFO_SRC pyImpactX)
     list(APPEND _ALL_TARGETS pyImpactX)
 
@@ -215,7 +198,7 @@ if(ImpactX_PYTHON)
 endif()
 
 # own headers
-target_include_directories(ImpactX PUBLIC
+target_include_directories(lib PUBLIC
     $<BUILD_INTERFACE:${ImpactX_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${ImpactX_BINARY_DIR}/src>
 )
@@ -223,7 +206,7 @@ target_include_directories(ImpactX PUBLIC
 # if we include <AMReX_buildInfo.H> we will need to call:
 include(AMReXBuildInfo)
 generate_buildinfo(${_BUILDINFO_SRC} "${ImpactX_SOURCE_DIR}")
-target_link_libraries(ImpactX PRIVATE buildInfo::${_BUILDINFO_SRC})
+target_link_libraries(lib PRIVATE buildInfo::${_BUILDINFO_SRC})
 unset(_BUILDINFO_SRC)
 
 # add sources
@@ -244,22 +227,21 @@ if(ImpactX_IPO)
 endif()
 
 # link dependencies
-#     note: only PUBLIC because ImpactX is an OBJECT collection
-target_link_libraries(ImpactX PUBLIC ImpactX::thirdparty::ablastr_3d)
+target_link_libraries(lib PUBLIC ImpactX::thirdparty::ablastr_3d)
 if(ImpactX_PYTHON)
     target_link_libraries(pyImpactX PRIVATE pybind11::module pybind11::lto pybind11::windows_extras)
 endif()
 
 if(ImpactX_OPENPMD)
-    target_link_libraries(ImpactX PUBLIC openPMD::openPMD)
+    target_link_libraries(lib PUBLIC openPMD::openPMD)
 endif()
 
 if(ImpactX_QED)
-    target_compile_definitions(ImpactX PUBLIC ImpactX_QED)
+    target_compile_definitions(lib PUBLIC ImpactX_QED)
     if(ImpactX_QED_TABLE_GEN)
-        target_compile_definitions(ImpactX PUBLIC ImpactX_QED_TABLE_GEN)
+        target_compile_definitions(lib PUBLIC ImpactX_QED_TABLE_GEN)
     endif()
-    target_link_libraries(ImpactX PUBLIC PXRMP_QED::PXRMP_QED)
+    target_link_libraries(lib PUBLIC PXRMP_QED::PXRMP_QED)
 endif()
 
 # AMReX helper function: propagate CUDA specific target & source properties
@@ -285,7 +267,7 @@ impactx_set_binary_name()
 # Defines #####################################################################
 #
 if(ImpactX_OPENPMD)
-    target_compile_definitions(ImpactX PUBLIC ImpactX_USE_OPENPMD)
+    target_compile_definitions(lib PUBLIC ImpactX_USE_OPENPMD)
 endif()
 if(ImpactX_PYTHON)
     # for module __version__
@@ -322,12 +304,9 @@ configure_file(
 #
 
 # headers, libraries and executables
-set(ImpactX_INSTALL_TARGET_NAMES)
+set(ImpactX_INSTALL_TARGET_NAMES lib)
 if(ImpactX_APP)
     list(APPEND ImpactX_INSTALL_TARGET_NAMES app)
-endif()
-if(ImpactX_LIB)
-    list(APPEND ImpactX_INSTALL_TARGET_NAMES lib)
 endif()
 if(ImpactX_PYTHON)
     list(APPEND ImpactX_INSTALL_TARGET_NAMES pyImpactX)
@@ -342,20 +321,18 @@ install(TARGETS ${ImpactX_INSTALL_TARGET_NAMES}
 )
 
 # simplified library alias
-if(ImpactX_LIB)
-    if(IS_ABSOLUTE ${CMAKE_INSTALL_LIBDIR})
-        set(ABS_INSTALL_LIB_DIR "${CMAKE_INSTALL_LIBDIR}")
-    else()
-        set(ABS_INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-    endif()
-    # escape spaces for generated cmake_install.cmake file
-    file(TO_CMAKE_PATH "${ABS_INSTALL_LIB_DIR}" ABS_INSTALL_LIB_DIR)
-
-    install(CODE "file(CREATE_LINK
-        $<TARGET_FILE_NAME:lib>
-        \"${ABS_INSTALL_LIB_DIR}/libImpactX$<TARGET_FILE_SUFFIX:lib>\"
-        COPY_ON_ERROR SYMBOLIC)")
+if(IS_ABSOLUTE ${CMAKE_INSTALL_LIBDIR})
+    set(ABS_INSTALL_LIB_DIR "${CMAKE_INSTALL_LIBDIR}")
+else()
+    set(ABS_INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
+# escape spaces for generated cmake_install.cmake file
+file(TO_CMAKE_PATH "${ABS_INSTALL_LIB_DIR}" ABS_INSTALL_LIB_DIR)
+
+install(CODE "file(CREATE_LINK
+    $<TARGET_FILE_NAME:lib>
+    \"${ABS_INSTALL_LIB_DIR}/libImpactX$<TARGET_FILE_SUFFIX:lib>\"
+    COPY_ON_ERROR SYMBOLIC)")
 
 # CMake package file for find_package(ImpactX::ImpactX) in depending projects
 #install(EXPORT ImpactXTargets
