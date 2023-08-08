@@ -477,7 +477,7 @@ This module provides elements for the accelerator lattice.
 
    :param xkick: horizontal kick strength (dimensionless OR T-m)
    :param ykick: vertical kick strength (dimensionless OR T-m)
-   :param units: specification of units (0 - dimensionless, 1 - T-m)
+   :param units: specification of units (``"dimensionless"`` in units of the magnetic rigidity of the reference particle or ``"T-m"``)
 
 .. py:class:: impactx.elements.Multipole(multipole, K_normal, K_skew)
 

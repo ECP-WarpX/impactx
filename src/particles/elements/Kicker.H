@@ -31,16 +31,22 @@ namespace impactx
         static constexpr auto name = "Kicker";
         using PType = ImpactXParticleContainer::ParticleType;
 
+        enum UnitSystem
+        {
+            dimensionless = 0, //! in units of the magnetic rigidity of the reference particle
+            Tm = 1  //! T-m
+        };
+
         /** A thin transverse kicker element, inducing a transverse
          *  momentum displacement from the reference orbit.
          *
          * @param xkick Strength of horizontal kick
          * @param ykick Strength of vertical kick
-         * @param unit (0 - dimensionless, 1 - T-m)
+         * @param unit units of xkick and ykick
          */
-        Kicker( amrex::ParticleReal const xkick,
-                amrex::ParticleReal const ykick,
-                int const unit )
+        Kicker (amrex::ParticleReal xkick,
+                amrex::ParticleReal ykick,
+                UnitSystem unit)
         : m_xkick(xkick), m_ykick(ykick), m_unit(unit)
         {
         }
@@ -59,12 +65,12 @@ namespace impactx
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
-                amrex::ParticleReal & AMREX_RESTRICT px,
-                amrex::ParticleReal & AMREX_RESTRICT py,
-                amrex::ParticleReal & AMREX_RESTRICT pt,
-                [[maybe_unused]] RefPart const & refpart) const {
-
+            PType& AMREX_RESTRICT p,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            [[maybe_unused]] RefPart const & refpart) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
@@ -75,7 +81,7 @@ namespace impactx
             // normalize quad units to MAD-X convention if needed
             amrex::ParticleReal dpx = m_xkick;
             amrex::ParticleReal dpy = m_ykick;
-            if (m_unit == 1) {
+            if (m_unit == UnitSystem::Tm) {
                   dpx /= refpart.rigidity_Tm();
                   dpy /= refpart.rigidity_Tm();
             }
@@ -99,7 +105,6 @@ namespace impactx
             px = pxout;
             py = pyout;
             pt = ptout;
-
         }
 
         /** This pushes the reference particle. */
@@ -108,8 +113,7 @@ namespace impactx
     private:
         amrex::ParticleReal m_xkick; //! horizontal kick strength
         amrex::ParticleReal m_ykick; //! vertical kick strength
-        int m_unit; //! Kicks are for 0 dimensionless, or for 1 in T-m."
-
+        UnitSystem m_unit; //! Kicks are for 0 dimensionless, or for 1 in T-m."
     };
 
 } // namespace impactx

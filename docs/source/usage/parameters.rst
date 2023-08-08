@@ -489,7 +489,7 @@ Lattice Elements
 
             * ``<element_name>.ykick`` (``float``, dimensionless OR in T-m) the vertical kick strength
 
-            * ``<element_name>.units`` (``integer``, dimensionless) specification of units (default: ``0``)
+            * ``<element_name>.units`` (``string``) specification of units: ``dimensionless`` (default, in units of the magnetic rigidity of the reference particle) or ``T-m``
 
         * ``beam_monitor`` a beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
           If the same element name is used multiple times, then an output series is created with multiple outputs.

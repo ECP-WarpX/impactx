@@ -1,6 +1,6 @@
 .. _examples-kicker:
 
-Test of a transverse kicker
+Test of a Transverse Kicker
 ===========================
 
 This test applies two transverse momentum kicks, first in the horizontal direction (2 mrad) and then in the vertical direction (3 mrad).

@@ -233,10 +233,15 @@ namespace detail
             m_lattice.emplace_back( ChrAcc(ds, ez, bz, nslice) );
         } else if (element_type == "kicker") {
             amrex::Real xkick, ykick;
-            int units = 0;
+            std::string units_str = "dimensionless";
             pp_element.get("xkick", xkick);
             pp_element.get("ykick", ykick);
-            pp_element.queryAdd("units", units);
+            pp_element.queryAdd("units", units_str);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(units_str == "dimensionless" || units_str == "T-m",
+                                             element_name + ".units must be \"dimensionless\" or \"T-m\"");
+            Kicker::UnitSystem units = units_str == "dimensionless" ?
+                Kicker::UnitSystem::dimensionless :
+                Kicker::UnitSystem::Tm;
             m_lattice.emplace_back( Kicker(xkick, ykick, units) );
         } else if (element_type == "beam_monitor") {
             std::string openpmd_name = element_name;

@@ -27,12 +27,12 @@ monitor.type = beam_monitor
 monitor.backend = h5
 
 hkick.type = kicker
-hkick.xkick = 2.0e-3      //2 mrad horizontal kick
+hkick.xkick = 2.0e-3      # 2 mrad horizontal kick
 hkick.ykick = 0.0
 
 vkick.type = kicker
 vkick.xkick = 0.0
-vkick.ykick = 3.0e-3     //3 mrad vertical kick
+vkick.ykick = 3.0e-3     # 3 mrad vertical kick
 
 ###############################################################################
 # Algorithms
