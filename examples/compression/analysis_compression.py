@@ -66,13 +66,14 @@ print(f"  sigx={sigx:e} sigy={sigy:e} sigt={sigt:e}")
 print(
     f"  emittance_x={emittance_x:e} emittance_y={emittance_y:e} emittance_t={emittance_t:e}"
 )
+print(f"  gamma={initial_gamma_ref:e}")
 
 atol = 0.0  # ignored
 rtol = 1.5 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
-    [sigx, sigy, sigt, emittance_x, emittance_y, emittance_t],
+    [sigx, sigy, sigt, emittance_x, emittance_y, emittance_t, initial_gamma_ref],
     [
         5.0e-04,
         5.0e-04,
@@ -80,6 +81,7 @@ assert np.allclose(
         4.952764e-09,
         5.028325e-09,
         1.997821e-08,
+        40.1389432485322889,
     ],
     rtol=rtol,
     atol=atol,
@@ -95,23 +97,25 @@ print(f"  sigx={sigx:e} sigy={sigy:e} sigt={sigt:e}")
 print(
     f"  emittance_x={emittance_x:e} emittance_y={emittance_y:e} emittance_t={emittance_t:e}"
 )
+print(f"  gamma={final_gamma_ref:e}")
+
 
 atol = 0.0  # ignored
 rtol = 1.5 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
-    [sigx, sigy, sigt, emittance_x, emittance_y, emittance_t],
+    [sigx, sigy, sigt, emittance_x, emittance_y, emittance_t, final_gamma_ref],
     [
-        5.005845e-04,
-        5.006680e-04,
-        1.444522e-03,
-        4.952764e-09,
-        5.028325e-09,
-        7.775187e-05,
+        5.004995e-04,
+        5.005865e-04,
+        3.033949e-03,
+        4.067876e-09,
+        4.129937e-09,
+        6.432081e-05,
+        48.8654787469061860,
     ],
     rtol=rtol,
     atol=atol,
 )
 
-# TODO assert final_gamma_ref
