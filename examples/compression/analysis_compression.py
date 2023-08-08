@@ -118,4 +118,3 @@ assert np.allclose(
     rtol=rtol,
     atol=atol,
 )
-
