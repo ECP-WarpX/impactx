@@ -48,7 +48,7 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 # design the accelerator lattice
 sim.lattice.append(monitor)
 #   Short RF cavity element
-shortrf1 = elements.ShortRF(V=1000.0, freq=1.3e9, phase=-90.0)
+shortrf1 = elements.ShortRF(V=1000.0, freq=1.3e9, phase=-89.5)
 #   Drift element
 drift1 = elements.Drift(ds=1.7)
 

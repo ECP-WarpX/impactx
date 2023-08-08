@@ -29,7 +29,7 @@ monitor.backend = h5
 shortrf1.type = shortrf
 shortrf1.V = 1000.0
 shortrf1.freq = 1.3e9
-shortrf1.phase = -90.0
+shortrf1.phase = -89.5
 
 drift1.type = drift
 drift1.ds = 1.7

@@ -3,10 +3,12 @@
 Ballistic Compression Using a Short RF Element
 ==============================================
 
-A 20 MeV electron beam propagates through a short RF element at zero-crossing, inducing a head-tail energy correlation.
-This is followed by ballistic motion in a drift, which is used to compress the bunch length by a factor of 3.
+A 20 MeV electron beam propagates through a short RF element near zero-crossing, inducing a head-tail energy correlation.
+This is followed by ballistic motion in a drift, which is used to compress the rms bunch length from 16 ps to 10 ps (compression of 5/3).
 
-The transverse emittance is sufficiently small that the transverse second moments are essentially unchanged.  Due to RF curvature, there is some growth of the longitudinal emittance.
+The beam is not exactly on-crest (phase = -89.5 deg), so there is an energy gain of 4.5 MeV.
+
+The transverse emittance is sufficiently small that the horizontal and verticle beam size are essentially unchanged.  Due to RF curvature, there is some growth of the longitudinal emittance.
 
 In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
