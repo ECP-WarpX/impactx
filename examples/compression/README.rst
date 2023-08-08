@@ -1,12 +1,10 @@
 .. _examples-compression:
 
-Ballistic compression using a short RF element
-================================================
+Ballistic Compression Using a Short RF Element
+==============================================
 
-A 20 MeV electron beam propagates through a short RF element
-at zero-crossing, inducing a head-tail energy correlation.
-This is followed by ballistic motion in a drift, which is
-used to compress the bunch length by a factor of 3.
+A 20 MeV electron beam propagates through a short RF element at zero-crossing, inducing a head-tail energy correlation.
+This is followed by ballistic motion in a drift, which is used to compress the bunch length by a factor of 3.
 
 The transverse emittance is sufficiently small that the transverse second moments are essentially unchanged.  Due to RF curvature, there is some growth of the longitudinal emittance.
 
