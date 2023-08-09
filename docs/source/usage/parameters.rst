@@ -524,9 +524,7 @@ Lattice Elements
 
             * ``<element_name>.ymax`` (``float``, in meters) maximum value of the vertical coordinate
 
-            * ``<element_name>.shape`` (``integer``, dimensionless) shape of the aperture boundary
-
-                (m = 0) rectangular, (m = 1) elliptical
+            * ``<element_name>.shape`` (``string``) shape of the aperture boundary: ``rectangular`` (default) or ``elliptical``
 
         * ``beam_monitor`` a beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
           If the same element name is used multiple times, then an output series is created with multiple outputs.

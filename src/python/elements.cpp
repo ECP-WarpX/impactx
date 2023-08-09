@@ -125,12 +125,20 @@ void init_elements(py::module& m)
 
     py::class_<Aperture, elements::Thin> py_Aperture(me, "Aperture");
     py_Aperture
-        .def(py::init<
-        int,
-                amrex::ParticleReal const,
-                amrex::ParticleReal const,
-                int>(),
-             py::arg("xmax"), py::arg("ymax"), py::arg("shape") = 0,
+        .def(py::init([](
+                 amrex::ParticleReal xmax,
+                 amrex::ParticleReal ymax,
+                 std::string shape)
+             {
+                 if (shape != "rectangular" && shape != "elliptical")
+                     throw std::runtime_error("shape must be \"rectangular\" or \"elliptical\"");
+
+                 Aperture::Shape s = shape == "rectangular" ?
+                     Aperture::Shape::rectangular :
+                     Aperture::Shape::elliptical;
+                 return new Aperture(xmax, ymax, s);
+             }),
+             py::arg("xmax"), py::arg("ymax"), py::arg("shape") = "rectangular",
              "A short collimator element applying a transverse aperture boundary."
         )
     ;

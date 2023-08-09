@@ -712,13 +712,13 @@ References:
    :param phi_in: angle of the reference particle with respect to the longitudinal (z) axis in the original frame in degrees
    :param phi_out: angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame in degrees
 
-.. py:class:: impactx.elements.Aperture(xmax, ymax, shape=0)
+.. py:class:: impactx.elements.Aperture(xmax, ymax, shape="rectangular")
 
    A thin collimator element, applying a transverse aperture boundary.
 
    :param xmax: maximum allowed value of the horizontal coordinate (meter)
    :param ymax: maximum allowed value of the vertical coordinate (meter)
-   :param shape: aperture boundary shape (0 rectangular, 1 elliptical)
+   :param shape: aperture boundary shape: ``"rectangular"`` (default) or ``"elliptical"``
 
 .. py:class:: impactx.elements.SoftQuadrupole(ds, gscale, cos_coefficients, sin_coefficients, nslice=1)
 

@@ -32,16 +32,22 @@ namespace impactx
         static constexpr auto name = "Aperture";
         using PType = ImpactXParticleContainer::ParticleType;
 
+        enum Shape
+        {
+            rectangular,
+            elliptical
+        };
+
         /** A thin collimator element that applies a transverse aperture boundary.
          *  Particles outside the boundary are considered lost.
          *
-         * @param shape aperture shape (0 rectangular, 1 elliptical)
+         * @param shape aperture shape
          * @param xmax maximum value of horizontal coordinate (m)
          * @param ymax maximum value of vertical coordinate (m)
          */
-        Aperture(  amrex::ParticleReal const xmax,
-                   amrex::ParticleReal const ymax,
-                   int const shape)
+        Aperture (amrex::ParticleReal xmax,
+                  amrex::ParticleReal ymax,
+                  Shape shape)
         : m_shape(shape), m_xmax(xmax), m_ymax(ymax)
         {
         }
@@ -60,55 +66,49 @@ namespace impactx
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
-                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT px,
-                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT py,
-                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT pt,
-                [[maybe_unused]] RefPart const & refpart) const {
-
+            PType& AMREX_RESTRICT p,
+            [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT px,
+            [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT py,
+            [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT pt,
+            [[maybe_unused]] RefPart const & refpart) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
             amrex::ParticleReal const y = p.pos(RealAoS::y);
-            int const id = p.id();
-            //uint64_t const global_id = ablastr::particles::localIDtoGlobal(p.id(), p.cpu());
+            auto const id = p.id();
 
             // scale horizontal and vertical coordinates
-            amrex::ParticleReal const u = x/m_xmax;
-            amrex::ParticleReal const v = y/m_ymax;
+            amrex::ParticleReal const u = x / m_xmax;
+            amrex::ParticleReal const v = y / m_ymax;
 
             // compare against the aperture boundary
-
-            switch(m_shape) {
-
-           // rectangular aperture (default)
-               case 0 :
-                  if (pow(u,2)>1 || pow(v,2)>1){
-                     p.pos(RealAoS::x) = 0.0_prt; //replace with id change of sign
-                     p.pos(RealAoS::y) = 0.0_prt; //replace with id change of sign
+            switch (m_shape)
+            {
+                case Shape::rectangular :  // default
+                  if (pow(u,2)>1 || pow(v,2) > 1_prt) {
+                     p.pos(RealAoS::x) = 0.0_prt; // replace with id change of sign
+                     p.pos(RealAoS::y) = 0.0_prt; // replace with id change of sign
                      p.id() = -id;
                   }
                   break;
 
-           // elliptical aperture
-               case 1 :
-                  if (pow(u,2)+pow(v,2)>1){
-                     p.pos(RealAoS::x) = 0.0_prt; //replace with id change of sign
-                     p.pos(RealAoS::y) = 0.0_prt; //replace with id change of sign
+               case Shape::elliptical :
+                  if (pow(u,2)+pow(v,2) > 1_prt) {
+                     p.pos(RealAoS::x) = 0.0_prt; // replace with id change of sign
+                     p.pos(RealAoS::y) = 0.0_prt; // replace with id change of sign
                      p.id() = -id;
                   }
                   break;
-
             }
-
         }
 
         /** This pushes the reference particle. */
         using Thin::operator();
 
     private:
-        int m_shape; //! aperture type (1 rectangular, 2 elliptical)
+        Shape m_shape; //! aperture type (rectangular, elliptical)
         amrex::ParticleReal m_xmax; //! maximum horizontal coordinate
         amrex::ParticleReal m_ymax; //! maximum vertical coordinate
 

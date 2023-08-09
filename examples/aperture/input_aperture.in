@@ -28,7 +28,7 @@ monitor.type = beam_monitor
 monitor.backend = h5
 
 collimator.type = aperture
-collimator.shape = 0
+collimator.shape = rectangular
 collimator.xmax = 1.0e-3
 collimator.ymax = 1.5e-3
 
