@@ -88,16 +88,12 @@ namespace impactx
             {
                 case Shape::rectangular :  // default
                   if (pow(u,2)>1 || pow(v,2) > 1_prt) {
-                     p.pos(RealAoS::x) = 0.0_prt; // replace with id change of sign
-                     p.pos(RealAoS::y) = 0.0_prt; // replace with id change of sign
                      p.id() = -id;
                   }
                   break;
 
                case Shape::elliptical :
                   if (pow(u,2)+pow(v,2) > 1_prt) {
-                     p.pos(RealAoS::x) = 0.0_prt; // replace with id change of sign
-                     p.pos(RealAoS::y) = 0.0_prt; // replace with id change of sign
                      p.id() = -id;
                   }
                   break;

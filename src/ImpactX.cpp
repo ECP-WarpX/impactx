@@ -9,6 +9,7 @@
  */
 #include "ImpactX.H"
 #include "initialization/InitAmrCore.H"
+#include "particles/CollectLost.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
 #include "particles/diagnostics/DiagnosticOutput.H"
@@ -209,6 +210,9 @@ namespace impactx
 
                     // push all particles with external maps
                     Push(*m_particle_container, element_variant, global_step);
+
+                    // move "lost" particles to another particle container
+                    collect_lost_particles(*m_particle_container, *m_particles_lost);
 
                     // just prints an empty newline at the end of the slice_step
                     amrex::Print() << "\n";

@@ -134,6 +134,9 @@ namespace impactx
         /** these are the physical/beam particles of the simulation */
         std::unique_ptr<ImpactXParticleContainer> m_particle_container;
 
+        /** former beam particles that got lost in apertures, the wall, etc. */
+        std::unique_ptr<ImpactXParticleContainer> m_particles_lost;
+
         /** charge density per level */
         std::unordered_map<int, amrex::MultiFab> m_rho;
         /** scalar potential per level */
