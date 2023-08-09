@@ -27,6 +27,7 @@ This section allows you to **download input files** that correspond to different
    examples/cyclotron/README.rst
    examples/cfbend/README.rst
    examples/compression/README.rst
+   examples/kicker/README.rst
 
 
 Unit tests

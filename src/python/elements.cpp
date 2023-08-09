@@ -182,6 +182,25 @@ void init_elements(py::module& m)
         )
     ;
 
+    py::class_<Kicker, elements::Thin>(me, "Kicker")
+        .def(py::init([](
+                amrex::ParticleReal xkick,
+                amrex::ParticleReal ykick,
+                std::string units)
+             {
+                 if (units != "dimensionless" && units != "T-m")
+                     throw std::runtime_error("units must be \"dimensionless\" or \"T-m\"");
+
+                 Kicker::UnitSystem u = units == "dimensionless" ?
+                                            Kicker::UnitSystem::dimensionless :
+                                            Kicker::UnitSystem::Tm;
+                 return new Kicker(xkick, ykick, u);
+             }),
+             py::arg("xkick"), py::arg("ykick"), py::arg("units") = "dimensionless",
+             "A thin transverse kicker element. Kicks are for units \"dimensionless\" or in \"T-m\"."
+        )
+    ;
+
     py::class_<Multipole, elements::Thin>(me, "Multipole")
         .def(py::init<
                 int const,

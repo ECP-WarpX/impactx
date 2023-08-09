@@ -20,6 +20,7 @@
 #include "Drift.H"
 #include "ExactDrift.H"
 #include "ExactSbend.H"
+#include "Kicker.H"
 #include "Multipole.H"
 #include "None.H"
 #include "NonlinearLens.H"
@@ -52,6 +53,7 @@ namespace impactx
         Drift,
         ExactDrift,
         ExactSbend,
+        Kicker,
         Multipole,
         NonlinearLens,
         Programmable,

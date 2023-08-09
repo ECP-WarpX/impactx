@@ -471,6 +471,14 @@ This module provides elements for the accelerator lattice.
    :param ds: Segment length in m
    :param nslice: number of slices used for the application of space charge
 
+.. py:class:: impactx.elements.Kicker(xkick, ykick, units)
+
+   A thin transverse kicker.
+
+   :param xkick: horizontal kick strength (dimensionless OR T-m)
+   :param ykick: vertical kick strength (dimensionless OR T-m)
+   :param units: specification of units (``"dimensionless"`` in units of the magnetic rigidity of the reference particle or ``"T-m"``)
+
 .. py:class:: impactx.elements.Multipole(multipole, K_normal, K_skew)
 
    A general thin multipole element.
