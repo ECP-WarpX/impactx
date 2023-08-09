@@ -87,8 +87,6 @@ assert np.allclose(
     atol=atol,
 )
 
-# TODO assert initial_gamma_ref
-
 
 print("")
 print("Final Beam:")
