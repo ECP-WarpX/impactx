@@ -409,7 +409,7 @@ Lattice Elements
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
-        * ``shortrf`` for a short RF (bunching) cavity element.
+        * ``buncher`` for a short RF cavity (linear) bunching element.
           This requires these additional parameters:
 
             * ``<element_name>.V`` (``float``, dimensionless) normalized voltage drop across the cavity
@@ -419,6 +419,23 @@ Lattice Elements
             * ``<element_name>.k`` (``float``, in 1/meters) the RF wavenumber
 
                 = 2*pi/(RF wavelength in m)
+
+        * ``shortrf`` for a short RF cavity element.
+          This requires these additional parameters:
+
+            * ``<element_name>.V`` (``float``, dimensionless) normalized voltage drop across the cavity
+
+                = (maximum energy gain in MeV) / (particle rest energy in MeV)
+
+            * ``<element_name>.freq`` (``float``, in Hz) the RF frequency
+
+            * ``<element_name>.phase`` (``float``, in degrees) the synchronous RF phase
+
+                phase = 0: maximum energy gain (on-crest)
+
+                phase = -90 deg:  zero energy gain for bunching
+
+                phase = 90 deg:  zero energy gain for debunching
 
         * ``uniform_acc_chromatic`` for a region of uniform acceleration, with chromatic effects included.
            The Hamiltonian is expanded through second order in the transverse variables (x,px,y,py), with the exact pt dependence retained.

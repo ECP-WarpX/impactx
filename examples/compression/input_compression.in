@@ -3,16 +3,16 @@
 ###############################################################################
 beam.npart = 10000
 beam.units = static
-beam.energy = 250.0
+beam.energy = 20.0
 beam.charge = 1.0e-9
-beam.particle = proton
+beam.particle = electron
 beam.distribution = waterbag
-beam.sigmaX = 3.131948925200e-3
-beam.sigmaY = 1.148450209423e-3
-beam.sigmaT = 2.159922887089e-3
-beam.sigmaPx = 3.192900088357e-4
-beam.sigmaPy = 8.707386631090e-4
-beam.sigmaPt = 4.62979491526e-4
+beam.sigmaX = 0.5e-3
+beam.sigmaY = 0.5e-3
+beam.sigmaT = 5.0e-3
+beam.sigmaPx = 1.0e-5
+beam.sigmaPy = 1.0e-5
+beam.sigmaPt = 4.0e-6
 beam.muxpx = 0.0
 beam.muypy = 0.0
 beam.mutpt = 0.0
@@ -21,26 +21,18 @@ beam.mutpt = 0.0
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
-lattice.elements = monitor quad1 drift1 shortrf1 drift1 quad2 drift1
-                   shortrf1 drift1 quad1 monitor
+lattice.elements = monitor shortrf1 drift1 monitor
 
 monitor.type = beam_monitor
 monitor.backend = h5
 
-quad1.type = quad
-quad1.ds = 0.15
-quad1.k = 2.5
+shortrf1.type = shortrf
+shortrf1.V = 1000.0
+shortrf1.freq = 1.3e9
+shortrf1.phase = -89.5
 
 drift1.type = drift
-drift1.ds = 1.0
-
-shortrf1.type = buncher
-shortrf1.V = 0.01
-shortrf1.k = 15.0
-
-quad2.type = quad
-quad2.ds = 0.3
-quad2.k = -2.5
+drift1.ds = 1.7
 
 
 ###############################################################################

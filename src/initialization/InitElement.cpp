@@ -113,11 +113,18 @@ namespace detail
             pp_element.get("kt", kt);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( ConstF(ds, kx, ky, kt, nslice) );
-        } else if (element_type == "shortrf") {
+        } else if (element_type == "buncher") {
             amrex::Real V, k;
             pp_element.get("V", V);
             pp_element.get("k", k);
-            m_lattice.emplace_back( ShortRF(V, k) );
+            m_lattice.emplace_back( Buncher(V, k) );
+        } else if (element_type == "shortrf") {
+            amrex::Real V, freq;
+            amrex::Real phase = -90.0;
+            pp_element.get("V", V);
+            pp_element.get("freq", freq);
+            pp_element.queryAdd("phase", phase);
+            m_lattice.emplace_back( ShortRF(V, freq, phase) );
         } else if (element_type == "multipole") {
             int m;
             amrex::Real k_normal, k_skew;
