@@ -46,7 +46,6 @@ cmake-build-*/
 *.kdev?
 
 # clangd LSP files
-compile_commands.json
 **.cache/clangd
 
 # File-based project format:

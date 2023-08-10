@@ -8,11 +8,6 @@ if(${CMAKE_GENERATOR} STREQUAL "Unix Makefiles" OR ${CMAKE_GENERATOR} STREQUAL
                                                    "Ninja")
   if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
       set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-      # and place it in the source directory https://stackoverflow.com/a/60910583
-      add_custom_target(
-        copy-compile-commands ALL
-        ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_BINARY_DIR}/compile_commands.json ${PROJECT_SOURCE_DIR})
   endif()
 endif()
 
