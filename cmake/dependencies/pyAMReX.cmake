@@ -61,7 +61,7 @@ function(find_pyamrex)
         endif()
     elseif(NOT ImpactX_pyamrex_internal)
         # TODO: MPI control
-        find_package(pyAMReX 23.07 CONFIG REQUIRED)
+        find_package(pyAMReX 23.08 CONFIG REQUIRED)
         message(STATUS "pyAMReX: Found version '${pyamrex_VERSION}'")
     endif()
 endfunction()
@@ -76,7 +76,7 @@ option(ImpactX_pyamrex_internal "Download & build pyAMReX" ON)
 set(ImpactX_pyamrex_repo "https://github.com/AMReX-Codes/pyamrex.git"
     CACHE STRING
     "Repository URI to pull and build pyamrex from if(ImpactX_pyamrex_internal)")
-set(ImpactX_pyamrex_branch "23.07"
+set(ImpactX_pyamrex_branch "23.08"
     CACHE STRING
     "Repository branch for ImpactX_pyamrex_repo if(ImpactX_pyamrex_internal)")
 
