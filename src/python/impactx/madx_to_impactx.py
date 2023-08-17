@@ -74,13 +74,6 @@ def lattice(parsed_beamline, nslice=1):
                         K2=d["fint"],
                     )
                 )
-            elif d["type"] == "kicker":
-                impactx_beamline.append(
-                    elements.Kicker(
-                        xkick=d["hkick"],
-                        ykick=d["vkick"],
-                    )
-                )
             elif d["type"] == "monitor":
                 if d["l"] > 0:
                     impactx_beamline.append(elements.Drift(ds=d["l"], nslice=nslice))
