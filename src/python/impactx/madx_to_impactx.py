@@ -31,6 +31,10 @@ def lattice(parsed_beamline, nslice=1):
         "SOLENOID": "Sol",  # Ideal, thick Solenoid: MAD-X user guide 10.9 p78
         "QUADRUPOLE": "Quad",  # Quadrupole
         "DIPEDGE": "DipEdge",
+        # Kicker, idealized thin element,
+        # MADX also defines length "L" and a roll angle around the longitudinal axis "TILT"
+        # https://mad.web.cern.ch/mad/webguide/manual.html#Ch11.S11
+        "KICKER" : "Kicker",
         # note: in MAD-X, this keeps track only of the beam centroid,
         # "In addition it serves to record the beam position for closed orbit correction."
         "MONITOR": "BeamMonitor",  # drift + output diagnostics
@@ -68,6 +72,13 @@ def lattice(parsed_beamline, nslice=1):
                         # MAD-X is using half the gap height
                         g=2.0 * d["hgap"],
                         K2=d["fint"],
+                    )
+                )
+            elif d["type"] == "kicker":
+                impactx_beamline.append(
+                    elements.Kicker(
+                        xkick=d["hkick"],
+                        ykick=d["vkick"],
                     )
                 )
             elif d["type"] == "monitor":
