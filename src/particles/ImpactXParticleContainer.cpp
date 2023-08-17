@@ -104,11 +104,6 @@ namespace impactx
         // number of particles to add
         int const np = x.size();
 
-        // have to resize here, not in the constructor because grids have not
-        // been built when constructor was called.
-        reserveData();
-        resizeData();
-
         auto& particle_tile = DefineAndReturnParticleTile(0, 0, 0);
 
         /* Create a temporary tile to obtain data from simulation. This data

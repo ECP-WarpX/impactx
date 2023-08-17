@@ -34,7 +34,8 @@ namespace impactx
 {
     ImpactX::ImpactX ()
         : AmrCore(initialization::init_amr_core()),
-          m_particle_container(std::make_unique<ImpactXParticleContainer>(this))
+          m_particle_container(std::make_unique<ImpactXParticleContainer>(this)),
+          m_particles_lost(std::make_unique<ImpactXParticleContainer>(this))
     {
         // todo: if amr.n_cells is provided, overwrite/redefine AmrCore object
 
@@ -82,6 +83,18 @@ namespace impactx
         // init blocks / grids & MultiFabs
         AmrCore::InitFromScratch(0.0);
         amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
+
+        // alloc particle containers
+        //   the lost particles have an extra runtime attribute: s when it was lost
+        bool comm = true;
+        m_particles_lost->AddRealComp(comm);
+
+        //   have to resize here, not in the constructor because grids have not
+        //   been built when constructor was called.
+        m_particle_container->reserveData();
+        m_particle_container->resizeData();
+        m_particles_lost->reserveData();
+        m_particles_lost->resizeData();
     }
 
     void ImpactX::evolve ()
