@@ -316,7 +316,7 @@ class MADXParser:
                                 + obj.group(i)
                                 + "'"
                                 + " does not exist for kicker.",
-                                )
+                            )
 
                     self.__elements.append(self.__kicker.copy())
 
@@ -382,10 +382,10 @@ class MADXParser:
 
                     self.sequence["name"] = obj.group(1)
                 else:
-                    raise MADXInputError((
-                        "Error at line " + str(nLine),
-                        "Parsed line: " + str(line)
-                    ), with_traceback=True)
+                    raise MADXInputError(
+                        ("Error at line " + str(nLine), "Parsed line: " + str(line)),
+                        with_traceback=True,
+                    )
 
         # 14. Oct. 2017,
         # https://stackoverflow.com/questions/7900882/extract-item-from-list-of-dictionaries
