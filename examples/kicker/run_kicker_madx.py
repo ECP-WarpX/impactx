@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Copyright 2022-2023 ImpactX contributors
-# Authors: Ryan Sandberg, Axel Huebl, Chad Mitchell, Marco Garten
+# Authors: Chad Mitchell, Axel Huebl, Marco Garten
 # License: BSD-3-Clause-LBNL
 #
 # -*- coding: utf-8 -*-
