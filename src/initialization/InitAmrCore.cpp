@@ -115,7 +115,7 @@ namespace details
         amrex::AmrInfo amr_info;
         const int nprocs = amrex::ParallelDescriptor::NProcs();
         const amrex::IntVect high_end = amr_info.blocking_factor[0]
-                                        * amrex::IntVect(AMREX_D_DECL(nprocs,1,1)) - amrex::IntVect(1);
+                                        * amrex::IntVect(AMREX_D_DECL(1,1,nprocs)) - amrex::IntVect(1);
         amrex::Box domain(amrex::IntVect(0), high_end);
         //   adding amr.n_cell for consistency
         amrex::ParmParse pp_amr("amr");
