@@ -303,7 +303,7 @@ class MADXParser:
 
                     self.__elements.append(self.__dipedge.copy())
 
-                elif re.search(r':\bkicker\b', line):
+                elif re.search(r":\bkicker\b", line):
                     obj = re.match(self.__kicker_pattern, line)
 
                     # first tag is name
@@ -326,7 +326,7 @@ class MADXParser:
 
                     self.__elements.append(self.__kicker.copy())
 
-                elif re.search(r':\bhkicker\b', line):
+                elif re.search(r":\bhkicker\b", line):
                     obj = re.match(self.__hkicker_pattern, line)
 
                     # first tag is name
@@ -346,11 +346,11 @@ class MADXParser:
                                 + obj.group(i)
                                 + "'"
                                 + " does not exist for hkicker.",
-                                )
+                            )
 
                     self.__elements.append(self.__kicker.copy())
 
-                elif re.search(r':\bvkicker\b', line):
+                elif re.search(r":\bvkicker\b", line):
                     obj = re.match(self.__vkicker_pattern, line)
 
                     # first tag is name
@@ -370,7 +370,7 @@ class MADXParser:
                                 + obj.group(i)
                                 + "'"
                                 + " does not exist for vkicker.",
-                                )
+                            )
 
                     self.__elements.append(self.__kicker.copy())
 
