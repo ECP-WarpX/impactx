@@ -7,7 +7,7 @@ This test applies two transverse momentum kicks, first in the horizontal directi
 
 We use a 2 GeV electron beam.
 
-The second beam moments should be unchanged, but the first beam moments corresponding to :math:`\p_x` and :math:`\p_y` should change according to the size of the kick.
+The second beam moments should be unchanged, but the first beam moments corresponding to :math:`p_x` and :math:`p_y` should change according to the size of the kick.
 
 In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
