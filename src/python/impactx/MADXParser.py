@@ -379,7 +379,7 @@ class MADXParser:
 
                 # We treat TKICKER elements exactly like KICKER elements for now
                 # http://mad.web.cern.ch/mad/madx.old/Introduction/tkickers.html
-                elif re.search(r':\btkicker\b', line):
+                elif re.search(r":\btkicker\b", line):
                     obj = re.match(self.__tkicker_pattern, line)
 
                     # first tag is name
@@ -398,7 +398,7 @@ class MADXParser:
                                 + obj.group(i)
                                 + "'"
                                 + " does not exist for tkicker.",
-                                )
+                            )
 
                     self.__elements.append(self.__kicker.copy())
 
