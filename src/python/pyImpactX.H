@@ -6,6 +6,9 @@
  * Authors: Axel Huebl
  * License: BSD-3-Clause-LBNL
  */
+#ifndef IMPACTX_PYIMPACTX_H
+#define IMPACTX_PYIMPACTX_H
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
@@ -19,3 +22,5 @@ namespace py = pybind11;
 using namespace impactx;
 
 PYBIND11_MAKE_OPAQUE(std::list<KnownElements>)
+
+#endif // IMPACTX_PYIMPACTX_H
