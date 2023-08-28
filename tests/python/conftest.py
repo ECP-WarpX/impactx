@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import time
+
 import pytest
 
 import amrex.space3d as amr
@@ -32,3 +34,8 @@ def amrex_init():
     )
     yield
     amr.finalize()
+
+    # sleep 1s because AMReX diagnostics cleanup can only do one rename
+    # per second
+    # https://github.com/AMReX-Codes/amrex/blob/23.08/Src/Base/AMReX_Utility.cpp#L186-L199
+    time.sleep(1)
