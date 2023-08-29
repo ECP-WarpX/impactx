@@ -656,3 +656,4 @@ add_impactx_test(fodo_rf_sc.py
       OFF   # ImpactX Python interface
     examples/epac2004_benchmarks/analysis_fodo_rf_SC.py
     OFF  # no plot script yet
+)
