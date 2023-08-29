@@ -34,7 +34,7 @@ def lattice(parsed_beamline, nslice=1):
         # Kicker, idealized thin element,
         # MADX also defines length "L" and a roll angle around the longitudinal axis "TILT"
         # https://mad.web.cern.ch/mad/webguide/manual.html#Ch11.S11
-        "KICKER": "Kicker",
+        "KICKER": "Kicker",  # TKICKER, HKICKER and VKICKER become KICKER elements
         # note: in MAD-X, this keeps track only of the beam centroid,
         # "In addition it serves to record the beam position for closed orbit correction."
         "MONITOR": "BeamMonitor",  # drift + output diagnostics

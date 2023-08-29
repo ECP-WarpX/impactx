@@ -1,0 +1,8 @@
+beam, particle=electron, energy=2.0;
+
+M1: MONITOR, L=0.0;
+HK1: HKICKER, hkick=2.0e-3;
+VK1: VKICKER, vkick=3.0e-3;
+
+KICKLATTICE: Line=(M1,HK1,VK1,M1);
+USE, SEQUENCE = KICKLATTICE;

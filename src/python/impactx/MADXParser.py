@@ -102,9 +102,18 @@ class MADXParser:
         self.__kicker = {"name": "", "hkick": 0.0, "vkick": 0.0, "type": "kicker"}
 
         self.__kicker_pattern = r"(.*):kicker,(.*)=(.*),(.*)=(.*);"
+        # equivalent to kicker
+        # http://mad.web.cern.ch/mad/madx.old/Introduction/tkickers.html
+        self.__tkicker_pattern = r"(.*):tkicker,(.*)=(.*),(.*)=(.*);"
+        # horizontal kicker without vkick
+        self.__hkicker_pattern = r"(.*):hkicker,(.*)=(.*);"
+        # vertical kicker without hkick
+        self.__vkicker_pattern = r"(.*):vkicker,(.*)=(.*);"
 
         # don't count name and type --> len - 2
         self.__nKicker = 2 * (len(self.__kicker) - 2)
+        self.__nHkicker = self.__nKicker - 2
+        self.__nVkicker = self.__nKicker - 2
 
         self.beam = {
             "energy": 0.0,
@@ -297,7 +306,7 @@ class MADXParser:
 
                     self.__elements.append(self.__dipedge.copy())
 
-                elif "kicker" in line:
+                elif re.search(r":\bkicker\b", line):
                     obj = re.match(self.__kicker_pattern, line)
 
                     # first tag is name
@@ -316,6 +325,79 @@ class MADXParser:
                                 + obj.group(i)
                                 + "'"
                                 + " does not exist for kicker.",
+                            )
+
+                    self.__elements.append(self.__kicker.copy())
+
+                elif re.search(r":\bhkicker\b", line):
+                    obj = re.match(self.__hkicker_pattern, line)
+
+                    # first tag is name
+                    self.__kicker["name"] = obj.group(1)
+                    self.__kicker["vkick"] = 0.0
+
+                    for i in range(2, self.__nHkicker + 2, 2):
+                        if obj.group(i) in self.__kicker:
+                            self.__kicker[obj.group(i)] = float(obj.group(i + 1))
+                        else:
+                            raise MADXInputError(
+                                "HKicker",
+                                "Line "
+                                + str(nLine)
+                                + ": Parameter "
+                                + "'"
+                                + obj.group(i)
+                                + "'"
+                                + " does not exist for hkicker.",
+                            )
+
+                    self.__elements.append(self.__kicker.copy())
+
+                elif re.search(r":\bvkicker\b", line):
+                    obj = re.match(self.__vkicker_pattern, line)
+
+                    # first tag is name
+                    self.__kicker["name"] = obj.group(1)
+                    self.__kicker["hkick"] = 0.0
+
+                    for i in range(2, self.__nVkicker + 2, 2):
+                        if obj.group(i) in self.__kicker:
+                            self.__kicker[obj.group(i)] = float(obj.group(i + 1))
+                        else:
+                            raise MADXInputError(
+                                "VKicker",
+                                "Line "
+                                + str(nLine)
+                                + ": Parameter "
+                                + "'"
+                                + obj.group(i)
+                                + "'"
+                                + " does not exist for vkicker.",
+                            )
+
+                    self.__elements.append(self.__kicker.copy())
+
+                # We treat TKICKER elements exactly like KICKER elements for now
+                # http://mad.web.cern.ch/mad/madx.old/Introduction/tkickers.html
+                elif re.search(r":\btkicker\b", line):
+                    obj = re.match(self.__tkicker_pattern, line)
+
+                    # first tag is name
+                    self.__kicker["name"] = obj.group(1)
+
+                    for i in range(2, self.__nKicker + 2, 2):
+                        if obj.group(i) in self.__kicker:
+                            self.__kicker[obj.group(i)] = float(obj.group(i + 1))
+                        else:
+                            raise MADXInputError(
+                                "TKicker",
+                                "Line "
+                                + str(nLine)
+                                + ": Parameter "
+                                + "'"
+                                + obj.group(i)
+                                + "'"
+                                + " does not exist for tkicker.",
                             )
 
                     self.__elements.append(self.__kicker.copy())

@@ -629,6 +629,16 @@ add_impactx_test(kicker_madx.py
         examples/kicker/analysis_kicker.py
         OFF  # no plot script yet
 )
+# copy MAD-X lattice file
+file(COPY ${ImpactX_SOURCE_DIR}/examples/kicker/hvkicker.madx
+        DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/hvkicker_madx.py)
+add_impactx_test(hvkicker_madx.py
+        examples/kicker/run_hvkicker_madx.py
+        OFF   # ImpactX MPI-parallel
+        ON   # ImpactX Python interface
+        examples/kicker/analysis_kicker.py
+        OFF  # no plot script yet
+)
 
 # FODO + RF EPAC2004 ##################################################
 #
@@ -646,4 +656,3 @@ add_impactx_test(fodo_rf_sc.py
       OFF   # ImpactX Python interface
     examples/epac2004_benchmarks/analysis_fodo_rf_SC.py
     OFF  # no plot script yet
-)
