@@ -1,7 +1,7 @@
 ###############################################################################
 # Particle Beam(s)
 ###############################################################################
-beam.npart = 5000000
+beam.npart = 10000
 beam.units = static
 beam.energy = 250.0
 beam.charge = 1.42857142857142865e-10
@@ -119,9 +119,8 @@ gapb1.sin_coefficients = 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  \
 algo.particle_shape = 2
 algo.space_charge = true
 
-#amr.n_cell = 56 56 48
-amr.n_cell = 64 64 64
-geometry.prob_relative = 3.0
+amr.n_cell = 56 56 64
+geometry.prob_relative = 4.0
 
 ###############################################################################
 # Diagnostics

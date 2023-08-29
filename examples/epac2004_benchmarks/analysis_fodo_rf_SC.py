@@ -46,25 +46,43 @@ initial = series.iterations[1].particles["beam"].to_df()
 final = series.iterations[last_step].particles["beam"].to_df()
 
 # compare number of particles
-num_particles = 1000000
+num_particles = 10000
 assert num_particles == len(initial)
 assert num_particles == len(final)
 
 print("Initial Beam:")
 sigx, sigy, sigt, emittance_x, emittance_y, emittance_t = get_moments(initial)
 print(f"  sigx={sigx:e} sigy={sigy:e} sigt={sigt:e}")
+
+atol = 0.0  # ignored
+rtol = 3.0*num_particles**-0.5  # from random sampling of a smooth distribution
+print(f"  rtol={rtol} (ignored: atol~={atol})")
+
+assert np.allclose(
+    [sigx, sigy, sigt],
+    [
+        9.84722273e-4,
+        6.96967278e-4,
+        4.486799242214e-03
+    ],
+    rtol=rtol,
+    atol=atol,
+)
+
 print(
     f"  emittance_x={emittance_x:e} emittance_y={emittance_y:e} emittance_t={emittance_t:e}"
 )
 
-atol = 0.0  # ignored
-rtol = 1.0e12 * num_particles**-0.5  # from random sampling of a smooth distribution
-print(f"  rtol={rtol} (ignored: atol~={atol})")
+atol = 4.0e-8 
+print(f"  atol={atol}")
 
 assert np.allclose(
-    [sigx, sigy, sigt, emittance_x, emittance_y, emittance_t],
-    [9.84722273e-4, 6.96967278e-4, 4.486799242214e-03, 0.0, 0.0, 0.0],
-    rtol=rtol,
+    [emittance_x, emittance_y, emittance_t],
+    [
+        0.0,
+        0.0,
+        0.0
+    ],
     atol=atol,
 )
 
@@ -73,17 +91,35 @@ print("")
 print("Final Beam:")
 sigx, sigy, sigt, emittance_x, emittance_y, emittance_t = get_moments(final)
 print(f"  sigx={sigx:e} sigy={sigy:e} sigt={sigt:e}")
+
+atol = 0.0  # ignored
+rtol = 3.0*num_particles**-0.5  # from random sampling of a smooth distribution
+print(f"  rtol={rtol} (ignored: atol~={atol})")
+
+assert np.allclose(
+    [sigx, sigy, sigt],
+    [
+        9.84722273e-4,
+        6.96967278e-4,
+        4.486799242214e-03
+    ],
+    rtol=rtol,
+    atol=atol,
+)
+
 print(
     f"  emittance_x={emittance_x:e} emittance_y={emittance_y:e} emittance_t={emittance_t:e}"
 )
 
-atol = 0.0  # ignored
-rtol = 1.0e12 * num_particles**-0.5  # from random sampling of a smooth distribution
-print(f"  rtol={rtol} (ignored: atol~={atol})")
+atol = 4.0e-8
+print(f"  atol={atol}")
 
 assert np.allclose(
-    [sigx, sigy, sigt, emittance_x, emittance_y, emittance_t],
-    [9.84722273e-4, 6.96967278e-4, 4.486799242214e-03, 0.0, 0.0, 0.0],
-    rtol=rtol,
+    [emittance_x, emittance_y, emittance_t],
+    [
+        0.0,
+        0.0,
+        0.0
+    ],
     atol=atol,
 )
