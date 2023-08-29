@@ -10,6 +10,7 @@
 
 import math
 
+from conftest import basepath
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -24,7 +25,7 @@ def test_charge_deposition(save_png=True):
     sim = impactx.ImpactX()
 
     sim.n_cell = [16, 24, 32]
-    sim.load_inputs_file("examples/fodo/input_fodo.in")
+    sim.load_inputs_file(basepath + "/examples/fodo/input_fodo.in")
     sim.space_charge = True
     sim.slice_step_diagnostics = False
 

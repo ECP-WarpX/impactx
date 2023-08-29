@@ -7,6 +7,7 @@
 #
 # -*- coding: utf-8 -*-
 
+from conftest import basepath
 import numpy as np
 import pytest
 
@@ -20,7 +21,7 @@ def test_impactx_fodo_file():
     """
     sim = ImpactX()
 
-    sim.load_inputs_file("examples/fodo/input_fodo.in")
+    sim.load_inputs_file(basepath + "/examples/fodo/input_fodo.in")
 
     sim.init_grids()
     sim.init_beam_distribution_from_inputs()
@@ -221,7 +222,7 @@ def test_impactx_no_elements():
     """
     sim = ImpactX()
 
-    sim.load_inputs_file("examples/fodo/input_fodo.in")
+    sim.load_inputs_file(basepath + "/examples/fodo/input_fodo.in")
 
     sim.init_grids()
     sim.init_beam_distribution_from_inputs()

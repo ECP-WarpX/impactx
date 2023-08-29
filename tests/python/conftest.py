@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 import pytest
 
 import amrex.space3d as amr
@@ -11,6 +13,9 @@ if impactx.Config.have_mpi:
     print("loaded mpi4py")
 else:
     print("NO mpi4py load")
+
+# base path for input files
+basepath = os.getcwd()
 
 
 @pytest.fixture(autouse=True, scope="function")
