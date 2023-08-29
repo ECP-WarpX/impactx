@@ -31,5 +31,5 @@ def amrex_init(tmpdir):
                 "amrex.the_arena_is_managed=0",
             ]
         )
-    yield
-    amr.finalize()
+        yield
+        amr.finalize()
