@@ -59,9 +59,9 @@ dr = elements.Drift(ds=0.1, nslice=4)
 
 #   RF cavity elements
 gapa1 = elements.RFCavity(
-        ds=1.0, 
-        escale=0.042631556991578, 
-        freq=7.0e8, 
+        ds=1.0,
+        escale=0.042631556991578,
+        freq=7.0e8,
         phase=45.0,
         cos_coefficients=[
                 0.120864178375839,
@@ -96,9 +96,9 @@ gapa1 = elements.RFCavity(
 )
 
 gapb1 = elements.RFCavity(
-        ds=1.0, 
-        escale=0.042631556991578, 
-        freq=7.0e8, 
+        ds=1.0,
+        escale=0.042631556991578,
+        freq=7.0e8,
         phase=-1.0,
         cos_coefficients=[
                 0.120864178375839,
