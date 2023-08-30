@@ -58,7 +58,8 @@ namespace impactx
             amrex::ParmParse const pp_amr("amr");
             pp_amr.queryarr("n_cell", n_cell);
 
-            amrex::IntVect const lo(amrex::IntVect::TheZeroVector()), hi(n_cell);
+            amrex::IntVect const lo(amrex::IntVect::TheZeroVector());
+            amrex::IntVect hi(n_cell);
             hi -= amrex::IntVect::TheUnitVector();
             amrex::Box index_domain(lo,hi);
             for (int i = 0; i <= max_level; i++)
