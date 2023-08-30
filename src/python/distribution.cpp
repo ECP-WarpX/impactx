@@ -18,7 +18,7 @@ using namespace impactx;
 
 void init_distribution(py::module& m)
 {
-    py::module_ md = m.def_submodule(
+    py::module_ const md = m.def_submodule(
         "distribution",
         "Particle beam distributions in ImpactX"
     );

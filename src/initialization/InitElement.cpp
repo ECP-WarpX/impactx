@@ -37,7 +37,7 @@ namespace detail
     template <typename T>
     int queryAddResize (amrex::ParmParse& pp, const char* name, std::vector<T>& ref) {
         std::vector<T> empty;
-        int exist = pp.queryarr(name, empty);
+        int const exist = pp.queryarr(name, empty);
         if (exist) {
             ref.resize(empty.size());
             pp.queryarr(name, ref);
@@ -141,7 +141,7 @@ namespace detail
             amrex::Real ds, escale, freq, phase;
             int nslice = nslice_default;
             int mapsteps = mapsteps_default;
-            RF_field_data ez;
+            RF_field_data const ez;
             std::vector<amrex::ParticleReal> cos_coef = ez.default_cos_coef;
             std::vector<amrex::ParticleReal> sin_coef = ez.default_sin_coef;
             pp_element.get("ds", ds);
@@ -169,7 +169,7 @@ namespace detail
             amrex::Real ds, bscale;
             int nslice = nslice_default;
             int mapsteps = mapsteps_default;
-            Sol_field_data bz;
+            Sol_field_data const bz;
             std::vector<amrex::ParticleReal> cos_coef = bz.default_cos_coef;
             std::vector<amrex::ParticleReal> sin_coef = bz.default_sin_coef;
             pp_element.get("ds", ds);
@@ -183,7 +183,7 @@ namespace detail
             amrex::Real ds, gscale;
             int nslice = nslice_default;
             int mapsteps = mapsteps_default;
-            Quad_field_data gz;
+            Quad_field_data const gz;
             std::vector<amrex::ParticleReal> cos_coef = gz.default_cos_coef;
             std::vector<amrex::ParticleReal> sin_coef = gz.default_sin_coef;
             pp_element.get("ds", ds);
@@ -239,7 +239,7 @@ namespace detail
             pp_element.queryAdd("units", units_str);
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(units_str == "dimensionless" || units_str == "T-m",
                                              element_name + ".units must be \"dimensionless\" or \"T-m\"");
-            Kicker::UnitSystem units = units_str == "dimensionless" ?
+            Kicker::UnitSystem const units = units_str == "dimensionless" ?
                 Kicker::UnitSystem::dimensionless :
                 Kicker::UnitSystem::Tm;
             m_lattice.emplace_back( Kicker(xkick, ykick, units) );
@@ -306,7 +306,7 @@ namespace detail
         pp_lattice.query("nslice", nslice_default);
 
         // Default number of map integration steps per slice
-        int mapsteps_default = 10;  // used only in RF cavity
+        int const mapsteps_default = 10;  // used only in RF cavity
 
         // Loop through lattice elements
         for (std::string const & element_name : lattice_elements) {

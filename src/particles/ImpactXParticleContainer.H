@@ -195,7 +195,7 @@ namespace impactx
          *
          * @returns refpart
          */
-        RefPart const
+        RefPart const &
         GetRefParticle () const;
 
         /** Update reference particle element edge
