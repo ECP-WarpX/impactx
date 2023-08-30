@@ -85,7 +85,7 @@ namespace impactx
             // intialize output values of momenta
             amrex::ParticleReal pxout = px;
             amrex::ParticleReal pyout = py;
-            amrex::ParticleReal ptout = pt;
+            amrex::ParticleReal const ptout = pt;
 
             if(m_k > 0.0) {
                // advance position and momentum (focusing quad)

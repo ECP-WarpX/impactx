@@ -84,10 +84,10 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // store rotation angle and initial, final values of pz
-            amrex::ParticleReal theta = m_phi_out - m_phi_in;
-            amrex::ParticleReal pz = sqrt(1.0_prt - 2.0_prt*pt/beta
+            amrex::ParticleReal const theta = m_phi_out - m_phi_in;
+            amrex::ParticleReal const pz = sqrt(1.0_prt - 2.0_prt*pt/beta
                + pow(pt,2) - pow(py,2) - pow(px + sin(m_phi_in),2));
-            amrex::ParticleReal pzf = pz*cos(theta) - (px +
+            amrex::ParticleReal const pzf = pz*cos(theta) - (px +
                  sin(m_phi_in))*sin(theta);
 
             // advance position and momentum

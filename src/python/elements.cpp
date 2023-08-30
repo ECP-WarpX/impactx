@@ -8,6 +8,7 @@
 #include <particles/elements/All.H>
 #include <AMReX.H>
 
+#include <utility>
 #include <vector>
 
 namespace py = pybind11;
@@ -26,25 +27,25 @@ void init_elements(py::module& m)
     kel
         .def(py::init<>())
         .def(py::init<KnownElements>())
-        .def(py::init([](py::list l){
+        .def(py::init([](py::list const & l){
             auto v = new KnownElementsList;
             for (auto const & handle : l)
                 v->push_back(handle.cast<KnownElements>());
             return v;
         }))
 
-        .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(el); },
+        .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(std::move(el)); },
              "Add a single element to the list.")
 
         .def("extend",
-             [](KnownElementsList &v, KnownElementsList l) {
+             [](KnownElementsList &v, KnownElementsList const & l) {
                  for (auto const & el : l)
                     v.push_back(el);
                  return v;
              },
              "Add a list of elements to the list.")
         .def("extend",
-             [](KnownElementsList &v, py::list l) {
+             [](KnownElementsList &v, py::list const & l) {
                  for (auto const & handle : l)
                  {
                     auto el = handle.cast<KnownElements>();
@@ -186,7 +187,7 @@ void init_elements(py::module& m)
         .def(py::init([](
                 amrex::ParticleReal xkick,
                 amrex::ParticleReal ykick,
-                std::string units)
+                std::string const & units)
              {
                  if (units != "dimensionless" && units != "T-m")
                      throw std::runtime_error(R"(units must be "dimensionless" or "T-m")");
@@ -250,21 +251,21 @@ void init_elements(py::module& m)
               [](Programmable & p) { return p.m_push; },
               [](Programmable & p,
                  std::function<void(ImpactXParticleContainer *, int)> new_hook
-              ) { p.m_push = new_hook; },
+              ) { p.m_push = std::move(new_hook); },
               "hook for push of whole container (pc, step)"
         )
         .def_property("beam_particles",
               [](Programmable & p) { return p.m_beam_particles; },
               [](Programmable & p,
                  std::function<void(ImpactXParticleContainer::iterator *, RefPart &)> new_hook
-              ) { p.m_beam_particles = new_hook; },
+              ) { p.m_beam_particles = std::move(new_hook); },
               "hook for beam particles (pti, RefPart)"
         )
         .def_property("ref_particle",
               [](Programmable & p) { return p.m_ref_particle; },
               [](Programmable & p,
                  std::function<void(RefPart &)> new_hook
-              ) { p.m_ref_particle = new_hook; },
+              ) { p.m_ref_particle = std::move(new_hook); },
               "hook for reference particle (RefPart)"
         )
     ;

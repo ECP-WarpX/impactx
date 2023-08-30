@@ -13,9 +13,7 @@
 #include "particles/ImpactXParticleContainer.H"
 
 
-namespace impactx
-{
-namespace transformation
+namespace impactx::transformation
 {
     /** Direction of the \see CoordinateTransformation
      */
@@ -33,7 +31,6 @@ namespace transformation
     void CoordinateTransformation (ImpactXParticleContainer &pc,
                                    Direction const & direction);
 
-} // namespace transformation
-} // namespace impactx
+} // namespace impactx::transformation
 
 #endif // IMPACTX_COORDINATE_TRANSFORMATION_H

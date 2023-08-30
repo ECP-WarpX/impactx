@@ -16,9 +16,7 @@
 #include <cmath>
 
 
-namespace impactx
-{
-namespace distribution
+namespace impactx::distribution
 {
     struct Kurth6D
     {
@@ -110,7 +108,7 @@ namespace distribution
             pt = pr*costheta - p2*sintheta;
 
             // Scale to produce the identity covariance matrix:
-            amrex::ParticleReal c = sqrt(5.0_prt);
+            amrex::ParticleReal const c = sqrt(5.0_prt);
             x = c*x;
             y = c*y;
             t = c*t;
@@ -141,7 +139,6 @@ namespace distribution
         amrex::ParticleReal m_muxpx,m_muypy,m_mutpt; //! correlation length-momentum
     };
 
-} // namespace distribution
-} // namespace impactx
+} // namespace impactx::distribution
 
 #endif // IMPACTX_DISTRIBUTION_KURTH6D

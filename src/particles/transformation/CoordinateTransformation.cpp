@@ -19,10 +19,11 @@
 #include <cmath>
 
 
-namespace impactx::transformation {
+namespace impactx::transformation
+{
     void CoordinateTransformation (ImpactXParticleContainer &pc,
                                    Direction const &direction)
-   {
+    {
         BL_PROFILE("impactx::transformation::CoordinateTransformation");
         using namespace amrex::literals; // for _rt and _prt
 
@@ -93,4 +94,4 @@ namespace impactx::transformation {
             } // end loop over all particle boxes
         } // env mesh-refinement level loop
     }
-} // namespace impactx
+} // namespace impactx::transformation

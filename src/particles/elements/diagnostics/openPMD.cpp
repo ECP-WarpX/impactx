@@ -109,7 +109,7 @@ namespace detail
      * @return pair of openPMD record and component name
      */
     inline std::pair< std::string, std::string >
-    name2openPMD ( std::string const& fullName )
+    name2openPMD ( const std::string& fullName )
     {
         std::string record_name = fullName;
         std::string component_name = io::RecordComponent::SCALAR;
@@ -126,10 +126,10 @@ namespace detail
     // TODO: move to ablastr
     io::RecordComponent get_component_record (
         io::ParticleSpecies & species,
-        std::string const comp_name
+        std::string comp_name
     ) {
         // handle scalar and non-scalar records by name
-        const auto [record_name, component_name] = name2openPMD(comp_name);
+        const auto [record_name, component_name] = name2openPMD(std::move(comp_name));
         return species[record_name][component_name];
     }
 #endif
@@ -240,8 +240,8 @@ namespace detail
 
         // helpers to parse strings to openPMD
         auto const scalar = openPMD::RecordComponent::SCALAR;
-        auto const getComponentRecord = [&beam](std::string const comp_name) {
-            return detail::get_component_record(beam, comp_name);
+        auto const getComponentRecord = [&beam](std::string comp_name) {
+            return detail::get_component_record(beam, std::move(comp_name));
         };
 
         // define data set and metadata
@@ -377,8 +377,8 @@ namespace detail
         //if (numParticleOnTile == 0) continue;
 
         auto const scalar = openPMD::RecordComponent::SCALAR;
-        auto const getComponentRecord = [&beam](std::string const comp_name) {
-            return detail::get_component_record(beam, comp_name);
+        auto const getComponentRecord = [&beam](std::string comp_name) {
+            return detail::get_component_record(beam, std::move(comp_name));
         };
 
         // AoS: position and particle ID
@@ -393,7 +393,7 @@ namespace detail
                 for (auto i = 0; i < numParticleOnTile; i++) {
                     curr.get()[i] = aos[i].pos(currDim);
                 }
-                std::string const positionComponent = positionComponents[currDim];
+                std::string const& positionComponent = positionComponents[currDim];
                 beam["position"][positionComponent].storeChunk(curr, {offset},
                                                                {numParticleOnTile64});
             }

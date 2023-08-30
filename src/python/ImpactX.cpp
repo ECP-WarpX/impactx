@@ -40,7 +40,7 @@ namespace detail
      * @return the queried value (or throws if not found)
      */
     template< typename T>
-    auto get_or_throw (std::string const prefix, std::string const name)
+    auto get_or_throw (std::string const & prefix, std::string const & name)
     {
         T value;
         bool const has_name = amrex::ParmParse(prefix).query(name.c_str(), value);
@@ -58,7 +58,7 @@ void init_ImpactX (py::module& m)
         .def(py::init<>())
 
         .def("load_inputs_file",
-            [](ImpactX const & /* ix */, std::string const filename) {
+            [](ImpactX const & /* ix */, std::string const & filename) {
 #if defined(AMREX_DEBUG) || defined(DEBUG)
                 // note: only in debug, since this is costly for the file
                 // system for highly parallel simulations with MPI
@@ -276,7 +276,7 @@ void init_ImpactX (py::module& m)
              [](ImpactX & /* ix */){
                  return detail::get_or_throw<std::string>("impactx", "abort_on_warning_threshold");
              },
-             [](ImpactX & ix, std::string const str_abort_on_warning_threshold) {
+             [](ImpactX & ix, std::string const & str_abort_on_warning_threshold) {
                  amrex::ParmParse pp_impactx("impactx");
                  pp_impactx.add("abort_on_warning_threshold", str_abort_on_warning_threshold);
                  // query input for warning logger variables and set up warning logger accordingly
@@ -358,7 +358,7 @@ void init_ImpactX (py::module& m)
         )
         .def(
             "space_charge_field",
-            [](ImpactX & ix, int const lev, std::string const comp) {
+            [](ImpactX & ix, int lev, std::string const & comp) {
                 return &ix.m_space_charge_field.at(lev).at(comp);
             },
             py::arg("lev"), py::arg("comp"),
@@ -407,7 +407,7 @@ void init_ImpactX (py::module& m)
 //            "ImpactX version")
         .def_property_readonly_static(
             "have_mpi",
-            [](py::object){
+            [](py::object const &){
 #ifdef AMREX_USE_MPI
                 return true;
 #else
@@ -416,7 +416,7 @@ void init_ImpactX (py::module& m)
             })
         .def_property_readonly_static(
             "have_gpu",
-            [](py::object){
+            [](py::object const &){
 #ifdef AMREX_USE_GPU
                 return true;
 #else
@@ -425,7 +425,7 @@ void init_ImpactX (py::module& m)
             })
         .def_property_readonly_static(
             "have_omp",
-            [](py::object){
+            [](py::object const &){
 #ifdef AMREX_USE_OMP
                 return true;
 #else
@@ -434,7 +434,7 @@ void init_ImpactX (py::module& m)
             })
         .def_property_readonly_static(
             "gpu_backend",
-            [](py::object){
+            [](py::object const &){
 #ifdef AMREX_USE_CUDA
                 return "CUDA";
 #elif defined(AMREX_USE_HIP)

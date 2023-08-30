@@ -52,7 +52,7 @@ namespace impactx
         };
 
         // charge (rho) mesh
-        amrex::BoxArray const cba = ba;
+        amrex::BoxArray const& cba = ba;
         // for MR levels (TODO):
         //cba.coarsen(refRatio(lev - 1));
 
