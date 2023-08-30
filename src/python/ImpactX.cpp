@@ -79,7 +79,7 @@ void init_ImpactX (py::module& m)
         .def_property("n_cell",
             [](ImpactX & /* ix */) {
                 std::vector<int> n_cell;
-                amrex::ParmParse pp_amr("amr");
+                amrex::ParmParse const pp_amr("amr");
                 pp_amr.getarr("n_cell", n_cell);
                 return n_cell;
             },
@@ -114,7 +114,7 @@ void init_ImpactX (py::module& m)
 
         .def_property("domain",
             [](ImpactX & /* ix */) {
-                amrex::ParmParse pp_geometry("geometry");
+                amrex::ParmParse const pp_geometry("geometry");
                 amrex::Vector<amrex::Real> prob_lo;
                 amrex::Vector<amrex::Real> prob_hi;
                 pp_geometry.getarr("prob_lo", prob_lo);
@@ -150,7 +150,7 @@ void init_ImpactX (py::module& m)
 
         .def_property("dynamic_size",
               [](ImpactX & /* ix */) {
-                  amrex::ParmParse pp_geometry("geometry");
+                  amrex::ParmParse const pp_geometry("geometry");
                   bool dynamic_size;
                   pp_geometry.get("dynamic_size", dynamic_size);
                   return dynamic_size;

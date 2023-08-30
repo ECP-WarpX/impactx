@@ -23,6 +23,9 @@
 namespace io = openPMD;
 #endif
 
+#include <utility>
+
+
 namespace impactx::diagnostics
 {
 namespace detail
@@ -112,7 +115,7 @@ namespace detail
         std::string component_name = io::RecordComponent::SCALAR;
 
         // we use "_" as separator in names to group vector records
-        std::size_t startComp = fullName.find_last_of("_");
+        std::size_t const startComp = fullName.find_last_of('_');
         if( startComp != std::string::npos ) {  // non-scalar
             record_name = fullName.substr(0, startComp);
             component_name = fullName.substr(startComp + 1u);
@@ -148,7 +151,7 @@ namespace detail
     }
 
     BeamMonitor::BeamMonitor (std::string series_name, std::string backend, std::string encoding) :
-        m_series_name(series_name), m_OpenPMDFileType(backend)
+        m_series_name(std::move(series_name)), m_OpenPMDFileType(std::move(backend))
     {
 #ifdef ImpactX_USE_OPENPMD
         // pick first available backend if default is chosen
@@ -165,11 +168,11 @@ namespace detail
 
         // encoding of iterations in the series
         openPMD::IterationEncoding series_encoding = openPMD::IterationEncoding::groupBased;
-        if ( 0 == encoding.compare("v") )
+        if ( "v" == encoding )
             series_encoding = openPMD::IterationEncoding::variableBased;
-        else if ( 0 == encoding.compare("g") )
+        else if ( "g" == encoding )
             series_encoding = openPMD::IterationEncoding::groupBased;
-        else if ( 0 == encoding.compare("f") )
+        else if ( "f" == encoding )
             series_encoding = openPMD::IterationEncoding::fileBased;
 
         // legacy options from other diagnostics
@@ -183,7 +186,7 @@ namespace detail
 
             if (series_encoding == openPMD::IterationEncoding::fileBased)
             {
-                std::string fileSuffix = std::string("_%0") + std::to_string(m_file_min_digits) + std::string("T");
+                std::string const fileSuffix = std::string("_%0") + std::to_string(m_file_min_digits) + std::string("T");
                 filepath.append(fileSuffix);
             }
             filepath.append(".").append(m_OpenPMDFileType);
@@ -242,8 +245,8 @@ namespace detail
         };
 
         // define data set and metadata
-        io::Datatype dtype_fl = io::determineDatatype<amrex::ParticleReal>();
-        io::Datatype dtype_ui = io::determineDatatype<uint64_t>();
+        io::Datatype const dtype_fl = io::determineDatatype<amrex::ParticleReal>();
+        io::Datatype const dtype_ui = io::determineDatatype<uint64_t>();
         auto d_fl = io::Dataset(dtype_fl, {np});
         auto d_ui = io::Dataset(dtype_ui, {np});
 
@@ -383,7 +386,7 @@ namespace detail
             using vs = std::vector<std::string>;
             vs const positionComponents{"x", "y", "t"}; // TODO: generalize
             for (auto currDim = 0; currDim < AMREX_SPACEDIM; currDim++) {
-                std::shared_ptr<amrex::ParticleReal> curr(
+                std::shared_ptr<amrex::ParticleReal> const curr(
                     new amrex::ParticleReal[numParticleOnTile],
                     [](amrex::ParticleReal const *p) { delete[] p; }
                 );
@@ -396,7 +399,7 @@ namespace detail
             }
 
             // save particle ID after converting it to a globally unique ID
-            std::shared_ptr<uint64_t> ids(
+            std::shared_ptr<uint64_t> const ids(
                 new uint64_t[numParticleOnTile],
                 [](uint64_t const *p) { delete[] p; }
             );

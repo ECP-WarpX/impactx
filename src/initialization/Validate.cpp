@@ -43,7 +43,7 @@ namespace impactx
         }
 
         // elements
-        if (m_lattice.size() == 0u)
+        if (m_lattice.empty())
             throw std::runtime_error("Beamline lattice has zero elements. Not yet initialized?");
     }
 } // namespace impactx

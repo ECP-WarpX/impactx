@@ -23,7 +23,7 @@ namespace impactx
 {
 void ImpactX::init_warning_logger ()
 {
-    amrex::ParmParse pp_impactx("impactx");
+    amrex::ParmParse const pp_impactx("impactx");
 
     // Set the flag to control if ImpactX has to emit a warning message
     // as soon as a warning is recorded
@@ -34,8 +34,9 @@ void ImpactX::init_warning_logger ()
 
     // Set the WarnPriority threshold to decide if ImpactX has to abort
     // when a warning is recorded
-    if(std::string str_abort_on_warning_threshold = "";
-            pp_impactx.query("abort_on_warning_threshold", str_abort_on_warning_threshold)){
+    if (std::string str_abort_on_warning_threshold;
+        pp_impactx.query("abort_on_warning_threshold", str_abort_on_warning_threshold))
+   {
         std::optional<ablastr::warn_manager::WarnPriority> abort_on_warning_threshold = std::nullopt;
         if (str_abort_on_warning_threshold == "high")
             abort_on_warning_threshold = ablastr::warn_manager::WarnPriority::high;
@@ -61,7 +62,7 @@ bool ImpactX::early_param_check ()
 
     // Print the warning list right after the first step.
     amrex::Print() << ablastr::warn_manager::GetWMInstance()
-            .PrintGlobalWarnings("FIRST STEP");
+        .PrintGlobalWarnings("FIRST STEP");
 
     return true;
 }

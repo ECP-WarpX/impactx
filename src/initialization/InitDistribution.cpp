@@ -64,10 +64,10 @@ namespace impactx
         // position, per MPI rank. We then measure the distribution's spatial
         // extent, create a grid, resize it to fit the beam, and then
         // redistribute particles so that they reside on the correct MPI rank.
-        int myproc = amrex::ParallelDescriptor::MyProc();
-        int nprocs = amrex::ParallelDescriptor::NProcs();
-        int navg = npart / nprocs;
-        int nleft = npart - navg * nprocs;
+        int const myproc = amrex::ParallelDescriptor::MyProc();
+        int const nprocs = amrex::ParallelDescriptor::NProcs();
+        int const navg = npart / nprocs;
+        int const nleft = npart - navg * nprocs;
         int npart_this_proc = (myproc < nleft) ? navg+1 : navg;
         auto const rel_part_this_proc = amrex::ParticleReal(npart_this_proc) /
                                         amrex::ParticleReal(npart);
@@ -110,7 +110,7 @@ namespace impactx
         using namespace amrex::literals;
 
         // Parse the beam distribution parameters
-        amrex::ParmParse pp_dist("beam");
+        amrex::ParmParse const pp_dist("beam");
 
         amrex::ParticleReal energy = 0.0;  // Beam kinetic energy (MeV)
         pp_dist.get("energy", energy);
@@ -169,7 +169,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions waterbag(distribution::Waterbag(
+          distribution::KnownDistributions const waterbag(distribution::Waterbag(
               sigx, sigy, sigt,
               sigpx, sigpy, sigpt,
               muxpx, muypy, mutpt));
@@ -189,7 +189,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions kurth6D(distribution::Kurth6D(
+          distribution::KnownDistributions const kurth6D(distribution::Kurth6D(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -209,7 +209,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions gaussian(distribution::Gaussian(
+          distribution::KnownDistributions const gaussian(distribution::Gaussian(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -229,7 +229,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions kvDist(distribution::KVdist(
+          distribution::KnownDistributions const kvDist(distribution::KVdist(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -249,7 +249,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions kurth4D(distribution::Kurth4D(
+          distribution::KnownDistributions const kurth4D(distribution::Kurth4D(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -268,7 +268,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions semigaussian(distribution::Semigaussian(
+          distribution::KnownDistributions const semigaussian(distribution::Semigaussian(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -288,7 +288,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions triangle(distribution::Triangle(
+          distribution::KnownDistributions const triangle(distribution::Triangle(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));

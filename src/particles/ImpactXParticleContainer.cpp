@@ -22,15 +22,19 @@
 #include <stdexcept>
 
 
-namespace impactx
+namespace
 {
-    bool do_omp_dynamic () {
+    bool do_omp_dynamic ()
+    {
         bool do_dynamic = true;
-        amrex::ParmParse pp_impactx("impactx");
+        amrex::ParmParse const pp_impactx("impactx");
         pp_impactx.query("do_dynamic_scheduling", do_dynamic);
         return do_dynamic;
     }
+}
 
+namespace impactx
+{
     ParIter::ParIter (ContainerType& pc, int level)
         : amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
                    amrex::MFItInfo().SetDynamic(do_omp_dynamic())) {}
@@ -69,9 +73,9 @@ namespace impactx
 
     void ImpactXParticleContainer::SetParticleShape ()
     {
-        amrex::ParmParse pp_algo("algo");
+        amrex::ParmParse const pp_algo("algo");
         int v = 0;
-        bool has_shape = pp_algo.query("particle_shape", v);
+        bool const has_shape = pp_algo.query("particle_shape", v);
         if (!has_shape)
             throw std::runtime_error("particle_shape is not set, cannot initialize grids with guard cells.");
         SetParticleShape(v);
@@ -154,13 +158,15 @@ namespace impactx
     ImpactXParticleContainer::SetRefParticle (RefPart const refpart)
     {
         m_refpart = refpart;
-    }    RefPart &
+    }
+
+    RefPart &
     ImpactXParticleContainer::GetRefParticle ()
     {
         return m_refpart;
     }
 
-    RefPart const
+    RefPart const &
     ImpactXParticleContainer::GetRefParticle () const
     {
         return m_refpart;

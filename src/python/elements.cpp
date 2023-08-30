@@ -16,7 +16,7 @@ using namespace impactx;
 
 void init_elements(py::module& m)
 {
-    py::module_ me = m.def_submodule(
+    py::module_ const me = m.def_submodule(
         "elements",
         "Accelerator lattice elements in ImpactX"
     );
@@ -189,15 +189,15 @@ void init_elements(py::module& m)
                 std::string units)
              {
                  if (units != "dimensionless" && units != "T-m")
-                     throw std::runtime_error("units must be \"dimensionless\" or \"T-m\"");
+                     throw std::runtime_error(R"(units must be "dimensionless" or "T-m")");
 
-                 Kicker::UnitSystem u = units == "dimensionless" ?
+                 Kicker::UnitSystem const u = units == "dimensionless" ?
                                             Kicker::UnitSystem::dimensionless :
                                             Kicker::UnitSystem::Tm;
                  return new Kicker(xkick, ykick, u);
              }),
              py::arg("xkick"), py::arg("ykick"), py::arg("units") = "dimensionless",
-             "A thin transverse kicker element. Kicks are for units \"dimensionless\" or in \"T-m\"."
+             R"(A thin transverse kicker element. Kicks are for units "dimensionless" or in "T-m".)"
         )
     ;
 

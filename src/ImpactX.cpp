@@ -55,10 +55,10 @@ namespace impactx
         // has set n_cells in the inputs file
         {
             amrex::Vector<int> n_cell(AMREX_SPACEDIM);
-            amrex::ParmParse pp_amr("amr");
+            amrex::ParmParse const pp_amr("amr");
             pp_amr.queryarr("n_cell", n_cell);
 
-            amrex::IntVect lo(amrex::IntVect::TheZeroVector()), hi(n_cell);
+            amrex::IntVect const lo(amrex::IntVect::TheZeroVector()), hi(n_cell);
             hi -= amrex::IntVect::TheUnitVector();
             amrex::Box index_domain(lo,hi);
             for (int i = 0; i <= max_level; i++)
@@ -111,7 +111,7 @@ namespace impactx
                                           global_step);
 
             // print the initial values of the two invariants H and I
-            std::string diag_name = amrex::Concatenate("diags/nonlinear_lens_invariants_", global_step, file_min_digits);
+            std::string const diag_name = amrex::Concatenate("diags/nonlinear_lens_invariants_", global_step, file_min_digits);
             diagnostics::DiagnosticOutput(*m_particle_container,
                                           diagnostics::OutputType::PrintNonlinearLensInvariants,
                                           diag_name);

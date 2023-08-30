@@ -332,7 +332,7 @@ namespace SoftQuadrupoleData
             amrex::ParticleReal bfieldint = 0.0;
             amrex::ParticleReal const z = zeval - zmid;
 
-            if (abs(z)<=zmid)
+            if (std::abs(z) <= zmid)
             {
                bfield = 0.5_prt*cos_data[0];
                bfieldint = z*bfield;

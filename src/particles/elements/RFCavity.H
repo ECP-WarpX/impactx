@@ -337,7 +337,7 @@ namespace RFCavityData
             amrex::ParticleReal efieldint = 0.0;
             amrex::ParticleReal const z = zeval - zmid;
 
-            if (abs(z)<=zmid)
+            if (std::abs(z) <= zmid)
             {
                efield = 0.5_prt*cos_data[0];
                efieldint = z*efield;
