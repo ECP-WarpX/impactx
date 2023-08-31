@@ -653,7 +653,7 @@ add_impactx_test(fodo_rf_sc
 add_impactx_test(fodo_rf_sc.py
     examples/epac2004_benchmarks/run_fodo_rf_SC.py
       OFF  # ImpactX MPI-parallel
-      OFF   # ImpactX Python interface
+      ON   # ImpactX Python interface
     examples/epac2004_benchmarks/analysis_fodo_rf_SC.py
     OFF  # no plot script yet
 )
