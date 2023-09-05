@@ -191,7 +191,7 @@ sim.lattice.append(lattice_no_drifts[0])
 
 #   intersperse all remaining elements of the lattice with a drift element
 for element in lattice_no_drifts[1:]:
-    sim.lattice.extend([drift1, element])
+    sim.lattice.extend([dr, element])
 
 sim.lattice.append(monitor)
 
