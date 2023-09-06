@@ -28,6 +28,8 @@ namespace impactx
         std::unordered_map<int, amrex::MultiFab> & rho,
         amrex::Vector<amrex::IntVect> const & ref_ratio)
     {
+        using namespace amrex::literals; // for _rt and _prt
+
         // reset the values in rho to zero
         int const nLevel = this->finestLevel();
         for (int lev = 0; lev <= nLevel; ++lev) {
@@ -76,6 +78,7 @@ namespace impactx
 
                     // cell size of the mesh to deposit to
                     std::array<amrex::Real, 3> const & AMREX_RESTRICT dx = {gm.CellSize(0), gm.CellSize(1), gm.CellSize(2)};
+                    amrex::Print() << "lev=" << lev << ": dx before charge depos=" << dx << "\n";
 
                     // RZ modes (unused)
                     int const n_rz_azimuthal_modes = 0;
