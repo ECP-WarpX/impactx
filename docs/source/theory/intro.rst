@@ -52,7 +52,7 @@ factors associated with the reference velocity.  In a region of zero scalar pote
 times the speed of light, so that :math:`p_t = \Delta(\gamma)/(\beta_0\gamma_0)`.
 
 Unlike particles within the beam, the reference particle is described by a set of 8 phase space variables (x [m], px, y [m], py, z [m], pz, t [m], pt) that are specified
-in a global laboratory coordinate system (x,y,z).  The momenta of the reference particle are normalized by :math:`mc`, so that :math:`\p_x=\beta_x\gamma`, etc.  A parameteric plot of
+in a global laboratory coordinate system (x,y,z).  The momenta of the reference particle are normalized by :math:`mc`, so that :math:`p_x=\beta_x\gamma`, etc.  A parameteric plot of
 the reference trajectory variables (x,z) allows the user to view the global geometry of the accelerator structure (footprint).
 
 
