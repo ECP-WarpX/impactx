@@ -7,6 +7,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+
 import amrex.space3d as amr
 from impactx import ImpactX, RefPart, distribution, elements
 
@@ -20,13 +21,13 @@ sim.dynamic_size = True
 sim.prob_relative = 3.0
 
 # beam diagnostics
-#sim.diagnostics = False  # benchmarking
+# sim.diagnostics = False  # benchmarking
 sim.slice_step_diagnostics = False
 
 # domain decomposition & space charge mesh
 sim.init_grids()
 
-# load a cold 10 MeV electron beam 
+# load a cold 10 MeV electron beam
 energy_MeV = 10.0  # reference energy (total)
 mass_MeV = 0.510998950  # electron mass in MeV/c^2
 bunch_charge_C = 1.0e-9  # charge in C
@@ -39,11 +40,11 @@ ref.set_charge_qe(-1.0).set_mass_MeV(mass_MeV).set_energy_MeV(energy_MeV)
 #   particle bunch
 r = 0.1  # aspect ratio = sigma_z / sigma_perp:  range 0.01 to 10
 sigma_r = 1.0e-3  # fixed at 1 mm
-sigma_z = r*sigma_r
+sigma_z = r * sigma_r
 gamma = energy_MeV / mass_MeV
 beta = (1.0 - (1.0 / gamma) ** 2) ** 0.5
 c0 = 2.99792458e8  # speed of light in m/s
-sigma_t = sigma_z / beta  #recall t is implicitly scaled by c0
+sigma_t = sigma_z / beta  # recall t is implicitly scaled by c0
 print(f"sigma_t={sigma_t}m")
 
 distr = distribution.Gaussian(
@@ -107,4 +108,3 @@ plt.show()
 #   note: timers turned stop here
 del sim
 amr.finalize()
-

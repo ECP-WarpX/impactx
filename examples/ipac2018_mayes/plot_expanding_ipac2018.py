@@ -5,9 +5,6 @@
 # License: BSD-3-Clause-LBNL
 #
 
-import argparse
-import glob
-import re
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -23,23 +20,21 @@ final_beam = series.iterations[last_step].particles["beam"].to_df()
 beta = 0.9986935469557160
 gamma = 19.569511835591836
 ErMeV = 0.510998950
-scalex = 1.0e3 # x [m] -> x [mm]
-scalet = -beta*1.0e3 # ct [m] -> z [m]
-scalepx = beta*gamma*ErMeV # px/p0 -> px [MeV/c]
-scalept = -gamma*ErMeV # pt/p0 -> pz [MeV/c]
+scalex = 1.0e3  # x [m] -> x [mm]
+scalet = -beta * 1.0e3  # ct [m] -> z [m]
+scalepx = beta * gamma * ErMeV  # px/p0 -> px [MeV/c]
+scalept = -gamma * ErMeV  # pt/p0 -> pz [MeV/c]
 
 # beam phase space scatter plots
 num_plots_per_row = 2
-fig, axs = plt.subplots(
-    1, num_plots_per_row, figsize=(10, 4.0)
-)
+fig, axs = plt.subplots(1, num_plots_per_row, figsize=(10, 4.0))
 
 # plot final x-px distribution
 ax = axs[(0)]
 ax.scatter(
     final_beam.position_x.multiply(scalex),
     final_beam.momentum_x.multiply(scalepx),
-    s = 0.5,
+    s=0.5,
 )
 ax.tick_params(labelsize=12)
 ax.set_xlabel(r"$x$ [mm]", fontsize=18)
@@ -50,7 +45,7 @@ ax = axs[(1)]
 ax.scatter(
     final_beam.position_t.multiply(scalet),
     final_beam.momentum_t.multiply(scalept),
-    s = 0.5,
+    s=0.5,
 )
 ax.tick_params(labelsize=12)
 ax.set_xlabel(r"$z$ [mm]", fontsize=18)
