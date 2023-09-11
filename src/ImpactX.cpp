@@ -192,7 +192,6 @@ namespace impactx
                         // the particles are in x, y, z coordinates.
 
                         // Resize the mesh, based on `m_particle_container` extent
-                        amrex::Print() << " ++++ calling ResizeMesh\n";
                         ResizeMesh();
 
                         // Redistribute particles in the new mesh in x, y, z

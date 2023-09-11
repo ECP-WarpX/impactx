@@ -267,7 +267,6 @@ namespace detail
         pp_geometry.query("dynamic_size", dynamic_size);
 
         amrex::Vector<amrex::RealBox> rb(this->finestLevel() + 1);  // extent per level
-        amrex::Print() << " ++++ dynamic_size=" << dynamic_size << "\n";
         if (dynamic_size)
         {
             // The coarsest level is expanded (or reduced) relative the min and max of particles.
@@ -280,55 +279,14 @@ namespace detail
 
             amrex::RealVect const beam_padding = beam_width * (frac - 1.0) / 2.0;
             //                           added to the beam extent --^         ^-- box half above/below the beam
+
+            // In AMReX, all levels have the same problem domain, that of the
+            // coarsest level, even if only partly covered.
             for (int lev = 0; lev <= this->finestLevel(); ++lev)
             {
                 rb[lev].setLo(beam_min - beam_padding);
                 rb[lev].setHi(beam_max + beam_padding);
             }
-
-            /*
-            // Coarser levels are NOT simply the rb[0] size scaled with prob_relative.
-            // The reason for that is that the cell tagging for refinement in ErrorEst
-            // will be founded up to full AMReX blocks of cells.
-            for (int lev = 1; lev <= this->finestLevel(); ++lev)
-            {
-                // covered index space of the current level and coarser level
-                amrex::Box const cov_box = boxArray(lev).minimalBox();
-                amrex::Box const cov_box_crs = boxArray(lev - 1).minimalBox();
-
-                // edge lengths of the covered box on current and coarser level
-                auto const r_cell_n = amrex::RealVect(cov_box.size());
-                auto const r_cell_crs = amrex::RealVect(cov_box_crs.size());
-
-                amrex::Print() << "lev=" << lev << " r_cell_n=" << r_cell_n << "\n";
-                amrex::Print() << "lev=" << lev << " r_cell_crs=" << r_cell_crs << "\n";
-
-                // based on the refinement ratio and the actual index space (domain) per level,
-                // we can calculate the size difference of the block-wise covered ProbDomains
-                amrex::RealVect const r_ref_ratio = ref_ratio[lev - 1];
-                amrex::Print() << "lev=" << lev << " r_ref_ratio=" << r_ref_ratio << "\n";
-                // difference in covered domain between levels (<=1)
-                amrex::RealVect const r_cell_ratio = (r_cell_n / r_ref_ratio) / r_cell_crs;
-                amrex::Print() << "lev=" << lev << " r_cell_ratio=" << r_cell_ratio << "\n";
-
-                amrex::RealVect const lo_crs(rb[lev - 1].lo());
-                amrex::RealVect const hi_crs(rb[lev - 1].hi());
-                amrex::RealVect const size_crs = hi_crs - lo_crs;
-
-                amrex::Print() << "lev=" << lev << " lo_crs=" << lo_crs << "\n";
-                amrex::Print() << "lev=" << lev << " hi_crs=" << hi_crs << "\n";
-                amrex::Print() << "lev=" << lev << " size_crs=" << size_crs << "\n";
-
-                amrex::RealVect const size = size_crs * r_cell_ratio; // wrong?!
-                amrex::RealVect const size_diff = size_crs - size;
-                amrex::Print() << "lev=" << lev << " size_crs=" << size_crs << "\n";
-                amrex::Print() << "lev=" << lev << " size=" << size << "\n";
-                amrex::Print() << "lev=" << lev << " size_diff=" << size_diff << "\n";
-
-                rb[lev].setLo(lo_crs + size_diff / 2.0);
-                rb[lev].setHi(hi_crs - size_diff / 2.0);
-            }
-            */
         }
         else
         {
@@ -351,9 +309,6 @@ namespace detail
         pp_geometry.addarr("prob_lo", prob_lo);
         pp_geometry.addarr("prob_hi", prob_hi);
 
-        amrex::Print() << "lev=0 prob_lo=" << prob_lo[0] << " " << prob_lo[1] << " " << prob_lo[2] << "\n";
-        amrex::Print() << "lev=0 prob_hi=" << prob_hi[0] << " " << prob_hi[1] << " " << prob_hi[2] << "\n";
-
         // Resize the domain size
         amrex::Geometry::ResetDefaultProbDomain(rb[0]);
 
@@ -362,8 +317,6 @@ namespace detail
             amrex::Geometry g = Geom(lev);
             g.ProbDomain(rb[lev]);
             SetGeometry(lev, g);
-
-            amrex::Print() << "lev=" << lev << " g.CellSize()=" << g.CellSize(0) << " " << g.CellSize(1) << " " << g.CellSize(2) << "\n";
 
             m_particle_container->SetParticleGeometry(lev, g);
         }
