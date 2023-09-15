@@ -40,10 +40,10 @@ namespace distribution
             amrex::ParticleReal T2; ///< temperature k*T of the secondary (halo) population
             amrex::ParticleReal w;  ///< weight of the secondary (halo) population
 
-            Rprofile(amrex::ParticleReal Q, 
-                     amrex::ParticleReal k, 
-                     amrex::ParticleReal T1, 
-                     amrex::ParticleReal T2, 
+            Rprofile(amrex::ParticleReal Q,
+                     amrex::ParticleReal k,
+                     amrex::ParticleReal T1,
+                     amrex::ParticleReal T2,
                      amrex::ParticleReal w)
             : m_Q(Q),m_k(k),m_T1(T1),m_T2(T2),m_w(w)
             {
@@ -184,8 +184,8 @@ namespace distribution
     {
         /** A stationary Thermal or Bi-thermal distribution
          *
-         * Return sampling from a 6D bi-thermal distribution, a 
-         * stationary solution of the Vlasov-Poisson system in 
+         * Return sampling from a 6D bi-thermal distribution, a
+         * stationary solution of the Vlasov-Poisson system in
          * an isotropic linear focusing channel.
          *
          * @param k linear focusing strength (1/meters)
