@@ -295,6 +295,24 @@ namespace impactx
 
           add_particles(bunch_charge, triangle, npart);
 
+        } else if (distribution_type == "thermal") {
+          amrex::ParticleReal k, kT1, kT2;
+          amrex::ParticleReal halo = 0.0;
+          pp_dist.get("k", k);
+          pp_dist.get("kT", kT1);
+          kT2 = kT1;
+          pp_dist.query("kT_halo", kT2);
+          pp_dist.query("halo", halo);
+
+//          distribution::ThermalData::Rprofile data = {0.0, 0.0, 0.0, 0.0, bunch_charge, k, kT1, kT2, halo};
+          distribution::ThermalData::Rprofile data(distribution::ThermalData::Rprofile(bunch_charge,k,kT1,kT2,halo));
+          distribution::ThermalData.generate_radial_dist(data);
+
+          distribution::KnownDistributions thermal(distribution::Thermal(
+            k, kT1, kT2, halo));
+
+          add_particles(bunch_charge, thermal, npart);
+
         } else {
             amrex::Abort("Unknown distribution: " + distribution_type);
         }

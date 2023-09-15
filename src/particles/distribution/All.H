@@ -16,6 +16,7 @@
 #include "KVdist.H"
 #include "None.H"
 #include "Semigaussian.H"
+#include "Thermal.H"
 #include "Triangle.H"
 #include "Waterbag.H"
 
@@ -32,6 +33,7 @@ namespace distribution
         Kurth4D,
         Kurth6D,
         KVdist,
+        Thermal,
         Triangle,
         Semigaussian,
         Waterbag
