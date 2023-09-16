@@ -260,11 +260,12 @@ namespace distribution
             g3 /= norm;
 
             // Define a radial CDF for numerical testing
-            float rmin = 0.0;
-            float rmax = 10.0;
-            float r;
-            int nbins = 1000;
-            float cdf[1001];
+            amrex::ParticleReal rmin = 0.0;
+            amrex::ParticleReal rmax = 10.0;
+            amrex::ParticleReal r;
+            int const nbins = 1000;
+            int const length = nbins + 1;
+            amrex::ParticleReal cdf[length];
             for (int n = 0; n < nbins; ++n) {
                 r = rmin + (rmax-rmin)*(n/(float)(nbins));
                 cdf[n] = pow(r/rmax,3);
@@ -272,11 +273,11 @@ namespace distribution
             cdf[nbins] = 1;
 
             // Generate a radial coordinate from the CDF
-            float u = amrex::Random(engine);
-            float *ptr = std::lower_bound(cdf, cdf + nbins + 1, u);
-            int off = std::max(0, (int)(ptr - cdf - 1));
-            float tv = (u - cdf[off]) / (cdf[off + 1] - cdf[off]);
-            float xv = (off + tv) / (float)(nbins);
+            amrex::ParticleReal u = amrex::Random(engine);
+            amrex::ParticleReal *ptr = amrex::lower_bound(cdf, cdf + nbins + 1, u);
+            int off = amrex::max(0, (int)(ptr - cdf - 1));
+            amrex::ParticleReal tv = (u - cdf[off]) / (cdf[off + 1] - cdf[off]);
+            amrex::ParticleReal xv = (off + tv) / (float)(nbins);
             r = rmin + (rmax - rmin) * xv;
 
             // Scale to produce samples with the correct radial density:
