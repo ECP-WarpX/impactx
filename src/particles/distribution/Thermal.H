@@ -15,7 +15,7 @@
 #include <AMReX_Print.H>
 
 #include <cmath>
-
+#include <cstdint>
 
 namespace impactx
 {
@@ -227,6 +227,10 @@ namespace distribution
 
             constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
+            // Use a Bernoulli random variable to select between core and halo:
+            //std::bernoulli_distribution select_population(m_w);
+            //bool out = select_population(engine);
+
             // Generate six standard normal random variables using Box-Muller:
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
@@ -244,26 +248,43 @@ namespace distribution
             g5 = ln1*cos(2_prt*pi*u2);
             g6 = ln1*sin(2_prt*pi*u2);
 
-            // Normalize to produce uniform samples on the unit sphere:
-            norm = sqrt(g1*g1+g2*g2+g3*g3+g4*g4+g5*g5+g6*g6);
+            // Scale the last three variables to produce the momenta:
+            px = sqrt(m_T1)*g4;
+            py = sqrt(m_T1)*g5;
+            pt = sqrt(m_T1)*g6;
+
+            // Normalize the first three variables to produce uniform samples on the unit 3-sphere:
+            norm = sqrt(g1*g1+g2*g2+g3*g3);
             g1 /= norm;
             g2 /= norm;
             g3 /= norm;
-            g4 /= norm;
-            g5 /= norm;
-            g6 /= norm;
 
-            // Scale to produce uniform samples in a ball (unit variance):
-            u1 = amrex::Random(engine);
-            u2 = sqrt(8_prt)*pow(u1,1_prt/6);
-            x = g1*u2;
-            y = g2*u2;
-            t = g3*u2;
-            px = g4*u2;
-            py = g5*u2;
-            pt = g6*u2;
+            // Define a radial CDF for numerical testing
+            float rmin = 0.0;
+            float rmax = 10.0;
+            float r;
+            int nbins = 1000;
+            float cdf[1001];
+            for (int n = 0; n < nbins; ++n) {
+                r = rmin + (rmax-rmin)*(n/(float)(nbins));
+                cdf[n] = pow(r/rmax,3);
+            }
+            cdf[nbins] = 1;
 
-            // Transform to produce the desired second moments/correlations:
+            // Generate a radial coordinate from the CDF
+            float u = amrex::Random(engine);
+            float *ptr = std::lower_bound(cdf, cdf + nbins + 1, u);
+            int off = std::max(0, (int)(ptr - cdf - 1));
+            float tv = (u - cdf[off]) / (cdf[off + 1] - cdf[off]);
+            float xv = (off + tv) / (float)(nbins);
+            r = rmin + (rmax - rmin) * xv;
+
+            // Scale to produce samples with the correct radial density:
+            x = g1*r;
+            y = g2*r;
+            t = g3*r;
+
+            // Transform logitudinal variables into the laboratory frame:
 
         }
 

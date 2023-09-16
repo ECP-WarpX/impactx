@@ -304,9 +304,11 @@ namespace impactx
           pp_dist.query("kT_halo", kT2);
           pp_dist.query("halo", halo);
 
+//    One of the following two lines must be uncommented in order to initialize struct "data":
 //          distribution::ThermalData::Rprofile data = {0.0, 0.0, 0.0, 0.0, bunch_charge, k, kT1, kT2, halo};
-          distribution::ThermalData::Rprofile data(distribution::ThermalData::Rprofile(bunch_charge,k,kT1,kT2,halo));
-          distribution::ThermalData.generate_radial_dist(data);
+//          distribution::ThermalData::Rprofile data(distribution::ThermalData::Rprofile(bunch_charge,k,kT1,kT2,halo));
+//    The following line must be uncommented in order to generate the radial profile:
+//          distribution::ThermalData.generate_radial_dist(data);
 
           distribution::KnownDistributions thermal(distribution::Thermal(
             k, kT1, kT2, halo));
