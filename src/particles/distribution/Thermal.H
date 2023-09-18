@@ -86,26 +86,26 @@ namespace distribution
         }
 
         void integrate (Rprofile & data,
-                        amrex::ParticleReal const rin,
-                        amrex::ParticleReal const rout,
-                        int const nsteps)
+                        amrex::ParticleReal const in,
+                        amrex::ParticleReal const out,
+                        int const steps)
         {
             using namespace amrex::literals; // for _rt and _prt
 
             // initialize numerical integration parameters
-            amrex::ParticleReal const dr = (rout-rin)/nsteps;
-            amrex::ParticleReal const half = dr/2.0_prt;
+            amrex::ParticleReal const tau = (out-in)/steps;
+            amrex::ParticleReal const half = tau/2.0_prt;
 //            amrex::ParticleReal const alpha = 1.0_prt - pow(2.0_prt,1.0/3.0);
-//            amrex::ParticleReal const tau2 = dr/(1.0_prt + alpha);
+//            amrex::ParticleReal const tau2 = tau/(1.0_prt + alpha);
 //            amrex::ParticleReal const tau1 = tau2/2.0_prt;
 //            amrex::ParticleReal const tau3 = alpha*tau1;
 //            amrex::ParticleReal const tau4 = (alpha - 1.0_prt)*tau2;
 
             // initialize the value of the independent variable
-            amrex::ParticleReal reval = rin;
+            amrex::ParticleReal reval = in;
 
             // loop over integration steps
-            for (int j=0; j < nsteps; ++j)
+            for (int j=0; j < steps; ++j)
             {
 /*             // for a fourth-order Ruth integrator
                 map1(tau1,data,reval);
@@ -117,7 +117,7 @@ namespace distribution
                 map1(tau1,data,reval); */
             // for a second-order Strang splitting
                 map1(half,data,reval);
-                map2(dr,data,reval);
+                map2(tau,data,reval);
                 map1(half,data,reval);
             // store tabulated CDF
                 data.cdf1[j+1] = data.f1;
