@@ -306,12 +306,11 @@ namespace impactx
 
           // Initialize the struct "data" containing the radial CDF:
           distribution::ThermalData::Rprofile data(distribution::ThermalData::Rprofile(bunch_charge,k,kT1,kT2,halo));
-          amrex::PrintToFile("initial_data.out") << data.Q << " " << data.k << " " << data.T1 << " " << data.T2 << "\n";
           distribution::ThermalData testobj;
           testobj.generate_radial_dist(data);
 
           distribution::KnownDistributions thermal(distribution::Thermal(
-            k, kT1, kT2, halo));
+            k, kT1, kT2, halo, data));
 
           add_particles(bunch_charge, thermal, npart);
 
