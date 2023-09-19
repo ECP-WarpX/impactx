@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <random>
 
 namespace impactx
 {
@@ -237,8 +238,9 @@ namespace distribution
             constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
             // Use a Bernoulli random variable to select between core and halo:
-            //std::bernoulli_distribution select_population(m_w);
-            //bool out = select_population(engine);
+            // If t < w, the particle is in the halo population.
+            // If t >= w, the particle is in the core population.
+            t = amrex::Random(engine);
 
             // Generate six standard normal random variables using Box-Muller:
             u1 = amrex::Random(engine);
@@ -258,9 +260,10 @@ namespace distribution
             g6 = ln1*sin(2_prt*pi*u2);
 
             // Scale the last three variables to produce the momenta:
-            px = sqrt(m_data.T1)*g4;
-            py = sqrt(m_data.T1)*g5;
-            pt = sqrt(m_data.T1)*g6;
+            amrex::ParticleReal kT = (t > m_data.w) ? m_data.T1 : m_data.T2;  // select core or halo value
+            px = sqrt(kT)*g4;
+            py = sqrt(kT)*g5;
+            pt = sqrt(kT)*g6;
 
             // Normalize the first three variables to produce uniform samples on the unit 3-sphere:
             norm = sqrt(g1*g1+g2*g2+g3*g3);
@@ -275,7 +278,7 @@ namespace distribution
             int const length = 1001;  //Ideally, int const length = nbins + 1;
             amrex::ParticleReal cdf[length];
             for (int n = 0; n < nbins; ++n) {
-                cdf[n] = m_data.cdf1[n];
+                cdf[n] = (t > m_data.w) ? m_data.cdf1[n] : m_data.cdf2[n]; //select core or halo CDF
             }
             cdf[nbins] = 1;
 
