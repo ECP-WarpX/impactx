@@ -52,11 +52,15 @@ namespace distribution
             Rprofile(amrex::ParticleReal kin,
                      amrex::ParticleReal T1in,
                      amrex::ParticleReal T2in,
+                     amrex::ParticleReal phi1in,
+                     amrex::ParticleReal phi2in,
                      amrex::ParticleReal win)
             {
                  k = kin;
                  T1 = T1in;
                  T2 = T2in;
+                 phi1 = phi1in;
+                 phi2 = phi2in;
                  w = win;
             }
 
@@ -92,13 +96,13 @@ namespace distribution
             // set initial conditions
             data.f1 = 0.0_prt;
             data.f2 = 0.0_prt;
-            data.phi1 = 27.5_prt;
-            data.phi2 = 0.0_prt;
+         //   data.phi1 = -6.3365215_prt;
+         //   data.phi2 = 0.0_prt;
             data.cdf1[0] = 0.0_prt;
             data.cdf2[0] = 0.0_prt;
 
             // integrate ODEs for the radial density
-            integrate(data,rin,rout,nsteps);
+            integrate(data,rmin,rmax,nsteps);
 
             // a search over initial conditions can be added here
 
@@ -256,15 +260,16 @@ namespace distribution
 
             using namespace amrex::literals;
 
-            amrex::ParticleReal ln1,norm,u1,u2;
+            amrex::ParticleReal ln1,norm,u1,u2,uhalo;
             amrex::ParticleReal g1,g2,g3,g4,g5,g6;
+            amrex::ParticleReal z,pz;
 
             constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
             // Use a Bernoulli random variable to select between core and halo:
-            // If t < w, the particle is in the halo population.
-            // If t >= w, the particle is in the core population.
-            t = amrex::Random(engine);
+            // If u < w, the particle is in the halo population.
+            // If u >= w, the particle is in the core population.
+            uhalo = amrex::Random(engine);
 
             // Generate six standard normal random variables using Box-Muller:
             u1 = amrex::Random(engine);
@@ -284,10 +289,10 @@ namespace distribution
             g6 = ln1*sin(2_prt*pi*u2);
 
             // Scale the last three variables to produce the momenta:
-            amrex::ParticleReal kT = (t > m_data.w) ? m_data.T1 : m_data.T2;  // select core or halo value
+            amrex::ParticleReal kT = (uhalo > m_data.w) ? m_data.T1 : m_data.T2;  // select core or halo value
             px = sqrt(kT)*g4;
             py = sqrt(kT)*g5;
-            pt = sqrt(kT)*g6;
+            pz = sqrt(kT)*g6;
 
             // Normalize the first three variables to produce uniform samples on the unit 3-sphere:
             norm = sqrt(g1*g1+g2*g2+g3*g3);
@@ -302,7 +307,7 @@ namespace distribution
             int const length = 1001;  //Ideally, int const length = nbins + 1;
             amrex::ParticleReal cdf[length];
             for (int n = 0; n < nbins; ++n) {
-                cdf[n] = (t > m_data.w) ? m_data.cdf1[n] : m_data.cdf2[n]; //select core or halo CDF
+                cdf[n] = (uhalo > m_data.w) ? m_data.cdf1[n] : m_data.cdf2[n]; //select core or halo CDF
             }
             cdf[nbins] = 1;
 
@@ -317,10 +322,11 @@ namespace distribution
             // Scale to produce samples with the correct radial density:
             x = g1*r;
             y = g2*r;
-            t = g3*r;
+            z = g3*r;
 
             // Transform logitudinal variables into the laboratory frame:
-
+            t = -z/(m_data.bg);
+            pt = -pz*(m_data.bg);
         }
 
     private:

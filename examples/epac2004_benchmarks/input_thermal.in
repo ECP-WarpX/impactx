@@ -1,35 +1,42 @@
 ###############################################################################
 # Particle Beam(s)
 ###############################################################################
-beam.npart = 10000
-#beam.npart = 2
+beam.npart = 1000000
 beam.units = static
-beam.energy = 2.0e3
-beam.charge = 1.0e-9
+beam.energy = 0.1
+beam.charge = 1.4285714285714285714e-10
 beam.particle = proton
 beam.distribution = thermal
-beam.k = 1.0
-beam.kT = 1.0
-beam.kT_halo = 1.0
-beam.halo = 0.0
+beam.k = 6.283185307179586
+beam.kT = 36.0e-6
+beam.phi = -6.336563125
 
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
-lattice.elements = monitor
+lattice.elements = monitor constf1 monitor
 
 monitor.type = beam_monitor
 monitor.backend = h5
 
 constf1.type = constf
-constf1.ds = 2.0
-constf1.kx = 1.0
-constf1.ky = 1.0
-constf1.kt = 1.0
-
+constf1.ds = 10.0
+constf1.kx = 6.283185307179586
+constf1.ky = 6.283185307179586
+constf1.kt = 6.283185307179586
+constf1.nslice = 400
 
 ###############################################################################
 # Algorithms
 ###############################################################################
 algo.particle_shape = 2
-algo.space_charge = false
+algo.space_charge = true
+
+amr.n_cell = 128 128 128
+geometry.prob_relative = 4.0
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = true
+
