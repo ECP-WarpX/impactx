@@ -111,7 +111,7 @@ namespace distribution
             constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
             amrex::ParticleReal k = data.k;
-            amrex::ParticleReal kT = sqrt(pow(data.T1,2)+pow(data.T2,2));
+            amrex::ParticleReal kT = (1.0_prt-data.w)*data.T1 + data.w*data.T2;
             amrex::ParticleReal a = data.Cintensity/(4.0_prt*pi*5.0_prt*sqrt(5.0_prt));
             amrex::ParticleReal rscale = sqrt(kT + pow(a*k,2.0/3.0))/k;
 
@@ -224,8 +224,11 @@ namespace distribution
          * @param T2 temperature k*T of the secondary (halo) population
          * @param w weight of the secondary (halo) population
          */
-         Thermal(amrex::ParticleReal const k, amrex::ParticleReal const T1,
-         amrex::ParticleReal const T2,amrex::ParticleReal const w, ThermalData::Rprofile const data
+         Thermal([[maybe_unused]] amrex::ParticleReal const k,
+                 [[maybe_unused]] amrex::ParticleReal const T1,
+                 [[maybe_unused]] amrex::ParticleReal const T2,
+                 [[maybe_unused]] amrex::ParticleReal const w,
+                 ThermalData::Rprofile const data
          )
           : m_k(k),m_T1(T1),m_T2(T2),m_w(w),m_data(data)
           {
