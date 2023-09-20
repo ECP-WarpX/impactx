@@ -13,6 +13,8 @@
 #include <AMReX_Random.H>
 #include <AMReX_REAL.H>
 #include <AMReX_Print.H>
+#include <ablastr/constant.H>
+#include "particles/ImpactXParticleContainer.H"
 
 #include <cmath>
 #include <cstdint>
@@ -40,19 +42,18 @@ namespace distribution
             int nbins;  ///< number of radial bins for tabulated cdf
             amrex::ParticleReal cdf1[1001];  ///< tabulated cumulative distribution (first)
             amrex::ParticleReal cdf2[1001];  ///< tabulated cumulative distribution (second)
-            amrex::ParticleReal Q;  ///< bunch charge
+            amrex::ParticleReal Cintensity;  ///< space charge intensity parameter
+            amrex::ParticleReal bg; ///< reference value of relativistic beta*gamma
             amrex::ParticleReal k;  ///< linear focusing strength (1/meters)
             amrex::ParticleReal T1; ///< temperature k*T of the primary (core) population
             amrex::ParticleReal T2; ///< temperature k*T of the secondary (halo) population
             amrex::ParticleReal w;  ///< weight of the secondary (halo) population
 
-            Rprofile(amrex::ParticleReal Qin,
-                     amrex::ParticleReal kin,
+            Rprofile(amrex::ParticleReal kin,
                      amrex::ParticleReal T1in,
                      amrex::ParticleReal T2in,
                      amrex::ParticleReal win)
             {
-                 Q = Qin;
                  k = kin;
                  T1 = T1in;
                  T2 = T2in;
@@ -61,15 +62,32 @@ namespace distribution
 
         };
 
-        void generate_radial_dist (Rprofile & data)
+        void generate_radial_dist (amrex::ParticleReal const bunch_charge, RefPart const & refpart, Rprofile & data)
 
         {
             using namespace amrex::literals; // for _rt and _prt
 
+            // Get relativistic beta*gamma
+            amrex::ParticleReal bg = refpart.beta_gamma();
+            data.bg = bg;
+
+            // Get reference particle rest energy (eV) and charge (q_e)
+            amrex::ParticleReal Erest = refpart.mass_MeV()*1.0e6;
+            amrex::ParticleReal q_e = refpart.charge_qe();
+
+            // Set space charge intensity
+            data.Cintensity = q_e*bunch_charge/(pow(bg,2)*Erest*ablastr::constant::SI::ep0);
+
+            // Set minimum and maximum radius
+            amrex::ParticleReal r_scale = matched_scale_radius(data);
+            amrex::ParticleReal rmin = rin*r_scale;
+            amrex::ParticleReal rmax = rout*r_scale;
+            amrex::PrintToFile("equilibrium_params.out") << r_scale << " " << data.Cintensity << "\n";
+
             // store integration parameters
             data.nbins = nsteps;
-            data.rmin = rin;
-            data.rmax = rout;
+            data.rmin = rmin;
+            data.rmax = rmax;
 
             // set initial conditions
             data.f1 = 0.0_prt;
@@ -82,8 +100,22 @@ namespace distribution
             // integrate ODEs for the radial density
             integrate(data,rin,rout,nsteps);
 
-            // a search over initial conditions will be added
+            // a search over initial conditions can be added here
 
+        }
+
+        amrex::ParticleReal
+        matched_scale_radius(Rprofile & data)
+        {
+            using namespace amrex::literals; // for _rt and _prt
+            constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
+
+            amrex::ParticleReal k = data.k;
+            amrex::ParticleReal kT = sqrt(pow(data.T1,2)+pow(data.T2,2));
+            amrex::ParticleReal a = data.Cintensity/(4.0_prt*pi*5.0_prt*sqrt(5.0_prt));
+            amrex::ParticleReal rscale = sqrt(kT + pow(a*k,2.0/3.0))/k;
+
+            return rscale;
         }
 
         void integrate (Rprofile & data,
@@ -96,11 +128,6 @@ namespace distribution
             // initialize numerical integration parameters
             amrex::ParticleReal const tau = (out-in)/steps;
             amrex::ParticleReal const half = tau/2.0_prt;
-//            amrex::ParticleReal const alpha = 1.0_prt - pow(2.0_prt,1.0/3.0);
-//            amrex::ParticleReal const tau2 = tau/(1.0_prt + alpha);
-//            amrex::ParticleReal const tau1 = tau2/2.0_prt;
-//            amrex::ParticleReal const tau3 = alpha*tau1;
-//            amrex::ParticleReal const tau4 = (alpha - 1.0_prt)*tau2;
 
             // initialize the value of the independent variable
             amrex::ParticleReal reval = in;
@@ -108,14 +135,6 @@ namespace distribution
             // loop over integration steps
             for (int j=0; j < steps; ++j)
             {
-/*             // for a fourth-order Ruth integrator
-                map1(tau1,data,reval);
-                map2(tau2,data,reval);
-                map1(tau3,data,reval);
-                map2(tau4,data,reval);
-                map1(tau3,data,reval);
-                map2(tau2,data,reval);
-                map1(tau1,data,reval); */
             // for a second-order Strang splitting
                 map1(half,data,reval);
                 map2(tau,data,reval);
@@ -171,10 +190,12 @@ namespace distribution
             amrex::ParticleReal const T2 = data.T2;
             constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
+            // Define space charge intensity parameters
+            amrex::ParticleReal const c1 = (1.0_prt-w)*data.Cintensity;
+            amrex::ParticleReal const c2 = w*data.Cintensity;
+
             // Define intermediate quantities
             amrex::ParticleReal potential = 0.0_prt;
-            amrex::ParticleReal const c1 = (1.0_prt-w)*(0.1_prt);
-            amrex::ParticleReal const c2 = w*(0.1_prt);
             potential = pow(k*r,2.0)/2.0_prt + c1*phi1 + c2*phi2;
             amrex::ParticleReal Pdensity1 = exp(-potential/T1);
             amrex::ParticleReal Pdensity2 = exp(-potential/T2);
