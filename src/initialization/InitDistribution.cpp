@@ -296,22 +296,22 @@ namespace impactx
           add_particles(bunch_charge, triangle, npart);
 
         } else if (distribution_type == "thermal") {
-          amrex::ParticleReal k, kT1, kT2, phi1,phi2;
+          amrex::ParticleReal k, kT1, kT2, p1,p2;
           amrex::ParticleReal halo = 0.0;
           pp_dist.get("k", k);
           pp_dist.get("kT", kT1);
           kT2 = kT1;
-          pp_dist.get("phi",phi1);
-          phi2 = phi1;
+          pp_dist.get("normalize",p1);
+          p2 = p1;
           pp_dist.query("kT_halo", kT2);
-          pp_dist.query("phi_halo", phi2);
+          pp_dist.query("normalize_halo", p2);
           pp_dist.query("halo", halo);
 
           distribution::ThermalData testobj;
           auto const & ref = m_particle_container->GetRefParticle();
 
           // Generate the struct "data" containing the radial CDF:
-          distribution::ThermalData::Rprofile data(distribution::ThermalData::Rprofile(k,kT1,kT2,phi1,phi2,halo));
+          distribution::ThermalData::Rprofile data(distribution::ThermalData::Rprofile(k,kT1,kT2,p1,p2,halo));
           testobj.generate_radial_dist(bunch_charge,ref,data);
 
           distribution::KnownDistributions thermal(distribution::Thermal(
