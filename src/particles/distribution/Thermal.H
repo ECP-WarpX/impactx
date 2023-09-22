@@ -212,8 +212,8 @@ namespace distribution
             potential = pow(k*r,2.0)/2.0_prt + c1*phi1 + c2*phi2;
             amrex::ParticleReal Pdensity1 = data.p1*exp(-potential/T1);
             amrex::ParticleReal Pdensity2 = data.p2*exp(-potential/T2);
-            amrex::PrintToFile("Pdensity1.out") << reval << " " << Pdensity1 << "\n";
-            amrex::PrintToFile("Pdensity2.out") << reval << " " << Pdensity2 << "\n";
+            amrex::ParticleReal Pdensity_tot = (1.0_prt-w)*Pdensity1 + w*Pdensity2;
+            amrex::PrintToFile("Pdensity.out") << reval << " " << Pdensity_tot << "\n";
 
             // Apply map to update f1 and f2:
             data.phi1 = phi1;
@@ -317,10 +317,12 @@ namespace distribution
             int const nbins = m_data.nbins;
             int const length = 2001;  //Ideally, int const length = nbins + 1;
             amrex::ParticleReal cdf[length];
-            for (int n = 0; n < nbins; ++n) {
+            for (int n = 0; n < length; ++n) {
                 cdf[n] = (uhalo > m_data.w) ? m_data.cdf1[n] : m_data.cdf2[n]; //select core or halo CDF
             }
-            cdf[nbins] = 1;
+            for (int n = 0; n < length; ++n) {
+                cdf[n] = cdf[n]/cdf[nbins];  //rescale cdf to ensure the exact range [0,1]
+            }
 
             // Generate a radial coordinate from the CDF
             amrex::ParticleReal u = amrex::Random(engine);

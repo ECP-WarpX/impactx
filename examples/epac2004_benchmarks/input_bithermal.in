@@ -18,7 +18,6 @@ beam.normalize_halo = 0.08195
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
-#lattice.elements = monitor
 lattice.elements = monitor constf1 monitor
 
 monitor.type = beam_monitor
