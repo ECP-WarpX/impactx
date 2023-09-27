@@ -10,6 +10,7 @@ import numpy as np
 
 import amrex.space3d as amr
 from impactx import ImpactX, RefPart, distribution, elements
+import matplotlib.pyplot as plt
 
 sim = ImpactX()
 
@@ -28,8 +29,8 @@ sim.slice_step_diagnostics = False
 sim.init_grids()
 
 # load a cold 10 MeV electron beam
-energy_MeV = 10.0  # reference energy (total)
 mass_MeV = 0.510998950  # electron mass in MeV/c^2
+energy_MeV = mass_MeV * 1.0001  # reference energy (total)
 bunch_charge_C = 1.0e-9  # charge in C
 npart = int(1000000)  # number of macro particles
 
@@ -43,6 +44,7 @@ sigma_r = 1.0e-3  # fixed at 1 mm
 sigma_z = r * sigma_r
 gamma = energy_MeV / mass_MeV
 beta = (1.0 - (1.0 / gamma) ** 2) ** 0.5
+print(gamma, beta)
 c0 = 2.99792458e8  # speed of light in m/s
 sigma_t = sigma_z / beta  # recall t is implicitly scaled by c0
 print(f"sigma_t={sigma_t}m")
@@ -57,49 +59,70 @@ distr = distribution.Gaussian(
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", backend="h5")
+
 # design the accelerator lattice
 sim.lattice.extend([monitor])
 
 # run simulation
 sim.evolve()
 
-# calculate phase space
-#   hack:
-import matplotlib.pyplot as plt
+# plotting
 
-num_plots_per_row = 2
-f, axs = plt.subplots(1, num_plots_per_row, figsize=(7, 2))
-ax_x_px = axs[0]
-ax_z_pz = axs[1]
+# theory data from eq. (1) in Mayes, sampled to text files in
+txt = np.loadtxt("Ex_Mayes.dat")
+x_theory, E_x_theory = txt[:, 0], txt[:, 2]
+#E_y_theory = ...
 
-pc = sim.particle_container()
-lev = pc.GetParticles(0)
-for tile_ind, pt in lev.items():
-    # positions + id + cpuid
-    aos = pt.GetArrayOfStructs()
-    aos_arr = np.array(aos, copy=False)
+# simulation data
+F_x = sim.space_charge_field(lev=0, comp="x")  # N
 
-    # momentum & particle weight
-    real_arrays = pt.GetStructOfArrays().GetRealData()
-    px = np.array(real_arrays[0], copy=False)
-    pz = np.array(real_arrays[2], copy=False)
+gm = sim.Geom(lev=0)
+dr = gm.data().CellSize()
+dV = np.prod(dr)
 
-    print(f"tile_ind={tile_ind}, pt={pt}")
-    print(f"aos_arr={aos_arr}, aos_arr.shape={aos_arr.shape}")
-    print(f"px={px}, px.shape={px.shape}")
+half_x, half_y, half_z = [n // 2 for n in sim.n_cell]  # order: x,y,z
 
-    ax_x_px.scatter(aos_arr[()]["x"], px)
-    ax_z_pz.scatter(aos_arr[()]["z"], pz)
+# plot data slices
+f = plt.figure()
+ax = f.gca()
+ng = F_x.nGrowVect
+q_e = -1.602176634e-19
+for mfi in F_x:
+    bx = mfi.validbox()
+    rbx = amr.RealBox(bx, dr, gm.ProbLo())
+
+    arr_np = F_x.array(mfi).to_numpy(copy=True)  # indices: x, y, z, comp
+
+    # shift box to zero-based local mfi index space
+    half_y_local = half_y - bx.lo_vect[1]
+    half_z_local = half_z - bx.lo_vect[2]
+    bx.shift(bx.lo_vect * -1)
+
+    # check if the current tile contains the half-y plane
+    if half_y_local < 0 or half_y_local > arr_np.shape[1]:
+        continue
+    # check if the current tile contains the half-z plane
+    if half_z_local < 0 or half_z_local > arr_np.shape[2]:
+        continue
+
+    comp = 0
+    lineout = arr_np[ng[0] : -ng[0], half_y_local, half_z_local, comp]  # w/o guard, N
+    E_x = lineout / q_e / 1.0e6  # E_x(x[m]) [MV/m]
+    ax.plot(
+        np.linspace(rbx.lo(0) / sigma_r, rbx.hi(0) / sigma_r, E_x.shape[0]),
+        E_x,
+        'o',
+    )
+ax.plot(x_theory, E_x_theory, label="theory")  # E_x(sigma_r) [MV/m]
+#cb = f.colorbar(im)
+#cb.set_label(r"charge density  [C/m$^3$]")
+ax.set_xlabel(r"$x$  [$\sigma_x$]")
+ax.set_ylabel(r"$E_x$  [MV/m]")
+ax.legend()
+#plt.savefig("charge_deposition.png")
 plt.show()
-
-# MPI reduce phase space
-#   TODO SUM up histograms via MPI
-
-# plot phase space
-# import matplotlib.pyplot as plt
-# f = plt.figure()
-# ax = plt.gca()
-# ax.scatter()
 
 # clean shutdown
 #   note: timers turned stop here
