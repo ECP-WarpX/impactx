@@ -142,7 +142,7 @@ ax1 = axs[1]
 im_sigx = ax1.plot(z, sigx, label=r"$\sigma_x$")
 im_sigt = ax1.plot(z, sigt, label=r"$\sigma_t$")
 ax2 = ax1.twinx()
-ax2._get_lines.prop_cycler = ax1._get_lines.prop_cycler
+ax2.set_prop_cycle(None)  # reset color cycle
 im_emittance_x = ax2.plot(z, emittance_x, ":", label=r"$\epsilon_x$")
 im_emittance_t = ax2.plot(z, emittance_t, ":", label=r"$\epsilon_t$")
 
