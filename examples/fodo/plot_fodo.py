@@ -130,7 +130,7 @@ ax1 = f.gca()
 im_sigx = ax1.plot(z, sigx, label=r"$\sigma_x$")
 im_sigy = ax1.plot(z, sigy, label=r"$\sigma_y$")
 ax2 = ax1.twinx()
-ax2._get_lines.prop_cycler = ax1._get_lines.prop_cycler
+ax2.set_prop_cycle(None)  # reset color cycle
 im_emittance_x = ax2.plot(z, emittance_x, ":", label=r"$\epsilon_x$")
 im_emittance_y = ax2.plot(z, emittance_y, ":", label=r"$\epsilon_y$")
 

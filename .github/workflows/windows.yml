@@ -53,8 +53,8 @@ jobs:
         $env:HDF5_USE_STATIC_LIBRARIES = "ON"
 
         python3 -m pip install -U pip setuptools wheel pytest
-        python3 -m pip install -r requirements.txt
-        python3 -m pip install -r examples/requirements.txt
+        python3 -m pip install -U -r requirements.txt
+        python3 -m pip install -U -r examples/requirements.txt
         python3 -m pip install -U openPMD-validator
     - name: Build
       run: |
@@ -138,8 +138,8 @@ jobs:
         set "HDF5_USE_STATIC_LIBRARIES=ON"
 
         python3 -m pip install -U pip setuptools wheel pytest
-        python3 -m pip install -r requirements.txt
-        python3 -m pip install -r examples/requirements.txt
+        python3 -m pip install -U -r requirements.txt
+        python3 -m pip install -U -r examples/requirements.txt
         python3 -m pip install -U openPMD-validator
     - name: Build
       shell: cmd

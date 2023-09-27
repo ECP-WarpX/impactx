@@ -53,8 +53,8 @@ jobs:
         brew install pkg-config
         python3 -m pip install --upgrade pip setuptools wheel pytest
         python3 -m pip install --upgrade pytest
-        python3 -m pip install -r requirements_mpi.txt
-        python3 -m pip install -r examples/requirements.txt
+        python3 -m pip install --upgrade -r requirements_mpi.txt
+        python3 -m pip install --upgrade -r examples/requirements.txt
         python3 -m pip install --upgrade openPMD-validator
         set -e
     - name: CCache Cache
