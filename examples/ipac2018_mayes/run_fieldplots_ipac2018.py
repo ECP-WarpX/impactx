@@ -6,11 +6,11 @@
 #
 # -*- coding: utf-8 -*-
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 import amrex.space3d as amr
 from impactx import ImpactX, RefPart, distribution, elements
-import matplotlib.pyplot as plt
 
 sim = ImpactX()
 
@@ -73,7 +73,7 @@ sim.evolve()
 # theory data from eq. (1) in Mayes, sampled to text files in
 txt = np.loadtxt("Ex_Mayes.dat")
 x_theory, E_x_theory = txt[:, 0], txt[:, 2]
-#E_y_theory = ...
+# E_y_theory = ...
 
 # simulation data
 F_x = sim.space_charge_field(lev=0, comp="x")  # N
@@ -113,15 +113,15 @@ for mfi in F_x:
     ax.plot(
         np.linspace(rbx.lo(0) / sigma_r, rbx.hi(0) / sigma_r, E_x.shape[0]),
         E_x,
-        'o',
+        "o",
     )
 ax.plot(x_theory, E_x_theory, label="theory")  # E_x(sigma_r) [MV/m]
-#cb = f.colorbar(im)
-#cb.set_label(r"charge density  [C/m$^3$]")
+# cb = f.colorbar(im)
+# cb.set_label(r"charge density  [C/m$^3$]")
 ax.set_xlabel(r"$x$  [$\sigma_x$]")
 ax.set_ylabel(r"$E_x$  [MV/m]")
 ax.legend()
-#plt.savefig("charge_deposition.png")
+# plt.savefig("charge_deposition.png")
 plt.show()
 
 # clean shutdown
