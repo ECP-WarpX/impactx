@@ -15,7 +15,7 @@ from impactx import ImpactX, RefPart, distribution, elements
 sim = ImpactX()
 
 # set numerical parameters and IO control
-sim.n_cell = [56, 56, 48]
+sim.n_cell = [128, 128, 256]  # 128^3 or higher for reasonable convergence
 sim.particle_shape = 2  # B-spline order
 sim.space_charge = True
 sim.dynamic_size = True
@@ -30,23 +30,23 @@ sim.init_grids()
 
 # load a cold 10 MeV electron beam
 mass_MeV = 0.510998950  # electron mass in MeV/c^2
-energy_MeV = mass_MeV * 1.0001  # reference energy (total)
+energy_MeV = 10.0  # reference energy (total)
 bunch_charge_C = 1.0e-9  # charge in C
 npart = int(1000000)  # number of macro particles
 
-#   reference particle
+#   reference particle (Mayes Fig. 1 is for + charge)
 ref = sim.particle_container().ref_particle()
-ref.set_charge_qe(-1.0).set_mass_MeV(mass_MeV).set_energy_MeV(energy_MeV)
+ref.set_charge_qe(1.0).set_mass_MeV(mass_MeV).set_energy_MeV(energy_MeV)
 
 #   particle bunch
-r = 0.1  # aspect ratio = sigma_z / sigma_perp:  range 0.01 to 10
+r = 1.0  # aspect ratio = sigma_z / sigma_perp:  range 0.01 to 10
 sigma_r = 1.0e-3  # fixed at 1 mm
 sigma_z = r * sigma_r
 gamma = energy_MeV / mass_MeV
 beta = (1.0 - (1.0 / gamma) ** 2) ** 0.5
 print(gamma, beta)
 c0 = 2.99792458e8  # speed of light in m/s
-sigma_t = sigma_z / beta  # recall t is implicitly scaled by c0
+sigma_t = sigma_z / (beta * gamma)  # recall t is implicitly scaled by c0
 print(f"sigma_t={sigma_t}m")
 
 distr = distribution.Gaussian(
@@ -72,11 +72,10 @@ sim.evolve()
 
 # theory data from eq. (1) in Mayes, sampled to text files in
 txt = np.loadtxt("Ex_Mayes.dat")
-x_theory, E_x_theory = txt[:, 0], txt[:, 2]
-# E_y_theory = ...
+x_theory, E_x_theory = txt[:, 0], txt[:, 3]
 
 # simulation data
-F_x = sim.space_charge_field(lev=0, comp="x")  # N
+F_x = sim.space_charge_field(lev=0, comp="x")  # [V/m] in the lab frame
 
 gm = sim.Geom(lev=0)
 dr = gm.data().CellSize()
@@ -109,12 +108,19 @@ for mfi in F_x:
 
     comp = 0
     lineout = arr_np[ng[0] : -ng[0], half_y_local, half_z_local, comp]  # w/o guard, N
-    E_x = lineout / q_e / 1.0e6  # E_x(x[m]) [MV/m]
+    E_x = lineout / gamma / 1.0e6  # E_x(x[m]) [MV/m]
     ax.plot(
         np.linspace(rbx.lo(0) / sigma_r, rbx.hi(0) / sigma_r, E_x.shape[0]),
         E_x,
-        "o",
+        "ko",
+        markersize=3,
     )
+xmin = -6.0
+xmax = 6.0
+ymin = -5.0
+ymax = 5.0
+ax.set_xlim([xmin, xmax])
+ax.set_ylim([ymin, ymax])
 ax.plot(x_theory, E_x_theory, label="theory")  # E_x(sigma_r) [MV/m]
 # cb = f.colorbar(im)
 # cb.set_label(r"charge density  [C/m$^3$]")
