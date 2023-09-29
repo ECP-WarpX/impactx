@@ -139,7 +139,7 @@ namespace impactx
             return ref_energy;
         }
 
-        /** Set reference particle energy
+        /** Set reference particle kinetic energy
          *
          * @param energy initial kinetic energy (MeV)
          */
