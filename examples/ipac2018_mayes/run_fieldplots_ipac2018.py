@@ -18,11 +18,8 @@ import amrex.space3d as amr
 from impactx import ImpactX, RefPart, distribution, elements
 
 # theory data from eq. (1) in Mayes, sampled to text files in
-txt = np.loadtxt("Ex_Mayes.dat")
-theory = pd.read_csv(
-    "Ex_Mayes.dat", sep=" ", names=["x", "r=0.01", "r=0.1", "r=1", "r=10"]
-)
-x_theory = theory["x"]
+theory = pd.read_csv("Ex_Mayes.dat", header=0, sep=r"\s+")
+x_theory = theory["x/sigmax"]
 
 
 def run_and_plot(case, r, ax):
@@ -75,10 +72,9 @@ def run_and_plot(case, r, ax):
     sigma_z = r * sigma_r
     gamma = energy_MeV / mass_MeV
     beta = (1.0 - (1.0 / gamma) ** 2) ** 0.5
-    print(gamma, beta)
     c0 = 2.99792458e8  # speed of light in m/s
     sigma_t = sigma_z / (beta * gamma)  # recall t is implicitly scaled by c0
-    print(f"sigma_t={sigma_t}m")
+    print(f"r={r} sigma_t={sigma_t}m")
 
     distr = distribution.Gaussian(
         sigmaX=sigma_r,
@@ -110,6 +106,10 @@ def run_and_plot(case, r, ax):
 
     half_x, half_y, half_z = [n // 2 for n in sim.n_cell]  # order: x,y,z
 
+    # plot theory
+    p = ax.plot(x_theory, theory[case], label=case)  # E_x(sigma_r) [MV/m]
+    line_color = p[0].get_color()
+
     # plot data slices
     ng = F_x.nGrowVect
     q_e = -1.602176634e-19
@@ -139,16 +139,10 @@ def run_and_plot(case, r, ax):
         ax.plot(
             np.linspace(rbx.lo(0) / sigma_r, rbx.hi(0) / sigma_r, E_x.shape[0]),
             E_x,
-            "ko",
+            "o",
             markersize=3,
+            color=line_color,
         )
-    xmin = -6.0
-    xmax = 6.0
-    ymin = -5.0
-    ymax = 5.0
-    ax.set_xlim([xmin, xmax])
-    ax.set_ylim([ymin, ymax])
-    ax.plot(x_theory, theory[case], label=case)  # E_x(sigma_r) [MV/m]
 
     # clean shutdown
     del sim
@@ -158,16 +152,38 @@ f = plt.figure()
 ax = f.gca()
 
 # run_and_plot("r=0.01", 0.01, ax)
-run_and_plot("r=0.1", 0.1, ax)
+# run_and_plot("r=0.1", 0.1, ax)
+run_and_plot("r=0.2", 0.2, ax)
+run_and_plot("r=0.5", 0.5, ax)
 run_and_plot("r=1", 1, ax)
 run_and_plot("r=10", 10, ax)
 
-# cb = f.colorbar(im)
-# cb.set_label(r"charge density  [C/m$^3$]")
+
+# Charge density (Gaussian, normalized)
+def gauss(x):
+    return np.exp(-(x**2) / 2)
+
+
+ax2 = ax.twinx()
+ax2.fill_between(x_theory, 0, gauss(x_theory), color="gray", alpha=0.2)
+
+xmin = -6.0
+xmax = 6.0
+ymin = -5.0
+ymax = 5.0
+ax.set_xlim([xmin, xmax])
+ax.set_ylim([ymin, ymax])
+ax2.set_ylim([-1.2, 1.2])
+ax2.set_yticks([0, 0.5, 1.0])
+
+# ax2.spines['right'].set_color('gray')
+ax2.yaxis.label.set_color("gray")
+ax2.tick_params(colors="gray", which="both")
+
 ax.set_xlabel(r"$x$  [$\sigma_x$]")
 ax.set_ylabel(r"$E_x$  [MV/m]")
-ax.legend()
-# plt.savefig("charge_deposition.png")
+ax2.set_ylabel(r"charge density  [arb. u.]")
+ax.legend(loc="upper left")
 plt.show()
 
 # clean shutdown
