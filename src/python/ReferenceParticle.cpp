@@ -48,6 +48,6 @@ void init_refparticle(py::module& m)
              "Set reference particle rest mass (MeV/c^2)", py::arg("mass_MeV"))
         .def("set_energy_MeV", &RefPart::set_energy_MeV,
              py::return_value_policy::reference_internal,
-             "Set reference particle energy (MeV)", py::arg("energy_MeV"))
+             "Set reference particle kinetic energy (MeV)", py::arg("energy_MeV"))
     ;
 }
