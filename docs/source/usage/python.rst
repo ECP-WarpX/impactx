@@ -311,7 +311,7 @@ Particles
 
    .. py:method:: set_energy_MeV(energy_MeV)
 
-      Write-only: Set reference particle energy.
+      Write-only: Set reference particle kinetic energy.
 
    .. py:method:: load_file(madx_file)
 
