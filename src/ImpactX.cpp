@@ -22,6 +22,7 @@
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
 #include <AMReX_BLProfiler.H>
+#include <AMReX_ParmParse.H>
 #include <AMReX_Print.H>
 #include <AMReX_Utility.H>
 

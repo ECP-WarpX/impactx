@@ -66,6 +66,39 @@ General
       This is in-development.
       At the moment, this flag only activates coordinate transformations and charge deposition.
 
+   .. py:property:: mlmg_relative_tolerance
+
+      Default: ``1.e-7``
+
+      The relative precision with which the electrostatic space-charge fields should be calculated.
+      More specifically, the space-charge fields are computed with an iterative Multi-Level Multi-Grid (MLMG) solver.
+      This solver can fail to reach the default precision within a reasonable time.
+
+   .. py:property:: mlmg_absolute_tolerance
+
+      Default: ``0``, which means: ignored
+
+      The absolute tolerance with which the space-charge fields should be calculated in units of :math:`V/m^2`.
+      More specifically, the acceptable residual with which the solution can be considered converged.
+      In general this should be left as the default, but in cases where the simulation state changes very
+      little between steps it can occur that the initial guess for the MLMG solver is so close to the
+      converged value that it fails to improve that solution sufficiently to reach the ``mlmg_relative_tolerance`` value.
+
+   .. py:property:: mlmg_max_iters
+
+      Default: ``100``
+
+      Maximum number of iterations used for MLMG solver for space-charge fields calculation.
+      In case if MLMG converges but fails to reach the desired self_fields_required_precision, this parameter may be increased.
+
+   .. py:property:: mlmg_verbosity
+
+      Default: ``1``
+
+      The verbosity used for MLMG solver for space-charge fields calculation.
+      Currently MLMG solver looks for verbosity levels from 0-5.
+      A higher number results in more verbose output.
+
    .. py:property:: diagnostics
 
       Enable (``True``) or disable (``False``) diagnostics generally (default: ``True``).
