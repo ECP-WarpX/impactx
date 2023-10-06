@@ -3,6 +3,14 @@
 cmake_minimum_required(VERSION 3.20.0)
 project(ImpactX VERSION 23.09)
 
+# generate compile_commands.json
+if(${CMAKE_GENERATOR} STREQUAL "Unix Makefiles" OR ${CMAKE_GENERATOR} STREQUAL
+                                                   "Ninja")
+  if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+      set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+  endif()
+endif()
+
 include(${ImpactX_SOURCE_DIR}/cmake/ImpactXFunctions.cmake)
 
 # In-source tree builds are messy and can screw up the build system.

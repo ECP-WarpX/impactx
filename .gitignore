@@ -46,6 +46,9 @@ cmake-build-*/
 .kdev?/
 *.kdev?
 
+# clangd LSP files
+**.cache/clangd
+
 # File-based project format:
 *.iws
 
