@@ -407,6 +407,17 @@ if(ImpactX_PYTHON)
             ${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel ${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_requirements
             ${_EXTRA_INSTALL_DEPENDS}
     )
+
+    # this is for package managers only
+    add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_nodeps
+        ${CMAKE_COMMAND} -E env IMPACTX_MPI=${ImpactX_MPI}
+            ${Python_EXECUTABLE} -m pip install --force-reinstall --no-index --no-deps ${PYINSTALLOPTIONS} --find-links=impactx-whl impactx
+        WORKING_DIRECTORY
+            ${ImpactX_BINARY_DIR}
+        DEPENDS
+            pyImpactX
+            ${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel
+    )
 endif()
 
 
