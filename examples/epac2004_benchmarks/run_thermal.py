@@ -50,8 +50,13 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 # design the accelerator lattice
 sim.lattice.append(monitor)
 
-constf = elements.Constf(ds=10.0, kx=6.283185307179586,
-                         ky=6.283185307179586,kt=6.283185307179586,nslice=400)
+constf = elements.Constf(
+    ds=10.0,
+    kx=6.283185307179586,
+    ky=6.283185307179586,
+    kt=6.283185307179586,
+    nslice=400,
+)
 
 #   set first lattice element
 sim.lattice.append(constf)
