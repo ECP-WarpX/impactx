@@ -92,6 +92,17 @@ void init_distribution(py::module& m)
              "A 6D Semi-Gaussian distribution (uniform in position, Gaussian in momentum)."
         );
 
+    py::class_<distribution::Thermal>(md, "Thermal")
+        .def(py::init<
+                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
+                 amrex::ParticleReal const, amrex::ParticleReal const,
+             >(),
+             py::arg("k"), py::arg("kT1"), py::arg("kT2"),
+             py::arg("halo"), py::arg("data"),
+             "A stationary thermal or bithermal distribution\n\n"
+             "R. D. Ryne, J. Qiang, and A. Adelmann, in Proc. EPAC2004, pp. 1942-1944 (2004)"
+        );
+
     py::class_<distribution::Triangle>(md, "Triangle")
         .def(py::init<
                  amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
