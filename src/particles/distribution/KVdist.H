@@ -16,9 +16,7 @@
 #include <cmath>
 
 
-namespace impactx
-{
-namespace distribution
+namespace impactx::distribution
 {
     struct KVdist
     {
@@ -94,7 +92,7 @@ namespace distribution
             pt = ln1*cos(2_prt*pi*u2);
 
             // Scale to produce the identity covariance matrix:
-            amrex::ParticleReal c = sqrt(3.0_prt);
+            amrex::ParticleReal const c = sqrt(3.0_prt);
             x = 2_prt*x;
             y = 2_prt*y;
             t = c*t;
@@ -125,7 +123,6 @@ namespace distribution
         amrex::ParticleReal m_muxpx,m_muypy,m_mutpt; //! correlation length-momentum
     };
 
-} // namespace distribution
-} // namespace impactx
+} // namespace impactx::distribution
 
 #endif // IMPACTX_DISTRIBUTION_KVDIST

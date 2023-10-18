@@ -58,7 +58,7 @@ bool ImpactX::early_param_check ()
     BL_PROFILE("ImpactX::early_param_check");
 
     amrex::Print() << "\n";
-    amrex::ParmParse().QueryUnusedInputs();
+    amrex::ParmParse::QueryUnusedInputs();
 
     // Print the warning list right after the first step.
     amrex::Print() << ablastr::warn_manager::GetWMInstance()

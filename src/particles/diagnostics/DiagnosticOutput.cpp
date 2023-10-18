@@ -19,21 +19,23 @@
 #include <AMReX_REAL.H>       // for ParticleReal
 #include <AMReX_Print.H>      // for PrintToFile
 
+#include <utility>
+
 
 namespace impactx::diagnostics
 {
     void DiagnosticOutput (ImpactXParticleContainer const & pc,
                            OutputType const otype,
                            std::string file_name,
-                           int const step,
-                           bool const append)
+                           int step,
+                           bool append)
     {
         BL_PROFILE("impactx::diagnostics::DiagnosticOutput");
 
         using namespace amrex::literals; // for _rt and _prt
 
         // keep file open as we add more and more lines
-        amrex::AllPrintToFile file_handler(file_name);
+        amrex::AllPrintToFile file_handler(std::move(file_name));
 
         // write file header per MPI RANK
         if (!append) {

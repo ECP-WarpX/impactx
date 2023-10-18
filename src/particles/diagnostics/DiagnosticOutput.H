@@ -40,10 +40,10 @@ namespace impactx::diagnostics
      * @param append open a new file with a fresh header (false) or append data to an existing file (true)
      */
     void DiagnosticOutput (ImpactXParticleContainer const & pc,
-                           OutputType const otype,
+                           OutputType otype,
                            std::string file_name,
-                           int const step = 0,
-                           bool const append = false);
+                           int step = 0,
+                           bool append = false);
 
 } // namespace impactx::diagnostics
 

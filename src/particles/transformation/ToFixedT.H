@@ -19,9 +19,7 @@
 #include <cmath>
 
 
-namespace impactx
-{
-namespace transformation
+namespace impactx::transformation
 {
     struct ToFixedT
     {
@@ -97,7 +95,6 @@ namespace transformation
         amrex::ParticleReal m_ptd;  ///< Design value of pt/mc2 = -gamma.
     };
 
-} // namespace transformation
-} // namespace impactx
+} // namespace impactx::transformation
 
 #endif // IMPACTX_TO_FIXED_T_H

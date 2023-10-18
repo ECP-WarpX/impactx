@@ -57,7 +57,7 @@ namespace impactx
         SetParticleSize();
     }
 
-    void ImpactXParticleContainer::SetParticleShape (int const order) {
+    void ImpactXParticleContainer::SetParticleShape (int order) {
         if (m_particle_shape.has_value())
         {
             throw std::logic_error(
@@ -155,7 +155,7 @@ namespace impactx
     }
 
     void
-    ImpactXParticleContainer::SetRefParticle (RefPart const refpart)
+    ImpactXParticleContainer::SetRefParticle (RefPart const & refpart)
     {
         m_refpart = refpart;
     }

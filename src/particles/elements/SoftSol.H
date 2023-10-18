@@ -146,7 +146,7 @@ namespace SoftSolenoidData
            SoftSolenoidData::next_id++;
 
            // validate sin and cos coefficients are the same length
-           m_ncoef = cos_coef.size();
+           m_ncoef = int(cos_coef.size());
            if (m_ncoef != int(sin_coef.size()))
                throw std::runtime_error("SoftSolenoid: cos and sin coefficients must have same length!");
 

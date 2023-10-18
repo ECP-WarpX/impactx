@@ -89,8 +89,8 @@ namespace impactx
             // assign complex position zeta = (x + iy)/cnll
             Complex zeta(x, y);
             zeta = zeta/m_cnll;
-            Complex re1(1.0_prt, 0.0_prt);
-            Complex im1(0.0_prt, 1.0_prt);
+            Complex const re1(1.0_prt, 0.0_prt);
+            Complex const im1(0.0_prt, 1.0_prt);
 
             // compute croot = sqrt(1-zeta**2)
             Complex croot = amrex::pow(zeta, 2);
@@ -106,9 +106,9 @@ namespace impactx
             dF = dF + carcsin/amrex::pow(croot,3);
 
             // compute momentum kick
-            amrex::ParticleReal kick = -m_knll/m_cnll;
-            amrex::ParticleReal dpx = kick*dF.m_real;
-            amrex::ParticleReal dpy = -kick*dF.m_imag;
+            amrex::ParticleReal const kick = -m_knll/m_cnll;
+            amrex::ParticleReal const dpx = kick*dF.m_real;
+            amrex::ParticleReal const dpy = -kick*dF.m_imag;
 
             // advance position and momentum
             p.pos(RealAoS::x) = x;

@@ -14,9 +14,7 @@
 #include <AMReX_REAL.H>
 
 
-namespace impactx
-{
-namespace distribution
+namespace impactx::distribution
 {
     struct None
     {
@@ -52,7 +50,6 @@ namespace distribution
         }
     };
 
-} // namespace distribution
-} // namespace impactx
+} // namespace impactx::distribution
 
 #endif // IMPACTX_DISTRIBUTION_NONE

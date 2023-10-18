@@ -22,9 +22,7 @@
 #include <variant>
 
 
-namespace impactx
-{
-namespace distribution
+namespace impactx::distribution
 {
     using KnownDistributions = std::variant<
         None, /* must be first, so KnownDistributions creates a default constructor */
@@ -37,7 +35,6 @@ namespace distribution
         Waterbag
     >;
 
-} // namespace distribution
-} // namespace impactx
+} // namespace impactx::distribution
 
 #endif // IMPACTX_DISTRIBUTION_ALL_H

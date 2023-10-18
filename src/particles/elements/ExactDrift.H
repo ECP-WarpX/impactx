@@ -69,9 +69,9 @@ namespace impactx
             amrex::ParticleReal const t = p.pos(RealAoS::t);
 
             // initialize output values of momenta
-            amrex::ParticleReal pxout = px;
-            amrex::ParticleReal pyout = py;
-            amrex::ParticleReal ptout = pt;
+            amrex::ParticleReal const pxout = px;
+            amrex::ParticleReal const pyout = py;
+            amrex::ParticleReal const ptout = pt;
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
@@ -81,7 +81,7 @@ namespace impactx
             amrex::ParticleReal const betgam = refpart.beta_gamma();
 
             // compute the radical in the denominator (= pz):
-            amrex::ParticleReal pzden = sqrt(pow(pt-1_prt/bet,2) -
+            amrex::ParticleReal const pzden = sqrt(pow(pt-1_prt/bet,2) -
                                 1_prt/pow(betgam,2) - pow(px,2) - pow(py,2));
 
             // advance position and momentum (exact drift)

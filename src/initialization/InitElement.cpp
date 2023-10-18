@@ -58,7 +58,7 @@ namespace detail
      * @param[in] nslice_default
      * @param[in] mapsteps_default
      */
-    void read_element (std::string element_name,
+    void read_element (std::string const & element_name,
                        std::list<KnownElements> & m_lattice,
                        int nslice_default,
                        int mapsteps_default)
@@ -94,7 +94,7 @@ namespace detail
             int nslice = nslice_default;
             pp_element.get("ds", ds);
             pp_element.get("rc", rc);
-        pp_element.get("k", k);
+            pp_element.get("k", k);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( CFbend(ds, rc, k, nslice) );
         } else if (element_type == "dipedge") {
@@ -216,14 +216,14 @@ namespace detail
             m_lattice.emplace_back( ExactDrift(ds, nslice) );
         } else if (element_type == "sbend_exact") {
             amrex::Real ds, phi;
-        amrex::Real B = 0.0;
+            amrex::Real B = 0.0;
             int nslice = nslice_default;
             pp_element.get("ds", ds);
             pp_element.get("phi", phi);
             pp_element.queryAdd("B", B);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( ExactSbend(ds, phi, B, nslice) );
-    } else if (element_type == "uniform_acc_chromatic") {
+        } else if (element_type == "uniform_acc_chromatic") {
             amrex::Real ds, ez, bz;
             int nslice = nslice_default;
             pp_element.get("ds", ds);
@@ -252,7 +252,7 @@ namespace detail
             pp_element.queryAdd("encoding", openpmd_encoding);
             m_lattice.emplace_back(diagnostics::BeamMonitor(openpmd_name, openpmd_backend, openpmd_encoding));
         } else if (element_type == "line") {
-            // Parse the lattice elements
+            // Parse the lattice elements for the sub-lattice in the line
             amrex::ParmParse pp_sub_lattice(element_name);
             std::vector<std::string> sub_lattice_elements;
             pp_sub_lattice.queryarr("elements", sub_lattice_elements);

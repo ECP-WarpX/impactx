@@ -19,9 +19,7 @@
 #include <cmath>
 
 
-namespace impactx
-{
-namespace transformation
+namespace impactx::transformation
 {
     struct ToFixedS
     {
@@ -97,7 +95,6 @@ namespace transformation
         amrex::ParticleReal m_pzd;  ///< Design value of pz/mc = beta*gamma.
     };
 
-} // namespace transformation
-} // namespace impactx
+} // namespace impactx::transformation
 
 #endif // IMPACTX_TO_FIXED_S_H
