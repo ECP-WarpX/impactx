@@ -34,7 +34,7 @@ ref = sim.particle_container().ref_particle()
 ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_energy_MeV(energy_MeV)
 
 #   particle bunch
-distr = distribution.Bithermal(
+distr = distribution.Thermal(
     k=6.283185307179586,
     kT=36.0e-6,
     kT_halo=36.0e-6,
