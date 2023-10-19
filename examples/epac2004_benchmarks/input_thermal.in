@@ -1,7 +1,8 @@
 ###############################################################################
 # Particle Beam(s)
 ###############################################################################
-beam.npart = 100000000
+#beam.npart = 100000000  #full resolution
+beam.npart = 10000
 beam.units = static
 beam.energy = 0.1
 beam.charge = 1.4285714285714285714e-10
@@ -24,7 +25,8 @@ constf1.ds = 10.0
 constf1.kx = 6.283185307179586
 constf1.ky = 6.283185307179586
 constf1.kt = 6.283185307179586
-constf1.nslice = 400
+#constf1.nslice = 400  #full resolution
+constf1.nslice = 50
 
 ###############################################################################
 # Algorithms
@@ -32,10 +34,11 @@ constf1.nslice = 400
 algo.particle_shape = 2
 algo.space_charge = true
 
-amr.n_cell = 128 128 128
+#amr.n_cell = 128 128 128  #full resolution
+amr.n_cell = 56 56 64 
 geometry.prob_relative = 3.0
 
 ###############################################################################
 # Diagnostics
 ###############################################################################
-diag.slice_step_diagnostics = true
+diag.slice_step_diagnostics = false

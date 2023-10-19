@@ -95,10 +95,10 @@ void init_distribution(py::module& m)
     py::class_<distribution::Thermal>(md, "Thermal")
         .def(py::init<
                  amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const,
+                 amrex::ParticleReal const, distribution::ThermalData::Rprofile const
              >(),
-             py::arg("k"), py::arg("kT1"), py::arg("kT2"),
-             py::arg("halo"), py::arg("data"),
+             py::arg("k"), py::arg("kT"), py::arg("kT_halo"),
+             py::arg("halo")=0.0, py::arg("data"),
              "A stationary thermal or bithermal distribution\n\n"
              "R. D. Ryne, J. Qiang, and A. Adelmann, in Proc. EPAC2004, pp. 1942-1944 (2004)"
         );
