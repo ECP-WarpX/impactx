@@ -693,4 +693,3 @@ add_impactx_test(bithermal.py
     examples/epac2004_benchmarks/analysis_bithermal.py
     OFF  # no plot script yet
 )
-
