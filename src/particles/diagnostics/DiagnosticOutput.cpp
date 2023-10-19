@@ -19,6 +19,7 @@
 #include <AMReX_REAL.H>       // for ParticleReal
 #include <AMReX_Print.H>      // for PrintToFile
 
+#include <limits>
 #include <utility>
 
 
@@ -36,6 +37,7 @@ namespace impactx::diagnostics
 
         // keep file open as we add more and more lines
         amrex::AllPrintToFile file_handler(std::move(file_name));
+        file_handler.SetPrecision(std::numeric_limits<amrex::ParticleReal>::max_digits10);
 
         // write file header per MPI RANK
         if (!append) {
@@ -75,6 +77,7 @@ namespace impactx::diagnostics
         } // if( otype == OutputType::PrintReducedBeamCharacteristics)
 
         // create a host-side particle buffer
+        // todo: NOT needed for OutputType::PrintRefParticle and OutputType::PrintReducedBeamCharacteristics
         auto tmp = pc.make_alike<amrex::PinnedArenaAllocator>();
 
         // copy device-to-host
