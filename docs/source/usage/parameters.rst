@@ -53,6 +53,9 @@ Overall simulation parameters
 Setting up the field mesh
 -------------------------
 
+ImpactX uses an AMReX grid of boxes to organize and parallelize the simulation domain.
+These boxes also contain a field mesh, if space charge calculations are enabled.
+
 * ``amr.n_cell`` (3 integers) optional (default: 1 `blocking_factor <https://amrex-codes.github.io/amrex/docs_html/GridCreation.html>`__ per MPI process)
     The number of grid points along each direction (on the **coarsest level**)
 
@@ -114,104 +117,119 @@ Domain Boundary Conditions
 Initial Beam Distributions
 --------------------------
 
-* ``<distribution>.type`` (``string``)
+* ``beam.npart`` (``integer``)
+  number of weighted simulation particles
+
+* ``beam.units`` (``string``)
+  currently, only ``static`` is supported.
+
+* ``beam.kin_energy`` (``float``, in MeV)
+  beam kinetic energy
+
+* ``beam.charge`` (``float``, in C)
+  bunch charge
+
+* ``beam.particle`` (``string``)
+  particle type: currently either ``electron``, ``positron`` or ``proton``
+
+* ``beam.distribution`` (``string``)
     Indicates the initial distribution type.
     This should be one of:
 
     * ``waterbag`` for initial Waterbag distribution.
       With additional parameters:
 
-        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
-        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
-        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
-        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
-        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
-        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
-        * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
-        * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
-        * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
+        * ``beam.sigmaX`` (``float``, in meters) rms X
+        * ``beam.sigmaY`` (``float``, in meters) rms Y
+        * ``beam.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``beam.sigmaPx`` (``float``, in momentum) rms Px
+        * ``beam.sigmaPy`` (``float``, in momentum) rms Py
+        * ``beam.sigmaPt`` (``float``, in energy deviation) rms Pt
+        * ``beam.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
+        * ``beam.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
+        * ``beam.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
     * ``kurth6d`` for initial 6D Kurth distribution.
       With additional parameters:
 
-        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
-        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
-        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
-        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
-        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
-        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
-        * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
-        * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
-        * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
+        * ``beam.sigmaX`` (``float``, in meters) rms X
+        * ``beam.sigmaY`` (``float``, in meters) rms Y
+        * ``beam.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``beam.sigmaPx`` (``float``, in momentum) rms Px
+        * ``beam.sigmaPy`` (``float``, in momentum) rms Py
+        * ``beam.sigmaPt`` (``float``, in energy deviation) rms Pt
+        * ``beam.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
+        * ``beam.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
+        * ``beam.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
     * ``gaussian`` for initial 6D Gaussian (normal) distribution.
       With additional parameters:
 
-        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
-        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
-        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
-        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
-        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
-        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
-        * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
-        * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
-        * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
+        * ``beam.sigmaX`` (``float``, in meters) rms X
+        * ``beam.sigmaY`` (``float``, in meters) rms Y
+        * ``beam.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``beam.sigmaPx`` (``float``, in momentum) rms Px
+        * ``beam.sigmaPy`` (``float``, in momentum) rms Py
+        * ``beam.sigmaPt`` (``float``, in energy deviation) rms Pt
+        * ``beam.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
+        * ``beam.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
+        * ``beam.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
     * ``kvdist`` for initial K-V distribution in the transverse plane.
       The distribution is uniform in t and Gaussian in pt.
       With additional parameters:
 
-        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
-        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
-        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
-        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
-        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
-        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
-        * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
-        * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
-        * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
+        * ``beam.sigmaX`` (``float``, in meters) rms X
+        * ``beam.sigmaY`` (``float``, in meters) rms Y
+        * ``beam.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``beam.sigmaPx`` (``float``, in momentum) rms Px
+        * ``beam.sigmaPy`` (``float``, in momentum) rms Py
+        * ``beam.sigmaPt`` (``float``, in energy deviation) rms Pt
+        * ``beam.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
+        * ``beam.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
+        * ``beam.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
     * ``kurth4d`` for initial 4D Kurth distribution in the transverse plane.
       The distribution is uniform in t and Gaussian in pt.
       With additional parameters:
 
-        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
-        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
-        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
-        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
-        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
-        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
-        * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
-        * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
-        * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
+        * ``beam.sigmaX`` (``float``, in meters) rms X
+        * ``beam.sigmaY`` (``float``, in meters) rms Y
+        * ``beam.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``beam.sigmaPx`` (``float``, in momentum) rms Px
+        * ``beam.sigmaPy`` (``float``, in momentum) rms Py
+        * ``beam.sigmaPt`` (``float``, in energy deviation) rms Pt
+        * ``beam.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
+        * ``beam.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
+        * ``beam.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
     * ``semigaussian`` for initial Semi-Gaussian distribution.  The distribution is uniform within a cylinder in (x,y,z) and Gaussian in momenta (px,py,pt).
       With additional parameters:
 
-        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
-        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
-        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
-        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
-        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
-        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
-        * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
-        * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
-        * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
+        * ``beam.sigmaX`` (``float``, in meters) rms X
+        * ``beam.sigmaY`` (``float``, in meters) rms Y
+        * ``beam.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``beam.sigmaPx`` (``float``, in momentum) rms Px
+        * ``beam.sigmaPy`` (``float``, in momentum) rms Py
+        * ``beam.sigmaPt`` (``float``, in energy deviation) rms Pt
+        * ``beam.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
+        * ``beam.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
+        * ``beam.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
     * ``triangle`` a triangle distribution for laser-plasma acceleration related applications.
       A ramped, triangular current profile with a Gaussian energy spread (possibly correlated).
       The transverse distribution is a 4D waterbag.
       With additional parameters:
 
-        * ``<distribution>.sigmaX`` (``float``, in meters) rms X
-        * ``<distribution>.sigmaY`` (``float``, in meters) rms Y
-        * ``<distribution>.sigmaT`` (``float``, in radian) rms normalized time difference T
-        * ``<distribution>.sigmaPx`` (``float``, in momentum) rms Px
-        * ``<distribution>.sigmaPy`` (``float``, in momentum) rms Py
-        * ``<distribution>.sigmaPt`` (``float``, in energy deviation) rms Pt
-        * ``<distribution>.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
-        * ``<distribution>.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
-        * ``<distribution>.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
+        * ``beam.sigmaX`` (``float``, in meters) rms X
+        * ``beam.sigmaY`` (``float``, in meters) rms Y
+        * ``beam.sigmaT`` (``float``, in radian) rms normalized time difference T
+        * ``beam.sigmaPx`` (``float``, in momentum) rms Px
+        * ``beam.sigmaPy`` (``float``, in momentum) rms Py
+        * ``beam.sigmaPt`` (``float``, in energy deviation) rms Pt
+        * ``beam.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
+        * ``beam.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
+        * ``beam.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
 .. _running-cpp-parameters-lattice:
 
