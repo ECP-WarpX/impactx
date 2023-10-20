@@ -31,7 +31,7 @@ Reference particle:
 * ``px_ref`` momentum in x, normalized to mass*c :math:`p_x = \gamma \beta_x`
 * ``py_ref`` momentum in y, normalized to mass*c :math:`p_y = \gamma \beta_y`
 * ``pz_ref`` momentum in z, normalized to mass*c :math:`p_z = \gamma \beta_z`
-* ``pt_ref`` energy deviation, normalized by rest energy
+* ``pt_ref`` energy, normalized by rest energy :math:`p_t = -\gamma`
 * ``mass`` reference rest mass, in kg
 * ``charge`` reference charge, in C
 
