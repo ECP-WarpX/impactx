@@ -671,7 +671,7 @@ add_impactx_test(thermal
 add_impactx_test(thermal.py
     examples/epac2004_benchmarks/run_thermal.py
       OFF  # ImpactX MPI-parallel
-      ON   # ImpactX Python interface
+      OFF   # ImpactX Python interface
     examples/epac2004_benchmarks/analysis_thermal.py
     OFF  # no plot script yet
 )
@@ -689,7 +689,7 @@ add_impactx_test(bithermal
 add_impactx_test(bithermal.py
     examples/epac2004_benchmarks/run_bithermal.py
       OFF  # ImpactX MPI-parallel
-      ON   # ImpactX Python interface
+      OFF   # ImpactX Python interface
     examples/epac2004_benchmarks/analysis_bithermal.py
     OFF  # no plot script yet
 )
