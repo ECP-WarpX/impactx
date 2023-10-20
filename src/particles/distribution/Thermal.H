@@ -275,12 +275,6 @@ namespace distribution
             amrex::ParticleReal g1,g2,g3,g4,g5,g6;
             amrex::ParticleReal z,pz;
 
-            // Avoid unused variable errors:
-            amrex::ParticleReal km = m_k;
-            amrex::ParticleReal T1m = m_T1;
-            amrex::ParticleReal T2m = m_T2;
-            amrex::ParticleReal wm = m_w;
-
             constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
             // Use a Bernoulli random variable to select between core and halo:
@@ -350,9 +344,9 @@ namespace distribution
         }
 
     private:
-        amrex::ParticleReal m_k; //! linear focusing strength (1/meters)
-        amrex::ParticleReal m_T1,m_T2; //! temperature of each particle population
-        amrex::ParticleReal m_w; //! relative weight of halo population
+        [[maybe_unused]] amrex::ParticleReal m_k; //! linear focusing strength (1/meters)
+        [[maybe_unused]] amrex::ParticleReal m_T1,m_T2; //! temperature of each particle population
+        [[maybe_unused]] amrex::ParticleReal m_w; //! relative weight of halo population
         ThermalData::Rprofile m_data; //! struct containing radial profile data
     };
 
