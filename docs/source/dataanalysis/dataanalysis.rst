@@ -28,10 +28,10 @@ Reference particle:
 * ``y_ref`` vertical position y, in meters
 * ``z_ref`` longitudinal position z, in meters
 * ``t_ref`` clock time * c in meters
-* ``px_ref`` momentum in x, normalized to mass*c :math:`p_x = \gamma \beta_x`
-* ``py_ref`` momentum in y, normalized to mass*c :math:`p_y = \gamma \beta_y`
-* ``pz_ref`` momentum in z, normalized to mass*c :math:`p_z = \gamma \beta_z`
-* ``pt_ref`` energy, normalized by rest energy :math:`p_t = -\gamma`
+* ``px_ref`` momentum in x, normalized to mass*c, :math:`p_x = \gamma \beta_x`
+* ``py_ref`` momentum in y, normalized to mass*c, :math:`p_y = \gamma \beta_y`
+* ``pz_ref`` momentum in z, normalized to mass*c, :math:`p_z = \gamma \beta_z`
+* ``pt_ref`` energy, normalized by rest energy, :math:`p_t = -\gamma`
 * ``mass`` reference rest mass, in kg
 * ``charge`` reference charge, in C
 
