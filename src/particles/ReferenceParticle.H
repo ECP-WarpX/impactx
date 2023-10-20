@@ -33,10 +33,10 @@ namespace impactx
         amrex::ParticleReal y = 0.0;  ///< vertical position y, in meters
         amrex::ParticleReal z = 0.0;  ///< longitudinal position z, in meters
         amrex::ParticleReal t = 0.0;  ///< clock time * c in meters
-        amrex::ParticleReal px = 0.0; ///< momentum in x, normalized to proper velocity
-        amrex::ParticleReal py = 0.0; ///< momentum in y, normalized to proper velocity
-        amrex::ParticleReal pz = 0.0; ///< momentum in z, normalized to proper velocity
-        amrex::ParticleReal pt = 0.0; ///< energy deviation, normalized by rest energy
+        amrex::ParticleReal px = 0.0; ///< momentum in x, normalized by mass*c
+        amrex::ParticleReal py = 0.0; ///< momentum in y, normalized by mass*c
+        amrex::ParticleReal pz = 0.0; ///< momentum in z, normalized by mass*c
+        amrex::ParticleReal pt = 0.0; ///< energy, normalized by rest energy
         amrex::ParticleReal mass = 0.0; ///< reference rest mass, in kg
         amrex::ParticleReal charge = 0.0; ///< reference charge, in C
 
@@ -124,7 +124,7 @@ namespace impactx
             return *this;
         }
 
-        /** Get reference particle energy
+        /** Get reference particle kinetic energy
          *
          * @returns kinetic energy in MeV
          */
