@@ -260,12 +260,22 @@ namespace detail
             }
         }
 
-        // beam mass
-        beam.setAttribute( "mass", ref_part.mass );
+        // reference particle information
         beam.setAttribute( "beta_ref", ref_part.beta() );
         beam.setAttribute( "gamma_ref", ref_part.gamma() );
+        beam.setAttribute( "s_ref", ref_part.s );
+        beam.setAttribute( "x_ref", ref_part.x );
+        beam.setAttribute( "y_ref", ref_part.y );
+        beam.setAttribute( "z_ref", ref_part.z );
+        beam.setAttribute( "t_ref", ref_part.t );
+        beam.setAttribute( "px_ref", ref_part.px );
+        beam.setAttribute( "py_ref", ref_part.py );
+        beam.setAttribute( "pz_ref", ref_part.pz );
+        beam.setAttribute( "pt_ref", ref_part.pt );
+        beam.setAttribute( "mass", ref_part.mass );
+        beam.setAttribute( "charge", ref_part.charge );
 
-        // openPMD coarse position
+        // openPMD coarse position: for global coordinates
         {
             beam["positionOffset"]["x"].resetDataset(d_fl);
             beam["positionOffset"]["x"].makeConstant(ref_part.x);
@@ -319,7 +329,7 @@ namespace detail
                           }, true);
         */
 
-        // prepare element access
+        // prepare element access & write reference particle
         this->prepare(pinned_pc, ref_part, step);
 
         // loop over refinement levels
@@ -331,10 +341,7 @@ namespace detail
             using ParIt = PinnedContainer::ParIterType;
             // note: openPMD-api is not thread-safe, so do not run OMP parallel here
             for (ParIt pti(pinned_pc, lev); pti.isValid(); ++pti) {
-                // push reference particle in global coordinates
-                this->operator()(ref_part);
-
-                // push beam particles relative to reference particle
+                // write beam particles relative to reference particle
                 this->operator()(pti, ref_part);
             } // end loop over all particle boxes
         } // end mesh-refinement level loop
