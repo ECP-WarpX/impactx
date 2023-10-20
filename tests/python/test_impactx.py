@@ -76,13 +76,13 @@ def test_impactx_nofile():
     sim.init_grids()
 
     # init particle beam
-    energy_MeV = 2.0e3
+    kin_energy_MeV = 2.0e3
     bunch_charge_C = 1.0e-9
     npart = 10000
 
     #   reference particle
     ref = sim.particle_container().ref_particle()
-    ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_energy_MeV(energy_MeV)
+    ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_MeV)
 
     #   particle bunch
     distr = distribution.Waterbag(
@@ -137,11 +137,11 @@ def test_impactx_noparticles():
     sim.init_grids()
 
     # init particle beam
-    energy_MeV = 2.0e3
+    kin_energy_MeV = 2.0e3
 
     #   reference particle
     ref = sim.particle_container().ref_particle()
-    ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_energy_MeV(energy_MeV)
+    ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_MeV)
     #   particle bunch: init intentionally missing
 
     # init accelerator lattice

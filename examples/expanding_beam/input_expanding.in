@@ -3,7 +3,7 @@
 ###############################################################################
 beam.npart = 10000  # outside tests, use 1e5 or more
 beam.units = static
-beam.energy = 250.0
+beam.kin_energy = 250.0
 beam.charge = 1.0e-9
 beam.particle = electron
 beam.distribution = kurth6d

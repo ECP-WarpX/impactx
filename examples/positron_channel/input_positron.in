@@ -3,7 +3,7 @@
 ###############################################################################
 beam.npart = 10000
 beam.units = static
-beam.energy = 10.0e3
+beam.kin_energy = 10.0e3
 beam.charge = 190.0e-12
 beam.particle = positron
 beam.distribution = triangle
