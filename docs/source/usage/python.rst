@@ -304,31 +304,31 @@ Particles
 
    .. py:property:: px
 
-      momentum in x, normalized to mass*c :math:`p_x = \gamma \beta_x`
+      momentum in x, normalized to mass*c, :math:`p_x = \gamma \beta_x`
 
    .. py:property:: py
 
-      momentum in y, normalized to mass*c :math:`p_x = \gamma \beta_x`
+      momentum in y, normalized to mass*c, :math:`p_x = \gamma \beta_x`
 
    .. py:property:: pz
 
-      momentum in z, normalized to mass*c :math:`p_x = \gamma \beta_x`
+      momentum in z, normalized to mass*c, :math:`p_x = \gamma \beta_x`
 
    .. py:property:: pt
 
-      energy, normalized by rest energy :math:`p_t = -\gamma`
+      energy, normalized by rest energy, :math:`p_t = -\gamma`
 
    .. py:property:: gamma
 
-      Read-only: Get reference particle relativistic gamma :math:`\gamma = 1/\sqrt{1-\beta^2}`
+      Read-only: Get reference particle relativistic gamma, :math:`\gamma = 1/\sqrt{1-\beta^2}`
 
    .. py:property:: beta
 
-      Read-only: Get reference particle relativistic beta :math:`\beta = v/c`
+      Read-only: Get reference particle relativistic beta, :math:`\beta = v/c`
 
    .. py:property:: beta_gamma
 
-      Read-only: Get reference particle beta*gamma
+      Read-only: Get reference particle :math:`\beta \cdot \gamma`
 
    .. py:property:: qm_qeeV
 
