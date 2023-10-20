@@ -275,6 +275,12 @@ namespace distribution
             amrex::ParticleReal g1,g2,g3,g4,g5,g6;
             amrex::ParticleReal z,pz;
 
+            // Avoid unused variable errors:
+            amrex::ParticleReal km = m_k;
+            amrex::ParticleReal T1m = m_T1;
+            amrex::ParticleReal T2m = m_T2;
+            amrex::ParticleReal wm = m_w;
+
             constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
             // Use a Bernoulli random variable to select between core and halo:
@@ -340,6 +346,7 @@ namespace distribution
             // Transform logitudinal variables into the laboratory frame:
             t = -z/(m_data.bg);
             pt = -pz*(m_data.bg);
+
         }
 
     private:
