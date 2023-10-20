@@ -117,7 +117,7 @@ namespace impactx
             // re-scale pt and pz
             if (pt != 0.0_prt)
             {
-                pt = -energy_MeV() / massE - 1.0_prt;
+                pt = -kin_energy_MeV() / massE - 1.0_prt;
                 pz = sqrt(pow(pt, 2) - 1.0_prt);
             }
 
@@ -130,31 +130,31 @@ namespace impactx
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         amrex::ParticleReal
-        energy_MeV () const
+        kin_energy_MeV () const
         {
             using namespace amrex::literals;
 
             amrex::ParticleReal const ref_gamma = -pt;
-            amrex::ParticleReal const ref_energy = mass_MeV() * (ref_gamma - 1.0_prt);
-            return ref_energy;
+            amrex::ParticleReal const ref_kin_energy = mass_MeV() * (ref_gamma - 1.0_prt);
+            return ref_kin_energy;
         }
 
         /** Set reference particle kinetic energy
          *
-         * @param energy initial kinetic energy (MeV)
+         * @param kin_energy initial kinetic energy (MeV)
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         RefPart &
-        set_energy_MeV (amrex::ParticleReal const energy)
+        set_kin_energy_MeV (amrex::ParticleReal const kin_energy)
         {
             using namespace amrex::literals;
 
             AMREX_ASSERT_WITH_MESSAGE(mass != 0.0_prt,
-                                      "set_energy_MeV: Set mass first!");
+                                      "set_kin_energy_MeV: Set mass first!");
 
             px = 0.0;
             py = 0.0;
-            pt = -energy / mass_MeV() - 1.0_prt;
+            pt = -kin_energy / mass_MeV() - 1.0_prt;
             pz = sqrt(pow(pt, 2) - 1.0_prt);
 
             return *this;

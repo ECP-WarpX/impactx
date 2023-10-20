@@ -36,7 +36,7 @@ void init_refparticle(py::module& m)
         .def_property_readonly("beta", &RefPart::beta, "Get reference particle relativistic beta")
         .def_property_readonly("beta_gamma", &RefPart::beta_gamma, "Get reference particle beta*gamma")
         .def_property_readonly("mass_MeV", &RefPart::mass_MeV, "Get reference particle rest mass (MeV/c^2)")
-        .def_property_readonly("energy_MeV", &RefPart::energy_MeV, "Get reference particle energy (MeV)")
+        .def_property_readonly("kin_energy_MeV", &RefPart::kin_energy_MeV, "Get reference particle energy (MeV)")
         .def_property_readonly("rigidity_Tm", &RefPart::rigidity_Tm, "Get reference particle magnetic rigidity Brho (T*m)")
         .def_property_readonly("qm_qeeV", &RefPart::qm_qeeV, "Get reference particle charge to mass ratio (charge/eV)")
 
@@ -46,8 +46,8 @@ void init_refparticle(py::module& m)
         .def("set_mass_MeV", &RefPart::set_mass_MeV,
              py::return_value_policy::reference_internal,
              "Set reference particle rest mass (MeV/c^2)", py::arg("mass_MeV"))
-        .def("set_energy_MeV", &RefPart::set_energy_MeV,
+        .def("set_kin_energy_MeV", &RefPart::set_kin_energy_MeV,
              py::return_value_policy::reference_internal,
-             "Set reference particle kinetic energy (MeV)", py::arg("energy_MeV"))
+             "Set reference particle kinetic energy (MeV)", py::arg("kin_energy_MeV"))
     ;
 }
