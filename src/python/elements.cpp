@@ -227,7 +227,7 @@ void init_elements(py::module& m)
         )
     ;
 
-    py::class_<Programmable>(me, "Programmable")
+    py::class_<Programmable>(me, "Programmable", py::dynamic_attr())
         .def(py::init<
                  amrex::ParticleReal,
                  int>(),
