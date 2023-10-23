@@ -341,12 +341,16 @@ namespace distribution
             t = -z/(m_data.bg);
             pt = -pz*(m_data.bg);
 
+            (void) m_k;
+            (void) m_T1;
+            (void) m_T2;
+            (void) m_w;
         }
 
     private:
-        [[maybe_unused]] amrex::ParticleReal m_k; //! linear focusing strength (1/meters)
-        [[maybe_unused]] amrex::ParticleReal m_T1,m_T2; //! temperature of each particle population
-        [[maybe_unused]] amrex::ParticleReal m_w; //! relative weight of halo population
+        amrex::ParticleReal m_k; //! linear focusing strength (1/meters)
+        amrex::ParticleReal m_T1,m_T2; //! temperature of each particle population
+        amrex::ParticleReal m_w; //! relative weight of halo population
         ThermalData::Rprofile m_data; //! struct containing radial profile data
     };
 
