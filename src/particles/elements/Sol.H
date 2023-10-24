@@ -36,11 +36,15 @@ namespace impactx
          * @param ds Segment length in m.
          * @param ks Solenoid strength in m^(-1) (MADX convention)
          *           = (magnetic field Bz in T) / (rigidity in T-m)
-         * @param nslice number of slices used for the application of space charge
+         *        OR Solenoid magnetic field in T (MaryLie convention)
+         * @param unit  Unit specification
+         *           unit = 0 MADX convention (default)
+         *           unit = 1 MaryLie convention
+     * @param nslice number of slices used for the application of space charge
          */
         Sol( amrex::ParticleReal const ds, amrex::ParticleReal const ks,
-              int const nslice )
-        : Thick(ds, nslice), m_ks(ks)
+              int const unit, int const nslice )
+        : Thick(ds, nslice), m_ks(ks), m_unit(unit)
         {
         }
 
@@ -77,9 +81,15 @@ namespace impactx
             amrex::ParticleReal const pt_ref = refpart.pt;
             amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
 
+            // normalize sol units to MAD-X convention if needed
+            amrex::ParticleReal g = m_ks;
+            if (m_unit == 1) {
+                  g = m_ks / refpart.rigidity_Tm();
+            }
+
             // compute phase advance per unit length (in rad/m) and
             // rotation angle (in rad)
-            amrex::ParticleReal const alpha = m_ks/2.0_prt;
+            amrex::ParticleReal const alpha = g/2.0_prt;
             amrex::ParticleReal const theta = alpha*slice_ds;
 
             // intialize output values
@@ -159,7 +169,8 @@ namespace impactx
         }
 
     private:
-        amrex::ParticleReal m_ks; //! solenoid strength in 1/m
+        amrex::ParticleReal m_ks; //! solenoid strength in 1/m (or T)
+    int m_unit; //! unit specification for solenoid strength
     };
 
 } // namespace impactx

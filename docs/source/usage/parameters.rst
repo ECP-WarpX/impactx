@@ -274,12 +274,16 @@ Lattice Elements
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
-            * ``<element_name>.k`` (``float``, in inverse meters squared) the quadrupole strength
+            * ``<element_name>.k`` (``float``, in inverse meters squared OR in T/m) the quadrupole strength
 
-                = (magnetic field gradient in T/m) / (magnetic rigidity in T-m)
+                = (magnetic field gradient in T/m) / (magnetic rigidity in T-m) - if units = 0
+
+             OR = magnetic field gradient in T/m - if units = 1
 
               * k > 0 horizontal focusing
               * k < 0 horizontal defocusing
+
+            * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
@@ -306,13 +310,19 @@ Lattice Elements
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
-            * ``<element_name>.gscale`` (``float``, in inverse meters) Scaling factor for on-axis magnetic field gradient
+            * ``<element_name>.gscale`` (``float``, in inverse meters squared OR in T/m) Scaling factor for on-axis magnetic field gradient
+
+                = (magnetic field gradient in T/m) / (magnetic rigidity in T-m) - if units = 0
+
+             OR = magnetic field gradient in T/m - if units = 1
 
             * ``<element_name>.cos_coefficients`` (array of ``float``) cos coefficients in Fourier expansion of the on-axis field gradient
               (optional); default is a tanh fringe field model from `MaryLie 3.0 <http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
 
             * ``<element_name>.sin_coefficients`` (array of ``float``) sin coefficients in Fourier expansion of the on-axis field gradient
               (optional); default is a tanh fringe field model from `MaryLie 3.0 <http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
+
+            * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
 
             * ``<element_name>.mapsteps`` (``integer``) number of integration steps per slice used for map and reference particle push in applied fields
                (default: ``1``)
@@ -344,9 +354,13 @@ Lattice Elements
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
-            * ``<element_name>.ks`` (``float``, in meters) Solenoid strength in m^(-1) (MADX convention)
+            * ``<element_name>.ks`` (``float``, in inverse meters OR in T) Solenoid strength
 
-                  = (magnetic field Bz in T) / (rigidity in T-m)
+                  = (magnetic field Bz in T) / (rigidity in T-m) - if units = 0
+
+             OR = magnetic field Bz in T - if units = 1
+
+             * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
 
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
@@ -354,13 +368,19 @@ Lattice Elements
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
 
-            * ``<element_name>.bscale`` (``float``, in inverse meters) Scaling factor for on-axis magnetic field Bz
+            * ``<element_name>.bscale`` (``float``, in inverse meters OR in T) Scaling factor for on-axis magnetic field Bz
+
+                  = (magnetic field Bz in T) / (rigidity in T-m) - if units = 0
+
+             OR = magnetic field Bz in T - if units = 1
 
             * ``<element_name>.cos_coefficients`` (array of ``float``) cos coefficients in Fourier expansion of the on-axis magnetic field Bz
               (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
 
             * ``<element_name>.sin_coefficients`` (array of ``float``) sin coefficients in Fourier expansion of the on-axis magnetic field Bz
               (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
+
+            * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
 
             * ``<element_name>.mapsteps`` (``integer``) number of integration steps per slice used for map and reference particle push in applied fields (default: ``1``)
 

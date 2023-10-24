@@ -585,10 +585,12 @@ This module provides elements for the accelerator lattice.
    A Quadrupole magnet.
 
    :param ds: Segment length in m.
-   :param k:  Quadrupole strength in m^(-2) (MADX convention)
+   :param k:  Quadrupole strength in m^(-2) (MADX convention, if units = 0)
               = (gradient in T/m) / (rigidity in T-m)
+          OR  Quadrupole strength in T/m (MaryLie convention, if units = 1)
               k > 0 horizontal focusing
               k < 0 horizontal defocusing
+   :param units: specification of units for quadrupole field strength
    :param nslice: number of slices used for the application of space charge
 
 .. py:class:: impactx.elements.ChrQuad(ds, k, units, nslice=1)
@@ -677,11 +679,14 @@ References:
    A soft-edge solenoid.
 
    :param ds: Segment length in m.
-   :param bscale: Scaling factor for on-axis magnetic field Bz in inverse meters
+   :param bscale: Scaling factor for on-axis magnetic field Bz in m^(-1) (MADX convention, if units = 0)
+              = (magnetic field Bz in T) / (rigidity in T-m)
+          OR  Solenoid magnetic field Bz in T (MaryLie convention, if units = 1)
    :param cos_coefficients: array of ``float`` cosine coefficients in Fourier expansion of on-axis magnetic field Bz
             (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
    :param sin_coefficients: array of ``float`` sine coefficients in Fourier expansion of on-axis magnetic field Bz
             (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
+   :param units: specification of units for solenoid field strength
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
 
@@ -690,7 +695,10 @@ References:
    An ideal hard-edge Solenoid magnet.
 
    :param ds: Segment length in m.
-   :param ks: Solenoid strength in m^(-1) (MADX convention) in (magnetic field Bz in T) / (rigidity in T-m)
+   :param ks: Solenoid strength in m^(-1) (MADX convention, if units = 0)
+              = (magnetic field Bz in T) / (rigidity in T-m)
+          OR  Solenoid magnetic field Bz in T (MaryLie convention, if units = 1)
+   :param units: specification of units for solenoid field strength
    :param nslice: number of slices used for the application of space charge
 
 .. py:class:: impactx.elements.PRot(phi_in, phi_out)
@@ -705,11 +713,14 @@ References:
    A soft-edge quadrupole.
 
    :param ds: Segment length in m.
-   :param gscale: Scaling factor for on-axis field gradient in inverse meters
+   :param gscale: Scaling factor for on-axis field gradient in m^(-2) (MADX convention, if units = 0)
+              = (gradient in T/m) / (rigidity in T-m)
+          OR  Quadrupole strength in T/m (MaryLie convention, if units = 1)
    :param cos_coefficients: array of ``float`` cosine coefficients in Fourier expansion of on-axis field gradient
             (optional); default is a tanh fringe field model based on `<http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
    :param sin_coefficients: array of ``float`` sine coefficients in Fourier expansion of on-axis field gradient
             (optional); default is a tanh fringe field model based on `<http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
+   :param units: specification of units for solenoid field strength
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
 

@@ -124,23 +124,25 @@ namespace SoftSolenoidData
         /** A soft-edge solenoid
          *
          * @param ds Segment length in m
-         * @param bscale Scaling factor for on-axis magnetic field Bz in 1/m
+         * @param bscale Scaling factor for on-axis magnetic field Bz in 1/m (unit=0) or T (unit=1)
          * @param cos_coef cosine coefficients in Fourier expansion of on-axis magnetic field Bz
          * @param sin_coef sine coefficients in Fourier expansion of on-axis magnetic field Bz
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
-         * @param nslice number of slices used for the application of space charge
+         * @param unit units describing normalization of gscale input
+     * @param nslice number of slices used for the application of space charge
          */
         SoftSolenoid (
             amrex::ParticleReal ds,
             amrex::ParticleReal bscale,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
+        int unit = 0,
             int mapsteps = 1,
             int nslice = 1
         )
           : Thick(ds, nslice),
-            m_bscale(bscale), m_mapsteps(mapsteps), m_id(SoftSolenoidData::next_id)
+            m_bscale(bscale), m_unit(unit), m_mapsteps(mapsteps), m_id(SoftSolenoidData::next_id)
        {
            // next created soft solenoid has another id for its data
            SoftSolenoidData::next_id++;
@@ -467,7 +469,11 @@ namespace SoftSolenoidData
             amrex::ParticleReal const z = zeval;
 
             // Define parameters and intermediate constants
-            amrex::ParticleReal const B0 = m_bscale;
+            // normalize sol units to MAD-X convention if needed
+            amrex::ParticleReal B0 = m_bscale;
+            if (m_unit == 1) {
+                  B0 = m_bscale / refpart.rigidity_Tm();
+            }
 
             // push the reference particle
             auto [bz, bzp, bzint] = Sol_Bfield(z);
@@ -523,7 +529,8 @@ namespace SoftSolenoidData
 
     private:
         amrex::ParticleReal m_bscale; //! scaling factor for solenoid Bz field
-        int m_mapsteps; //! number of map integration steps per slice
+        int m_unit; //! unit specification for solenoid Bz field
+    int m_mapsteps; //! number of map integration steps per slice
         int m_id; //! unique soft solenoid id used for data lookup map
 
         int m_ncoef = 0; //! number of Fourier coefficients

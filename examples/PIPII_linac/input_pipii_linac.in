@@ -1,0 +1,3827 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.energy = 2.1   #2.1 MeV
+beam.charge = 1.2533e-12  #to convert from 5 mA
+beam.particle = proton
+beam.distribution = waterbag
+beam.sigmaX = 2.0e-3  #2.0 mm
+beam.sigmaY = 2.0e-3  #2.0 mm
+beam.sigmaT = 0.0299792458   #100 ps
+beam.sigmaPx = 1.120361422284e-3  #exn = 0.15 um
+beam.sigmaPy = 1.120361422284e-3  #eyn = 0.15 um
+beam.sigmaPt = 8.0151827741e-5  #dp/p = 1.2e-3
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+
+D1.type = drift
+D1.ds = 0.25
+
+D2.type = drift
+D2.ds = 0.05
+
+Q1.type = quad
+Q1.ds = 0.1
+Q1.k = 12.2
+
+D3.type = drift
+D3.ds = 0.035
+
+D4.type = drift
+D4.ds = 1.0000000000000001e-11
+
+D5.type = drift
+D5.ds = 0.035
+
+Q2.type = quad
+Q2.ds = 0.1
+Q2.k = -10.88
+
+D6.type = drift
+D6.ds = 0.05
+
+D7.type = drift
+D7.ds = 0.009
+
+D8.type = drift
+D8.ds = 0.009
+
+D9.type = drift
+D9.ds = 0.0404
+
+D10.type = drift
+D10.ds = 0.05
+
+D11.type = drift
+D11.ds = 0.05
+
+D12.type = drift
+D12.ds = 1e-23
+
+D13.type = drift
+D13.ds = 1e-23
+
+D14.type = drift
+D14.ds = 0.05
+
+D15.type = drift
+D15.ds = 0.02
+
+D16.type = drift
+D16.ds = 0.03
+
+RF1.type = rfcavity
+RF1.ds = 0.24
+RF1.escale = 0.065
+RF1.freq = 162500000.0
+RF1.phase = -90.0
+RF1.mapsteps = 100
+
+D17.type = drift
+D17.ds = 0.03
+
+D18.type = drift
+D18.ds = 0.0016
+
+D19.type = drift
+D19.ds = 0.05
+
+Q3.type = quad
+Q3.ds = 0.1
+Q3.k = 7.75
+
+D20.type = drift
+D20.ds = 0.035
+
+D21.type = drift
+D21.ds = 1.0000000000000001e-11
+
+D22.type = drift
+D22.ds = 0.035
+
+Q4.type = quad
+Q4.ds = 0.1
+Q4.k = -6.05
+
+D23.type = drift
+D23.ds = 0.05
+
+D24.type = drift
+D24.ds = 0.009
+
+D25.type = drift
+D25.ds = 0.1
+
+D26.type = drift
+D26.ds = 0.075
+
+D27.type = drift
+D27.ds = 0.35
+
+D28.type = drift
+D28.ds = 0.025
+
+D29.type = drift
+D29.ds = 0.026
+
+D30.type = drift
+D30.ds = 0.05
+
+D31.type = drift
+D31.ds = 1e-23
+
+D32.type = drift
+D32.ds = 1e-23
+
+D33.type = drift
+D33.ds = 0.05
+
+D34.type = drift
+D34.ds = 0.05
+
+D35.type = drift
+D35.ds = 0.05
+
+Q5.type = quad
+Q5.ds = 0.05
+Q5.k = 10.7
+
+D36.type = drift
+D36.ds = 0.07
+
+Q6.type = quad
+Q6.ds = 0.1
+Q6.k = -9.82
+
+D37.type = drift
+D37.ds = 0.035
+
+D38.type = drift
+D38.ds = 1.0000000000000001e-11
+
+D39.type = drift
+D39.ds = 0.035
+
+Q7.type = quad
+Q7.ds = 0.05
+Q7.k = 10.7
+
+D40.type = drift
+D40.ds = 0.05
+
+D41.type = drift
+D41.ds = 0.0065
+
+D42.type = drift
+D42.ds = 1e-13
+
+D43.type = drift
+D43.ds = 0.1
+
+D44.type = drift
+D44.ds = 0.025
+
+D45.type = drift
+D45.ds = 0.0185
+
+D46.type = drift
+D46.ds = 1e-13
+
+D47.type = drift
+D47.ds = 0.25
+
+D48.type = drift
+D48.ds = 0.25
+
+D49.type = drift
+D49.ds = 0.05
+
+D50.type = drift
+D50.ds = 0.035
+
+D51.type = drift
+D51.ds = 0.05
+
+Q8.type = quad
+Q8.ds = 0.05
+Q8.k = 12.9
+
+D52.type = drift
+D52.ds = 0.07
+
+Q9.type = quad
+Q9.ds = 0.1
+Q9.k = -11.6
+
+D53.type = drift
+D53.ds = 0.035
+
+D54.type = drift
+D54.ds = 1.0000000000000001e-11
+
+D55.type = drift
+D55.ds = 0.035
+
+Q10.type = quad
+Q10.ds = 0.05
+Q10.k = 12.9
+
+D56.type = drift
+D56.ds = 0.05
+
+D57.type = drift
+D57.ds = 0.0065
+
+D58.type = drift
+D58.ds = 0.0035
+
+D59.type = drift
+D59.ds = 0.03
+
+RF2.type = rfcavity
+RF2.ds = 0.24
+RF2.escale = 0.05
+RF2.freq = 162500000.0
+RF2.phase = -90.0
+RF2.mapsteps = 100
+
+D60.type = drift
+D60.ds = 0.02
+
+D61.type = drift
+D61.ds = 0.33
+
+D62.type = drift
+D62.ds = 0.095
+
+D63.type = drift
+D63.ds = 0.01
+
+D64.type = drift
+D64.ds = 0.05
+
+Q11.type = quad
+Q11.ds = 0.05
+Q11.k = 13.3
+
+D65.type = drift
+D65.ds = 0.07
+
+Q12.type = quad
+Q12.ds = 0.1
+Q12.k = -11.6
+
+D66.type = drift
+D66.ds = 0.035
+
+D67.type = drift
+D67.ds = 1.0000000000000001e-11
+
+D68.type = drift
+D68.ds = 0.035
+
+Q13.type = quad
+Q13.ds = 0.05
+Q13.k = 13.3
+
+D69.type = drift
+D69.ds = 0.05
+
+D70.type = drift
+D70.ds = 0.0065
+
+D71.type = drift
+D71.ds = 0.05
+
+D72.type = drift
+D72.ds = 0.0035
+
+D73.type = drift
+D73.ds = 0.1
+
+D74.type = drift
+D74.ds = 0.25
+
+D75.type = drift
+D75.ds = 0.25
+
+D76.type = drift
+D76.ds = 0.05
+
+D77.type = drift
+D77.ds = 0.025
+
+D78.type = drift
+D78.ds = 1e-23
+
+D79.type = drift
+D79.ds = 0.05
+
+Q14.type = quad
+Q14.ds = 0.05
+Q14.k = 12.7
+
+D80.type = drift
+D80.ds = 0.07
+
+Q15.type = quad
+Q15.ds = 0.1
+Q15.k = -11.09
+
+D81.type = drift
+D81.ds = 0.035
+
+D82.type = drift
+D82.ds = 1.0000000000000001e-11
+
+D83.type = drift
+D83.ds = 0.035
+
+Q16.type = quad
+Q16.ds = 0.05
+Q16.k = 12.7
+
+D84.type = drift
+D84.ds = 0.05
+
+D85.type = drift
+D85.ds = 0.0065
+
+D86.type = drift
+D86.ds = 0.0035
+
+D87.type = drift
+D87.ds = 0.04
+
+D88.type = drift
+D88.ds = 0.1
+
+D89.type = drift
+D89.ds = 0.05
+
+D90.type = drift
+D90.ds = 0.05
+
+D91.type = drift
+D91.ds = 0.05
+
+D92.type = drift
+D92.ds = 0.05
+
+D93.type = drift
+D93.ds = 0.05
+
+D94.type = drift
+D94.ds = 0.05
+
+D95.type = drift
+D95.ds = 0.05
+
+D96.type = drift
+D96.ds = 0.05
+
+D97.type = drift
+D97.ds = 0.05
+
+D98.type = drift
+D98.ds = 0.05
+
+D99.type = drift
+D99.ds = 0.05
+
+D100.type = drift
+D100.ds = 0.035
+
+D101.type = drift
+D101.ds = 0.05
+
+Q17.type = quad
+Q17.ds = 0.05
+Q17.k = 13.88
+
+D102.type = drift
+D102.ds = 0.07
+
+Q18.type = quad
+Q18.ds = 0.1
+Q18.k = -12.24
+
+D103.type = drift
+D103.ds = 0.035
+
+D104.type = drift
+D104.ds = 1.0000000000000001e-11
+
+D105.type = drift
+D105.ds = 0.035
+
+Q19.type = quad
+Q19.ds = 0.05
+Q19.k = 13.88
+
+D106.type = drift
+D106.ds = 0.05
+
+D107.type = drift
+D107.ds = 0.0065
+
+D108.type = drift
+D108.ds = 0.0035
+
+D109.type = drift
+D109.ds = 0.1
+
+D110.type = drift
+D110.ds = 0.025
+
+D111.type = drift
+D111.ds = 0.1
+
+D112.type = drift
+D112.ds = 1e-23
+
+D113.type = drift
+D113.ds = 0.05
+
+D114.type = drift
+D114.ds = 1e-23
+
+D115.type = drift
+D115.ds = 0.2
+
+D116.type = drift
+D116.ds = 0.05
+
+D117.type = drift
+D117.ds = 0.2
+
+D118.type = drift
+D118.ds = 0.05
+
+Q20.type = quad
+Q20.ds = 0.05
+Q20.k = 13.5
+
+D119.type = drift
+D119.ds = 0.07
+
+Q21.type = quad
+Q21.ds = 0.1
+Q21.k = -12.1
+
+D120.type = drift
+D120.ds = 0.035
+
+D121.type = drift
+D121.ds = 1.0000000000000001e-11
+
+D122.type = drift
+D122.ds = 0.035
+
+Q22.type = quad
+Q22.ds = 0.05
+Q22.k = 13.5
+
+D123.type = drift
+D123.ds = 0.05
+
+D124.type = drift
+D124.ds = 0.0065
+
+D125.type = drift
+D125.ds = 0.0035
+
+D126.type = drift
+D126.ds = 0.03
+
+RF3.type = rfcavity
+RF3.ds = 0.24
+RF3.escale = 0.0355
+RF3.freq = 162500000.0
+RF3.phase = -90.0
+RF3.mapsteps = 100
+
+D127.type = drift
+D127.ds = 0.02
+
+D128.type = drift
+D128.ds = 0.035
+
+D129.type = drift
+D129.ds = 0.1
+
+D130.type = drift
+D130.ds = 0.1
+
+D131.type = drift
+D131.ds = 0.1
+
+D132.type = drift
+D132.ds = 0.1
+
+D133.type = drift
+D133.ds = 0.05
+
+Q23.type = quad
+Q23.ds = 0.05
+Q23.k = 10.0
+
+D134.type = drift
+D134.ds = 0.07
+
+Q24.type = quad
+Q24.ds = 0.1
+Q24.k = -9.5
+
+D135.type = drift
+D135.ds = 0.035
+
+D136.type = drift
+D136.ds = 1.0000000000000001e-11
+
+D137.type = drift
+D137.ds = 0.035
+
+Q25.type = quad
+Q25.ds = 0.05
+Q25.k = 10.0
+
+D138.type = drift
+D138.ds = 0.05
+
+D139.type = drift
+D139.ds = 0.0065
+
+D140.type = drift
+D140.ds = 0.0035
+
+D141.type = drift
+D141.ds = 0.01
+
+D142.type = drift
+D142.ds = 0.025
+
+D143.type = drift
+D143.ds = 0.07
+
+D144.type = drift
+D144.ds = 0.29
+
+D145.type = drift
+D145.ds = 0.1
+
+D146.type = drift
+D146.ds = 0.05
+
+D147.type = drift
+D147.ds = 0.04
+
+D148.type = drift
+D148.ds = 0.05
+
+D149.type = drift
+D149.ds = 1e-23
+
+D150.type = drift
+D150.ds = 1e-23
+
+D151.type = drift
+D151.ds = 0.09
+
+D152.type = drift
+D152.ds = 0.05
+
+Q26.type = quad
+Q26.ds = 0.05
+Q26.k = 7.7
+
+D153.type = drift
+D153.ds = 0.07
+
+Q27.type = quad
+Q27.ds = 0.1
+Q27.k = -7.42
+
+D154.type = drift
+D154.ds = 0.035
+
+D155.type = drift
+D155.ds = 1.0000000000000001e-11
+
+D156.type = drift
+D156.ds = 0.035
+
+Q28.type = quad
+Q28.ds = 0.05
+Q28.k = 7.7
+
+D157.type = drift
+D157.ds = 0.05
+
+D158.type = drift
+D158.ds = 0.0065
+
+D159.type = drift
+D159.ds = 0.0035
+
+D160.type = drift
+D160.ds = 0.1
+
+D161.type = drift
+D161.ds = 0.1
+
+D162.type = drift
+D162.ds = 0.1
+
+D163.type = drift
+D163.ds = 0.1
+
+D164.type = drift
+D164.ds = 0.1
+
+D165.type = drift
+D165.ds = 0.1
+
+D166.type = drift
+D166.ds = 0.1
+
+D167.type = drift
+D167.ds = 0.025
+
+D168.type = drift
+D168.ds = 0.05
+
+Q29.type = quad
+Q29.ds = 0.05
+Q29.k = 7.22
+
+D169.type = drift
+D169.ds = 0.07
+
+Q30.type = quad
+Q30.ds = 0.1
+Q30.k = -7.0
+
+D170.type = drift
+D170.ds = 0.035
+
+D171.type = drift
+D171.ds = 1.0000000000000001e-11
+
+D172.type = drift
+D172.ds = 0.035
+
+Q31.type = quad
+Q31.ds = 0.05
+Q31.k = 7.22
+
+D173.type = drift
+D173.ds = 0.05
+
+D174.type = drift
+D174.ds = 0.0065
+
+D175.type = drift
+D175.ds = 0.0035
+
+D176.type = drift
+D176.ds = 0.1
+
+D177.type = drift
+D177.ds = 0.05
+
+D178.type = drift
+D178.ds = 0.005
+
+D179.type = drift
+D179.ds = 0.1
+
+D180.type = drift
+D180.ds = 0.04
+
+D181.type = drift
+D181.ds = 1e-23
+
+D182.type = drift
+D182.ds = 1e-23
+
+D183.type = drift
+D183.ds = 0.09
+
+D184.type = drift
+D184.ds = 0.03
+
+D185.type = drift
+D185.ds = 0.03
+
+D186.type = drift
+D186.ds = 1e-23
+
+D187.type = drift
+D187.ds = 1e-23
+
+RF4.type = rfcavity
+RF4.ds = 0.24
+RF4.escale = 0.059
+RF4.freq = 162500000.0
+RF4.phase = -90.0
+RF4.mapsteps = 100
+
+D188.type = drift
+D188.ds = 0.02
+
+D189.type = drift
+D189.ds = 0.05
+
+D190.type = drift
+D190.ds = 0.05
+
+Q32.type = quad
+Q32.ds = 0.05
+Q32.k = 11.1
+
+D191.type = drift
+D191.ds = 0.07
+
+Q33.type = quad
+Q33.ds = 0.1
+Q33.k = -10.32
+
+D192.type = drift
+D192.ds = 0.035
+
+D193.type = drift
+D193.ds = 1.0000000000000001e-11
+
+D194.type = drift
+D194.ds = 0.035
+
+Q34.type = quad
+Q34.ds = 0.05
+Q34.k = 11.1
+
+D195.type = drift
+D195.ds = 0.05
+
+D196.type = drift
+D196.ds = 0.0065
+
+D197.type = drift
+D197.ds = 0.0035
+
+D198.type = drift
+D198.ds = 0.19
+
+D199.type = drift
+D199.ds = 1e-23
+
+D200.type = drift
+D200.ds = 1e-23
+
+D201.type = drift
+D201.ds = 0.05
+
+D202.type = drift
+D202.ds = 0.1
+
+D203.type = drift
+D203.ds = 0.1
+
+D204.type = drift
+D204.ds = 0.1
+
+D205.type = drift
+D205.ds = 0.1
+
+D206.type = drift
+D206.ds = 0.1
+
+D207.type = drift
+D207.ds = 0.1
+
+D208.type = drift
+D208.ds = 0.1
+
+D209.type = drift
+D209.ds = 1e-13
+
+D210.type = drift
+D210.ds = 0.17614
+
+D211.type = drift
+D211.ds = 1e-12
+
+SOL1.type = solenoid_softedge
+SOL1.ds = 0.3
+SOL1.bscale = -1.67
+SOL1.mapsteps = 100
+
+D212.type = drift
+D212.ds = 0.08059999999999999
+
+RF5.type = rfcavity
+RF5.ds = 0.25
+RF5.escale = 0.33
+RF5.freq = 162500000.0
+RF5.phase = -50.0
+RF5.mapsteps = 100
+
+D213.type = drift
+D213.ds = 0.055200000000000006
+
+SOL2.type = solenoid_softedge
+SOL2.ds = 0.3
+SOL2.bscale = -1.91
+SOL2.mapsteps = 100
+
+D214.type = drift
+D214.ds = 0.08059999999999999
+
+RF6.type = rfcavity
+RF6.ds = 0.25
+RF6.escale = 0.52
+RF6.freq = 162500000.0
+RF6.phase = -42.0
+RF6.mapsteps = 100
+
+D215.type = drift
+D215.ds = 0.055200000000000006
+
+SOL3.type = solenoid_softedge
+SOL3.ds = 0.3
+SOL3.bscale = 2.13
+SOL3.mapsteps = 100
+
+D216.type = drift
+D216.ds = 0.08059999999999999
+
+RF7.type = rfcavity
+RF7.ds = 0.25
+RF7.escale = 0.72
+RF7.freq = 162500000.0
+RF7.phase = -41.0
+RF7.mapsteps = 100
+
+D217.type = drift
+D217.ds = 0.055200000000000006
+
+SOL4.type = solenoid_softedge
+SOL4.ds = 0.3
+SOL4.bscale = -2.32
+SOL4.mapsteps = 100
+
+D218.type = drift
+D218.ds = 0.08059999999999999
+
+RF8.type = rfcavity
+RF8.ds = 0.25
+RF8.escale = 1.0
+RF8.freq = 162500000.0
+RF8.phase = -33.0
+RF8.mapsteps = 100
+
+D219.type = drift
+D219.ds = 0.055200000000000006
+
+SOL5.type = solenoid_softedge
+SOL5.ds = 0.3
+SOL5.bscale = 2.39
+SOL5.mapsteps = 100
+
+D220.type = drift
+D220.ds = 0.08059999999999999
+
+RF9.type = rfcavity
+RF9.ds = 0.25
+RF9.escale = 1.35
+RF9.freq = 162500000.0
+RF9.phase = -29.0
+RF9.mapsteps = 100
+
+D221.type = drift
+D221.ds = 0.055200000000000006
+
+SOL6.type = solenoid_softedge
+SOL6.ds = 0.3
+SOL6.bscale = -2.38
+SOL6.mapsteps = 100
+
+D222.type = drift
+D222.ds = 0.08059999999999999
+
+RF10.type = rfcavity
+RF10.ds = 0.25
+RF10.escale = 1.8
+RF10.freq = 162500000.0
+RF10.phase = -22.0
+RF10.mapsteps = 100
+
+D223.type = drift
+D223.ds = 0.055200000000000006
+
+SOL7.type = solenoid_softedge
+SOL7.ds = 0.3
+SOL7.bscale = -2.1
+SOL7.mapsteps = 100
+
+D224.type = drift
+D224.ds = 0.08059999999999999
+
+RF11.type = rfcavity
+RF11.ds = 0.25
+RF11.escale = 1.95
+RF11.freq = 162500000.0
+RF11.phase = -20.0
+RF11.mapsteps = 100
+
+D225.type = drift
+D225.ds = 0.055200000000000006
+
+SOL8.type = solenoid_softedge
+SOL8.ds = 0.3
+SOL8.bscale = 3.08
+SOL8.mapsteps = 100
+
+D226.type = drift
+D226.ds = 0.08059999999999999
+
+RF12.type = rfcavity
+RF12.ds = 0.25
+RF12.escale = 2.0
+RF12.freq = 162500000.0
+RF12.phase = -23.0
+RF12.mapsteps = 100
+
+D227.type = drift
+D227.ds = 0.055200000000000006
+
+D228.type = drift
+D228.ds = 0.16981200000000002
+
+D229.type = drift
+D229.ds = 0.095656
+
+D230.type = drift
+D230.ds = 0.045
+
+D231.type = drift
+D231.ds = 0.045
+
+D232.type = drift
+D232.ds = 0.085
+
+D233.type = drift
+D233.ds = 0.075
+
+D234.type = drift
+D234.ds = 0.035
+
+D235.type = drift
+D235.ds = 0.1165
+
+D236.type = drift
+D236.ds = 1e-13
+
+D237.type = drift
+D237.ds = 1e-13
+
+D238.type = drift
+D238.ds = 0.015
+
+D239.type = drift
+D239.ds = 0.06
+
+RF13.type = rfcavity
+RF13.ds = 0.3
+RF13.escale = 1.0
+RF13.freq = 325000000.0
+RF13.phase = -37.0
+RF13.mapsteps = 100
+
+D240.type = drift
+D240.ds = 0.1
+
+SOL9.type = solenoid_softedge
+SOL9.ds = 0.3
+SOL9.bscale = 3.58
+SOL9.mapsteps = 100
+
+D241.type = drift
+D241.ds = 0.1
+
+RF14.type = rfcavity
+RF14.ds = 0.3
+RF14.escale = 0.95
+RF14.freq = 325000000.0
+RF14.phase = -34.0
+RF14.mapsteps = 100
+
+D242.type = drift
+D242.ds = 0.06
+
+D243.type = drift
+D243.ds = 0.015
+
+D244.type = drift
+D244.ds = 0.076
+
+D245.type = drift
+D245.ds = 0.015
+
+D246.type = drift
+D246.ds = 0.06
+
+RF15.type = rfcavity
+RF15.ds = 0.3
+RF15.escale = 0.98
+RF15.freq = 325000000.0
+RF15.phase = -30.0
+RF15.mapsteps = 100
+
+D247.type = drift
+D247.ds = 0.1
+
+SOL10.type = solenoid_softedge
+SOL10.ds = 0.3
+SOL10.bscale = 3.5
+SOL10.mapsteps = 100
+
+D248.type = drift
+D248.ds = 0.1
+
+RF16.type = rfcavity
+RF16.ds = 0.3
+RF16.escale = 1.5
+RF16.freq = 325000000.0
+RF16.phase = -28.0
+RF16.mapsteps = 100
+
+D249.type = drift
+D249.ds = 0.06
+
+D250.type = drift
+D250.ds = 0.015
+
+D251.type = drift
+D251.ds = 0.076
+
+D252.type = drift
+D252.ds = 0.015
+
+D253.type = drift
+D253.ds = 0.06
+
+RF17.type = rfcavity
+RF17.ds = 0.3
+RF17.escale = 1.6
+RF17.freq = 325000000.0
+RF17.phase = -28.0
+RF17.mapsteps = 100
+
+D254.type = drift
+D254.ds = 0.1
+
+SOL11.type = solenoid_softedge
+SOL11.ds = 0.3
+SOL11.bscale = -3.77
+SOL11.mapsteps = 100
+
+D255.type = drift
+D255.ds = 0.1
+
+RF18.type = rfcavity
+RF18.ds = 0.3
+RF18.escale = 1.55
+RF18.freq = 325000000.0
+RF18.phase = -24.0
+RF18.mapsteps = 100
+
+D256.type = drift
+D256.ds = 0.06
+
+D257.type = drift
+D257.ds = 0.015
+
+D258.type = drift
+D258.ds = 0.076
+
+D259.type = drift
+D259.ds = 0.015
+
+D260.type = drift
+D260.ds = 0.06
+
+RF19.type = rfcavity
+RF19.ds = 0.3
+RF19.escale = 1.5
+RF19.freq = 325000000.0
+RF19.phase = -24.0
+RF19.mapsteps = 100
+
+D261.type = drift
+D261.ds = 0.1
+
+SOL12.type = solenoid_softedge
+SOL12.ds = 0.3
+SOL12.bscale = 4.35
+SOL12.mapsteps = 100
+
+D262.type = drift
+D262.ds = 0.1
+
+RF20.type = rfcavity
+RF20.ds = 0.3
+RF20.escale = 2.05
+RF20.freq = 325000000.0
+RF20.phase = -33.0
+RF20.mapsteps = 100
+
+D263.type = drift
+D263.ds = 0.06
+
+D264.type = drift
+D264.ds = 0.015
+
+D265.type = drift
+D265.ds = 0.076
+
+D266.type = drift
+D266.ds = 0.0755
+
+D267.type = drift
+D267.ds = 0.04
+
+D268.type = drift
+D268.ds = 0.035
+
+D269.type = drift
+D269.ds = 0.1
+
+D270.type = drift
+D270.ds = 0.275
+
+D271.type = drift
+D271.ds = 0.035
+
+D272.type = drift
+D272.ds = 0.1165
+
+D273.type = drift
+D273.ds = 1e-13
+
+D274.type = drift
+D274.ds = 1e-13
+
+D275.type = drift
+D275.ds = 0.015
+
+D276.type = drift
+D276.ds = 0.06
+
+RF21.type = rfcavity
+RF21.ds = 0.3
+RF21.escale = 2.05
+RF21.freq = 325000000.0
+RF21.phase = -32.0
+RF21.mapsteps = 100
+
+D277.type = drift
+D277.ds = 0.1
+
+SOL13.type = solenoid_softedge
+SOL13.ds = 0.3
+SOL13.bscale = -4.4
+SOL13.mapsteps = 100
+
+D278.type = drift
+D278.ds = 0.1
+
+RF22.type = rfcavity
+RF22.ds = 0.3
+RF22.escale = 1.8
+RF22.freq = 325000000.0
+RF22.phase = -23.0
+RF22.mapsteps = 100
+
+D279.type = drift
+D279.ds = 0.06
+
+D280.type = drift
+D280.ds = 0.015
+
+D281.type = drift
+D281.ds = 0.076
+
+D282.type = drift
+D282.ds = 0.015
+
+D283.type = drift
+D283.ds = 0.06
+
+RF23.type = rfcavity
+RF23.ds = 0.3
+RF23.escale = 1.65
+RF23.freq = 325000000.0
+RF23.phase = -21.0
+RF23.mapsteps = 100
+
+D284.type = drift
+D284.ds = 0.1
+
+SOL14.type = solenoid_softedge
+SOL14.ds = 0.3
+SOL14.bscale = 3.43
+SOL14.mapsteps = 100
+
+D285.type = drift
+D285.ds = 0.1
+
+RF24.type = rfcavity
+RF24.ds = 0.3
+RF24.escale = 2.05
+RF24.freq = 325000000.0
+RF24.phase = -20.0
+RF24.mapsteps = 100
+
+D286.type = drift
+D286.ds = 0.06
+
+D287.type = drift
+D287.ds = 0.015
+
+D288.type = drift
+D288.ds = 0.076
+
+D289.type = drift
+D289.ds = 0.015
+
+D290.type = drift
+D290.ds = 0.06
+
+RF25.type = rfcavity
+RF25.ds = 0.3
+RF25.escale = 2.0
+RF25.freq = 325000000.0
+RF25.phase = -20.0
+RF25.mapsteps = 100
+
+D291.type = drift
+D291.ds = 0.1
+
+SOL15.type = solenoid_softedge
+SOL15.ds = 0.3
+SOL15.bscale = -3.55
+SOL15.mapsteps = 100
+
+D292.type = drift
+D292.ds = 0.1
+
+RF26.type = rfcavity
+RF26.ds = 0.3
+RF26.escale = 2.05
+RF26.freq = 325000000.0
+RF26.phase = -19.0
+RF26.mapsteps = 100
+
+D293.type = drift
+D293.ds = 0.06
+
+D294.type = drift
+D294.ds = 0.015
+
+D295.type = drift
+D295.ds = 0.076
+
+D296.type = drift
+D296.ds = 0.015
+
+D297.type = drift
+D297.ds = 0.06
+
+RF27.type = rfcavity
+RF27.ds = 0.3
+RF27.escale = 1.75
+RF27.freq = 325000000.0
+RF27.phase = -19.0
+RF27.mapsteps = 100
+
+D298.type = drift
+D298.ds = 0.1
+
+SOL16.type = solenoid_softedge
+SOL16.ds = 0.3
+SOL16.bscale = 3.72
+SOL16.mapsteps = 100
+
+D299.type = drift
+D299.ds = 0.1
+
+RF28.type = rfcavity
+RF28.ds = 0.3
+RF28.escale = 2.05
+RF28.freq = 325000000.0
+RF28.phase = -36.0
+RF28.mapsteps = 100
+
+D300.type = drift
+D300.ds = 0.06
+
+D301.type = drift
+D301.ds = 0.015
+
+D302.type = drift
+D302.ds = 0.076
+
+D303.type = drift
+D303.ds = 0.0405
+
+D304.type = drift
+D304.ds = 0.035
+
+D305.type = drift
+D305.ds = 0.25
+
+D306.type = drift
+D306.ds = 0.075
+
+D307.type = drift
+D307.ds = 0.125
+
+D308.type = drift
+D308.ds = 0.122
+
+D309.type = drift
+D309.ds = 0.093
+
+SOL17.type = solenoid_softedge
+SOL17.ds = 0.32
+SOL17.bscale = 3.12
+SOL17.mapsteps = 100
+
+D310.type = drift
+D310.ds = 0.093
+
+D311.type = drift
+D311.ds = 0.244
+
+D312.type = drift
+D312.ds = 0.01465
+
+RF29.type = rfcavity
+RF29.ds = 0.4767
+RF29.escale = 5.0
+RF29.freq = 325000000.0
+RF29.phase = -25.0
+RF29.mapsteps = 100
+
+D313.type = drift
+D313.ds = 0.01465
+
+D314.type = drift
+D314.ds = 0.244
+
+D315.type = drift
+D315.ds = 0.01465
+
+RF30.type = rfcavity
+RF30.ds = 0.4767
+RF30.escale = 5.0
+RF30.freq = 325000000.0
+RF30.phase = -24.0
+RF30.mapsteps = 100
+
+D316.type = drift
+D316.ds = 0.01465
+
+D317.type = drift
+D317.ds = 0.122
+
+D318.type = drift
+D318.ds = 0.122
+
+D319.type = drift
+D319.ds = 0.093
+
+SOL18.type = solenoid_softedge
+SOL18.ds = 0.32
+SOL18.bscale = -3.58
+SOL18.mapsteps = 100
+
+D320.type = drift
+D320.ds = 0.093
+
+D321.type = drift
+D321.ds = 0.244
+
+D322.type = drift
+D322.ds = 0.01465
+
+RF31.type = rfcavity
+RF31.ds = 0.4767
+RF31.escale = 5.0
+RF31.freq = 325000000.0
+RF31.phase = -19.0
+RF31.mapsteps = 100
+
+D323.type = drift
+D323.ds = 0.01465
+
+D324.type = drift
+D324.ds = 0.244
+
+D325.type = drift
+D325.ds = 0.01465
+
+RF32.type = rfcavity
+RF32.ds = 0.4767
+RF32.escale = 4.6
+RF32.freq = 325000000.0
+RF32.phase = -19.0
+RF32.mapsteps = 100
+
+D326.type = drift
+D326.ds = 0.01465
+
+D327.type = drift
+D327.ds = 0.122
+
+D328.type = drift
+D328.ds = 0.122
+
+D329.type = drift
+D329.ds = 0.093
+
+SOL19.type = solenoid_softedge
+SOL19.ds = 0.32
+SOL19.bscale = 3.66
+SOL19.mapsteps = 100
+
+D330.type = drift
+D330.ds = 0.093
+
+D331.type = drift
+D331.ds = 0.244
+
+D332.type = drift
+D332.ds = 0.01465
+
+RF33.type = rfcavity
+RF33.ds = 0.4767
+RF33.escale = 5.0
+RF33.freq = 325000000.0
+RF33.phase = -35.0
+RF33.mapsteps = 100
+
+D333.type = drift
+D333.ds = 0.01465
+
+D334.type = drift
+D334.ds = 0.244
+
+D335.type = drift
+D335.ds = 9.999999999999999e-10
+
+D336.type = drift
+D336.ds = 0.506
+
+D337.type = drift
+D337.ds = 9.999999999999999e-10
+
+D338.type = drift
+D338.ds = 0.122
+
+D339.type = drift
+D339.ds = 0.2
+
+D340.type = drift
+D340.ds = 0.122
+
+D341.type = drift
+D341.ds = 0.093
+
+SOL20.type = solenoid_softedge
+SOL20.ds = 0.32
+SOL20.bscale = 3.7
+SOL20.mapsteps = 100
+
+D342.type = drift
+D342.ds = 0.093
+
+D343.type = drift
+D343.ds = 0.244
+
+D344.type = drift
+D344.ds = 0.01465
+
+RF34.type = rfcavity
+RF34.ds = 0.4767
+RF34.escale = 5.0
+RF34.freq = 325000000.0
+RF34.phase = -20.0
+RF34.mapsteps = 100
+
+D345.type = drift
+D345.ds = 0.01465
+
+D346.type = drift
+D346.ds = 0.244
+
+D347.type = drift
+D347.ds = 0.01465
+
+RF35.type = rfcavity
+RF35.ds = 0.4767
+RF35.escale = 4.9
+RF35.freq = 325000000.0
+RF35.phase = -19.0
+RF35.mapsteps = 100
+
+D348.type = drift
+D348.ds = 0.01465
+
+D349.type = drift
+D349.ds = 0.122
+
+D350.type = drift
+D350.ds = 0.122
+
+D351.type = drift
+D351.ds = 0.093
+
+SOL21.type = solenoid_softedge
+SOL21.ds = 0.32
+SOL21.bscale = -3.75
+SOL21.mapsteps = 100
+
+D352.type = drift
+D352.ds = 0.093
+
+D353.type = drift
+D353.ds = 0.244
+
+D354.type = drift
+D354.ds = 0.01465
+
+RF36.type = rfcavity
+RF36.ds = 0.4767
+RF36.escale = 4.88
+RF36.freq = 325000000.0
+RF36.phase = -15.0
+RF36.mapsteps = 100
+
+D355.type = drift
+D355.ds = 0.01465
+
+D356.type = drift
+D356.ds = 0.244
+
+D357.type = drift
+D357.ds = 0.01465
+
+RF37.type = rfcavity
+RF37.ds = 0.4767
+RF37.escale = 4.4
+RF37.freq = 325000000.0
+RF37.phase = -14.0
+RF37.mapsteps = 100
+
+D358.type = drift
+D358.ds = 0.01465
+
+D359.type = drift
+D359.ds = 0.122
+
+D360.type = drift
+D360.ds = 0.122
+
+D361.type = drift
+D361.ds = 0.093
+
+SOL22.type = solenoid_softedge
+SOL22.ds = 0.32
+SOL22.bscale = 4.1
+SOL22.mapsteps = 100
+
+D362.type = drift
+D362.ds = 0.093
+
+D363.type = drift
+D363.ds = 0.244
+
+D364.type = drift
+D364.ds = 0.01465
+
+RF38.type = rfcavity
+RF38.ds = 0.4767
+RF38.escale = 5.0
+RF38.freq = 325000000.0
+RF38.phase = -35.0
+RF38.mapsteps = 100
+
+D365.type = drift
+D365.ds = 0.01465
+
+D366.type = drift
+D366.ds = 0.244
+
+D367.type = drift
+D367.ds = 9.999999999999999e-10
+
+D368.type = drift
+D368.ds = 0.506
+
+D369.type = drift
+D369.ds = 9.999999999999999e-10
+
+D370.type = drift
+D370.ds = 0.122
+
+D371.type = drift
+D371.ds = 0.2
+
+D372.type = drift
+D372.ds = 0.122
+
+D373.type = drift
+D373.ds = 0.093
+
+SOL23.type = solenoid_softedge
+SOL23.ds = 0.32
+SOL23.bscale = 4.05
+SOL23.mapsteps = 100
+
+D374.type = drift
+D374.ds = 0.093
+
+D375.type = drift
+D375.ds = 0.244
+
+D376.type = drift
+D376.ds = 0.01465
+
+RF39.type = rfcavity
+RF39.ds = 0.4767
+RF39.escale = 5.0
+RF39.freq = 325000000.0
+RF39.phase = -24.0
+RF39.mapsteps = 100
+
+D377.type = drift
+D377.ds = 0.01465
+
+D378.type = drift
+D378.ds = 0.244
+
+D379.type = drift
+D379.ds = 0.01465
+
+RF40.type = rfcavity
+RF40.ds = 0.4767
+RF40.escale = 5.0
+RF40.freq = 325000000.0
+RF40.phase = -16.0
+RF40.mapsteps = 100
+
+D380.type = drift
+D380.ds = 0.01465
+
+D381.type = drift
+D381.ds = 0.122
+
+D382.type = drift
+D382.ds = 0.122
+
+D383.type = drift
+D383.ds = 0.093
+
+SOL24.type = solenoid_softedge
+SOL24.ds = 0.32
+SOL24.bscale = -4.05
+SOL24.mapsteps = 100
+
+D384.type = drift
+D384.ds = 0.093
+
+D385.type = drift
+D385.ds = 0.244
+
+D386.type = drift
+D386.ds = 0.01465
+
+RF41.type = rfcavity
+RF41.ds = 0.4767
+RF41.escale = 5.0
+RF41.freq = 325000000.0
+RF41.phase = -16.0
+RF41.mapsteps = 100
+
+D387.type = drift
+D387.ds = 0.01465
+
+D388.type = drift
+D388.ds = 0.244
+
+D389.type = drift
+D389.ds = 0.01465
+
+RF42.type = rfcavity
+RF42.ds = 0.4767
+RF42.escale = 5.0
+RF42.freq = 325000000.0
+RF42.phase = -14.0
+RF42.mapsteps = 100
+
+D390.type = drift
+D390.ds = 0.01465
+
+D391.type = drift
+D391.ds = 0.122
+
+D392.type = drift
+D392.ds = 0.122
+
+D393.type = drift
+D393.ds = 0.093
+
+SOL25.type = solenoid_softedge
+SOL25.ds = 0.32
+SOL25.bscale = 4.07
+SOL25.mapsteps = 100
+
+D394.type = drift
+D394.ds = 0.093
+
+D395.type = drift
+D395.ds = 0.244
+
+D396.type = drift
+D396.ds = 0.01465
+
+RF43.type = rfcavity
+RF43.ds = 0.4767
+RF43.escale = 5.0
+RF43.freq = 325000000.0
+RF43.phase = -25.0
+RF43.mapsteps = 100
+
+D397.type = drift
+D397.ds = 0.01465
+
+D398.type = drift
+D398.ds = 0.244
+
+D399.type = drift
+D399.ds = 9.999999999999999e-10
+
+D400.type = drift
+D400.ds = 0.506
+
+D401.type = drift
+D401.ds = 9.999999999999999e-10
+
+D402.type = drift
+D402.ds = 0.122
+
+D403.type = drift
+D403.ds = 0.2
+
+D404.type = drift
+D404.ds = 0.122
+
+D405.type = drift
+D405.ds = 0.093
+
+SOL26.type = solenoid_softedge
+SOL26.ds = 0.32
+SOL26.bscale = -3.97
+SOL26.mapsteps = 100
+
+D406.type = drift
+D406.ds = 0.093
+
+D407.type = drift
+D407.ds = 0.244
+
+D408.type = drift
+D408.ds = 0.01465
+
+RF44.type = rfcavity
+RF44.ds = 0.4767
+RF44.escale = 5.0
+RF44.freq = 325000000.0
+RF44.phase = -20.0
+RF44.mapsteps = 100
+
+D409.type = drift
+D409.ds = 0.01465
+
+D410.type = drift
+D410.ds = 0.244
+
+D411.type = drift
+D411.ds = 0.01465
+
+RF45.type = rfcavity
+RF45.ds = 0.4767
+RF45.escale = 5.0
+RF45.freq = 325000000.0
+RF45.phase = -14.0
+RF45.mapsteps = 100
+
+D412.type = drift
+D412.ds = 0.01465
+
+D413.type = drift
+D413.ds = 0.122
+
+D414.type = drift
+D414.ds = 0.122
+
+D415.type = drift
+D415.ds = 0.093
+
+SOL27.type = solenoid_softedge
+SOL27.ds = 0.32
+SOL27.bscale = 3.97
+SOL27.mapsteps = 100
+
+D416.type = drift
+D416.ds = 0.093
+
+D417.type = drift
+D417.ds = 0.244
+
+D418.type = drift
+D418.ds = 0.01465
+
+RF46.type = rfcavity
+RF46.ds = 0.4767
+RF46.escale = 5.0
+RF46.freq = 325000000.0
+RF46.phase = -13.0
+RF46.mapsteps = 100
+
+D419.type = drift
+D419.ds = 0.01465
+
+D420.type = drift
+D420.ds = 0.244
+
+D421.type = drift
+D421.ds = 0.01465
+
+RF47.type = rfcavity
+RF47.ds = 0.4767
+RF47.escale = 5.0
+RF47.freq = 325000000.0
+RF47.phase = -13.0
+RF47.mapsteps = 100
+
+D422.type = drift
+D422.ds = 0.01465
+
+D423.type = drift
+D423.ds = 0.122
+
+D424.type = drift
+D424.ds = 0.122
+
+D425.type = drift
+D425.ds = 0.093
+
+SOL28.type = solenoid_softedge
+SOL28.ds = 0.32
+SOL28.bscale = -4.0
+SOL28.mapsteps = 100
+
+D426.type = drift
+D426.ds = 0.093
+
+D427.type = drift
+D427.ds = 0.244
+
+D428.type = drift
+D428.ds = 0.01465
+
+RF48.type = rfcavity
+RF48.ds = 0.4767
+RF48.escale = 5.0
+RF48.freq = 325000000.0
+RF48.phase = -23.0
+RF48.mapsteps = 100
+
+D429.type = drift
+D429.ds = 0.01465
+
+D430.type = drift
+D430.ds = 0.244
+
+D431.type = drift
+D431.ds = 9.999999999999999e-10
+
+D432.type = drift
+D432.ds = 0.506
+
+D433.type = drift
+D433.ds = 9.999999999999999e-10
+
+D434.type = drift
+D434.ds = 0.122
+
+D435.type = drift
+D435.ds = 0.2
+
+D436.type = drift
+D436.ds = 0.122
+
+D437.type = drift
+D437.ds = 0.093
+
+SOL29.type = solenoid_softedge
+SOL29.ds = 0.32
+SOL29.bscale = -3.95
+SOL29.mapsteps = 100
+
+D438.type = drift
+D438.ds = 0.093
+
+D439.type = drift
+D439.ds = 0.244
+
+D440.type = drift
+D440.ds = 0.01465
+
+RF49.type = rfcavity
+RF49.ds = 0.4767
+RF49.escale = 5.0
+RF49.freq = 325000000.0
+RF49.phase = -18.0
+RF49.mapsteps = 100
+
+D441.type = drift
+D441.ds = 0.01465
+
+D442.type = drift
+D442.ds = 0.244
+
+D443.type = drift
+D443.ds = 0.01465
+
+RF50.type = rfcavity
+RF50.ds = 0.4767
+RF50.escale = 5.0
+RF50.freq = 325000000.0
+RF50.phase = -14.0
+RF50.mapsteps = 100
+
+D444.type = drift
+D444.ds = 0.01465
+
+D445.type = drift
+D445.ds = 0.122
+
+D446.type = drift
+D446.ds = 0.122
+
+D447.type = drift
+D447.ds = 0.093
+
+SOL30.type = solenoid_softedge
+SOL30.ds = 0.32
+SOL30.bscale = 4.01
+SOL30.mapsteps = 100
+
+D448.type = drift
+D448.ds = 0.093
+
+D449.type = drift
+D449.ds = 0.244
+
+D450.type = drift
+D450.ds = 0.01465
+
+RF51.type = rfcavity
+RF51.ds = 0.4767
+RF51.escale = 5.0
+RF51.freq = 325000000.0
+RF51.phase = -13.0
+RF51.mapsteps = 100
+
+D451.type = drift
+D451.ds = 0.01465
+
+D452.type = drift
+D452.ds = 0.244
+
+D453.type = drift
+D453.ds = 0.01465
+
+RF52.type = rfcavity
+RF52.ds = 0.4767
+RF52.escale = 5.0
+RF52.freq = 325000000.0
+RF52.phase = -12.0
+RF52.mapsteps = 100
+
+D454.type = drift
+D454.ds = 0.01465
+
+D455.type = drift
+D455.ds = 0.122
+
+D456.type = drift
+D456.ds = 0.122
+
+D457.type = drift
+D457.ds = 0.093
+
+SOL31.type = solenoid_softedge
+SOL31.ds = 0.32
+SOL31.bscale = 4.0
+SOL31.mapsteps = 100
+
+D458.type = drift
+D458.ds = 0.093
+
+D459.type = drift
+D459.ds = 0.244
+
+D460.type = drift
+D460.ds = 0.01465
+
+RF53.type = rfcavity
+RF53.ds = 0.4767
+RF53.escale = 5.0
+RF53.freq = 325000000.0
+RF53.phase = -22.0
+RF53.mapsteps = 100
+
+D461.type = drift
+D461.ds = 0.01465
+
+D462.type = drift
+D462.ds = 0.244
+
+D463.type = drift
+D463.ds = 9.999999999999999e-10
+
+D464.type = drift
+D464.ds = 0.506
+
+D465.type = drift
+D465.ds = 9.999999999999999e-10
+
+D466.type = drift
+D466.ds = 0.122
+
+D467.type = drift
+D467.ds = 0.2
+
+D468.type = drift
+D468.ds = 0.122
+
+D469.type = drift
+D469.ds = 0.093
+
+SOL32.type = solenoid_softedge
+SOL32.ds = 0.32
+SOL32.bscale = -4.0
+SOL32.mapsteps = 100
+
+D470.type = drift
+D470.ds = 0.093
+
+D471.type = drift
+D471.ds = 0.244
+
+D472.type = drift
+D472.ds = 0.01465
+
+RF54.type = rfcavity
+RF54.ds = 0.4767
+RF54.escale = 5.0
+RF54.freq = 325000000.0
+RF54.phase = -18.0
+RF54.mapsteps = 100
+
+D473.type = drift
+D473.ds = 0.01465
+
+D474.type = drift
+D474.ds = 0.244
+
+D475.type = drift
+D475.ds = 0.01465
+
+RF55.type = rfcavity
+RF55.ds = 0.4767
+RF55.escale = 5.0
+RF55.freq = 325000000.0
+RF55.phase = -13.0
+RF55.mapsteps = 100
+
+D476.type = drift
+D476.ds = 0.01465
+
+D477.type = drift
+D477.ds = 0.122
+
+D478.type = drift
+D478.ds = 0.122
+
+D479.type = drift
+D479.ds = 0.093
+
+SOL33.type = solenoid_softedge
+SOL33.ds = 0.32
+SOL33.bscale = -4.0
+SOL33.mapsteps = 100
+
+D480.type = drift
+D480.ds = 0.093
+
+D481.type = drift
+D481.ds = 0.244
+
+D482.type = drift
+D482.ds = 0.01465
+
+RF56.type = rfcavity
+RF56.ds = 0.4767
+RF56.escale = 5.0
+RF56.freq = 325000000.0
+RF56.phase = -13.0
+RF56.mapsteps = 100
+
+D483.type = drift
+D483.ds = 0.01465
+
+D484.type = drift
+D484.ds = 0.244
+
+D485.type = drift
+D485.ds = 0.01465
+
+RF57.type = rfcavity
+RF57.ds = 0.4767
+RF57.escale = 5.0
+RF57.freq = 325000000.0
+RF57.phase = -13.0
+RF57.mapsteps = 100
+
+D486.type = drift
+D486.ds = 0.01465
+
+D487.type = drift
+D487.ds = 0.122
+
+D488.type = drift
+D488.ds = 0.122
+
+D489.type = drift
+D489.ds = 0.093
+
+SOL34.type = solenoid_softedge
+SOL34.ds = 0.32
+SOL34.bscale = 3.9
+SOL34.mapsteps = 100
+
+D490.type = drift
+D490.ds = 0.093
+
+D491.type = drift
+D491.ds = 0.244
+
+D492.type = drift
+D492.ds = 0.01465
+
+RF58.type = rfcavity
+RF58.ds = 0.4767
+RF58.escale = 5.0
+RF58.freq = 325000000.0
+RF58.phase = -20.0
+RF58.mapsteps = 100
+
+D493.type = drift
+D493.ds = 0.01465
+
+D494.type = drift
+D494.ds = 0.244
+
+D495.type = drift
+D495.ds = 9.999999999999999e-10
+
+D496.type = drift
+D496.ds = 0.506
+
+D497.type = drift
+D497.ds = 9.999999999999999e-10
+
+D498.type = drift
+D498.ds = 0.122
+
+D499.type = drift
+D499.ds = 0.2
+
+D500.type = drift
+D500.ds = 0.122
+
+D501.type = drift
+D501.ds = 0.093
+
+SOL35.type = solenoid_softedge
+SOL35.ds = 0.32
+SOL35.bscale = -3.8
+SOL35.mapsteps = 100
+
+D502.type = drift
+D502.ds = 0.093
+
+D503.type = drift
+D503.ds = 0.244
+
+D504.type = drift
+D504.ds = 0.01465
+
+RF59.type = rfcavity
+RF59.ds = 0.4767
+RF59.escale = 5.0
+RF59.freq = 325000000.0
+RF59.phase = -20.0
+RF59.mapsteps = 100
+
+D505.type = drift
+D505.ds = 0.01465
+
+D506.type = drift
+D506.ds = 0.244
+
+D507.type = drift
+D507.ds = 0.01465
+
+RF60.type = rfcavity
+RF60.ds = 0.4767
+RF60.escale = 5.0
+RF60.freq = 325000000.0
+RF60.phase = -14.0
+RF60.mapsteps = 100
+
+D508.type = drift
+D508.ds = 0.01465
+
+D509.type = drift
+D509.ds = 0.122
+
+D510.type = drift
+D510.ds = 0.122
+
+D511.type = drift
+D511.ds = 0.093
+
+SOL36.type = solenoid_softedge
+SOL36.ds = 0.32
+SOL36.bscale = -3.5
+SOL36.mapsteps = 100
+
+D512.type = drift
+D512.ds = 0.093
+
+D513.type = drift
+D513.ds = 0.244
+
+D514.type = drift
+D514.ds = 0.01465
+
+RF61.type = rfcavity
+RF61.ds = 0.4767
+RF61.escale = 5.0
+RF61.freq = 325000000.0
+RF61.phase = -14.0
+RF61.mapsteps = 100
+
+D515.type = drift
+D515.ds = 0.01465
+
+D516.type = drift
+D516.ds = 0.244
+
+D517.type = drift
+D517.ds = 0.01465
+
+RF62.type = rfcavity
+RF62.ds = 0.4767
+RF62.escale = 5.0
+RF62.freq = 325000000.0
+RF62.phase = -13.0
+RF62.mapsteps = 100
+
+D518.type = drift
+D518.ds = 0.01465
+
+D519.type = drift
+D519.ds = 0.122
+
+D520.type = drift
+D520.ds = 0.122
+
+D521.type = drift
+D521.ds = 0.093
+
+SOL37.type = solenoid_softedge
+SOL37.ds = 0.32
+SOL37.bscale = -3.0
+SOL37.mapsteps = 100
+
+D522.type = drift
+D522.ds = 0.093
+
+D523.type = drift
+D523.ds = 0.244
+
+D524.type = drift
+D524.ds = 0.01465
+
+RF63.type = rfcavity
+RF63.ds = 0.4767
+RF63.escale = 5.0
+RF63.freq = 325000000.0
+RF63.phase = -20.0
+RF63.mapsteps = 100
+
+D525.type = drift
+D525.ds = 0.01465
+
+D526.type = drift
+D526.ds = 0.244
+
+D527.type = drift
+D527.ds = 9.999999999999999e-10
+
+D528.type = drift
+D528.ds = 0.506
+
+D529.type = drift
+D529.ds = 9.999999999999999e-10
+
+D530.type = drift
+D530.ds = 0.122
+
+D531.type = drift
+D531.ds = 0.2
+
+D532.type = drift
+D532.ds = 0.125
+
+D533.type = drift
+D533.ds = 0.125
+
+Q35.type = quad
+Q35.ds = 0.2
+Q35.k = 7.23
+
+D534.type = drift
+D534.ds = 0.15
+
+D535.type = drift
+D535.ds = 0.1
+
+D536.type = drift
+D536.ds = 0.15
+
+Q36.type = quad
+Q36.ds = 0.2
+Q36.k = -7.3
+
+D537.type = drift
+D537.ds = 0.25
+
+D538.type = drift
+D538.ds = 0.125
+
+D539.type = drift
+D539.ds = 0.15
+
+D540.type = drift
+D540.ds = 0.025
+
+D541.type = drift
+D541.ds = 0.1725
+
+RF64.type = rfcavity
+RF64.ds = 0.9
+RF64.escale = 7.0
+RF64.freq = 650000000.0
+RF64.phase = -22.0
+RF64.mapsteps = 100
+
+D542.type = drift
+D542.ds = 0.0544
+
+D543.type = drift
+D543.ds = 0.234
+
+RF65.type = rfcavity
+RF65.ds = 0.9
+RF65.escale = 4.0
+RF65.freq = 650000000.0
+RF65.phase = -21.0
+RF65.mapsteps = 100
+
+D544.type = drift
+D544.ds = 0.0544
+
+D545.type = drift
+D545.ds = 0.234
+
+RF66.type = rfcavity
+RF66.ds = 0.9
+RF66.escale = 5.0
+RF66.freq = 650000000.0
+RF66.phase = -19.0
+RF66.mapsteps = 100
+
+D546.type = drift
+D546.ds = 0.0544
+
+D547.type = drift
+D547.ds = 0.234
+
+RF67.type = rfcavity
+RF67.ds = 0.9
+RF67.escale = 5.0
+RF67.freq = 650000000.0
+RF67.phase = -16.0
+RF67.mapsteps = 100
+
+D548.type = drift
+D548.ds = 0.025
+
+D549.type = drift
+D549.ds = 0.16090000000000002
+
+D550.type = drift
+D550.ds = 0.4
+
+D551.type = drift
+D551.ds = 0.125
+
+D552.type = drift
+D552.ds = 0.125
+
+Q37.type = quad
+Q37.ds = 0.2
+Q37.k = 8.78
+
+D553.type = drift
+D553.ds = 0.15
+
+D554.type = drift
+D554.ds = 0.1
+
+D555.type = drift
+D555.ds = 0.15
+
+Q38.type = quad
+Q38.ds = 0.2
+Q38.k = -8.58
+
+D556.type = drift
+D556.ds = 0.25
+
+D557.type = drift
+D557.ds = 0.125
+
+D558.type = drift
+D558.ds = 0.15
+
+D559.type = drift
+D559.ds = 0.025
+
+D560.type = drift
+D560.ds = 0.1725
+
+RF68.type = rfcavity
+RF68.ds = 0.9
+RF68.escale = 11.0
+RF68.freq = 650000000.0
+RF68.phase = -17.0
+RF68.mapsteps = 100
+
+D561.type = drift
+D561.ds = 0.0544
+
+D562.type = drift
+D562.ds = 0.234
+
+RF69.type = rfcavity
+RF69.ds = 0.9
+RF69.escale = 9.5
+RF69.freq = 650000000.0
+RF69.phase = -16.0
+RF69.mapsteps = 100
+
+D563.type = drift
+D563.ds = 0.0544
+
+D564.type = drift
+D564.ds = 0.234
+
+RF70.type = rfcavity
+RF70.ds = 0.9
+RF70.escale = 9.0
+RF70.freq = 650000000.0
+RF70.phase = -16.0
+RF70.mapsteps = 100
+
+D565.type = drift
+D565.ds = 0.0544
+
+D566.type = drift
+D566.ds = 0.234
+
+RF71.type = rfcavity
+RF71.ds = 0.9
+RF71.escale = 11.5
+RF71.freq = 650000000.0
+RF71.phase = -14.0
+RF71.mapsteps = 100
+
+D567.type = drift
+D567.ds = 0.025
+
+D568.type = drift
+D568.ds = 0.16090000000000002
+
+D569.type = drift
+D569.ds = 0.4
+
+D570.type = drift
+D570.ds = 0.125
+
+D571.type = drift
+D571.ds = 0.125
+
+Q39.type = quad
+Q39.ds = 0.2
+Q39.k = 9.32
+
+D572.type = drift
+D572.ds = 0.15
+
+D573.type = drift
+D573.ds = 0.1
+
+D574.type = drift
+D574.ds = 0.15
+
+Q40.type = quad
+Q40.ds = 0.2
+Q40.k = -9.2
+
+D575.type = drift
+D575.ds = 0.25
+
+D576.type = drift
+D576.ds = 0.125
+
+D577.type = drift
+D577.ds = 0.15
+
+D578.type = drift
+D578.ds = 0.025
+
+D579.type = drift
+D579.ds = 0.1725
+
+RF72.type = rfcavity
+RF72.ds = 0.9
+RF72.escale = 11.79
+RF72.freq = 650000000.0
+RF72.phase = -19.0
+RF72.mapsteps = 100
+
+D580.type = drift
+D580.ds = 0.0544
+
+D581.type = drift
+D581.ds = 0.234
+
+RF73.type = rfcavity
+RF73.ds = 0.9
+RF73.escale = 11.1
+RF73.freq = 650000000.0
+RF73.phase = -14.0
+RF73.mapsteps = 100
+
+D582.type = drift
+D582.ds = 0.0544
+
+D583.type = drift
+D583.ds = 0.234
+
+RF74.type = rfcavity
+RF74.ds = 0.9
+RF74.escale = 10.0
+RF74.freq = 650000000.0
+RF74.phase = -13.0
+RF74.mapsteps = 100
+
+D584.type = drift
+D584.ds = 0.0544
+
+D585.type = drift
+D585.ds = 0.234
+
+RF75.type = rfcavity
+RF75.ds = 0.9
+RF75.escale = 11.79
+RF75.freq = 650000000.0
+RF75.phase = -14.0
+RF75.mapsteps = 100
+
+D586.type = drift
+D586.ds = 0.025
+
+D587.type = drift
+D587.ds = 0.16090000000000002
+
+D588.type = drift
+D588.ds = 0.4
+
+D589.type = drift
+D589.ds = 0.125
+
+D590.type = drift
+D590.ds = 0.125
+
+Q41.type = quad
+Q41.ds = 0.2
+Q41.k = 9.89
+
+D591.type = drift
+D591.ds = 0.15
+
+D592.type = drift
+D592.ds = 0.1
+
+D593.type = drift
+D593.ds = 0.15
+
+Q42.type = quad
+Q42.ds = 0.2
+Q42.k = -9.58
+
+D594.type = drift
+D594.ds = 0.25
+
+D595.type = drift
+D595.ds = 0.125
+
+D596.type = drift
+D596.ds = 0.15
+
+D597.type = drift
+D597.ds = 0.025
+
+D598.type = drift
+D598.ds = 0.1725
+
+RF76.type = rfcavity
+RF76.ds = 0.9
+RF76.escale = 11.79
+RF76.freq = 650000000.0
+RF76.phase = -15.0
+RF76.mapsteps = 100
+
+D599.type = drift
+D599.ds = 0.0544
+
+D600.type = drift
+D600.ds = 0.234
+
+RF77.type = rfcavity
+RF77.ds = 0.9
+RF77.escale = 11.7
+RF77.freq = 650000000.0
+RF77.phase = -14.0
+RF77.mapsteps = 100
+
+D601.type = drift
+D601.ds = 0.0544
+
+D602.type = drift
+D602.ds = 0.234
+
+RF78.type = rfcavity
+RF78.ds = 0.9
+RF78.escale = 11.6
+RF78.freq = 650000000.0
+RF78.phase = -13.0
+RF78.mapsteps = 100
+
+D603.type = drift
+D603.ds = 0.0544
+
+D604.type = drift
+D604.ds = 0.234
+
+RF79.type = rfcavity
+RF79.ds = 0.9
+RF79.escale = 11.7
+RF79.freq = 650000000.0
+RF79.phase = -13.0
+RF79.mapsteps = 100
+
+D605.type = drift
+D605.ds = 0.025
+
+D606.type = drift
+D606.ds = 0.16090000000000002
+
+D607.type = drift
+D607.ds = 0.4
+
+D608.type = drift
+D608.ds = 0.125
+
+D609.type = drift
+D609.ds = 0.125
+
+Q43.type = quad
+Q43.ds = 0.2
+Q43.k = 9.3
+
+D610.type = drift
+D610.ds = 0.15
+
+D611.type = drift
+D611.ds = 0.1
+
+D612.type = drift
+D612.ds = 0.15
+
+Q44.type = quad
+Q44.ds = 0.2
+Q44.k = -9.03
+
+D613.type = drift
+D613.ds = 0.25
+
+D614.type = drift
+D614.ds = 0.125
+
+D615.type = drift
+D615.ds = 0.15
+
+D616.type = drift
+D616.ds = 0.025
+
+D617.type = drift
+D617.ds = 0.1725
+
+RF80.type = rfcavity
+RF80.ds = 0.9
+RF80.escale = 11.79
+RF80.freq = 650000000.0
+RF80.phase = -14.0
+RF80.mapsteps = 100
+
+D618.type = drift
+D618.ds = 0.0544
+
+D619.type = drift
+D619.ds = 0.234
+
+RF81.type = rfcavity
+RF81.ds = 0.9
+RF81.escale = 11.79
+RF81.freq = 650000000.0
+RF81.phase = -13.0
+RF81.mapsteps = 100
+
+D620.type = drift
+D620.ds = 0.0544
+
+D621.type = drift
+D621.ds = 0.234
+
+RF82.type = rfcavity
+RF82.ds = 0.9
+RF82.escale = 11.79
+RF82.freq = 650000000.0
+RF82.phase = -12.0
+RF82.mapsteps = 100
+
+D622.type = drift
+D622.ds = 0.0544
+
+D623.type = drift
+D623.ds = 0.234
+
+RF83.type = rfcavity
+RF83.ds = 0.9
+RF83.escale = 11.79
+RF83.freq = 650000000.0
+RF83.phase = -12.0
+RF83.mapsteps = 100
+
+D624.type = drift
+D624.ds = 0.025
+
+D625.type = drift
+D625.ds = 0.16090000000000002
+
+D626.type = drift
+D626.ds = 0.4
+
+D627.type = drift
+D627.ds = 0.125
+
+D628.type = drift
+D628.ds = 0.125
+
+Q45.type = quad
+Q45.ds = 0.2
+Q45.k = 8.75
+
+D629.type = drift
+D629.ds = 0.15
+
+D630.type = drift
+D630.ds = 0.1
+
+D631.type = drift
+D631.ds = 0.15
+
+Q46.type = quad
+Q46.ds = 0.2
+Q46.k = -8.55
+
+D632.type = drift
+D632.ds = 0.25
+
+D633.type = drift
+D633.ds = 0.125
+
+D634.type = drift
+D634.ds = 0.15
+
+D635.type = drift
+D635.ds = 0.025
+
+D636.type = drift
+D636.ds = 0.1725
+
+RF84.type = rfcavity
+RF84.ds = 0.9
+RF84.escale = 11.79
+RF84.freq = 650000000.0
+RF84.phase = -14.0
+RF84.mapsteps = 100
+
+D637.type = drift
+D637.ds = 0.0544
+
+D638.type = drift
+D638.ds = 0.234
+
+RF85.type = rfcavity
+RF85.ds = 0.9
+RF85.escale = 11.79
+RF85.freq = 650000000.0
+RF85.phase = -13.0
+RF85.mapsteps = 100
+
+D639.type = drift
+D639.ds = 0.0544
+
+D640.type = drift
+D640.ds = 0.234
+
+RF86.type = rfcavity
+RF86.ds = 0.9
+RF86.escale = 11.79
+RF86.freq = 650000000.0
+RF86.phase = -12.0
+RF86.mapsteps = 100
+
+D641.type = drift
+D641.ds = 0.0544
+
+D642.type = drift
+D642.ds = 0.234
+
+RF87.type = rfcavity
+RF87.ds = 0.9
+RF87.escale = 11.79
+RF87.freq = 650000000.0
+RF87.phase = -12.0
+RF87.mapsteps = 100
+
+D643.type = drift
+D643.ds = 0.025
+
+D644.type = drift
+D644.ds = 0.16090000000000002
+
+D645.type = drift
+D645.ds = 0.4
+
+D646.type = drift
+D646.ds = 0.125
+
+D647.type = drift
+D647.ds = 0.125
+
+Q47.type = quad
+Q47.ds = 0.2
+Q47.k = 8.4
+
+D648.type = drift
+D648.ds = 0.15
+
+D649.type = drift
+D649.ds = 0.1
+
+D650.type = drift
+D650.ds = 0.15
+
+Q48.type = quad
+Q48.ds = 0.2
+Q48.k = -8.26
+
+D651.type = drift
+D651.ds = 0.25
+
+D652.type = drift
+D652.ds = 0.125
+
+D653.type = drift
+D653.ds = 0.15
+
+D654.type = drift
+D654.ds = 0.025
+
+D655.type = drift
+D655.ds = 0.1725
+
+RF88.type = rfcavity
+RF88.ds = 0.9
+RF88.escale = 11.79
+RF88.freq = 650000000.0
+RF88.phase = -14.0
+RF88.mapsteps = 100
+
+D656.type = drift
+D656.ds = 0.0544
+
+D657.type = drift
+D657.ds = 0.234
+
+RF89.type = rfcavity
+RF89.ds = 0.9
+RF89.escale = 11.79
+RF89.freq = 650000000.0
+RF89.phase = -13.0
+RF89.mapsteps = 100
+
+D658.type = drift
+D658.ds = 0.0544
+
+D659.type = drift
+D659.ds = 0.234
+
+RF90.type = rfcavity
+RF90.ds = 0.9
+RF90.escale = 11.79
+RF90.freq = 650000000.0
+RF90.phase = -12.0
+RF90.mapsteps = 100
+
+D660.type = drift
+D660.ds = 0.0544
+
+D661.type = drift
+D661.ds = 0.234
+
+RF91.type = rfcavity
+RF91.ds = 0.9
+RF91.escale = 11.79
+RF91.freq = 650000000.0
+RF91.phase = -12.0
+RF91.mapsteps = 100
+
+D662.type = drift
+D662.ds = 0.025
+
+D663.type = drift
+D663.ds = 0.16090000000000002
+
+D664.type = drift
+D664.ds = 0.4
+
+D665.type = drift
+D665.ds = 0.125
+
+D666.type = drift
+D666.ds = 0.125
+
+Q49.type = quad
+Q49.ds = 0.2
+Q49.k = 8.18
+
+D667.type = drift
+D667.ds = 0.15
+
+D668.type = drift
+D668.ds = 0.1
+
+D669.type = drift
+D669.ds = 0.15
+
+Q50.type = quad
+Q50.ds = 0.2
+Q50.k = -8.0
+
+D670.type = drift
+D670.ds = 0.25
+
+D671.type = drift
+D671.ds = 0.125
+
+D672.type = drift
+D672.ds = 0.15
+
+D673.type = drift
+D673.ds = 0.025
+
+D674.type = drift
+D674.ds = 0.1725
+
+RF92.type = rfcavity
+RF92.ds = 0.9
+RF92.escale = 11.79
+RF92.freq = 650000000.0
+RF92.phase = -14.0
+RF92.mapsteps = 100
+
+D675.type = drift
+D675.ds = 0.0544
+
+D676.type = drift
+D676.ds = 0.234
+
+RF93.type = rfcavity
+RF93.ds = 0.9
+RF93.escale = 11.79
+RF93.freq = 650000000.0
+RF93.phase = -13.0
+RF93.mapsteps = 100
+
+D677.type = drift
+D677.ds = 0.0544
+
+D678.type = drift
+D678.ds = 0.234
+
+RF94.type = rfcavity
+RF94.ds = 0.9
+RF94.escale = 11.79
+RF94.freq = 650000000.0
+RF94.phase = -13.0
+RF94.mapsteps = 100
+
+D679.type = drift
+D679.ds = 0.0544
+
+D680.type = drift
+D680.ds = 0.234
+
+RF95.type = rfcavity
+RF95.ds = 0.9
+RF95.escale = 11.79
+RF95.freq = 650000000.0
+RF95.phase = -12.0
+RF95.mapsteps = 100
+
+D681.type = drift
+D681.ds = 0.025
+
+D682.type = drift
+D682.ds = 0.16090000000000002
+
+D683.type = drift
+D683.ds = 0.4
+
+D684.type = drift
+D684.ds = 0.125
+
+D685.type = drift
+D685.ds = 0.125
+
+Q51.type = quad
+Q51.ds = 0.2
+Q51.k = 7.6
+
+D686.type = drift
+D686.ds = 0.15
+
+D687.type = drift
+D687.ds = 0.1
+
+D688.type = drift
+D688.ds = 0.15
+
+Q52.type = quad
+Q52.ds = 0.2
+Q52.k = -7.55
+
+D689.type = drift
+D689.ds = 0.25
+
+D690.type = drift
+D690.ds = 0.125
+
+D691.type = drift
+D691.ds = 0.15
+
+D692.type = drift
+D692.ds = 0.025
+
+D693.type = drift
+D693.ds = 0.1725
+
+RF96.type = rfcavity
+RF96.ds = 0.9
+RF96.escale = 11.79
+RF96.freq = 650000000.0
+RF96.phase = -13.0
+RF96.mapsteps = 100
+
+D694.type = drift
+D694.ds = 0.0544
+
+D695.type = drift
+D695.ds = 0.234
+
+RF97.type = rfcavity
+RF97.ds = 0.9
+RF97.escale = 11.79
+RF97.freq = 650000000.0
+RF97.phase = -12.0
+RF97.mapsteps = 100
+
+D696.type = drift
+D696.ds = 0.0544
+
+D697.type = drift
+D697.ds = 0.234
+
+RF98.type = rfcavity
+RF98.ds = 0.9
+RF98.escale = 11.79
+RF98.freq = 650000000.0
+RF98.phase = -12.0
+RF98.mapsteps = 100
+
+D698.type = drift
+D698.ds = 0.0544
+
+D699.type = drift
+D699.ds = 0.234
+
+RF99.type = rfcavity
+RF99.ds = 0.9
+RF99.escale = 11.79
+RF99.freq = 650000000.0
+RF99.phase = -12.0
+RF99.mapsteps = 100
+
+D700.type = drift
+D700.ds = 0.025
+
+D701.type = drift
+D701.ds = 0.16090000000000002
+
+D702.type = drift
+D702.ds = 0.4
+
+D703.type = drift
+D703.ds = 1e-12
+
+D704.type = drift
+D704.ds = 0.125
+
+D705.type = drift
+D705.ds = 0.125
+
+Q53.type = quad
+Q53.ds = 0.2
+Q53.k = 9.74
+
+D706.type = drift
+D706.ds = 0.15
+
+D707.type = drift
+D707.ds = 0.1
+
+D708.type = drift
+D708.ds = 0.15
+
+Q54.type = quad
+Q54.ds = 0.2
+Q54.k = -9.5
+
+D709.type = drift
+D709.ds = 0.25
+
+D710.type = drift
+D710.ds = 0.259
+
+D711.type = drift
+D711.ds = 0.096
+
+RF100.type = rfcavity
+RF100.ds = 1.44
+RF100.escale = 18.5
+RF100.freq = 650000000.0
+RF100.phase = -11.0
+RF100.mapsteps = 100
+
+D712.type = drift
+D712.ds = 0.06
+
+D713.type = drift
+D713.ds = 0.025
+
+RF101.type = rfcavity
+RF101.ds = 1.44
+RF101.escale = 18.5
+RF101.freq = 650000000.0
+RF101.phase = -11.0
+RF101.mapsteps = 100
+
+D714.type = drift
+D714.ds = 0.06
+
+D715.type = drift
+D715.ds = 0.025
+
+RF102.type = rfcavity
+RF102.ds = 1.44
+RF102.escale = 19.5
+RF102.freq = 650000000.0
+RF102.phase = -11.0
+RF102.mapsteps = 100
+
+D716.type = drift
+D716.ds = 0.06
+
+D717.type = drift
+D717.ds = 0.025
+
+RF103.type = rfcavity
+RF103.ds = 1.44
+RF103.escale = 19.5
+RF103.freq = 650000000.0
+RF103.phase = -11.0
+RF103.mapsteps = 100
+
+D718.type = drift
+D718.ds = 0.06
+
+D719.type = drift
+D719.ds = 0.025
+
+RF104.type = rfcavity
+RF104.ds = 1.44
+RF104.escale = 19.5
+RF104.freq = 650000000.0
+RF104.phase = -11.0
+RF104.mapsteps = 100
+
+D720.type = drift
+D720.ds = 0.06
+
+D721.type = drift
+D721.ds = 0.025
+
+RF105.type = rfcavity
+RF105.ds = 1.44
+RF105.escale = 19.81
+RF105.freq = 650000000.0
+RF105.phase = -22.0
+RF105.mapsteps = 100
+
+D722.type = drift
+D722.ds = 0.099
+
+D723.type = drift
+D723.ds = 0.4
+
+D724.type = drift
+D724.ds = 0.125
+
+D725.type = drift
+D725.ds = 0.125
+
+Q55.type = quad
+Q55.ds = 0.2
+Q55.k = 10.5
+
+D726.type = drift
+D726.ds = 0.15
+
+D727.type = drift
+D727.ds = 0.1
+
+D728.type = drift
+D728.ds = 0.15
+
+Q56.type = quad
+Q56.ds = 0.2
+Q56.k = -10.41
+
+D729.type = drift
+D729.ds = 0.25
+
+D730.type = drift
+D730.ds = 0.259
+
+D731.type = drift
+D731.ds = 0.096
+
+RF106.type = rfcavity
+RF106.ds = 1.44
+RF106.escale = 19.81
+RF106.freq = 650000000.0
+RF106.phase = -12.0
+RF106.mapsteps = 100
+
+D732.type = drift
+D732.ds = 0.06
+
+D733.type = drift
+D733.ds = 0.025
+
+RF107.type = rfcavity
+RF107.ds = 1.44
+RF107.escale = 19.81
+RF107.freq = 650000000.0
+RF107.phase = -11.0
+RF107.mapsteps = 100
+
+D734.type = drift
+D734.ds = 0.06
+
+D735.type = drift
+D735.ds = 0.025
+
+RF108.type = rfcavity
+RF108.ds = 1.44
+RF108.escale = 19.81
+RF108.freq = 650000000.0
+RF108.phase = -11.0
+RF108.mapsteps = 100
+
+D736.type = drift
+D736.ds = 0.06
+
+D737.type = drift
+D737.ds = 0.025
+
+RF109.type = rfcavity
+RF109.ds = 1.44
+RF109.escale = 19.81
+RF109.freq = 650000000.0
+RF109.phase = -11.0
+RF109.mapsteps = 100
+
+D738.type = drift
+D738.ds = 0.06
+
+D739.type = drift
+D739.ds = 0.025
+
+RF110.type = rfcavity
+RF110.ds = 1.44
+RF110.escale = 19.81
+RF110.freq = 650000000.0
+RF110.phase = -11.0
+RF110.mapsteps = 100
+
+D740.type = drift
+D740.ds = 0.06
+
+D741.type = drift
+D741.ds = 0.025
+
+RF111.type = rfcavity
+RF111.ds = 1.44
+RF111.escale = 19.81
+RF111.freq = 650000000.0
+RF111.phase = -20.0
+RF111.mapsteps = 100
+
+D742.type = drift
+D742.ds = 0.099
+
+D743.type = drift
+D743.ds = 0.4
+
+D744.type = drift
+D744.ds = 0.125
+
+D745.type = drift
+D745.ds = 0.125
+
+Q57.type = quad
+Q57.ds = 0.2
+Q57.k = 10.57
+
+D746.type = drift
+D746.ds = 0.15
+
+D747.type = drift
+D747.ds = 0.1
+
+D748.type = drift
+D748.ds = 0.15
+
+Q58.type = quad
+Q58.ds = 0.2
+Q58.k = -10.48
+
+D749.type = drift
+D749.ds = 0.25
+
+D750.type = drift
+D750.ds = 0.259
+
+D751.type = drift
+D751.ds = 0.096
+
+RF112.type = rfcavity
+RF112.ds = 1.44
+RF112.escale = 19.81
+RF112.freq = 650000000.0
+RF112.phase = -15.0
+RF112.mapsteps = 100
+
+D752.type = drift
+D752.ds = 0.06
+
+D753.type = drift
+D753.ds = 0.025
+
+RF113.type = rfcavity
+RF113.ds = 1.44
+RF113.escale = 19.81
+RF113.freq = 650000000.0
+RF113.phase = -11.0
+RF113.mapsteps = 100
+
+D754.type = drift
+D754.ds = 0.06
+
+D755.type = drift
+D755.ds = 0.025
+
+RF114.type = rfcavity
+RF114.ds = 1.44
+RF114.escale = 19.81
+RF114.freq = 650000000.0
+RF114.phase = -11.0
+RF114.mapsteps = 100
+
+D756.type = drift
+D756.ds = 0.06
+
+D757.type = drift
+D757.ds = 0.025
+
+RF115.type = rfcavity
+RF115.ds = 1.44
+RF115.escale = 19.81
+RF115.freq = 650000000.0
+RF115.phase = -11.0
+RF115.mapsteps = 100
+
+D758.type = drift
+D758.ds = 0.06
+
+D759.type = drift
+D759.ds = 0.025
+
+RF116.type = rfcavity
+RF116.ds = 1.44
+RF116.escale = 19.81
+RF116.freq = 650000000.0
+RF116.phase = -11.0
+RF116.mapsteps = 100
+
+D760.type = drift
+D760.ds = 0.06
+
+D761.type = drift
+D761.ds = 0.025
+
+RF117.type = rfcavity
+RF117.ds = 1.44
+RF117.escale = 19.81
+RF117.freq = 650000000.0
+RF117.phase = -12.0
+RF117.mapsteps = 100
+
+D762.type = drift
+D762.ds = 0.099
+
+D763.type = drift
+D763.ds = 0.4
+
+D764.type = drift
+D764.ds = 0.125
+
+D765.type = drift
+D765.ds = 0.125
+
+Q59.type = quad
+Q59.ds = 0.2
+Q59.k = 10.7
+
+D766.type = drift
+D766.ds = 0.15
+
+D767.type = drift
+D767.ds = 0.1
+
+D768.type = drift
+D768.ds = 0.15
+
+Q60.type = quad
+Q60.ds = 0.2
+Q60.k = -10.6
+
+D769.type = drift
+D769.ds = 0.25
+
+D770.type = drift
+D770.ds = 0.259
+
+D771.type = drift
+D771.ds = 0.096
+
+RF118.type = rfcavity
+RF118.ds = 1.44
+RF118.escale = 19.81
+RF118.freq = 650000000.0
+RF118.phase = -12.0
+RF118.mapsteps = 100
+
+D772.type = drift
+D772.ds = 0.06
+
+D773.type = drift
+D773.ds = 0.025
+
+RF119.type = rfcavity
+RF119.ds = 1.44
+RF119.escale = 19.81
+RF119.freq = 650000000.0
+RF119.phase = -10.0
+RF119.mapsteps = 100
+
+D774.type = drift
+D774.ds = 0.06
+
+D775.type = drift
+D775.ds = 0.025
+
+RF120.type = rfcavity
+RF120.ds = 1.44
+RF120.escale = 19.81
+RF120.freq = 650000000.0
+RF120.phase = -10.0
+RF120.mapsteps = 100
+
+D776.type = drift
+D776.ds = 0.06
+
+D777.type = drift
+D777.ds = 0.025
+
+RF121.type = rfcavity
+RF121.ds = 1.44
+RF121.escale = 19.81
+RF121.freq = 650000000.0
+RF121.phase = -10.0
+RF121.mapsteps = 100
+
+D778.type = drift
+D778.ds = 0.06
+
+D779.type = drift
+D779.ds = 0.025
+
+RF122.type = rfcavity
+RF122.ds = 1.44
+RF122.escale = 19.81
+RF122.freq = 650000000.0
+RF122.phase = -10.0
+RF122.mapsteps = 100
+
+D780.type = drift
+D780.ds = 0.06
+
+D781.type = drift
+D781.ds = 0.025
+
+RF123.type = rfcavity
+RF123.ds = 1.44
+RF123.escale = 19.81
+RF123.freq = 650000000.0
+RF123.phase = -10.0
+RF123.mapsteps = 100
+
+D782.type = drift
+D782.ds = 0.099
+
+D783.type = drift
+D783.ds = 0.4
+
+D784.type = drift
+D784.ds = 0.125
+
+D785.type = drift
+D785.ds = 0.125
+
+Q61.type = quad
+Q61.ds = 0.2
+Q61.k = 10.6
+
+D786.type = drift
+D786.ds = 0.15
+
+D787.type = drift
+D787.ds = 0.1
+
+D788.type = drift
+D788.ds = 0.15
+
+Q62.type = quad
+Q62.ds = 0.2
+Q62.k = -10.54
+
+D789.type = drift
+D789.ds = 0.25
+
+lattice.elements =
+D1 D2 Q1 D3 D4 D5 Q2 D6
+D7 D8 D9 D10 D11 D12 D13 D14
+D15 D16 RF1 D17 D18 D19 Q3 D20
+D21 D22 Q4 D23 D24 D25 D26 D27
+D28 D29 D30 D31 D32 D33 D34 D35
+Q5 D36 Q6 D37 D38 D39 Q7 D40
+D41 D42 D43 D44 D45 D46 D47 D48
+D49 D50 D51 Q8 D52 Q9 D53 D54
+D55 Q10 D56 D57 D58 D59 RF2 D60
+D61 D62 D63 D64 Q11 D65 Q12 D66
+D67 D68 Q13 D69 D70 D71 D72 D73
+D74 D75 D76 D77 D78 D79 Q14 D80
+Q15 D81 D82 D83 Q16 D84 D85 D86
+D87 D88 D89 D90 D91 D92 D93 D94
+D95 D96 D97 D98 D99 D100 D101 Q17
+D102 Q18 D103 D104 D105 Q19 D106 D107
+D108 D109 D110 D111 D112 D113 D114 D115
+D116 D117 D118 Q20 D119 Q21 D120 D121
+D122 Q22 D123 D124 D125 D126 RF3 D127
+D128 D129 D130 D131 D132 D133 Q23 D134
+Q24 D135 D136 D137 Q25 D138 D139 D140
+D141 D142 D143 D144 D145 D146 D147 D148
+D149 D150 D151 D152 Q26 D153 Q27 D154
+D155 D156 Q28 D157 D158 D159 D160 D161
+D162 D163 D164 D165 D166 D167 D168 Q29
+D169 Q30 D170 D171 D172 Q31 D173 D174
+D175 D176 D177 D178 D179 D180 D181 D182
+D183 D184 D185 D186 D187 RF4 D188 D189
+D190 Q32 D191 Q33 D192 D193 D194 Q34
+D195 D196 D197 D198 D199 D200 D201 D202
+D203 D204 D205 D206 D207 D208 D209 D210
+D211 SOL1 D212 RF5 D213 SOL2 D214 RF6
+D215 SOL3 D216 RF7 D217 SOL4 D218 RF8
+D219 SOL5 D220 RF9 D221 SOL6 D222 RF10
+D223 SOL7 D224 RF11 D225 SOL8 D226 RF12
+D227 D228 D229 D230 D231 D232 D233 D234
+D235 D236 D237 D238 D239 RF13 D240 SOL9
+D241 RF14 D242 D243 D244 D245 D246 RF15
+D247 SOL10 D248 RF16 D249 D250 D251 D252
+D253 RF17 D254 SOL11 D255 RF18 D256 D257
+D258 D259 D260 RF19 D261 SOL12 D262 RF20
+D263 D264 D265 D266 D267 D268 D269 D270
+D271 D272 D273 D274 D275 D276 RF21 D277
+SOL13 D278 RF22 D279 D280 D281 D282 D283
+RF23 D284 SOL14 D285 RF24 D286 D287 D288
+D289 D290 RF25 D291 SOL15 D292 RF26 D293
+D294 D295 D296 D297 RF27 D298 SOL16 D299
+RF28 D300 D301 D302 D303 D304 D305 D306
+D307 D308 D309 SOL17 D310 D311 D312 RF29
+D313 D314 D315 RF30 D316 D317 D318 D319
+SOL18 D320 D321 D322 RF31 D323 D324 D325
+RF32 D326 D327 D328 D329 SOL19 D330 D331
+D332 RF33 D333 D334 D335 D336 D337 D338
+D339 D340 D341 SOL20 D342 D343 D344 RF34
+D345 D346 D347 RF35 D348 D349 D350 D351
+SOL21 D352 D353 D354 RF36 D355 D356 D357
+RF37 D358 D359 D360 D361 SOL22 D362 D363
+D364 RF38 D365 D366 D367 D368 D369 D370
+D371 D372 D373 SOL23 D374 D375 D376 RF39
+D377 D378 D379 RF40 D380 D381 D382 D383
+SOL24 D384 D385 D386 RF41 D387 D388 D389
+RF42 D390 D391 D392 D393 SOL25 D394 D395
+D396 RF43 D397 D398 D399 D400 D401 D402
+D403 D404 D405 SOL26 D406 D407 D408 RF44
+D409 D410 D411 RF45 D412 D413 D414 D415
+SOL27 D416 D417 D418 RF46 D419 D420 D421
+RF47 D422 D423 D424 D425 SOL28 D426 D427
+D428 RF48 D429 D430 D431 D432 D433 D434
+D435 D436 D437 SOL29 D438 D439 D440 RF49
+D441 D442 D443 RF50 D444 D445 D446 D447
+SOL30 D448 D449 D450 RF51 D451 D452 D453
+RF52 D454 D455 D456 D457 SOL31 D458 D459
+D460 RF53 D461 D462 D463 D464 D465 D466
+D467 D468 D469 SOL32 D470 D471 D472 RF54
+D473 D474 D475 RF55 D476 D477 D478 D479
+SOL33 D480 D481 D482 RF56 D483 D484 D485
+RF57 D486 D487 D488 D489 SOL34 D490 D491
+D492 RF58 D493 D494 D495 D496 D497 D498
+D499 D500 D501 SOL35 D502 D503 D504 RF59
+D505 D506 D507 RF60 D508 D509 D510 D511
+SOL36 D512 D513 D514 RF61 D515 D516 D517
+RF62 D518 D519 D520 D521 SOL37 D522 D523
+D524 RF63 D525 D526 D527 D528 D529 D530
+D531 D532 D533 Q35 D534 D535 D536 Q36
+D537 D538 D539 D540 D541 RF64 D542 D543
+RF65 D544 D545 RF66 D546 D547 RF67 D548
+D549 D550 D551 D552 Q37 D553 D554 D555
+Q38 D556 D557 D558 D559 D560 RF68 D561
+D562 RF69 D563 D564 RF70 D565 D566 RF71
+D567 D568 D569 D570 D571 Q39 D572 D573
+D574 Q40 D575 D576 D577 D578 D579 RF72
+D580 D581 RF73 D582 D583 RF74 D584 D585
+RF75 D586 D587 D588 D589 D590 Q41 D591
+D592 D593 Q42 D594 D595 D596 D597 D598
+RF76 D599 D600 RF77 D601 D602 RF78 D603
+D604 RF79 D605 D606 D607 D608 D609 Q43
+D610 D611 D612 Q44 D613 D614 D615 D616
+D617 RF80 D618 D619 RF81 D620 D621 RF82
+D622 D623 RF83 D624 D625 D626 D627 D628
+Q45 D629 D630 D631 Q46 D632 D633 D634
+D635 D636 RF84 D637 D638 RF85 D639 D640
+RF86 D641 D642 RF87 D643 D644 D645 D646
+D647 Q47 D648 D649 D650 Q48 D651 D652
+D653 D654 D655 RF88 D656 D657 RF89 D658
+D659 RF90 D660 D661 RF91 D662 D663 D664
+D665 D666 Q49 D667 D668 D669 Q50 D670
+D671 D672 D673 D674 RF92 D675 D676 RF93
+D677 D678 RF94 D679 D680 RF95 D681 D682
+D683 D684 D685 Q51 D686 D687 D688 Q52
+D689 D690 D691 D692 D693 RF96 D694 D695
+RF97 D696 D697 RF98 D698 D699 RF99 D700
+D701 D702 D703 D704 D705 Q53 D706 D707
+D708 Q54 D709 D710 D711 RF100 D712 D713
+RF101 D714 D715 RF102 D716 D717 RF103 D718
+D719 RF104 D720 D721 RF105 D722 D723 D724
+D725 Q55 D726 D727 D728 Q56 D729 D730
+D731 RF106 D732 D733 RF107 D734 D735 RF108
+D736 D737 RF109 D738 D739 RF110 D740 D741
+RF111 D742 D743 D744 D745 Q57 D746 D747
+D748 Q58 D749 D750 D751 RF112 D752 D753
+RF113 D754 D755 RF114 D756 D757 RF115 D758
+D759 RF116 D760 D761 RF117 D762 D763 D764
+D765 Q59 D766 D767 D768 Q60 D769 D770
+D771 RF118 D772 D773 RF119 D774 D775 RF120
+D776 D777 RF121 D778 D779 RF122 D780 D781
+RF123 D782 D783 D784 D785 Q61 D786 D787
+D788 Q62 D789
+
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = true
