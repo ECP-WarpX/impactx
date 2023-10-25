@@ -25,7 +25,7 @@ constf1.ds = 10.0
 constf1.kx = 6.283185307179586
 constf1.ky = 6.283185307179586
 constf1.kt = 6.283185307179586
-constf1.nslice = 400   #full resolution
+#constf1.nslice = 400   #full resolution
 constf1.nslice = 100
 
 
