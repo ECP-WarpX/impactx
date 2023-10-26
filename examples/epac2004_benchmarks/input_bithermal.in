@@ -30,7 +30,7 @@ constf1.kx = 6.283185307179586
 constf1.ky = 6.283185307179586
 constf1.kt = 6.283185307179586
 #constf1.nslice = 400  #full resolution
-constf1.nslice = 100
+constf1.nslice = 50
 
 ###############################################################################
 # Algorithms
@@ -38,7 +38,8 @@ constf1.nslice = 100
 algo.particle_shape = 2
 algo.space_charge = true
 
-amr.n_cell = 128 128 128
+#amr.n_cell = 128 128 128  #full resolution
+amr.n_cell = 64 64 64
 geometry.prob_relative = 3.0
 
 ###############################################################################
