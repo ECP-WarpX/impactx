@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os
+from pathlib import Path
 
 import pytest
 
@@ -15,7 +15,7 @@ else:
     print("NO mpi4py load")
 
 # base path for input files
-basepath = os.getcwd()
+basepath = Path(__file__).parent.parent
 
 
 @pytest.fixture(autouse=True, scope="function")
