@@ -21,7 +21,8 @@ sudo apt-get install -y \
     python3-pip         \
     wget
 
-python3 -m pip install -U pip setuptools wheel
+python3 -m pip install -U pip
+python3 -m pip install -U build packaging setuptools wheel
 python3 -m pip install -U cmake pytest
 python3 -m pip install -U -r examples/requirements.txt
 
