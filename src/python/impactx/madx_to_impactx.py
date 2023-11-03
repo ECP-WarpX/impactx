@@ -8,11 +8,26 @@
 
 import warnings
 
-import scipy.constants as sc
-
 from impactx import RefPart, elements
 
 from .MADXParser import MADXParser
+
+
+class sc:
+    """
+    This class is used in lieu of scipy.constants
+    to avoid a direct dependency on it.
+    At the time of writing, this file was the only
+    one requiring scipy in the ImpactX source outside
+    of examples.
+    """
+
+    c = 299792458.0
+    electron_volt = 1.602176634e-19
+    physical_constants = {"electron-muon mass ratio": (0.00483633169, "", 1.1e-10)}
+    m_e = 9.1093837015e-31
+    m_p = 1.67262192369e-27
+    m_u = 1.6605390666e-27
 
 
 def lattice(parsed_beamline, nslice=1):
