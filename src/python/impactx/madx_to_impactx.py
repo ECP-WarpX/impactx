@@ -122,7 +122,7 @@ def beam(particle, charge=None, mass=None, energy=None):
     :param str particle: reference particle name
     :param float charge: particle charge (proton charge units)
     :param float mass: particle mass (electron masses)
-    :param float energy: particle energy (GeV)
+    :param float energy: total particle energy (GeV)
         - MAD-X default: 1 GeV
     :return dict: dictionary containing particle and beam attributes in ImpactX units
     """
@@ -131,7 +131,7 @@ def beam(particle, charge=None, mass=None, energy=None):
     kg2MeV = sc.c**2 / sc.electron_volt * 1.0e-6
     muon_mass = sc.physical_constants["electron-muon mass ratio"][0] / sc.m_e
     if energy is None:
-        energy_MeV = 1.0e3  # MAD-X default is 1 GeV particle energy
+        energy_MeV = 1.0e3  # MAD-X default is 1 GeV total particle energy
     else:
         energy_MeV = energy * GeV2MeV
 
@@ -192,6 +192,6 @@ def read_beam(ref: RefPart, madx_file):
 
     ref.set_charge_qe(ref_particle_dict["charge"])
     ref.set_mass_MeV(ref_particle_dict["mass"])
-    ref.set_energy_MeV(ref_particle_dict["energy"])
+    ref.set_kin_energy_MeV(ref_particle_dict["energy"] - ref_particle_dict["mass"])
 
     return ref

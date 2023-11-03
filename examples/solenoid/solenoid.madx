@@ -1,4 +1,4 @@
-beam, particle=proton, energy=0.250;
+beam, particle=proton, energy=1.188272;
 
 M1: MONITOR,L=0.0;
 SOL1: solenoid, L=3.820395, KS=0.8223219329893234;

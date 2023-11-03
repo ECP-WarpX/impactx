@@ -39,7 +39,7 @@ namespace impactx
             "add_particles: Reference particle charge not yet set!");
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ref.mass_MeV() != 0.0,
             "add_particles: Reference particle mass not yet set!");
-        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ref.energy_MeV() != 0.0,
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ref.kin_energy_MeV() != 0.0,
             "add_particles: Reference particle energy not yet set!");
 
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(bunch_charge >= 0.0,
@@ -112,8 +112,8 @@ namespace impactx
         // Parse the beam distribution parameters
         amrex::ParmParse const pp_dist("beam");
 
-        amrex::ParticleReal energy = 0.0;  // Beam kinetic energy (MeV)
-        pp_dist.get("energy", energy);
+        amrex::ParticleReal kin_energy = 0.0;  // Beam kinetic energy (MeV)
+        pp_dist.get("kin_energy", kin_energy);
 
         amrex::ParticleReal bunch_charge = 0.0;  // Bunch charge (C)
         pp_dist.get("charge", bunch_charge);
@@ -145,7 +145,7 @@ namespace impactx
 
         // set charge and mass and energy of ref particle
         m_particle_container->GetRefParticle()
-            .set_charge_qe(qe).set_mass_MeV(massE).set_energy_MeV(energy);
+                .set_charge_qe(qe).set_mass_MeV(massE).set_kin_energy_MeV(kin_energy);
 
         int npart = 1;  // Number of simulation particles
         pp_dist.get("npart", npart);
@@ -300,7 +300,7 @@ namespace impactx
         }
 
         // print information on the initialized beam
-        amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;
+        amrex::Print() << "Beam kinetic energy (MeV): " << kin_energy << std::endl;
         amrex::Print() << "Bunch charge (C): " << bunch_charge << std::endl;
         amrex::Print() << "Particle type: " << particle_type << std::endl;
         amrex::Print() << "Number of particles: " << npart << std::endl;
