@@ -10,8 +10,12 @@ This demonstrates a simple cyclotron as published by Ernest O. Lawrence and M. S
 Run
 ---
 
-This example can be run as a Python script (``python3 run_cyclotron.py``) or with an app with an input file (``impactx input_cyclotron.in``).
-Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
+This example can be run **either** as:
+
+* **Python** script: ``python3 run_cyclotron.py`` or
+* ImpactX **executable** using an input file: ``impactx input_cyclotron.in``
+
+For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
 .. tab-set::
 
