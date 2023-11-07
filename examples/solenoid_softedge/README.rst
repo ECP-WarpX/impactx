@@ -33,13 +33,13 @@ For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with `
 
 .. tab-set::
 
-   .. tab-item:: Python Script
+   .. tab-item:: Python: Script
 
        .. literalinclude:: run_solenoid_softedge.py
           :language: python3
           :caption: You can copy this file from ``examples/solenoid_softedge/run_solenoid_softedge.py``.
 
-   .. tab-item:: App Input File
+   .. tab-item:: Executable: Input File
 
        .. literalinclude:: input_solenoid_softedge.in
           :language: ini

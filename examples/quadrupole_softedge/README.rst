@@ -25,13 +25,13 @@ For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with `
 
 .. tab-set::
 
-   .. tab-item:: Python Script
+   .. tab-item:: Python: Script
 
        .. literalinclude:: run_quadrupole_softedge.py
           :language: python3
           :caption: You can copy this file from ``examples/quadrupole_softedge/run_quadrupole_softedge.py``.
 
-   .. tab-item:: App Input File
+   .. tab-item:: Executable: Input File
 
        .. literalinclude:: input_quadrupole_softedge.in
           :language: ini

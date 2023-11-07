@@ -27,13 +27,13 @@ For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with `
 
 .. tab-set::
 
-   .. tab-item:: Python Script
+   .. tab-item:: Python: Script
 
       .. literalinclude:: run_expanding.py
          :language: python3
          :caption: You can copy this file from ``examples/expanding/run_expanding.py``.
 
-   .. tab-item:: App Input File
+   .. tab-item:: Executable: Input File
 
        .. literalinclude:: input_expanding.in
           :language: ini

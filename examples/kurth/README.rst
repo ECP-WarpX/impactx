@@ -29,13 +29,13 @@ For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with `
 
 .. tab-set::
 
-   .. tab-item:: Python Script
+   .. tab-item:: Python: Script
 
        .. literalinclude:: run_kurth_periodic.py
           :language: python3
           :caption: You can copy this file from ``examples/kurth/run_kurth_periodic.py``.
 
-   .. tab-item:: App Input File
+   .. tab-item:: Executable: Input File
 
        .. literalinclude:: input_kurth_periodic.in
           :language: ini
