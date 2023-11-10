@@ -47,20 +47,6 @@ We run the following script to analyze correctness:
 Visualize
 ---------
 
-You can run the following script to visualize the beam evolution over time:
+.. note::
 
-.. dropdown:: Script ``plot_cyclotron.py``
-
-   .. literalinclude:: plot_cyclotron.py
-      :language: python3
-      :caption: You can copy this file from ``examples/cyclotron/plot_cyclotron.py``.
-
-.. figure:: https://user-images.githubusercontent.com/1353258/180287840-8561f6fd-278f-4856-abd8-04fbdb78c8ff.png
-   :alt: focusing, defocusing and preserved emittane in our cyclotron cell benchmark.
-
-   cyclotron transversal beam width and emittance evolution
-
-.. figure:: https://user-images.githubusercontent.com/1353258/180287845-eb0210a7-2500-4aa9-844c-67fb094329d3.png
-   :alt: focusing, defocusing and phase space rotation in our cyclotron cell benchmark.
-
-   cyclotron transversal beam width and phase space evolution
+   TODO :)
