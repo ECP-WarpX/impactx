@@ -77,7 +77,7 @@ Note that the actual executable might have a longer name, depending on build opt
 
 We used the copied executable in the current directory (``./``); if you installed with a package manager, skip the ``./`` because ImpactX is in your ``PATH``.
 
-On an :ref:`HPC system <install-hpc>`, you would instead submit the :ref:`job script <install-hpc>` at this point, e.g. ``sbatch <submission_script>`` (SLURM on Cori/NERSC) or ``bsub <submission_script>`` (LSF on Summit/OLCF).
+On an :ref:`HPC system <install-hpc>`, you would instead submit the :ref:`job script <install-hpc>` at this point, e.g. ``sbatch <submission_script>`` (SLURM on Perlmutter/NERSC) or ``bsub <submission_script>`` (LSF on Summit/OLCF).
 
 .. tip::
 
@@ -86,4 +86,4 @@ On an :ref:`HPC system <install-hpc>`, you would instead submit the :ref:`job sc
 
    .. code-block:: bash
 
-      mpirun -np 4 ./impactx <input_file> max_step=10 impactx.numprocs=1 2 2
+      mpirun -np 4 ./impactx <input_file> max_step=10 amr.n_cell=64 64 128
