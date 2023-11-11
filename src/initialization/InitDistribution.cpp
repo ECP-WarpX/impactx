@@ -21,6 +21,7 @@
 #include <AMReX_Print.H>
 
 #include <string>
+#include <variant>
 
 
 namespace impactx
