@@ -27,7 +27,9 @@ namespace
         using Element = typename T_PyClass::type;  // py::class<T, options...>
 
         cl.def("push",
-            py::overload_cast<ImpactXParticleContainer &, int>(&Element::operator()),
+            [](Element & el, ImpactXParticleContainer & pc, int step) {
+                el(pc, step);
+            },
             py::arg("pc"), py::arg("step")=0,
             "Push first the reference particle, then all other particles."
         );
