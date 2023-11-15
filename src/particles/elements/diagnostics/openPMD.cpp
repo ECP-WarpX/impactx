@@ -15,6 +15,7 @@
 #include <ablastr/particles/IndexHandling.H>
 
 #include <AMReX.H>
+#include <AMReX_BLProfiler.H>
 #include <AMReX_REAL.H>
 #include <AMReX_ParmParse.H>
 
@@ -23,6 +24,7 @@
 namespace io = openPMD;
 #endif
 
+#include <string>
 #include <utility>
 
 
@@ -310,6 +312,9 @@ namespace detail
         int step
     )
     {
+        std::string profile_name = "impactx::Push::" + std::string(BeamMonitor::name);
+        BL_PROFILE(profile_name);
+
         // preparing to access reference particle data: RefPart
         RefPart & ref_part = pc.GetRefParticle();
 
