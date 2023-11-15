@@ -77,7 +77,7 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::None>(md, "None")
         .def(py::init<>(),
-             "This distribution does nothing"
+             "Sets all values to zero."
         );
 
     py::class_<distribution::Semigaussian>(md, "Semigaussian")

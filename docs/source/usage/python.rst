@@ -394,7 +394,7 @@ This module provides particle beam distributions that can be used to initialize 
 
 .. py:class:: impactx.distribution.None
 
-   This distribution does nothing.
+   This distribution sets all values to zero.
 
 .. py:class:: impactx.distribution.Semigaussian(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
