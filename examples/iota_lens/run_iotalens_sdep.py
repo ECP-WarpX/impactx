@@ -6,8 +6,9 @@
 #
 # -*- coding: utf-8 -*-
 
-import amrex.space3d as amr
 import math
+
+import amrex.space3d as amr
 from impactx import ImpactX, distribution, elements
 
 sim = ImpactX()
@@ -47,21 +48,21 @@ num_lenses = 18
 tune_advance = 0.3
 c_parameter = 0.01
 t_strength = 0.4
-ds = lens_length/num_lenses
+ds = lens_length / num_lenses
 
 # drift elements
-ds_half = ds/2.0
+ds_half = ds / 2.0
 dr = elements.Drift(ds=ds_half)
 
 # define the nonlinear lens segments
-for j in range(0,num_lenses):
-	s = -lens_length/2.0 + ds_half + j*ds
-	beta = 1.0 + 4.0*s**2*math.tan(math.pi*tune_advance)**2/lens_length**2
-	knll_s = t_strength*c_parameter**2*ds/beta
-	cnll_s = c_parameter*math.sqrt(beta)
-	nllens = elements.NonlinearLens(knll=knll_s, cnll=cnll_s)
-	segments = [dr, nllens, dr]
-	sim.lattice.extend(segments)
+for j in range(0, num_lenses):
+    s = -lens_length / 2.0 + ds_half + j * ds
+    beta = 1.0 + 4.0 * s**2 * math.tan(math.pi * tune_advance) ** 2 / lens_length**2
+    knll_s = t_strength * c_parameter**2 * ds / beta
+    cnll_s = c_parameter * math.sqrt(beta)
+    nllens = elements.NonlinearLens(knll=knll_s, cnll=cnll_s)
+    segments = [dr, nllens, dr]
+    sim.lattice.extend(segments)
 
 # run simulation
 sim.evolve()
