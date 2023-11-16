@@ -6,8 +6,9 @@
 #
 # -*- coding: utf-8 -*-
 
-import amrex.space3d as amr
 import math
+
+import amrex.space3d as amr
 from impactx import ImpactX, RefPart, distribution, elements
 
 sim = ImpactX()
@@ -108,32 +109,81 @@ num_lenses = 18
 tune_advance = 0.3
 c_parameter = 0.01
 t_strength = 0.4
-ds = lens_length/num_lenses
+ds = lens_length / num_lenses
 
 # build up the nonlinear lens in segments
-ds_half = ds/2.0
+ds_half = ds / 2.0
 dr = elements.Drift(ds=ds_half, nslice=1)
 nll = []
-for j in range(0,num_lenses):
-        s = -lens_length/2.0 + ds_half + j*ds
-        beta = 1.0 + 4.0*s**2*math.tan(math.pi*tune_advance)**2/lens_length**2
-        knll_s = t_strength*c_parameter**2*ds/beta
-        cnll_s = c_parameter*math.sqrt(beta)
-        nllens = elements.NonlinearLens(knll=knll_s, cnll=cnll_s)
-        segment = [dr, nllens, dr]
-        nll.extend(segment)
+for j in range(0, num_lenses):
+    s = -lens_length / 2.0 + ds_half + j * ds
+    beta = 1.0 + 4.0 * s**2 * math.tan(math.pi * tune_advance) ** 2 / lens_length**2
+    knll_s = t_strength * c_parameter**2 * ds / beta
+    cnll_s = c_parameter * math.sqrt(beta)
+    nllens = elements.NonlinearLens(knll=knll_s, cnll=cnll_s)
+    segment = [dr, nllens, dr]
+    nll.extend(segment)
 
 lattice_before_nll = [
-    dra1, qa1, dra2, qa2, dra3, qa3, dra4, qa4, dra5,
-    edge30, sbend30, edge30, drb1, qb1, drb2, qb2, drb2, qb3,
-    drb3
+    dra1,
+    qa1,
+    dra2,
+    qa2,
+    dra3,
+    qa3,
+    dra4,
+    qa4,
+    dra5,
+    edge30,
+    sbend30,
+    edge30,
+    drb1,
+    qb1,
+    drb2,
+    qb2,
+    drb2,
+    qb3,
+    drb3,
 ]
 
 lattice_after_nll = [
-    drb3, qb4, drb2, qb5, drb2, qb6, drb4,
-    edge60, sbend60, edge60, drc1, qc1, drc2, qc2, drc2, qc3, drc1,
-    edge60, sbend60, edge60, drd1, qd1, drd2, qd2, drd3, qd3, drd2, qd4, drd4,
-    edge30, sbend30, edge30, dre1, qe1, dre2, qe2, dre3
+    drb3,
+    qb4,
+    drb2,
+    qb5,
+    drb2,
+    qb6,
+    drb4,
+    edge60,
+    sbend60,
+    edge60,
+    drc1,
+    qc1,
+    drc2,
+    qc2,
+    drc2,
+    qc3,
+    drc1,
+    edge60,
+    sbend60,
+    edge60,
+    drd1,
+    qd1,
+    drd2,
+    qd2,
+    drd3,
+    qd3,
+    drd2,
+    qd4,
+    drd4,
+    edge30,
+    sbend30,
+    edge30,
+    dre1,
+    qe1,
+    dre2,
+    qe2,
+    dre3,
 ]
 
 # build lattice: first half, qe3, then mirror
