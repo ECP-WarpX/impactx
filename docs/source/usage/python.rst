@@ -465,6 +465,18 @@ This module provides elements for the accelerator lattice.
    :param kt: Focusing strength for t in 1/m.
    :param nslice: number of slices used for the application of space charge
 
+   .. py:property:: kx
+
+      focusing x strength in 1/m
+
+   .. py:property:: ky
+
+      focusing y strength in 1/m
+
+   .. py:property:: kt
+
+      focusing t strength in 1/m
+
 .. py:class:: impactx.elements.DipEdge(psi, rc, g, K2)
 
    Edge focusing associated with bend entry or exit

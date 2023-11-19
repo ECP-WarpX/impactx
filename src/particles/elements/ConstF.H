@@ -138,7 +138,6 @@ namespace impactx
 
         }
 
-    private:
         amrex::ParticleReal m_kx; //! focusing x strength in 1/m
         amrex::ParticleReal m_ky; //! focusing y strength in 1/m
         amrex::ParticleReal m_kt; //! focusing t strength in 1/m

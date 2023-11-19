@@ -171,6 +171,21 @@ void init_elements(py::module& m)
              py::arg("ds"), py::arg("kx"), py::arg("ky"), py::arg("kt"), py::arg("nslice") = 1,
              "A linear Constant Focusing element."
         )
+        .def_property("kx",
+        [](ConstF & cf) { return cf.m_kx; },
+        [](ConstF & cf, amrex::ParticleReal kx) { cf.m_kx = kx; },
+            "focusing x strength in 1/m"
+        )
+        .def_property("ky",
+              [](ConstF & cf) { return cf.m_ky; },
+              [](ConstF & cf, amrex::ParticleReal ky) { cf.m_ky = ky; },
+              "focusing y strength in 1/m"
+        )
+        .def_property("kt",
+              [](ConstF & cf) { return cf.m_kt; },
+              [](ConstF & cf, amrex::ParticleReal kt) { cf.m_kt = kt; },
+              "focusing t strength in 1/m"
+        )
     ;
     register_beamoptics_push(py_ConstF);
 
