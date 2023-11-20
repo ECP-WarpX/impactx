@@ -53,7 +53,7 @@ namespace detail
 
 void init_ImpactX (py::module& m)
 {
-    py::class_<ImpactX> impactx(m, "ImpactX");
+    py::class_<ImpactX> impactx(m, "ImpactX", py::dynamic_attr());
     impactx
         .def(py::init<>())
 

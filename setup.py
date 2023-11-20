@@ -230,6 +230,20 @@ with open("./requirements.txt") as f:
     if ImpactX_MPI == "ON":
         install_requires.append("mpi4py>=2.1.0")
 
+# Extra dependencies
+tests_require = ["matplotlib", "numpy", "pandas", "pytest", "scipy"]
+extras = {
+    "default": install_requires,
+    "test": tests_require,
+    "dashboard": ["trame"],
+    # trame-components trame-vuetify
+    # trame-plotly
+    # trame-matplotlib mpld3
+    # trame-vtk vtk
+}
+extras["all"] = list(set(sum(extras.values(), [])))
+
+
 # keyword reference:
 #   https://packaging.python.org/guides/distributing-packages-using-setuptools
 setup(
@@ -266,8 +280,9 @@ setup(
     cmdclass=cmdclass,
     zip_safe=False,
     python_requires=">=3.8",
-    tests_require=["numpy", "pandas", "pytest", "scipy"],
+    tests_require=tests_require,
     install_requires=install_requires,
+    extras_require=extras,
     # cmdclass={'test': PyTest},
     # platforms='any',
     classifiers=[
