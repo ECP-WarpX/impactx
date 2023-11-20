@@ -17,6 +17,7 @@ if os.name == "nt":
 
 # import core bindings to C++
 from . import impactx_pybind as cxx
+from .Dashboard import register_dashboard
 from .ImpactXParticleContainer import (
     register_ImpactXParticleContainer_extension,
 )
@@ -41,3 +42,4 @@ RefPart.load_file = read_beam  # noqa
 
 # Pure Python extensions to ImpactX types
 register_ImpactXParticleContainer_extension(ImpactXParticleContainer)
+register_dashboard(ImpactX)
