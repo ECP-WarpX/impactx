@@ -20,6 +20,7 @@ if os.name == "nt":
 from . import impactx_pybind as cxx
 from .impactx_pybind import *  # noqa
 from .ImpactXParIter import register_ImpactXParIter_extension
+from .ImpactXParticleContainer import register_ImpactXParticleContainer_extension
 from .madx_to_impactx import read_beam, read_lattice  # noqa
 
 __version__ = cxx.__version__
@@ -40,3 +41,4 @@ RefPart.load_file = read_beam  # noqa
 
 # Pure Python extensions to ImpactX types
 register_ImpactXParIter_extension(cxx)
+register_ImpactXParticleContainer_extension(cxx.ImpactXParticleContainer)

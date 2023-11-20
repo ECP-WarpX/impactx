@@ -9,14 +9,16 @@
 
 import importlib
 
+import matplotlib.pyplot as plt
 import pytest
-from impactx import ImpactX, distribution, elements
+
+from impactx import ImpactX, amr, distribution, elements
 
 
 @pytest.mark.skipif(
     importlib.util.find_spec("pandas") is None, reason="pandas is not available"
 )
-def test_df_pandas():
+def test_df_pandas(save_png=True):
     """
     This tests using ImpactX and Pandas Dataframes
     """
@@ -90,9 +92,23 @@ def test_df_pandas():
     #    assert npart == len(df)
     #    assert df.columns.tolist() == ['idcpu', 'position_x', 'position_y', 'position_t', 'momentum_x', 'momentum_y', 'momentum_t', 'qm', 'weighting']
 
+    # plot
+    fig = pc.plot_phasespace()
+
+    #   note: figure data available on MPI rank zero
+    if fig is not None:
+        fig.savefig("phase_space.png")
+        if save_png:
+            fig.savefig("phase_space.png")
+        else:
+            plt.show()
+
     # finalize simulation
     sim.finalize()
 
 
 if __name__ == "__main__":
-    test_df_pandas()
+    test_df_pandas(save_png=False)
+
+    # clean simulation shutdown
+    amr.finalize()
