@@ -7,10 +7,12 @@
 #
 # -*- coding: utf-8 -*-
 
-from impactx import ImpactX, RefPart, distribution, elements
+import matplotlib.pyplot as plt
+
+from impactx import ImpactX, RefPart, amr, distribution, elements
 
 
-def test_df_pandas():
+def test_df_pandas(save_png=True):
     """
     This tests using ImpactX and Pandas Dataframes
     """
@@ -64,6 +66,20 @@ def test_df_pandas():
     if df is not None:
         assert npart == len(df)
 
+    # plot
+    fig = pc.plot_phasespace()
+
+    #   note: figure data available on MPI rank zero
+    if fig is not None:
+        fig.savefig("phase_space.png")
+        if save_png:
+            fig.savefig("phase_space.png")
+        else:
+            plt.show()
+
 
 if __name__ == "__main__":
-    test_df_pandas()
+    test_df_pandas(save_png=False)
+
+    # clean simulation shutdown
+    amr.finalize()
