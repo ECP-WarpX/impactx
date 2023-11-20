@@ -17,6 +17,9 @@ if os.name == "nt":
 
 # import core bindings to C++
 from . import impactx_pybind as cxx
+from .ImpactXParticleContainer import (
+    register_ImpactXParticleContainer_extension,
+)
 from .impactx_pybind import *  # noqa
 from .madx_to_impactx import read_beam, read_lattice  # noqa
 
@@ -35,3 +38,6 @@ elements.KnownElementsList.load_file = lambda self, madx_file, nslice=1: self.ex
 
 # MAD-X file reader for reference particle
 RefPart.load_file = read_beam  # noqa
+
+# Pure Python extensions to ImpactX types
+register_ImpactXParticleContainer_extension(ImpactXParticleContainer)
