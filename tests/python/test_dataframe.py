@@ -64,6 +64,12 @@ def test_df_pandas():
     if df is not None:
         assert npart == len(df)
 
+    # plot
+    fig = pc.plot_phasespace()
+    import matplotlib.pyplot as plt
+
+    plt.show()
+
 
 if __name__ == "__main__":
     test_df_pandas()
