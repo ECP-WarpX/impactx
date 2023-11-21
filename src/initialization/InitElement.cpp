@@ -231,6 +231,11 @@ namespace detail
             pp_element.get("bz", bz);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( ChrAcc(ds, ez, bz, nslice) );
+        } else if (element_type == "thin_dipole") {
+            amrex::Real theta, rc;
+            pp_element.get("theta", theta);
+            pp_element.get("rc", rc);
+            m_lattice.emplace_back( ThinDipole(theta, rc) );
         } else if (element_type == "kicker") {
             amrex::Real xkick, ykick;
             std::string units_str = "dimensionless";
