@@ -28,6 +28,8 @@ namespace impactx
         static constexpr auto name = "ThinDipole";
         using PType = ImpactXParticleContainer::ParticleType;
 
+        static constexpr amrex::ParticleReal degree2rad = ablastr::constant::math::pi / 180.0;
+
         /** A general thin-kick dipole element with chromatic effects
          *
          * This model is equivalent to the model described in Section 3.1 of
@@ -85,7 +87,7 @@ namespace impactx
 
             // compute the effective (equivalent) arc length and curvature
             amrex::ParticleReal ds = m_theta*m_rc;
-            amrex::ParticleReal kx = 1.0_prt/rc;
+            amrex::ParticleReal kx = 1.0_prt/m_rc;
 
             // advance position and momentum
             p.pos(RealAoS::x) = x;
