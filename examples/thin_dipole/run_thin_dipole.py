@@ -59,7 +59,7 @@ inverse_bend = elements.ExactSbend(ds=-1.570796326794897, phi=-90.0)
 
 sim.lattice.append(monitor)
 sim.lattice.extend(bend)
-sim.lattice.extend(inverse_bend)
+sim.lattice.append(inverse_bend)
 sim.lattice.append(monitor)
 
 # run simulation
