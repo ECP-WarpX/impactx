@@ -4,7 +4,7 @@
 #beam.npart = 100000000  #full resolution
 beam.npart = 10000
 beam.units = static
-beam.energy = 0.1
+beam.kin_energy = 0.1
 beam.charge = 1.4285714285714285714e-10
 beam.particle = proton
 beam.distribution = thermal
