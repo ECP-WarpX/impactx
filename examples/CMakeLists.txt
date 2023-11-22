@@ -677,6 +677,8 @@ add_impactx_test(bithermal
       ON  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/epac2004_benchmarks/analysis_bithermal.py
+    OFF  # no plot script yet
+)
 
 # Thin dipole ########################################################
 #
