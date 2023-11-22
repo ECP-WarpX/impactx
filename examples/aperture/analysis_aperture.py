@@ -45,10 +45,17 @@ last_step = list(series.iterations)[-1]
 initial = series.iterations[1].particles["beam"].to_df()
 final = series.iterations[last_step].particles["beam"].to_df()
 
+series_lost = io.Series("diags/openPMD/particles_lost.h5", io.Access.read_only)
+particles_lost = series_lost.iterations[0].particles["beam"].to_df()
+
 # compare number of particles
 num_particles = 10000
 assert num_particles == len(initial)
-assert num_particles == len(final)
+# we lost particles in apertures
+assert num_particles > len(final)
+print(len(final))
+print(len(particles_lost))
+assert num_particles == len(particles_lost) + len(final)
 
 print("Initial Beam:")
 sigx, sigy, sigt, emittance_x, emittance_y, emittance_t = get_moments(initial)
@@ -79,6 +86,7 @@ assert np.allclose(
 xmax = 1.0e-3
 ymax = 1.5e-3
 
+# kept particles
 dx = abs(final["position_x"]) - xmax
 dy = abs(final["position_y"]) - ymax
 
@@ -90,3 +98,16 @@ assert np.less_equal(dx.max(), 0.0)
 print(f"  y_max={final['position_y'].max()}")
 print(f"  y_min={final['position_y'].min()}")
 assert np.less_equal(dy.max(), 0.0)
+
+# lost particles
+dx = abs(particles_lost["position_x"]) - xmax
+dy = abs(particles_lost["position_y"]) - ymax
+
+print()
+print(f"  x_max={particles_lost['position_x'].max()}")
+print(f"  x_min={particles_lost['position_x'].min()}")
+assert np.greater_equal(dx.max(), 0.0)
+
+print(f"  y_max={particles_lost['position_y'].max()}")
+print(f"  y_min={particles_lost['position_y'].min()}")
+assert np.greater_equal(dy.max(), 0.0)
