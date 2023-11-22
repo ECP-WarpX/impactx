@@ -53,9 +53,9 @@ segment = [
     elements.ThinDipole(theta=0.45, rc=1.0),
     elements.Drift(ds=0.003926990816987, nslice=ns),
 ]
-bend = 200*segment
+bend = 200 * segment
 
-inverse_bend = elements.ExactSbend(ds=-1.570796326794897,phi=-90.0)
+inverse_bend = elements.ExactSbend(ds=-1.570796326794897, phi=-90.0)
 
 sim.lattice.append(monitor)
 sim.lattice.extend(bend)
