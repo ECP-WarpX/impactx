@@ -83,7 +83,7 @@ namespace impactx
 
             // compute the function expressing dp/p in terms of pt (labeled f in Ripken etc.)
             amrex::ParticleReal f = -1.0_prt + sqrt(1.0_prt - 2.0_prt*pt/beta_ref + pow(pt,2));
-            amrex::ParticleReal fprime = (1.0_prt + beta_ref*pt)/(beta_ref*(1.0_prt + f));
+            amrex::ParticleReal fprime = (1.0_prt - beta_ref*pt)/(beta_ref*(1.0_prt + f));
 
             // compute the effective (equivalent) arc length and curvature
             amrex::ParticleReal ds = m_theta*m_rc;
@@ -96,7 +96,7 @@ namespace impactx
             p.pos(RealAoS::y) = y;
             pyout = py;
 
-            p.pos(RealAoS::t) = t - kx*x*ds*fprime; //eq (3.2e)
+            p.pos(RealAoS::t) = t + kx*x*ds*fprime; //eq (3.2e)
             ptout = pt;
 
             // assign updated momenta

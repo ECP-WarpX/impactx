@@ -3,7 +3,7 @@
 ###############################################################################
 beam.npart = 10000
 beam.units = static
-beam.kin_energy = 4.0e-3
+beam.kin_energy = 5.0
 beam.charge = 1.0e-9
 beam.particle = proton
 beam.distribution = waterbag
@@ -12,7 +12,7 @@ beam.sigmaY = 1.0e-3
 beam.sigmaT = 0.3
 beam.sigmaPx = 2.0e-4
 beam.sigmaPy = 2.0e-4
-beam.sigmaPt = 2.0e-5
+beam.sigmaPt = 2.0e-4
 beam.muxpx = 0.0
 beam.muypy = 0.0
 beam.mutpt = 0.0
@@ -21,28 +21,28 @@ beam.mutpt = 0.0
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
-lattice.elements = monitor bend monitor
+lattice.elements = monitor bend inverse_bend monitor
 lattice.nslice = 1
 
 monitor.type = beam_monitor
 monitor.backend = h5
 
-#a 360 deg sbend using drift-kick-drift:
+#90 degree sbend using drift-kick-drift:
 bend.type = line
 bend.elements = dr kick dr
-bend.repeat = 100
+bend.repeat = 200
 
 dr.type = drift
-dr.ds = 0.0314159265358979
+dr.ds = 0.003926990816987
 
 kick.type = thin_dipole
-kick.theta = 3.6
+kick.theta = 0.45
 kick.rc = 1.0
 
-#a 360 sbend using exact nonlinear map:
-#bend.type = sbend_exact
-#bend.ds = 6.283185307179586
-#bend.phi = 360.0
+#inverse of a 90 degree sbend using exact nonlinear map:
+inverse_bend.type = sbend_exact
+inverse_bend.ds = -1.570796326794897
+inverse_bend.phi = -90.0
 
 ###############################################################################
 # Algorithms
