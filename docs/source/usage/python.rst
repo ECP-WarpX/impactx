@@ -116,6 +116,11 @@ General
       The minimum number of digits (default: ``6``) used for the step
       number appended to the diagnostic file names.
 
+   .. py:property:: particle_lost_diagnostics_backend
+
+      Diagnostics for particles lost in apertures.
+      See the ``BeamMonitor`` element for backend values.
+
    .. py:method:: init_grids()
 
       Initialize AMReX blocks/grids for domain decomposition & space charge mesh.

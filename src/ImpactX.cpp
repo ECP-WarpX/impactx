@@ -281,6 +281,16 @@ namespace impactx
                                           diagnostics::OutputType::PrintReducedBeamCharacteristics,
                                           "diags/reduced_beam_characteristics_final",
                                           global_step);
+
+            // output particles lost in apertures
+            {
+                std::string openpmd_backend = "default";
+                pp_diag.queryAdd("backend", openpmd_backend);
+
+                diagnostics::BeamMonitor output_lost("particles_lost", openpmd_backend, "g");
+                output_lost(*m_particles_lost, 0);
+                output_lost.finalize();
+            }
         }
 
         // loop over all beamline elements & finalize them

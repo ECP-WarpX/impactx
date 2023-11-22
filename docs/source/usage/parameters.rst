@@ -701,6 +701,11 @@ Diagnostics and output
 * ``diag.file_min_digits`` (``integer``, optional, default: ``6``)
     The minimum number of digits used for the step number appended to the diagnostic file names.
 
+* ``diag.backend`` (``string``, default value: ``default``)
+
+  Diagnostics for particles lost in apertures, stored as ``diags/openPMD/particles_lost.*`` at the end of the simulation.
+  See the ``beam_monitor`` element for backend values.
+
 .. _running-cpp-parameters-diagnostics-reduced:
 
 Reduced Diagnostics

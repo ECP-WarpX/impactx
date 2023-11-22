@@ -260,7 +260,7 @@ void init_ImpactX (py::module& m)
              "Enable or disable diagnostics every slice step in elements (default: disabled).\n\n"
              "By default, diagnostics is performed at the beginning and end of the simulation.\n"
              "Enabling this flag will write diagnostics every step and slice step."
-         )
+        )
         .def_property("diag_file_min_digits",
              [](ImpactX & /* ix */) {
                  return detail::get_or_throw<int>("diag", "file_min_digits");
@@ -271,7 +271,18 @@ void init_ImpactX (py::module& m)
              },
              "The minimum number of digits (default: 6) used for the step\n"
              "number appended to the diagnostic file names."
-         )
+        )
+        .def_property("particle_lost_diagnostics_backend",
+                      [](ImpactX & /* ix */) {
+                          return detail::get_or_throw<std::string>("diag", "backend");
+                      },
+                      [](ImpactX & /* ix */, std::string const backend) {
+                          amrex::ParmParse pp_diag("diag");
+                          pp_diag.add("backend", backend);
+                      },
+                      "Diagnostics for particles lost in apertures.\n\n"
+                      "See the ``BeamMonitor`` element for backend values."
+        )
         .def_property("abort_on_warning_threshold",
              [](ImpactX & /* ix */){
                  return detail::get_or_throw<std::string>("impactx", "abort_on_warning_threshold");
