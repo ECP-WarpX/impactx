@@ -471,6 +471,18 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_SoftQuadrupole);
 
+    py::class_<ThinDipole, elements::Thin> py_ThinDipole(me, "ThinDipole");
+    py_ThinDipole
+        .def(py::init<
+                amrex::ParticleReal const,
+                amrex::ParticleReal const>(),
+             py::arg("theta"), py::arg("rc"),
+             "A thin kick model of a dipole bend."
+        )
+    ;
+    register_beamoptics_push(py_ThinDipole);
+
+
     // free-standing push function
     m.def("push", &Push,
         py::arg("pc"), py::arg("element"), py::arg("step")=0,

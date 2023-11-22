@@ -725,6 +725,15 @@ References:
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
 
+.. py:class:: impactx.elements.ThinDipole(theta, rc)
+
+   A general thin dipole element.
+
+   :param theta: Bend angle (degrees)
+   :param rc: Effective curvature radius (meters)
+
+Reference:
+   * G. Ripken and F. Schmidt, Thin-Lens Formalism for Tracking, CERN/SL/95-12 (AP), 1995.
 
 Coordinate Transformation
 -------------------------

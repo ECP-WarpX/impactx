@@ -33,6 +33,7 @@
 #include "PRot.H"
 #include "SoftSol.H"
 #include "SoftQuad.H"
+#include "ThinDipole.H"
 #include "diagnostics/openPMD.H"
 
 #include <variant>
@@ -64,7 +65,8 @@ namespace impactx
         ShortRF,
         SoftSolenoid,
         SoftQuadrupole,
-        Sol
+        Sol,
+        ThinDipole
     >;
 
 } // namespace impactx
