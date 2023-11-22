@@ -177,6 +177,16 @@ namespace impactx
                        amrex::ParticleReal const & qm,
                        amrex::ParticleReal const & bchchg);
 
+        /** Register storage for lost particles
+         *
+         * @param lost_pc particle container for lost particles
+         */
+        void
+        SetLostParticleContainer (ImpactXParticleContainer * lost_pc);
+
+        ImpactXParticleContainer *
+        GetLostParticleContainer ();
+
         /** Set reference particle attributes
          *
          * @param refpart reference particle
@@ -266,6 +276,9 @@ namespace impactx
 
         //! the particle shape
         std::optional<int> m_particle_shape;
+
+        //! a non-owning reference to lost particles, i.e., due to apertures
+        ImpactXParticleContainer* m_particles_lost = nullptr;
 
     }; // ImpactXParticleContainer
 

@@ -57,6 +57,24 @@ namespace impactx
         SetParticleSize();
     }
 
+    void
+    ImpactXParticleContainer::SetLostParticleContainer (ImpactXParticleContainer * lost_pc)
+    {
+        m_particles_lost = lost_pc;
+    }
+
+    ImpactXParticleContainer *
+    ImpactXParticleContainer::GetLostParticleContainer ()
+    {
+        if (m_particles_lost == nullptr)
+        {
+            throw std::logic_error(
+                    "ImpactXParticleContainer::GetLostParticleContainer No lost particle container registered yet.");
+        } else {
+            return m_particles_lost;
+        }
+    }
+
     void ImpactXParticleContainer::SetParticleShape (int order) {
         if (m_particle_shape.has_value())
         {

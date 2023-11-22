@@ -15,14 +15,15 @@
 
 namespace impactx
 {
-    /** ...
+    /** Move lost particles into a separate container
      *
-     * ...
+     * If particles are marked as lost, by setting their id to negative, we
+     * will move them to another particle container, store their position when
+     * lost and stop pushing them in the beamline.
      *
-     * @param source
-     * @param dest
+     * @param source the beam particle container that might loose particles
      */
-    void collect_lost_particles (ImpactXParticleContainer& source, ImpactXParticleContainer& dest);
+    void collect_lost_particles (ImpactXParticleContainer& source);
 
 } // namespace impactx
 

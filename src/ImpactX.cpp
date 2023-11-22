@@ -95,6 +95,9 @@ namespace impactx
         m_particle_container->resizeData();
         m_particles_lost->reserveData();
         m_particles_lost->resizeData();
+
+        // register shortcut
+        m_particle_container->SetLostParticleContainer(m_particles_lost.get());
     }
 
     void ImpactX::evolve ()
@@ -225,7 +228,7 @@ namespace impactx
                     Push(*m_particle_container, element_variant, global_step);
 
                     // move "lost" particles to another particle container
-                    collect_lost_particles(*m_particle_container, *m_particles_lost);
+                    collect_lost_particles(*m_particle_container);
 
                     // just prints an empty newline at the end of the slice_step
                     amrex::Print() << "\n";

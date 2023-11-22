@@ -18,12 +18,14 @@
 
 namespace impactx
 {
-    void collect_lost_particles (ImpactXParticleContainer& source, ImpactXParticleContainer& dest)
+    void collect_lost_particles (ImpactXParticleContainer& source)
     {
         BL_PROFILE("impactX::collect_lost_particles");
 
         using SrcData = ImpactXParticleContainer::ParticleTileType::ConstParticleTileDataType;
         using DstData = ImpactXParticleContainer::ParticleTileType::ParticleTileDataType;
+
+        ImpactXParticleContainer& dest = *source.GetLostParticleContainer();
 
         RefPart const ref_part = source.GetRefParticle();
         auto const s_lost = ref_part.s;
