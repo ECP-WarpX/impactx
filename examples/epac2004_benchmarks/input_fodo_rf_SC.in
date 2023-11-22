@@ -3,7 +3,7 @@
 ###############################################################################
 beam.npart = 10000
 beam.units = static
-beam.energy = 250.0
+beam.kin_energy = 250.0
 beam.charge = 1.42857142857142865e-10
 beam.particle = proton
 beam.distribution = kurth6d
