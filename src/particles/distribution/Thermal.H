@@ -238,6 +238,7 @@ namespace distribution
          * @param T1 temperature k*T of the primary (core) population
          * @param T2 temperature k*T of the secondary (halo) population
          * @param w weight of the secondary (halo) population
+         * @param data radial profile of the stationary beam
          */
          Thermal([[maybe_unused]] amrex::ParticleReal const k,
                  [[maybe_unused]] amrex::ParticleReal const T1,
