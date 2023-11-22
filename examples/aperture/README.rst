@@ -8,10 +8,15 @@ Proton beam undergoing collimation by a rectangular boundary aperture.
 
 We use a 250 MeV proton beam with a horizontal rms beam size of 1.56 mm and a vertical rms beam size of 2.21 mm.
 
-The beam is scraped by a 1 mm x 1.5 mm rectangular aperture.
+After a short drift of 0.123, the beam is scraped by a 1 mm x 1.5 mm rectangular aperture.
 
 In this test, the initial values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
-The test fails if any of the final coordinates for the valid (not lost) particles lie outside the aperture boundary.
+The test fails if:
+
+* any of the final coordinates for the valid (not lost) particles lie outside the aperture boundary or
+* any of the lost particles are inside the aperture boundary or
+* if the sum of lost and kept particles is not equal to the initial particles or
+* if the recorded position :math:`s` for the lost particles does not coincide with the drift distance.
 
 
 Run

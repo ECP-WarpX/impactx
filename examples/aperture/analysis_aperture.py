@@ -53,8 +53,6 @@ num_particles = 10000
 assert num_particles == len(initial)
 # we lost particles in apertures
 assert num_particles > len(final)
-print(len(final))
-print(len(particles_lost))
 assert num_particles == len(particles_lost) + len(final)
 
 print("Initial Beam:")
@@ -111,3 +109,8 @@ assert np.greater_equal(dx.max(), 0.0)
 print(f"  y_max={particles_lost['position_y'].max()}")
 print(f"  y_min={particles_lost['position_y'].min()}")
 assert np.greater_equal(dy.max(), 0.0)
+
+# check that s is set correctly
+lost_at_s = particles_lost["s_lost"]
+drift_s = np.ones_like(lost_at_s) * 0.123
+assert np.allclose(lost_at_s, drift_s)
