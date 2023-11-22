@@ -5,18 +5,40 @@
  */
 #include "pyImpactX.H"
 
+#include <particles/Push.H>
 #include <particles/elements/All.H>
 #include <AMReX.H>
 
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace py = pybind11;
 using namespace impactx;
 
 
+namespace
+{
+    /** Registers the mixin BeamOptics::operator methods
+     */
+    template<typename T_PyClass>
+    void register_beamoptics_push(T_PyClass & cl)
+    {
+        using Element = typename T_PyClass::type;  // py::class<T, options...>
+
+        cl.def("push",
+            [](Element & el, ImpactXParticleContainer & pc, int step) {
+                el(pc, step);
+            },
+            py::arg("pc"), py::arg("step")=0,
+            "Push first the reference particle, then all other particles."
+        );
+    }
+}
+
 void init_elements(py::module& m)
 {
-    py::module_ me = m.def_submodule(
+    py::module_ const me = m.def_submodule(
         "elements",
         "Accelerator lattice elements in ImpactX"
     );
@@ -26,25 +48,25 @@ void init_elements(py::module& m)
     kel
         .def(py::init<>())
         .def(py::init<KnownElements>())
-        .def(py::init([](py::list l){
+        .def(py::init([](py::list const & l){
             auto v = new KnownElementsList;
             for (auto const & handle : l)
                 v->push_back(handle.cast<KnownElements>());
             return v;
         }))
 
-        .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(el); },
+        .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(std::move(el)); },
              "Add a single element to the list.")
 
         .def("extend",
-             [](KnownElementsList &v, KnownElementsList l) {
+             [](KnownElementsList &v, KnownElementsList const & l) {
                  for (auto const & el : l)
                     v.push_back(el);
                  return v;
              },
              "Add a list of elements to the list.")
         .def("extend",
-             [](KnownElementsList &v, py::list l) {
+             [](KnownElementsList &v, py::list const & l) {
                  for (auto const & handle : l)
                  {
                     auto el = handle.cast<KnownElements>();
@@ -90,16 +112,19 @@ void init_elements(py::module& m)
 
     // diagnostics
 
-    py::class_<diagnostics::BeamMonitor, elements::Thin>(me, "BeamMonitor")
+    py::class_<diagnostics::BeamMonitor, elements::Thin> py_BeamMonitor(me, "BeamMonitor");
+    py_BeamMonitor
         .def(py::init<std::string, std::string, std::string>(),
              py::arg("name"), py::arg("backend")="default", py::arg("encoding")="g",
              "This element writes the particle beam out to openPMD data."
         )
     ;
+    register_beamoptics_push(py_BeamMonitor);
 
     // beam optics
 
-    py::class_<ChrDrift, elements::Thick>(me, "ChrDrift")
+    py::class_<ChrDrift, elements::Thick> py_ChrDrift(me, "ChrDrift");
+    py_ChrDrift
         .def(py::init<
                 amrex::ParticleReal const,
                 int const >(),
@@ -107,8 +132,10 @@ void init_elements(py::module& m)
              "A Drift with chromatic effects included."
         )
     ;
+    register_beamoptics_push(py_ChrDrift);
 
-    py::class_<ChrQuad, elements::Thick>(me, "ChrQuad")
+    py::class_<ChrQuad, elements::Thick> py_ChrQuad(me, "ChrQuad");
+    py_ChrQuad
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
@@ -118,8 +145,10 @@ void init_elements(py::module& m)
              "A Quadrupole magnet with chromatic effects included."
         )
     ;
+    register_beamoptics_push(py_ChrQuad);
 
-    py::class_<ChrAcc, elements::Thick>(me, "ChrAcc")
+    py::class_<ChrAcc, elements::Thick> py_ChrAcc(me, "ChrAcc");
+    py_ChrAcc
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
@@ -129,8 +158,10 @@ void init_elements(py::module& m)
              "A region of Uniform Acceleration, with chromatic effects included."
         )
     ;
+    register_beamoptics_push(py_ChrAcc);
 
-    py::class_<ConstF, elements::Thick>(me, "ConstF")
+    py::class_<ConstF, elements::Thick> py_ConstF(me, "ConstF");
+    py_ConstF
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
@@ -140,9 +171,26 @@ void init_elements(py::module& m)
              py::arg("ds"), py::arg("kx"), py::arg("ky"), py::arg("kt"), py::arg("nslice") = 1,
              "A linear Constant Focusing element."
         )
+        .def_property("kx",
+        [](ConstF & cf) { return cf.m_kx; },
+        [](ConstF & cf, amrex::ParticleReal kx) { cf.m_kx = kx; },
+            "focusing x strength in 1/m"
+        )
+        .def_property("ky",
+              [](ConstF & cf) { return cf.m_ky; },
+              [](ConstF & cf, amrex::ParticleReal ky) { cf.m_ky = ky; },
+              "focusing y strength in 1/m"
+        )
+        .def_property("kt",
+              [](ConstF & cf) { return cf.m_kt; },
+              [](ConstF & cf, amrex::ParticleReal kt) { cf.m_kt = kt; },
+              "focusing t strength in 1/m"
+        )
     ;
+    register_beamoptics_push(py_ConstF);
 
-    py::class_<DipEdge, elements::Thin>(me, "DipEdge")
+    py::class_<DipEdge, elements::Thin> py_DipEdge(me, "DipEdge");
+    py_DipEdge
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
@@ -152,8 +200,10 @@ void init_elements(py::module& m)
              "Edge focusing associated with bend entry or exit."
         )
     ;
+    register_beamoptics_push(py_DipEdge);
 
-    py::class_<Drift, elements::Thick>(me, "Drift")
+    py::class_<Drift, elements::Thick> py_Drift(me, "Drift");
+    py_Drift
         .def(py::init<
                 amrex::ParticleReal const,
                 int const >(),
@@ -161,8 +211,10 @@ void init_elements(py::module& m)
              "A drift."
         )
     ;
+    register_beamoptics_push(py_Drift);
 
-    py::class_<ExactDrift, elements::Thick>(me, "ExactDrift")
+    py::class_<ExactDrift, elements::Thick> py_ExactDrift(me, "ExactDrift");
+    py_ExactDrift
         .def(py::init<
                 amrex::ParticleReal const,
                 int const >(),
@@ -170,8 +222,10 @@ void init_elements(py::module& m)
              "A Drift using the exact nonlinear map."
         )
     ;
+    register_beamoptics_push(py_ExactDrift);
 
-    py::class_<ExactSbend, elements::Thick>(me, "ExactSbend")
+    py::class_<ExactSbend, elements::Thick> py_ExactSbend(me, "ExactSbend");
+    py_ExactSbend
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
@@ -181,27 +235,31 @@ void init_elements(py::module& m)
              "An ideal sector bend using the exact nonlinear map.  When B = 0, the reference bending radius is defined by r0 = length / (angle in rad), corresponding to a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B."
         )
     ;
+    register_beamoptics_push(py_ExactSbend);
 
-    py::class_<Kicker, elements::Thin>(me, "Kicker")
+    py::class_<Kicker, elements::Thin> py_Kicker(me, "Kicker");
+    py_Kicker
         .def(py::init([](
                 amrex::ParticleReal xkick,
                 amrex::ParticleReal ykick,
-                std::string units)
+                std::string const & units)
              {
                  if (units != "dimensionless" && units != "T-m")
-                     throw std::runtime_error("units must be \"dimensionless\" or \"T-m\"");
+                     throw std::runtime_error(R"(units must be "dimensionless" or "T-m")");
 
-                 Kicker::UnitSystem u = units == "dimensionless" ?
+                 Kicker::UnitSystem const u = units == "dimensionless" ?
                                             Kicker::UnitSystem::dimensionless :
                                             Kicker::UnitSystem::Tm;
                  return new Kicker(xkick, ykick, u);
              }),
              py::arg("xkick"), py::arg("ykick"), py::arg("units") = "dimensionless",
-             "A thin transverse kicker element. Kicks are for units \"dimensionless\" or in \"T-m\"."
+             R"(A thin transverse kicker element. Kicks are for units "dimensionless" or in "T-m".)"
         )
     ;
+    register_beamoptics_push(py_Kicker);
 
-    py::class_<Multipole, elements::Thin>(me, "Multipole")
+    py::class_<Multipole, elements::Thin> py_Multipole(me, "Multipole");
+    py_Multipole
         .def(py::init<
                 int const,
                 amrex::ParticleReal const,
@@ -210,14 +268,18 @@ void init_elements(py::module& m)
              "A general thin multipole element."
         )
     ;
+    register_beamoptics_push(py_Multipole);
 
-    py::class_<None, elements::Thin>(me, "None")
+    py::class_<None, elements::Thin> py_None(me, "None");
+    py_None
         .def(py::init<>(),
              "This element does nothing."
         )
     ;
+    register_beamoptics_push(py_None);
 
-    py::class_<NonlinearLens, elements::Thin>(me, "NonlinearLens")
+    py::class_<NonlinearLens, elements::Thin> py_NonlinearLens(me, "NonlinearLens");
+    py_NonlinearLens
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const>(),
@@ -225,8 +287,9 @@ void init_elements(py::module& m)
              "Single short segment of the nonlinear magnetic insert element."
         )
     ;
+    register_beamoptics_push(py_NonlinearLens);
 
-    py::class_<Programmable>(me, "Programmable")
+    py::class_<Programmable>(me, "Programmable", py::dynamic_attr())
         .def(py::init<
                  amrex::ParticleReal,
                  int>(),
@@ -250,26 +313,27 @@ void init_elements(py::module& m)
               [](Programmable & p) { return p.m_push; },
               [](Programmable & p,
                  std::function<void(ImpactXParticleContainer *, int)> new_hook
-              ) { p.m_push = new_hook; },
+              ) { p.m_push = std::move(new_hook); },
               "hook for push of whole container (pc, step)"
         )
         .def_property("beam_particles",
               [](Programmable & p) { return p.m_beam_particles; },
               [](Programmable & p,
                  std::function<void(ImpactXParticleContainer::iterator *, RefPart &)> new_hook
-              ) { p.m_beam_particles = new_hook; },
+              ) { p.m_beam_particles = std::move(new_hook); },
               "hook for beam particles (pti, RefPart)"
         )
         .def_property("ref_particle",
               [](Programmable & p) { return p.m_ref_particle; },
               [](Programmable & p,
                  std::function<void(RefPart &)> new_hook
-              ) { p.m_ref_particle = new_hook; },
+              ) { p.m_ref_particle = std::move(new_hook); },
               "hook for reference particle (RefPart)"
         )
     ;
 
-    py::class_<Quad, elements::Thick>(me, "Quad")
+    py::class_<Quad, elements::Thick> py_Quad(me, "Quad");
+    py_Quad
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
@@ -278,8 +342,10 @@ void init_elements(py::module& m)
              "A Quadrupole magnet."
         )
     ;
+    register_beamoptics_push(py_Quad);
 
-    py::class_<RFCavity, elements::Thick>(me, "RFCavity")
+    py::class_<RFCavity, elements::Thick> py_RFCavity(me, "RFCavity");
+    py_RFCavity
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -296,8 +362,10 @@ void init_elements(py::module& m)
              "An RF cavity."
         )
     ;
+    register_beamoptics_push(py_RFCavity);
 
-    py::class_<Sbend, elements::Thick>(me, "Sbend")
+    py::class_<Sbend, elements::Thick> py_Sbend(me, "Sbend");
+    py_Sbend
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
@@ -306,8 +374,10 @@ void init_elements(py::module& m)
              "An ideal sector bend."
         )
     ;
+    register_beamoptics_push(py_Sbend);
 
-    py::class_<CFbend, elements::Thick>(me, "CFbend")
+    py::class_<CFbend, elements::Thick> py_CFbend(me, "CFbend");
+    py_CFbend
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
@@ -317,8 +387,10 @@ void init_elements(py::module& m)
              "An ideal combined function bend (sector bend with quadrupole component)."
         )
     ;
+    register_beamoptics_push(py_CFbend);
 
-    py::class_<Buncher, elements::Thin>(me, "Buncher")
+    py::class_<Buncher, elements::Thin> py_Buncher(me, "Buncher");
+    py_Buncher
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const>(),
@@ -326,8 +398,10 @@ void init_elements(py::module& m)
              "A short linear RF cavity element at zero-crossing for bunching."
         )
     ;
+    register_beamoptics_push(py_Buncher);
 
-    py::class_<ShortRF, elements::Thin>(me, "ShortRF")
+    py::class_<ShortRF, elements::Thin> py_ShortRF(me, "ShortRF");
+    py_ShortRF
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
@@ -336,8 +410,10 @@ void init_elements(py::module& m)
              "A short RF cavity element."
         )
     ;
+    register_beamoptics_push(py_ShortRF);
 
-    py::class_<SoftSolenoid, elements::Thick>(me, "SoftSolenoid")
+    py::class_<SoftSolenoid, elements::Thick> py_SoftSolenoid(me, "SoftSolenoid");
+    py_SoftSolenoid
         .def(py::init<
                  amrex::ParticleReal const,
                  amrex::ParticleReal const,
@@ -352,8 +428,10 @@ void init_elements(py::module& m)
              "A soft-edge solenoid."
         )
     ;
+    register_beamoptics_push(py_SoftSolenoid);
 
-    py::class_<Sol, elements::Thick>(me, "Sol")
+    py::class_<Sol, elements::Thick> py_Sol(me, "Sol");
+    py_Sol
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const,
@@ -362,8 +440,10 @@ void init_elements(py::module& m)
              "An ideal hard-edge Solenoid magnet."
         )
     ;
+    register_beamoptics_push(py_Sol);
 
-    py::class_<PRot, elements::Thin>(me, "PRot")
+    py::class_<PRot, elements::Thin> py_PRot(me, "PRot");
+    py_PRot
         .def(py::init<
                 amrex::ParticleReal const,
                 amrex::ParticleReal const>(),
@@ -371,8 +451,10 @@ void init_elements(py::module& m)
              "An exact pole-face rotation in the x-z plane. Both angles are in degrees."
         )
     ;
+    register_beamoptics_push(py_PRot);
 
-    py::class_<SoftQuadrupole, elements::Thick>(me, "SoftQuadrupole")
+    py::class_<SoftQuadrupole, elements::Thick> py_SoftQuadrupole(me, "SoftQuadrupole");
+    py_SoftQuadrupole
         .def(py::init<
                  amrex::ParticleReal,
                  amrex::ParticleReal,
@@ -387,5 +469,23 @@ void init_elements(py::module& m)
              "A soft-edge quadrupole."
         )
     ;
+    register_beamoptics_push(py_SoftQuadrupole);
 
+    py::class_<ThinDipole, elements::Thin> py_ThinDipole(me, "ThinDipole");
+    py_ThinDipole
+        .def(py::init<
+                amrex::ParticleReal const,
+                amrex::ParticleReal const>(),
+             py::arg("theta"), py::arg("rc"),
+             "A thin kick model of a dipole bend."
+        )
+    ;
+    register_beamoptics_push(py_ThinDipole);
+
+
+    // free-standing push function
+    m.def("push", &Push,
+        py::arg("pc"), py::arg("element"), py::arg("step")=0,
+        "Push particles through an element"
+    );
 }

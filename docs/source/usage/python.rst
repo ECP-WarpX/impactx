@@ -66,6 +66,39 @@ General
       This is in-development.
       At the moment, this flag only activates coordinate transformations and charge deposition.
 
+   .. py:property:: mlmg_relative_tolerance
+
+      Default: ``1.e-7``
+
+      The relative precision with which the electrostatic space-charge fields should be calculated.
+      More specifically, the space-charge fields are computed with an iterative Multi-Level Multi-Grid (MLMG) solver.
+      This solver can fail to reach the default precision within a reasonable time.
+
+   .. py:property:: mlmg_absolute_tolerance
+
+      Default: ``0``, which means: ignored
+
+      The absolute tolerance with which the space-charge fields should be calculated in units of :math:`V/m^2`.
+      More specifically, the acceptable residual with which the solution can be considered converged.
+      In general this should be left as the default, but in cases where the simulation state changes very
+      little between steps it can occur that the initial guess for the MLMG solver is so close to the
+      converged value that it fails to improve that solution sufficiently to reach the ``mlmg_relative_tolerance`` value.
+
+   .. py:property:: mlmg_max_iters
+
+      Default: ``100``
+
+      Maximum number of iterations used for MLMG solver for space-charge fields calculation.
+      In case if MLMG converges but fails to reach the desired self_fields_required_precision, this parameter may be increased.
+
+   .. py:property:: mlmg_verbosity
+
+      Default: ``1``
+
+      The verbosity used for MLMG solver for space-charge fields calculation.
+      Currently MLMG solver looks for verbosity levels from 0-5.
+      A higher number results in more verbose output.
+
    .. py:property:: diagnostics
 
       Enable (``True``) or disable (``False``) diagnostics generally (default: ``True``).
@@ -271,31 +304,31 @@ Particles
 
    .. py:property:: px
 
-      momentum in x, normalized to proper velocity
+      momentum in x, normalized to mass*c, :math:`p_x = \gamma \beta_x`
 
    .. py:property:: py
 
-      momentum in y, normalized to proper velocity
+      momentum in y, normalized to mass*c, :math:`p_x = \gamma \beta_x`
 
    .. py:property:: pz
 
-      momentum in z, normalized to proper velocity
+      momentum in z, normalized to mass*c, :math:`p_x = \gamma \beta_x`
 
    .. py:property:: pt
 
-      energy deviation, normalized by rest energy
+      energy, normalized by rest energy, :math:`p_t = -\gamma`
 
    .. py:property:: gamma
 
-      Read-only: Get reference particle relativistic gamma.
+      Read-only: Get reference particle relativistic gamma, :math:`\gamma = 1/\sqrt{1-\beta^2}`
 
    .. py:property:: beta
 
-      Read-only: Get reference particle relativistic beta.
+      Read-only: Get reference particle relativistic beta, :math:`\beta = v/c`
 
    .. py:property:: beta_gamma
 
-      Read-only: Get reference particle beta*gamma
+      Read-only: Get reference particle :math:`\beta \cdot \gamma`
 
    .. py:property:: qm_qeeV
 
@@ -309,9 +342,9 @@ Particles
 
       Write-only: Set reference particle rest mass (MeV/c^2).
 
-   .. py:method:: set_energy_MeV(energy_MeV)
+   .. py:method:: set_kin_energy_MeV(kin_energy_MeV)
 
-      Write-only: Set reference particle energy.
+      Write-only: Set reference particle kinetic energy (MeV)
 
    .. py:method:: load_file(madx_file)
 
@@ -361,7 +394,7 @@ This module provides particle beam distributions that can be used to initialize 
 
 .. py:class:: impactx.distribution.None
 
-   This distribution does nothing.
+   This distribution sets all values to zero.
 
 .. py:class:: impactx.distribution.Semigaussian(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
@@ -431,6 +464,18 @@ This module provides elements for the accelerator lattice.
    :param ky: Focusing strength for y in 1/m.
    :param kt: Focusing strength for t in 1/m.
    :param nslice: number of slices used for the application of space charge
+
+   .. py:property:: kx
+
+      focusing x strength in 1/m
+
+   .. py:property:: ky
+
+      focusing y strength in 1/m
+
+   .. py:property:: kt
+
+      focusing t strength in 1/m
 
 .. py:class:: impactx.elements.DipEdge(psi, rc, g, K2)
 
@@ -680,6 +725,15 @@ References:
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
 
+.. py:class:: impactx.elements.ThinDipole(theta, rc)
+
+   A general thin dipole element.
+
+   :param theta: Bend angle (degrees)
+   :param rc: Effective curvature radius (meters)
+
+Reference:
+   * G. Ripken and F. Schmidt, Thin-Lens Formalism for Tracking, CERN/SL/95-12 (AP), 1995.
 
 Coordinate Transformation
 -------------------------

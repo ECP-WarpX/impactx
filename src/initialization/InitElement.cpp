@@ -37,7 +37,7 @@ namespace detail
     template <typename T>
     int queryAddResize (amrex::ParmParse& pp, const char* name, std::vector<T>& ref) {
         std::vector<T> empty;
-        int exist = pp.queryarr(name, empty);
+        int const exist = pp.queryarr(name, empty);
         if (exist) {
             ref.resize(empty.size());
             pp.queryarr(name, ref);
@@ -58,7 +58,7 @@ namespace detail
      * @param[in] nslice_default
      * @param[in] mapsteps_default
      */
-    void read_element (std::string element_name,
+    void read_element (std::string const & element_name,
                        std::list<KnownElements> & m_lattice,
                        int nslice_default,
                        int mapsteps_default)
@@ -94,7 +94,7 @@ namespace detail
             int nslice = nslice_default;
             pp_element.get("ds", ds);
             pp_element.get("rc", rc);
-        pp_element.get("k", k);
+            pp_element.get("k", k);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( CFbend(ds, rc, k, nslice) );
         } else if (element_type == "dipedge") {
@@ -141,7 +141,7 @@ namespace detail
             amrex::Real ds, escale, freq, phase;
             int nslice = nslice_default;
             int mapsteps = mapsteps_default;
-            RF_field_data ez;
+            RF_field_data const ez;
             std::vector<amrex::ParticleReal> cos_coef = ez.default_cos_coef;
             std::vector<amrex::ParticleReal> sin_coef = ez.default_sin_coef;
             pp_element.get("ds", ds);
@@ -169,7 +169,7 @@ namespace detail
             amrex::Real ds, bscale;
             int nslice = nslice_default;
             int mapsteps = mapsteps_default;
-            Sol_field_data bz;
+            Sol_field_data const bz;
             std::vector<amrex::ParticleReal> cos_coef = bz.default_cos_coef;
             std::vector<amrex::ParticleReal> sin_coef = bz.default_sin_coef;
             pp_element.get("ds", ds);
@@ -183,7 +183,7 @@ namespace detail
             amrex::Real ds, gscale;
             int nslice = nslice_default;
             int mapsteps = mapsteps_default;
-            Quad_field_data gz;
+            Quad_field_data const gz;
             std::vector<amrex::ParticleReal> cos_coef = gz.default_cos_coef;
             std::vector<amrex::ParticleReal> sin_coef = gz.default_sin_coef;
             pp_element.get("ds", ds);
@@ -216,14 +216,14 @@ namespace detail
             m_lattice.emplace_back( ExactDrift(ds, nslice) );
         } else if (element_type == "sbend_exact") {
             amrex::Real ds, phi;
-        amrex::Real B = 0.0;
+            amrex::Real B = 0.0;
             int nslice = nslice_default;
             pp_element.get("ds", ds);
             pp_element.get("phi", phi);
             pp_element.queryAdd("B", B);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( ExactSbend(ds, phi, B, nslice) );
-    } else if (element_type == "uniform_acc_chromatic") {
+        } else if (element_type == "uniform_acc_chromatic") {
             amrex::Real ds, ez, bz;
             int nslice = nslice_default;
             pp_element.get("ds", ds);
@@ -231,6 +231,11 @@ namespace detail
             pp_element.get("bz", bz);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( ChrAcc(ds, ez, bz, nslice) );
+        } else if (element_type == "thin_dipole") {
+            amrex::Real theta, rc;
+            pp_element.get("theta", theta);
+            pp_element.get("rc", rc);
+            m_lattice.emplace_back( ThinDipole(theta, rc) );
         } else if (element_type == "kicker") {
             amrex::Real xkick, ykick;
             std::string units_str = "dimensionless";
@@ -239,7 +244,7 @@ namespace detail
             pp_element.queryAdd("units", units_str);
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(units_str == "dimensionless" || units_str == "T-m",
                                              element_name + ".units must be \"dimensionless\" or \"T-m\"");
-            Kicker::UnitSystem units = units_str == "dimensionless" ?
+            Kicker::UnitSystem const units = units_str == "dimensionless" ?
                 Kicker::UnitSystem::dimensionless :
                 Kicker::UnitSystem::Tm;
             m_lattice.emplace_back( Kicker(xkick, ykick, units) );
@@ -252,7 +257,7 @@ namespace detail
             pp_element.queryAdd("encoding", openpmd_encoding);
             m_lattice.emplace_back(diagnostics::BeamMonitor(openpmd_name, openpmd_backend, openpmd_encoding));
         } else if (element_type == "line") {
-            // Parse the lattice elements
+            // Parse the lattice elements for the sub-lattice in the line
             amrex::ParmParse pp_sub_lattice(element_name);
             std::vector<std::string> sub_lattice_elements;
             pp_sub_lattice.queryarr("elements", sub_lattice_elements);
@@ -306,7 +311,7 @@ namespace detail
         pp_lattice.query("nslice", nslice_default);
 
         // Default number of map integration steps per slice
-        int mapsteps_default = 10;  // used only in RF cavity
+        int const mapsteps_default = 10;  // used only in RF cavity
 
         // Loop through lattice elements
         for (std::string const & element_name : lattice_elements) {

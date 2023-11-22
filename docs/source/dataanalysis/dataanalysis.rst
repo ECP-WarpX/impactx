@@ -14,6 +14,40 @@ For data analysis of openPMD data, see examples of `many supported tools, Python
 
 See also `WarpX' documentation on openPMD <https://warpx.readthedocs.io/en/latest/dataanalysis/formats.html>`__.
 
+Additional Beam Attributes
+""""""""""""""""""""""""""
+
+We add the following additional attributes on the openPMD ``beam`` species at the monitor position.
+
+Reference particle:
+
+* ``beta_ref`` reference particle normalized velocity :math:`\beta = v/c`
+* ``gamma_ref`` reference particle Lorentz factor :math:`\gamma = 1/\sqrt{1-\beta^2}`
+* ``s_ref`` integrated orbit path length, in meters
+* ``x_ref`` horizontal position x, in meters
+* ``y_ref`` vertical position y, in meters
+* ``z_ref`` longitudinal position z, in meters
+* ``t_ref`` clock time * c in meters
+* ``px_ref`` momentum in x, normalized to mass*c, :math:`p_x = \gamma \beta_x`
+* ``py_ref`` momentum in y, normalized to mass*c, :math:`p_y = \gamma \beta_y`
+* ``pz_ref`` momentum in z, normalized to mass*c, :math:`p_z = \gamma \beta_z`
+* ``pt_ref`` energy, normalized by rest energy, :math:`p_t = -\gamma`
+* ``mass`` reference rest mass, in kg
+* ``charge`` reference charge, in C
+
+Example to print the integrated orbit path length ``s`` at each beam monitor position:
+
+.. code-block:: python
+
+   import openpmd_api as io
+
+   series = io.Series("diags/openPMD/monitor.h5", io.Access.read_only)
+
+   for k_i, i in series.iterations.items():
+       beam = i.particles["beam"]
+       s_ref = beam.get_attribute("s_ref")
+       print(f"step {k_i:>3}: s_ref={s_ref}")
+
 
 Reduced Beam Characteristics
 ----------------------------

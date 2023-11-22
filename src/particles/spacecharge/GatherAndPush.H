@@ -38,7 +38,7 @@ namespace impactx::spacecharge
         ImpactXParticleContainer & pc,
         std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > const & space_charge_field,
         const amrex::Vector<amrex::Geometry>& geom,
-        amrex::ParticleReal const slice_ds
+        amrex::ParticleReal slice_ds
     );
 
 } // namespace impactx

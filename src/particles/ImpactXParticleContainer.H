@@ -182,7 +182,7 @@ namespace impactx
          * @param refpart reference particle
          */
         void
-        SetRefParticle (RefPart const refpart);
+        SetRefParticle (RefPart const & refpart);
 
         /** Get reference particle attributes
          *
@@ -195,7 +195,7 @@ namespace impactx
          *
          * @returns refpart
          */
-        RefPart const
+        RefPart const &
         GetRefParticle () const;
 
         /** Update reference particle element edge
@@ -224,7 +224,7 @@ namespace impactx
          *
          * @param order the order of the particle shape
          */
-        void SetParticleShape (int const order);
+        void SetParticleShape (int order);
 
         /** Compute the min and max of the particle position in each dimension
          *

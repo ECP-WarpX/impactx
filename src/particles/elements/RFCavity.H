@@ -136,7 +136,7 @@ namespace RFCavityData
             RFCavityData::next_id++;
 
             // validate sin and cos coefficients are the same length
-            m_ncoef = cos_coef.size();
+            m_ncoef = int(cos_coef.size());
             if (m_ncoef != int(sin_coef.size()))
                 throw std::runtime_error("RFCavity: cos and sin coefficients must have same length!");
 
@@ -337,7 +337,7 @@ namespace RFCavityData
             amrex::ParticleReal efieldint = 0.0;
             amrex::ParticleReal const z = zeval - zmid;
 
-            if (abs(z)<=zmid)
+            if (std::abs(z) <= zmid)
             {
                efield = 0.5_prt*cos_data[0];
                efieldint = z*efield;

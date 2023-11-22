@@ -18,9 +18,7 @@
 #include <cmath>
 
 
-namespace impactx
-{
-namespace distribution
+namespace impactx::distribution
 {
     struct Triangle
     {
@@ -139,7 +137,6 @@ namespace distribution
         amrex::ParticleReal m_muxpx, m_muypy, m_mutpt; //! correlation length-momentum
     };
 
-} // namespace distribution
-} // namespace impactx
+} // namespace impactx::distribution
 
 #endif // IMPACTX_DISTRIBUTION_TRIANGLE

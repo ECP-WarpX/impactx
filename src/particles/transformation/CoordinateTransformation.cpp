@@ -19,17 +19,16 @@
 #include <cmath>
 
 
-namespace impactx
+namespace impactx::transformation
 {
-namespace transformation {
     void CoordinateTransformation (ImpactXParticleContainer &pc,
                                    Direction const &direction)
-   {
+    {
         BL_PROFILE("impactx::transformation::CoordinateTransformation");
         using namespace amrex::literals; // for _rt and _prt
 
         // preparing to access reference particle data: RefPart
-        RefPart ref_part = pc.GetRefParticle();
+        RefPart const ref_part = pc.GetRefParticle();
         amrex::ParticleReal const pd = ref_part.pt;  // Design value of pt/mc2 = -gamma
 
         // loop over refinement levels
@@ -95,5 +94,4 @@ namespace transformation {
             } // end loop over all particle boxes
         } // env mesh-refinement level loop
     }
-} // namespace transformation
-} // namespace impactx
+} // namespace impactx::transformation

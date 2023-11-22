@@ -24,7 +24,7 @@ namespace impactx
 
         // reference particle initialized?
         auto const & ref = m_particle_container->GetRefParticle();
-        if (ref.energy_MeV() == 0.0)
+        if (ref.kin_energy_MeV() == 0.0)
             throw std::runtime_error("The reference particle energy is zero. Not yet initialized?");
 
         // particles in the beam bunch
@@ -43,7 +43,7 @@ namespace impactx
         }
 
         // elements
-        if (m_lattice.size() == 0u)
+        if (m_lattice.empty())
             throw std::runtime_error("Beamline lattice has zero elements. Not yet initialized?");
     }
 } // namespace impactx

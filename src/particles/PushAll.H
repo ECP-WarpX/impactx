@@ -36,6 +36,10 @@ namespace impactx
             [[maybe_unused]] bool omp_parallel = true
     )
     {
+        // performance profiling per element
+        std::string const profile_name = "impactx::Push::" + std::string(T_Element::name);
+        BL_PROFILE(profile_name);
+
         // preparing to access reference particle data: RefPart
         RefPart & ref_part = pc.GetRefParticle();
 

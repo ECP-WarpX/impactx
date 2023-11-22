@@ -1,7 +1,7 @@
 # Preamble ####################################################################
 #
 cmake_minimum_required(VERSION 3.20.0)
-project(ImpactX VERSION 23.08)
+project(ImpactX VERSION 23.11)
 
 include(${ImpactX_SOURCE_DIR}/cmake/ImpactXFunctions.cmake)
 
@@ -81,7 +81,7 @@ option(ImpactX_openpmd_internal                  "Download & build openPMD-api" 
 option(ImpactX_pyamrex_internal                  "Download & build pyAMReX" ON)
 
 set(pyImpactX_VERSION_INFO "" CACHE STRING
-    "PEP-440 conformant version (set by distutils)")
+    "PEP-440 conformant version (set by setup.py)")
 
 # change the default build type to Release (or RelWithDebInfo) instead of Debug
 set_default_build_type("Release")
@@ -406,6 +406,17 @@ if(ImpactX_PYTHON)
             pyImpactX
             ${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel ${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_requirements
             ${_EXTRA_INSTALL_DEPENDS}
+    )
+
+    # this is for package managers only
+    add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_nodeps
+        ${CMAKE_COMMAND} -E env IMPACTX_MPI=${ImpactX_MPI}
+            ${Python_EXECUTABLE} -m pip install --force-reinstall --no-index --no-deps ${PYINSTALLOPTIONS} --find-links=impactx-whl impactx
+        WORKING_DIRECTORY
+            ${ImpactX_BINARY_DIR}
+        DEPENDS
+            pyImpactX
+            ${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel
     )
 endif()
 

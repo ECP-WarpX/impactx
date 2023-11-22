@@ -677,5 +677,21 @@ add_impactx_test(bithermal
       ON  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/epac2004_benchmarks/analysis_bithermal.py
+
+# Thin dipole ########################################################
+#
+# w/o space charge
+add_impactx_test(thin_dipole
+    examples/thin_dipole/input_thin_dipole.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/thin_dipole/analysis_thin_dipole.py
+    OFF  # no plot script yet
+)
+add_impactx_test(thin_dipole.py
+    examples/thin_dipole/run_thin_dipole.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/thin_dipole/analysis_thin_dipole.py
     OFF  # no plot script yet
 )

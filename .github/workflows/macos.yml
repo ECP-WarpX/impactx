@@ -13,12 +13,7 @@ jobs:
     if: github.event.pull_request.draft == false
     env:
       CXXFLAGS: "-Werror -Wno-error=pass-failed"
-      # For macOS, Ninja is slower than the default:
-      #CMAKE_GENERATOR: Ninja
-      # setuptools/mp4py work-around, see
-      #   https://github.com/mpi4py/mpi4py/pull/159
-      #   https://github.com/mpi4py/mpi4py/issues/157#issuecomment-1001022274
-      SETUPTOOLS_USE_DISTUTILS: stdlib
+      HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: TRUE
     steps:
     - uses: actions/checkout@v3
     - name: Brew Cache
@@ -46,14 +41,21 @@ jobs:
         brew install cmake
         brew install hdf5-mpi
         brew install libomp
-        brew link --force libomp
+        brew link --overwrite --force libomp
         brew install ninja
         brew install open-mpi
         brew install pkg-config
-        python3 -m pip install --upgrade pip setuptools wheel pytest
+
+        python3 -m pip install --upgrade pip
+        python3 -m pip install --upgrade virtualenv
+
+        python3 -m venv py-venv
+        source py-venv/bin/activate
+        python3 -m pip install --upgrade pip
+        python3 -m pip install --upgrade build packaging setuptools wheel pytest
         python3 -m pip install --upgrade pytest
-        python3 -m pip install -r requirements_mpi.txt
-        python3 -m pip install -r examples/requirements.txt
+        python3 -m pip install --upgrade -r requirements_mpi.txt
+        python3 -m pip install --upgrade -r examples/requirements.txt
         python3 -m pip install --upgrade openPMD-validator
         set -e
     - name: CCache Cache
@@ -68,6 +70,8 @@ jobs:
           ccache-macos-appleclang-
     - name: build ImpactX
       run: |
+        source py-venv/bin/activate
+
         cmake -S . -B build            \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
           -DImpactX_PYTHON=ON          \
@@ -76,12 +80,15 @@ jobs:
 
     - name: run tests
       run: |
+        source py-venv/bin/activate
+
         ctest --test-dir build --output-on-failure -E pytest.AMReX
 
     - name: run installed python module
       run: |
         cmake --build build --target pip_install
 
+        source py-venv/bin/activate
         python3 examples/fodo/run_fodo.py
 
     - name: run installed app

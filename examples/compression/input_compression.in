@@ -3,7 +3,7 @@
 ###############################################################################
 beam.npart = 10000
 beam.units = static
-beam.energy = 20.0
+beam.kin_energy = 20.0
 beam.charge = 1.0e-9
 beam.particle = electron
 beam.distribution = waterbag

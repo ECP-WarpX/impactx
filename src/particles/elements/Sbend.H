@@ -71,8 +71,8 @@ namespace impactx
 
             // initialize output values of momenta
             amrex::ParticleReal pxout = px;
-            amrex::ParticleReal pyout = py;
-            amrex::ParticleReal ptout = pt;
+            amrex::ParticleReal const pyout = py;
+            amrex::ParticleReal const ptout = pt;
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();

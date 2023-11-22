@@ -2,6 +2,9 @@ function(find_pyamrex)
     if(ImpactX_pyamrex_src)
         message(STATUS "Compiling local pyAMReX ...")
         message(STATUS "pyAMReX source path: ${ImpactX_pyamrex_src}")
+        if(NOT IS_DIRECTORY ${ImpactX_pyamrex_src})
+            message(FATAL_ERROR "Specified directory ImpactX_pyamrex_src='${ImpactX_pyamrex_src}' does not exist!")
+        endif()
     elseif(ImpactX_pyamrex_internal)
         message(STATUS "Downloading pyAMReX ...")
         message(STATUS "pyAMReX repository: ${ImpactX_pyamrex_repo} (${ImpactX_pyamrex_branch})")
@@ -61,8 +64,8 @@ function(find_pyamrex)
         endif()
     elseif(NOT ImpactX_pyamrex_internal)
         # TODO: MPI control
-        find_package(pyAMReX 23.08 CONFIG REQUIRED)
-        message(STATUS "pyAMReX: Found version '${pyamrex_VERSION}'")
+        find_package(pyAMReX 23.11 CONFIG REQUIRED)
+        message(STATUS "pyAMReX: Found version '${pyAMReX_VERSION}'")
     endif()
 endfunction()
 
@@ -76,7 +79,7 @@ option(ImpactX_pyamrex_internal "Download & build pyAMReX" ON)
 set(ImpactX_pyamrex_repo "https://github.com/AMReX-Codes/pyamrex.git"
     CACHE STRING
     "Repository URI to pull and build pyamrex from if(ImpactX_pyamrex_internal)")
-set(ImpactX_pyamrex_branch "23.08"
+set(ImpactX_pyamrex_branch "1c24a8504fd9df0e2ad2f447a4d1567750a0e4e0"
     CACHE STRING
     "Repository branch for ImpactX_pyamrex_repo if(ImpactX_pyamrex_internal)")
 

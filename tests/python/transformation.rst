@@ -11,7 +11,7 @@ The beam has average energy 1 GeV.
 This tests that the t/s transforms are inverses of each other
 Specifically, in this test the :math:`t`- and :math:`s`-coordinates of the beam must differ substantially
 and the forward-inverse transformed coordinates must agree with the initial coordinates.
-That is, we require that :math:`to_fixed_s` ( :math:`to_fixed_t` (initial beam)) = initial beam.
+That is, we require that ``to_fixed_s`` (``to_fixed_t`` (initial beam)) = initial beam.
 
 
 Run

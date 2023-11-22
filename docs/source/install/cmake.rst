@@ -35,7 +35,8 @@ ImpactX depends on popular third party software.
 
    .. code-block:: bash
 
-      python3 -m pip install -U pip setuptools wheel pytest
+      python3 -m pip install -U pip
+      python3 -m pip install -U build packaging setuptools wheel pytest
       python3 -m pip install -U -r examples/requirements.txt
 
 

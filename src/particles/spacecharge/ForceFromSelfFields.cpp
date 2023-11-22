@@ -45,7 +45,7 @@ namespace impactx::spacecharge
 #endif
             for (amrex::MFIter mfi(phi.at(lev)); mfi.isValid(); ++mfi) {
 
-                amrex::Box bx = mfi.validbox();
+                amrex::Box const bx = mfi.validbox();
                 auto const phi_arr = (phi.at(lev))[mfi].const_array();
 
                 auto scf_arr_x = space_charge_field[lev]["x"][mfi].array();

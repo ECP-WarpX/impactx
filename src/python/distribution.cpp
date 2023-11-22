@@ -18,7 +18,7 @@ using namespace impactx;
 
 void init_distribution(py::module& m)
 {
-    py::module_ md = m.def_submodule(
+    py::module_ const md = m.def_submodule(
         "distribution",
         "Particle beam distributions in ImpactX"
     );
@@ -77,7 +77,7 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::None>(md, "None")
         .def(py::init<>(),
-             "This distribution does nothing"
+             "Sets all values to zero."
         );
 
     py::class_<distribution::Semigaussian>(md, "Semigaussian")

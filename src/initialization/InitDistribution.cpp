@@ -21,6 +21,7 @@
 #include <AMReX_Print.H>
 
 #include <string>
+#include <variant>
 
 
 namespace impactx
@@ -39,7 +40,7 @@ namespace impactx
             "add_particles: Reference particle charge not yet set!");
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ref.mass_MeV() != 0.0,
             "add_particles: Reference particle mass not yet set!");
-        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ref.energy_MeV() != 0.0,
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ref.kin_energy_MeV() != 0.0,
             "add_particles: Reference particle energy not yet set!");
 
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(bunch_charge >= 0.0,
@@ -64,10 +65,10 @@ namespace impactx
         // position, per MPI rank. We then measure the distribution's spatial
         // extent, create a grid, resize it to fit the beam, and then
         // redistribute particles so that they reside on the correct MPI rank.
-        int myproc = amrex::ParallelDescriptor::MyProc();
-        int nprocs = amrex::ParallelDescriptor::NProcs();
-        int navg = npart / nprocs;
-        int nleft = npart - navg * nprocs;
+        int const myproc = amrex::ParallelDescriptor::MyProc();
+        int const nprocs = amrex::ParallelDescriptor::NProcs();
+        int const navg = npart / nprocs;
+        int const nleft = npart - navg * nprocs;
         int npart_this_proc = (myproc < nleft) ? navg+1 : navg;
         auto const rel_part_this_proc = amrex::ParticleReal(npart_this_proc) /
                                         amrex::ParticleReal(npart);
@@ -110,10 +111,10 @@ namespace impactx
         using namespace amrex::literals;
 
         // Parse the beam distribution parameters
-        amrex::ParmParse pp_dist("beam");
+        amrex::ParmParse const pp_dist("beam");
 
-        amrex::ParticleReal energy = 0.0;  // Beam kinetic energy (MeV)
-        pp_dist.get("energy", energy);
+        amrex::ParticleReal kin_energy = 0.0;  // Beam kinetic energy (MeV)
+        pp_dist.get("kin_energy", kin_energy);
 
         amrex::ParticleReal bunch_charge = 0.0;  // Bunch charge (C)
         pp_dist.get("charge", bunch_charge);
@@ -145,7 +146,7 @@ namespace impactx
 
         // set charge and mass and energy of ref particle
         m_particle_container->GetRefParticle()
-            .set_charge_qe(qe).set_mass_MeV(massE).set_energy_MeV(energy);
+                .set_charge_qe(qe).set_mass_MeV(massE).set_kin_energy_MeV(kin_energy);
 
         int npart = 1;  // Number of simulation particles
         pp_dist.get("npart", npart);
@@ -169,7 +170,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions waterbag(distribution::Waterbag(
+          distribution::KnownDistributions const waterbag(distribution::Waterbag(
               sigx, sigy, sigt,
               sigpx, sigpy, sigpt,
               muxpx, muypy, mutpt));
@@ -189,7 +190,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions kurth6D(distribution::Kurth6D(
+          distribution::KnownDistributions const kurth6D(distribution::Kurth6D(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -209,7 +210,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions gaussian(distribution::Gaussian(
+          distribution::KnownDistributions const gaussian(distribution::Gaussian(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -229,7 +230,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions kvDist(distribution::KVdist(
+          distribution::KnownDistributions const kvDist(distribution::KVdist(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -249,7 +250,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions kurth4D(distribution::Kurth4D(
+          distribution::KnownDistributions const kurth4D(distribution::Kurth4D(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -268,7 +269,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions semigaussian(distribution::Semigaussian(
+          distribution::KnownDistributions const semigaussian(distribution::Semigaussian(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -288,7 +289,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions triangle(distribution::Triangle(
+          distribution::KnownDistributions const triangle(distribution::Triangle(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -324,7 +325,7 @@ namespace impactx
         }
 
         // print information on the initialized beam
-        amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;
+        amrex::Print() << "Beam kinetic energy (MeV): " << kin_energy << std::endl;
         amrex::Print() << "Bunch charge (C): " << bunch_charge << std::endl;
         amrex::Print() << "Particle type: " << particle_type << std::endl;
         amrex::Print() << "Number of particles: " << npart << std::endl;
