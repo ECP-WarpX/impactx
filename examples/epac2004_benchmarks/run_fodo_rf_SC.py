@@ -25,13 +25,13 @@ sim.slice_step_diagnostics = False
 sim.init_grids()
 
 # beam parameters
-energy_MeV = 250.0  # reference energy
+kin_energy_MeV = 250.0  # reference energy
 bunch_charge_C = 1.42857142857142865e-10  # used with space charge
 npart = 10000  # number of macro particles
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
-ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_energy_MeV(energy_MeV)
+ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_kin_energy_MeV(kin_energy_MeV)
 
 #   particle bunch
 distr = distribution.Kurth6D(
