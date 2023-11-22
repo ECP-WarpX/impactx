@@ -1,14 +1,14 @@
 .. _examples-thin-dipole:
 
 Thin Dipole
-=============
+===========
 
 This test involves tracking a 5 MeV proton beam through a 90 degree sector bend, using two different methods:
 
-1) Using a sequence of drifts and thin kicks as described by:
+#. Using a sequence of drifts and thin kicks as described by:
 G. Ripken and F. Schmidt, "A Symplectic Six-Dimensional Thin-Lens Formalism for Tracking," CERN/SL/95-12 (1995).
 
-2) Using the exact nonlinear transfer map for a sector bend as described by:
+#. Using the exact nonlinear transfer map for a sector bend as described by:
 D. Bruhwiler et al, "Symplectic Propagation of the Map, Tangent Map and Tangent Map Derivative through
 Quadrupole and Combined-Function Dipole Magnets without Truncation," THP41C, EPAC98, pp. 1171-1173 (1998).
 
