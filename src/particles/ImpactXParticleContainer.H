@@ -269,6 +269,14 @@ namespace impactx
         DepositCharge (std::unordered_map<int, amrex::MultiFab> & rho,
                        amrex::Vector<amrex::IntVect> const & ref_ratio);
 
+        /** Get the name of each Real AoS component */
+        std::vector<std::string>
+        RealAoS_names () const;
+
+        /** Get the name of each Real SoA component */
+        std::vector<std::string>
+        RealSoA_names () const;
+
       private:
 
         //! the reference particle for the beam in the particle container
@@ -281,6 +289,18 @@ namespace impactx
         ImpactXParticleContainer* m_particles_lost = nullptr;
 
     }; // ImpactXParticleContainer
+
+    /** Get the name of each Real AoS component */
+    std::vector<std::string>
+    get_RealAoS_names ();
+
+    /** Get the name of each Real SoA component
+     *
+     * @param num_real_comps number of compile-time + runtime arrays
+     * @return names
+     */
+    std::vector<std::string>
+    get_RealSoA_names (int num_real_comps);
 
 } // namespace impactx
 

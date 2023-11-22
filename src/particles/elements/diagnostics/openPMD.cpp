@@ -255,8 +255,7 @@ namespace detail
 
         // AoS: Real
         {
-            std::vector<std::string> real_aos_names(RealAoS::names_s.size());
-            std::copy(RealAoS::names_s.begin(), RealAoS::names_s.end(), real_aos_names.begin());
+            std::vector<std::string> real_aos_names = get_RealAoS_names();
             for (auto real_idx=0; real_idx < RealAoS::nattribs; real_idx++) {
                 auto const component_name = real_aos_names.at(real_idx);
                 getComponentRecord(component_name).resetDataset(d_fl);
@@ -293,9 +292,8 @@ namespace detail
 
         // SoA: Real
         {
-            std::vector<std::string> real_soa_names(RealSoA::names_s.size());
-            std::copy(RealSoA::names_s.begin(), RealSoA::names_s.end(), real_soa_names.begin());
-            for (auto real_idx = 0; real_idx < RealSoA::nattribs; real_idx++) {
+            std::vector<std::string> real_soa_names = get_RealSoA_names(pc.NumRealComps());
+            for (auto real_idx = 0; real_idx < pc.NumRealComps(); real_idx++) {
                 auto const component_name = real_soa_names.at(real_idx);
                 getComponentRecord(component_name).resetDataset(d_fl);
             }
@@ -426,10 +424,8 @@ namespace detail
         auto const& soa = pti.GetStructOfArrays();
         //   SoA floating point (ParticleReal) properties
         {
-            std::vector<std::string> real_soa_names(RealSoA::names_s.size());
-            std::copy(RealSoA::names_s.begin(), RealSoA::names_s.end(), real_soa_names.begin());
-
-            for (auto real_idx=0; real_idx < RealSoA::nattribs; real_idx++) {
+            std::vector<std::string> real_soa_names = get_RealSoA_names(soa.NumRealComps());
+            for (auto real_idx=0; real_idx < soa.NumRealComps(); real_idx++) {
                 auto const component_name = real_soa_names.at(real_idx);
                 getComponentRecord(component_name).storeChunkRaw(
                 soa.GetRealData(real_idx).data(), {offset}, {numParticleOnTile64});
