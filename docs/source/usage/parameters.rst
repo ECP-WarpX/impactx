@@ -509,6 +509,13 @@ Lattice Elements
 
             * ``<element_name>.units`` (``string``) specification of units: ``dimensionless`` (default, in units of the magnetic rigidity of the reference particle) or ``T-m``
 
+        * ``thin_dipole`` for a thin dipole element.
+          This requires these additional parameters:
+
+            * ``<element_name>.theta`` (``float``, in degrees) dipole bend angle
+
+            * ``<element_name>.rc`` (``float``, in meters) effective radius of curvature
+
         * ``beam_monitor`` a beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
           If the same element name is used multiple times, then an output series is created with multiple outputs.
 
