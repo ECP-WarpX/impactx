@@ -64,7 +64,7 @@ namespace impactx
                 amrex::ParticleReal & AMREX_RESTRICT px,
                 amrex::ParticleReal & AMREX_RESTRICT py,
                 amrex::ParticleReal & AMREX_RESTRICT pt,
-                [[maybe_unused]] RefPart const & refpart) const {
+                RefPart const & refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
 
