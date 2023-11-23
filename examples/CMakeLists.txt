@@ -619,7 +619,6 @@ add_impactx_test(kicker.py
     examples/kicker/analysis_kicker.py
     OFF  # no plot script yet
 )
-
 # copy MAD-X lattice file
 file(COPY ${ImpactX_SOURCE_DIR}/examples/kicker/kicker.madx
         DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kicker_madx.py)

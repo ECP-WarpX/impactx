@@ -509,7 +509,6 @@ Lattice Elements
 
             * ``<element_name>.units`` (``string``) specification of units: ``dimensionless`` (default, in units of the magnetic rigidity of the reference particle) or ``T-m``
 
-
         * ``thin_dipole`` for a thin dipole element.
           This requires these additional parameters:
 
