@@ -230,7 +230,6 @@ namespace detail
         io::WriteIterations iterations = series.writeIterations();
         io::Iteration iteration = iterations[m_step];
         io::ParticleSpecies beam = iteration.particles["beam"];
-        io::ParticleSpecies lost = iteration.particles["lost"];
 
         // calculate & update particle offset in MPI-global particle array, per level
         auto const num_levels = pc.finestLevel() + 1;
