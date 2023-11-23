@@ -283,6 +283,7 @@ namespace impactx
                                           global_step);
 
             // output particles lost in apertures
+            if (m_particles_lost->TotalNumberOfParticles() > 0)
             {
                 std::string openpmd_backend = "default";
                 pp_diag.queryAdd("backend", openpmd_backend);
