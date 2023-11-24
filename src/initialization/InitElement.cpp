@@ -248,6 +248,18 @@ namespace detail
                 Kicker::UnitSystem::dimensionless :
                 Kicker::UnitSystem::Tm;
             m_lattice.emplace_back( Kicker(xkick, ykick, units) );
+        } else if (element_type == "aperture") {
+            amrex::Real xmax, ymax;
+            std::string shape_str = "rectangular";
+            pp_element.get("xmax", xmax);
+            pp_element.get("ymax", ymax);
+            pp_element.queryAdd("shape", shape_str);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(shape_str == "rectangular" || shape_str == "elliptical",
+                                             element_name + ".shape must be \"rectangular\" or \"elliptical\"");
+            Aperture::Shape shape = shape_str == "rectangular" ?
+                                        Aperture::Shape::rectangular :
+                                        Aperture::Shape::elliptical;
+            m_lattice.emplace_back( Aperture(xmax, ymax, shape) );
         } else if (element_type == "beam_monitor") {
             std::string openpmd_name = element_name;
             pp_element.queryAdd("name", openpmd_name);

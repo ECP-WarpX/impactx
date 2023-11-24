@@ -13,8 +13,8 @@ def ix_pc_to_df(self, local=True, comm=None, root_rank=0):
 
     Parameters
     ----------
-    self : amrex.ParticleContainer_*
-        A ParticleContainer class in pyAMReX
+    self : ImpactXParticleContainer_*
+        The particle container class in ImpactX
     local : bool
         MPI-local particles
     comm : MPI Communicator
@@ -36,16 +36,13 @@ def ix_pc_to_df(self, local=True, comm=None, root_rank=0):
         # todo: check if currently in fixed s or fixed t and pick name accordingly
 
         names = []
-        for n in self.RealAoS.names_s:
+        for n in self.RealAoS_names:
             names.append(n)
         names.append("cpuid")
-        for n in self.RealSoA.names_s:
+        for n in self.RealSoA_names:
             names.append(n)
 
         df.columns.values[0 : len(names)] = names
-
-        # todo: also rename runtime attributes (e.g., "s_lost")
-        # https://github.com/ECP-WarpX/impactx/pull/398
 
     return df
 

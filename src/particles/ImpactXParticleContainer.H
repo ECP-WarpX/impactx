@@ -177,6 +177,16 @@ namespace impactx
                        amrex::ParticleReal const & qm,
                        amrex::ParticleReal const & bchchg);
 
+        /** Register storage for lost particles
+         *
+         * @param lost_pc particle container for lost particles
+         */
+        void
+        SetLostParticleContainer (ImpactXParticleContainer * lost_pc);
+
+        ImpactXParticleContainer *
+        GetLostParticleContainer ();
+
         /** Set reference particle attributes
          *
          * @param refpart reference particle
@@ -259,6 +269,14 @@ namespace impactx
         DepositCharge (std::unordered_map<int, amrex::MultiFab> & rho,
                        amrex::Vector<amrex::IntVect> const & ref_ratio);
 
+        /** Get the name of each Real AoS component */
+        std::vector<std::string>
+        RealAoS_names () const;
+
+        /** Get the name of each Real SoA component */
+        std::vector<std::string>
+        RealSoA_names () const;
+
       private:
 
         //! the reference particle for the beam in the particle container
@@ -267,7 +285,22 @@ namespace impactx
         //! the particle shape
         std::optional<int> m_particle_shape;
 
+        //! a non-owning reference to lost particles, i.e., due to apertures
+        ImpactXParticleContainer* m_particles_lost = nullptr;
+
     }; // ImpactXParticleContainer
+
+    /** Get the name of each Real AoS component */
+    std::vector<std::string>
+    get_RealAoS_names ();
+
+    /** Get the name of each Real SoA component
+     *
+     * @param num_real_comps number of compile-time + runtime arrays
+     * @return names
+     */
+    std::vector<std::string>
+    get_RealSoA_names (int num_real_comps);
 
 } // namespace impactx
 

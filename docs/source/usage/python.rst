@@ -116,6 +116,11 @@ General
       The minimum number of digits (default: ``6``) used for the step
       number appended to the diagnostic file names.
 
+   .. py:property:: particle_lost_diagnostics_backend
+
+      Diagnostics for particles lost in apertures.
+      See the ``BeamMonitor`` element for backend values.
+
    .. py:method:: init_grids()
 
       Initialize AMReX blocks/grids for domain decomposition & space charge mesh.
@@ -711,6 +716,14 @@ References:
 
    :param phi_in: angle of the reference particle with respect to the longitudinal (z) axis in the original frame in degrees
    :param phi_out: angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame in degrees
+
+.. py:class:: impactx.elements.Aperture(xmax, ymax, shape="rectangular")
+
+   A thin collimator element, applying a transverse aperture boundary.
+
+   :param xmax: maximum allowed value of the horizontal coordinate (meter)
+   :param ymax: maximum allowed value of the vertical coordinate (meter)
+   :param shape: aperture boundary shape: ``"rectangular"`` (default) or ``"elliptical"``
 
 .. py:class:: impactx.elements.SoftQuadrupole(ds, gscale, cos_coefficients, sin_coefficients, nslice=1)
 

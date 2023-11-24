@@ -22,40 +22,6 @@ using namespace impactx;
 
 void init_impactxparticlecontainer(py::module& m)
 {
-    py::class_<RealAoS>(m, "RealAoS")
-        .def_property_readonly_static("names_s",
-            [](py::object) {
-                std::vector<std::string> real_aos_names(RealAoS::names_s.size());
-                std::copy(RealAoS::names_s.begin(), RealAoS::names_s.end(), real_aos_names.begin());
-                return real_aos_names;
-            },
-            "named labels for fixed s")
-        .def_property_readonly_static("names_t",
-            [](py::object) {
-                std::vector<std::string> real_aos_names(RealAoS::names_t.size());
-                std::copy(RealAoS::names_t.begin(), RealAoS::names_t.end(), real_aos_names.begin());
-                return real_aos_names;
-            },
-            "named labels for fixed t")
-    ;
-
-    py::class_<RealSoA>(m, "RealSoA")
-        .def_property_readonly_static("names_s",
-        [](py::object) {
-                std::vector<std::string> real_soa_names(RealSoA::names_s.size());
-                std::copy(RealSoA::names_s.begin(), RealSoA::names_s.end(), real_soa_names.begin());
-                return real_soa_names;
-        },
-        "named labels for fixed s")
-        .def_property_readonly_static("names_t",
-    [](py::object) {
-            std::vector<std::string> real_soa_names(RealSoA::names_t.size());
-            std::copy(RealSoA::names_t.begin(), RealSoA::names_t.end(), real_soa_names.begin());
-            return real_soa_names;
-        },
-        "named labels for fixed t")
-    ;
-
     py::class_<
         ParIter,
         amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
@@ -150,5 +116,18 @@ void init_impactxparticlecontainer(py::module& m)
              "Charge deposition"
         )
         */
+
+        .def_property_readonly("RealAoS_names", &ImpactXParticleContainer::RealAoS_names,
+              "Get the name of each Real AoS component")
+
+        .def_property_readonly("RealSoA_names", &ImpactXParticleContainer::RealSoA_names,
+              "Get the name of each Real SoA component")
     ;
+
+    m.def("get_RealAoS_names", &get_RealAoS_names,
+          "Get the name of each Real AoS component");
+
+    m.def("get_RealSoA_names", &get_RealSoA_names,
+          py::arg("num_real_comps"),
+          "Get the name of each Real SoA component\n\nnum_real_comps: pass number of compile-time + runtime arrays");
 }
