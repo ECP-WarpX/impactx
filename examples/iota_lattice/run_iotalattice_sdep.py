@@ -187,18 +187,19 @@ lattice_after_nll = [
 ]
 
 # build lattice: first half, qe3, then mirror
-# fmt: off
-lattice_half = []
-lattice_half.extend(lattice_before_nll)
-lattice_half.extend(nll)
-lattice_half.extend(lattice_after_nll)
-
+# modified to place nll as the first element
 # fmt:on
 sim.lattice.append(monitor)
-sim.lattice.extend(lattice_half)
+sim.lattice.extend(nll)
+sim.lattice.extend(lattice_after_nll)
 sim.lattice.append(qe3)
-lattice_half.reverse()
-sim.lattice.extend(lattice_half)
+lattice_after_nll.reverse()
+sim.lattice.extend(lattice_after_nll)
+sim.lattice.extend(dnll)
+lattice_before_nll.reverse()
+sim.lattice.extend(lattice_before_nll)
+lattice_before_nll.reverse()
+sim.lattice.extend(lattice_before_nll)
 sim.lattice.append(monitor)
 
 # number of turns in the ring
