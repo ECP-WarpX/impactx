@@ -33,11 +33,11 @@ ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_kin_energy_MeV(energy_MeV)
 
 #   particle bunch
 distr = distribution.Waterbag(
-    sigmaX=1.588960728035e-3,
-    sigmaY=2.496625268437e-3,
+    sigmaX=2.1293614592274089e-003,
+    sigmaY=4.5657786292299966e-003,
     sigmaT=1.0e-3,
-    sigmaPx=2.8320397837724e-3,
-    sigmaPy=1.802433091137e-3,
+    sigmaPx=1.6010530665125471e-003,
+    sigmaPy=2.1652798110168682e-003,
     sigmaPt=0.0,
 )
 sim.add_particles(bunch_charge_C, distr, npart)
