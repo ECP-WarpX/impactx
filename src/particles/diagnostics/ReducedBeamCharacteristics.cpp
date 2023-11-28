@@ -36,6 +36,89 @@ namespace impactx::diagnostics
         // preparing access to particle data: AoS and SoA
         using PType = typename ImpactXParticleContainer::SuperParticleType;
 
+        // prepare reduction operations for minimum and maximum values from 6D phase space
+        amrex::ReduceOps<
+            amrex::ReduceOpMin, amrex::ReduceOpMax,  // x
+            amrex::ReduceOpMin, amrex::ReduceOpMax,  // y
+            amrex::ReduceOpMin, amrex::ReduceOpMax,  // t
+            amrex::ReduceOpMin, amrex::ReduceOpMax,  // px
+            amrex::ReduceOpMin, amrex::ReduceOpMax,  // py
+            amrex::ReduceOpMin, amrex::ReduceOpMax   // pt
+        > min_max_reduce_ops;
+
+        // execute reduction operation on MPI ranks with parallel lambda
+        auto min_max_r = amrex::ParticleReduce<
+            amrex::ReduceData<
+                amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal
+            >
+        >(
+            pc,
+            [=] AMREX_GPU_DEVICE (const PType& p) noexcept
+            -> amrex::GpuTuple<
+                amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal
+            >
+            {
+                const amrex::ParticleReal p_pos0 = p.pos(0); // x position
+                const amrex::ParticleReal p_pos1 = p.pos(1); // y position
+                const amrex::ParticleReal p_pos2 = p.pos(2); // t position
+
+                const amrex::ParticleReal p_px = p.rdata(RealSoA::px); // px momentum
+                const amrex::ParticleReal p_py = p.rdata(RealSoA::py); // py momentum
+                const amrex::ParticleReal p_pt = p.rdata(RealSoA::pt); // pt momentum
+
+                return {p_pos0, p_pos0,
+                        p_pos1, p_pos1,
+                        p_pos2, p_pos2,
+                        p_px, p_px,
+                        p_py, p_py,
+                        p_pt, p_pt};
+            },
+            min_max_reduce_ops
+        );
+
+        std::vector<amrex::ParticleReal> values_per_rank_min = {
+                amrex::get<0>(min_max_r), // x_min
+                amrex::get<2>(min_max_r), // y_min
+                amrex::get<4>(min_max_r), // t_min
+                amrex::get<6>(min_max_r), // px_min
+                amrex::get<8>(min_max_r), // py_min
+                amrex::get<10>(min_max_r), // pt_min
+        };
+
+        std::vector<amrex::ParticleReal> values_per_rank_max = {
+                amrex::get<1>(min_max_r), // x_max
+                amrex::get<3>(min_max_r), // y_max
+                amrex::get<5>(min_max_r), // t_max
+                amrex::get<7>(min_max_r), // px_max
+                amrex::get<9>(min_max_r), // py_max
+                amrex::get<11>(min_max_r), // pt_max
+        };
+
+        // reduced sum over mpi ranks (allreduce)
+        amrex::ParallelAllReduce::Min(
+                values_per_rank_min.data(),
+                values_per_rank_min.size(),
+                amrex::ParallelDescriptor::Communicator()
+        );
+
+        // reduced sum over mpi ranks (allreduce)
+        amrex::ParallelAllReduce::Max(
+                values_per_rank_max.data(),
+                values_per_rank_max.size(),
+                amrex::ParallelDescriptor::Communicator()
+        );
+
+        // prepare reduction operations for calculation of mean values
         amrex::ReduceOps<
             amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum,
             amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum,
@@ -109,7 +192,7 @@ namespace impactx::diagnostics
         amrex::ParticleReal const py_mean = values_per_rank_1st.at(5) /= w_sum;
         amrex::ParticleReal const pt_mean = values_per_rank_1st.at(6) /= w_sum;
 
-
+        // prepare reduction operations for calculation of mean square and correlation values
         amrex::ReduceOps<
             amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum,
             amrex::ReduceOpSum, amrex::ReduceOpSum, amrex::ReduceOpSum,
@@ -190,6 +273,21 @@ namespace impactx::diagnostics
             amrex::ParallelDescriptor::IOProcessorNumber()
         );
 
+        // minimum values
+        amrex::ParticleReal const x_min = values_per_rank_min.at(0);
+        amrex::ParticleReal const y_min = values_per_rank_min.at(1);
+        amrex::ParticleReal const t_min = values_per_rank_min.at(2);
+        amrex::ParticleReal const px_min = values_per_rank_min.at(3);
+        amrex::ParticleReal const py_min = values_per_rank_min.at(4);
+        amrex::ParticleReal const pt_min = values_per_rank_min.at(5);
+        // maximum values
+        amrex::ParticleReal const x_max = values_per_rank_max.at(0);
+        amrex::ParticleReal const y_max = values_per_rank_max.at(1);
+        amrex::ParticleReal const t_max = values_per_rank_max.at(2);
+        amrex::ParticleReal const px_max = values_per_rank_max.at(3);
+        amrex::ParticleReal const py_max = values_per_rank_max.at(4);
+        amrex::ParticleReal const pt_max = values_per_rank_max.at(5);
+        // mean square and correlation values
         amrex::ParticleReal const x_ms   = values_per_rank_2nd.at(0) /= w_sum;
         amrex::ParticleReal const y_ms   = values_per_rank_2nd.at(1) /= w_sum;
         amrex::ParticleReal const t_ms   = values_per_rank_2nd.at(2) /= w_sum;
@@ -225,14 +323,26 @@ namespace impactx::diagnostics
         data["s"] = ref_part.s;  // TODO: remove when the output gets rerouted to openPMD
         data["ref_beta_gamma"] = ref_part.beta_gamma();  // TODO: remove when the output gets rerouted to openPMD
         data["x_mean"] = x_mean;
+        data["x_min"] = x_min;
+        data["x_max"] = x_max;
         data["y_mean"] = y_mean;
+        data["y_min"] = y_min;
+        data["y_max"] = y_max;
         data["t_mean"] = t_mean;
+        data["t_min"] = t_min;
+        data["t_max"] = t_max;
         data["sig_x"] = sig_x;
         data["sig_y"] = sig_y;
         data["sig_t"] = sig_t;
         data["px_mean"] = px_mean;
+        data["px_min"] = px_min;
+        data["px_max"] = px_max;
         data["py_mean"] = py_mean;
+        data["py_min"] = py_min;
+        data["py_max"] = py_max;
         data["pt_mean"] = pt_mean;
+        data["pt_min"] = pt_min;
+        data["pt_max"] = pt_max;
         data["sig_px"] = sig_px;
         data["sig_py"] = sig_py;
         data["sig_pt"] = sig_pt;
