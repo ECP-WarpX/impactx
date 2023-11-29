@@ -41,7 +41,7 @@ before_nll_rev.type = line
 before_nll_rev.reverse = true
 before_nll_rev.elements = dra1 qa1 dra2 qa2 dra3 qa3 dra4 qa4 dra5                \
                       edge30 sbend30 edge30 drb1 qb1 drb2 qb2 drb2 qb3        \
-                      drb3 
+                      drb3
 
 after_nll_rev.type = line
 after_nll_rev.reverse = true
@@ -94,7 +94,7 @@ nll8.cnll = 0.008296371635942
 
 nll9.type = nonlinear_lens
 nll9.knll = 6.081693334e-6
-nll9.cnll = 0.008109941789663  
+nll9.cnll = 0.008109941789663
 
 
 # Drift elements:

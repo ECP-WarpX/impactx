@@ -120,8 +120,10 @@ dr = elements.Drift(ds=ds_half, nslice=1)
 nll = []
 for j in range(0, num_lenses):
     s = -lens_length / 2.0 + ds_half + j * ds
-    beta_star = lens_length/2.0 * 1.0/math.tan(math.pi * tune_advance)
-    beta = beta_star * (1.0 + (2.0 * s * math.tan(math.pi * tune_advance) / lens_length)**2)
+    beta_star = lens_length / 2.0 * 1.0 / math.tan(math.pi * tune_advance)
+    beta = beta_star * (
+        1.0 + (2.0 * s * math.tan(math.pi * tune_advance) / lens_length) ** 2
+    )
     knll_s = t_strength * c_parameter**2 * ds / beta
     cnll_s = c_parameter * math.sqrt(beta)
     nllens = elements.NonlinearLens(knll=knll_s, cnll=cnll_s)
