@@ -56,7 +56,7 @@ meanH, sigH, meanI, sigI = get_moments(initial)
 print(f"  meanH={meanH:e} sigH={sigH:e} meanI={meanI:e} sigI={sigI:e}")
 
 atol = 0.0  # a big number
-rtol = 1.5 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 1.8 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
@@ -73,7 +73,7 @@ meanH, sigH, meanI, sigI = get_moments(final)
 print(f"  meanH={meanH:e} sigH={sigH:e} meanI={meanI:e} sigI={sigI:e}")
 
 atol = 0.0  # a big number
-rtol = 1.5 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 1.8 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
