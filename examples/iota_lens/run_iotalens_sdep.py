@@ -43,7 +43,7 @@ distr = distribution.Waterbag(
     muypy=0.8090169943749474,
     mutpt=0.0,
 )
-#distr = distribution.Waterbag(
+# distr = distribution.Waterbag(
 #    sigmaX=1.865379469388e-003,
 #    sigmaY=2.0192133150418e-003,
 #    sigmaT=1.0e-4,
@@ -53,7 +53,7 @@ distr = distribution.Waterbag(
 #    muxpx=-0.482260919078473,
 #    muypy=-0.762127656873158,
 #    mutpt=0.0,
-#)
+# )
 
 sim.add_particles(bunch_charge_C, distr, npart)
 
@@ -76,18 +76,22 @@ dr = elements.Drift(ds=ds_half)
 # define the nonlinear lens segments
 for j in range(0, num_lenses):
     s = -lens_length / 2.0 + ds_half + j * ds
-    beta_star = lens_length/2.0 * 1.0/math.tan(math.pi * tune_advance)
-   # beta = beta_star * (1.0 + 4.0 * s**2 * math.tan(math.pi * tune_advance) ** 2 / lens_length**2)
-    beta = beta_star * (1.0 + (2.0 * s * math.tan(math.pi * tune_advance) / lens_length)**2)
+    beta_star = lens_length / 2.0 * 1.0 / math.tan(math.pi * tune_advance)
+    # beta = beta_star * (1.0 + 4.0 * s**2 * math.tan(math.pi * tune_advance) ** 2 / lens_length**2)
+    beta = beta_star * (
+        1.0 + (2.0 * s * math.tan(math.pi * tune_advance) / lens_length) ** 2
+    )
     knll_s = t_strength * c_parameter**2 * ds / beta
     cnll_s = c_parameter * math.sqrt(beta)
     nllens = elements.NonlinearLens(knll=knll_s, cnll=cnll_s)
     segments = [dr, nllens, dr]
-#    segments = [dr, dr]
+    #    segments = [dr, dr]
     sim.lattice.extend(segments)
 
 # focusing lens
-const = elements.ConstF(ds=1.0e-8, kx=12060.113295833, ky=12060.113295833, kt=1.0e-12, nslice=1)
+const = elements.ConstF(
+    ds=1.0e-8, kx=12060.113295833, ky=12060.113295833, kt=1.0e-12, nslice=1
+)
 sim.lattice.append(const)
 sim.lattice.append(monitor)
 
