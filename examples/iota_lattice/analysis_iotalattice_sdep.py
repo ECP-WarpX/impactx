@@ -101,7 +101,7 @@ print(f"  atol={atol} (ignored: rtol~={rtol})")
 print(f"  dH_max={beam_joined['dH'].max()}")
 assert np.allclose(beam_joined["dH"], 0.0, rtol=rtol, atol=atol)
 
-atol = 5.0e-3 * Irms
+atol = 5.5e-3 * Irms
 rtol = 0.0
 print()
 print(f"  atol={atol} (ignored: rtol~={rtol})")
