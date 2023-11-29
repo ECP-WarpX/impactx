@@ -33,14 +33,33 @@ ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_kin_energy_MeV(kin_energy_
 
 #   particle bunch
 distr = distribution.Waterbag(
-    sigmaX=2.0e-3,
-    sigmaY=2.0e-3,
-    sigmaT=1.0e-3,
-    sigmaPx=3.0e-4,
-    sigmaPy=3.0e-4,
+    sigmaX=1.397456296195e-003,
+    sigmaY=1.397456296195e-003,
+    sigmaT=1.0e-4,
+    sigmaPx=1.256184325020e-003,
+    sigmaPy=1.256184325020e-003,
     sigmaPt=0.0,
+    muxpx=0.8090169943749474,
+    muypy=0.8090169943749474,
+    mutpt=0.0,
 )
+#distr = distribution.Waterbag(
+#    sigmaX=1.865379469388e-003,
+#    sigmaY=2.0192133150418e-003,
+#    sigmaT=1.0e-4,
+#    sigmaPx=1.402566720991e-003,
+#    sigmaPy=9.57593913381e-004,
+#    sigmaPt=0.0,
+#    muxpx=-0.482260919078473,
+#    muypy=-0.762127656873158,
+#    mutpt=0.0,
+#)
+
 sim.add_particles(bunch_charge_C, distr, npart)
+
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", backend="h5")
+sim.lattice.append(monitor)
 
 # defining parameters of the nonlinear lens
 lens_length = 1.8
@@ -57,12 +76,23 @@ dr = elements.Drift(ds=ds_half)
 # define the nonlinear lens segments
 for j in range(0, num_lenses):
     s = -lens_length / 2.0 + ds_half + j * ds
-    beta = 1.0 + 4.0 * s**2 * math.tan(math.pi * tune_advance) ** 2 / lens_length**2
+    beta_star = lens_length/2.0 * 1.0/math.tan(math.pi * tune_advance)
+   # beta = beta_star * (1.0 + 4.0 * s**2 * math.tan(math.pi * tune_advance) ** 2 / lens_length**2)
+    beta = beta_star * (1.0 + (2.0 * s * math.tan(math.pi * tune_advance) / lens_length)**2)
     knll_s = t_strength * c_parameter**2 * ds / beta
     cnll_s = c_parameter * math.sqrt(beta)
     nllens = elements.NonlinearLens(knll=knll_s, cnll=cnll_s)
     segments = [dr, nllens, dr]
+#    segments = [dr, dr]
     sim.lattice.extend(segments)
+
+# focusing lens
+const = elements.ConstF(ds=1.0e-8, kx=12060.113295833, ky=12060.113295833, kt=1.0e-12, nslice=1)
+sim.lattice.append(const)
+sim.lattice.append(monitor)
+
+# number of periods
+sim.periods = 1
 
 # run simulation
 sim.evolve()

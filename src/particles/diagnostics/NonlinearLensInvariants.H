@@ -82,8 +82,8 @@ namespace impactx::diagnostics
             // convert transverse phase space coordinates to normalized units
             amrex::ParticleReal const xn = x/(m_cn*sqrt(m_beta));
             amrex::ParticleReal const yn = y/(m_cn*sqrt(m_beta));
-            amrex::ParticleReal const pxn = px*sqrt(m_beta)/m_cn + m_alpha*x;
-            amrex::ParticleReal const pyn = py*sqrt(m_beta)/m_cn + m_alpha*y;
+            amrex::ParticleReal const pxn = px*sqrt(m_beta)/m_cn + m_alpha*xn;
+            amrex::ParticleReal const pyn = py*sqrt(m_beta)/m_cn + m_alpha*yn;
 
             // assign complex position zeta = x + iy
             Complex const zeta(xn, yn);
