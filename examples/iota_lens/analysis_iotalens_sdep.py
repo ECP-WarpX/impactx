@@ -61,7 +61,7 @@ print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
     [meanH, sigH, meanI, sigI],
-#    [5.993291e-02, 3.426664e-02, 8.513875e-02, 7.022481e-02],
+    #    [5.993291e-02, 3.426664e-02, 8.513875e-02, 7.022481e-02],
     [6.016450e-02, 3.502064e-02, 8.560226e-02, 7.148169e-02],
     rtol=rtol,
     atol=atol,
@@ -79,7 +79,7 @@ print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
     [meanH, sigH, meanI, sigI],
-#    [5.993291e-02, 3.426664e-02, 8.513875e-02, 7.022481e-02],
+    #    [5.993291e-02, 3.426664e-02, 8.513875e-02, 7.022481e-02],
     [6.016450e-02, 3.502064e-02, 8.560226e-02, 7.148169e-02],
     rtol=rtol,
     atol=atol,
