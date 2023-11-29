@@ -231,6 +231,11 @@ namespace detail
             pp_element.get("bz", bz);
             pp_element.queryAdd("nslice", nslice);
             m_lattice.emplace_back( ChrAcc(ds, ez, bz, nslice) );
+        } else if (element_type == "thin_dipole") {
+            amrex::Real theta, rc;
+            pp_element.get("theta", theta);
+            pp_element.get("rc", rc);
+            m_lattice.emplace_back( ThinDipole(theta, rc) );
         } else if (element_type == "kicker") {
             amrex::Real xkick, ykick;
             std::string units_str = "dimensionless";
@@ -243,6 +248,18 @@ namespace detail
                 Kicker::UnitSystem::dimensionless :
                 Kicker::UnitSystem::Tm;
             m_lattice.emplace_back( Kicker(xkick, ykick, units) );
+        } else if (element_type == "aperture") {
+            amrex::Real xmax, ymax;
+            std::string shape_str = "rectangular";
+            pp_element.get("xmax", xmax);
+            pp_element.get("ymax", ymax);
+            pp_element.queryAdd("shape", shape_str);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(shape_str == "rectangular" || shape_str == "elliptical",
+                                             element_name + ".shape must be \"rectangular\" or \"elliptical\"");
+            Aperture::Shape shape = shape_str == "rectangular" ?
+                                        Aperture::Shape::rectangular :
+                                        Aperture::Shape::elliptical;
+            m_lattice.emplace_back( Aperture(xmax, ymax, shape) );
         } else if (element_type == "beam_monitor") {
             std::string openpmd_name = element_name;
             pp_element.queryAdd("name", openpmd_name);

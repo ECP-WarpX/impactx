@@ -12,6 +12,10 @@
 #include <AMReX_MFIter.H>
 #include <AMReX_ParticleContainer.H>
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 namespace py = pybind11;
 using namespace impactx;
 
@@ -43,6 +47,16 @@ void init_impactxparticlecontainer(py::module& m)
         amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>
     >(m, "ImpactXParticleContainer")
         //.def(py::init<>())
+
+        .def_property_readonly_static("RealAoS",
+            [](py::object /* pc */){ return py::type::of<RealAoS>(); },
+            "RealAoS attribute name labels"
+        )
+        .def_property_readonly_static("RealSoA",
+            [](py::object /* pc */){ return py::type::of<RealSoA>(); },
+            "RealSoA attribute name labels"
+        )
+
         .def("add_n_particles",
              &ImpactXParticleContainer::AddNParticles,
              py::arg("lev"),
@@ -102,5 +116,18 @@ void init_impactxparticlecontainer(py::module& m)
              "Charge deposition"
         )
         */
+
+        .def_property_readonly("RealAoS_names", &ImpactXParticleContainer::RealAoS_names,
+              "Get the name of each Real AoS component")
+
+        .def_property_readonly("RealSoA_names", &ImpactXParticleContainer::RealSoA_names,
+              "Get the name of each Real SoA component")
     ;
+
+    m.def("get_RealAoS_names", &get_RealAoS_names,
+          "Get the name of each Real AoS component");
+
+    m.def("get_RealSoA_names", &get_RealSoA_names,
+          py::arg("num_real_comps"),
+          "Get the name of each Real SoA component\n\nnum_real_comps: pass number of compile-time + runtime arrays");
 }

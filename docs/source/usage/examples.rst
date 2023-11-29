@@ -28,6 +28,8 @@ This section allows you to **download input files** that correspond to different
    examples/cfbend/README.rst
    examples/compression/README.rst
    examples/kicker/README.rst
+   examples/thin_dipole/README.rst
+   examples/aperture/README.rst
 
 
 Unit tests

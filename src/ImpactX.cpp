@@ -9,6 +9,7 @@
  */
 #include "ImpactX.H"
 #include "initialization/InitAmrCore.H"
+#include "particles/CollectLost.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
 #include "particles/diagnostics/DiagnosticOutput.H"
@@ -33,7 +34,8 @@ namespace impactx
 {
     ImpactX::ImpactX ()
         : AmrCore(initialization::init_amr_core()),
-          m_particle_container(std::make_unique<ImpactXParticleContainer>(this))
+          m_particle_container(std::make_unique<ImpactXParticleContainer>(this)),
+          m_particles_lost(std::make_unique<ImpactXParticleContainer>(this))
     {
         // todo: if amr.n_cells is provided, overwrite/redefine AmrCore object
 
@@ -81,6 +83,21 @@ namespace impactx
         // init blocks / grids & MultiFabs
         AmrCore::InitFromScratch(0.0);
         amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
+
+        // alloc particle containers
+        //   the lost particles have an extra runtime attribute: s when it was lost
+        bool comm = true;
+        m_particles_lost->AddRealComp(comm);
+
+        //   have to resize here, not in the constructor because grids have not
+        //   been built when constructor was called.
+        m_particle_container->reserveData();
+        m_particle_container->resizeData();
+        m_particles_lost->reserveData();
+        m_particles_lost->resizeData();
+
+        // register shortcut
+        m_particle_container->SetLostParticleContainer(m_particles_lost.get());
     }
 
     void ImpactX::evolve ()
@@ -210,6 +227,9 @@ namespace impactx
                     // push all particles with external maps
                     Push(*m_particle_container, element_variant, global_step);
 
+                    // move "lost" particles to another particle container
+                    collect_lost_particles(*m_particle_container);
+
                     // just prints an empty newline at the end of the slice_step
                     amrex::Print() << "\n";
 
@@ -261,6 +281,17 @@ namespace impactx
                                           diagnostics::OutputType::PrintReducedBeamCharacteristics,
                                           "diags/reduced_beam_characteristics_final",
                                           global_step);
+
+            // output particles lost in apertures
+            if (m_particles_lost->TotalNumberOfParticles() > 0)
+            {
+                std::string openpmd_backend = "default";
+                pp_diag.queryAdd("backend", openpmd_backend);
+
+                diagnostics::BeamMonitor output_lost("particles_lost", openpmd_backend, "g");
+                output_lost(*m_particles_lost, 0);
+                output_lost.finalize();
+            }
         }
 
         // loop over all beamline elements & finalize them

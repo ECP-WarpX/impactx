@@ -18,7 +18,7 @@ namespace impactx::distribution
 {
     struct None
     {
-        /** This distribution does nothing
+        /** This distribution sets all values to zero.
          */
          None()
          {
@@ -26,7 +26,7 @@ namespace impactx::distribution
 
         /** Return 1 6D particle coordinate
          *
-         * Does nothing to the parameters.
+         * Sets all values to zero.
          *
          * @param x particle position in x
          * @param y particle position in y
@@ -38,15 +38,22 @@ namespace impactx::distribution
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                [[maybe_unused]] amrex::ParticleReal & x,
-                [[maybe_unused]] amrex::ParticleReal & y,
-                [[maybe_unused]] amrex::ParticleReal & t,
-                [[maybe_unused]] amrex::ParticleReal & px,
-                [[maybe_unused]] amrex::ParticleReal & py,
-                [[maybe_unused]] amrex::ParticleReal & pt,
+                amrex::ParticleReal & x,
+                amrex::ParticleReal & y,
+                amrex::ParticleReal & t,
+                amrex::ParticleReal & px,
+                amrex::ParticleReal & py,
+                amrex::ParticleReal & pt,
                 [[maybe_unused]] amrex::RandomEngine const& engine) const
         {
-            /* nothing to do */
+            using namespace amrex::literals;
+
+            x = 0_prt;
+            y = 0_prt;
+            t = 0_prt;
+            px = 0_prt;
+            py = 0_prt;
+            pt = 0_prt;
         }
     };
 

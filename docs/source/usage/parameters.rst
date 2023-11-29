@@ -509,6 +509,22 @@ Lattice Elements
 
             * ``<element_name>.units`` (``string``) specification of units: ``dimensionless`` (default, in units of the magnetic rigidity of the reference particle) or ``T-m``
 
+        * ``thin_dipole`` for a thin dipole element.
+          This requires these additional parameters:
+
+            * ``<element_name>.theta`` (``float``, in degrees) dipole bend angle
+
+            * ``<element_name>.rc`` (``float``, in meters) effective radius of curvature
+
+        * ``aperture`` for a thin collimator element applying a transverse aperture boundary.
+          This requires these additional parameters:
+
+            * ``<element_name>.xmax`` (``float``, in meters) maximum value of the horizontal coordinate
+
+            * ``<element_name>.ymax`` (``float``, in meters) maximum value of the vertical coordinate
+
+            * ``<element_name>.shape`` (``string``) shape of the aperture boundary: ``rectangular`` (default) or ``elliptical``
+
         * ``beam_monitor`` a beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
           If the same element name is used multiple times, then an output series is created with multiple outputs.
 
@@ -683,6 +699,11 @@ Diagnostics and output
 
 * ``diag.file_min_digits`` (``integer``, optional, default: ``6``)
     The minimum number of digits used for the step number appended to the diagnostic file names.
+
+* ``diag.backend`` (``string``, default value: ``default``)
+
+  Diagnostics for particles lost in apertures, stored as ``diags/openPMD/particles_lost.*`` at the end of the simulation.
+  See the ``beam_monitor`` element for backend values.
 
 .. _running-cpp-parameters-diagnostics-reduced:
 

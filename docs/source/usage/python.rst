@@ -116,6 +116,11 @@ General
       The minimum number of digits (default: ``6``) used for the step
       number appended to the diagnostic file names.
 
+   .. py:property:: particle_lost_diagnostics_backend
+
+      Diagnostics for particles lost in apertures.
+      See the ``BeamMonitor`` element for backend values.
+
    .. py:method:: init_grids()
 
       Initialize AMReX blocks/grids for domain decomposition & space charge mesh.
@@ -394,7 +399,7 @@ This module provides particle beam distributions that can be used to initialize 
 
 .. py:class:: impactx.distribution.None
 
-   This distribution does nothing.
+   This distribution sets all values to zero.
 
 .. py:class:: impactx.distribution.Semigaussian(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
@@ -464,6 +469,18 @@ This module provides elements for the accelerator lattice.
    :param ky: Focusing strength for y in 1/m.
    :param kt: Focusing strength for t in 1/m.
    :param nslice: number of slices used for the application of space charge
+
+   .. py:property:: kx
+
+      focusing x strength in 1/m
+
+   .. py:property:: ky
+
+      focusing y strength in 1/m
+
+   .. py:property:: kt
+
+      focusing t strength in 1/m
 
 .. py:class:: impactx.elements.DipEdge(psi, rc, g, K2)
 
@@ -700,6 +717,14 @@ References:
    :param phi_in: angle of the reference particle with respect to the longitudinal (z) axis in the original frame in degrees
    :param phi_out: angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame in degrees
 
+.. py:class:: impactx.elements.Aperture(xmax, ymax, shape="rectangular")
+
+   A thin collimator element, applying a transverse aperture boundary.
+
+   :param xmax: maximum allowed value of the horizontal coordinate (meter)
+   :param ymax: maximum allowed value of the vertical coordinate (meter)
+   :param shape: aperture boundary shape: ``"rectangular"`` (default) or ``"elliptical"``
+
 .. py:class:: impactx.elements.SoftQuadrupole(ds, gscale, cos_coefficients, sin_coefficients, nslice=1)
 
    A soft-edge quadrupole.
@@ -713,6 +738,15 @@ References:
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
 
+.. py:class:: impactx.elements.ThinDipole(theta, rc)
+
+   A general thin dipole element.
+
+   :param theta: Bend angle (degrees)
+   :param rc: Effective curvature radius (meters)
+
+Reference:
+   * G. Ripken and F. Schmidt, Thin-Lens Formalism for Tracking, CERN/SL/95-12 (AP), 1995.
 
 Coordinate Transformation
 -------------------------

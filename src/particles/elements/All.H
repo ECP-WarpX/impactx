@@ -10,6 +10,7 @@
 #ifndef IMPACTX_ELEMENTS_ALL_H
 #define IMPACTX_ELEMENTS_ALL_H
 
+#include "Aperture.H"
 #include "Buncher.H"
 #include "CFbend.H"
 #include "ChrDrift.H"
@@ -33,6 +34,7 @@
 #include "PRot.H"
 #include "SoftSol.H"
 #include "SoftQuad.H"
+#include "ThinDipole.H"
 #include "diagnostics/openPMD.H"
 
 #include <variant>
@@ -42,6 +44,7 @@ namespace impactx
 {
     using KnownElements = std::variant<
         None, /* must be first, so KnownElements creates a default constructor */
+        Aperture,
         Buncher,
         CFbend,
         ChrAcc,
@@ -64,7 +67,8 @@ namespace impactx
         ShortRF,
         SoftSolenoid,
         SoftQuadrupole,
-        Sol
+        Sol,
+        ThinDipole
     >;
 
 } // namespace impactx

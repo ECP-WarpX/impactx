@@ -1,6 +1,7 @@
 target_sources(lib
   PRIVATE
     ChargeDeposition.cpp
+    CollectLost.cpp
     ImpactXParticleContainer.cpp
     Push.cpp
 )
