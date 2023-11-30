@@ -672,7 +672,7 @@ add_impactx_test(IOTA_lattice.py
     examples/iota_lattice/run_iotalattice_sdep.py
       OFF   # ImpactX MPI-parallel
       ON   # ImpactX Python interface
-    examples/run_iotalattice_sdep.py/analysis_iotalattice_sdep_dum.py
+    examples/iota_lattice/analysis_iotalattice_sdep_dum.py
     OFF  # no plot script yet
 )
 
