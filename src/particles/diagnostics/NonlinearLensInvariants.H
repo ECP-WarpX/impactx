@@ -49,7 +49,7 @@ namespace impactx::diagnostics
          * @param cn - scale parameter of the nonlinear insert (m^[1/2])
          *
          */
-        NonlinearLensInvariants(
+        NonlinearLensInvariants (
             amrex::ParticleReal const alpha,
             amrex::ParticleReal const beta,
             amrex::ParticleReal const tn,
@@ -68,10 +68,11 @@ namespace impactx::diagnostics
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         Data operator() (
-                amrex::ParticleReal const x,
-                amrex::ParticleReal const y,
-                amrex::ParticleReal const px,
-                amrex::ParticleReal const py ) const
+            amrex::ParticleReal const x,
+            amrex::ParticleReal const y,
+            amrex::ParticleReal const px,
+            amrex::ParticleReal const py
+        ) const
         {
 
             using namespace amrex::literals; // for _rt and _prt

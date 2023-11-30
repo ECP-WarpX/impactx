@@ -272,6 +272,20 @@ void init_ImpactX (py::module& m)
              "The minimum number of digits (default: 6) used for the step\n"
              "number appended to the diagnostic file names."
         )
+        .def("set_diag_iota_invariants",
+              [](ImpactX & /* ix */, amrex::ParticleReal alpha, amrex::ParticleReal beta, amrex::ParticleReal tn, amrex::ParticleReal cn) {
+                  amrex::ParmParse pp_diag("diag");
+
+                  pp_diag.add("alpha", alpha);
+                  pp_diag.add("beta", beta);
+                  pp_diag.add("tn", tn);
+                  pp_diag.add("cn", cn);
+              },
+              py::arg("alpha"), py::arg("beta"), py::arg("tn"), py::arg("cn"),
+              "Set the Twiss alpha, beta (m), dimensionless strength of the nonlinear insert and "
+              "scale parameter of the nonlinear insert (m^[1/2]) of the IOTA nonlinear lens "
+              "invariants diagnostics."
+        )
         .def_property("particle_lost_diagnostics_backend",
                       [](ImpactX & /* ix */) {
                           return detail::get_or_throw<std::string>("diag", "backend");
