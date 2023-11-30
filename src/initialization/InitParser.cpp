@@ -25,6 +25,10 @@ namespace impactx::initialization
         bool the_arena_is_managed = false; // AMReX' default: true
         pp_amrex.queryAdd("the_arena_is_managed", the_arena_is_managed);
 
+        // https://amrex-codes.github.io/amrex/docs_html/InputsComputeBackends.html
+        std::string omp_threads = "nosmt"; // AMReX' default: system
+        pp_amrex.queryAdd("omp_threads", omp_threads);
+
         // Here we override the default tiling option for particles, which is always
         // "false" in AMReX, to "false" if compiling for GPU execution and "true"
         // if compiling for CPU.
