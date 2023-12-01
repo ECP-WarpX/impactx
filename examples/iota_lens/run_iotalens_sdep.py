@@ -23,7 +23,9 @@ sim.slice_step_diagnostics = True
 sim.init_grids()
 
 # diagnostics: IOTA nonlinear lens invariants calculation
-sim.set_diag_iota_invariants(alpha=1.376381920471173, beta=1.892632003628881, tn=0.4, cn=0.01)
+sim.set_diag_iota_invariants(
+    alpha=1.376381920471173, beta=1.892632003628881, tn=0.4, cn=0.01
+)
 
 # load a 2.5 MeV proton beam
 kin_energy_MeV = 2.5  # reference energy
