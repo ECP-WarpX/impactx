@@ -116,6 +116,15 @@ General
       The minimum number of digits (default: ``6``) used for the step
       number appended to the diagnostic file names.
 
+   .. py:method:: set_diag_iota_invariants(alpha, beta, tn, cn)
+
+      Set the parameters of the IOTA nonlinear lens invariants diagnostics.
+
+      :param float alpha: Twiss alpha
+      :param float beta: Twiss beta (m)
+      :param float tn: dimensionless strength of the nonlinear insert
+      :param float cn: scale parameter of the nonlinear insert (m^[1/2])
+
    .. py:property:: particle_lost_diagnostics_backend
 
       Diagnostics for particles lost in apertures.
