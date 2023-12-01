@@ -64,8 +64,8 @@ ideal map associated with the remainder of the lattice.
 
 We use a 2.5 MeV proton beam, corresponding to the nominal IOTA proton energy.
 
-The two functions H (Hamiltonian) and I (the second invariant) are evaluated at the 
-entrance to the nonlinear element, and then again after the thin lens (representing a 
+The two functions H (Hamiltonian) and I (the second invariant) are evaluated at the
+entrance to the nonlinear element, and then again after the thin lens (representing a
 single period).  These values should be unchanged for all particles (to within acceptable tolerance).
 
 In this test, the initial and final values of :math:`\mu_H`, :math:`\sigma_H`, :math:`\mu_I`, :math:`\sigma_I` must agree with nominal values.
