@@ -56,7 +56,7 @@ meanH, sigH, meanI, sigI = get_moments(initial)
 print(f"  meanH={meanH:e} sigH={sigH:e} meanI={meanI:e} sigI={sigI:e}")
 
 atol = 0.0  # a big number
-rtol = 1.5e3 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 1.8 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
@@ -73,7 +73,7 @@ meanH, sigH, meanI, sigI = get_moments(final)
 print(f"  meanH={meanH:e} sigH={sigH:e} meanI={meanI:e} sigI={sigI:e}")
 
 atol = 0.0  # a big number
-rtol = 1.5e3 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 1.8 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
@@ -94,14 +94,14 @@ beam_joined["dI"] = (beam_joined["I_initial"] - beam_joined["I_final"]).abs()
 Hrms = np.sqrt(sigH**2 + meanH**2)
 Irms = np.sqrt(sigI**2 + meanI**2)
 
-atol = 2.5e3 * Hrms
+atol = 2.5e-3 * Hrms
 rtol = 0.0  # large number
 print()
 print(f"  atol={atol} (ignored: rtol~={rtol})")
 print(f"  dH_max={beam_joined['dH'].max()}")
 assert np.allclose(beam_joined["dH"], 0.0, rtol=rtol, atol=atol)
 
-atol = 3.5e3 * Irms
+atol = 3.5e-3 * Irms
 rtol = 0.0
 print()
 print(f"  atol={atol} (ignored: rtol~={rtol})")
