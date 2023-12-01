@@ -22,6 +22,9 @@ sim.slice_step_diagnostics = True
 # domain decomposition & space charge mesh
 sim.init_grids()
 
+# diagnostics: IOTA nonlinear lens invariants calculation
+sim.set_diag_iota_invariants(alpha=1.376381920471173, beta=1.892632003628881, tn=0.4, cn=0.01)
+
 # load a 2.5 MeV proton beam
 kin_energy_MeV = 2.5  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
@@ -43,17 +46,6 @@ distr = distribution.Waterbag(
     muypy=0.8090169943749474,
     mutpt=0.0,
 )
-# distr = distribution.Waterbag(
-#    sigmaX=1.865379469388e-003,
-#    sigmaY=2.0192133150418e-003,
-#    sigmaT=1.0e-4,
-#    sigmaPx=1.402566720991e-003,
-#    sigmaPy=9.57593913381e-004,
-#    sigmaPt=0.0,
-#    muxpx=-0.482260919078473,
-#    muypy=-0.762127656873158,
-#    mutpt=0.0,
-# )
 
 sim.add_particles(bunch_charge_C, distr, npart)
 
@@ -77,7 +69,6 @@ dr = elements.Drift(ds=ds_half)
 for j in range(0, num_lenses):
     s = -lens_length / 2.0 + ds_half + j * ds
     beta_star = lens_length / 2.0 * 1.0 / math.tan(math.pi * tune_advance)
-    # beta = beta_star * (1.0 + 4.0 * s**2 * math.tan(math.pi * tune_advance) ** 2 / lens_length**2)
     beta = beta_star * (
         1.0 + (2.0 * s * math.tan(math.pi * tune_advance) / lens_length) ** 2
     )
@@ -85,7 +76,6 @@ for j in range(0, num_lenses):
     cnll_s = c_parameter * math.sqrt(beta)
     nllens = elements.NonlinearLens(knll=knll_s, cnll=cnll_s)
     segments = [dr, nllens, dr]
-    #    segments = [dr, dr]
     sim.lattice.extend(segments)
 
 # focusing lens
