@@ -53,7 +53,7 @@ We run the following script to analyze correctness:
 .. _examples-iotalattice-sdep:
 
 The full nonlinear lattice of the Fermilab IOTA storage ring
-=============================================================
+============================================================
 
 The full nonlinear lattice of the IOTA storage ring, configured for operation with a 2.5 MeV proton beam.
 
