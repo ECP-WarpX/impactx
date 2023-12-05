@@ -42,7 +42,8 @@ jobs:
         python3 -m pip install --upgrade pytest
         python3 -m pip install --upgrade -r requirements_mpi.txt
         python3 -m pip install --upgrade -r examples/requirements.txt
-        python3 -m pip install --upgrade openPMD-validator
+        python3 -m pip install --upgrade pipx
+        python3 -m pipx install --upgrade openPMD-validator
         set -e
     - name: CCache Cache
       uses: actions/cache@v3
