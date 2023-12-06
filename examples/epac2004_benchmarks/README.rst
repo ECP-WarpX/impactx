@@ -9,7 +9,7 @@ R. D. Ryne et al, "A Test Suite of Space-Charge Problems for Code Benchmarking",
 See additional documentation in:
 C. E. Mitchell et al, "ImpactX Modeling of Benchmark Tests for Space Charge Validation", in Proc. HB2023, Geneva, Switzerland.
 
-A cold (zero momentum spread), uniform density, 250 MeV, 143 pC proton bunch propagates in a FODO lattice with 700 MHz RF 
+A cold (zero momentum spread), uniform density, 250 MeV, 143 pC proton bunch propagates in a FODO lattice with 700 MHz RF
 cavities added for longitudinal confinement.  The on-axis profile of the RF electric field is given by:
 
 :math:`E(z)=\exp(-(4z)^4)\cos(\frac{5\pi}{2}\tanh(5z))'.
@@ -179,4 +179,3 @@ We run the following script to analyze correctness:
    .. literalinclude:: analysis_bithermal.py
       :language: python3
       :caption: You can copy this file from ``examples/epac2004_benchmarks/analysis_bithermal.py``.
-
