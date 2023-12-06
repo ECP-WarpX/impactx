@@ -33,6 +33,11 @@ Overall simulation parameters
     For all regular ImpactX operations, we therefore do explicit memory transfers without the need for managed memory and thus changed the AMReX default to false.
     `Please also see the documentation in AMReX <https://amrex-codes.github.io/amrex/docs_html/GPU.html#inputs-parameters>`__.
 
+* ``amrex.omp_threads``  (``system``, ``nosmt`` or positive integer; default is ``nosmt``)
+    An integer number can be set in lieu of the ``OMP_NUM_THREADS`` environment variable to control the number of OpenMP threads to use for the ``OMP`` compute backend on CPUs.
+    By default, we use the ``nosmt`` option, which overwrites the OpenMP default of spawning one thread per logical CPU core, and instead only spawns a number of threads equal to the number of physical CPU cores on the machine.
+    If set, the environment variable ``OMP_NUM_THREADS`` takes precedence over ``system`` and ``nosmt``, but not over integer numbers set in this option.
+
 * ``amrex.abort_on_unused_inputs`` (``0`` or ``1``; default is ``0`` for false)
     When set to ``1``, this option causes the simulation to fail *after* its completion if there were unused parameters.
     It is mainly intended for continuous integration and automated testing to check that all tests and inputs are adapted to API changes.
@@ -516,6 +521,15 @@ Lattice Elements
 
             * ``<element_name>.rc`` (``float``, in meters) effective radius of curvature
 
+        * ``aperture`` for a thin collimator element applying a transverse aperture boundary.
+          This requires these additional parameters:
+
+            * ``<element_name>.xmax`` (``float``, in meters) maximum value of the horizontal coordinate
+
+            * ``<element_name>.ymax`` (``float``, in meters) maximum value of the vertical coordinate
+
+            * ``<element_name>.shape`` (``string``) shape of the aperture boundary: ``rectangular`` (default) or ``elliptical``
+
         * ``beam_monitor`` a beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
           If the same element name is used multiple times, then an output series is created with multiple outputs.
 
@@ -690,6 +704,11 @@ Diagnostics and output
 
 * ``diag.file_min_digits`` (``integer``, optional, default: ``6``)
     The minimum number of digits used for the step number appended to the diagnostic file names.
+
+* ``diag.backend`` (``string``, default value: ``default``)
+
+  Diagnostics for particles lost in apertures, stored as ``diags/openPMD/particles_lost.*`` at the end of the simulation.
+  See the ``beam_monitor`` element for backend values.
 
 .. _running-cpp-parameters-diagnostics-reduced:
 

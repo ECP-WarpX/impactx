@@ -57,6 +57,24 @@ namespace impactx
         SetParticleSize();
     }
 
+    void
+    ImpactXParticleContainer::SetLostParticleContainer (ImpactXParticleContainer * lost_pc)
+    {
+        m_particles_lost = lost_pc;
+    }
+
+    ImpactXParticleContainer *
+    ImpactXParticleContainer::GetLostParticleContainer ()
+    {
+        if (m_particles_lost == nullptr)
+        {
+            throw std::logic_error(
+                    "ImpactXParticleContainer::GetLostParticleContainer No lost particle container registered yet.");
+        } else {
+            return m_particles_lost;
+        }
+    }
+
     void ImpactXParticleContainer::SetParticleShape (int order) {
         if (m_particle_shape.has_value())
         {
@@ -103,11 +121,6 @@ namespace impactx
 
         // number of particles to add
         int const np = x.size();
-
-        // have to resize here, not in the constructor because grids have not
-        // been built when constructor was called.
-        reserveData();
-        resizeData();
 
         auto& particle_tile = DefineAndReturnParticleTile(0, 0, 0);
 
@@ -198,5 +211,46 @@ namespace impactx
         return ablastr::particles::MeanAndStdPositions<
             ImpactXParticleContainer, RealSoA::w
         >(*this);
+    }
+
+    std::vector<std::string>
+    ImpactXParticleContainer::RealAoS_names () const
+    {
+        return get_RealAoS_names();
+    }
+
+    std::vector<std::string>
+    ImpactXParticleContainer::RealSoA_names () const
+    {
+        return get_RealSoA_names(this->NumRealComps());
+    }
+
+    std::vector<std::string>
+    get_RealAoS_names ()
+    {
+        std::vector<std::string> real_aos_names(RealAoS::names_s.size());
+
+        // compile-time attributes
+        std::copy(RealAoS::names_s.begin(), RealAoS::names_s.end(), real_aos_names.begin());
+
+        return real_aos_names;
+    }
+
+    std::vector<std::string>
+    get_RealSoA_names (int num_real_comps)
+    {
+        std::vector<std::string> real_soa_names(num_real_comps);
+
+        // compile-time attributes
+        std::copy(RealSoA::names_s.begin(), RealSoA::names_s.end(), real_soa_names.begin());
+
+        // runtime attributes
+        if (num_real_comps > int(RealSoA::names_s.size()))
+        {
+            // particles lost record their "s" position where they got lost
+            real_soa_names[RealSoA::nattribs] = "s_lost";
+        }
+
+        return real_soa_names;
     }
 } // namespace impactx

@@ -61,20 +61,20 @@ The code writes out the values in an ASCII file prefixed ``reduced_beam_characte
 * ``step``
     Iteration within the simulation
 * ``s``, ``ref_beta_gamma``
-    Reference particle coordinate ``s`` and relativistic momentum normalized by the particle mass and the speed of light
-* ``x_mean``, ``y_mean``, ``t_mean``
-    Average beam particle position in the dimensions of ``x``, ``y`` (transverse coordinates), and ``t`` (normalized time difference)
+    Reference particle coordinate ``s`` (unit: meter) and relativistic momentum normalized by the particle mass and the speed of light (unit: dimensionless)
+* ``x_mean/min/max``, ``y_mean/min/max``, ``t_mean/min/max``
+    Average / minimum / maximum beam particle position in the dimensions of ``x``, ``y`` (transverse coordinates, unit: meter), and ``t`` (normalized time difference :math:`ct`, unit: meter)
 * ``sig_x``, ``sig_y``, ``sig_t``
-    RMS of the average beam particle positions
-* ``px_mean``, ``py_mean``, ``pt_mean``
-    Average beam momenta
+    RMS of the average beam particle positions (unit: meter)
+* ``px_mean/min/max``, ``py_mean/min/max``, ``pt_mean/min/max``
+    Average / minimum / maximum beam momenta normalized by reference particle momentum (unit: dimensionless, radians for transverse momenta)
 * ``sig_px``, ``sig_py``, ``sig_pt``
-    RMS of the average beam momenta (energy difference for ``pt``)
+    RMS of the average beam momenta (energy difference for ``pt``) (unit: dimensionless)
 * ``emittance_x``, ``emittance_y``, ``emittance_t``
-    Normalized beam emittance
+    Normalized beam emittance (unit: meter)
 * ``alpha_x``, ``alpha_y``, ``alpha_t``
-    Twiss alpha
+    Courant-Snyder (Twiss) alpha (unit: dimensionless)
 * ``beta_x``, ``beta_y``, ``beta_t``
-    Twiss beta
+    Courant-Snyder (Twiss) beta (unit: meter)
 * ``charge``
-    Cumulated beam charge in C
+    Cumulated beam charge (unit: Coulomb)
