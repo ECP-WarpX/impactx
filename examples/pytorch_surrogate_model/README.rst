@@ -3,8 +3,8 @@
 9 stage laser-plasma accelerator surrogate example
 ==================================================
 
-Nine stages of laser-plasma accelerators.  
-The laser-plasma accelerator elements are neural network surrogate models, 
+Nine stages of laser-plasma accelerators.
+The laser-plasma accelerator elements are neural network surrogate models,
 previously trained and included in ``models``.
 The neural networks require normalized input data, the normalizations can be found in ``datasets``.
 
@@ -61,7 +61,7 @@ You can run the following script to visualize the beam evolution over time:
    9 stage LPA (via neural network surrogates) beam moments
 
 .. figure:: initial_phase_spaces.png
-   :alt: Initial phase space projections 
+   :alt: Initial phase space projections
 
    Initial phase space projections going into 9 stage LPA (via neural network surrogates) simulation
 

@@ -75,9 +75,9 @@ assert np.allclose(
     atol=atol,
 )
 
-atol = 1.e-6
+atol = 1.0e-6
 print(f"  atol~={atol}")
-assert np.allclose([emittance_t],[0.0],atol=atol)
+assert np.allclose([emittance_t], [0.0], atol=atol)
 
 print("")
 print("Final Beam:")
@@ -104,4 +104,3 @@ assert np.allclose(
     rtol=rtol,
     atol=atol,
 )
-
