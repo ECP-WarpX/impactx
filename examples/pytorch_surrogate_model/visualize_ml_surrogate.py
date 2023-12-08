@@ -304,14 +304,14 @@ impactx_surrogate_reduced_diags = read_time_series(
 ref_gamma = np.sqrt(1 + impactx_surrogate_reduced_diags["ref_beta_gamma"] ** 2)
 beam_gamma = (
     ref_gamma
-    + impactx_surrogate_reduced_diags["pt_mean"]
+    - impactx_surrogate_reduced_diags["pt_mean"]
     * impactx_surrogate_reduced_diags["ref_beta_gamma"]
 )
-beam_uz = np.sqrt(beam_gamma**2 - 1)
+beam_u = np.sqrt(beam_gamma**2 - 1)
 emit_x = impactx_surrogate_reduced_diags["emittance_x"]
-emit_nx = emit_x * beam_uz
+emit_nx = emit_x * beam_u
 emit_y = impactx_surrogate_reduced_diags["emittance_y"]
-emit_ny = emit_y * beam_uz
+emit_ny = emit_y * beam_u
 
 ix_slice = [0] + [2 + 9 * i for i in range(8)]
 
@@ -340,8 +340,7 @@ ax = axT[0][1]
 scale = m_e * c**2 / e * 1e-9
 ax.plot(
     impactx_surrogate_reduced_diags["s"][ix_slice],
-    (ref_gamma[ix_slice] - impactx_surrogate_reduced_diags["pt_mean"][ix_slice])
-    * scale,
+    beam_gamma[ix_slice] * scale,
     "go",
 )
 ax.set_xlabel("s [m]")
