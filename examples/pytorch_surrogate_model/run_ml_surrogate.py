@@ -49,7 +49,6 @@ ebeam_lpa_z0 = -107e-6
 L_plasma = 0.28
 L_transport = 0.03
 L_stage_period = L_plasma + L_transport
-ebeam_lpa_z0 = -107e-6
 drift_after_LPA = 43e-6
 L_surrogate = abs(ebeam_lpa_z0) + L_plasma + drift_after_LPA
 
@@ -151,7 +150,6 @@ class LPASurrogateStage(elements.Programmable):
         ref_part.y = ref_part_final[1]
         ref_part.z = ref_part_final[2]
         ref_gamma = np.sqrt(1 + ref_beta_gamma_final**2)
-        ref_beta = ref_beta_gamma_final / ref_gamma
         ref_part.px = ref_part_final[3]
         ref_part.py = ref_part_final[4]
         ref_part.pz = ref_part_final[5]
