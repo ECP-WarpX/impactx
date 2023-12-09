@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+#
+# Copyright 2022-2023 ImpactX contributors
+# Authors: Axel Huebl, Chad Mitchell
+# License: BSD-3-Clause-LBNL
+#
+# https://openpmd-api.readthedocs.io/en/0.15.2/analysis/pandas.html#openpmd-to-ascii
+#
+
 import openpmd_api as io  # install with python3 -m pip install openpmd-api
 
 # access the initial/final beam

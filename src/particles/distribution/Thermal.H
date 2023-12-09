@@ -71,7 +71,8 @@ namespace distribution
         void generate_radial_dist (amrex::ParticleReal const bunch_charge, RefPart const & refpart, Rprofile & data)
 
         {
-            using namespace amrex::literals; // for _rt and _prt
+            using namespace amrex::literals;  // for _rt and _prt
+            using namespace ablastr::constant::math;  // for pi
 
             // Get relativistic beta*gamma
             amrex::ParticleReal bg = refpart.beta_gamma();
@@ -91,7 +92,6 @@ namespace distribution
             amrex::PrintToFile("equilibrium_params.out") << r_scale << " " << data.Cintensity << "\n";
 
             // Scale the parameters p1 and p2
-            constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
             amrex::ParticleReal rt2pi = sqrt(2.0_prt*pi);
             amrex::ParticleReal p_scale = pow(r_scale*rt2pi,-3);
             data.p1 = data.p1*p_scale;
@@ -120,8 +120,8 @@ namespace distribution
         amrex::ParticleReal
         matched_scale_radius(Rprofile & data)
         {
-            using namespace amrex::literals; // for _rt and _prt
-            constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
+            using namespace amrex::literals;  // for _rt and _prt
+            using namespace ablastr::constant::math;  // for pi
 
             amrex::ParticleReal k = data.k;
             amrex::ParticleReal kT = (1.0_prt-data.w)*data.T1 + data.w*data.T2;
@@ -168,14 +168,14 @@ namespace distribution
                    Rprofile & data,
                    amrex::ParticleReal & reval) const
         {
-            using namespace amrex::literals; // for _rt and _prt
+            using namespace amrex::literals;  // for _rt and _prt
+            using namespace ablastr::constant::math;  // for pi
 
             amrex::ParticleReal const f1 = data.f1;
             amrex::ParticleReal const f2 = data.f2;
             amrex::ParticleReal const phi1 = data.phi1;
             amrex::ParticleReal const phi2 = data.phi2;
             amrex::ParticleReal const r = reval;
-            constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
             // Apply map to update phi1, phi2, and r:
             reval = r + tau;
@@ -190,7 +190,8 @@ namespace distribution
                    Rprofile & data,
                    amrex::ParticleReal & reval) const
         {
-            using namespace amrex::literals; // for _rt and _prt
+            using namespace amrex::literals;  // for _rt and _prt
+            using namespace ablastr::constant::math;  // for pi
 
             amrex::ParticleReal const f1 = data.f1;
             amrex::ParticleReal const f2 = data.f2;
@@ -201,7 +202,6 @@ namespace distribution
             amrex::ParticleReal const w = data.w;
             amrex::ParticleReal const T1 = data.T1;
             amrex::ParticleReal const T2 = data.T2;
-            constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
             // Define space charge intensity parameters
             amrex::ParticleReal const c1 = (1.0_prt-w)*data.Cintensity;
@@ -270,13 +270,12 @@ namespace distribution
                 amrex::ParticleReal & pt,
                 amrex::RandomEngine const& engine) {
 
-            using namespace amrex::literals;
+            using namespace amrex::literals;  // for _rt and _prt
+            using namespace ablastr::constant::math;  // for pi
 
             amrex::ParticleReal ln1,norm,u1,u2,uhalo;
             amrex::ParticleReal g1,g2,g3,g4,g5,g6;
             amrex::ParticleReal z,pz;
-
-            constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
             // Use a Bernoulli random variable to select between core and halo:
             // If u < w, the particle is in the halo population.

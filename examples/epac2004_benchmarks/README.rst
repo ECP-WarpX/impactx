@@ -59,7 +59,7 @@ We run the following script to analyze correctness:
 .. _examples-thermal-beam:
 
 Thermal Beam in a Constant Focusing Channel (with Space Charge)
-===================================================================
+===============================================================
 
 This example is based on the subsection of the same name in:
 R. D. Ryne et al, "A Test Suite of Space-Charge Problems for Code Benchmarking", in Proc. EPAC2004, Lucerne, Switzerland.
@@ -80,7 +80,7 @@ with 3D isotropic focusing.  (The isotropy is exact in the beam rest frame.)
 The particle distribution should remain unchanged, to within the level expected due to numerical particle noise.
 This is tested using the second moments of the distribution.
 
-In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`
+In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
 
 Run
@@ -121,7 +121,7 @@ We run the following script to analyze correctness:
 .. _examples-bithermal-beam:
 
 Bithermal Beam in a Constant Focusing Channel (with Space Charge)
-===================================================================
+=================================================================
 
 This example is based on the subsection of the same name in:
 R. D. Ryne et al, "A Test Suite of Space-Charge Problems for Code Benchmarking", in Proc. EPAC2004, Lucerne, Switzerland.
@@ -144,7 +144,7 @@ with 3D isotropic focusing.  (The isotropy is exact in the beam rest frame.)  5%
 The particle distribution should remain unchanged, to within the level expected due to numerical particle noise.
 This is tested using the second moments of the distribution.
 
-In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`
+In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
 
 Run
