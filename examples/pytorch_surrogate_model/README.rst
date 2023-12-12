@@ -4,12 +4,12 @@
 ==========================================
 
 This example models an electron beam accelerated through nine stages of laser-plasma accelerators
-with ideal plasma lenses providing the focusing between stages. 
+with ideal plasma lenses providing the focusing between stages.
 A schematic with more information can be seen in Fig. `[fig:lpa_schematic] <#fig:lpa_schematic>`__.
 
 .. figure:: https://user-images.githubusercontent.com/10621396/289956389-c7463b99-fb56-490a-8511-22c43f45cdf8.png
    :alt: [fig:lpa_schematic] Schematic of the 9 stages of laser-plasma accelerators.
-   
+
    [fig:lpa_schematic] Schematic of the 9 stages of laser-plasma accelerators.
 
 The laser-plasma accelerator elements are modeled with neural network surrogates,
@@ -59,7 +59,7 @@ You can run the following script to visualize the beam evolution over time:
       :language: python3
       :caption: You can copy this file from ``examples/pytorch_surrogate_model/visualize_ml_surrogate.py``.
 
-.. figure:: https://user-images.githubusercontent.com/10621396/289976300-6f861d19-5a5c-42eb-9435-9f57bd2010bf.png 
+.. figure:: https://user-images.githubusercontent.com/10621396/289976300-6f861d19-5a5c-42eb-9435-9f57bd2010bf.png
    :alt: [fig:moments] Evolution of beam moments through 9 stage LPA via neural network surrogates.
 
    [fig:moments] Evolution of electron beam moments through 9 stages of LPAs (via neural network surrogates).
