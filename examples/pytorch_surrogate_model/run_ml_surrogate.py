@@ -8,7 +8,13 @@
 
 import numpy as np
 from surrogate_model_definitions import surrogate_model
-import torch
+import sys
+
+try:
+    import torch
+except ImportError:
+    print("Warning: Cannot import PyTorch. Skipping test.")
+    sys.exit(0)
 
 from impactx import (
     ImpactX,
@@ -25,16 +31,6 @@ N_stage = 9
 
 training_sim_dir = "./"
 dataset_dir = training_sim_dir + "datasets/"
-
-# models_dir = training_sim_dir + 'source_iter_0_target_iter_4/'
-# stage_model_list = ['04_batches_improve_dataset/lr_1.00e-04_n_layers_5_n_nodes_900_nepochs_1500/',
-#                     '01_batches/n_layers_5_n_nodes_950/',
-#                     '00_batches/n_layers_4_n_nodes_850/',
-#                     '00_batches/n_layers_4_n_nodes_850/'
-#                    ] + ['00_lr_1.00e-04_n_layers_4_n_nodes_850/']*5
-
-# model_list = [ surrogate_model(dataset_dir + f'dataset_beam_stage_{i}.pt',
-#              models_dir + f'models_stage_{i}/' + stage_model_list[i] + 'model.pt') for i in range(N_stage)]
 
 model_list = [
     surrogate_model(
@@ -186,7 +182,7 @@ sim.slice_step_diagnostics = True
 sim.init_grids()
 
 # load a 1 GeV electron beam with an initial
-# unnormalized rms emittance of 2 nm
+# normalized rms emittance of 1 nm
 ref_u = 1957
 energy_gamma = np.sqrt(1 + ref_u**2)
 energy_MeV = 0.510998950 * energy_gamma  # reference energy
