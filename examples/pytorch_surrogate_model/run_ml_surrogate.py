@@ -6,9 +6,10 @@
 #
 # -*- coding: utf-8 -*-
 
+import sys
+
 import numpy as np
 from surrogate_model_definitions import surrogate_model
-import sys
 
 try:
     import torch
