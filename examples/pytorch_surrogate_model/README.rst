@@ -29,13 +29,9 @@ This example can be **only** be run with **Python**:
 
 For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
-.. tab-set::
-
-   .. tab-item:: Python: Script
-
-       .. literalinclude:: run_fodo.py
-          :language: python3
-          :caption: You can copy this file from ``examples/fodo/run_fodo.py``.
+.. literalinclude:: run_fodo.py
+   :language: python
+   :caption: You can copy this file from ``examples/pytorch_surrogate_model/run_ml_surrogate.py``.
 
 Analyze
 -------
@@ -45,8 +41,8 @@ We run the following script to analyze correctness:
 .. dropdown:: Script ``analyze_ml_surrogate.py``
 
    .. literalinclude:: analyze_ml_surrogate.py
-      :language: python3
-      :caption: You can copy this file from ``examples/pytorch_surrogate_model/run_ml_surrogate.py``.
+      :language: python
+      :caption: You can copy this file from ``examples/pytorch_surrogate_model/analyze_ml_surrogate.py``.
 
 Visualize
 ---------
@@ -56,7 +52,7 @@ You can run the following script to visualize the beam evolution over time:
 .. dropdown:: Script ``visualize_ml_surrogate.py``
 
    .. literalinclude:: visualize_ml_surrogate.py
-      :language: python3
+      :language: python
       :caption: You can copy this file from ``examples/pytorch_surrogate_model/visualize_ml_surrogate.py``.
 
 .. figure:: https://user-images.githubusercontent.com/10621396/289976300-6f861d19-5a5c-42eb-9435-9f57bd2010bf.png
