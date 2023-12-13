@@ -35,11 +35,11 @@ Run
 
 This example can be **only** be run with **Python**:
 
-* **Python** script: ``python3 run_ml_surrogate.py```
+* **Python** script: ``python3 run_ml_surrogate.py``
 
 For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
-.. literalinclude:: run_fodo.py
+.. literalinclude:: run_ml_surrogate.py
    :language: python
    :caption: You can copy this file from ``examples/pytorch_surrogate_model/run_ml_surrogate.py``.
 
