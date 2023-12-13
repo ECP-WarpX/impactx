@@ -66,6 +66,6 @@ You can run the following script to visualize the beam evolution over time:
    Initial phase space projections going into 9 stage LPA (via neural network surrogates) simulation. Top row: spatial projections, middle row: momentum projections, bottom row: phase spaces.
 
 .. figure:: https://user-images.githubusercontent.com/10621396/289975961-7d389864-9106-4446-8556-b0ea4bb28145.png
-   :alt: [fig:final_phase] Final phase space projections after 9 stage LPA (via neural network surrogates) simulation
+   :alt: Final phase space projections after 9 stage LPA (via neural network surrogates) simulation
 
-   [fig:final_phase] Final phase space projections after 9 stage LPA (via neural network surrogates) simulation. Top row: spatial projections, middle row: momentum projections, bottom row: phase spaces.
+   Final phase space projections after 9 stage LPA (via neural network surrogates) simulation. Top row: spatial projections, middle row: momentum projections, bottom row: phase spaces.
