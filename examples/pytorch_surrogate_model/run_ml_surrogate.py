@@ -6,9 +6,11 @@
 #
 # -*- coding: utf-8 -*-
 
-import sys
-
 import numpy as np
+import sys
+import tarfile
+from urllib import request
+
 from surrogate_model_definitions import surrogate_model
 
 try:
@@ -27,15 +29,24 @@ from impactx import (
     elements,
 )
 
+def download_and_unzip(url, data_dir):
+  request.urlretrieve(url, data_dir)
+  with tarfile.open(data_dir) as tar_dataset:
+      tar_dataset.extractall()
+
 # load models
 N_stage = 9
 
-training_sim_dir = "./"
-dataset_dir = training_sim_dir + "datasets/"
+data_url = "https://zenodo.org/records/10368972/files/ml_example_inference.tar.gz?download=1"
+download_and_unzip(data_url, "inference_dataset")
+
+dataset_dir = "datasets/"
+model_dir = "models/"
 
 model_list = [
     surrogate_model(
-        dataset_dir + f"dataset_beam_stage_{i}.pt", f"models/stage_{i}_model.pt"
+        dataset_dir + f"dataset_beam_stage_{i}.pt", 
+        model_dir + f"beam_stage_{i}_model.pt"
     )
     for i in range(N_stage)
 ]
