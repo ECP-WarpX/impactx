@@ -3,8 +3,18 @@
 9 Stage Laser-Plasma Accelerator Surrogate
 ==========================================
 
-This example models an electron beam accelerated through nine stages of laser-plasma accelerators
-with ideal plasma lenses providing the focusing between stages.
+This example models an electron beam accelerated through nine stages of laser-plasma accelerators with ideal plasma lenses providing the focusing between stages.
+For more details, see:
+
+
+- Sandberg R T, Lehe R, Mitchell C E, Garten M, Qiang J, Vay J-L and Huebl A.
+  **Synthesizing Particle-in-Cell Simulations Through Learning and GPU Computing for Hybrid Particle Accelerator Beamlines**.
+  Proc. of Platform for Advanced Scientific Computing (PASC'24), *submitted*, 2024.
+- Sandberg R T, Lehe R, Mitchell C E, Garten M, Qiang J, Vay J-L and Huebl A.
+  **Hybrid Beamline Element ML-Training for Surrogates in the ImpactX Beam-Dynamics Code**.
+  14th International Particle Accelerator Conference (IPAC'23), WEPA101, 2023.
+  `DOI:10.18429/JACoW-IPAC2023-WEPA101 <https://doi.org/10.18429/JACoW-IPAC2023-WEPA101>`__
+
 A schematic with more information can be seen in the figure below:
 
 .. figure:: https://user-images.githubusercontent.com/10621396/289956389-c7463b99-fb56-490a-8511-22c43f45cdf8.png
