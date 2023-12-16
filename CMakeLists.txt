@@ -331,7 +331,7 @@ file(TO_CMAKE_PATH "${ABS_INSTALL_LIB_DIR}" ABS_INSTALL_LIB_DIR)
 
 install(CODE "file(CREATE_LINK
     $<TARGET_FILE_NAME:lib>
-    \"${ABS_INSTALL_LIB_DIR}/libImpactX$<TARGET_FILE_SUFFIX:lib>\"
+    \"${ABS_INSTALL_LIB_DIR}/libimpactx$<TARGET_FILE_SUFFIX:lib>\"
     COPY_ON_ERROR SYMBOLIC)")
 
 # CMake package file for find_package(ImpactX::ImpactX) in depending projects
