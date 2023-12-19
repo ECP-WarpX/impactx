@@ -51,12 +51,12 @@ namespace distribution
             amrex::ParticleReal T2; ///< temperature k*T of the secondary (halo) population
             amrex::ParticleReal w;  ///< weight of the secondary (halo) population
 
-            Rprofile(amrex::ParticleReal kin,
-                     amrex::ParticleReal T1in,
-                     amrex::ParticleReal T2in,
-                     amrex::ParticleReal p1in,
-                     amrex::ParticleReal p2in,
-                     amrex::ParticleReal win)
+            Rprofile (amrex::ParticleReal kin,
+                      amrex::ParticleReal T1in,
+                      amrex::ParticleReal T2in,
+                      amrex::ParticleReal p1in,
+                      amrex::ParticleReal p2in,
+                      amrex::ParticleReal win)
             {
                  k = kin;
                  T1 = T1in;
