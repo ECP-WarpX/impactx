@@ -6,11 +6,6 @@ ImpactX
 ImpactX is an s-based beam dynamics code including space charge effects.
 This is the next generation of the `IMPACT-Z <https://github.com/impact-lbl/IMPACT-Z>`__ code.
 
-.. note::
-
-   ImpactX development is in `beta status <https://en.wikipedia.org/wiki/Software_release_life_cycle>`__.
-   Please contact us with any questions on it or if you like to contribute to its development.
-
 
 .. _contact:
 
