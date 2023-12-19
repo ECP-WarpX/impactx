@@ -317,7 +317,7 @@ namespace distribution
             amrex::ParticleReal rmin = m_data.rmin;
             amrex::ParticleReal rmax = m_data.rmax;
             int const nbins = m_data.nbins;
-            int const length = 2001;  //Ideally, int const length = nbins + 1;
+            constexpr int length = 2001;  // Ideally, int const length = nbins + 1;
             amrex::ParticleReal cdf[length];
             for (int n = 0; n < length; ++n) {
                 cdf[n] = (uhalo > m_data.w) ? m_data.cdf1[n] : m_data.cdf2[n]; //select core or halo CDF
