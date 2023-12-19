@@ -3,7 +3,7 @@
 ###############################################################################
 beam.npart = 10000
 beam.units = static
-beam.kin_energy = 100.0e3  #100 GeV nominal energy
+beam.kin_energy = 100.0e3  # 100 GeV nominal energy
 beam.charge = 1.0e-9
 beam.particle = electron
 beam.distribution = waterbag
@@ -15,7 +15,7 @@ beam.sigmaPy = 2.6623538760e-5
 beam.sigmaPt = 2.0e-3
 beam.muxpx = 0.0
 beam.muypy = 0.0
-beam.mutpt = 0.1  #10% energy spread
+beam.mutpt = 0.1  # 10% energy spread
 
 
 ###############################################################################

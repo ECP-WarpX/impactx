@@ -40,7 +40,7 @@ distr = distribution.Waterbag(
     sigmaPt=2.0e-3,
     muxpx=0.0,
     muypy=0.0,
-    mutpt=0.1,
+    mutpt=0.1,  # 10% energy spread
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
