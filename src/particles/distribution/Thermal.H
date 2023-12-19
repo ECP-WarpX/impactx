@@ -148,14 +148,14 @@ namespace distribution
             // loop over integration steps
             for (int j=0; j < steps; ++j)
             {
-            // for a second-order Strang splitting
+                // for a second-order Strang splitting
                 map1(half,data,reval);
                 map2(tau,data,reval);
                 map1(half,data,reval);
-            // store tabulated CDF
+                // store tabulated CDF
                 data.cdf1[j+1] = data.f1;
                 data.cdf2[j+1] = data.f2;
-            // write cumulative density to file for debugging
+                // write cumulative density to file for debugging
                 amrex::PrintToFile("density1.out") << reval << " " << data.f1 << "\n";
                 amrex::PrintToFile("density2.out") << reval << " " << data.f2 << "\n";
                 amrex::PrintToFile("phi1.out") << reval << " " << data.phi1 << "\n";
