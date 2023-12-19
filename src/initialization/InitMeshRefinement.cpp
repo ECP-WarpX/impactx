@@ -132,9 +132,6 @@ namespace detail
             AMREX_D_DECL((int)std::ceil(r_fine_tag_hi[0]), (int)std::ceil(r_fine_tag_hi[1]), (int)std::ceil(r_fine_tag_hi[2]))
         };
 
-        amrex::Print() << "Err lev=" << lev << " fine_tag_lo=" << fine_tag_lo << "\n";
-        amrex::Print() << "Err lev=" << lev << " fine_tag_hi=" << fine_tag_hi << "\n";
-
         amrex::Box const fine_tag = {fine_tag_lo, fine_tag_hi};
 
 #ifdef AMREX_USE_OMP
