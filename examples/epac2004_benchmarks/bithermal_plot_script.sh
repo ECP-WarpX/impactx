@@ -1,3 +1,13 @@
+#!/usr/bin/env gnuplot
+#
+# Copyright 2022-2023 ImpactX contributors
+# Authors:  Chad Mitchell
+# License: BSD-3-Clause-LBNL
+#
+
+set term png
+set output "bithermal.png"
+
 w1=0.95
 w2=0.05
 bg=0.0146003

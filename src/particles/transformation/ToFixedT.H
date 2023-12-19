@@ -60,7 +60,7 @@ namespace impactx::transformation
             amrex::ParticleReal const t = p.pos(RealAoS::t);
 
             // small tolerance to avoid NaN for pz<0:
-            amrex::ParticleReal const tol = 1.0e-8_prt;
+            constexpr amrex::ParticleReal tol = 1.0e-8_prt;
 
             // compute value of reference pzd = beta*gamma
             amrex::ParticleReal const argd = -1.0_prt + pow(m_ptd, 2);
