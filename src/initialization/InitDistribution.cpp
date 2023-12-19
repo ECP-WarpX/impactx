@@ -308,12 +308,12 @@ namespace impactx
           pp_dist.query("normalize_halo", p2);
           pp_dist.query("halo", halo);
 
-          distribution::ThermalData testobj;
+          distribution::ThermalData termal_data;
           auto const & ref = m_particle_container->GetRefParticle();
 
           // Generate the struct "data" containing the radial CDF:
           distribution::ThermalData::Rprofile data(distribution::ThermalData::Rprofile(k,kT1,kT2,p1,p2,halo));
-          testobj.generate_radial_dist(bunch_charge,ref,data);
+          termal_data.generate_radial_dist(bunch_charge,ref,data);
 
           distribution::KnownDistributions thermal(distribution::Thermal(
             k, kT1, kT2, halo, data));
