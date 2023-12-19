@@ -58,7 +58,7 @@ q6.ds = 1.205625
 q6.k = -0.5787
 
 q7.type = quad_chromatic
-q7.ds = 1.5677083333   
+q7.ds = 1.5677083333
 q7.k = 0.7525
 
 q8.type = quad_chromatic
