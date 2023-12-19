@@ -53,7 +53,7 @@ General
       For instance, ``1.2`` means the mesh will span 10% above and 10% below the beam;
       ``1.0`` means the beam is exactly covered with the mesh.
 
-      Default: ``3.0 1.0 1.0 ...``.
+      Default: ``[3.0 1.0 1.0 ...]``.
       When set, turns ``dynamic_size`` to ``True``.
 
    .. py:property:: dynamic_size

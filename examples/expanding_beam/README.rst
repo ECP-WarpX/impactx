@@ -17,6 +17,7 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 This test uses mesh-refinement to solve the space charge force.
 The coarse grid wraps the beam maximum extent by 300%, emulating "open boundary" conditions.
 The refined grid in level 1 spans 110% of the beam maximum extent.
+The grid spacing is adaptively adjusted as the beam evolves.
 
 
 Run
