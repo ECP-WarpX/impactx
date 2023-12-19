@@ -7,16 +7,15 @@ beam.kin_energy = 100.0e3  # 100 GeV nominal energy
 beam.charge = 1.0e-9
 beam.particle = electron
 beam.distribution = waterbag
-beam.sigmaX = 3.9984884770e-5
-beam.sigmaY = 3.9984884770e-5
+beam.sigmaX = 1.288697604e-6
+beam.sigmaY = 1.288697604e-6
 beam.sigmaT = 1.0e-3
-beam.sigmaPx = 2.6623538760e-5
-beam.sigmaPy = 2.6623538760e-5
-beam.sigmaPt = 2.0e-3
+beam.sigmaPx = 3.965223396e-6
+beam.sigmaPy = 3.965223396e-6
+beam.sigmaPt = 0.1  #10% energy spread
 beam.muxpx = 0.0
 beam.muypy = 0.0
-beam.mutpt = 0.1  # 10% energy spread
-
+beam.mutpt = 0.0
 
 ###############################################################################
 # Beamline: lattice elements and segments
