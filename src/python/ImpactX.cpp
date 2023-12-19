@@ -105,8 +105,17 @@ void init_ImpactX (py::module& m)
         )
 
         // from amrex::AmrMesh
-        .def_property_readonly("max_level",
+        .def_property("max_level",
             [](ImpactX & ix){ return ix.maxLevel(); },
+            [](ImpactX & /* ix */, int /* max_level */) {
+                throw std::runtime_error("setting n_cell is not yet implemented");
+                /*
+                amrex::ParmParse pp_amr("amr");
+                pp_amr.add("max_level", max_level);
+                */
+
+                // note, this must be done *before* initGrids is called
+            },
             "The maximum mesh-refinement level for the simulation."
         )
         .def_property_readonly("finest_level",
