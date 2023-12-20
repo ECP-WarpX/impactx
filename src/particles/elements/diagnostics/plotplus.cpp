@@ -93,11 +93,11 @@ bool AMReXWithOpenPMD::InitLocalHandler(const std::string& prefix)
     {
       BL_PROFILE("BeamPlotplus::finalize()")
       if (m_uniqueWriter.count(m_seriesName) == 0u)
-	return;
+    return;
 
       if (m_plotWriter != NULL) {
-	auto m_Writer = (AMReXWithOpenPMD*)(m_plotWriter);
-	delete m_Writer;
+    auto m_Writer = (AMReXWithOpenPMD*)(m_plotWriter);
+    delete m_Writer;
       }
       amrex::Print()<<" => [check]: is things in BeamPlotplus::finalize() addressed? \n";
       m_uniqueWriter.erase(m_seriesName);
@@ -122,11 +122,11 @@ bool AMReXWithOpenPMD::InitLocalHandler(const std::string& prefix)
     {
       BL_PROFILE("BeamPlotplus::BeamPlotplus()")
       if (m_uniqueWriter.count(m_seriesName) > 0u)
-	{
-	  m_plotWriter = m_uniqueWriter[m_seriesName];
-	}
+    {
+      m_plotWriter = m_uniqueWriter[m_seriesName];
+    }
       else
-	{
+    {
       auto m_Writer =  new AMReXWithOpenPMD();
 #ifdef ImpactX_USE_OPENPMD
         // encoding of iterations in the series
@@ -138,17 +138,17 @@ bool AMReXWithOpenPMD::InitLocalHandler(const std::string& prefix)
         else if ( "f" == encoding )
             series_encoding = openPMD::IterationEncoding::fileBased;
 
-	if ( m_Writer->InitLocalHandler(m_seriesName) )
-	  {
-	    AMReX_impactxWriter* testWriter = new AMReX_impactxWriter(series_encoding);
-	    m_Writer->SetWriter(testWriter);
-	  }
+    if ( m_Writer->InitLocalHandler(m_seriesName) )
+      {
+        AMReX_impactxWriter* testWriter = new AMReX_impactxWriter(series_encoding);
+        m_Writer->SetWriter(testWriter);
+      }
 #else
         amrex::AllPrint() << "Warning: openPMD output requested but not compiled for series=" << m_series_name << "\n";
 #endif
-	m_plotWriter = m_Writer;
-	m_uniqueWriter[m_seriesName] = m_plotWriter;
-	}// else
+    m_plotWriter = m_Writer;
+    m_uniqueWriter[m_seriesName] = m_plotWriter;
+    }// else
     }
 
   #ifdef NEVER
@@ -159,7 +159,7 @@ bool AMReXWithOpenPMD::InitLocalHandler(const std::string& prefix)
     ) {
 #ifdef ImpactX_USE_OPENPMD
 
-	/* should be covered by amrex-openpmd-io
+    /* should be covered by amrex-openpmd-io
         // SoA: Real
         {
             std::vector<std::string> real_soa_names(RealSoA::names_s.size());
@@ -171,7 +171,7 @@ bool AMReXWithOpenPMD::InitLocalHandler(const std::string& prefix)
         }
         // SoA: Int
         static_assert(IntSoA::nattribs == 0); // not yet used
-	*/
+    */
 #else
         amrex::ignore_unused(pc, step);
 #endif
@@ -203,13 +203,13 @@ bool AMReXWithOpenPMD::InitLocalHandler(const std::string& prefix)
                           }, true);
         */
 
-	//auto ixWriter = std::any_cast<AMReXWithOpenPMD>(m_Writer);
-	auto m_Writer = (AMReXWithOpenPMD*)(m_plotWriter);
-	//StepMgr sm(step, m_Writer->get());
-	StepMgr sm(step, m_Writer);
-	pinned_pc.CountParticles();
+    //auto ixWriter = std::any_cast<AMReXWithOpenPMD>(m_Writer);
+    auto m_Writer = (AMReXWithOpenPMD*)(m_plotWriter);
+    //StepMgr sm(step, m_Writer->get());
+    StepMgr sm(step, m_Writer);
+    pinned_pc.CountParticles();
 
-	//auto hi = pc.m_PtlCounter.m_Total;
+    //auto hi = pc.m_PtlCounter.m_Total;
 
       AMReX_impactxWriter* impactxWriter =  (AMReX_impactxWriter*) (m_Writer->m_UserHandler->m_Writer.get());
       amrex::Vector<std::string> real_names;
@@ -218,22 +218,22 @@ bool AMReXWithOpenPMD::InitLocalHandler(const std::string& prefix)
       amrex::Vector<int> real_flags;
       impactxWriter->GetNames(real_names, int_names, int_flags, real_flags);
       m_Writer->m_UserHandler->m_Writer->DumpParticles(pinned_pc,
-						       "beam",
-						       real_flags,
-						       int_flags,
-						       real_names,
-						       int_names,
+                               "beam",
+                               real_flags,
+                               int_flags,
+                               real_names,
+                               int_names,
 
-						       [=] ([[maybe_unused]] auto& ppc, openPMD::ParticleSpecies& currSpecies, [[maybe_unused]]  unsigned long long localTotal)
-						       {
-							 //impactxWriter->SetConstantRefPart(currSpecies, localTotal, ref_part);
-							      impactxWriter->SetConstantRefPart(currSpecies,  ref_part);
-						       },
-						       [=] (auto& pti, openPMD::ParticleSpecies& currSpecies, unsigned long long offset)
-						       {
-							 // use the default
-							 impactxWriter->Save_impactx_PosID(pti, currSpecies, offset);
-						       });
+                               [=] ([[maybe_unused]] auto& ppc, openPMD::ParticleSpecies& currSpecies, [[maybe_unused]]  unsigned long long localTotal)
+                               {
+                             //impactxWriter->SetConstantRefPart(currSpecies, localTotal, ref_part);
+                                  impactxWriter->SetConstantRefPart(currSpecies,  ref_part);
+                               },
+                               [=] (auto& pti, openPMD::ParticleSpecies& currSpecies, unsigned long long offset)
+                               {
+                             // use the default
+                             impactxWriter->Save_impactx_PosID(pti, currSpecies, offset);
+                               });
 
 
     }

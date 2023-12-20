@@ -26,8 +26,8 @@ namespace impactx::diagnostics
   {
   public:
     AMReX_impactxWriter(openPMD::IterationEncoding ie =  openPMD::IterationEncoding::variableBased,
-			std::string filetype = "default",
-			std::string openpmdOptions = "{}")
+            std::string filetype = "default",
+            std::string openpmdOptions = "{}")
       :AMReX_openPMDWriter("{impactX}", ie, filetype, openpmdOptions)
     {}
 
@@ -47,9 +47,9 @@ namespace impactx::diagnostics
      * @param[in] step global step for diagnostics
      */
     void SetConstantRefPart (openPMD::ParticleSpecies& beam,
-			     //const unsigned long long& np,
-			     RefPart const & ref_part
-			     )
+                 //const unsigned long long& np,
+                 RefPart const & ref_part
+                 )
     {
       // beam mass
         beam.setAttribute( "beta_ref", ref_part.beta() );
@@ -66,16 +66,16 @@ namespace impactx::diagnostics
         beam.setAttribute( "mass", ref_part.mass );
         beam.setAttribute( "charge", ref_part.charge );
 
-	beam["positionOffset"]["x"].makeConstant( ref_part.x );
-	beam["positionOffset"]["y"].makeConstant( ref_part.y );
-	beam["positionOffset"]["t"].makeConstant( ref_part.t );
+    beam["positionOffset"]["x"].makeConstant( ref_part.x );
+    beam["positionOffset"]["y"].makeConstant( ref_part.y );
+    beam["positionOffset"]["t"].makeConstant( ref_part.t );
 
     }
 
     template<class PIt>
     void Save_impactx_PosID(PIt& pti,
-			    openPMD::ParticleSpecies& currSpecies,
-			    unsigned long long offset) const
+                openPMD::ParticleSpecies& currSpecies,
+                unsigned long long offset) const
     {
       //  use default is enough I guess?
       SavePosId(pti, currSpecies, offset);
@@ -83,16 +83,16 @@ namespace impactx::diagnostics
 
     void
     GetNames(amrex::Vector<std::string>& real_names,
-	     amrex::Vector<std::string>& int_names,
-	     amrex::Vector<int>& int_flags,
-	     amrex::Vector<int>& real_flags) const
+         amrex::Vector<std::string>& int_names,
+         amrex::Vector<int>& int_flags,
+         amrex::Vector<int>& real_flags) const
 
     {
       real_names.resize(RealSoA::names_s.size());
       std::copy(RealSoA::names_s.begin(), RealSoA::names_s.end(), real_names.begin());
 
       for (auto real_idx=0; real_idx < RealSoA::nattribs; real_idx++) {
-	       auto const component_name = real_names.at(real_idx);
+           auto const component_name = real_names.at(real_idx);
       }
       real_flags.resize(real_names.size(), 1);
 
@@ -102,13 +102,13 @@ namespace impactx::diagnostics
       int_flags.resize(0);
 
       /*
-	// enable when IntSoA is in
+    // enable when IntSoA is in
       amrex::Print() <<" => [check] int names ?  "<<IntSoA::names_s.size()<<std::endl;
       int_names.resize(IntSoA::names_s.size());
       std::copy(IntSoA::names_s.begin(), IntSoA::names_s.end(), int_names.begin());
 
       for (auto int_idx=0; int_idx < IntSoA::nattribs; int_idx++) {
-	auto const component_name = int_names.at(int_idx);
+    auto const component_name = int_names.at(int_idx);
       }
       int_flags.resize(int_names.size(), 1);
       */
@@ -201,4 +201,3 @@ private:
 
 #endif // AMREX_USE_OPENPMD_API
 #endif // IMPACTX_ELEMENTS_DIAGS_OPENPMD_WITH_AMREX_H
-
