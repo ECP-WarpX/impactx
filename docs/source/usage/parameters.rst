@@ -92,7 +92,7 @@ These boxes also contain a field mesh, if space charge calculations are enabled.
 * ``geometry.dynamic_size`` (``boolean``) optional (default: ``true`` for dynamic)
     Use dynamic (``true``) resizing of the field mesh, via ``geometry.prob_relative``, or static sizing (``false``), via ``geometry.prob_lo``/``geometry.prob_hi``.
 
-* ``geometry.prob_relative`` (positive ``float``, unitless) optional (default: ``3.0``)
+* ``geometry.prob_relative`` (positive ``float`` array with ``amr.max_level`` entries, unitless) optional (default: ``3.0 1.0 1.0 ...``)
     By default, we dynamically extract the minimum and maximum of the particle positions in the beam.
     The field mesh spans, per direction, multiple times the maximum physical extent of beam particles, as given by this factor.
     The beam minimum and maximum extent are symmetrically padded by the mesh.

@@ -27,11 +27,13 @@ namespace impactx::spacecharge
      * @param[in] pc container of the particles that deposited rho
      * @param[in] rho charge per level
      * @param[inout] phi scalar potential per level
+     * @param[in] rel_ref_ratio mesh refinement ratio between levels
      */
     void PoissonSolve (
         ImpactXParticleContainer const & pc,
         std::unordered_map<int, amrex::MultiFab> & rho,
-        std::unordered_map<int, amrex::MultiFab> & phi
+        std::unordered_map<int, amrex::MultiFab> & phi,
+        amrex::Vector<amrex::IntVect> rel_ref_ratio
     );
 
 } // namespace impactx

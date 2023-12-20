@@ -130,7 +130,12 @@ namespace details
         // Periodicity (none)
         amrex::Array<int, AMREX_SPACEDIM> const is_periodic{AMREX_D_DECL(0,0,0)};
 
-        amrex::Geometry const geom(domain, rb, amrex::CoordSys::cartesian, is_periodic);
-        return {geom, amr_info};
+        // Mesh-refinement
+        int max_level = 0;
+        pp_amr.query("max_level", max_level);
+        //   amrex::AmrMesh::InitAmrMesh will query amr.ref_ratio or amr.ref_ratio_vect on its own
+        amrex::Vector<amrex::IntVect> const & ref_ratios = amrex::Vector<amrex::IntVect>();
+
+        return {rb, max_level, n_cell_v, amrex::CoordSys::cartesian, ref_ratios, is_periodic};
     }
 } // namespace impactx::initialization

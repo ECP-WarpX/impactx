@@ -26,7 +26,8 @@ namespace impactx::spacecharge
     void PoissonSolve (
         ImpactXParticleContainer const & pc,
         std::unordered_map<int, amrex::MultiFab> & rho,
-        std::unordered_map<int, amrex::MultiFab> & phi
+        std::unordered_map<int, amrex::MultiFab> & phi,
+        amrex::Vector<amrex::IntVect> rel_ref_ratio
     )
     {
         using namespace amrex::literals;
@@ -87,6 +88,7 @@ namespace impactx::spacecharge
             sorted_phi.emplace_back(&phi[lev]);
         }
 
+        const bool do_single_precision_comms = false;
         ablastr::fields::computePhi(
             sorted_rho,
             sorted_phi,
@@ -98,10 +100,10 @@ namespace impactx::spacecharge
             pc.GetParGDB()->Geom(),
             pc.GetParGDB()->DistributionMap(),
             pc.GetParGDB()->boxArray(),
-            poisson_boundary_handler
-            /*
+            poisson_boundary_handler,
             do_single_precision_comms,
-            this->ref_ratio,
+            rel_ref_ratio
+            /*
             post_phi_calculation,
             gett_new(0),
             eb_farray_box_factory

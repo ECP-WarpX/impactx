@@ -14,6 +14,11 @@ expands to twice its original size.  This is tested using the second moments of 
 
 In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
+This test uses mesh-refinement to solve the space charge force.
+The coarse grid wraps the beam maximum extent by 300%, emulating "open boundary" conditions.
+The refined grid in level 1 spans 110% of the beam maximum extent.
+The grid spacing is adaptively adjusted as the beam evolves.
+
 
 Run
 ---
