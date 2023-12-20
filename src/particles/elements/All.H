@@ -36,6 +36,7 @@
 #include "SoftQuad.H"
 #include "ThinDipole.H"
 #include "diagnostics/openPMD.H"
+#include "diagnostics/plotplus.H"
 
 #include <variant>
 
@@ -52,6 +53,7 @@ namespace impactx
         ChrQuad,
         ConstF,
         diagnostics::BeamMonitor,
+        diagnostics::BeamPlotplus,
         DipEdge,
         Drift,
         ExactDrift,

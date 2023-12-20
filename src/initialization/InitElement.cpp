@@ -268,6 +268,18 @@ namespace detail
             std::string openpmd_encoding{"g"};
             pp_element.queryAdd("encoding", openpmd_encoding);
             m_lattice.emplace_back(diagnostics::BeamMonitor(openpmd_name, openpmd_backend, openpmd_encoding));
+        } else if (element_type == "beam_plotplus") {
+#ifdef AMREX_USE_OPENPMD_API
+            std::string openpmd_name = element_name;
+            pp_element.queryAdd("name", openpmd_name);
+            std::string openpmd_backend = "default";
+            pp_element.queryAdd("backend", openpmd_backend);
+            std::string openpmd_encoding{"g"};
+            pp_element.queryAdd("encoding", openpmd_encoding);
+            m_lattice.emplace_back(diagnostics::BeamPlotplus(openpmd_name, openpmd_backend, openpmd_encoding));
+#else
+            amrex::Abort("plotplus is not supported for lattice element  " + element_name + ": " + element_type);
+#endif
         } else if (element_type == "line") {
             // Parse the lattice elements for the sub-lattice in the line
             amrex::ParmParse pp_sub_lattice(element_name);
