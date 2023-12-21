@@ -96,25 +96,12 @@ bool AMReXWithOpenPMD::InitLocalHandler(const std::string& prefix)
     return;
 
       if (m_plotWriter != NULL) {
-    auto m_Writer = (AMReXWithOpenPMD*)(m_plotWriter);
-    delete m_Writer;
+         auto m_Writer = (AMReXWithOpenPMD*)(m_plotWriter);
+         delete m_Writer;
       }
       amrex::Print()<<" => [check]: is things in BeamPlotplus::finalize() addressed? \n";
       m_uniqueWriter.erase(m_seriesName);
 
-      /*
-        // close shared series alias
-        if (m_series.has_value())
-        {
-            auto series = std::any_cast<io::Series>(m_series);
-            series.close();
-            m_series.reset();
-        }
-
-        // remove from unique series map
-        if (m_unique_series.count(m_series_name) != 0u)
-            m_unique_series.erase(m_series_name);
-      */
     }
 
     BeamPlotplus::BeamPlotplus (std::string series_name, std::string backend, std::string encoding)
@@ -203,13 +190,11 @@ bool AMReXWithOpenPMD::InitLocalHandler(const std::string& prefix)
                           }, true);
         */
 
-    //auto ixWriter = std::any_cast<AMReXWithOpenPMD>(m_Writer);
     auto m_Writer = (AMReXWithOpenPMD*)(m_plotWriter);
-    //StepMgr sm(step, m_Writer->get());
+
     StepMgr sm(step, m_Writer);
     pinned_pc.CountParticles();
 
-    //auto hi = pc.m_PtlCounter.m_Total;
 
       AMReX_impactxWriter* impactxWriter =  (AMReX_impactxWriter*) (m_Writer->m_UserHandler->m_Writer.get());
       amrex::Vector<std::string> real_names;
@@ -226,13 +211,12 @@ bool AMReXWithOpenPMD::InitLocalHandler(const std::string& prefix)
 
                                [=] ([[maybe_unused]] auto& ppc, openPMD::ParticleSpecies& currSpecies, [[maybe_unused]]  unsigned long long localTotal)
                                {
-                             //impactxWriter->SetConstantRefPart(currSpecies, localTotal, ref_part);
                                   impactxWriter->SetConstantRefPart(currSpecies,  ref_part);
                                },
                                [=] (auto& pti, openPMD::ParticleSpecies& currSpecies, unsigned long long offset)
                                {
-                             // use the default
-                             impactxWriter->Save_impactx_PosID(pti, currSpecies, offset);
+                                   // use the default
+                                   impactxWriter->Save_impactx_PosID(pti, currSpecies, offset);
                                });
 
 
