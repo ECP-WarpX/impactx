@@ -51,11 +51,15 @@ num_particles = 100000
 assert num_particles == len(initial)
 assert num_particles == len(final)
 
-scale = (1.0 - initial.momentum_t)**2 + (initial.momentum_x)**2 + (initial.momentum_y)**2
+scale = (
+    (1.0 - initial.momentum_t) ** 2
+    + (initial.momentum_x) ** 2
+    + (initial.momentum_y) ** 2
+)
 xp = initial.momentum_x / np.sqrt(scale)
-initial['divergence_x'] = xp
+initial["divergence_x"] = xp
 yp = initial.momentum_y / np.sqrt(scale)
-initial['divergence_y'] = yp
+initial["divergence_y"] = yp
 
 print("Initial Beam:")
 sigx, sigy, sigt, emittance_x, emittance_y, emittance_t = get_moments(initial)
@@ -65,7 +69,7 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = 3.0*num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 3.0 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
@@ -83,18 +87,20 @@ assert np.allclose(
 )
 
 
-scale = (1.0 - final.momentum_t)**2 + (final.momentum_x)**2 + (final.momentum_y)**2
+scale = (
+    (1.0 - final.momentum_t) ** 2 + (final.momentum_x) ** 2 + (final.momentum_y) ** 2
+)
 xp = final.momentum_x / np.sqrt(scale)
-final['divergence_x'] = xp
+final["divergence_x"] = xp
 yp = final.momentum_y / np.sqrt(scale)
-final['divergence_y'] = yp
+final["divergence_y"] = yp
 
 print("")
 print("Final Beam:")
 sigx, sigy, sigt, emittance_xf, emittance_yf, emittance_tf = get_moments(final)
-demittance_x = 100*(emittance_xf - emittance_x)/emittance_x
-demittance_y = 100*(emittance_yf - emittance_y)/emittance_y
-demittance_t = 100*(emittance_tf - emittance_t)/emittance_t
+demittance_x = 100 * (emittance_xf - emittance_x) / emittance_x
+demittance_y = 100 * (emittance_yf - emittance_y) / emittance_y
+demittance_t = 100 * (emittance_tf - emittance_t) / emittance_t
 
 print(f"  sigx={sigx:e} sigy={sigy:e} sigt={sigt:e}")
 print(
@@ -102,7 +108,7 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = 15.0*num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 15.0 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
