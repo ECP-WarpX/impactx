@@ -11,6 +11,7 @@
 #define IMPACTX_QUAD_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 #include "mixin/nofinalize.H"
@@ -26,6 +27,7 @@ namespace impactx
     struct Quad
     : public elements::BeamOptic<Quad>,
       public elements::Thick,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "Quad";
@@ -38,11 +40,22 @@ namespace impactx
          *           = (gradient in T/m) / (rigidity in T-m)
          *           k > 0 horizontal focusing
          *           k < 0 horizontal defocusing
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error around the s axis (in the x-y plane) [degrees]
          * @param nslice number of slices used for the application of space charge
          */
-        Quad( amrex::ParticleReal const ds, amrex::ParticleReal const k,
-              int const nslice )
-        : Thick(ds, nslice), m_k(k)
+        Quad (
+            amrex::ParticleReal ds,
+            amrex::ParticleReal k,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0,
+            int nslice = 1
+        )
+        : Thick(ds, nslice),
+          Alignment(dx, dy, rotation_degree),
+          m_k(k)
         {
         }
 
@@ -59,13 +72,17 @@ namespace impactx
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
-                amrex::ParticleReal & AMREX_RESTRICT px,
-                amrex::ParticleReal & AMREX_RESTRICT py,
-                amrex::ParticleReal & AMREX_RESTRICT pt,
-                RefPart const & refpart) const {
-
+            PType& AMREX_RESTRICT p,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            RefPart const & refpart
+        ) const
+        {
             using namespace amrex::literals; // for _rt and _prt
+
+            // shift due to alignment errors of the element
+            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
 
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
@@ -114,6 +131,8 @@ namespace impactx
             py = pyout;
             pt = ptout;
 
+            // undo shift due to alignment errors of the element
+            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
         }
 
         /** This pushes the reference particle.

@@ -11,6 +11,7 @@
 #define IMPACTX_CHRQUAD_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 #include "mixin/nofinalize.H"
@@ -27,6 +28,7 @@ namespace impactx
     struct ChrQuad
     : public elements::BeamOptic<ChrQuad>,
       public elements::Thick,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "ChrQuad";
@@ -46,11 +48,23 @@ namespace impactx
          * @param unit  Unit specification
          *           unit = 0 MADX convention (default)
          *           unit = 1 MaryLie convention
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error around the s axis (in the x-y plane) [degrees]
          * @param nslice number of slices used for the application of space charge
          */
-        ChrQuad( amrex::ParticleReal const ds, amrex::ParticleReal const k,
-              int const unit, int const nslice )
-        : Thick(ds, nslice), m_k(k), m_unit(unit)
+        ChrQuad (
+            amrex::ParticleReal ds,
+            amrex::ParticleReal k,
+            int unit,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0,
+            int nslice = 1
+        )
+        : Thick(ds, nslice),
+          Alignment(dx, dy, rotation_degree),
+          m_k(k), m_unit(unit)
         {
         }
 
@@ -74,6 +88,9 @@ namespace impactx
                 RefPart const & refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
+
+            // shift due to alignment errors of the element
+            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
 
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
@@ -162,6 +179,8 @@ namespace impactx
             py = pyout;
             pt = ptout;
 
+            // undo shift due to alignment errors of the element
+            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
         }
 
         /** This pushes the reference particle.

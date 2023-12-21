@@ -11,6 +11,7 @@
 #define IMPACTX_CFBEND_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 #include "mixin/nofinalize.H"
@@ -27,6 +28,7 @@ namespace impactx
     struct CFbend
     : public elements::BeamOptic<CFbend>,
       public elements::Thick,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "CFbend";
@@ -41,14 +43,23 @@ namespace impactx
          *           = (gradient in T/m) / (rigidity in T-m)
          *           k > 0 horizontal focusing
          *           k < 0 horizontal defocusing
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error around the s axis (in the x-y plane) [degrees]
          * @param nslice number of slices used for the application of space charge
          */
-        CFbend(
-            amrex::ParticleReal const ds,
-            amrex::ParticleReal const rc,
-            amrex::ParticleReal const k,
-            int const nslice)
-        : Thick(ds, nslice), m_rc(rc), m_k(k)
+        CFbend (
+            amrex::ParticleReal ds,
+            amrex::ParticleReal rc,
+            amrex::ParticleReal k,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0,
+            int nslice = 1
+        )
+        : Thick(ds, nslice),
+          Alignment(dx, dy, rotation_degree),
+          m_rc(rc), m_k(k)
         {
         }
 
@@ -72,6 +83,9 @@ namespace impactx
                 RefPart const & refpart) const
         {
             using namespace amrex::literals; // for _rt and _prt
+
+            // shift due to alignment errors of the element
+            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
 
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
@@ -150,6 +164,9 @@ namespace impactx
             px = pxout;
             py = pyout;
             pt = ptout;
+
+            // undo shift due to alignment errors of the element
+            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
         }
 
         /** This pushes the reference particle.

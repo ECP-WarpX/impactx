@@ -11,6 +11,7 @@
 #define IMPACTX_DIPEDGE_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 #include "mixin/nofinalize.H"
@@ -26,6 +27,7 @@ namespace impactx
     struct DipEdge
     : public elements::BeamOptic<DipEdge>,
       public elements::Thin,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "DipEdge";
@@ -44,10 +46,21 @@ namespace impactx
          * @param rc Radius of curvature in m.
          * @param g Gap parameter in m.
          * @param K2 Fringe field integral (unitless).
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error around the s axis (in the x-y plane) [degrees]
          */
-        DipEdge( amrex::ParticleReal const psi, amrex::ParticleReal const rc,
-                 amrex::ParticleReal const g, amrex::ParticleReal const K2 )
-        : m_psi(psi), m_rc(rc), m_g(g), m_K2(K2)
+        DipEdge (
+            amrex::ParticleReal psi,
+            amrex::ParticleReal rc,
+            amrex::ParticleReal g,
+            amrex::ParticleReal K2,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0
+        )
+        : Alignment(dx, dy, rotation_degree),
+          m_psi(psi), m_rc(rc), m_g(g), m_K2(K2)
         {
         }
 
@@ -73,6 +86,9 @@ namespace impactx
 
             using namespace amrex::literals; // for _rt and _prt
 
+            // shift due to alignment errors of the element
+            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
             amrex::ParticleReal const y = p.pos(RealAoS::y);
@@ -92,6 +108,9 @@ namespace impactx
             // apply edge focusing
             px = px + R21*x;
             py = py + R43*y;
+
+            // undo shift due to alignment errors of the element
+            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
         }
 
         /** This pushes the reference particle. */

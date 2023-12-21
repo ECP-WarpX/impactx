@@ -12,6 +12,7 @@
 
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 #include "mixin/nofinalize.H"
@@ -27,6 +28,7 @@ namespace impactx
     struct Aperture
     : public elements::BeamOptic<Aperture>,
       public elements::Thin,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "Aperture";
@@ -44,11 +46,20 @@ namespace impactx
          * @param shape aperture shape
          * @param xmax maximum value of horizontal coordinate (m)
          * @param ymax maximum value of vertical coordinate (m)
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error around the s axis (in the x-y plane) [degrees]
          */
-        Aperture (amrex::ParticleReal xmax,
-                  amrex::ParticleReal ymax,
-                  Shape shape)
-        : m_shape(shape), m_xmax(xmax), m_ymax(ymax)
+        Aperture (
+            amrex::ParticleReal xmax,
+            amrex::ParticleReal ymax,
+            Shape shape,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0
+        )
+        : Alignment(dx, dy, rotation_degree),
+          m_shape(shape), m_xmax(xmax), m_ymax(ymax)
         {
         }
 
@@ -74,6 +85,9 @@ namespace impactx
         {
             using namespace amrex::literals; // for _rt and _prt
 
+            // shift due to alignment errors of the element
+            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
             amrex::ParticleReal const y = p.pos(RealAoS::y);
@@ -98,6 +112,9 @@ namespace impactx
                   }
                   break;
             }
+
+            // undo shift due to alignment errors of the element
+            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
         }
 
         /** This pushes the reference particle. */

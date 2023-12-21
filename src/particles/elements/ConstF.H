@@ -11,6 +11,7 @@
 #define IMPACTX_CONSTF_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 #include "mixin/nofinalize.H"
@@ -26,6 +27,7 @@ namespace impactx
     struct ConstF
     : public elements::BeamOptic<ConstF>,
       public elements::Thick,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "ConstF";
@@ -37,12 +39,24 @@ namespace impactx
          * @param kx Focusing strength for x in 1/m.
          * @param ky Focusing strength for y in 1/m.
          * @param kt Focusing strength for t in 1/m.
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error around the s axis (in the x-y plane) [degrees]
          * @param nslice number of slices used for the application of space charge
          */
-        ConstF( amrex::ParticleReal const ds, amrex::ParticleReal const kx,
-                amrex::ParticleReal const ky, amrex::ParticleReal const kt,
-                int const nslice )
-        : Thick(ds, nslice), m_kx(kx), m_ky(ky), m_kt(kt)
+        ConstF (
+            amrex::ParticleReal ds,
+            amrex::ParticleReal kx,
+            amrex::ParticleReal ky,
+            amrex::ParticleReal kt,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0,
+            int nslice = 1
+        )
+        : Thick(ds, nslice),
+          Alignment(dx, dy, rotation_degree),
+          m_kx(kx), m_ky(ky), m_kt(kt)
         {
         }
 
@@ -66,6 +80,9 @@ namespace impactx
                 RefPart const & refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
+
+            // shift due to alignment errors of the element
+            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
 
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
@@ -99,6 +116,8 @@ namespace impactx
             py = pyout;
             pt = ptout;
 
+            // undo shift due to alignment errors of the element
+            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
         }
 
         /** This pushes the reference particle.

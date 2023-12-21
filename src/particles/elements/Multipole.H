@@ -11,6 +11,7 @@
 #define IMPACTX_MULTIPOLE_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 #include "mixin/nofinalize.H"
@@ -26,6 +27,7 @@ namespace impactx
     struct Multipole
     : public elements::BeamOptic<Multipole>,
       public elements::Thin,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "Multipole";
@@ -36,11 +38,20 @@ namespace impactx
          * @param multipole index m (m=1 dipole, m=2 quadrupole, m=3 sextupole etc.)
          * @param K_normal Integrated normal multipole coefficient (1/meter^m)
          * @param K_skew Integrated skew multipole coefficient (1/meter^m)
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error around the s axis (in the x-y plane) [degrees]
          */
-        Multipole( int const multipole,
-                   amrex::ParticleReal const K_normal,
-                   amrex::ParticleReal const K_skew )
-        : m_multipole(multipole), m_Kn(K_normal), m_Ks(K_skew)
+        Multipole (
+            int multipole,
+            amrex::ParticleReal K_normal,
+            amrex::ParticleReal K_skew,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0
+        )
+        : Alignment(dx, dy, rotation_degree),
+          m_multipole(multipole), m_Kn(K_normal), m_Ks(K_skew)
         {
             // compute factorial of multipole index
             int const m = m_multipole - 1;
@@ -71,6 +82,9 @@ namespace impactx
                 [[maybe_unused]] RefPart const & refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
+
+            // shift due to alignment errors of the element
+            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
 
             // a complex type with two amrex::ParticleReal
             using Complex = amrex::GpuComplex<amrex::ParticleReal>;
@@ -115,6 +129,8 @@ namespace impactx
             py = pyout;
             pt = ptout;
 
+            // undo shift due to alignment errors of the element
+            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
         }
 
         /** This pushes the reference particle. */

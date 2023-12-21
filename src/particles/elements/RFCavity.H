@@ -12,6 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/integrators/Integrators.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 
@@ -102,7 +103,8 @@ namespace RFCavityData
 
     struct RFCavity
     : public elements::BeamOptic<RFCavity>,
-      public elements::Thick
+      public elements::Thick,
+      public elements::Alignment
     {
         static constexpr auto name = "RFCavity";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -115,6 +117,9 @@ namespace RFCavityData
          * @param phase RF driven phase in deg
          * @param cos_coef TODO
          * @param sin_coef TODO
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error around the s axis (in the x-y plane) [degrees]
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
@@ -126,10 +131,14 @@ namespace RFCavityData
             amrex::ParticleReal phase,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0,
             int mapsteps = 1,
             int nslice = 1
         )
           : Thick(ds, nslice),
+            Alignment(dx, dy, rotation_degree),
             m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps)
         {
             // next created RF cavity has another id for its data
@@ -185,6 +194,9 @@ namespace RFCavityData
         {
             using namespace amrex::literals; // for _rt and _prt
 
+            // shift due to alignment errors of the element
+            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
             amrex::ParticleReal const y = p.pos(RealAoS::y);
@@ -222,6 +234,9 @@ namespace RFCavityData
             px = pxout;
             py = pyout;
             pt = ptout;
+
+            // undo shift due to alignment errors of the element
+            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
         }
 
         /** This pushes the reference particle.

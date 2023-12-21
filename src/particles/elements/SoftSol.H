@@ -12,6 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/integrators/Integrators.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 
@@ -116,7 +117,8 @@ namespace SoftSolenoidData
 
     struct SoftSolenoid
     : public elements::BeamOptic<SoftSolenoid>,
-      public elements::Thick
+      public elements::Thick,
+      public elements::Alignment
     {
         static constexpr auto name = "SoftSolenoid";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -127,6 +129,9 @@ namespace SoftSolenoidData
          * @param bscale Scaling factor for on-axis magnetic field Bz in 1/m
          * @param cos_coef cosine coefficients in Fourier expansion of on-axis magnetic field Bz
          * @param sin_coef sine coefficients in Fourier expansion of on-axis magnetic field Bz
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error around the s axis (in the x-y plane) [degrees]
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
@@ -136,10 +141,14 @@ namespace SoftSolenoidData
             amrex::ParticleReal bscale,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0,
             int mapsteps = 1,
             int nslice = 1
         )
           : Thick(ds, nslice),
+            Alignment(dx, dy, rotation_degree),
             m_bscale(bscale), m_mapsteps(mapsteps), m_id(SoftSolenoidData::next_id)
        {
            // next created soft solenoid has another id for its data
@@ -195,6 +204,9 @@ namespace SoftSolenoidData
         {
             using namespace amrex::literals; // for _rt and _prt
 
+            // shift due to alignment errors of the element
+            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
             amrex::ParticleReal const y = p.pos(RealAoS::y);
@@ -232,6 +244,9 @@ namespace SoftSolenoidData
             px = pxout;
             py = pyout;
             pt = ptout;
+
+            // undo shift due to alignment errors of the element
+            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
         }
 
         /** This pushes the reference particle.
