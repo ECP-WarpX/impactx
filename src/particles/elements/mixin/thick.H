@@ -27,7 +27,10 @@ namespace impactx::elements
          * @param ds Segment length in m
          * @param nslice number of slices used for the application of space charge
          */
-        Thick(amrex::ParticleReal const ds, int const nslice )
+        Thick (
+            amrex::ParticleReal ds,
+            int nslice
+        )
         : m_ds(ds), m_nslice(nslice)
         {
         }
@@ -52,7 +55,6 @@ namespace impactx::elements
             return m_ds;
         }
 
-    protected:
         amrex::ParticleReal m_ds; //! segment length in m
         int m_nslice; //! number of slices used for the application of space charge
     };
