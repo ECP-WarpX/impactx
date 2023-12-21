@@ -711,3 +711,21 @@ add_impactx_test(aperture.py
     examples/aperture/analysis_aperture.py
     OFF  # no plot script yet
 )
+
+# Apochromat example ########################################################
+#
+# w/o space charge
+add_impactx_test(apochromat
+    examples/apochromatic/input_apochromatic.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/apochromatic/analysis_apochromatic.py
+    OFF  # no plot script yet
+)
+add_impactx_test(apochromat.py
+    examples/apochromatic/run_apochromatic.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/apochromatic/analysis_apochromatic.py
+    OFF  # no plot script yet
+)
