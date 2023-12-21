@@ -53,7 +53,9 @@ namespace impactx
         ChrQuad,
         ConstF,
         diagnostics::BeamMonitor,
+#ifdef AMREX_USE_OPENPMD_API
         diagnostics::BeamPlotplus,
+#endif
         DipEdge,
         Drift,
         ExactDrift,
