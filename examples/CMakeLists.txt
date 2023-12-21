@@ -726,6 +726,6 @@ add_impactx_test(apochromat.py
     examples/apochromatic/run_apochromatic.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
-    examples/apochromatic/analysis_apochromaic.py
+    examples/apochromatic/analysis_apochromatic.py
     OFF  # no plot script yet
 )
