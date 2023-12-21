@@ -719,13 +719,13 @@ add_impactx_test(apochromat
     examples/apochromatic/input_apochromatic.in
       ON  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
-    examples/thin_dipole/analysis_apochromatic.py
+    examples/apochromatic/analysis_apochromatic.py
     OFF  # no plot script yet
 )
 add_impactx_test(apochromat.py
     examples/apochromatic/run_apochromatic.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
-    examples/thin_dipole/analysis_apochromaic.py
+    examples/apochromatic/analysis_apochromaic.py
     OFF  # no plot script yet
 )
