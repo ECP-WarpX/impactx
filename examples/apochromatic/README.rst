@@ -1,7 +1,7 @@
 .. _examples-apochromat:
 
 Apochromatic Drift-Quadrupole Beamline
-=======================================
+======================================
 
 Electron beam matched to the 1st-order apochromatic drift-quadrupole beamline appearing in Fig. 4a of:
 C. A. Lindstrom and E. Adli, "Design of general apochromatic drift-quadrupole beam lines," Phys. Rev. Accel. Beams 19, 071002 (2016).
