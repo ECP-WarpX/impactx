@@ -18,10 +18,11 @@
 # Import the required Python packages
 
 import re
+
 import pandas as pd
+
 import amrex.space3d as amr
 from impactx import ImpactX, RefPart, distribution, elements
-
 
 # Read the input file as a single string, since elements span multiple lines
 
@@ -46,9 +47,7 @@ rx_dict = {
     "name": re.compile(r"^\s*(?P<name>[\w\.]+)\s+"),  # element name
     "type": re.compile(r"^\s*[\w\.]+\s+(?P<type>[\w]+)\s*\{"),  # element name
     "tag": re.compile(r"tag = (?P<tag>[\w\.]+)"),  # element tag (often same as name)
-    "zloc": re.compile(
-        r"at\s*=\s*(?P<zloc>\d*\.?\d*)[\s\n\r\}]+"
-    ),  # element location
+    "zloc": re.compile(r"at\s*=\s*(?P<zloc>\d*\.?\d*)[\s\n\r\}]+"),  # element location
     "body": re.compile(r"body\s*=\s*\{(?P<body>.+)\s*\}.*\}"),  # ...
     # multipole
     "lrad": re.compile(
@@ -83,7 +82,7 @@ def parse_one_group(element, key):
         None
 
 
-def parse_element(element,zprev):
+def parse_element(element, zprev):
     """
     Input: SXF Element String
     Outpu: ImpactX Element
@@ -102,7 +101,7 @@ def parse_element(element,zprev):
         zloc = zprev
     else:
         zloc = float(zloc)
-        dz = zloc-zprev
+        dz = zloc - zprev
 
         print(f"elements.Drift(ds={dz})")
         sim.lattice.append(elements.Drift(ds=dz))
@@ -135,8 +134,12 @@ def parse_element(element,zprev):
                 print(f"kl={kl}")
 
                 for i in range(len(kl)):
-                   print(f"elements.Multipole(multiple={i}, K_normal={kl[i]}, K_skew=0.0)")
-                   sim.lattice.append(elements.Multipole(multiple=i, K_normal=kl[i], K_skew=0.0))
+                    print(
+                        f"elements.Multipole(multiple={i}, K_normal={kl[i]}, K_skew=0.0)"
+                    )
+                    sim.lattice.append(
+                        elements.Multipole(multiple=i, K_normal=kl[i], K_skew=0.0)
+                    )
         else:
             print("... empty body - ignored")
 
@@ -162,7 +165,7 @@ def parse_element(element,zprev):
                 if tilt is None:
                     print("... empty tilt - ignored")
                 else:
-                    tilt=float(tilt)
+                    tilt = float(tilt)
                     print(f"tilt={tilt}")
                 print(f"elements.DipEdge(psi={e1}, rc=1.0, g={h}, K2=0.125)")
                 sim.lattice.append(elements.DipEdge(psi=e1, rc=1.0, g=h, K2=0.125))
@@ -188,8 +191,12 @@ def parse_element(element,zprev):
 
                 f0 = 0.45079517081715459e6
                 Erest = 938.27208816
-                print(f"elements.ShortRF(V={volt/Erest}, freq={harmon*f0}, phase=-90.0)")
-                sim.lattice.append(elements.ShortRF(V=volt/Erest,freq=harmon*f0,phase=-90.0))
+                print(
+                    f"elements.ShortRF(V={volt/Erest}, freq={harmon*f0}, phase=-90.0)"
+                )
+                sim.lattice.append(
+                    elements.ShortRF(V=volt / Erest, freq=harmon * f0, phase=-90.0)
+                )
 
         else:
             print("... empty body - ignored")
@@ -208,10 +215,10 @@ sim.particle_shape = 2  # B-spline order
 sim.space_charge = False
 # sim.diagnostics = False  # benchmarking
 sim.slice_step_diagnostics = True
-    
+
 # domain decomposition & space charge mesh
 sim.init_grids()
-    
+
 # intial proton beam parameters
 tot_energy_MeV = 1.3382720460000002e3  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
@@ -244,8 +251,8 @@ sim.lattice.append(elements.BeamMonitor("monitor", backend="h5"))
 
 zprev = 0.0
 for element in element_list:  # elements[0:12]:
-    zloc = parse_element(element,zprev)
-    zprev = zloc    
+    zloc = parse_element(element, zprev)
+    zprev = zloc
 
 # Final beam diagnostics
 sim.lattice.append(elements.BeamMonitor("monitor", backend="h5"))
@@ -256,4 +263,3 @@ sim.evolve()
 # clean shutdown
 del sim
 amr.finalize()
-
