@@ -134,12 +134,16 @@ def parse_element(element, zprev):
                 print(f"kl={kl}")
 
                 for i in range(len(kl)):
-                   if i == 0:
-                      print(f"elements.ThinDipole(theta={kl[i]}, rc=1.0)")
-                      sim.lattice.append(elements.ThinDipole(theta=kl[i], rc=1.0))
-                   else:
-                      print(f"elements.Multipole(multiple={i}, K_normal={kl[i]}, K_skew=0.0)")
-                      sim.lattice.append(elements.Multipole(multiple=i, K_normal=kl[i], K_skew=0.0))
+                    if i == 0:
+                        print(f"elements.ThinDipole(theta={kl[i]}, rc=1.0)")
+                        sim.lattice.append(elements.ThinDipole(theta=kl[i], rc=1.0))
+                    else:
+                        print(
+                            f"elements.Multipole(multiple={i}, K_normal={kl[i]}, K_skew=0.0)"
+                        )
+                        sim.lattice.append(
+                            elements.Multipole(multiple=i, K_normal=kl[i], K_skew=0.0)
+                        )
         else:
             print("... empty body - ignored")
 
