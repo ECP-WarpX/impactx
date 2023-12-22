@@ -73,6 +73,8 @@ macro(find_ablastr)
 
         # shared libs, i.e. for Python bindings, need relocatable code
         if(ImpactX_PYTHON OR BUILD_SHARED_LIBS)
+            set(AMReX_TINY_PROFILE ON CACHE BOOL "")
+            set(AMReX_OPENPMD_API ON CACHE BOOL "")
             set(AMReX_PIC ON CACHE INTERNAL
                 "Build AMReX with position independent code")
             set(ABLASTR_POSITION_INDEPENDENT_CODE ON CACHE INTERNAL
