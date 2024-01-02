@@ -25,9 +25,9 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::Gaussian>(md, "Gaussian")
         .def(py::init<
-                amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
@@ -37,9 +37,9 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::Kurth4D>(md, "Kurth4D")
         .def(py::init<
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
          >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
@@ -50,9 +50,9 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::Kurth6D>(md, "Kurth6D")
         .def(py::init<
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
@@ -64,9 +64,9 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::KVdist>(md, "KVdist")
         .def(py::init<
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
@@ -82,9 +82,9 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::Semigaussian>(md, "Semigaussian")
         .def(py::init<
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
@@ -94,9 +94,9 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::Triangle>(md, "Triangle")
         .def(py::init<
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
@@ -108,9 +108,9 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::Waterbag>(md, "Waterbag")
         .def(py::init<
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),

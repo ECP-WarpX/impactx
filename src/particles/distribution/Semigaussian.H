@@ -10,6 +10,8 @@
 #ifndef IMPACTX_DISTRIBUTION_SEMIGAUSSIAN
 #define IMPACTX_DISTRIBUTION_SEMIGAUSSIAN
 
+#include <ablastr/constant.H>
+
 #include <AMReX_Random.H>
 #include <AMReX_REAL.H>
 
@@ -30,16 +32,21 @@ namespace impactx::distribution
          * @param sigpx,sigpy,sigpt RMS momentum
          * @param muxpx,muypy,mutpt correlation length-momentum
          */
-         Semigaussian(amrex::ParticleReal const sigx, amrex::ParticleReal const sigy,
-         amrex::ParticleReal const sigt,amrex::ParticleReal const sigpx,
-         amrex::ParticleReal const sigpy,amrex::ParticleReal const sigpt,
-         amrex::ParticleReal const muxpx=0.0, amrex::ParticleReal const muypy=0.0,
-         amrex::ParticleReal const mutpt=0.0
-         )
-          : m_sigmaX(sigx),m_sigmaY(sigy),m_sigmaT(sigt),m_sigmaPx(sigpx),m_sigmaPy(sigpy),
-            m_sigmaPt(sigpt),m_muxpx(muxpx),m_muypy(muypy),m_mutpt(mutpt)
-          {
-          }
+        Semigaussian (
+            amrex::ParticleReal sigx,
+            amrex::ParticleReal sigy,
+            amrex::ParticleReal sigt,
+            amrex::ParticleReal sigpx,
+            amrex::ParticleReal sigpy,
+            amrex::ParticleReal sigpt,
+            amrex::ParticleReal muxpx=0.0,
+            amrex::ParticleReal muypy=0.0,
+            amrex::ParticleReal mutpt=0.0
+        )
+        : m_sigmaX(sigx), m_sigmaY(sigy), m_sigmaT(sigt), m_sigmaPx(sigpx), m_sigmaPy(sigpy),
+          m_sigmaPt(sigpt), m_muxpx(muxpx), m_muypy(muypy), m_mutpt(mutpt)
+        {
+        }
 
         /** Return 1 6D particle coordinate
          *
@@ -53,21 +60,21 @@ namespace impactx::distribution
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                amrex::ParticleReal & x,
-                amrex::ParticleReal & y,
-                amrex::ParticleReal & t,
-                amrex::ParticleReal & px,
-                amrex::ParticleReal & py,
-                amrex::ParticleReal & pt,
-                amrex::RandomEngine const& engine) const {
-
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            amrex::ParticleReal & AMREX_RESTRICT t,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            amrex::RandomEngine const & engine
+        ) const
+        {
             using namespace amrex::literals;
+            using ablastr::constant::math::pi;
 
             amrex::ParticleReal ln1,u1,u2;
             amrex::ParticleReal root,a1,a2;
             amrex::ParticleReal phi,v,r;
-
-            constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
             // Generate a 3D uniform distribution (x,y,t) within a cylinder:
 
@@ -116,10 +123,11 @@ namespace impactx::distribution
             t = a1;
             pt = a2;
         }
+
     private:
-        amrex::ParticleReal m_sigmaX,m_sigmaY,m_sigmaT; //! related RMS sizes (length)
-        amrex::ParticleReal m_sigmaPx,m_sigmaPy,m_sigmaPt; //! RMS momentum
-        amrex::ParticleReal m_muxpx,m_muypy,m_mutpt; //! correlation length-momentum
+        amrex::ParticleReal m_sigmaX, m_sigmaY, m_sigmaT;  //! related RMS sizes (length)
+        amrex::ParticleReal m_sigmaPx, m_sigmaPy, m_sigmaPt;  //! RMS momentum
+        amrex::ParticleReal m_muxpx, m_muypy, m_mutpt;  //! correlation length-momentum
     };
 
 } // namespace impactx::distribution
