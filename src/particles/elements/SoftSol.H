@@ -131,7 +131,7 @@ namespace SoftSolenoidData
          * @param sin_coef sine coefficients in Fourier expansion of on-axis magnetic field Bz
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
-         * @param rotation_degree rotation error around the s axis (in the x-y plane) [degrees]
+         * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge

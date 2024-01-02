@@ -145,7 +145,7 @@ void init_elements(py::module& m)
             {
                 a.m_rotation = rotation_degree * elements::Alignment::degree2rad;
             },
-            "rotation error around the s axis (in the x-y plane) in degree"
+            "rotation error in the transverse plane in degree"
         )
     ;
 

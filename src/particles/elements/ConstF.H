@@ -41,7 +41,7 @@ namespace impactx
          * @param kt Focusing strength for t in 1/m.
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
-         * @param rotation_degree rotation error around the s axis (in the x-y plane) [degrees]
+         * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param nslice number of slices used for the application of space charge
          */
         ConstF (

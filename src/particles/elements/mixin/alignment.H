@@ -31,7 +31,7 @@ namespace impactx::elements
          *
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
-         * @param rotation_degree rotation error around the s axis (in the x-y plane) [degrees]
+         * @param rotation_degree rotation error in the transverse plane [degrees]
          */
         Alignment (
             amrex::ParticleReal dx,
@@ -132,9 +132,9 @@ namespace impactx::elements
             return m_dy;
         }
 
-        /** rotation error around the s axis (in the x-y plane)
+        /** rotation error in the transverse plane
          *
-         * @return rotation error around the s axis (in the x-y plane) [degrees]
+         * @return rotation error in the transverse plane [degrees]
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         amrex::ParticleReal rotation () const
@@ -144,7 +144,7 @@ namespace impactx::elements
 
         amrex::ParticleReal m_dx = 0; //! horizontal translation error [m]
         amrex::ParticleReal m_dy = 0; //! vertical translation error [m]
-        amrex::ParticleReal m_rotation = 0; //! rotation error around the s axis (in the x-y plane) [rad]
+        amrex::ParticleReal m_rotation = 0; //! rotation error in the transverse plane [rad]
     };
 
 } // namespace impactx::elements

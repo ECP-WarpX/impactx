@@ -47,7 +47,7 @@ namespace impactx
          * @param unit units of xkick and ykick
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
-         * @param rotation_degree rotation error around the s axis (in the x-y plane) [degrees]
+         * @param rotation_degree rotation error in the transverse plane [degrees]
          */
         Kicker (
             amrex::ParticleReal xkick,
