@@ -9,10 +9,8 @@ import argparse
 from math import pi
 
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
 import numpy as np
 import openpmd_api as io
-import pandas as pd
 
 # options to run this script
 parser = argparse.ArgumentParser(description="Plot the Bithermal benchmark.")

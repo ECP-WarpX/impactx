@@ -94,8 +94,8 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::Thermal>(md, "Thermal")
         .def(py::init<
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, distribution::ThermalData::Rprofile const
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, distribution::ThermalData::Rprofile
              >(),
              py::arg("k"), py::arg("kT"), py::arg("kT_halo"),
              py::arg("halo")=0.0, py::arg("data"),

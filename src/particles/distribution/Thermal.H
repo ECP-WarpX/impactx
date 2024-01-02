@@ -26,10 +26,10 @@ namespace distribution
 {
     struct ThermalData
     {
-        amrex::ParticleReal const tolerance = 1.0e-3; ///< tolerance for matching condition
-        amrex::ParticleReal const rin = 1.0e-10;  ///< initial r value for numerical integration
-        amrex::ParticleReal const rout = 10.0;  ///< final r value for numerical integration
-        int const nsteps = 2000;  ///< number of radial steps for numerical integration
+        static constexpr amrex::ParticleReal tolerance = 1.0e-3; ///< tolerance for matching condition
+        static constexpr amrex::ParticleReal rin = 1.0e-10;  ///< initial r value for numerical integration
+        static constexpr amrex::ParticleReal rout = 10.0;  ///< final r value for numerical integration
+        static constexpr int nsteps = 2000;  ///< number of radial steps for numerical integration
 
         struct Rprofile
         {
@@ -242,11 +242,11 @@ namespace distribution
          * @param w weight of the secondary (halo) population
          * @param data radial profile of the stationary beam
          */
-         Thermal([[maybe_unused]] amrex::ParticleReal const k,
-                 [[maybe_unused]] amrex::ParticleReal const T1,
-                 [[maybe_unused]] amrex::ParticleReal const T2,
-                 [[maybe_unused]] amrex::ParticleReal const w,
-                 ThermalData::Rprofile const data
+         Thermal(amrex::ParticleReal k,
+                 amrex::ParticleReal T1,
+                 amrex::ParticleReal T2,
+                 amrex::ParticleReal w,
+                 ThermalData::Rprofile data
          )
           : m_k(k),m_T1(T1),m_T2(T2),m_w(w),m_data(data)
           {
@@ -264,12 +264,12 @@ namespace distribution
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                amrex::ParticleReal & x,
-                amrex::ParticleReal & y,
-                amrex::ParticleReal & t,
-                amrex::ParticleReal & px,
-                amrex::ParticleReal & py,
-                amrex::ParticleReal & pt,
+                amrex::ParticleReal & AMREX_RESTRICT x,
+                amrex::ParticleReal & AMREX_RESTRICT y,
+                amrex::ParticleReal & AMREX_RESTRICT t,
+                amrex::ParticleReal & AMREX_RESTRICT px,
+                amrex::ParticleReal & AMREX_RESTRICT py,
+                amrex::ParticleReal & AMREX_RESTRICT pt,
                 amrex::RandomEngine const& engine) {
 
             using namespace amrex::literals;  // for _rt and _prt
