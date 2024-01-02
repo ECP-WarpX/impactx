@@ -548,7 +548,7 @@ add_impactx_test(positron_channel.py
     OFF  # no plot script yet
 )
 
-# Cyclotron ############################################################
+# Cyclotron ###################################################################
 #
 # w/o space charge
 add_impactx_test(cyclotron
@@ -566,7 +566,7 @@ add_impactx_test(cyclotron.py
     OFF  # no plot script yet
 )
 
-# Combined-function bend ########################################################
+# Combined-function bend ######################################################
 #
 # w/o space charge
 add_impactx_test(cfbend
@@ -584,7 +584,7 @@ add_impactx_test(cfbend.py
     OFF  # no plot script yet
 )
 
-# Ballistic compression ########################################################
+# Ballistic compression #######################################################
 #
 # w/o space charge
 add_impactx_test(compression
@@ -602,7 +602,7 @@ add_impactx_test(compression.py
     OFF  # no plot script yet
 )
 
-# Kicker test ##########################################################
+# Kicker test #################################################################
 #
 # w/o space charge
 add_impactx_test(kicker
@@ -640,7 +640,7 @@ add_impactx_test(hvkicker_madx.py
         OFF  # no plot script yet
 )
 
-# FODO + RF EPAC2004 ##################################################
+# FODO + RF EPAC2004 ##########################################################
 #
 # with space charge
 add_impactx_test(fodo_rf_sc
@@ -658,7 +658,7 @@ add_impactx_test(fodo_rf_sc.py
     OFF  # no plot script yet
 )
 
-# THERMAL BEAM EPAC2004 ##################################################
+# Thermal Beam EPAC2004 #######################################################
 #
 # with space charge
 add_impactx_test(thermal
@@ -669,7 +669,7 @@ add_impactx_test(thermal
     OFF  # no plot script yet
 )
 
-# BITHERMAL BEAM EPAC2004 ##################################################
+# Bithermal Beam EPAC2004 #####################################################
 #
 # with space charge
 add_impactx_test(bithermal
@@ -677,10 +677,10 @@ add_impactx_test(bithermal
       ON  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/epac2004_benchmarks/analysis_bithermal.py
-    OFF  # no plot script yet
+    examples/epac2004_benchmarks/plot_bithermal.py
 )
 
-# IOTA s-dependent nonlinear lens test ##########################################################
+# IOTA s-dependent nonlinear lens test ########################################
 #
 # w/o space charge
 add_impactx_test(IOTA_nll
@@ -698,7 +698,7 @@ add_impactx_test(IOTA_nll.py
     OFF  # no plot script yet
 )
 
-# IOTA nonlinear lattice test ##########################################################
+# IOTA nonlinear lattice test #################################################
 #
 # w/o space charge
 add_impactx_test(IOTA_lattice
@@ -716,7 +716,7 @@ add_impactx_test(IOTA_lattice.py
     OFF  # no plot script yet
 )
 
-# Thin dipole ########################################################
+# Thin dipole #################################################################
 #
 # w/o space charge
 add_impactx_test(thin_dipole
@@ -734,7 +734,7 @@ add_impactx_test(thin_dipole.py
     OFF  # no plot script yet
 )
 
-# Aperture collimation ############################################################
+# Aperture collimation ########################################################
 #
 # w/o space charge
 add_impactx_test(aperture
@@ -752,7 +752,7 @@ add_impactx_test(aperture.py
     OFF  # no plot script yet
 )
 
-# Apochromat example ########################################################
+# Apochromat example ##########################################################
 #
 # w/o space charge
 add_impactx_test(apochromat
