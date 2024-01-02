@@ -16,6 +16,7 @@
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
+#include <AMReX_Math.H>
 #include <AMReX_REAL.H>
 
 #include <cmath>
@@ -96,8 +97,7 @@ namespace impactx
 
             if(gx > 0.0) {
                 // calculate expensive terms once
-                amrex::ParticleReal const sinx = sin(omegax * slice_ds);
-                amrex::ParticleReal const cosx = cos(omegax * slice_ds);
+                auto const [sinx, cosx] = amrex::Math::sincos(omegax * slice_ds);
                 amrex::ParticleReal const r56 = slice_ds/betgam2
                     + (sinx - omegax*slice_ds)/(gx*omegax*pow(bet,2)*pow(m_rc,2));
 
@@ -130,8 +130,7 @@ namespace impactx
 
             if(gy > 0.0) {
                 // calculate expensive terms once
-                amrex::ParticleReal const siny = sin(omegay * slice_ds);
-                amrex::ParticleReal const cosy = cos(omegay * slice_ds);
+                auto const [siny, cosy] = amrex::Math::sincos(omegay * slice_ds);
 
                 // advance position and momentum (focusing)
                 p.pos(RealAoS::y) = cosy*y + siny/omegay*py;
@@ -181,9 +180,7 @@ namespace impactx
             amrex::ParticleReal const B = sqrt(pow(pt,2)-1.0_prt)/m_rc;
 
             // calculate expensive terms once
-            //   TODO: use sincos function once wrapped in AMReX
-            amrex::ParticleReal const sin_theta = sin(theta);
-            amrex::ParticleReal const cos_theta = cos(theta);
+            auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);
 
             // advance position and momentum (bend)
             refpart.px = px*cos_theta - pz*sin_theta;

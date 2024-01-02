@@ -454,9 +454,9 @@ void init_elements(py::module& m)
     py::class_<Sol, elements::Thick> py_Sol(me, "Sol");
     py_Sol
         .def(py::init<
-                amrex::ParticleReal const,
-                amrex::ParticleReal const,
-                int const>(),
+                amrex::ParticleReal,
+                amrex::ParticleReal,
+                int>(),
              py::arg("ds"), py::arg("ks"), py::arg("nslice") = 1,
              "An ideal hard-edge Solenoid magnet."
         )
@@ -466,8 +466,8 @@ void init_elements(py::module& m)
     py::class_<PRot, elements::Thin> py_PRot(me, "PRot");
     py_PRot
         .def(py::init<
-                amrex::ParticleReal const,
-                amrex::ParticleReal const>(),
+                amrex::ParticleReal,
+                amrex::ParticleReal>(),
              py::arg("phi_in"), py::arg("phi_out"),
              "An exact pole-face rotation in the x-z plane. Both angles are in degrees."
         )

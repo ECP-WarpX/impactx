@@ -16,6 +16,7 @@
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
+#include <AMReX_Math.H>
 #include <AMReX_REAL.H>
 
 #include <cmath>
@@ -83,10 +84,8 @@ namespace impactx
             amrex::ParticleReal const bet = sqrt(betgam2/(1.0_prt + betgam2));
 
             // calculate expensive terms once
-            //   TODO: use sincos function once wrapped in AMReX
             amrex::ParticleReal const theta = slice_ds/m_rc;
-            amrex::ParticleReal const sin_theta = sin(theta);
-            amrex::ParticleReal const cos_theta = cos(theta);
+            auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);
 
             // advance position and momentum (sector bend)
             p.pos(RealAoS::x) = cos_theta*x + m_rc*sin_theta*px
@@ -138,9 +137,7 @@ namespace impactx
             amrex::ParticleReal const B = sqrt(pow(pt,2)-1.0_prt)/m_rc;
 
             // calculate expensive terms once
-            //   TODO: use sincos function once wrapped in AMReX
-            amrex::ParticleReal const sin_theta = sin(theta);
-            amrex::ParticleReal const cos_theta = cos(theta);
+            auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);
 
             // advance position and momentum (bend)
             refpart.px = px*cos_theta - pz*sin_theta;
