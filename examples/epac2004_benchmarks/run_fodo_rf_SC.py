@@ -16,7 +16,7 @@ sim.n_cell = [56, 56, 64]
 sim.particle_shape = 2  # B-spline order
 sim.space_charge = True
 sim.dynamic_size = True
-sim.prob_relative = 4.0
+sim.prob_relative = [4.0]
 
 # beam diagnostics
 sim.slice_step_diagnostics = False
