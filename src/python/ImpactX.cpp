@@ -43,6 +43,8 @@ namespace detail
     auto get_or_throw (std::string const & prefix, std::string const & name)
     {
         T value;
+        // TODO: if array do queryarr
+        // bool const has_name = amrex::ParmParse(prefix).queryarr(name.c_str(), value);
         bool const has_name = amrex::ParmParse(prefix).query(name.c_str(), value);
 
         if (!has_name)
@@ -103,8 +105,17 @@ void init_ImpactX (py::module& m)
         )
 
         // from amrex::AmrMesh
-        .def_property_readonly("max_level",
+        .def_property("max_level",
             [](ImpactX & ix){ return ix.maxLevel(); },
+            [](ImpactX & /* ix */, int /* max_level */) {
+                throw std::runtime_error("setting n_cell is not yet implemented");
+                /*
+                amrex::ParmParse pp_amr("amr");
+                pp_amr.add("max_level", max_level);
+                */
+
+                // note, this must be done *before* initGrids is called
+            },
             "The maximum mesh-refinement level for the simulation."
         )
         .def_property_readonly("finest_level",
@@ -141,9 +152,9 @@ void init_ImpactX (py::module& m)
               [](ImpactX & /* ix */) {
                   return detail::get_or_throw<amrex::Real>("geometry", "prob_relative");
               },
-              [](ImpactX & /* ix */, amrex::Real frac) {
+              [](ImpactX & /* ix */, std::vector<amrex::Real> frac) {
                   amrex::ParmParse pp_geometry("geometry");
-                  pp_geometry.add("prob_relative", frac);
+                  pp_geometry.addarr("prob_relative", frac);
               },
               "The field mesh spans, per direction, multiple times the maximum physical extent of beam particles, as given by this factor."
         )

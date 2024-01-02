@@ -1,0 +1,77 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 100000
+beam.units = static
+beam.kin_energy = 100.0e3  # 100 GeV nominal energy
+beam.charge = 1.0e-9
+beam.particle = electron
+beam.distribution = gaussian
+beam.sigmaX = 1.288697604e-6
+beam.sigmaY = 1.288697604e-6
+beam.sigmaT = 1.0e-6
+beam.sigmaPx = 3.965223396e-6
+beam.sigmaPy = 3.965223396e-6
+beam.sigmaPt = 0.01  #1% energy spread
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor dr1 q1 q2 q3 dr2 q4 q5 dr2 q6 q7 q8 dr1 monitor
+lattice.nslice = 1
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+dr1.type = drift_chromatic
+dr1.ds = 1.0
+
+dr2.type = drift_chromatic
+dr2.ds = 10.0
+
+q1.type = quad_chromatic
+q1.ds = 1.2258333333
+q1.k = 0.5884
+
+q2.type = quad_chromatic
+q2.ds = 1.5677083333
+q2.k = -0.7525
+
+q3.type = quad_chromatic
+q3.ds = 1.205625
+q3.k = 0.5787
+
+q4.type = quad_chromatic
+q4.ds = 1.2502083333
+q4.k = -0.6001
+
+q5.type = quad_chromatic
+q5.ds = 1.2502083333
+q5.k = 0.6001
+
+q6.type = quad_chromatic
+q6.ds = 1.205625
+q6.k = -0.5787
+
+q7.type = quad_chromatic
+q7.ds = 1.5677083333
+q7.k = 0.7525
+
+q8.type = quad_chromatic
+q8.ds = 1.2258333333
+q8.k = -0.5884
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = true

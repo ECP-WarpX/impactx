@@ -23,10 +23,12 @@
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
 #include <AMReX_BLProfiler.H>
+#include <AMReX_ParallelDescriptor.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_Print.H>
 #include <AMReX_Utility.H>
 
+#include <iostream>
 #include <memory>
 
 
@@ -82,7 +84,6 @@ namespace impactx
 
         // init blocks / grids & MultiFabs
         AmrCore::InitFromScratch(0.0);
-        amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
 
         // alloc particle containers
         //   the lost particles have an extra runtime attribute: s when it was lost
@@ -98,6 +99,12 @@ namespace impactx
 
         // register shortcut
         m_particle_container->SetLostParticleContainer(m_particles_lost.get());
+
+        // print AMReX grid summary
+        if (amrex::ParallelDescriptor::IOProcessor()) {
+            std::cout << "\nGrids Summary:\n";
+            printGridSummary(std::cout, 0, finestLevel());
+        }
     }
 
     void ImpactX::evolve ()
@@ -194,7 +201,7 @@ namespace impactx
                         m_particle_container->DepositCharge(m_rho, this->refRatio());
 
                         // poisson solve in x,y,z
-                        spacecharge::PoissonSolve(*m_particle_container, m_rho, m_phi);
+                        spacecharge::PoissonSolve(*m_particle_container, m_rho, m_phi, this->ref_ratio);
 
                         // calculate force in x,y,z
                         spacecharge::ForceFromSelfFields(m_space_charge_field,

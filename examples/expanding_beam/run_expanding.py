@@ -9,14 +9,18 @@
 import amrex.space3d as amr
 from impactx import ImpactX, RefPart, distribution, elements
 
+pp_amr = amr.ParmParse("amr")
+pp_amr.add("max_level", 1)
+
 sim = ImpactX()
 
 # set numerical parameters and IO control
-sim.n_cell = [56, 56, 48]
+sim.n_cell = [16, 16, 20]
+# sim.max_level = 1  # TODO: not yet implemented
 sim.particle_shape = 2  # B-spline order
 sim.space_charge = True
 sim.dynamic_size = True
-sim.prob_relative = 3.0
+sim.prob_relative = [3.0, 1.1]
 
 # beam diagnostics
 # sim.diagnostics = False  # benchmarking
