@@ -214,7 +214,7 @@ namespace distribution
             potential = pow(k*r,2.0)/2.0_prt + c1*phi1 + c2*phi2;
             amrex::ParticleReal Pdensity1 = data.p1*exp(-potential/T1);
             amrex::ParticleReal Pdensity2 = data.p2*exp(-potential/T2);
-            amrex::ParticleReal Pdensity_tot = (1.0_prt-w)*Pdensity1 + w*Pdensity2;
+            // amrex::ParticleReal Pdensity_tot = (1.0_prt-w)*Pdensity1 + w*Pdensity2;
             // amrex::PrintToFile("Pdensity.out") << reval << " " << Pdensity_tot << "\n";
 
             // Apply map to update f1 and f2:
