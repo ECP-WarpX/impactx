@@ -20,15 +20,14 @@ sim.slice_step_diagnostics = True
 # domain decomposition & space charge mesh
 sim.init_grids()
 
-# load a 2 GeV electron beam with an initial
-# unnormalized rms emittance of 2 nm
+# load a 2 GeV proton beam
 kin_energy_MeV = 2.0e3  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
 npart = 100000  # number of macro particles
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
-ref.set_charge_qe(1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_MeV)
+ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_kin_energy_MeV(kin_energy_MeV)
 
 #   particle bunch
 distr = distribution.Waterbag(
