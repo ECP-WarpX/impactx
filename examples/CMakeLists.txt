@@ -780,3 +780,21 @@ add_impactx_test(apochromat.py
     examples/apochromatic/analysis_apochromatic.py
     OFF  # no plot script yet
 )
+
+# Misalignment Quad ###########################################################
+#
+# w/o space charge
+add_impactx_test(alignment
+    examples/alignment/input_alignment.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/alignment/analysis_alignment.py
+    OFF  # no plot script yet
+)
+add_impactx_test(alignment.py
+    examples/alignment/run_alignment.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/alignment/analysis_alignment.py
+    OFF  # no plot script yet
+)

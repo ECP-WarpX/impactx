@@ -276,22 +276,24 @@ Lattice Elements
          * ``cfbend`` for a combined function bending magnet. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
             * ``<element_name>.rc`` (``float``, in meters) the bend radius
-
             * ``<element_name>.k`` (``float``, in inverse meters squared) the quadrupole strength
-
                 = (magnetic field gradient in T/m) / (magnetic rigidity in T-m)
 
               * k > 0 horizontal focusing
               * k < 0 horizontal defocusing
 
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``drift`` for a free drift. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``drift_chromatic`` for a free drift, with chromatic effects included.
@@ -299,26 +301,31 @@ Lattice Elements
            This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``drift_exact`` for a free drift, using the exact nonlinear map. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``quad`` for a quadrupole. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
             * ``<element_name>.k`` (``float``, in inverse meters squared) the quadrupole strength
-
                 = (magnetic field gradient in T/m) / (magnetic rigidity in T-m)
 
               * k > 0 horizontal focusing
               * k < 0 horizontal defocusing
 
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``quad_chromatic`` for A Quadrupole magnet, with chromatic effects included.
@@ -326,9 +333,7 @@ Lattice Elements
            This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
             * ``<element_name>.k`` (``float``, in inverse meters squared OR in T/m) the quadrupole strength
-
                 = (magnetic field gradient in T/m) / (magnetic rigidity in T-m) - if units = 0
 
              OR = magnetic field gradient in T/m - if units = 1
@@ -337,32 +342,33 @@ Lattice Elements
               * k < 0 horizontal defocusing
 
             * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
-
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``quadrupole_softedge`` for a soft-edge quadrupole. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
             * ``<element_name>.gscale`` (``float``, in inverse meters) Scaling factor for on-axis magnetic field gradient
-
             * ``<element_name>.cos_coefficients`` (array of ``float``) cos coefficients in Fourier expansion of the on-axis field gradient
               (optional); default is a tanh fringe field model from `MaryLie 3.0 <http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
-
             * ``<element_name>.sin_coefficients`` (array of ``float``) sin coefficients in Fourier expansion of the on-axis field gradient
               (optional); default is a tanh fringe field model from `MaryLie 3.0 <http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
-
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.mapsteps`` (``integer``) number of integration steps per slice used for map and reference particle push in applied fields
                (default: ``1``)
-
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``sbend`` for a bending magnet. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
             * ``<element_name>.rc`` (``float``, in meters) the bend radius
-
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``sbend_exact`` for a bending magnet using the exact nonlinear map for the bend body. The map corresponds to the map described in:
@@ -371,102 +377,91 @@ Lattice Elements
             particle.  This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
             * ``<element_name>.phi`` (``float``, in degrees) the bend angle
-
             * ``<element_name>.B`` (``float``, in Tesla) the bend magnetic field; when B = 0 (default), the reference bending radius is defined by r0 = length / (angle in rad), corresponding to a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B
-
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``solenoid`` for an ideal hard-edge solenoid magnet. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
             * ``<element_name>.ks`` (``float``, in meters) Solenoid strength in m^(-1) (MADX convention)
-
                   = (magnetic field Bz in T) / (rigidity in T-m)
-
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``solenoid_softedge`` for a soft-edge solenoid. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
             * ``<element_name>.bscale`` (``float``, in inverse meters) Scaling factor for on-axis magnetic field Bz
-
             * ``<element_name>.cos_coefficients`` (array of ``float``) cos coefficients in Fourier expansion of the on-axis magnetic field Bz
               (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
-
             * ``<element_name>.sin_coefficients`` (array of ``float``) sin coefficients in Fourier expansion of the on-axis magnetic field Bz
               (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
-
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.mapsteps`` (``integer``) number of integration steps per slice used for map and reference particle push in applied fields (default: ``1``)
-
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``dipedge`` for dipole edge focusing. This requires these additional parameters:
 
             * ``<element_name>.psi`` (``float``, in radians) the pole face rotation angle
-
             * ``<element_name>.rc`` (``float``, in meters) the bend radius
-
             * ``<element_name>.g`` (``float``, in meters) the gap size
-
             * ``<element_name>.K2`` (``float``, dimensionless) normalized field integral for fringe field
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
 
         * ``constf`` for a constant focusing element. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
             * ``<element_name>.kx`` (``float``, in 1/meters) the horizontal focusing strength
-
             * ``<element_name>.ky`` (``float``, in 1/meters) the vertical focusing strength
-
             * ``<element_name>.kt`` (``float``, in 1/meters) the longitudinal focusing strength
-
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``rfcavity`` a radiofrequency cavity.
           This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
             * ``<element_name>.escale`` (``float``, in 1/m) scaling factor for on-axis RF electric field
-
                 = (peak on-axis electric field Ez in MV/m) / (particle rest energy in MeV)
-
             * ``<element_name>.freq`` (``float``, in Hz) RF frequency
-
             * ``<element_name>.phase`` (``float``, in degrees) RF driven phase
-
             * ``<element_name>.cos_coefficients`` (array of ``float``) cosine coefficients in Fourier expansion of on-axis electric field Ez (optional); default is a 9-cell TESLA superconducting cavity model from `DOI:10.1103/PhysRevSTAB.3.092001 <https://doi.org/10.1103/PhysRevSTAB.3.092001>`__
-
             * ``<element_name>.cos_coefficients`` (array of ``float``) sine coefficients in Fourier expansion of on-axis electric field Ez (optional); default is a 9-cell TESLA superconducting cavity model from `DOI:10.1103/PhysRevSTAB.3.092001 <https://doi.org/10.1103/PhysRevSTAB.3.092001>`__
-
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.mapsteps`` (``integer``) number of integration steps per slice used for map and reference particle push in applied fields (default: ``1``)
-
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``buncher`` for a short RF cavity (linear) bunching element.
           This requires these additional parameters:
 
             * ``<element_name>.V`` (``float``, dimensionless) normalized voltage drop across the cavity
-
                 = (maximum voltage drop in Volts) / (speed of light in m/s * magnetic rigidity in T-m)
-
             * ``<element_name>.k`` (``float``, in 1/meters) the RF wavenumber
-
                 = 2*pi/(RF wavelength in m)
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
 
         * ``shortrf`` for a short RF cavity element.
           This requires these additional parameters:
 
             * ``<element_name>.V`` (``float``, dimensionless) normalized voltage drop across the cavity
-
                 = (maximum energy gain in MeV) / (particle rest energy in MeV)
-
             * ``<element_name>.freq`` (``float``, in Hz) the RF frequency
-
             * ``<element_name>.phase`` (``float``, in degrees) the synchronous RF phase
 
                 phase = 0: maximum energy gain (on-crest)
@@ -474,76 +469,80 @@ Lattice Elements
                 phase = -90 deg:  zero energy gain for bunching
 
                 phase = 90 deg:  zero energy gain for debunching
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
 
         * ``uniform_acc_chromatic`` for a region of uniform acceleration, with chromatic effects included.
            The Hamiltonian is expanded through second order in the transverse variables (x,px,y,py), with the exact pt dependence retained.
            This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-
             * ``<element_name>.ez`` (``float``, in inverse meters) the electric field strength
-
                 = (particle charge in C * electric field Ez in V/m) / (particle mass in kg * (speed of light in m/s)^2)
-
             * ``<element_name>.bz`` (``float``, in inverse meters) the magnetic field strength
-
                 = (particle charge in C * magnetic field Bz in T) / (particle mass in kg * speed of light in m/s)
-
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
         * ``multipole`` for a thin multipole element.
           This requires these additional parameters:
 
             * ``<element_name>.multipole`` (``integer``, dimensionless) order of multipole
-
                 (m = 1) dipole, (m = 2) quadrupole, (m = 3) sextupole, etc.
 
             * ``<element_name>.k_normal`` (``float``, in 1/meters^m) integrated normal multipole coefficient (MAD-X convention)
-
                 = 1/(magnetic rigidity in T-m) * (derivative of order m-1 of By with respect to x)
-
             * ``<element_name>.k_skew`` (``float``, in 1/meters^m) integrated skew multipole strength (MAD-X convention)
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
 
         * ``nonlinear_lens`` for a thin IOTA nonlinear lens element.
           This requires these additional parameters:
 
             * ``<element_name>.knll`` (``float``, in meters) integrated strength of the lens segment (MAD-X convention)
-
                 = dimensionless lens strength * c parameter**2 * length / Twiss beta
-
             * ``<element_name>.cnll`` (``float``, in meters) distance of the singularities from the origin (MAD-X convention)
-
                 = c parameter * sqrt(Twiss beta)
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
 
         * ``prot`` for an exact pole-face rotation in the x-z plane. This requires these additional parameters:
 
             * ``<element_name>.phi_in`` (``float``, in degrees) angle of the reference particle with respect to the longitudinal (z) axis in the original frame
-
             * ``<element_name>.phi_out`` (``float``, in degrees) angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame
 
         * ``kicker`` for a thin transverse kicker. This requires these additional parameters:
 
             * ``<element_name>.xkick`` (``float``, dimensionless OR in T-m) the horizontal kick strength
-
             * ``<element_name>.ykick`` (``float``, dimensionless OR in T-m) the vertical kick strength
-
             * ``<element_name>.units`` (``string``) specification of units: ``dimensionless`` (default, in units of the magnetic rigidity of the reference particle) or ``T-m``
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
 
         * ``thin_dipole`` for a thin dipole element.
           This requires these additional parameters:
 
             * ``<element_name>.theta`` (``float``, in degrees) dipole bend angle
-
             * ``<element_name>.rc`` (``float``, in meters) effective radius of curvature
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
 
         * ``aperture`` for a thin collimator element applying a transverse aperture boundary.
           This requires these additional parameters:
 
             * ``<element_name>.xmax`` (``float``, in meters) maximum value of the horizontal coordinate
-
             * ``<element_name>.ymax`` (``float``, in meters) maximum value of the vertical coordinate
-
             * ``<element_name>.shape`` (``string``) shape of the aperture boundary: ``rectangular`` (default) or ``elliptical``
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
 
         * ``beam_monitor`` a beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
           If the same element name is used multiple times, then an output series is created with multiple outputs.

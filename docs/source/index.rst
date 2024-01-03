@@ -65,9 +65,9 @@ Usage
    :hidden:
 
    usage/how_to_run
+   usage/examples
    usage/python
    usage/parameters
-   usage/examples
    usage/workflows
 
 Data Analysis
