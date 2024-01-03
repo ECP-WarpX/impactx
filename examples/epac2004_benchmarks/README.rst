@@ -27,18 +27,22 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 Run
 ---
 
-This example can be run as a Python script (``python3 run_fodo_rf_SC.py``) or with an app with an input file (``impactx input_fodo_rf_SC.in``).
-Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
+This example can be run **either** as:
+
+* **Python** script: ``python3 run_fodo_rf_SC.py`` or
+* ImpactX **executable** using an input file: ``impactx input_fodo_rf_SC.in``
+
+For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
 .. tab-set::
 
-   .. tab-item:: Python Script
+   .. tab-item:: Python: Script
 
        .. literalinclude:: run_fodo_rf_SC.py
           :language: python3
           :caption: You can copy this file from ``examples/epac2004_benchmarks/run_fodo_rf_SC.py``.
 
-   .. tab-item:: App Input File
+   .. tab-item:: Executable: Input File
 
        .. literalinclude:: input_fodo_rf_SC.in
           :language: ini
@@ -90,19 +94,23 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 Run
 ---
 
-This example can be run as a Python script (``python3 run_thermal.py``) or as an app with an input file (``impactx input_thermal.in``).
-Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
+This example can be run **either** as:
+
+* **Python** script: ``python3 run_thermal.py`` or
+* ImpactX **executable** using an input file: ``impactx input_thermal.in``
+
+For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
 .. tab-set::
 
-   .. tab-item:: Python Script
+   .. tab-item:: Python: Script
 
        .. literalinclude:: run_thermal.py
           :language: python3
           :caption: You can copy this file from ``examples/epac2004_benchmarks/run_thermal.py``.
 
 
-   .. tab-item:: App Input File
+   .. tab-item:: Executable: Input File
 
        .. literalinclude:: input_thermal.in
           :language: ini
@@ -158,19 +166,23 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 Run
 ---
 
-This example can be run as a Python script (``python3 run_bithermal.py``) or as an app with an input file (``impactx input_bithermal.in``).
-Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
+This example can be run **either** as:
+
+* **Python** script: ``python3 run_bithermal.py`` or
+* ImpactX **executable** using an input file: ``impactx input_bithermal.in``
+
+For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
 .. tab-set::
 
-   .. tab-item:: Python Script
+   .. tab-item:: Python: Script
 
        .. literalinclude:: run_bithermal.py
           :language: python3
           :caption: You can copy this file from ``examples/epac2004_benchmarks/run_bithermal.py``.
 
 
-   .. tab-item:: App Input File
+   .. tab-item:: Executable: Input File
 
        .. literalinclude:: input_bithermal.in
           :language: ini
