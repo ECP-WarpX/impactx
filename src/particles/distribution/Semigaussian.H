@@ -10,6 +10,8 @@
 #ifndef IMPACTX_DISTRIBUTION_SEMIGAUSSIAN
 #define IMPACTX_DISTRIBUTION_SEMIGAUSSIAN
 
+#include "particles/ReferenceParticle.H"
+
 #include <ablastr/constant.H>
 
 #include <AMReX_Random.H>
@@ -45,6 +47,17 @@ namespace impactx::distribution
         )
         : m_sigmaX(sigx), m_sigmaY(sigy), m_sigmaT(sigt), m_sigmaPx(sigpx), m_sigmaPy(sigpy),
           m_sigmaPt(sigpt), m_muxpx(muxpx), m_muypy(muypy), m_mutpt(mutpt)
+        {
+        }
+
+        /** Initialize the distribution.
+         *
+         * Nothing to do here.
+         *
+         * @param bunch_charge charge of the beam in C
+         * @param ref the reference particle
+         */
+        void initialize ([[maybe_unused]] amrex::ParticleReal bunch_charge, [[maybe_unused]] RefPart const & ref)
         {
         }
 

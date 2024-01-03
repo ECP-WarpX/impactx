@@ -30,6 +30,7 @@ This section allows you to **download input files** that correspond to different
    examples/kicker/README.rst
    examples/thin_dipole/README.rst
    examples/aperture/README.rst
+   examples/epac2004_benchmarks/README.rst
    examples/pytorch_surrogate_model/README.rst
    examples/apochromatic/README.rst
 

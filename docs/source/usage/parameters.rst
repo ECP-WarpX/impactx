@@ -236,6 +236,21 @@ Initial Beam Distributions
         * ``beam.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``beam.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
+    * ``thermal`` for a 6D stationary thermal or bithermal distribution.
+      This distribution type is described, for example in:
+      R. D. Ryne et al, "A Test Suite of Space-Charge Problems for Code Benchmarking", in Proc. EPAC2004, Lucerne, Switzerland.
+      C. E. Mitchell et al, "ImpactX Modeling of Benchmark Tests for Space Charge Validation", in Proc. HB2023, Geneva, Switzerland.
+      With additional parameters:
+
+        * ``beam.k`` (``float``, in inverse meters) external focusing strength
+        * ``beam.kT`` (``float``, dimensionless) temperature of core population
+           = < p_x^2 > = < p_y^2 >, where all momenta are normalized by the reference momentum
+        * ``beam.kT_halo`` (``float``, dimensionless, default ``kT``) temperature of halo population
+        * ``beam.normalize`` (``float``, dimensionless) normalizing constant for core population
+        * ``beam.normalize_halo`` (``float``, dimensionless) normalizing constant for halo population
+        * ``beam.halo`` (``float``, dimensionless) fraction of charge in halo
+
+
 .. _running-cpp-parameters-lattice:
 
 Lattice Elements

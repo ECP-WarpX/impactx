@@ -1,0 +1,45 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+#beam.npart = 100000000  #full resolution
+beam.npart = 10000
+beam.units = static
+beam.kin_energy = 0.1
+beam.charge = 1.4285714285714285714e-10
+beam.particle = proton
+beam.distribution = thermal
+beam.k = 6.283185307179586
+beam.kT = 36.0e-6
+beam.normalize = 0.41604661
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor constf1 monitor
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+constf1.type = constf
+constf1.ds = 10.0
+constf1.kx = 6.283185307179586
+constf1.ky = 6.283185307179586
+constf1.kt = 6.283185307179586
+constf1.nslice = 400   #full resolution
+#constf1.nslice = 50
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = true
+
+#amr.n_cell = 128 128 128  #full resolution
+amr.n_cell = 64 64 64
+geometry.prob_relative = 3.0
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = false

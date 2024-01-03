@@ -427,6 +427,10 @@ This module provides particle beam distributions that can be used to initialize 
 
    A 6D Waterbag distribution.
 
+.. py:class:: impactx.distribution.Thermal(k, kT, kT_halo, normalize, normalize_halo, halo)
+
+   A 6D stationary thermal or bithermal distribution.
+
 
 Lattice Elements
 ----------------
