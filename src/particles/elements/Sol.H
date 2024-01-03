@@ -16,6 +16,7 @@
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
+#include <AMReX_Math.H>
 #include <AMReX_REAL.H>
 
 #include <cmath>
@@ -38,8 +39,11 @@ namespace impactx
          *           = (magnetic field Bz in T) / (rigidity in T-m)
          * @param nslice number of slices used for the application of space charge
          */
-        Sol( amrex::ParticleReal const ds, amrex::ParticleReal const ks,
-              int const nslice )
+        Sol (
+            amrex::ParticleReal ds,
+            amrex::ParticleReal ks,
+            int nslice
+        )
         : Thick(ds, nslice), m_ks(ks)
         {
         }
@@ -57,12 +61,13 @@ namespace impactx
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
-                amrex::ParticleReal & AMREX_RESTRICT px,
-                amrex::ParticleReal & AMREX_RESTRICT py,
-                amrex::ParticleReal & AMREX_RESTRICT pt,
-                RefPart const & refpart) const {
-
+            PType & AMREX_RESTRICT p,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            RefPart const & refpart
+        ) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
@@ -91,11 +96,12 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // advance positions and momenta using map for focusing
-            xout = cos(theta)*x + sin(theta)/alpha*px;
-            pxout = -alpha*sin(theta)*x + cos(theta)*px;
+            auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);
+            xout = cos_theta*x + sin_theta/alpha*px;
+            pxout = -alpha*sin_theta*x + cos_theta*px;
 
-            yout = cos(theta)*y + sin(theta)/alpha*py;
-            pyout = -alpha*sin(theta)*y + cos(theta)*py;
+            yout = cos_theta*y + sin_theta/alpha*py;
+            pyout = -alpha*sin_theta*y + cos_theta*py;
 
             tout = t + (slice_ds/betgam2)*pt;
             ptout = pt;
@@ -106,11 +112,11 @@ namespace impactx
             pt = ptout;
 
             // advance positions and momenta using map for rotation
-            p.pos(RealAoS::x) = cos(theta)*xout + sin(theta)*yout;
-            pxout = cos(theta)*px + sin(theta)*py;
+            p.pos(RealAoS::x) = cos_theta*xout + sin_theta*yout;
+            pxout = cos_theta*px + sin_theta*py;
 
-            p.pos(RealAoS::y) = -sin(theta)*xout + cos(theta)*yout;
-            pyout = -sin(theta)*px + cos(theta)*py;
+            p.pos(RealAoS::y) = -sin_theta*xout + cos_theta*yout;
+            pyout = -sin_theta*px + cos_theta*py;
 
             p.pos(RealAoS::t) = tout;
             ptout = pt;
@@ -119,7 +125,6 @@ namespace impactx
             px = pxout;
             py = pyout;
             pt = ptout;
-
         }
 
         /** This pushes the reference particle.
@@ -127,8 +132,8 @@ namespace impactx
          * @param[in,out] refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void operator() (RefPart & AMREX_RESTRICT refpart) const {
-
+        void operator() (RefPart & AMREX_RESTRICT refpart) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
             // assign input reference particle values

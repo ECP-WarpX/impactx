@@ -16,6 +16,7 @@
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
+#include <AMReX_Math.H>
 #include <AMReX_REAL.H>
 #include <AMReX_Print.H>      // for PrintToFile
 
@@ -100,8 +101,7 @@ namespace impactx
             amrex::ParticleReal const pperp = sqrt(pow(pt,2)-2.0_prt/bet*pt-pow(py,2)+1.0_prt);
             amrex::ParticleReal const pzi = sqrt(pow(pperp,2)-pow(px,2));
             amrex::ParticleReal const rho = rc + x;
-            amrex::ParticleReal const sin_phi = sin(slice_phi);
-            amrex::ParticleReal const cos_phi = cos(slice_phi);
+            auto const [sin_phi, cos_phi] = amrex::Math::sincos(slice_phi);
 
             // update momenta
             pxout = px*cos_phi + (pzi - rho/rc)*sin_phi;
@@ -153,9 +153,7 @@ namespace impactx
             amrex::ParticleReal const B = refpart.beta_gamma() /rc;
 
             // calculate expensive terms once
-            //   TODO: use sincos function once wrapped in AMReX
-            amrex::ParticleReal const sin_theta = sin(theta);
-            amrex::ParticleReal const cos_theta = cos(theta);
+            auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);
 
             // advance position and momentum (bend)
             refpart.px = px*cos_theta - pz*sin_theta;
