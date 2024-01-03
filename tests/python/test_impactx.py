@@ -12,7 +12,16 @@ import numpy as np
 import pytest
 
 import amrex.space3d as amr
+import impactx
 from impactx import ImpactX, RefPart, distribution, elements
+
+
+def test_impactx_module():
+    """
+    Tests the basic modules we provide.
+    """
+    print(f"version={impactx.__version__}")
+    assert impactx.__version__  # version must not be empty
 
 
 def test_impactx_fodo_file():

@@ -80,7 +80,7 @@ option(ImpactX_amrex_internal                    "Download & build AMReX" ON)
 option(ImpactX_openpmd_internal                  "Download & build openPMD-api" ON)
 option(ImpactX_pyamrex_internal                  "Download & build pyAMReX" ON)
 
-set(pyImpactX_VERSION_INFO "" CACHE STRING
+set(pyImpactX_VERSION_INFO "${ImpactX_VERSION}" CACHE STRING
     "PEP-440 conformant version (set by setup.py)")
 
 # change the default build type to Release (or RelWithDebInfo) instead of Debug
