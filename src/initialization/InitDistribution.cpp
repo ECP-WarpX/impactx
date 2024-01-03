@@ -56,6 +56,7 @@ namespace impactx
             );
         }
 
+        // init particles
         amrex::Vector<amrex::ParticleReal> x, y, t;
         amrex::Vector<amrex::ParticleReal> px, py, pt;
         amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
@@ -74,6 +75,10 @@ namespace impactx
                                         amrex::ParticleReal(npart);
 
         std::visit([&](auto&& distribution){
+            // initialize distributions
+            distribution.initialize(bunch_charge, ref);
+
+            // alloc data for particle attributes
             x.reserve(npart_this_proc);
             y.reserve(npart_this_proc);
             t.reserve(npart_this_proc);
@@ -297,26 +302,18 @@ namespace impactx
           add_particles(bunch_charge, triangle, npart);
 
         } else if (distribution_type == "thermal") {
-          amrex::ParticleReal k, kT1, kT2, p1,p2;
+          amrex::ParticleReal k, kT, kT_halo, normalize, normalize_halo;
           amrex::ParticleReal halo = 0.0;
           pp_dist.get("k", k);
-          pp_dist.get("kT", kT1);
-          kT2 = kT1;
-          pp_dist.get("normalize",p1);
-          p2 = p1;
-          pp_dist.query("kT_halo", kT2);
-          pp_dist.query("normalize_halo", p2);
+          pp_dist.get("kT", kT);
+          kT_halo = kT;
+          pp_dist.get("normalize", normalize);
+          normalize_halo = normalize;
+          pp_dist.query("kT_halo", kT_halo);
+          pp_dist.query("normalize_halo", normalize_halo);
           pp_dist.query("halo", halo);
 
-          distribution::ThermalData termal_data;
-          auto const & ref = m_particle_container->GetRefParticle();
-
-          // Generate the struct "data" containing the radial CDF:
-          distribution::ThermalData::Rprofile data(distribution::ThermalData::Rprofile(k,kT1,kT2,p1,p2,halo));
-          termal_data.generate_radial_dist(bunch_charge,ref,data);
-
-          distribution::KnownDistributions thermal(distribution::Thermal(
-            k, kT1, kT2, halo, data));
+          distribution::KnownDistributions thermal(distribution::Thermal(k, kT, kT_halo, normalize, normalize_halo, halo));
 
           add_particles(bunch_charge, thermal, npart);
 

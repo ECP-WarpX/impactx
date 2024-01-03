@@ -10,6 +10,8 @@
 #ifndef IMPACTX_DISTRIBUTION_NONE
 #define IMPACTX_DISTRIBUTION_NONE
 
+#include "particles/ReferenceParticle.H"
+
 #include <AMReX_Random.H>
 #include <AMReX_REAL.H>
 
@@ -20,9 +22,20 @@ namespace impactx::distribution
     {
         /** This distribution sets all values to zero.
          */
-         None()
-         {
-         }
+        None()
+        {
+        }
+
+        /** Initialize the distribution.
+         *
+         * Nothing to do here.
+         *
+         * @param bunch_charge charge of the beam in C
+         * @param ref the reference particle
+         */
+        void initialize ([[maybe_unused]] amrex::ParticleReal bunch_charge, [[maybe_unused]] RefPart const & ref)
+        {
+        }
 
         /** Return 1 6D particle coordinate
          *

@@ -646,7 +646,7 @@ add_impactx_test(hvkicker_madx.py
 add_impactx_test(fodo_rf_sc
     examples/epac2004_benchmarks/input_fodo_rf_SC.in
       ON  # ImpactX MPI-parallel
-      OFF  # ImpactX Python interface
+      OFF # ImpactX Python interface
     examples/epac2004_benchmarks/analysis_fodo_rf_SC.py
     OFF  # no plot script yet
 )
@@ -664,7 +664,7 @@ add_impactx_test(fodo_rf_sc.py
 add_impactx_test(thermal
     examples/epac2004_benchmarks/input_thermal.in
       ON  # ImpactX MPI-parallel
-      OFF  # ImpactX Python interface
+      OFF # ImpactX Python interface
     examples/epac2004_benchmarks/analysis_thermal.py
     OFF  # no plot script yet
 )
@@ -675,7 +675,18 @@ add_impactx_test(thermal
 add_impactx_test(bithermal
     examples/epac2004_benchmarks/input_bithermal.in
       ON  # ImpactX MPI-parallel
-      OFF  # ImpactX Python interface
+      OFF # ImpactX Python interface
+    examples/epac2004_benchmarks/analysis_bithermal.py
+    examples/epac2004_benchmarks/plot_bithermal.py
+)
+
+# Python: Bithermal Beam EPAC2004 #############################################
+#
+# with space charge
+add_impactx_test(bithermal.py
+    examples/epac2004_benchmarks/run_bithermal.py
+      ON  # ImpactX MPI-parallel
+      ON  # ImpactX Python interface
     examples/epac2004_benchmarks/analysis_bithermal.py
     examples/epac2004_benchmarks/plot_bithermal.py
 )

@@ -4,21 +4,26 @@
  *
  * This file is part of ImpactX.
  *
- * Authors: Ji Qiang, Axel Huebl
+ * Authors: Ji Qiang, Axel Huebl, Chad Mitchell
  * License: BSD-3-Clause-LBNL
  */
 #ifndef IMPACTX_DISTRIBUTION_THERMAL
 #define IMPACTX_DISTRIBUTION_THERMAL
 
+#include "particles/ReferenceParticle.H"
+
+#include <ablastr/constant.H>
+
+#include <AMReX_Math.H>
+#include <AMReX_Print.H>
 #include <AMReX_Random.H>
 #include <AMReX_REAL.H>
-#include <AMReX_Print.H>
-#include <ablastr/constant.H>
-#include "particles/ImpactXParticleContainer.H"
 
 #include <cmath>
 #include <cstdint>
 #include <random>
+#include <utility>
+
 
 namespace impactx
 {
@@ -65,10 +70,16 @@ namespace distribution
                  p2 = p2in;
                  w = win;
             }
-
         };
 
-        void generate_radial_dist (amrex::ParticleReal const bunch_charge, RefPart const & refpart, Rprofile & data)
+        /** Populate the radial CDF data.
+         *
+         * @param[in] bunch_charge the bunch charge in C
+         * @param[in] refpart the reference particle
+         * @param[inout] data the data to contain the radial CDF
+         */
+        static void
+        generate_radial_dist (amrex::ParticleReal bunch_charge, RefPart const & refpart, Rprofile & data)
 
         {
             using namespace amrex::literals;  // for _rt and _prt
@@ -117,7 +128,7 @@ namespace distribution
 
         }
 
-        amrex::ParticleReal
+        static amrex::ParticleReal
         matched_scale_radius(Rprofile & data)
         {
             using namespace amrex::literals;  // for _rt and _prt
@@ -131,10 +142,13 @@ namespace distribution
             return rscale;
         }
 
-        void integrate (Rprofile & data,
-                        amrex::ParticleReal const in,
-                        amrex::ParticleReal const out,
-                        int const steps)
+        static void
+        integrate (
+            Rprofile & data,
+            amrex::ParticleReal const in,
+            amrex::ParticleReal const out,
+            int const steps
+        )
         {
             using namespace amrex::literals; // for _rt and _prt
 
@@ -166,9 +180,12 @@ namespace distribution
 
         }
 
-        void map1 (amrex::ParticleReal const tau,
-                   Rprofile & data,
-                   amrex::ParticleReal & reval) const
+        static void
+        map1 (
+            amrex::ParticleReal const tau,
+            Rprofile & data,
+            amrex::ParticleReal & reval
+        )
         {
             using namespace amrex::literals;  // for _rt and _prt
             using namespace ablastr::constant::math;  // for pi
@@ -188,9 +205,12 @@ namespace distribution
 
         }
 
-        void map2 (amrex::ParticleReal const tau,
-                   Rprofile & data,
-                   amrex::ParticleReal & reval) const
+        static void
+        map2 (
+            amrex::ParticleReal const tau,
+            Rprofile & data,
+            amrex::ParticleReal & reval
+        )
         {
             using namespace amrex::literals;  // for _rt and _prt
             using namespace ablastr::constant::math;  // for pi
@@ -223,9 +243,7 @@ namespace distribution
             data.f1 = f1 + tau*4.0_prt*pi*pow(r,2.0)*Pdensity1;
             data.f2 = f2 + tau*4.0_prt*pi*pow(r,2.0)*Pdensity2;
             reval = r;
-
         }
-
     };
 
     struct Thermal
@@ -237,20 +255,42 @@ namespace distribution
          * an isotropic linear focusing channel.
          *
          * @param k linear focusing strength (1/meters)
-         * @param T1 temperature k*T of the primary (core) population
-         * @param T2 temperature k*T of the secondary (halo) population
-         * @param w weight of the secondary (halo) population
-         * @param data radial profile of the stationary beam
+         * @param kT temperature k*T of the primary (core) population
+         * @param kT_halo temperature k*T of the secondary (halo) population
+         * @param normalize normalization constant of first population
+         * @param normalize_halo normalization constant of second population
+         * @param halo weight of the secondary (halo) population
          */
-         Thermal(amrex::ParticleReal k,
-                 amrex::ParticleReal T1,
-                 amrex::ParticleReal T2,
-                 amrex::ParticleReal w,
-                 ThermalData::Rprofile data
-         )
-          : m_k(k),m_T1(T1),m_T2(T2),m_w(w),m_data(data)
-          {
-          }
+        Thermal (
+            amrex::ParticleReal k,
+            amrex::ParticleReal kT,
+            amrex::ParticleReal kT_halo,
+            amrex::ParticleReal normalize,
+            amrex::ParticleReal normalize_halo,
+            amrex::ParticleReal halo
+        )
+        : m_k(k),
+          m_kT(kT),
+          m_T2(kT_halo),
+          m_normalize(normalize),
+          m_normalize_halo(normalize_halo),
+          m_halo(halo),
+          m_data(ThermalData::Rprofile(m_k, m_kT, m_T2, m_normalize, m_normalize_halo, m_halo))
+        {
+        }
+
+        /** Initialize the distribution.
+         *
+         * This in particular sets the m_data radial profile of the stationary beam
+         *
+         * @param bunch_charge charge of the beam in C
+         * @param ref the reference particle
+         */
+        void initialize (amrex::ParticleReal bunch_charge, RefPart const & ref)
+        {
+            // Generate the struct "data" containing the radial CDF:
+            distribution::ThermalData::generate_radial_dist(bunch_charge, ref, m_data);
+        }
 
         /** Return 1 6D particle coordinate
          *
@@ -344,15 +384,16 @@ namespace distribution
             pt = -pz*(m_data.bg);
 
             (void) m_k;
-            (void) m_T1;
+            (void) m_kT;
             (void) m_T2;
-            (void) m_w;
+            (void) m_halo;
         }
 
     private:
         amrex::ParticleReal m_k; //! linear focusing strength (1/meters)
-        amrex::ParticleReal m_T1,m_T2; //! temperature of each particle population
-        amrex::ParticleReal m_w; //! relative weight of halo population
+        amrex::ParticleReal m_kT, m_T2; //! temperature of each particle population
+        amrex::ParticleReal m_normalize, m_normalize_halo; //! normalization constant of first/second population
+        amrex::ParticleReal m_halo; //! relative weight of halo population
         ThermalData::Rprofile m_data; //! struct containing radial profile data
     };
 
