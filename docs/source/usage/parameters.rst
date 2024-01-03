@@ -244,6 +244,7 @@ Initial Beam Distributions
 
         * ``beam.k`` (``float``, in inverse meters) external focusing strength
         * ``beam.kT`` (``float``, dimensionless) temperature of core population
+           = < p_x^2 > = < p_y^2 >, where all momenta are normalized by the reference momentum
         * ``beam.kT_halo`` (``float``, dimensionless, default ``kT``) temperature of halo population
         * ``beam.normalize`` (``float``, dimensionless) normalizing constant for core population
         * ``beam.normalize_halo`` (``float``, dimensionless) normalizing constant for halo population
