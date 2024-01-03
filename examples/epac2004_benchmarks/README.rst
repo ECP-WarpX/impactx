@@ -200,7 +200,8 @@ You can run the following script to visualize the initial and final beam distrib
       :language: python3
       :caption: You can copy this file from ``examples/fodo/plot_bithermal.py``.
 
-.. figure:: https://user-images.githubusercontent.com/1353258/293794130-9aaee337-d810-4221-8f6d-1d7d2134c1b7.png
-   :alt: Initial and final beam distribution.
+.. figure:: https://user-images.githubusercontent.com/1353258/294003440-b16185c7-2573-48d9-8998-17e116721ab5.png
+   :alt: Initial and final beam distribution when running with full resolution (see inline comments in the input file/script). The bithermal distribution should stay static in this test.
 
-   Initial and final beam distribution.
+   Initial and final beam distribution when running with full resolution (see inline comments in the input file/script).
+   The bithermal distribution should stay static in this test.
