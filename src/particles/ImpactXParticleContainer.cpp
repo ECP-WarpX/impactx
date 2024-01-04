@@ -100,83 +100,17 @@ namespace impactx
     }
 
     void
-    ImpactXParticleContainer::AddNParticles (int lev,
-                                             amrex::Vector<amrex::ParticleReal> const & x,
-                                             amrex::Vector<amrex::ParticleReal> const & y,
-                                             amrex::Vector<amrex::ParticleReal> const & t,
-                                             amrex::Vector<amrex::ParticleReal> const & px,
-                                             amrex::Vector<amrex::ParticleReal> const & py,
-                                             amrex::Vector<amrex::ParticleReal> const & pt,
-                                             amrex::ParticleReal qm,
-                                             amrex::ParticleReal bchchg)
-    {
-        BL_PROFILE("ImpactX::AddNParticles");
-
-        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(lev == 0, "AddNParticles: only lev=0 is supported yet.");
-        AMREX_ALWAYS_ASSERT(x.size() == y.size());
-        AMREX_ALWAYS_ASSERT(x.size() == t.size());
-        AMREX_ALWAYS_ASSERT(x.size() == px.size());
-        AMREX_ALWAYS_ASSERT(x.size() == py.size());
-        AMREX_ALWAYS_ASSERT(x.size() == pt.size());
-
-        // number of particles to add
-        int const np = x.size();
-
-        auto& particle_tile = DefineAndReturnParticleTile(0, 0, 0);
-
-        /* Create a temporary tile to obtain data from simulation. This data
-         * is then copied to the permanent tile which is stored on the particle
-         * (particle_tile).
-         */
-        using PinnedTile = amrex::ParticleTile<
-            amrex::Particle<NStructReal, NStructInt>,
-            NArrayReal, NArrayInt,
-            amrex::PinnedArenaAllocator
-        >;
-        PinnedTile pinned_tile;
-        pinned_tile.define(NumRuntimeRealComps(), NumRuntimeIntComps());
-
-        for (int i = 0; i < np; i++)
-        {
-            ParticleType p;
-            p.id() = ParticleType::NextID();
-            p.cpu() = amrex::ParallelDescriptor::MyProc();
-            p.pos(RealAoS::x) = x[i];
-            p.pos(RealAoS::y) = y[i];
-            p.pos(RealAoS::t) = t[i];
-            // write position, creating cpu id, and particle id
-            pinned_tile.push_back(p);
-        }
-
-        // write Real attributes (SoA) to particle initialized zero
-        DefineAndReturnParticleTile(0, 0, 0);
-
-        pinned_tile.push_back_real(RealSoA::px, px);
-        pinned_tile.push_back_real(RealSoA::py, py);
-        pinned_tile.push_back_real(RealSoA::pt, pt);
-        pinned_tile.push_back_real(RealSoA::qm, np, qm);
-        pinned_tile.push_back_real(RealSoA::w, np, bchchg/ablastr::constant::SI::q_e/np);
-
-        /* Redistributes particles to their respective tiles (spatial bucket
-         * sort per box over MPI ranks)
-         */
-        auto old_np = particle_tile.numParticles();
-        auto new_np = old_np + pinned_tile.numParticles();
-        particle_tile.resize(new_np);
-        amrex::copyParticles(
-                particle_tile, pinned_tile, 0, old_np, pinned_tile.numParticles());
-    }
-
-    void
-    ImpactXParticleContainer::AddNParticles (int lev,
-                                             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & x,
-                                             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & y,
-                                             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & t,
-                                             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & px,
-                                             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & py,
-                                             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & pt,
-                                             amrex::ParticleReal qm,
-                                             amrex::ParticleReal bchchg)
+    ImpactXParticleContainer::AddNParticles (
+        int lev,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & x,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & y,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & t,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & px,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & py,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & pt,
+        amrex::ParticleReal qm,
+        amrex::ParticleReal bchchg
+    )
     {
         BL_PROFILE("ImpactX::AddNParticles");
 
@@ -240,8 +174,6 @@ namespace impactx
             qm_arr[old_np+i] = qm;
             w_arr[old_np+i]  = bchchg/ablastr::constant::SI::q_e/np;
         });
-
-        Redistribute();
     }
 
     void

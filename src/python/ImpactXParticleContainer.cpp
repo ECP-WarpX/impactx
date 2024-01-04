@@ -58,25 +58,12 @@ void init_impactxparticlecontainer(py::module& m)
         )
 
         .def("add_n_particles",
-             py::overload_cast<
-                 int,
-                 amrex::Vector<amrex::ParticleReal> const &,
-                 amrex::Vector<amrex::ParticleReal> const &,
-                 amrex::Vector<amrex::ParticleReal> const &,
-                 amrex::Vector<amrex::ParticleReal> const &,
-                 amrex::Vector<amrex::ParticleReal> const &,
-                 amrex::Vector<amrex::ParticleReal> const &,
-                 amrex::ParticleReal,
-                 amrex::ParticleReal
-             >(&ImpactXParticleContainer::AddNParticles),
+             &ImpactXParticleContainer::AddNParticles,
              py::arg("lev"),
              py::arg("x"), py::arg("y"), py::arg("t"),
              py::arg("px"), py::arg("py"), py::arg("pt"),
              py::arg("qm"), py::arg("bchchg"),
              "Add new particles to the container for fixed s.\n\n"
-             "In this version of AddNParticles, when running on GPUs, the input\n"
-             "vectors of particle data live on the host, and will be copied to\n"
-             "the device as part of the method call.\n\n"
              "Note: This can only be used *after* the initialization (grids) have\n"
              "      been created, meaning after the call to ImpactX.init_grids\n"
              "      has been made in the ImpactX class.\n\n"

@@ -151,10 +151,6 @@ namespace impactx
 
         /** Add new particles to the container for fixed s.
          *
-         * In this version of AddNParticles, when running on GPUs, the input
-         * vectors of particle data live on the host, and will be copied to
-         * the device as part of the method call.
-         *
          * Note: This can only be used *after* the initialization (grids) have
          *       been created, meaning after the call to AmrCore::InitFromScratch
          *       or AmrCore::InitFromCheckpoint has been made in the ImpactX
@@ -171,46 +167,17 @@ namespace impactx
          * @param bchchg total charge within a bunch in C
          */
         void
-        AddNParticles (int lev,
-                       amrex::Vector<amrex::ParticleReal> const & x,
-                       amrex::Vector<amrex::ParticleReal> const & y,
-                       amrex::Vector<amrex::ParticleReal> const & t,
-                       amrex::Vector<amrex::ParticleReal> const & px,
-                       amrex::Vector<amrex::ParticleReal> const & py,
-                       amrex::Vector<amrex::ParticleReal> const & pt,
-                       amrex::ParticleReal qm,
-                       amrex::ParticleReal bchchg);
-
-        /** Add new particles to the container for fixed s.
-         *
-         * In this version of AddNParticles, when running on GPUs, the input
-         * vectors of particle data have already been copied to the device.
-         *
-         * Note: This can only be used *after* the initialization (grids) have
-         *       been created, meaning after the call to AmrCore::InitFromScratch
-         *       or AmrCore::InitFromCheckpoint has been made in the ImpactX
-         *       class.
-         *
-         * @param lev mesh-refinement level
-         * @param x positions in x
-         * @param y positions in y
-         * @param t positions as time-of-flight in c*t
-         * @param px momentum in x
-         * @param py momentum in y
-         * @param pt momentum in t
-         * @param qm charge over mass in 1/eV
-         * @param bchchg total charge within a bunch in C
-         */
-        void
-        AddNParticles (int lev,
-                       amrex::Gpu::DeviceVector<amrex::ParticleReal> const & x,
-                       amrex::Gpu::DeviceVector<amrex::ParticleReal> const & y,
-                       amrex::Gpu::DeviceVector<amrex::ParticleReal> const & t,
-                       amrex::Gpu::DeviceVector<amrex::ParticleReal> const & px,
-                       amrex::Gpu::DeviceVector<amrex::ParticleReal> const & py,
-                       amrex::Gpu::DeviceVector<amrex::ParticleReal> const & pt,
-                       amrex::ParticleReal qm,
-                       amrex::ParticleReal bchchg);
+        AddNParticles (
+            int lev,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & x,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & y,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & t,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & px,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & py,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & pt,
+            amrex::ParticleReal qm,
+            amrex::ParticleReal bchchg
+        );
 
         /** Register storage for lost particles
          *
