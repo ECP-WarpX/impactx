@@ -96,6 +96,10 @@ namespace impactx
             auto init_single_particle_data = initialization::InitSingleParticleData(
                 distribution, x_ptr, y_ptr, t_ptr, px_ptr, py_ptr, pt_ptr);
             amrex::ParallelForRNG(npart_this_proc, init_single_particle_data);
+
+            // finalize distributions and deallocate temporary device global memory
+            amrex::Gpu::streamSynchronize();
+            distribution.finalize();
         }, distr);
 
         int const lev = 0;
