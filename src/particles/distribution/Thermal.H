@@ -304,13 +304,15 @@ namespace distribution
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                amrex::ParticleReal & AMREX_RESTRICT x,
-                amrex::ParticleReal & AMREX_RESTRICT y,
-                amrex::ParticleReal & AMREX_RESTRICT t,
-                amrex::ParticleReal & AMREX_RESTRICT px,
-                amrex::ParticleReal & AMREX_RESTRICT py,
-                amrex::ParticleReal & AMREX_RESTRICT pt,
-                amrex::RandomEngine const& engine) {
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            amrex::ParticleReal & AMREX_RESTRICT t,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            amrex::RandomEngine const & engine
+        ) const
+        {
 
             using namespace amrex::literals;  // for _rt and _prt
             using namespace ablastr::constant::math;  // for pi
