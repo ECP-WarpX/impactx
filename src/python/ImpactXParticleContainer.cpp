@@ -22,6 +22,11 @@ using namespace impactx;
 
 void init_impactxparticlecontainer(py::module& m)
 {
+    py::enum_<CoordSystem>(m, "CoordSystem")
+        .value("s", CoordSystem::s)
+        .value("t", CoordSystem::t)
+        .export_values();
+
     py::class_<
         ParIter,
         amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
@@ -55,6 +60,11 @@ void init_impactxparticlecontainer(py::module& m)
         .def_property_readonly_static("RealSoA",
             [](py::object /* pc */){ return py::type::of<RealSoA>(); },
             "RealSoA attribute name labels"
+        )
+
+        .def_property_readonly("coord_system",
+            &ImpactXParticleContainer::GetCoordSystem,
+            "Get the current coordinate system of particles in this container"
         )
 
         .def("add_n_particles",

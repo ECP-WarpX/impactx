@@ -225,6 +225,18 @@ namespace impactx
         return get_RealSoA_names(this->NumRealComps());
     }
 
+    CoordSystem
+    ImpactXParticleContainer::GetCoordSystem () const
+    {
+        return m_coordsystem;
+    }
+
+    void
+    ImpactXParticleContainer::SetCoordSystem (CoordSystem coord_system)
+    {
+        m_coordsystem = coord_system;
+    }
+
     std::vector<std::string>
     get_RealAoS_names ()
     {

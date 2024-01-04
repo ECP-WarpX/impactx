@@ -28,6 +28,12 @@
 
 namespace impactx
 {
+    enum class CoordSystem
+    {
+        s,  ///< fixed s as the independent variable
+        t   ///< fixed t as the independent variable
+    };
+
     /** AMReX pre-defined Real attributes
      *
      * These are the AMReX pre-defined struct indexes for the Real attributes
@@ -277,6 +283,17 @@ namespace impactx
         std::vector<std::string>
         RealSoA_names () const;
 
+        /** Get the current coordinate system of particles in this container */
+        CoordSystem
+        GetCoordSystem () const;
+
+        /** Set the current coordinate system of particles in this container
+         *
+         * @param coord_system the new coordinate system the beam particles are in
+         */
+        void
+        SetCoordSystem (CoordSystem coord_system);
+
       private:
 
         //! the reference particle for the beam in the particle container
@@ -287,6 +304,9 @@ namespace impactx
 
         //! a non-owning reference to lost particles, i.e., due to apertures
         ImpactXParticleContainer* m_particles_lost = nullptr;
+
+        //! the current coordinate system of particles in this container
+        CoordSystem m_coordsystem = CoordSystem::s;
 
     }; // ImpactXParticleContainer
 
