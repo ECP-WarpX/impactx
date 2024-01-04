@@ -12,10 +12,11 @@
 
 #include "particles/ImpactXParticleContainer.H"
 
-#include <AMReX_Extension.H> // for AMREX_RESTRICT
+#include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_REAL.H>
 
-#include <type_traits>
+#include <utility>  // for std::move
+
 
 namespace impactx::initialization
 {
@@ -77,9 +78,15 @@ namespace impactx::initialization
             amrex::RandomEngine const & engine
         ) const
         {
-            m_distribution(m_part_x[i], m_part_y[i], m_part_t[i],
-                           m_part_px[i], m_part_py[i], m_part_pt[i],
-                           engine);
+            m_distribution(
+                m_part_x[i],
+                m_part_y[i],
+                m_part_t[i],
+                m_part_px[i],
+                m_part_py[i],
+                m_part_pt[i],
+                engine
+            );
         }
 
     private:

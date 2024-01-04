@@ -107,8 +107,8 @@ namespace impactx
                                              amrex::Vector<amrex::ParticleReal> const & px,
                                              amrex::Vector<amrex::ParticleReal> const & py,
                                              amrex::Vector<amrex::ParticleReal> const & pt,
-                                             amrex::ParticleReal const & qm,
-                                             amrex::ParticleReal const & bchchg)
+                                             amrex::ParticleReal qm,
+                                             amrex::ParticleReal bchchg)
     {
         BL_PROFILE("ImpactX::AddNParticles");
 
@@ -175,8 +175,8 @@ namespace impactx
                                              amrex::Gpu::DeviceVector<amrex::ParticleReal> const & px,
                                              amrex::Gpu::DeviceVector<amrex::ParticleReal> const & py,
                                              amrex::Gpu::DeviceVector<amrex::ParticleReal> const & pt,
-                                             amrex::ParticleReal const & qm,
-                                             amrex::ParticleReal const & bchchg)
+                                             amrex::ParticleReal qm,
+                                             amrex::ParticleReal bchchg)
     {
         BL_PROFILE("ImpactX::AddNParticles");
 

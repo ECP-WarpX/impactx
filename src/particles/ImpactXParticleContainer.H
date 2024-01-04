@@ -151,9 +151,9 @@ namespace impactx
 
         /** Add new particles to the container for fixed s.
          *
-         *  In this version of AddNParticles, when running on GPUs, the input
-         *  vectors of particle data live on the host, and will be copied to
-         *  the device as part of the method call.
+         * In this version of AddNParticles, when running on GPUs, the input
+         * vectors of particle data live on the host, and will be copied to
+         * the device as part of the method call.
          *
          * Note: This can only be used *after* the initialization (grids) have
          *       been created, meaning after the call to AmrCore::InitFromScratch
@@ -178,13 +178,13 @@ namespace impactx
                        amrex::Vector<amrex::ParticleReal> const & px,
                        amrex::Vector<amrex::ParticleReal> const & py,
                        amrex::Vector<amrex::ParticleReal> const & pt,
-                       amrex::ParticleReal const & qm,
-                       amrex::ParticleReal const & bchchg);
+                       amrex::ParticleReal qm,
+                       amrex::ParticleReal bchchg);
 
         /** Add new particles to the container for fixed s.
          *
-         *  In this version of AddNParticles, when running on GPUs, the input
-         *  vectors of particle data have already been copied to the device.
+         * In this version of AddNParticles, when running on GPUs, the input
+         * vectors of particle data have already been copied to the device.
          *
          * Note: This can only be used *after* the initialization (grids) have
          *       been created, meaning after the call to AmrCore::InitFromScratch
@@ -209,8 +209,8 @@ namespace impactx
                        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & px,
                        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & py,
                        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & pt,
-                       amrex::ParticleReal const & qm,
-                       amrex::ParticleReal const & bchchg);
+                       amrex::ParticleReal qm,
+                       amrex::ParticleReal bchchg);
 
         /** Register storage for lost particles
          *

@@ -7,8 +7,9 @@
  * Authors: Axel Huebl, Chad Mitchell, Ji Qiang
  * License: BSD-3-Clause-LBNL
  */
-#include "ImpactX.H"
 #include "initialization/InitDistribution.H"
+
+#include "ImpactX.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/distribution/All.H"
 
