@@ -168,6 +168,83 @@ namespace impactx
     }
 
     void
+    ImpactXParticleContainer::AddNParticles (int lev,
+                                             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & x,
+                                             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & y,
+                                             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & t,
+                                             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & px,
+                                             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & py,
+                                             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & pt,
+                                             amrex::ParticleReal const & qm,
+                                             amrex::ParticleReal const & bchchg)
+    {
+        BL_PROFILE("ImpactX::AddNParticles");
+
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(lev == 0, "AddNParticles: only lev=0 is supported yet.");
+        AMREX_ALWAYS_ASSERT(x.size() == y.size());
+        AMREX_ALWAYS_ASSERT(x.size() == t.size());
+        AMREX_ALWAYS_ASSERT(x.size() == px.size());
+        AMREX_ALWAYS_ASSERT(x.size() == py.size());
+        AMREX_ALWAYS_ASSERT(x.size() == pt.size());
+
+        // number of particles to add
+        int const np = x.size();
+
+        auto& particle_tile = DefineAndReturnParticleTile(0, 0, 0);
+        auto old_np = particle_tile.numParticles();
+        auto new_np = old_np + np;
+        particle_tile.resize(new_np);
+
+        // Update NextID to include particles created in this function
+        int pid;
+#ifdef AMREX_USE_OMP
+#pragma omp critical (add_plasma_nextid)
+#endif
+        {
+            pid = ParticleType::NextID();
+            ParticleType::NextID(pid+np);
+        }
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(
+        static_cast<amrex::Long>(pid) + static_cast<amrex::Long>(np) < amrex::LongParticleIds::LastParticleID,
+            "ERROR: overflow on particle id numbers");
+
+        const int cpuid = amrex::ParallelDescriptor::MyProc();
+
+        auto pstructs = particle_tile.GetArrayOfStructs()().data();
+        auto px_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::px).data();
+        auto py_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::py).data();
+        auto pt_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::pt).data();
+        auto qm_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::qm).data();
+        auto w_arr  = particle_tile.GetStructOfArrays().GetRealData(RealSoA::w ).data();
+
+        auto x_ptr = x.data();
+        auto y_ptr = y.data();
+        auto t_ptr = t.data();
+        auto px_ptr = px.data();
+        auto py_ptr = py.data();
+        auto pt_ptr = pt.data();
+
+        amrex::ParallelFor(np,
+        [=] AMREX_GPU_DEVICE (int i) noexcept
+        {
+            ParticleType& p = pstructs[old_np + i];
+            p.id() = pid + i;
+            p.cpu() = cpuid;
+            p.pos(RealAoS::x) = x_ptr[i];
+            p.pos(RealAoS::y) = y_ptr[i];
+            p.pos(RealAoS::t) = t_ptr[i];
+
+            px_arr[old_np+i] = px_ptr[i];
+            py_arr[old_np+i] = py_ptr[i];
+            pt_arr[old_np+i] = pt_ptr[i];
+            qm_arr[old_np+i] = qm;
+            w_arr[old_np+i]  = bchchg/ablastr::constant::SI::q_e/np;
+        });
+
+        Redistribute();
+    }
+
+    void
     ImpactXParticleContainer::SetRefParticle (RefPart const & refpart)
     {
         m_refpart = refpart;
