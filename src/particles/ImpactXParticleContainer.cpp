@@ -101,7 +101,6 @@ namespace impactx
 
     void
     ImpactXParticleContainer::AddNParticles (
-        int lev,
         amrex::Gpu::DeviceVector<amrex::ParticleReal> const & x,
         amrex::Gpu::DeviceVector<amrex::ParticleReal> const & y,
         amrex::Gpu::DeviceVector<amrex::ParticleReal> const & t,
@@ -114,7 +113,6 @@ namespace impactx
     {
         BL_PROFILE("ImpactX::AddNParticles");
 
-        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(lev == 0, "AddNParticles: only lev=0 is supported yet.");
         AMREX_ALWAYS_ASSERT(x.size() == y.size());
         AMREX_ALWAYS_ASSERT(x.size() == t.size());
         AMREX_ALWAYS_ASSERT(x.size() == px.size());
@@ -132,7 +130,7 @@ namespace impactx
         // Update NextID to include particles created in this function
         int pid;
 #ifdef AMREX_USE_OMP
-#pragma omp critical (add_plasma_nextid)
+#pragma omp critical (add_beam_nextid)
 #endif
         {
             pid = ParticleType::NextID();
@@ -144,19 +142,19 @@ namespace impactx
 
         const int cpuid = amrex::ParallelDescriptor::MyProc();
 
-        auto pstructs = particle_tile.GetArrayOfStructs()().data();
-        auto px_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::px).data();
-        auto py_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::py).data();
-        auto pt_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::pt).data();
-        auto qm_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::qm).data();
-        auto w_arr  = particle_tile.GetStructOfArrays().GetRealData(RealSoA::w ).data();
+        auto * pstructs = particle_tile.GetArrayOfStructs()().data();
+        auto * px_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::px).data();
+        auto * py_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::py).data();
+        auto * pt_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::pt).data();
+        auto * qm_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::qm).data();
+        auto * w_arr  = particle_tile.GetStructOfArrays().GetRealData(RealSoA::w ).data();
 
-        auto x_ptr = x.data();
-        auto y_ptr = y.data();
-        auto t_ptr = t.data();
-        auto px_ptr = px.data();
-        auto py_ptr = py.data();
-        auto pt_ptr = pt.data();
+        auto const * x_ptr = x.data();
+        auto const * y_ptr = y.data();
+        auto const * t_ptr = t.data();
+        auto const * px_ptr = px.data();
+        auto const * py_ptr = py.data();
+        auto const * pt_ptr = pt.data();
 
         amrex::ParallelFor(np,
         [=] AMREX_GPU_DEVICE (int i) noexcept
@@ -174,6 +172,10 @@ namespace impactx
             qm_arr[old_np+i] = qm;
             w_arr[old_np+i]  = bchchg/ablastr::constant::SI::q_e/np;
         });
+
+        // safety first: in case passed attribute arrays were temporary, we
+        // want to make sure the ParallelFor has ended here
+        amrex::Gpu::streamSynchronize();
     }
 
     void

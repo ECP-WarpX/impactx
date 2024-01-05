@@ -58,10 +58,6 @@ namespace impactx
             );
         }
 
-        // init particles
-        amrex::Gpu::DeviceVector<amrex::ParticleReal> x, y, t;
-        amrex::Gpu::DeviceVector<amrex::ParticleReal> px, py, pt;
-
         // Logic: We initialize 1/Nth of particles, independent of their
         // position, per MPI rank. We then measure the distribution's spatial
         // extent, create a grid, resize it to fit the beam, and then
@@ -71,29 +67,31 @@ namespace impactx
         int const navg = npart / nprocs;
         int const nleft = npart - navg * nprocs;
         int npart_this_proc = (myproc < nleft) ? navg+1 : navg;
-        auto const rel_part_this_proc = amrex::ParticleReal(npart_this_proc) /
-                                        amrex::ParticleReal(npart);
+        auto const rel_part_this_proc =
+            amrex::ParticleReal(npart_this_proc) / amrex::ParticleReal(npart);
+
+        // alloc data for particle attributes
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> x, y, t;
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> px, py, pt;
+        x.resize(npart_this_proc);
+        y.resize(npart_this_proc);
+        t.resize(npart_this_proc);
+        px.resize(npart_this_proc);
+        py.resize(npart_this_proc);
+        pt.resize(npart_this_proc);
 
         std::visit([&](auto&& distribution){
             // initialize distributions
             distribution.initialize(bunch_charge, ref);
 
-            // alloc data for particle attributes
-            x.resize(npart_this_proc);
-            y.resize(npart_this_proc);
-            t.resize(npart_this_proc);
-            px.resize(npart_this_proc);
-            py.resize(npart_this_proc);
-            pt.resize(npart_this_proc);
+            auto * x_ptr = x.data();
+            auto * y_ptr = y.data();
+            auto * t_ptr = t.data();
+            auto * px_ptr = px.data();
+            auto * py_ptr = py.data();
+            auto * pt_ptr = pt.data();
 
-            auto x_ptr = x.data();
-            auto y_ptr = y.data();
-            auto t_ptr = t.data();
-            auto px_ptr = px.data();
-            auto py_ptr = py.data();
-            auto pt_ptr = pt.data();
-
-            auto init_single_particle_data = initialization::InitSingleParticleData(
+            auto const init_single_particle_data = initialization::InitSingleParticleData(
                 distribution, x_ptr, y_ptr, t_ptr, px_ptr, py_ptr, pt_ptr);
             amrex::ParallelForRNG(npart_this_proc, init_single_particle_data);
 
@@ -102,8 +100,7 @@ namespace impactx
             distribution.finalize();
         }, distr);
 
-        int const lev = 0;
-        m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
+        m_particle_container->AddNParticles(x, y, t, px, py, pt,
                                             ref.qm_qeeV(),
                                             bunch_charge * rel_part_this_proc);
 

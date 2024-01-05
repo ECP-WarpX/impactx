@@ -156,7 +156,6 @@ namespace impactx
          *       or AmrCore::InitFromCheckpoint has been made in the ImpactX
          *       class.
          *
-         * @param lev mesh-refinement level
          * @param x positions in x
          * @param y positions in y
          * @param t positions as time-of-flight in c*t
@@ -168,7 +167,6 @@ namespace impactx
          */
         void
         AddNParticles (
-            int lev,
             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & x,
             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & y,
             amrex::Gpu::DeviceVector<amrex::ParticleReal> const & t,
