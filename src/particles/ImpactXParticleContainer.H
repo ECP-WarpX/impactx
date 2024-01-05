@@ -156,7 +156,6 @@ namespace impactx
          *       or AmrCore::InitFromCheckpoint has been made in the ImpactX
          *       class.
          *
-         * @param lev mesh-refinement level
          * @param x positions in x
          * @param y positions in y
          * @param t positions as time-of-flight in c*t
@@ -167,15 +166,16 @@ namespace impactx
          * @param bchchg total charge within a bunch in C
          */
         void
-        AddNParticles (int lev,
-                       amrex::Vector<amrex::ParticleReal> const & x,
-                       amrex::Vector<amrex::ParticleReal> const & y,
-                       amrex::Vector<amrex::ParticleReal> const & t,
-                       amrex::Vector<amrex::ParticleReal> const & px,
-                       amrex::Vector<amrex::ParticleReal> const & py,
-                       amrex::Vector<amrex::ParticleReal> const & pt,
-                       amrex::ParticleReal const & qm,
-                       amrex::ParticleReal const & bchchg);
+        AddNParticles (
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & x,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & y,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & t,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & px,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & py,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & pt,
+            amrex::ParticleReal qm,
+            amrex::ParticleReal bchchg
+        );
 
         /** Register storage for lost particles
          *

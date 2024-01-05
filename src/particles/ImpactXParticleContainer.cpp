@@ -100,19 +100,19 @@ namespace impactx
     }
 
     void
-    ImpactXParticleContainer::AddNParticles (int lev,
-                                             amrex::Vector<amrex::ParticleReal> const & x,
-                                             amrex::Vector<amrex::ParticleReal> const & y,
-                                             amrex::Vector<amrex::ParticleReal> const & t,
-                                             amrex::Vector<amrex::ParticleReal> const & px,
-                                             amrex::Vector<amrex::ParticleReal> const & py,
-                                             amrex::Vector<amrex::ParticleReal> const & pt,
-                                             amrex::ParticleReal const & qm,
-                                             amrex::ParticleReal const & bchchg)
+    ImpactXParticleContainer::AddNParticles (
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & x,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & y,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & t,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & px,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & py,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & pt,
+        amrex::ParticleReal qm,
+        amrex::ParticleReal bchchg
+    )
     {
         BL_PROFILE("ImpactX::AddNParticles");
 
-        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(lev == 0, "AddNParticles: only lev=0 is supported yet.");
         AMREX_ALWAYS_ASSERT(x.size() == y.size());
         AMREX_ALWAYS_ASSERT(x.size() == t.size());
         AMREX_ALWAYS_ASSERT(x.size() == px.size());
@@ -123,48 +123,60 @@ namespace impactx
         int const np = x.size();
 
         auto& particle_tile = DefineAndReturnParticleTile(0, 0, 0);
-
-        /* Create a temporary tile to obtain data from simulation. This data
-         * is then copied to the permanent tile which is stored on the particle
-         * (particle_tile).
-         */
-        using PinnedTile = amrex::ParticleTile<
-            amrex::Particle<NStructReal, NStructInt>,
-            NArrayReal, NArrayInt,
-            amrex::PinnedArenaAllocator
-        >;
-        PinnedTile pinned_tile;
-        pinned_tile.define(NumRuntimeRealComps(), NumRuntimeIntComps());
-
-        for (int i = 0; i < np; i++)
-        {
-            ParticleType p;
-            p.id() = ParticleType::NextID();
-            p.cpu() = amrex::ParallelDescriptor::MyProc();
-            p.pos(RealAoS::x) = x[i];
-            p.pos(RealAoS::y) = y[i];
-            p.pos(RealAoS::t) = t[i];
-            // write position, creating cpu id, and particle id
-            pinned_tile.push_back(p);
-        }
-
-        // write Real attributes (SoA) to particle initialized zero
-        DefineAndReturnParticleTile(0, 0, 0);
-
-        pinned_tile.push_back_real(RealSoA::px, px);
-        pinned_tile.push_back_real(RealSoA::py, py);
-        pinned_tile.push_back_real(RealSoA::pt, pt);
-        pinned_tile.push_back_real(RealSoA::qm, np, qm);
-        pinned_tile.push_back_real(RealSoA::w, np, bchchg/ablastr::constant::SI::q_e/np);
-
-        /* Redistributes particles to their respective tiles (spatial bucket
-         * sort per box over MPI ranks)
-         */
         auto old_np = particle_tile.numParticles();
-        auto new_np = old_np + pinned_tile.numParticles();
+        auto new_np = old_np + np;
         particle_tile.resize(new_np);
-        amrex::copyParticles(
-                particle_tile, pinned_tile, 0, old_np, pinned_tile.numParticles());
+
+        // Update NextID to include particles created in this function
+        int pid;
+#ifdef AMREX_USE_OMP
+#pragma omp critical (add_beam_nextid)
+#endif
+        {
+            pid = ParticleType::NextID();
+            ParticleType::NextID(pid+np);
+        }
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(
+        static_cast<amrex::Long>(pid) + static_cast<amrex::Long>(np) < amrex::LongParticleIds::LastParticleID,
+            "ERROR: overflow on particle id numbers");
+
+        const int cpuid = amrex::ParallelDescriptor::MyProc();
+
+        auto * AMREX_RESTRICT pstructs = particle_tile.GetArrayOfStructs()().dataPtr();
+        auto & soa = particle_tile.GetStructOfArrays().GetRealData();
+        amrex::ParticleReal * const AMREX_RESTRICT px_arr = soa[RealSoA::px].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT py_arr = soa[RealSoA::py].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT pt_arr = soa[RealSoA::pt].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT qm_arr = soa[RealSoA::qm].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT w_arr  = soa[RealSoA::w ].dataPtr();
+
+        amrex::ParticleReal const * const AMREX_RESTRICT x_ptr = x.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT y_ptr = y.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT t_ptr = t.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT px_ptr = px.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT py_ptr = py.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT pt_ptr = pt.data();
+
+        amrex::ParallelFor(np,
+        [=] AMREX_GPU_DEVICE (int i) noexcept
+        {
+            ParticleType& p = pstructs[old_np + i];
+            p.id() = pid + i;
+            p.cpu() = cpuid;
+            p.pos(RealAoS::x) = x_ptr[i];
+            p.pos(RealAoS::y) = y_ptr[i];
+            p.pos(RealAoS::t) = t_ptr[i];
+
+            px_arr[old_np+i] = px_ptr[i];
+            py_arr[old_np+i] = py_ptr[i];
+            pt_arr[old_np+i] = pt_ptr[i];
+            qm_arr[old_np+i] = qm;
+            w_arr[old_np+i]  = bchchg/ablastr::constant::SI::q_e/np;
+        });
+
+        // safety first: in case passed attribute arrays were temporary, we
+        // want to make sure the ParallelFor has ended here
+        amrex::Gpu::streamSynchronize();
     }
 
     void

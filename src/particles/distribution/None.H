@@ -37,6 +37,15 @@ namespace impactx::distribution
         {
         }
 
+        /** Close and deallocate all data and handles.
+         *
+         * Nothing to do here.
+         */
+        void
+        finalize ()
+        {
+        }
+
         /** Return 1 6D particle coordinate
          *
          * Sets all values to zero.
