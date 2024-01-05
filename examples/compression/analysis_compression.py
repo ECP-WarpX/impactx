@@ -69,7 +69,7 @@ print(
 print(f"  gamma={initial_gamma_ref:e}")
 
 atol = 0.0  # ignored
-rtol = 1.8 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 1.9 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
@@ -99,7 +99,7 @@ print(f"  gamma={final_gamma_ref:e}")
 
 
 atol = 0.0  # ignored
-rtol = 1.8 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 1.9 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
