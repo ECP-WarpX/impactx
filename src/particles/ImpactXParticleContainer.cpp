@@ -142,19 +142,20 @@ namespace impactx
 
         const int cpuid = amrex::ParallelDescriptor::MyProc();
 
-        auto * pstructs = particle_tile.GetArrayOfStructs()().data();
-        auto * px_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::px).data();
-        auto * py_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::py).data();
-        auto * pt_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::pt).data();
-        auto * qm_arr = particle_tile.GetStructOfArrays().GetRealData(RealSoA::qm).data();
-        auto * w_arr  = particle_tile.GetStructOfArrays().GetRealData(RealSoA::w ).data();
+        auto * AMREX_RESTRICT pstructs = particle_tile.GetArrayOfStructs()().dataPtr();
+        auto & soa = particle_tile.GetStructOfArrays().GetRealData();
+        amrex::ParticleReal * const AMREX_RESTRICT px_arr = soa[RealSoA::px].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT py_arr = soa[RealSoA::py].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT pt_arr = soa[RealSoA::pt].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT qm_arr = soa[RealSoA::qm].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT w_arr  = soa[RealSoA::w ].dataPtr();
 
-        auto const * x_ptr = x.data();
-        auto const * y_ptr = y.data();
-        auto const * t_ptr = t.data();
-        auto const * px_ptr = px.data();
-        auto const * py_ptr = py.data();
-        auto const * pt_ptr = pt.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT x_ptr = x.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT y_ptr = y.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT t_ptr = t.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT px_ptr = px.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT py_ptr = py.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT pt_ptr = pt.data();
 
         amrex::ParallelFor(np,
         [=] AMREX_GPU_DEVICE (int i) noexcept

@@ -84,14 +84,14 @@ namespace impactx
             // initialize distributions
             distribution.initialize(bunch_charge, ref);
 
-            auto * x_ptr = x.data();
-            auto * y_ptr = y.data();
-            auto * t_ptr = t.data();
-            auto * px_ptr = px.data();
-            auto * py_ptr = py.data();
-            auto * pt_ptr = pt.data();
+            amrex::ParticleReal * const AMREX_RESTRICT x_ptr = x.data();
+            amrex::ParticleReal * const AMREX_RESTRICT y_ptr = y.data();
+            amrex::ParticleReal * const AMREX_RESTRICT t_ptr = t.data();
+            amrex::ParticleReal * const AMREX_RESTRICT px_ptr = px.data();
+            amrex::ParticleReal * const AMREX_RESTRICT py_ptr = py.data();
+            amrex::ParticleReal * const AMREX_RESTRICT pt_ptr = pt.data();
 
-            auto const init_single_particle_data = initialization::InitSingleParticleData(
+            initialization::InitSingleParticleData const init_single_particle_data(
                 distribution, x_ptr, y_ptr, t_ptr, px_ptr, py_ptr, pt_ptr);
             amrex::ParallelForRNG(npart_this_proc, init_single_particle_data);
 
