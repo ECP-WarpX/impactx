@@ -23,7 +23,7 @@ beam.mutpt = 0.0
 ###############################################################################
 lattice.elements = monitor half half monitor
 lattice.periods = 150
-lattice.nslice = 25
+lattice.nslice = 1
 
 monitor.type = beam_monitor
 monitor.backend = h5

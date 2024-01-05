@@ -23,7 +23,7 @@ beam.mutpt = 0.995037190209989
 ###############################################################################
 lattice.periods = 250
 lattice.elements = monitor quad1 drift1 quad2 drift1 quad1 drift2 unifacc drift2 monitor
-lattice.nslice = 25
+lattice.nslice = 1
 
 monitor.type = beam_monitor
 monitor.backend = h5
