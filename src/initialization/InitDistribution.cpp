@@ -23,6 +23,7 @@
 #include <AMReX_Print.H>
 
 #include <string>
+#include <type_traits>
 #include <variant>
 
 
@@ -91,7 +92,8 @@ namespace impactx
             amrex::ParticleReal * const AMREX_RESTRICT py_ptr = py.data();
             amrex::ParticleReal * const AMREX_RESTRICT pt_ptr = pt.data();
 
-            initialization::InitSingleParticleData const init_single_particle_data(
+            using Distribution = std::remove_reference_t< std::remove_cv_t<decltype(distribution)> >;
+            initialization::InitSingleParticleData<Distribution> const init_single_particle_data(
                 distribution, x_ptr, y_ptr, t_ptr, px_ptr, py_ptr, pt_ptr);
             amrex::ParallelForRNG(npart_this_proc, init_single_particle_data);
 
