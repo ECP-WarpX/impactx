@@ -100,22 +100,22 @@ namespace impactx::distribution
             // Generate six standard normal random variables using Box-Muller:
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            g1 = ln1*cos(2_prt*pi*u2);
-            g2 = ln1*sin(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            g1 = ln1*std::cos(2_prt*pi*u2);
+            g2 = ln1*std::sin(2_prt*pi*u2);
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            g3 = ln1*cos(2_prt*pi*u2);
-            g4 = ln1*sin(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            g3 = ln1*std::cos(2_prt*pi*u2);
+            g4 = ln1*std::sin(2_prt*pi*u2);
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            g5 = ln1*cos(2_prt*pi*u2);
-            g6 = ln1*sin(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            g5 = ln1*std::cos(2_prt*pi*u2);
+            g6 = ln1*std::sin(2_prt*pi*u2);
 
             // Normalize to produce uniform samples on the unit sphere:
-            norm = sqrt(g1*g1+g2*g2+g3*g3+g4*g4+g5*g5+g6*g6);
+            norm = std::sqrt(g1*g1+g2*g2+g3*g3+g4*g4+g5*g5+g6*g6);
             g1 /= norm;
             g2 /= norm;
             g3 /= norm;
@@ -125,7 +125,7 @@ namespace impactx::distribution
 
             // Scale to produce uniform samples in a ball (unit variance):
             u1 = amrex::Random(engine);
-            u2 = sqrt(8_prt)*pow(u1,1_prt/6);
+            u2 = std::sqrt(8_prt)*std::pow(u1,1_prt/6_prt);
             x = g1*u2;
             y = g2*u2;
             t = g3*u2;
@@ -134,17 +134,17 @@ namespace impactx::distribution
             pt = g6*u2;
 
             // Transform to produce the desired second moments/correlations:
-            root = sqrt(1.0_prt-m_muxpx*m_muxpx);
+            root = std::sqrt(1.0_prt-m_muxpx*m_muxpx);
             a1 = m_sigmaX*x/root;
             a2 = m_sigmaPx*(-m_muxpx*x/root+px);
             x = a1;
             px = a2;
-            root = sqrt(1.0_prt-m_muypy*m_muypy);
+            root = std::sqrt(1.0_prt-m_muypy*m_muypy);
             a1 = m_sigmaY*y/root;
             a2 = m_sigmaPy*(-m_muypy*y/root+py);
             y = a1;
             py = a2;
-            root = sqrt(1.0_prt-m_mutpt*m_mutpt);
+            root = std::sqrt(1.0_prt-m_mutpt*m_mutpt);
             a1 = m_sigmaT*t/root;
             a2 = m_sigmaPt*(-m_mutpt*t/root+pt);
             t = a1;
