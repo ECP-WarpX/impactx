@@ -264,8 +264,8 @@ def test_impactx_change_resolution():
     assert rho.nComp == 1
     assert rho.size == 1
     assert rho.num_comp == 1
-    # assert rho.nGrowVect == [2, 2, 2]
-    print(f"rho.nGrowVect={rho.nGrowVect}")
+    # assert rho.n_grow_vect == [2, 2, 2]
+    print(f"rho.n_grow_vect={rho.n_grow_vect}")
     assert iter(rho).length > 0
     assert not rho.is_all_cell_centered
     assert rho.is_all_nodal
