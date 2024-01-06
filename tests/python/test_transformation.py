@@ -7,13 +7,14 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import pytest
 
 from impactx import (
     Config,
+    CoordSystem,
     ImpactX,
     ImpactXParIter,
     RefPart,
-    TransformationDirection,
     coordinate_transformation,
     distribution,
     elements,
@@ -61,11 +62,22 @@ def test_transformation():
         mutpt=0.8,
     )
     sim.add_particles(bunch_charge_C, distr, npart)
-
     rbc_s0 = pc.reduced_beam_characteristics()
-    coordinate_transformation(pc, TransformationDirection.to_fixed_t)
+
+    # this must fail: we cannot transform from s to s
+    with pytest.raises(Exception):
+        coordinate_transformation(pc, direction=CoordSystem.s)
+
+    # transform to t
+    coordinate_transformation(pc, direction=CoordSystem.t)
     rbc_t = pc.reduced_beam_characteristics()
-    coordinate_transformation(pc, TransformationDirection.to_fixed_s)
+
+    # this must fail: we cannot transform from t to t
+    with pytest.raises(Exception):
+        coordinate_transformation(pc, direction=CoordSystem.t)
+
+    # transform back to s
+    coordinate_transformation(pc, direction=CoordSystem.s)
     rbc_s = pc.reduced_beam_characteristics()
 
     # clean shutdown
