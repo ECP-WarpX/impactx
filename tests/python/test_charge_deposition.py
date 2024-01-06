@@ -70,7 +70,7 @@ def test_charge_deposition(save_png=True):
     # plot data slices
     f = plt.figure()
     ax = f.gca()
-    ng = rho_host.nGrowVect
+    ng = rho_host.n_grow_vect
     for mfi in rho_host:
         bx = mfi.validbox()
         rbx = amr.RealBox(bx, dr, gm.ProbLo())
