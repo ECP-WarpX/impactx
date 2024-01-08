@@ -16,7 +16,7 @@ sim.n_cell = [48, 48, 40]  # use [72, 72, 72] for increased precision
 sim.particle_shape = 2  # B-spline order
 sim.space_charge = True
 # sim.diagnostics = False  # benchmarking
-sim.slice_step_diagnostics = True
+sim.slice_step_diagnostics = False
 
 # domain decomposition & space charge mesh
 sim.init_grids()

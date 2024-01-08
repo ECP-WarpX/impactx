@@ -668,6 +668,13 @@ add_impactx_test(thermal
     examples/epac2004_benchmarks/analysis_thermal.py
     OFF  # no plot script yet
 )
+add_impactx_test(thermal.py
+    examples/epac2004_benchmarks/run_thermal.py
+      ON  # ImpactX MPI-parallel
+      ON  # ImpactX Python interface
+    examples/epac2004_benchmarks/analysis_thermal.py
+    OFF  # no plot script yet
+)
 
 # Bithermal Beam EPAC2004 #####################################################
 #
