@@ -120,7 +120,6 @@ namespace impactx
         /** This pushes the reference particle. */
         using Thin::operator();
 
-    private:
         Shape m_shape; //! aperture type (rectangular, elliptical)
         amrex::ParticleReal m_xmax; //! maximum horizontal coordinate
         amrex::ParticleReal m_ymax; //! maximum vertical coordinate

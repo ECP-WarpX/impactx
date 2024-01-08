@@ -191,6 +191,21 @@ void init_elements(py::module& m)
              py::arg("rotation") = 0,
              "A short collimator element applying a transverse aperture boundary."
         )
+        .def_property("shape",
+            [](Aperture & ap) { return ap.m_shape; },
+            [](Aperture & ap, Aperture::Shape shape) { ap.m_shape = shape; },
+            "aperture type (rectangular, elliptical)"
+        )
+        .def_property("xmax",
+            [](Aperture & ap) { return ap.m_xmax; },
+            [](Aperture & ap, amrex::ParticleReal xmax) { ap.m_xmax = xmax; },
+            "maximum horizontal coordinate"
+        )
+        .def_property("ymax",
+            [](Aperture & ap) { return ap.m_ymax; },
+            [](Aperture & ap, amrex::ParticleReal ymax) { ap.m_ymax = ymax; },
+            "maximum vertical coordinate"
+        )
     ;
     register_beamoptics_push(py_Aperture);
 
@@ -233,6 +248,16 @@ void init_elements(py::module& m)
              py::arg("nslice") = 1,
              "A Quadrupole magnet with chromatic effects included."
         )
+        .def_property("k",
+            [](ChrQuad & cq) { return cq.m_k; },
+            [](ChrQuad & cq, amrex::ParticleReal k) { cq.m_k = k; },
+            "quadrupole strength in 1/m^2 (or T/m)"
+        )
+        .def_property("units",
+            [](ChrQuad & cq) { return cq.m_unit; },
+            [](ChrQuad & cq, int unit) { cq.m_unit = unit; },
+            "unit specification for quad strength"
+        )
     ;
     register_beamoptics_push(py_ChrQuad);
 
@@ -255,6 +280,16 @@ void init_elements(py::module& m)
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
              "A region of Uniform Acceleration, with chromatic effects included."
+        )
+        .def_property("ez",
+            [](ChrAcc & ca) { return ca.m_ez; },
+            [](ChrAcc & ca, amrex::ParticleReal ez) { ca.m_ez = ez; },
+            "electric field strength in 1/m"
+        )
+        .def_property("bz",
+            [](ChrAcc & ca) { return ca.m_bz; },
+            [](ChrAcc & ca, amrex::ParticleReal bz) { ca.m_bz = bz; },
+            "magnetic field strength in 1/m"
         )
     ;
     register_beamoptics_push(py_ChrAcc);
@@ -282,19 +317,19 @@ void init_elements(py::module& m)
              "A linear Constant Focusing element."
         )
         .def_property("kx",
-        [](ConstF & cf) { return cf.m_kx; },
-        [](ConstF & cf, amrex::ParticleReal kx) { cf.m_kx = kx; },
+            [](ConstF & cf) { return cf.m_kx; },
+            [](ConstF & cf, amrex::ParticleReal kx) { cf.m_kx = kx; },
             "focusing x strength in 1/m"
         )
         .def_property("ky",
-              [](ConstF & cf) { return cf.m_ky; },
-              [](ConstF & cf, amrex::ParticleReal ky) { cf.m_ky = ky; },
-              "focusing y strength in 1/m"
+            [](ConstF & cf) { return cf.m_ky; },
+            [](ConstF & cf, amrex::ParticleReal ky) { cf.m_ky = ky; },
+            "focusing y strength in 1/m"
         )
         .def_property("kt",
-              [](ConstF & cf) { return cf.m_kt; },
-              [](ConstF & cf, amrex::ParticleReal kt) { cf.m_kt = kt; },
-              "focusing t strength in 1/m"
+            [](ConstF & cf) { return cf.m_kt; },
+            [](ConstF & cf, amrex::ParticleReal kt) { cf.m_kt = kt; },
+            "focusing t strength in 1/m"
         )
     ;
     register_beamoptics_push(py_ConstF);
