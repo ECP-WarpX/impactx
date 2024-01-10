@@ -665,6 +665,39 @@ This module provides elements for the accelerator lattice.
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
+   .. py:property:: k
+
+      quadrupole strength in 1/m^2 (or T/m)
+
+   .. py:property:: units
+
+      unit specification for quad strength
+
+.. py:class:: impactx.elements.ChrAcc(ds, ez, bz, dx=0, dy=0, rotation=0, nslice=1)
+
+   Acceleration in a uniform field Ez, with a uniform solenoidal field Bz.
+
+   The Hamiltonian is expanded through second order in the
+   transverse variables (x,px,y,py), with the exact pt dependence retained.
+
+   :param ds: Segment length in m
+   :param ez: electric field strength in m^(-1)
+              = (charge * electric field Ez in V/m) / (m*c^2)
+   :param bz: magnetic field strength in m^(-1)
+              = (charge * magnetic field Bz in T) / (m*c)
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
+   :param nslice: number of slices used for the application of space charge
+
+   .. py:property:: ez
+
+      electric field strength in 1/m
+
+   .. py:property:: bz
+
+      magnetic field strength in 1/m
+
 .. py:class:: impactx.elements.RFCavity(ds, escale, freq, phase, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1)
 
    A radiofrequency cavity.
@@ -796,6 +829,18 @@ This module provides elements for the accelerator lattice.
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
+
+   .. py:property:: shape
+
+      aperture type (rectangular, elliptical)
+
+   .. py:property:: xmax
+
+      maximum horizontal coordinate
+
+   .. py:property:: ymax
+
+      maximum vertical coordinate
 
 .. py:class:: impactx.elements.SoftQuadrupole(ds, gscale, cos_coefficients, sin_coefficients, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1)
 
