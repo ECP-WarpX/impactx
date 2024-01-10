@@ -680,7 +680,7 @@ This module provides elements for the accelerator lattice.
    The Hamiltonian is expanded through second order in the
    transverse variables (x,px,y,py), with the exact pt dependence retained.
 
-   :param ds: Segment length in m.
+   :param ds: Segment length in m
    :param ez: electric field strength in m^(-1)
               = (charge * electric field Ez in V/m) / (m*c^2)
    :param bz: magnetic field strength in m^(-1)
