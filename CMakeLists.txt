@@ -89,6 +89,10 @@ set_default_build_type("Release")
 # Option to enable interprocedural optimization
 # (also know as "link-time optimization" or "whole program optimization")
 option(ImpactX_IPO "Compile ImpactX with interprocedural optimization (will take more time)" OFF)
+option(ImpactX_PYTHON_IPO
+    "Compile Python bindings with interprocedural optimization (IPO) / link-time optimization (LTO)"
+    ON
+)
 
 # this defined the variable BUILD_TESTING which is ON by default
 include(CTest)
@@ -229,7 +233,10 @@ endif()
 # link dependencies
 target_link_libraries(lib PUBLIC ImpactX::thirdparty::ablastr_3d)
 if(ImpactX_PYTHON)
-    target_link_libraries(pyImpactX PRIVATE pybind11::module pybind11::lto pybind11::windows_extras)
+    target_link_libraries(pyImpactX PRIVATE pybind11::module pybind11::windows_extras)
+    if(ImpactX_PYTHON_IPO)
+        target_link_libraries(pyImpactX PRIVATE pybind11::lto)
+    endif()
 endif()
 
 if(ImpactX_OPENPMD)
