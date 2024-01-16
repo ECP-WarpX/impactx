@@ -1,0 +1,35 @@
+! TITLE,'GSI.MADX -- SIS18 with a sextupole --';
+BEAM, PARTICLE=PROTON,ENERGY=11.4e-3;
+
+!---------------------  DRIFT SPACES DEFINITION  ---------------------
+DR1: DRIFT, TYPE=DRIF, L=0.6450000;
+DR2: DRIFT, TYPE=DRIF, L=0.9700000;
+DR3: DRIFT, TYPE=DRIF, L=6.8390117;
+DR4: DRIFT, TYPE=DRIF, L=0.6000000;
+DR5: DRIFT, TYPE=DRIF, L=0.7098000;
+DR6: DRIFT, TYPE=DRIF, L=0.4998000;
+
+
+!--------------------------  BENDING MAGNET ---------------------------
+ALPHA  := 15  * RADDEG;
+LL     := 150 * RADDEG;
+PFR    := 7.3 * RADDEG;
+RB: SBEND,TYPE=B1,L= LL,ANGLE= ALPHA,E1= PFR,E2=PFR,HGAP= 0.035;
+
+
+! ------------------- horizontal quadrupole ----------------------------
+QS1F:  QUADRUPOLE, TYPE= QD1, L= 1.0400000,  K1=  0.311872401;
+QS2D:  QUADRUPOLE, TYPE= QD2, L= 1.0400000,  K1= -0.496504354;
+QS3T:  QUADRUPOLE, TYPE= QD3, L= 0.4804000,  K1=  0.62221964;
+
+
+! ------------------- normal sextupole ---------------------------------
+S:     MULTIPOLE, K2L = 0.2;
+
+
+! ---------------------------  LINE DEFINITION -------------------------
+CELL:  LINE=(DR1,RB,DR2,RB,DR3,QS1F,DR4,QS2D,DR5,QS3T,DR6);
+
+MACHINE: LINE=(CELL, S, 11*CELL);
+
+USE, SEQUENCE = MACHINE;
