@@ -1,8 +1,0 @@
-  match,sequence=RING;      ;
-  global,sequence=RING,Q1=6.6e+00 ;
-  global,sequence=RING,Q2=6.65e+00;
-  vary,name=I_DQL,step=1.0e-6;
-  vary,name=I_DQS,step=1.0e-6;
-  lmdif,calls=500,tolerance=1.e-8;
-  jacobian, calls=10, tolerance=1.0e-21;
-endmatch;
