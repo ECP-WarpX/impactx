@@ -583,3 +583,14 @@ add_impactx_test(cfbend.py
     examples/cfbend/analysis_cfbend.py
     OFF  # no plot script yet
 )
+
+# Fermilab Booster thin-kick model ################################################
+#
+# w/o space charge
+add_impactx_test(booster.py
+    examples/fnal_booster/fnal_booster.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/fnal_booster/analysis_booster.py
+    OFF  # no plot script yet
+)
