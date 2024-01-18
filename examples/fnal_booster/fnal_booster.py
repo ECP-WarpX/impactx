@@ -168,11 +168,13 @@ def parse_element(element, zprev):
                 print(f"h={h}")
                 if tilt is None:
                     print("... empty tilt - ignored")
+                    angledeg = 0.0
                 else:
                     tilt = float(tilt)
                     print(f"tilt={tilt}")
-                print(f"elements.DipEdge(psi={e1}, rc=1.0, g={h}, K2=0.125)")
-                sim.lattice.append(elements.DipEdge(psi=e1, rc=1.0, g=h, K2=0.125))
+                    angledeg = tilt*180.0/math.pi
+                print(f"elements.DipEdge(psi={e1}, rc=1.0, g={h}, K2=0.125, rotation={angledeg})")
+                sim.lattice.append(elements.DipEdge(psi=e1, rc=1.0, g=h, K2=0.125, rotation=angledeg))
 
         else:
             print("... empty body - ignored")
