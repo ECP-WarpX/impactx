@@ -1,0 +1,42 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.kin_energy = 20.0
+beam.charge = 1.0e-9
+beam.particle = electron
+beam.distribution = waterbag
+beam.sigmaX = 0.5e-3
+beam.sigmaY = 0.5e-3
+beam.sigmaT = 5.0e-3
+beam.sigmaPx = 1.0e-5
+beam.sigmaPy = 1.0e-5
+beam.sigmaPt = 4.0e-6
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor shortrf1 drift1 monitor
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+shortrf1.type = shortrf
+shortrf1.V = 1000.0
+shortrf1.freq = 1.3e9
+shortrf1.phase = -89.5
+
+drift1.type = drift
+drift1.ds = 1.7
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false

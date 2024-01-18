@@ -19,18 +19,22 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 Run
 ---
 
-This example can be run as a Python script (``python3 run_positron.py``) or with an app with an input file (``impactx input_positron.in``).
-Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
+This example can be run **either** as:
+
+* **Python** script: ``python3 run_positron.py`` or
+* ImpactX **executable** using an input file: ``impactx input_positron.in``
+
+For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
 .. tab-set::
 
-   .. tab-item:: Python Script
+   .. tab-item:: Python: Script
 
        .. literalinclude:: run_positron.py
           :language: python3
           :caption: You can copy this file from ``examples/positron_channel/run_positron.py``.
 
-   .. tab-item:: App Input File
+   .. tab-item:: Executable: Input File
 
        .. literalinclude:: input_positron.in
           :language: ini

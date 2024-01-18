@@ -3,7 +3,7 @@
 ###############################################################################
 beam.npart = 10000
 beam.units = static
-beam.energy = 5.0e3
+beam.kin_energy = 5.0e3
 beam.charge = 1.0e-9
 beam.particle = electron
 beam.distribution = waterbag
@@ -21,7 +21,7 @@ beam.mutpt = 0.999999961419755
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
-lattice.elements = monitor sbend1 dipedge1 drift1 dipedge2 sbend2 drift2
+lattice.elements = monitor sbend1 dipedge1 drift1 dipedge2 sbend2 drift2      \
                    sbend2 dipedge2 drift1 dipedge1 sbend1 drift3 monitor
 lattice.nslice = 25
 

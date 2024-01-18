@@ -19,9 +19,7 @@
 #include <cmath>
 
 
-namespace impactx
-{
-namespace transformation
+namespace impactx::transformation
 {
     struct ToFixedT
     {
@@ -61,10 +59,13 @@ namespace transformation
             amrex::ParticleReal const y = p.pos(RealAoS::y);
             amrex::ParticleReal const t = p.pos(RealAoS::t);
 
+            // small tolerance to avoid NaN for pz<0:
+            constexpr amrex::ParticleReal tol = 1.0e-8_prt;
+
             // compute value of reference pzd = beta*gamma
             amrex::ParticleReal const argd = -1.0_prt + pow(m_ptd, 2);
-            AMREX_ASSERT_WITH_MESSAGE(argd > 0.0_prt, "invalid pzd arg (<=0)");
-            amrex::ParticleReal const pzdf = argd > 0.0_prt ? sqrt(argd) : 0.0_prt;
+            // AMREX_ASSERT_WITH_MESSAGE(argd > 0.0_prt, "invalid pzd arg (<=0)");
+            amrex::ParticleReal const pzdf = argd > 0.0_prt ? sqrt(argd) : tol;
 
             // transform momenta to dynamic units (eg, so that momenta are
             // normalized by mc):
@@ -74,8 +75,8 @@ namespace transformation
 
             // compute value of particle pz = beta*gamma
             amrex::ParticleReal const arg = -1.0_prt + pow(m_ptd+pt, 2) - pow(px, 2) - pow(py, 2);
-            AMREX_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pz arg (<=0)");
-            amrex::ParticleReal const pzf = arg > 0.0_prt ? sqrt(arg) : 0.0_prt;
+            // AMREX_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pz arg (<=0)");
+            amrex::ParticleReal const pzf = arg > 0.0_prt ? sqrt(arg) : tol;
 
             // transform position and momentum (from fixed s to fixed t)
             p.pos(RealAoS::x) = x + px*t/(m_ptd+pt);
@@ -97,7 +98,6 @@ namespace transformation
         amrex::ParticleReal m_ptd;  ///< Design value of pt/mc2 = -gamma.
     };
 
-} // namespace transformation
-} // namespace impactx
+} // namespace impactx::transformation
 
 #endif // IMPACTX_TO_FIXED_T_H

@@ -6,18 +6,14 @@ ImpactX
 ImpactX is an s-based beam dynamics code including space charge effects.
 This is the next generation of the `IMPACT-Z <https://github.com/impact-lbl/IMPACT-Z>`__ code.
 
-.. note::
-
-   ImpactX development is in `beta status <https://en.wikipedia.org/wiki/Software_release_life_cycle>`__.
-   Please contact us with any questions on it or if you like to contribute to its development.
-
+Please contact us with any questions on it or if you like to contribute to its development.
 
 .. _contact:
 
 Contact us
 ^^^^^^^^^^
 
-If you are starting using ImpactX, or if you have a user question, please pop in our `Gitter chat room <https://gitter.im/ECP-WarpX/community>`__ and get in touch with the community.
+If you are starting using ImpactX, or if you have a user question, please pop in our `discussions page <https://github.com/ECP-WarpX/impactx/discussions>`__ and get in touch with the community.
 
 The `ImpactX GitHub repo <https://github.com/ECP-WarpX/impactx>`__ is the main communication platform.
 Have a look at the action icons on the top right of the web page: feel free to watch the repo if you want to receive updates, or to star the repo to support the project.
@@ -69,9 +65,9 @@ Usage
    :hidden:
 
    usage/how_to_run
+   usage/examples
    usage/python
    usage/parameters
-   usage/examples
    usage/workflows
 
 Data Analysis

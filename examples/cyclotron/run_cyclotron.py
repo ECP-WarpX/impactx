@@ -21,13 +21,13 @@ sim.slice_step_diagnostics = True
 sim.init_grids()
 
 # load initial beam
-energy_MeV = 4.0e-3  # reference energy
+kin_energy_MeV = 4.0e-3  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
 npart = 10000  # number of macro particles
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
-ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_energy_MeV(energy_MeV)
+ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_kin_energy_MeV(kin_energy_MeV)
 
 #   particle bunch
 distr = distribution.Waterbag(
@@ -47,7 +47,7 @@ sim.add_particles(bunch_charge_C, distr, npart)
 monitor = elements.BeamMonitor("monitor", backend="h5")
 
 # design the accelerator lattice)
-ns = 25  # number of slices per ds in the element
+ns = 1  # number of slices per ds in the element
 period = [
     monitor,
     elements.ChrAcc(ds=0.038, ez=1.12188308693e-4, bz=1.0e-14, nslice=ns),

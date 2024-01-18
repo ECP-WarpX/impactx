@@ -11,11 +11,13 @@
 #define IMPACTX_EXACTSBEND_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
+#include <AMReX_Math.H>
 #include <AMReX_REAL.H>
 #include <AMReX_Print.H>      // for PrintToFile
 
@@ -27,6 +29,7 @@ namespace impactx
     struct ExactSbend
     : public elements::BeamOptic<ExactSbend>,
       public elements::Thick,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "ExactSbend";
@@ -48,11 +51,23 @@ namespace impactx
          * @param B Magnetic field strength in T.
          *  When B = 0 (default), the reference bending radius is defined by r0 = length / (angle in rad), corresponding to
          *  a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B.
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param nslice number of slices used for the application of space charge
          */
-        ExactSbend( amrex::ParticleReal const ds, amrex::ParticleReal const phi,
-              amrex::ParticleReal const B, int const nslice )
-        : Thick(ds, nslice), m_phi(phi * degree2rad), m_B(B)
+        ExactSbend (
+            amrex::ParticleReal ds,
+            amrex::ParticleReal phi,
+            amrex::ParticleReal B,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0,
+            int nslice = 1
+        )
+        : Thick(ds, nslice),
+          Alignment(dx, dy, rotation_degree),
+          m_phi(phi * degree2rad), m_B(B)
         {
         }
 
@@ -77,6 +92,9 @@ namespace impactx
 
             using namespace amrex::literals; // for _rt and _prt
 
+            // shift due to alignment errors of the element
+            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
             amrex::ParticleReal const y = p.pos(RealAoS::y);
@@ -100,8 +118,7 @@ namespace impactx
             amrex::ParticleReal const pperp = sqrt(pow(pt,2)-2.0_prt/bet*pt-pow(py,2)+1.0_prt);
             amrex::ParticleReal const pzi = sqrt(pow(pperp,2)-pow(px,2));
             amrex::ParticleReal const rho = rc + x;
-            amrex::ParticleReal const sin_phi = sin(slice_phi);
-            amrex::ParticleReal const cos_phi = cos(slice_phi);
+            auto const [sin_phi, cos_phi] = amrex::Math::sincos(slice_phi);
 
             // update momenta
             pxout = px*cos_phi + (pzi - rho/rc)*sin_phi;
@@ -122,6 +139,8 @@ namespace impactx
             py = pyout;
             pt = ptout;
 
+            // undo shift due to alignment errors of the element
+            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
         }
 
         /** This pushes the reference particle.
@@ -153,9 +172,7 @@ namespace impactx
             amrex::ParticleReal const B = refpart.beta_gamma() /rc;
 
             // calculate expensive terms once
-            //   TODO: use sincos function once wrapped in AMReX
-            amrex::ParticleReal const sin_theta = sin(theta);
-            amrex::ParticleReal const cos_theta = cos(theta);
+            auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);
 
             // advance position and momentum (bend)
             refpart.px = px*cos_theta - pz*sin_theta;

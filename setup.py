@@ -5,9 +5,6 @@
 # Authors: Axel Huebl
 # License: BSD-3-Clause-LBNL
 #
-from distutils.command.build import build
-from distutils.command.clean import clean
-from distutils.version import LooseVersion
 import os
 import platform
 import re
@@ -16,6 +13,7 @@ import subprocess
 import sys
 
 from setuptools import Extension, setup
+from setuptools.command.build import build
 from setuptools.command.build_ext import build_ext
 
 
@@ -33,10 +31,8 @@ class CopyPreBuild(build):
         #   by default, this stays around. we want to make sure generated
         #   files like libwarpx.(2d|3d|rz).(so|pyd) are always only the
         #   ones we want to package and not ones from an earlier wheel's stage
-        c = clean(self.distribution)
-        c.all = True
-        c.finalize_options()
-        c.run()
+        if os.path.exists(self.build_base):
+            shutil.rmtree(self.build_base)
 
         # call superclass
         build.run(self)
@@ -68,6 +64,8 @@ class CMakeExtension(Extension):
 
 class CMakeBuild(build_ext):
     def run(self):
+        from packaging.version import parse
+
         try:
             out = subprocess.check_output(["cmake", "--version"])
         except OSError:
@@ -77,10 +75,8 @@ class CMakeBuild(build_ext):
                 + ", ".join(e.name for e in self.extensions)
             )
 
-        cmake_version = LooseVersion(
-            re.search(r"version\s*([\d.]+)", out.decode()).group(1)
-        )
-        if cmake_version < "3.20.0":
+        cmake_version = parse(re.search(r"version\s*([\d.]+)", out.decode()).group(1))
+        if cmake_version < parse("3.20.0"):
             raise RuntimeError("CMake >= 3.20.0 is required")
 
         for ext in self.extensions:
@@ -193,12 +189,12 @@ ImpactX_amrex_internal = os.environ.get("IMPACTX_AMREX_INTERNAL", "ON")
 ImpactX_amrex_repo = os.environ.get(
     "IMPACTX_AMREX_REPO", "https://github.com/AMReX-Codes/amrex.git"
 )
-ImpactX_amrex_branch = os.environ.get("IMPACTX_PYAMREX_BRANCH", "development")
+ImpactX_amrex_branch = os.environ.get("IMPACTX_AMREX_BRANCH")
 # ImpactX_pyamrex_src = os.environ.get('IMPACTX_PYAMREX_SRC')
 # ImpactX_pyamrex_internal = os.environ.get('IMPACTX_PYAMREX_INTERNAL', 'ON')
 # ImpactX_pyamrex_repo = os.environ.get('IMPACTX_PYAMREX_REPO',
 #    'https://github.com/AMReX-Codes/pyamrex.git')
-# ImpactX_pyamrex_branch = os.environ.get('IMPACTX_PYAMREX_BRANCH', 'development')
+# ImpactX_pyamrex_branch = os.environ.get('IMPACTX_PYAMREX_BRANCH')
 
 # extra CMake arguments
 extra_cmake_args = []
@@ -239,7 +235,7 @@ with open("./requirements.txt") as f:
 setup(
     name="impactx",
     # note PEP-440 syntax: x.y.zaN but x.y.z.devN
-    version="23.07",
+    version="24.01",
     packages=["impactx"],
     # Python sources:
     package_dir={"": "src/python"},
@@ -269,13 +265,13 @@ setup(
     ext_modules=cxx_modules,
     cmdclass=cmdclass,
     zip_safe=False,
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     tests_require=["numpy", "pandas", "pytest", "scipy"],
     install_requires=install_requires,
     # cmdclass={'test': PyTest},
     # platforms='any',
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Natural Language :: English",
         "Environment :: Console",
         "Environment :: GPU",
@@ -287,10 +283,10 @@ setup(
         "Topic :: Software Development :: Libraries",
         "Programming Language :: C++",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         (
             "License :: OSI Approved :: " "BSD License"
         ),  # TODO: use real SPDX: BSD-3-Clause-LBNL

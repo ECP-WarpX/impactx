@@ -16,15 +16,14 @@
 #include "KVdist.H"
 #include "None.H"
 #include "Semigaussian.H"
+#include "Thermal.H"
 #include "Triangle.H"
 #include "Waterbag.H"
 
 #include <variant>
 
 
-namespace impactx
-{
-namespace distribution
+namespace impactx::distribution
 {
     using KnownDistributions = std::variant<
         None, /* must be first, so KnownDistributions creates a default constructor */
@@ -32,12 +31,12 @@ namespace distribution
         Kurth4D,
         Kurth6D,
         KVdist,
+        Thermal,
         Triangle,
         Semigaussian,
         Waterbag
     >;
 
-} // namespace distribution
-} // namespace impactx
+} // namespace impactx::distribution
 
 #endif // IMPACTX_DISTRIBUTION_ALL_H

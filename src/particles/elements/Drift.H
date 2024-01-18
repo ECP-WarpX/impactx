@@ -11,6 +11,7 @@
 #define IMPACTX_DRIFT_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 #include "mixin/nofinalize.H"
@@ -26,6 +27,7 @@ namespace impactx
     struct Drift
     : public elements::BeamOptic<Drift>,
       public elements::Thick,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "Drift";
@@ -34,10 +36,20 @@ namespace impactx
         /** A drift
          *
          * @param ds Segment length in m
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param nslice number of slices used for the application of space charge
          */
-        Drift( amrex::ParticleReal const ds, int const nslice )
-        : Thick(ds, nslice)
+        Drift (
+            amrex::ParticleReal ds,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0,
+            int nslice = 1
+        )
+        : Thick(ds, nslice),
+          Alignment(dx, dy, rotation_degree)
         {
         }
 
@@ -62,15 +74,18 @@ namespace impactx
 
             using namespace amrex::literals; // for _rt and _prt
 
+            // shift due to alignment errors of the element
+            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
             amrex::ParticleReal const y = p.pos(RealAoS::y);
             amrex::ParticleReal const t = p.pos(RealAoS::t);
 
             // initialize output values of momenta
-            amrex::ParticleReal pxout = px;
-            amrex::ParticleReal pyout = py;
-            amrex::ParticleReal ptout = pt;
+            amrex::ParticleReal const pxout = px;
+            amrex::ParticleReal const pyout = py;
+            amrex::ParticleReal const ptout = pt;
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
@@ -92,6 +107,8 @@ namespace impactx
             py = pyout;
             pt = ptout;
 
+            // undo shift due to alignment errors of the element
+            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
         }
 
         /** This pushes the reference particle.

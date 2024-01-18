@@ -9,6 +9,7 @@
  */
 #include "ImpactX.H"
 #include "initialization/InitAmrCore.H"
+#include "particles/CollectLost.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
 #include "particles/diagnostics/DiagnosticOutput.H"
@@ -22,9 +23,12 @@
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
 #include <AMReX_BLProfiler.H>
+#include <AMReX_ParallelDescriptor.H>
+#include <AMReX_ParmParse.H>
 #include <AMReX_Print.H>
 #include <AMReX_Utility.H>
 
+#include <iostream>
 #include <memory>
 
 
@@ -32,7 +36,8 @@ namespace impactx
 {
     ImpactX::ImpactX ()
         : AmrCore(initialization::init_amr_core()),
-          m_particle_container(std::make_unique<ImpactXParticleContainer>(this))
+          m_particle_container(std::make_unique<ImpactXParticleContainer>(this)),
+          m_particles_lost(std::make_unique<ImpactXParticleContainer>(this))
     {
         // todo: if amr.n_cells is provided, overwrite/redefine AmrCore object
 
@@ -55,10 +60,11 @@ namespace impactx
         // has set n_cells in the inputs file
         {
             amrex::Vector<int> n_cell(AMREX_SPACEDIM);
-            amrex::ParmParse pp_amr("amr");
+            amrex::ParmParse const pp_amr("amr");
             pp_amr.queryarr("n_cell", n_cell);
 
-            amrex::IntVect lo(amrex::IntVect::TheZeroVector()), hi(n_cell);
+            amrex::IntVect const lo(amrex::IntVect::TheZeroVector());
+            amrex::IntVect hi(n_cell);
             hi -= amrex::IntVect::TheUnitVector();
             amrex::Box index_domain(lo,hi);
             for (int i = 0; i <= max_level; i++)
@@ -78,7 +84,27 @@ namespace impactx
 
         // init blocks / grids & MultiFabs
         AmrCore::InitFromScratch(0.0);
-        amrex::Print() << "boxArray(0) " << boxArray(0) << std::endl;
+
+        // alloc particle containers
+        //   the lost particles have an extra runtime attribute: s when it was lost
+        bool comm = true;
+        m_particles_lost->AddRealComp(comm);
+
+        //   have to resize here, not in the constructor because grids have not
+        //   been built when constructor was called.
+        m_particle_container->reserveData();
+        m_particle_container->resizeData();
+        m_particles_lost->reserveData();
+        m_particles_lost->resizeData();
+
+        // register shortcut
+        m_particle_container->SetLostParticleContainer(m_particles_lost.get());
+
+        // print AMReX grid summary
+        if (amrex::ParallelDescriptor::IOProcessor()) {
+            std::cout << "\nGrids Summary:\n";
+            printGridSummary(std::cout, 0, finestLevel());
+        }
     }
 
     void ImpactX::evolve ()
@@ -111,7 +137,7 @@ namespace impactx
                                           global_step);
 
             // print the initial values of the two invariants H and I
-            std::string diag_name = amrex::Concatenate("diags/nonlinear_lens_invariants_", global_step, file_min_digits);
+            std::string const diag_name = amrex::Concatenate("diags/nonlinear_lens_invariants_", global_step, file_min_digits);
             diagnostics::DiagnosticOutput(*m_particle_container,
                                           diagnostics::OutputType::PrintNonlinearLensInvariants,
                                           diag_name);
@@ -160,7 +186,7 @@ namespace impactx
                         // transform from x',y',t to x,y,z
                         transformation::CoordinateTransformation(
                                 *m_particle_container,
-                                transformation::Direction::to_fixed_t);
+                                CoordSystem::t);
 
                         // Note: The following operation assume that
                         // the particles are in x, y, z coordinates.
@@ -175,7 +201,7 @@ namespace impactx
                         m_particle_container->DepositCharge(m_rho, this->refRatio());
 
                         // poisson solve in x,y,z
-                        spacecharge::PoissonSolve(*m_particle_container, m_rho, m_phi);
+                        spacecharge::PoissonSolve(*m_particle_container, m_rho, m_phi, this->ref_ratio);
 
                         // calculate force in x,y,z
                         spacecharge::ForceFromSelfFields(m_space_charge_field,
@@ -192,7 +218,7 @@ namespace impactx
 
                         // transform from x,y,z to x',y',t
                         transformation::CoordinateTransformation(*m_particle_container,
-                                                                 transformation::Direction::to_fixed_s);
+                                                                 CoordSystem::s);
                     }
 
                     // for later: original Impact implementation as an option
@@ -207,6 +233,9 @@ namespace impactx
 
                     // push all particles with external maps
                     Push(*m_particle_container, element_variant, global_step);
+
+                    // move "lost" particles to another particle container
+                    collect_lost_particles(*m_particle_container);
 
                     // just prints an empty newline at the end of the slice_step
                     amrex::Print() << "\n";
@@ -259,6 +288,17 @@ namespace impactx
                                           diagnostics::OutputType::PrintReducedBeamCharacteristics,
                                           "diags/reduced_beam_characteristics_final",
                                           global_step);
+
+            // output particles lost in apertures
+            if (m_particles_lost->TotalNumberOfParticles() > 0)
+            {
+                std::string openpmd_backend = "default";
+                pp_diag.queryAdd("backend", openpmd_backend);
+
+                diagnostics::BeamMonitor output_lost("particles_lost", openpmd_backend, "g");
+                output_lost(*m_particles_lost, 0);
+                output_lost.finalize();
+            }
         }
 
         // loop over all beamline elements & finalize them

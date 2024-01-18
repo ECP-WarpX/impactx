@@ -83,6 +83,8 @@ namespace detail
 
         /** Prepare entering the element before starting push logic.
          *
+         * And write reference particle.
+         *
          * @param[in] pc particle container
          * @param[in] ref_part reference particle
          * @param[in] step global step for diagnostics
@@ -105,7 +107,11 @@ namespace detail
             int step
         );
 
-        // TODO: move to private function
+        /** Write a tile of particles
+         *
+         * @param pti particle tile iterator
+         * @param ref_part reference particle
+         */
         void operator() (
             PinnedContainer::ParIterType & pti,
             RefPart const & ref_part

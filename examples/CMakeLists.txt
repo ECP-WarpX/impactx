@@ -548,7 +548,7 @@ add_impactx_test(positron_channel.py
     OFF  # no plot script yet
 )
 
-# Cyclotron ############################################################
+# Cyclotron ###################################################################
 #
 # w/o space charge
 add_impactx_test(cyclotron
@@ -566,7 +566,7 @@ add_impactx_test(cyclotron.py
     OFF  # no plot script yet
 )
 
-# Combined-function bend ########################################################
+# Combined-function bend ######################################################
 #
 # w/o space charge
 add_impactx_test(cfbend
@@ -581,6 +581,221 @@ add_impactx_test(cfbend.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/cfbend/analysis_cfbend.py
+    OFF  # no plot script yet
+)
+
+# Ballistic compression #######################################################
+#
+# w/o space charge
+add_impactx_test(compression
+    examples/compression/input_compression.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/compression/analysis_compression.py
+    OFF  # no plot script yet
+)
+add_impactx_test(compression.py
+    examples/compression/run_compression.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/compression/analysis_compression.py
+    OFF  # no plot script yet
+)
+
+# Kicker test #################################################################
+#
+# w/o space charge
+add_impactx_test(kicker
+    examples/kicker/input_kicker.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/kicker/analysis_kicker.py
+    OFF  # no plot script yet
+)
+add_impactx_test(kicker.py
+    examples/kicker/run_kicker.py
+      OFF   # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/kicker/analysis_kicker.py
+    OFF  # no plot script yet
+)
+# copy MAD-X lattice file
+file(COPY ${ImpactX_SOURCE_DIR}/examples/kicker/kicker.madx
+        DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kicker_madx.py)
+add_impactx_test(kicker_madx.py
+        examples/kicker/run_kicker_madx.py
+        OFF   # ImpactX MPI-parallel
+        ON   # ImpactX Python interface
+        examples/kicker/analysis_kicker.py
+        OFF  # no plot script yet
+)
+# copy MAD-X lattice file
+file(COPY ${ImpactX_SOURCE_DIR}/examples/kicker/hvkicker.madx
+        DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/hvkicker_madx.py)
+add_impactx_test(hvkicker_madx.py
+        examples/kicker/run_hvkicker_madx.py
+        OFF   # ImpactX MPI-parallel
+        ON   # ImpactX Python interface
+        examples/kicker/analysis_kicker.py
+        OFF  # no plot script yet
+)
+
+# FODO + RF EPAC2004 ##########################################################
+#
+# with space charge
+add_impactx_test(fodo_rf_sc
+    examples/epac2004_benchmarks/input_fodo_rf_SC.in
+      ON  # ImpactX MPI-parallel
+      OFF # ImpactX Python interface
+    examples/epac2004_benchmarks/analysis_fodo_rf_SC.py
+    OFF  # no plot script yet
+)
+add_impactx_test(fodo_rf_sc.py
+    examples/epac2004_benchmarks/run_fodo_rf_SC.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/epac2004_benchmarks/analysis_fodo_rf_SC.py
+    OFF  # no plot script yet
+)
+
+# Thermal Beam EPAC2004 #######################################################
+#
+# with space charge
+add_impactx_test(thermal
+    examples/epac2004_benchmarks/input_thermal.in
+      ON  # ImpactX MPI-parallel
+      OFF # ImpactX Python interface
+    examples/epac2004_benchmarks/analysis_thermal.py
+    OFF  # no plot script yet
+)
+
+# Bithermal Beam EPAC2004 #####################################################
+#
+# with space charge
+add_impactx_test(bithermal
+    examples/epac2004_benchmarks/input_bithermal.in
+      ON  # ImpactX MPI-parallel
+      OFF # ImpactX Python interface
+    examples/epac2004_benchmarks/analysis_bithermal.py
+    examples/epac2004_benchmarks/plot_bithermal.py
+)
+
+# Python: Bithermal Beam EPAC2004 #############################################
+#
+# with space charge
+add_impactx_test(bithermal.py
+    examples/epac2004_benchmarks/run_bithermal.py
+      ON  # ImpactX MPI-parallel
+      ON  # ImpactX Python interface
+    examples/epac2004_benchmarks/analysis_bithermal.py
+    examples/epac2004_benchmarks/plot_bithermal.py
+)
+
+# IOTA s-dependent nonlinear lens test ########################################
+#
+# w/o space charge
+add_impactx_test(IOTA_nll
+    examples/iota_lens/input_iotalens_sdep.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/iota_lens/analysis_iotalens_sdep.py
+    OFF  # no plot script yet
+)
+add_impactx_test(IOTA_nll.py
+    examples/iota_lens/run_iotalens_sdep.py
+      OFF   # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/iota_lens/analysis_iotalens_sdep.py
+    OFF  # no plot script yet
+)
+
+# IOTA nonlinear lattice test #################################################
+#
+# w/o space charge
+add_impactx_test(IOTA_lattice
+    examples/iota_lattice/input_iotalattice_sdep.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/iota_lattice/analysis_iotalattice_sdep.py
+    OFF  # no plot script yet
+)
+add_impactx_test(IOTA_lattice.py
+    examples/iota_lattice/run_iotalattice_sdep.py
+      OFF   # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/iota_lattice/analysis_iotalattice_sdep.py
+    OFF  # no plot script yet
+)
+
+# Thin dipole #################################################################
+#
+# w/o space charge
+add_impactx_test(thin_dipole
+    examples/thin_dipole/input_thin_dipole.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/thin_dipole/analysis_thin_dipole.py
+    OFF  # no plot script yet
+)
+add_impactx_test(thin_dipole.py
+    examples/thin_dipole/run_thin_dipole.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/thin_dipole/analysis_thin_dipole.py
+    OFF  # no plot script yet
+)
+
+# Aperture collimation ########################################################
+#
+# w/o space charge
+add_impactx_test(aperture
+    examples/aperture/input_aperture.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/aperture/analysis_aperture.py
+    OFF  # no plot script yet
+)
+add_impactx_test(aperture.py
+    examples/aperture/run_aperture.py
+      OFF  # ImpactX MPI-parallel
+      ON  # ImpactX Python interface
+    examples/aperture/analysis_aperture.py
+    OFF  # no plot script yet
+)
+
+# Apochromat example ##########################################################
+#
+# w/o space charge
+add_impactx_test(apochromat
+    examples/apochromatic/input_apochromatic.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/apochromatic/analysis_apochromatic.py
+    OFF  # no plot script yet
+)
+add_impactx_test(apochromat.py
+    examples/apochromatic/run_apochromatic.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/apochromatic/analysis_apochromatic.py
+    OFF  # no plot script yet
+)
+
+# Misalignment Quad ###########################################################
+#
+# w/o space charge
+add_impactx_test(alignment
+    examples/alignment/input_alignment.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/alignment/analysis_alignment.py
+    OFF  # no plot script yet
+)
+add_impactx_test(alignment.py
+    examples/alignment/run_alignment.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/alignment/analysis_alignment.py
     OFF  # no plot script yet
 )
 

@@ -15,7 +15,7 @@ sim = ImpactX()
 sim.n_cell = [48, 48, 40]  # [72, 72, 64] for increased precision
 sim.particle_shape = 2  # B-spline order
 sim.space_charge = True
-sim.prob_relative = 3.0
+sim.prob_relative = [3.0]
 # sim.diagnostics = False  # benchmarking
 sim.slice_step_diagnostics = True
 
@@ -24,13 +24,13 @@ sim.init_grids()
 
 # load a 2 GeV proton beam with an initial
 # normalized transverse rms emittance of 1 um
-energy_MeV = 2.0e3  # reference energy
+kin_energy_MeV = 2.0e3  # reference energy
 bunch_charge_C = 1.0e-8  # used with space charge
 npart = 10000  # number of macro particles; use 1e5 for increased precision
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
-ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_energy_MeV(energy_MeV)
+ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_kin_energy_MeV(kin_energy_MeV)
 
 #   particle bunch
 distr = distribution.Waterbag(

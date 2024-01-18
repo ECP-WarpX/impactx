@@ -8,11 +8,26 @@
 
 import warnings
 
-import scipy.constants as sc
-
 from impactx import RefPart, elements
 
 from .MADXParser import MADXParser
+
+
+class sc:
+    """
+    This class is used in lieu of scipy.constants
+    to avoid a direct dependency on it.
+    At the time of writing, this file was the only
+    one requiring scipy in the ImpactX source outside
+    of examples.
+    """
+
+    c = 299792458.0
+    electron_volt = 1.602176634e-19
+    physical_constants = {"electron-muon mass ratio": (0.00483633169, "", 1.1e-10)}
+    m_e = 9.1093837015e-31
+    m_p = 1.67262192369e-27
+    m_u = 1.6605390666e-27
 
 
 def lattice(parsed_beamline, nslice=1):
@@ -31,6 +46,10 @@ def lattice(parsed_beamline, nslice=1):
         "SOLENOID": "Sol",  # Ideal, thick Solenoid: MAD-X user guide 10.9 p78
         "QUADRUPOLE": "Quad",  # Quadrupole
         "DIPEDGE": "DipEdge",
+        # Kicker, idealized thin element,
+        # MADX also defines length "L" and a roll angle around the longitudinal axis "TILT"
+        # https://mad.web.cern.ch/mad/webguide/manual.html#Ch11.S11
+        "KICKER": "Kicker",  # TKICKER, HKICKER and VKICKER become KICKER elements
         # note: in MAD-X, this keeps track only of the beam centroid,
         # "In addition it serves to record the beam position for closed orbit correction."
         "MONITOR": "BeamMonitor",  # drift + output diagnostics
@@ -68,6 +87,13 @@ def lattice(parsed_beamline, nslice=1):
                         # MAD-X is using half the gap height
                         g=2.0 * d["hgap"],
                         K2=d["fint"],
+                    )
+                )
+            elif d["type"] == "kicker":
+                impactx_beamline.append(
+                    elements.Kicker(
+                        xkick=d["hkick"],
+                        ykick=d["vkick"],
                     )
                 )
             elif d["type"] == "monitor":
@@ -111,7 +137,7 @@ def beam(particle, charge=None, mass=None, energy=None):
     :param str particle: reference particle name
     :param float charge: particle charge (proton charge units)
     :param float mass: particle mass (electron masses)
-    :param float energy: particle energy (GeV)
+    :param float energy: total particle energy (GeV)
         - MAD-X default: 1 GeV
     :return dict: dictionary containing particle and beam attributes in ImpactX units
     """
@@ -120,7 +146,7 @@ def beam(particle, charge=None, mass=None, energy=None):
     kg2MeV = sc.c**2 / sc.electron_volt * 1.0e-6
     muon_mass = sc.physical_constants["electron-muon mass ratio"][0] / sc.m_e
     if energy is None:
-        energy_MeV = 1.0e3  # MAD-X default is 1 GeV particle energy
+        energy_MeV = 1.0e3  # MAD-X default is 1 GeV total particle energy
     else:
         energy_MeV = energy * GeV2MeV
 
@@ -181,6 +207,6 @@ def read_beam(ref: RefPart, madx_file):
 
     ref.set_charge_qe(ref_particle_dict["charge"])
     ref.set_mass_MeV(ref_particle_dict["mass"])
-    ref.set_energy_MeV(ref_particle_dict["energy"])
+    ref.set_kin_energy_MeV(ref_particle_dict["energy"] - ref_particle_dict["mass"])
 
     return ref

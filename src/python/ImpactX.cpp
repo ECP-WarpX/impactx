@@ -40,9 +40,11 @@ namespace detail
      * @return the queried value (or throws if not found)
      */
     template< typename T>
-    auto get_or_throw (std::string const prefix, std::string const name)
+    auto get_or_throw (std::string const & prefix, std::string const & name)
     {
         T value;
+        // TODO: if array do queryarr
+        // bool const has_name = amrex::ParmParse(prefix).queryarr(name.c_str(), value);
         bool const has_name = amrex::ParmParse(prefix).query(name.c_str(), value);
 
         if (!has_name)
@@ -58,7 +60,7 @@ void init_ImpactX (py::module& m)
         .def(py::init<>())
 
         .def("load_inputs_file",
-            [](ImpactX const & /* ix */, std::string const filename) {
+            [](ImpactX const & /* ix */, std::string const & filename) {
 #if defined(AMREX_DEBUG) || defined(DEBUG)
                 // note: only in debug, since this is costly for the file
                 // system for highly parallel simulations with MPI
@@ -79,7 +81,7 @@ void init_ImpactX (py::module& m)
         .def_property("n_cell",
             [](ImpactX & /* ix */) {
                 std::vector<int> n_cell;
-                amrex::ParmParse pp_amr("amr");
+                amrex::ParmParse const pp_amr("amr");
                 pp_amr.getarr("n_cell", n_cell);
                 return n_cell;
             },
@@ -103,8 +105,17 @@ void init_ImpactX (py::module& m)
         )
 
         // from amrex::AmrMesh
-        .def_property_readonly("max_level",
+        .def_property("max_level",
             [](ImpactX & ix){ return ix.maxLevel(); },
+            [](ImpactX & /* ix */, int /* max_level */) {
+                throw std::runtime_error("setting n_cell is not yet implemented");
+                /*
+                amrex::ParmParse pp_amr("amr");
+                pp_amr.add("max_level", max_level);
+                */
+
+                // note, this must be done *before* initGrids is called
+            },
             "The maximum mesh-refinement level for the simulation."
         )
         .def_property_readonly("finest_level",
@@ -114,7 +125,7 @@ void init_ImpactX (py::module& m)
 
         .def_property("domain",
             [](ImpactX & /* ix */) {
-                amrex::ParmParse pp_geometry("geometry");
+                amrex::ParmParse const pp_geometry("geometry");
                 amrex::Vector<amrex::Real> prob_lo;
                 amrex::Vector<amrex::Real> prob_hi;
                 pp_geometry.getarr("prob_lo", prob_lo);
@@ -141,16 +152,16 @@ void init_ImpactX (py::module& m)
               [](ImpactX & /* ix */) {
                   return detail::get_or_throw<amrex::Real>("geometry", "prob_relative");
               },
-              [](ImpactX & /* ix */, amrex::Real frac) {
+              [](ImpactX & /* ix */, std::vector<amrex::Real> frac) {
                   amrex::ParmParse pp_geometry("geometry");
-                  pp_geometry.add("prob_relative", frac);
+                  pp_geometry.addarr("prob_relative", frac);
               },
               "The field mesh spans, per direction, multiple times the maximum physical extent of beam particles, as given by this factor."
         )
 
         .def_property("dynamic_size",
               [](ImpactX & /* ix */) {
-                  amrex::ParmParse pp_geometry("geometry");
+                  amrex::ParmParse const pp_geometry("geometry");
                   bool dynamic_size;
                   pp_geometry.get("dynamic_size", dynamic_size);
                   return dynamic_size;
@@ -187,6 +198,57 @@ void init_ImpactX (py::module& m)
              },
              "Enable or disable space charge calculations (default: enabled)."
         )
+        .def_property("mlmg_relative_tolerance",
+              [](ImpactX & /* ix */) {
+                  return detail::get_or_throw<bool>("algo", "mlmg_relative_tolerance");
+              },
+              [](ImpactX & /* ix */, amrex::Real const mlmg_relative_tolerance) {
+                  amrex::ParmParse pp_algo("algo");
+                  pp_algo.add("mlmg_relative_tolerance", mlmg_relative_tolerance);
+              },
+              "The relative precision with which the electrostatic space-charge fields should be calculated. "
+              "More specifically, the space-charge fields are computed with an iterative Multi-Level Multi-Grid (MLMG) solver. "
+              "This solver can fail to reach the default precision within a reasonable time."
+        )
+        .def_property("mlmg_absolute_tolerance",
+              [](ImpactX & /* ix */) {
+                  return detail::get_or_throw<bool>("algo", "mlmg_absolute_tolerance");
+              },
+              [](ImpactX & /* ix */, amrex::Real const mlmg_absolute_tolerance) {
+                  amrex::ParmParse pp_algo("algo");
+                  pp_algo.add("mlmg_absolute_tolerance", mlmg_absolute_tolerance);
+              },
+              "The absolute tolerance with which the space-charge fields should be calculated in units of V/m^2. "
+              "More specifically, the acceptable residual with which the solution can be considered converged. "
+              "In general this should be left as the default, but in cases where the simulation state changes very "
+              "little between steps it can occur that the initial guess for the MLMG solver is so close to the "
+              "converged value that it fails to improve that solution sufficiently to reach the "
+              "mlmg_relative_tolerance value."
+        )
+        .def_property("mlmg_max_iters",
+              [](ImpactX & /* ix */) {
+                  return detail::get_or_throw<bool>("algo", "mlmg_max_iters");
+              },
+              [](ImpactX & /* ix */, int const mlmg_max_iters) {
+                  amrex::ParmParse pp_algo("algo");
+                  pp_algo.add("mlmg_max_iters", mlmg_max_iters);
+              },
+              "Maximum number of iterations used for MLMG solver for space-charge fields calculation. "
+              "In case if MLMG converges but fails to reach the desired self_fields_required_precision, "
+              "this parameter may be increased."
+        )
+        .def_property("mlmg_verbosity",
+              [](ImpactX & /* ix */) {
+                  return detail::get_or_throw<bool>("algo", "mlmg_verbosity");
+              },
+              [](ImpactX & /* ix */, int const mlmg_verbosity) {
+                  amrex::ParmParse pp_algo("algo");
+                  pp_algo.add("mlmg_verbosity", mlmg_verbosity);
+              },
+              "The verbosity used for MLMG solver for space-charge fields calculation. "
+              "Currently MLMG solver looks for verbosity levels from 0-5. "
+              "A higher number results in more verbose output."
+        )
         .def_property("diagnostics",
              [](ImpactX & /* ix */) {
                  return detail::get_or_throw<bool>("diag", "enable");
@@ -209,7 +271,7 @@ void init_ImpactX (py::module& m)
              "Enable or disable diagnostics every slice step in elements (default: disabled).\n\n"
              "By default, diagnostics is performed at the beginning and end of the simulation.\n"
              "Enabling this flag will write diagnostics every step and slice step."
-         )
+        )
         .def_property("diag_file_min_digits",
              [](ImpactX & /* ix */) {
                  return detail::get_or_throw<int>("diag", "file_min_digits");
@@ -220,12 +282,37 @@ void init_ImpactX (py::module& m)
              },
              "The minimum number of digits (default: 6) used for the step\n"
              "number appended to the diagnostic file names."
-         )
+        )
+        .def("set_diag_iota_invariants",
+              [](ImpactX & /* ix */, amrex::ParticleReal alpha, amrex::ParticleReal beta, amrex::ParticleReal tn, amrex::ParticleReal cn) {
+                  amrex::ParmParse pp_diag("diag");
+
+                  pp_diag.add("alpha", alpha);
+                  pp_diag.add("beta", beta);
+                  pp_diag.add("tn", tn);
+                  pp_diag.add("cn", cn);
+              },
+              py::arg("alpha"), py::arg("beta"), py::arg("tn"), py::arg("cn"),
+              "Set the Twiss alpha, beta (m), dimensionless strength of the nonlinear insert and "
+              "scale parameter of the nonlinear insert (m^[1/2]) of the IOTA nonlinear lens "
+              "invariants diagnostics."
+        )
+        .def_property("particle_lost_diagnostics_backend",
+                      [](ImpactX & /* ix */) {
+                          return detail::get_or_throw<std::string>("diag", "backend");
+                      },
+                      [](ImpactX & /* ix */, std::string const backend) {
+                          amrex::ParmParse pp_diag("diag");
+                          pp_diag.add("backend", backend);
+                      },
+                      "Diagnostics for particles lost in apertures.\n\n"
+                      "See the ``BeamMonitor`` element for backend values."
+        )
         .def_property("abort_on_warning_threshold",
              [](ImpactX & /* ix */){
                  return detail::get_or_throw<std::string>("impactx", "abort_on_warning_threshold");
              },
-             [](ImpactX & ix, std::string const str_abort_on_warning_threshold) {
+             [](ImpactX & ix, std::string const & str_abort_on_warning_threshold) {
                  amrex::ParmParse pp_impactx("impactx");
                  pp_impactx.add("abort_on_warning_threshold", str_abort_on_warning_threshold);
                  // query input for warning logger variables and set up warning logger accordingly
@@ -307,7 +394,7 @@ void init_ImpactX (py::module& m)
         )
         .def(
             "space_charge_field",
-            [](ImpactX & ix, int const lev, std::string const comp) {
+            [](ImpactX & ix, int lev, std::string const & comp) {
                 return &ix.m_space_charge_field.at(lev).at(comp);
             },
             py::arg("lev"), py::arg("comp"),
@@ -356,7 +443,7 @@ void init_ImpactX (py::module& m)
 //            "ImpactX version")
         .def_property_readonly_static(
             "have_mpi",
-            [](py::object){
+            [](py::object const &){
 #ifdef AMREX_USE_MPI
                 return true;
 #else
@@ -365,7 +452,7 @@ void init_ImpactX (py::module& m)
             })
         .def_property_readonly_static(
             "have_gpu",
-            [](py::object){
+            [](py::object const &){
 #ifdef AMREX_USE_GPU
                 return true;
 #else
@@ -374,7 +461,7 @@ void init_ImpactX (py::module& m)
             })
         .def_property_readonly_static(
             "have_omp",
-            [](py::object){
+            [](py::object const &){
 #ifdef AMREX_USE_OMP
                 return true;
 #else
@@ -383,7 +470,7 @@ void init_ImpactX (py::module& m)
             })
         .def_property_readonly_static(
             "gpu_backend",
-            [](py::object){
+            [](py::object const &){
 #ifdef AMREX_USE_CUDA
                 return "CUDA";
 #elif defined(AMREX_USE_HIP)

@@ -10,16 +10,12 @@
 #include "PoissonSolve.H"
 
 #include <ablastr/constant.H>
-/* work-around for https://github.com/ECP-WarpX/WarpX/pull/4090 in ABLASTR 23.07 */
-namespace PhysConst
-{
-    using namespace ablastr::constant::SI;
-}
 #include <ablastr/fields/PoissonSolver.H>
 
 #include <AMReX_BLProfiler.H>
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_LO_BCTYPES.H>
+#include <AMReX_ParmParse.H>
 #include <AMReX_REAL.H>       // for ParticleReal
 
 #include <cmath>
@@ -30,7 +26,8 @@ namespace impactx::spacecharge
     void PoissonSolve (
         ImpactXParticleContainer const & pc,
         std::unordered_map<int, amrex::MultiFab> & rho,
-        std::unordered_map<int, amrex::MultiFab> & phi
+        std::unordered_map<int, amrex::MultiFab> & phi,
+        amrex::Vector<amrex::IntVect> rel_ref_ratio
     )
     {
         using namespace amrex::literals;
@@ -55,11 +52,16 @@ namespace impactx::spacecharge
         // particle.
         std::array<amrex::Real, 3> const beta_xyz = {0.0, 0.0, beta_s};
 
-        amrex::Real const mlmg_relative_tolerance = 1.e-7; // relative TODO: make smaller for SP
-        amrex::Real const mlmg_absolute_tolerance = 0.0;   // ignored
+        amrex::ParmParse pp_algo("algo");
+        amrex::Real mlmg_relative_tolerance = 1.e-7; // relative TODO: make smaller for SP
+        amrex::Real mlmg_absolute_tolerance = 0.0;   // ignored
+        pp_algo.queryAdd("mlmg_relative_tolerance", mlmg_relative_tolerance);
+        pp_algo.queryAdd("mlmg_absolute_tolerance", mlmg_absolute_tolerance);
 
-        int const mlmg_max_iters = 100;
-        int const mlmg_verbosity = 1;
+        int mlmg_max_iters = 100;
+        int mlmg_verbosity = 1;
+        pp_algo.queryAdd("mlmg_max_iters", mlmg_max_iters);
+        pp_algo.queryAdd("mlmg_verbosity", mlmg_verbosity);
 
         struct PoissonBoundaryHandler {
             amrex::Array<amrex::LinOpBCType, AMREX_SPACEDIM> const lobc = {
@@ -86,6 +88,7 @@ namespace impactx::spacecharge
             sorted_phi.emplace_back(&phi[lev]);
         }
 
+        const bool do_single_precision_comms = false;
         ablastr::fields::computePhi(
             sorted_rho,
             sorted_phi,
@@ -97,10 +100,10 @@ namespace impactx::spacecharge
             pc.GetParGDB()->Geom(),
             pc.GetParGDB()->DistributionMap(),
             pc.GetParGDB()->boxArray(),
-            poisson_boundary_handler
-            /*
+            poisson_boundary_handler,
             do_single_precision_comms,
-            this->ref_ratio,
+            rel_ref_ratio
+            /*
             post_phi_calculation,
             gett_new(0),
             eb_farray_box_factory

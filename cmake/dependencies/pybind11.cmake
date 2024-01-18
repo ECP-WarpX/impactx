@@ -2,6 +2,9 @@ function(find_pybind11)
     if(ImpactX_pybind11_src)
         message(STATUS "Compiling local pybind11 ...")
         message(STATUS "pybind11 source path: ${ImpactX_pybind11_src}")
+        if(NOT IS_DIRECTORY ${ImpactX_pybind11_src})
+            message(FATAL_ERROR "Specified directory ImpactX_pybind11_src='${ImpactX_pybind11_src}' does not exist!")
+        endif()
     elseif(ImpactX_pybind11_internal)
         message(STATUS "Downloading pybind11 ...")
         message(STATUS "pybind11 repository: ${ImpactX_pybind11_repo} (${ImpactX_pybind11_branch})")
@@ -34,7 +37,7 @@ function(find_pybind11)
             mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED_FETCHEDpybind11)
         endif()
     else()
-        find_package(pybind11 2.9.1 CONFIG REQUIRED)
+        find_package(pybind11 2.11.1 CONFIG REQUIRED)
         message(STATUS "pybind11: Found version '${pybind11_VERSION}'")
     endif()
 endfunction()
@@ -49,7 +52,7 @@ option(ImpactX_pybind11_internal "Download & build pybind11" ON)
 set(ImpactX_pybind11_repo "https://github.com/pybind/pybind11.git"
     CACHE STRING
     "Repository URI to pull and build pybind11 from if(ImpactX_pybind11_internal)")
-set(ImpactX_pybind11_branch "v2.10.1"
+set(ImpactX_pybind11_branch "v2.11.1"
     CACHE STRING
     "Repository branch for ImpactX_pybind11_repo if(ImpactX_pybind11_internal)")
 

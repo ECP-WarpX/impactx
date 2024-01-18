@@ -10,25 +10,45 @@
 #ifndef IMPACTX_DISTRIBUTION_NONE
 #define IMPACTX_DISTRIBUTION_NONE
 
+#include "particles/ReferenceParticle.H"
+
 #include <AMReX_Random.H>
 #include <AMReX_REAL.H>
 
 
-namespace impactx
-{
-namespace distribution
+namespace impactx::distribution
 {
     struct None
     {
-        /** This distribution does nothing
+        /** This distribution sets all values to zero.
          */
-         None()
-         {
-         }
+        None()
+        {
+        }
+
+        /** Initialize the distribution.
+         *
+         * Nothing to do here.
+         *
+         * @param bunch_charge charge of the beam in C
+         * @param ref the reference particle
+         */
+        void initialize ([[maybe_unused]] amrex::ParticleReal bunch_charge, [[maybe_unused]] RefPart const & ref)
+        {
+        }
+
+        /** Close and deallocate all data and handles.
+         *
+         * Nothing to do here.
+         */
+        void
+        finalize ()
+        {
+        }
 
         /** Return 1 6D particle coordinate
          *
-         * Does nothing to the parameters.
+         * Sets all values to zero.
          *
          * @param x particle position in x
          * @param y particle position in y
@@ -40,19 +60,25 @@ namespace distribution
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                [[maybe_unused]] amrex::ParticleReal & x,
-                [[maybe_unused]] amrex::ParticleReal & y,
-                [[maybe_unused]] amrex::ParticleReal & t,
-                [[maybe_unused]] amrex::ParticleReal & px,
-                [[maybe_unused]] amrex::ParticleReal & py,
-                [[maybe_unused]] amrex::ParticleReal & pt,
+                amrex::ParticleReal & x,
+                amrex::ParticleReal & y,
+                amrex::ParticleReal & t,
+                amrex::ParticleReal & px,
+                amrex::ParticleReal & py,
+                amrex::ParticleReal & pt,
                 [[maybe_unused]] amrex::RandomEngine const& engine) const
         {
-            /* nothing to do */
+            using namespace amrex::literals;
+
+            x = 0_prt;
+            y = 0_prt;
+            t = 0_prt;
+            px = 0_prt;
+            py = 0_prt;
+            pt = 0_prt;
         }
     };
 
-} // namespace distribution
-} // namespace impactx
+} // namespace impactx::distribution
 
 #endif // IMPACTX_DISTRIBUTION_NONE

@@ -19,17 +19,22 @@
 #include <cmath>
 
 
-namespace impactx
+namespace impactx::transformation
 {
-namespace transformation {
-    void CoordinateTransformation (ImpactXParticleContainer &pc,
-                                   Direction const &direction)
-   {
+    void CoordinateTransformation (ImpactXParticleContainer & pc,
+                                   CoordSystem direction)
+    {
         BL_PROFILE("impactx::transformation::CoordinateTransformation");
         using namespace amrex::literals; // for _rt and _prt
 
+        if (direction == CoordSystem::s) {
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(pc.GetCoordSystem() == CoordSystem::t, "Already in fixed s coordinates!");
+        } else {
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(pc.GetCoordSystem() == CoordSystem::s, "Already in fixed t coordinates!");
+        }
+
         // preparing to access reference particle data: RefPart
-        RefPart ref_part = pc.GetRefParticle();
+        RefPart const ref_part = pc.GetRefParticle();
         amrex::ParticleReal const pd = ref_part.pt;  // Design value of pt/mc2 = -gamma
 
         // loop over refinement levels
@@ -53,7 +58,7 @@ namespace transformation {
                 amrex::ParticleReal *const AMREX_RESTRICT part_px = soa_real[RealSoA::px].dataPtr();
                 amrex::ParticleReal *const AMREX_RESTRICT part_py = soa_real[RealSoA::py].dataPtr();
 
-                if( direction == Direction::to_fixed_s) {
+                if (direction == CoordSystem::s) {
                     BL_PROFILE("impactx::transformation::CoordinateTransformation::to_fixed_s");
 
                     amrex::ParticleReal *const AMREX_RESTRICT part_pz = soa_real[RealSoA::pz].dataPtr();
@@ -94,6 +99,8 @@ namespace transformation {
                 }
             } // end loop over all particle boxes
         } // env mesh-refinement level loop
+
+        // update coordinate system meta data
+        pc.SetCoordSystem(direction);
     }
-} // namespace transformation
-} // namespace impactx
+} // namespace impactx::transformation

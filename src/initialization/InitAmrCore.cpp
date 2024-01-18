@@ -73,7 +73,7 @@ namespace details
             default_init_AMReX();
         }
 
-        amrex::ParmParse pp_amr("amr");
+        amrex::ParmParse const pp_amr("amr");
 
         amrex::Vector<int> n_cell(AMREX_SPACEDIM);
         bool const has_ncell = pp_amr.queryarr("n_cell", n_cell);
@@ -86,18 +86,18 @@ namespace details
     AmrCoreData
     amrex_amrcore_gridding ()
     {
-        amrex::ParmParse pp_amr("amr");
+        amrex::ParmParse const pp_amr("amr");
 
         // Domain index space - we use temporary values here, then fix later
-        amrex::Vector<int> n_cell = {AMREX_D_DECL(256,256,256)};
-        amrex::Box domain(amrex::IntVect(0), amrex::IntVect(n_cell));
+        amrex::Vector<int> const n_cell = {AMREX_D_DECL(256,256,256)};
+        amrex::Box const domain(amrex::IntVect(0), amrex::IntVect(n_cell));
 
         // Domain physical size
         //   we might resize this dynamically
         auto rb = details::init_physical_domain();
 
         // Periodicity (none)
-        amrex::Array<int, AMREX_SPACEDIM> is_periodic{AMREX_D_DECL(0,0,0)};
+        amrex::Array<int, AMREX_SPACEDIM> const is_periodic{AMREX_D_DECL(0,0,0)};
 
         // Mesh-refinement
         int max_level = 0;
@@ -116,11 +116,11 @@ namespace details
         const int nprocs = amrex::ParallelDescriptor::NProcs();
         const amrex::IntVect high_end = amr_info.blocking_factor[0]
                                         * amrex::IntVect(AMREX_D_DECL(nprocs,1,1)) - amrex::IntVect(1);
-        amrex::Box domain(amrex::IntVect(0), high_end);
+        amrex::Box const domain(amrex::IntVect(0), high_end);
         //   adding amr.n_cell for consistency
         amrex::ParmParse pp_amr("amr");
         auto const n_cell_iv = domain.size();
-        amrex::Vector<int> n_cell_v(n_cell_iv.begin(), n_cell_iv.end());
+        amrex::Vector<int> const n_cell_v(n_cell_iv.begin(), n_cell_iv.end());
         pp_amr.addarr("n_cell", n_cell_v);
 
         // Domain physical size
@@ -128,9 +128,14 @@ namespace details
         auto rb = details::init_physical_domain();
 
         // Periodicity (none)
-        amrex::Array<int, AMREX_SPACEDIM> is_periodic{AMREX_D_DECL(0,0,0)};
+        amrex::Array<int, AMREX_SPACEDIM> const is_periodic{AMREX_D_DECL(0,0,0)};
 
-        amrex::Geometry geom(domain, rb, amrex::CoordSys::cartesian, is_periodic);
-        return {geom, amr_info};
+        // Mesh-refinement
+        int max_level = 0;
+        pp_amr.query("max_level", max_level);
+        //   amrex::AmrMesh::InitAmrMesh will query amr.ref_ratio or amr.ref_ratio_vect on its own
+        amrex::Vector<amrex::IntVect> const & ref_ratios = amrex::Vector<amrex::IntVect>();
+
+        return {rb, max_level, n_cell_v, amrex::CoordSys::cartesian, ref_ratios, is_periodic};
     }
 } // namespace impactx::initialization

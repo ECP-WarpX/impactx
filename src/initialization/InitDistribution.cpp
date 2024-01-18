@@ -7,6 +7,8 @@
  * Authors: Axel Huebl, Chad Mitchell, Ji Qiang
  * License: BSD-3-Clause-LBNL
  */
+#include "initialization/InitDistribution.H"
+
 #include "ImpactX.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/distribution/All.H"
@@ -21,6 +23,8 @@
 #include <AMReX_Print.H>
 
 #include <string>
+#include <type_traits>
+#include <variant>
 
 
 namespace impactx
@@ -39,7 +43,7 @@ namespace impactx
             "add_particles: Reference particle charge not yet set!");
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ref.mass_MeV() != 0.0,
             "add_particles: Reference particle mass not yet set!");
-        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ref.energy_MeV() != 0.0,
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ref.kin_energy_MeV() != 0.0,
             "add_particles: Reference particle energy not yet set!");
 
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(bunch_charge >= 0.0,
@@ -55,44 +59,50 @@ namespace impactx
             );
         }
 
-        amrex::Vector<amrex::ParticleReal> x, y, t;
-        amrex::Vector<amrex::ParticleReal> px, py, pt;
-        amrex::ParticleReal ix, iy, it, ipx, ipy, ipt;
-        amrex::RandomEngine rng;
-
         // Logic: We initialize 1/Nth of particles, independent of their
         // position, per MPI rank. We then measure the distribution's spatial
         // extent, create a grid, resize it to fit the beam, and then
         // redistribute particles so that they reside on the correct MPI rank.
-        int myproc = amrex::ParallelDescriptor::MyProc();
-        int nprocs = amrex::ParallelDescriptor::NProcs();
-        int navg = npart / nprocs;
-        int nleft = npart - navg * nprocs;
+        int const myproc = amrex::ParallelDescriptor::MyProc();
+        int const nprocs = amrex::ParallelDescriptor::NProcs();
+        int const navg = npart / nprocs;
+        int const nleft = npart - navg * nprocs;
         int npart_this_proc = (myproc < nleft) ? navg+1 : navg;
-        auto const rel_part_this_proc = amrex::ParticleReal(npart_this_proc) /
-                                        amrex::ParticleReal(npart);
+        auto const rel_part_this_proc =
+            amrex::ParticleReal(npart_this_proc) / amrex::ParticleReal(npart);
+
+        // alloc data for particle attributes
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> x, y, t;
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> px, py, pt;
+        x.resize(npart_this_proc);
+        y.resize(npart_this_proc);
+        t.resize(npart_this_proc);
+        px.resize(npart_this_proc);
+        py.resize(npart_this_proc);
+        pt.resize(npart_this_proc);
 
         std::visit([&](auto&& distribution){
-            x.reserve(npart_this_proc);
-            y.reserve(npart_this_proc);
-            t.reserve(npart_this_proc);
-            px.reserve(npart_this_proc);
-            py.reserve(npart_this_proc);
-            pt.reserve(npart_this_proc);
+            // initialize distributions
+            distribution.initialize(bunch_charge, ref);
 
-            for (amrex::Long i = 0; i < npart_this_proc; ++i) {
-                distribution(ix, iy, it, ipx, ipy, ipt, rng);
-                x.push_back(ix);
-                y.push_back(iy);
-                t.push_back(it);
-                px.push_back(ipx);
-                py.push_back(ipy);
-                pt.push_back(ipt);
-            }
+            amrex::ParticleReal * const AMREX_RESTRICT x_ptr = x.data();
+            amrex::ParticleReal * const AMREX_RESTRICT y_ptr = y.data();
+            amrex::ParticleReal * const AMREX_RESTRICT t_ptr = t.data();
+            amrex::ParticleReal * const AMREX_RESTRICT px_ptr = px.data();
+            amrex::ParticleReal * const AMREX_RESTRICT py_ptr = py.data();
+            amrex::ParticleReal * const AMREX_RESTRICT pt_ptr = pt.data();
+
+            using Distribution = std::remove_reference_t< std::remove_cv_t<decltype(distribution)> >;
+            initialization::InitSingleParticleData<Distribution> const init_single_particle_data(
+                distribution, x_ptr, y_ptr, t_ptr, px_ptr, py_ptr, pt_ptr);
+            amrex::ParallelForRNG(npart_this_proc, init_single_particle_data);
+
+            // finalize distributions and deallocate temporary device global memory
+            amrex::Gpu::streamSynchronize();
+            distribution.finalize();
         }, distr);
 
-        int const lev = 0;
-        m_particle_container->AddNParticles(lev, x, y, t, px, py, pt,
+        m_particle_container->AddNParticles(x, y, t, px, py, pt,
                                             ref.qm_qeeV(),
                                             bunch_charge * rel_part_this_proc);
 
@@ -110,10 +120,10 @@ namespace impactx
         using namespace amrex::literals;
 
         // Parse the beam distribution parameters
-        amrex::ParmParse pp_dist("beam");
+        amrex::ParmParse const pp_dist("beam");
 
-        amrex::ParticleReal energy = 0.0;  // Beam kinetic energy (MeV)
-        pp_dist.get("energy", energy);
+        amrex::ParticleReal kin_energy = 0.0;  // Beam kinetic energy (MeV)
+        pp_dist.get("kin_energy", kin_energy);
 
         amrex::ParticleReal bunch_charge = 0.0;  // Bunch charge (C)
         pp_dist.get("charge", bunch_charge);
@@ -145,7 +155,7 @@ namespace impactx
 
         // set charge and mass and energy of ref particle
         m_particle_container->GetRefParticle()
-            .set_charge_qe(qe).set_mass_MeV(massE).set_energy_MeV(energy);
+                .set_charge_qe(qe).set_mass_MeV(massE).set_kin_energy_MeV(kin_energy);
 
         int npart = 1;  // Number of simulation particles
         pp_dist.get("npart", npart);
@@ -169,7 +179,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions waterbag(distribution::Waterbag(
+          distribution::KnownDistributions const waterbag(distribution::Waterbag(
               sigx, sigy, sigt,
               sigpx, sigpy, sigpt,
               muxpx, muypy, mutpt));
@@ -189,7 +199,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions kurth6D(distribution::Kurth6D(
+          distribution::KnownDistributions const kurth6D(distribution::Kurth6D(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -209,7 +219,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions gaussian(distribution::Gaussian(
+          distribution::KnownDistributions const gaussian(distribution::Gaussian(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -229,7 +239,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions kvDist(distribution::KVdist(
+          distribution::KnownDistributions const kvDist(distribution::KVdist(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -249,7 +259,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions kurth4D(distribution::Kurth4D(
+          distribution::KnownDistributions const kurth4D(distribution::Kurth4D(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -268,7 +278,7 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions semigaussian(distribution::Semigaussian(
+          distribution::KnownDistributions const semigaussian(distribution::Semigaussian(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
@@ -288,19 +298,35 @@ namespace impactx
           pp_dist.query("muypy", muypy);
           pp_dist.query("mutpt", mutpt);
 
-          distribution::KnownDistributions triangle(distribution::Triangle(
+          distribution::KnownDistributions const triangle(distribution::Triangle(
             sigx, sigy, sigt,
             sigpx, sigpy, sigpt,
             muxpx, muypy, mutpt));
 
           add_particles(bunch_charge, triangle, npart);
 
+        } else if (distribution_type == "thermal") {
+          amrex::ParticleReal k, kT, kT_halo, normalize, normalize_halo;
+          amrex::ParticleReal halo = 0.0;
+          pp_dist.get("k", k);
+          pp_dist.get("kT", kT);
+          kT_halo = kT;
+          pp_dist.get("normalize", normalize);
+          normalize_halo = normalize;
+          pp_dist.query("kT_halo", kT_halo);
+          pp_dist.query("normalize_halo", normalize_halo);
+          pp_dist.query("halo", halo);
+
+          distribution::KnownDistributions thermal(distribution::Thermal(k, kT, kT_halo, normalize, normalize_halo, halo));
+
+          add_particles(bunch_charge, thermal, npart);
+
         } else {
             amrex::Abort("Unknown distribution: " + distribution_type);
         }
 
         // print information on the initialized beam
-        amrex::Print() << "Beam kinetic energy (MeV): " << energy << std::endl;
+        amrex::Print() << "Beam kinetic energy (MeV): " << kin_energy << std::endl;
         amrex::Print() << "Bunch charge (C): " << bunch_charge << std::endl;
         amrex::Print() << "Particle type: " << particle_type << std::endl;
         amrex::Print() << "Number of particles: " << npart << std::endl;

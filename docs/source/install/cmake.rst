@@ -35,7 +35,8 @@ ImpactX depends on popular third party software.
 
    .. code-block:: bash
 
-      python3 -m pip install -U pip setuptools wheel pytest
+      python3 -m pip install -U pip
+      python3 -m pip install -U build packaging setuptools wheel pytest
       python3 -m pip install -U -r examples/requirements.txt
 
 
@@ -104,7 +105,6 @@ CMake Option                    Default & Values                             Des
 ``ImpactX_APP``                 **ON**/OFF                                   Build the ImpactX executable application
 ``ImpactX_COMPUTE``             NOACC/**OMP**/CUDA/SYCL/HIP                  On-node, accelerated computing backend
 ``ImpactX_IPO``                 ON/**OFF**                                   Compile ImpactX with interprocedural optimization (aka LTO)
-``ImpactX_LIB``                 ON/**OFF**                                   Build ImpactX as a library (shared or static)
 ``ImpactX_MPI``                 **ON**/OFF                                   Multi-node support (message-passing)
 ``ImpactX_MPI_THREAD_MULTIPLE`` **ON**/OFF                                   MPI thread-multiple support, i.e. for ``async_io``
 ``ImpactX_OPENPMD``             **ON**/OFF                                   openPMD I/O (HDF5, ADIOS)

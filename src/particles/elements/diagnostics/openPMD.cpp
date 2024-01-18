@@ -15,6 +15,7 @@
 #include <ablastr/particles/IndexHandling.H>
 
 #include <AMReX.H>
+#include <AMReX_BLProfiler.H>
 #include <AMReX_REAL.H>
 #include <AMReX_ParmParse.H>
 
@@ -22,6 +23,10 @@
 #   include <openPMD/openPMD.hpp>
 namespace io = openPMD;
 #endif
+
+#include <string>
+#include <utility>
+
 
 namespace impactx::diagnostics
 {
@@ -106,13 +111,13 @@ namespace detail
      * @return pair of openPMD record and component name
      */
     inline std::pair< std::string, std::string >
-    name2openPMD ( std::string const& fullName )
+    name2openPMD ( const std::string& fullName )
     {
         std::string record_name = fullName;
         std::string component_name = io::RecordComponent::SCALAR;
 
         // we use "_" as separator in names to group vector records
-        std::size_t startComp = fullName.find_last_of("_");
+        std::size_t const startComp = fullName.find_last_of('_');
         if( startComp != std::string::npos ) {  // non-scalar
             record_name = fullName.substr(0, startComp);
             component_name = fullName.substr(startComp + 1u);
@@ -123,10 +128,10 @@ namespace detail
     // TODO: move to ablastr
     io::RecordComponent get_component_record (
         io::ParticleSpecies & species,
-        std::string const comp_name
+        std::string comp_name
     ) {
         // handle scalar and non-scalar records by name
-        const auto [record_name, component_name] = name2openPMD(comp_name);
+        const auto [record_name, component_name] = name2openPMD(std::move(comp_name));
         return species[record_name][component_name];
     }
 #endif
@@ -148,7 +153,7 @@ namespace detail
     }
 
     BeamMonitor::BeamMonitor (std::string series_name, std::string backend, std::string encoding) :
-        m_series_name(series_name), m_OpenPMDFileType(backend)
+        m_series_name(std::move(series_name)), m_OpenPMDFileType(std::move(backend))
     {
 #ifdef ImpactX_USE_OPENPMD
         // pick first available backend if default is chosen
@@ -165,11 +170,11 @@ namespace detail
 
         // encoding of iterations in the series
         openPMD::IterationEncoding series_encoding = openPMD::IterationEncoding::groupBased;
-        if ( 0 == encoding.compare("v") )
+        if ( "v" == encoding )
             series_encoding = openPMD::IterationEncoding::variableBased;
-        else if ( 0 == encoding.compare("g") )
+        else if ( "g" == encoding )
             series_encoding = openPMD::IterationEncoding::groupBased;
-        else if ( 0 == encoding.compare("f") )
+        else if ( "f" == encoding )
             series_encoding = openPMD::IterationEncoding::fileBased;
 
         // legacy options from other diagnostics
@@ -183,7 +188,7 @@ namespace detail
 
             if (series_encoding == openPMD::IterationEncoding::fileBased)
             {
-                std::string fileSuffix = std::string("_%0") + std::to_string(m_file_min_digits) + std::string("T");
+                std::string const fileSuffix = std::string("_%0") + std::to_string(m_file_min_digits) + std::string("T");
                 filepath.append(fileSuffix);
             }
             filepath.append(".").append(m_OpenPMDFileType);
@@ -237,32 +242,41 @@ namespace detail
 
         // helpers to parse strings to openPMD
         auto const scalar = openPMD::RecordComponent::SCALAR;
-        auto const getComponentRecord = [&beam](std::string const comp_name) {
-            return detail::get_component_record(beam, comp_name);
+        auto const getComponentRecord = [&beam](std::string comp_name) {
+            return detail::get_component_record(beam, std::move(comp_name));
         };
 
         // define data set and metadata
-        io::Datatype dtype_fl = io::determineDatatype<amrex::ParticleReal>();
-        io::Datatype dtype_ui = io::determineDatatype<uint64_t>();
+        io::Datatype const dtype_fl = io::determineDatatype<amrex::ParticleReal>();
+        io::Datatype const dtype_ui = io::determineDatatype<uint64_t>();
         auto d_fl = io::Dataset(dtype_fl, {np});
         auto d_ui = io::Dataset(dtype_ui, {np});
 
         // AoS: Real
         {
-            std::vector<std::string> real_aos_names(RealAoS::names_s.size());
-            std::copy(RealAoS::names_s.begin(), RealAoS::names_s.end(), real_aos_names.begin());
+            std::vector<std::string> real_aos_names = get_RealAoS_names();
             for (auto real_idx=0; real_idx < RealAoS::nattribs; real_idx++) {
                 auto const component_name = real_aos_names.at(real_idx);
                 getComponentRecord(component_name).resetDataset(d_fl);
             }
         }
 
-        // beam mass
-        beam.setAttribute( "mass", ref_part.mass );
+        // reference particle information
         beam.setAttribute( "beta_ref", ref_part.beta() );
         beam.setAttribute( "gamma_ref", ref_part.gamma() );
+        beam.setAttribute( "s_ref", ref_part.s );
+        beam.setAttribute( "x_ref", ref_part.x );
+        beam.setAttribute( "y_ref", ref_part.y );
+        beam.setAttribute( "z_ref", ref_part.z );
+        beam.setAttribute( "t_ref", ref_part.t );
+        beam.setAttribute( "px_ref", ref_part.px );
+        beam.setAttribute( "py_ref", ref_part.py );
+        beam.setAttribute( "pz_ref", ref_part.pz );
+        beam.setAttribute( "pt_ref", ref_part.pt );
+        beam.setAttribute( "mass", ref_part.mass );
+        beam.setAttribute( "charge", ref_part.charge );
 
-        // openPMD coarse position
+        // openPMD coarse position: for global coordinates
         {
             beam["positionOffset"]["x"].resetDataset(d_fl);
             beam["positionOffset"]["x"].makeConstant(ref_part.x);
@@ -277,9 +291,8 @@ namespace detail
 
         // SoA: Real
         {
-            std::vector<std::string> real_soa_names(RealSoA::names_s.size());
-            std::copy(RealSoA::names_s.begin(), RealSoA::names_s.end(), real_soa_names.begin());
-            for (auto real_idx = 0; real_idx < RealSoA::nattribs; real_idx++) {
+            std::vector<std::string> real_soa_names = get_RealSoA_names(pc.NumRealComps());
+            for (auto real_idx = 0; real_idx < pc.NumRealComps(); real_idx++) {
                 auto const component_name = real_soa_names.at(real_idx);
                 getComponentRecord(component_name).resetDataset(d_fl);
             }
@@ -297,6 +310,9 @@ namespace detail
         int step
     )
     {
+        std::string profile_name = "impactx::Push::" + std::string(BeamMonitor::name);
+        BL_PROFILE(profile_name);
+
         // preparing to access reference particle data: RefPart
         RefPart & ref_part = pc.GetRefParticle();
 
@@ -316,7 +332,7 @@ namespace detail
                           }, true);
         */
 
-        // prepare element access
+        // prepare element access & write reference particle
         this->prepare(pinned_pc, ref_part, step);
 
         // loop over refinement levels
@@ -328,10 +344,7 @@ namespace detail
             using ParIt = PinnedContainer::ParIterType;
             // note: openPMD-api is not thread-safe, so do not run OMP parallel here
             for (ParIt pti(pinned_pc, lev); pti.isValid(); ++pti) {
-                // push reference particle in global coordinates
-                this->operator()(ref_part);
-
-                // push beam particles relative to reference particle
+                // write beam particles relative to reference particle
                 this->operator()(pti, ref_part);
             } // end loop over all particle boxes
         } // end mesh-refinement level loop
@@ -374,8 +387,8 @@ namespace detail
         //if (numParticleOnTile == 0) continue;
 
         auto const scalar = openPMD::RecordComponent::SCALAR;
-        auto const getComponentRecord = [&beam](std::string const comp_name) {
-            return detail::get_component_record(beam, comp_name);
+        auto const getComponentRecord = [&beam](std::string comp_name) {
+            return detail::get_component_record(beam, std::move(comp_name));
         };
 
         // AoS: position and particle ID
@@ -383,20 +396,20 @@ namespace detail
             using vs = std::vector<std::string>;
             vs const positionComponents{"x", "y", "t"}; // TODO: generalize
             for (auto currDim = 0; currDim < AMREX_SPACEDIM; currDim++) {
-                std::shared_ptr<amrex::ParticleReal> curr(
+                std::shared_ptr<amrex::ParticleReal> const curr(
                     new amrex::ParticleReal[numParticleOnTile],
                     [](amrex::ParticleReal const *p) { delete[] p; }
                 );
                 for (auto i = 0; i < numParticleOnTile; i++) {
                     curr.get()[i] = aos[i].pos(currDim);
                 }
-                std::string const positionComponent = positionComponents[currDim];
+                std::string const& positionComponent = positionComponents[currDim];
                 beam["position"][positionComponent].storeChunk(curr, {offset},
                                                                {numParticleOnTile64});
             }
 
             // save particle ID after converting it to a globally unique ID
-            std::shared_ptr<uint64_t> ids(
+            std::shared_ptr<uint64_t> const ids(
                 new uint64_t[numParticleOnTile],
                 [](uint64_t const *p) { delete[] p; }
             );
@@ -410,10 +423,8 @@ namespace detail
         auto const& soa = pti.GetStructOfArrays();
         //   SoA floating point (ParticleReal) properties
         {
-            std::vector<std::string> real_soa_names(RealSoA::names_s.size());
-            std::copy(RealSoA::names_s.begin(), RealSoA::names_s.end(), real_soa_names.begin());
-
-            for (auto real_idx=0; real_idx < RealSoA::nattribs; real_idx++) {
+            std::vector<std::string> real_soa_names = get_RealSoA_names(soa.NumRealComps());
+            for (auto real_idx=0; real_idx < soa.NumRealComps(); real_idx++) {
                 auto const component_name = real_soa_names.at(real_idx);
                 getComponentRecord(component_name).storeChunkRaw(
                 soa.GetRealData(real_idx).data(), {offset}, {numParticleOnTile64});

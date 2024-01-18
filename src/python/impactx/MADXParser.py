@@ -99,6 +99,22 @@ class MADXParser:
         # don't count name and type --> len - 2
         self.__nDipedge = 2 * (len(self.__dipedge) - 2)
 
+        self.__kicker = {"name": "", "hkick": 0.0, "vkick": 0.0, "type": "kicker"}
+
+        self.__kicker_pattern = r"(.*):kicker,(.*)=(.*),(.*)=(.*);"
+        # equivalent to kicker
+        # http://mad.web.cern.ch/mad/madx.old/Introduction/tkickers.html
+        self.__tkicker_pattern = r"(.*):tkicker,(.*)=(.*),(.*)=(.*);"
+        # horizontal kicker without vkick
+        self.__hkicker_pattern = r"(.*):hkicker,(.*)=(.*);"
+        # vertical kicker without hkick
+        self.__vkicker_pattern = r"(.*):vkicker,(.*)=(.*);"
+
+        # don't count name and type --> len - 2
+        self.__nKicker = 2 * (len(self.__kicker) - 2)
+        self.__nHkicker = self.__nKicker - 2
+        self.__nVkicker = self.__nKicker - 2
+
         self.beam = {
             "energy": 0.0,
             # TODO extend by 'PC'
@@ -290,6 +306,102 @@ class MADXParser:
 
                     self.__elements.append(self.__dipedge.copy())
 
+                elif re.search(r":\bkicker\b", line):
+                    obj = re.match(self.__kicker_pattern, line)
+
+                    # first tag is name
+                    self.__kicker["name"] = obj.group(1)
+
+                    for i in range(2, self.__nKicker + 2, 2):
+                        if obj.group(i) in self.__kicker:
+                            self.__kicker[obj.group(i)] = float(obj.group(i + 1))
+                        else:
+                            raise MADXInputError(
+                                "Kicker",
+                                "Line "
+                                + str(nLine)
+                                + ": Parameter "
+                                + "'"
+                                + obj.group(i)
+                                + "'"
+                                + " does not exist for kicker.",
+                            )
+
+                    self.__elements.append(self.__kicker.copy())
+
+                elif re.search(r":\bhkicker\b", line):
+                    obj = re.match(self.__hkicker_pattern, line)
+
+                    # first tag is name
+                    self.__kicker["name"] = obj.group(1)
+                    self.__kicker["vkick"] = 0.0
+
+                    for i in range(2, self.__nHkicker + 2, 2):
+                        if obj.group(i) in self.__kicker:
+                            self.__kicker[obj.group(i)] = float(obj.group(i + 1))
+                        else:
+                            raise MADXInputError(
+                                "HKicker",
+                                "Line "
+                                + str(nLine)
+                                + ": Parameter "
+                                + "'"
+                                + obj.group(i)
+                                + "'"
+                                + " does not exist for hkicker.",
+                            )
+
+                    self.__elements.append(self.__kicker.copy())
+
+                elif re.search(r":\bvkicker\b", line):
+                    obj = re.match(self.__vkicker_pattern, line)
+
+                    # first tag is name
+                    self.__kicker["name"] = obj.group(1)
+                    self.__kicker["hkick"] = 0.0
+
+                    for i in range(2, self.__nVkicker + 2, 2):
+                        if obj.group(i) in self.__kicker:
+                            self.__kicker[obj.group(i)] = float(obj.group(i + 1))
+                        else:
+                            raise MADXInputError(
+                                "VKicker",
+                                "Line "
+                                + str(nLine)
+                                + ": Parameter "
+                                + "'"
+                                + obj.group(i)
+                                + "'"
+                                + " does not exist for vkicker.",
+                            )
+
+                    self.__elements.append(self.__kicker.copy())
+
+                # We treat TKICKER elements exactly like KICKER elements for now
+                # http://mad.web.cern.ch/mad/madx.old/Introduction/tkickers.html
+                elif re.search(r":\btkicker\b", line):
+                    obj = re.match(self.__tkicker_pattern, line)
+
+                    # first tag is name
+                    self.__kicker["name"] = obj.group(1)
+
+                    for i in range(2, self.__nKicker + 2, 2):
+                        if obj.group(i) in self.__kicker:
+                            self.__kicker[obj.group(i)] = float(obj.group(i + 1))
+                        else:
+                            raise MADXInputError(
+                                "TKicker",
+                                "Line "
+                                + str(nLine)
+                                + ": Parameter "
+                                + "'"
+                                + obj.group(i)
+                                + "'"
+                                + " does not exist for tkicker.",
+                            )
+
+                    self.__elements.append(self.__kicker.copy())
+
                 elif "marker" in line:
                     pass
 
@@ -352,7 +464,10 @@ class MADXParser:
 
                     self.sequence["name"] = obj.group(1)
                 else:
-                    raise MADXInputError("", "Error at line " + str(nLine))
+                    raise MADXInputError(
+                        ("Error at line " + str(nLine), "Parsed line: " + str(line)),
+                        with_traceback=True,
+                    )
 
         # 14. Oct. 2017,
         # https://stackoverflow.com/questions/7900882/extract-item-from-list-of-dictionaries
@@ -410,14 +525,14 @@ class MADXParser:
         https://stackoverflow.com/questions/3739909/how-to-strip-all-whitespace-from-string
 
         """
-        return string.replace(" ", "")
+        return "".join(string.split())
 
     def __str__(self):
         if self.__lattice:
             length = 0.0
 
-            # drift, monitor, dipole, solenoid, quadrupole, dipedge
-            nTypes = [0, 0, 0, 0, 0, 0]
+            # drift, monitor, dipole, solenoid, quadrupole, dipedge, kicker
+            nTypes = [0, 0, 0, 0, 0, 0, 0]
 
             for elem in self.__lattice["elem"]:
                 for e in self.__elements:
@@ -437,6 +552,8 @@ class MADXParser:
                             nTypes[4] += 1
                         elif e["type"] == "dipedge":
                             nTypes[5] += 1
+                        elif e["type"] == "kicker":
+                            nTypes[6] += 1
                         break
 
             sign = "*" * 70
@@ -467,6 +584,9 @@ class MADXParser:
                 + "\n"
                 + "            *     #dipedge:\t"
                 + str(nTypes[5])
+                + "\n"
+                + "            *     #kicker:\t"
+                + str(nTypes[6])
                 + "\n"
                 + "           beam:\t\n"
                 + "            *     particle:\t"
@@ -506,6 +626,9 @@ class MADXParser:
                             beamline.append(e)
                         elif e["type"] == "dipedge":
                             # print("Dipedge H= ", e["h"], " E1 = ", e["e1"])
+                            beamline.append(e)
+                        elif e["type"] == "kicker":
+                            # print("Kicker hkick= ", e["hkick"], " vkick = ", e["vkick"])
                             beamline.append(e)
                         else:
                             print("Skipping element type " + "'" + e["type"] + "'")

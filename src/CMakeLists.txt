@@ -3,7 +3,7 @@
 # We build this into a library internally, so we can call this both as an
 # application as well as a Python module.
 #
-target_sources(ImpactX
+target_sources(lib
   PRIVATE
     ImpactX.cpp
 )

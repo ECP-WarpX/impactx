@@ -100,11 +100,13 @@ namespace impactx
          */
         void init_warning_logger ();
 
-      private:
         //! Tag cells for refinement.  TagBoxArray tags is built on level lev grids.
-        void ErrorEst (int lev, amrex::TagBoxArray& tags, amrex::Real time,
-                               int ngrow) override;
+        void ErrorEst (int lev,
+                       amrex::TagBoxArray& tags,
+                       amrex::Real time,
+                       int ngrow) override;
 
+      private:
         //! Make a new level from scratch using provided BoxArray and DistributionMapping.
         //! Only used during initialization.
         void MakeNewLevelFromScratch (int lev, amrex::Real time, const amrex::BoxArray& ba,
@@ -133,6 +135,9 @@ namespace impactx
 
         /** these are the physical/beam particles of the simulation */
         std::unique_ptr<ImpactXParticleContainer> m_particle_container;
+
+        /** former beam particles that got lost in apertures, the wall, etc. */
+        std::unique_ptr<ImpactXParticleContainer> m_particles_lost;
 
         /** charge density per level */
         std::unordered_map<int, amrex::MultiFab> m_rho;

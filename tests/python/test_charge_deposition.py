@@ -10,6 +10,7 @@
 
 import math
 
+from conftest import basepath
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -24,7 +25,7 @@ def test_charge_deposition(save_png=True):
     sim = impactx.ImpactX()
 
     sim.n_cell = [16, 24, 32]
-    sim.load_inputs_file("examples/fodo/input_fodo.in")
+    sim.load_inputs_file(basepath + "/examples/fodo/input_fodo.in")
     sim.space_charge = True
     sim.slice_step_diagnostics = False
 
@@ -60,16 +61,16 @@ def test_charge_deposition(save_png=True):
             rho.dm(),
             rho.n_comp(),
             rho.n_grow_vect(),
-            amr.MFInfo().set_arena(amrex.The_Pinned_Arena()),
+            amr.MFInfo().set_arena(amr.The_Pinned_Arena()),
         )
-        amrex.dtoh_memcpy(rho_host, rho)
+        amr.dtoh_memcpy(rho_host, rho)
     else:
         rho_host = rho
 
     # plot data slices
     f = plt.figure()
     ax = f.gca()
-    ng = rho_host.nGrowVect
+    ng = rho_host.n_grow_vect
     for mfi in rho_host:
         bx = mfi.validbox()
         rbx = amr.RealBox(bx, dr, gm.ProbLo())

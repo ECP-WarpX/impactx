@@ -13,6 +13,7 @@ This section allows you to **download input files** that correspond to different
    examples/cfchannel/README.rst
    examples/expanding_beam/README.rst
    examples/kurth/README.rst
+   examples/alignment/README.rst
    examples/rfcavity/README.rst
    examples/fodo_rf/README.rst
    examples/fodo_chromatic/README.rst
@@ -26,6 +27,13 @@ This section allows you to **download input files** that correspond to different
    examples/positron_channel/README.rst
    examples/cyclotron/README.rst
    examples/cfbend/README.rst
+   examples/compression/README.rst
+   examples/kicker/README.rst
+   examples/thin_dipole/README.rst
+   examples/aperture/README.rst
+   examples/epac2004_benchmarks/README.rst
+   examples/pytorch_surrogate_model/README.rst
+   examples/apochromatic/README.rst
 
 
 Unit tests

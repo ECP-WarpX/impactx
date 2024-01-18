@@ -45,13 +45,15 @@ General
 
    .. py:property:: prob_relative
 
+      This is a list with ``amr.max_level`` + 1 entries.
+
       By default, we dynamically extract the minimum and maximum of the particle positions in the beam.
       The field mesh spans, per direction, multiple times the maximum physical extent of beam particles, as given by this factor.
       The beam minimum and maximum extent are symmetrically padded by the mesh.
       For instance, ``1.2`` means the mesh will span 10% above and 10% below the beam;
       ``1.0`` means the beam is exactly covered with the mesh.
 
-      Default: ``3.0``.
+      Default: ``[3.0 1.0 1.0 ...]``.
       When set, turns ``dynamic_size`` to ``True``.
 
    .. py:property:: dynamic_size
@@ -65,6 +67,39 @@ General
       Whether to calculate space charge effects.
       This is in-development.
       At the moment, this flag only activates coordinate transformations and charge deposition.
+
+   .. py:property:: mlmg_relative_tolerance
+
+      Default: ``1.e-7``
+
+      The relative precision with which the electrostatic space-charge fields should be calculated.
+      More specifically, the space-charge fields are computed with an iterative Multi-Level Multi-Grid (MLMG) solver.
+      This solver can fail to reach the default precision within a reasonable time.
+
+   .. py:property:: mlmg_absolute_tolerance
+
+      Default: ``0``, which means: ignored
+
+      The absolute tolerance with which the space-charge fields should be calculated in units of :math:`V/m^2`.
+      More specifically, the acceptable residual with which the solution can be considered converged.
+      In general this should be left as the default, but in cases where the simulation state changes very
+      little between steps it can occur that the initial guess for the MLMG solver is so close to the
+      converged value that it fails to improve that solution sufficiently to reach the ``mlmg_relative_tolerance`` value.
+
+   .. py:property:: mlmg_max_iters
+
+      Default: ``100``
+
+      Maximum number of iterations used for MLMG solver for space-charge fields calculation.
+      In case if MLMG converges but fails to reach the desired self_fields_required_precision, this parameter may be increased.
+
+   .. py:property:: mlmg_verbosity
+
+      Default: ``1``
+
+      The verbosity used for MLMG solver for space-charge fields calculation.
+      Currently MLMG solver looks for verbosity levels from 0-5.
+      A higher number results in more verbose output.
 
    .. py:property:: diagnostics
 
@@ -82,6 +117,20 @@ General
 
       The minimum number of digits (default: ``6``) used for the step
       number appended to the diagnostic file names.
+
+   .. py:method:: set_diag_iota_invariants(alpha, beta, tn, cn)
+
+      Set the parameters of the IOTA nonlinear lens invariants diagnostics.
+
+      :param float alpha: Twiss alpha
+      :param float beta: Twiss beta (m)
+      :param float tn: dimensionless strength of the nonlinear insert
+      :param float cn: scale parameter of the nonlinear insert (m^[1/2])
+
+   .. py:property:: particle_lost_diagnostics_backend
+
+      Diagnostics for particles lost in apertures.
+      See the ``BeamMonitor`` element for backend values.
 
    .. py:method:: init_grids()
 
@@ -188,7 +237,7 @@ Particles
 
    This class stores particles, distributed over MPI ranks.
 
-   .. py:method:: add_n_particles(lev, x, y, t, px, py, pt, qm, bchchg)
+   .. py:method:: add_n_particles(x, y, t, px, py, pt, qm, bchchg)
 
       Add new particles to the container for fixed s.
 
@@ -196,7 +245,6 @@ Particles
             been created, meaning after the call to :py:meth:`ImpactX.init_grids`
             has been made in the ImpactX class.
 
-      :param lev: mesh-refinement level
       :param x: positions in x
       :param y: positions in y
       :param t: positions as time-of-flight in c*t
@@ -271,31 +319,31 @@ Particles
 
    .. py:property:: px
 
-      momentum in x, normalized to proper velocity
+      momentum in x, normalized to mass*c, :math:`p_x = \gamma \beta_x`
 
    .. py:property:: py
 
-      momentum in y, normalized to proper velocity
+      momentum in y, normalized to mass*c, :math:`p_x = \gamma \beta_x`
 
    .. py:property:: pz
 
-      momentum in z, normalized to proper velocity
+      momentum in z, normalized to mass*c, :math:`p_x = \gamma \beta_x`
 
    .. py:property:: pt
 
-      energy deviation, normalized by rest energy
+      energy, normalized by rest energy, :math:`p_t = -\gamma`
 
    .. py:property:: gamma
 
-      Read-only: Get reference particle relativistic gamma.
+      Read-only: Get reference particle relativistic gamma, :math:`\gamma = 1/\sqrt{1-\beta^2}`
 
    .. py:property:: beta
 
-      Read-only: Get reference particle relativistic beta.
+      Read-only: Get reference particle relativistic beta, :math:`\beta = v/c`
 
    .. py:property:: beta_gamma
 
-      Read-only: Get reference particle beta*gamma
+      Read-only: Get reference particle :math:`\beta \cdot \gamma`
 
    .. py:property:: qm_qeeV
 
@@ -309,9 +357,9 @@ Particles
 
       Write-only: Set reference particle rest mass (MeV/c^2).
 
-   .. py:method:: set_energy_MeV(energy_MeV)
+   .. py:method:: set_kin_energy_MeV(kin_energy_MeV)
 
-      Write-only: Set reference particle energy.
+      Write-only: Set reference particle kinetic energy (MeV)
 
    .. py:method:: load_file(madx_file)
 
@@ -361,7 +409,7 @@ This module provides particle beam distributions that can be used to initialize 
 
 .. py:class:: impactx.distribution.None
 
-   This distribution does nothing.
+   This distribution sets all values to zero.
 
 .. py:class:: impactx.distribution.Semigaussian(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
@@ -377,6 +425,10 @@ This module provides particle beam distributions that can be used to initialize 
 .. py:class:: impactx.distribution.Waterbag(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A 6D Waterbag distribution.
+
+.. py:class:: impactx.distribution.Thermal(k, kT, kT_halo, normalize, normalize_halo, halo)
+
+   A 6D stationary thermal or bithermal distribution.
 
 
 Lattice Elements
@@ -410,7 +462,7 @@ This module provides elements for the accelerator lattice.
       :param madx_file: file name to MAD-X file with beamline elements
       :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.CFbend(ds, rc, k, nslice=1)
+.. py:class:: impactx.elements.CFbend(ds, rc, k, dx=0, dy=0, rotation=0, nslice=1)
 
    A combined function bending magnet.  This is an ideal Sbend with a normal quadrupole field component.
 
@@ -420,9 +472,12 @@ This module provides elements for the accelerator lattice.
               = (gradient in T/m) / (rigidity in T-m)
               k > 0 horizontal focusing
               k < 0 horizontal defocusing
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.ConstF(ds, kx, ky, kt, nslice=1)
+.. py:class:: impactx.elements.ConstF(ds, kx, ky, kt, dx=0, dy=0, rotation=0, nslice=1)
 
    A linear Constant Focusing element.
 
@@ -430,9 +485,24 @@ This module provides elements for the accelerator lattice.
    :param kx: Focusing strength for x in 1/m.
    :param ky: Focusing strength for y in 1/m.
    :param kt: Focusing strength for t in 1/m.
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.DipEdge(psi, rc, g, K2)
+   .. py:property:: kx
+
+      focusing x strength in 1/m
+
+   .. py:property:: ky
+
+      focusing y strength in 1/m
+
+   .. py:property:: kt
+
+      focusing t strength in 1/m
+
+.. py:class:: impactx.elements.DipEdge(psi, rc, g, K2, dx=0, dy=0, rotation=0)
 
    Edge focusing associated with bend entry or exit
 
@@ -440,6 +510,7 @@ This module provides elements for the accelerator lattice.
    Here we use the linear fringe field map, given to first order in g/rc (gap / radius of curvature).
 
    References:
+
    * K. L. Brown, SLAC Report No. 75 (1982).
    * K. Hwang and S. Y. Lee, PRAB 18, 122401 (2015).
 
@@ -447,53 +518,76 @@ This module provides elements for the accelerator lattice.
    :param rc: Radius of curvature in m
    :param g: Gap parameter in m
    :param K2: Fringe field integral (unitless)
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
 
-.. py:class:: impactx.elements.Drift(ds, nslice=1)
+.. py:class:: impactx.elements.Drift(ds, dx=0, dy=0, rotation=0, nslice=1)
 
    A drift.
 
    :param ds: Segment length in m
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.ChrDrift(ds, nslice=1)
+.. py:class:: impactx.elements.ChrDrift(ds, dx=0, dy=0, rotation=0, nslice=1)
 
    A drift with chromatic effects included.  The Hamiltonian is expanded
    through second order in the transverse variables (x,px,y,py), with the exact pt
    dependence retained.
 
    :param ds: Segment length in m
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.ExactDrift(ds, nslice=1)
+.. py:class:: impactx.elements.ExactDrift(ds, dx=0, dy=0, rotation=0, nslice=1)
 
    A drift using the exact nonlinear transfer map.
 
    :param ds: Segment length in m
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.Multipole(multipole, K_normal, K_skew)
+.. py:class:: impactx.elements.Kicker(xkick, ykick, units, dx=0, dy=0, rotation=0)
+
+   A thin transverse kicker.
+
+   :param xkick: horizontal kick strength (dimensionless OR T-m)
+   :param ykick: vertical kick strength (dimensionless OR T-m)
+   :param units: specification of units (``"dimensionless"`` in units of the magnetic rigidity of the reference particle or ``"T-m"``)
+
+.. py:class:: impactx.elements.Multipole(multipole, K_normal, K_skew, dx=0, dy=0, rotation=0)
 
    A general thin multipole element.
 
    :param multipole: index m (m=1 dipole, m=2 quadrupole, m=3 sextupole etc.)
    :param K_normal: Integrated normal multipole coefficient (1/meter^m)
    :param K_skew: Integrated skew multipole coefficient (1/meter^m)
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
 
 .. py::class:: impactx.elements.None
 
    This element does nothing.
 
-.. py:class:: impactx.elements.NonlinearLens(knll, cnll)
+.. py:class:: impactx.elements.NonlinearLens(knll, cnll, dx=0, dy=0, rotation=0)
 
    Single short segment of the nonlinear magnetic insert element.
 
    A thin lens associated with a single short segment of the
    nonlinear magnetic insert described by V. Danilov and
    S. Nagaitsev, PRSTAB 13, 084002 (2010), Sect. V.A.  This
-   element appears in MAD-X as type NLLENS.
+   element appears in MAD-X as type ``NLLENS``.
 
    :param knll: integrated strength of the nonlinear lens (m)
    :param cnll: distance of singularities from the origin (m)
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
 
 .. py:class:: impactx.elements.BeamMonitor(name, backend="default", encoding="g")
 
@@ -539,7 +633,7 @@ This module provides elements for the accelerator lattice.
          This function is called for the reference particle as it passes through the element.
          The reference particle is updated *before* the beam particles are pushed.
 
-.. py:class:: impactx.elements.Quad(ds, k, nslice=1)
+.. py:class:: impactx.elements.Quad(ds, k, dx=0, dy=0, rotation=0, nslice=1)
 
    A Quadrupole magnet.
 
@@ -548,9 +642,12 @@ This module provides elements for the accelerator lattice.
               = (gradient in T/m) / (rigidity in T-m)
               k > 0 horizontal focusing
               k < 0 horizontal defocusing
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.ChrQuad(ds, k, units, nslice=1)
+.. py:class:: impactx.elements.ChrQuad(ds, k, units, dx=0, dy=0, rotation=0, nslice=1)
 
    A Quadrupole magnet, with chromatic effects included.  The Hamiltonian is expanded
    through second order in the transverse variables (x,px,y,py), with the exact pt
@@ -563,9 +660,45 @@ This module provides elements for the accelerator lattice.
               k > 0 horizontal focusing
               k < 0 horizontal defocusing
    :param units: specification of units for quadrupole field strength
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.RFCavity(ds, escale, freq, phase, mapsteps, nslice)
+   .. py:property:: k
+
+      quadrupole strength in 1/m^2 (or T/m)
+
+   .. py:property:: units
+
+      unit specification for quad strength
+
+.. py:class:: impactx.elements.ChrAcc(ds, ez, bz, dx=0, dy=0, rotation=0, nslice=1)
+
+   Acceleration in a uniform field Ez, with a uniform solenoidal field Bz.
+
+   The Hamiltonian is expanded through second order in the
+   transverse variables (x,px,y,py), with the exact pt dependence retained.
+
+   :param ds: Segment length in m
+   :param ez: electric field strength in m^(-1)
+              = (charge * electric field Ez in V/m) / (m*c^2)
+   :param bz: magnetic field strength in m^(-1)
+              = (charge * magnetic field Bz in T) / (m*c)
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
+   :param nslice: number of slices used for the application of space charge
+
+   .. py:property:: ez
+
+      electric field strength in 1/m
+
+   .. py:property:: bz
+
+      magnetic field strength in 1/m
+
+.. py:class:: impactx.elements.RFCavity(ds, escale, freq, phase, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1)
 
    A radiofrequency cavity.
 
@@ -577,39 +710,63 @@ This module provides elements for the accelerator lattice.
    :param cos_coefficients: array of ``float`` cosine coefficients in Fourier expansion of on-axis electric field Ez (optional); default is a 9-cell TESLA superconducting cavity model from `DOI:10.1103/PhysRevSTAB.3.092001 <https://doi.org/10.1103/PhysRevSTAB.3.092001>`__
 
    :param cos_coefficients: array of ``float`` sine coefficients in Fourier expansion of on-axis electric field Ez (optional); default is a 9-cell TESLA superconducting cavity model from `DOI:10.1103/PhysRevSTAB.3.092001 <https://doi.org/10.1103/PhysRevSTAB.3.092001>`__
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.Sbend(ds, rc, nslice=1)
+.. py:class:: impactx.elements.Sbend(ds, rc, dx=0, dy=0, rotation=0, nslice=1)
 
    An ideal sector bend.
 
    :param ds: Segment length in m.
    :param rc: Radius of curvature in m.
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.ExactSbend(ds, phi, B, nslice=1)
+.. py:class:: impactx.elements.ExactSbend(ds, phi, B, dx=0, dy=0, rotation=0, nslice=1)
 
    An ideal sector bend using the exact nonlinear map.  The model consists of a uniform bending field B_y with a hard edge.  Pole faces are
    normal to the entry and exit velocity of the reference particle.
 
-References:
+   References:
+
    * D. L. Bruhwiler et al, in Proc. of EPAC 98, pp. 1171-1173 (1998).
    * E. Forest et al, Part. Accel. 45, pp. 65-94 (1994).
 
    :param ds: Segment length in m.
    :param phi: Bend angle in degrees.
    :param B: Magnetic field in Tesla; when B = 0 (default), the reference bending radius is defined by r0 = length / (angle in rad),   corresponding to a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B.
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.ShortRF(V, k)
+.. py:class:: impactx.elements.Buncher(V, k, dx=0, dy=0, rotation=0)
 
-   A short RF cavity element at zero crossing for bunching.
+   A short RF cavity element at zero crossing for bunching (MaryLie model).
 
    :param V: Normalized RF voltage drop V = Emax*L/(c*Brho)
    :param k: Wavenumber of RF in 1/m
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
 
-.. py:class:: impactx.elements.ChrUniformAcc(ds, k, nslice=1)
+.. py:class:: impactx.elements.ShortRF(V, freq, phase, dx=0, dy=0, rotation=0)
+
+   A short RF cavity element (MAD-X model).
+
+   :param V: Normalized RF voltage V = maximum energy gain/(m*c^2)
+   :param freq: RF frequency in Hz
+   :param phase: RF synchronous phase in degrees (phase = 0 corresponds to maximum energy gain, phase = -90 corresponds go zero energy gain for bunching)
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
+
+.. py:class:: impactx.elements.ChrUniformAcc(ds, k, dx=0, dy=0, rotation=0, nslice=1)
 
    A region of constant Ez and Bz for uniform acceleration, with chromatic effects included.
    The Hamiltonian is expanded through second order in the transverse variables (x,px,y,py),
@@ -620,10 +777,12 @@ References:
               = (particle charge in C * field Ez in V/m) / (particle mass in kg * (speed of light in m/s)^2)
    :param bz: Magnetic field strength in m^(-1)
               = (particle charge in C * field Bz in T) / (particle mass in kg * speed of light in m/s)
-
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.SoftSolenoid(ds, bscale, cos_coefficients, sin_coefficients, nslice=1)
+.. py:class:: impactx.elements.SoftSolenoid(ds, bscale, cos_coefficients, sin_coefficients, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1)
 
    A soft-edge solenoid.
 
@@ -633,15 +792,21 @@ References:
             (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
    :param sin_coefficients: array of ``float`` sine coefficients in Fourier expansion of on-axis magnetic field Bz
             (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.Sol(ds, ks, nslice=1)
+.. py:class:: impactx.elements.Sol(ds, ks, dx=0, dy=0, rotation=0, nslice=1)
 
    An ideal hard-edge Solenoid magnet.
 
    :param ds: Segment length in m.
    :param ks: Solenoid strength in m^(-1) (MADX convention) in (magnetic field Bz in T) / (rigidity in T-m)
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
 .. py:class:: impactx.elements.PRot(phi_in, phi_out)
@@ -650,8 +815,34 @@ References:
 
    :param phi_in: angle of the reference particle with respect to the longitudinal (z) axis in the original frame in degrees
    :param phi_out: angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame in degrees
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
 
-.. py:class:: impactx.elements.SoftQuadrupole(ds, gscale, cos_coefficients, sin_coefficients, nslice=1)
+.. py:class:: impactx.elements.Aperture(xmax, ymax, shape="rectangular", dx=0, dy=0, rotation=0)
+
+   A thin collimator element, applying a transverse aperture boundary.
+
+   :param xmax: maximum allowed value of the horizontal coordinate (meter)
+   :param ymax: maximum allowed value of the vertical coordinate (meter)
+   :param shape: aperture boundary shape: ``"rectangular"`` (default) or ``"elliptical"``
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
+
+   .. py:property:: shape
+
+      aperture type (rectangular, elliptical)
+
+   .. py:property:: xmax
+
+      maximum horizontal coordinate
+
+   .. py:property:: ymax
+
+      maximum vertical coordinate
+
+.. py:class:: impactx.elements.SoftQuadrupole(ds, gscale, cos_coefficients, sin_coefficients, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1)
 
    A soft-edge quadrupole.
 
@@ -661,8 +852,25 @@ References:
             (optional); default is a tanh fringe field model based on `<http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
    :param sin_coefficients: array of ``float`` sine coefficients in Fourier expansion of on-axis field gradient
             (optional); default is a tanh fringe field model based on `<http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf>`__
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
+
+.. py:class:: impactx.elements.ThinDipole(theta, rc, dx=0, dy=0, rotation=0)
+
+   A general thin dipole element.
+
+   :param theta: Bend angle (degrees)
+   :param rc: Effective curvature radius (meters)
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
+
+   Reference:
+
+   * G. Ripken and F. Schmidt, Thin-Lens Formalism for Tracking, CERN/SL/95-12 (AP), 1995.
 
 
 Coordinate Transformation
@@ -675,8 +883,7 @@ Coordinate Transformation
    :param to_fixed_t:
    :param to_fixed_s:
 
-Function
-.. py:method:: impactx.coordinate_transformation(pc, direction)
+.. py:function:: impactx.coordinate_transformation(pc, direction)
 
    Function to transform the coordinates of the particles in a particle container either to fixed :math:`t` or to fixed :math:`s`.
 

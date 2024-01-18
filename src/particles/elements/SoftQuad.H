@@ -12,6 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/integrators/Integrators.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 
@@ -111,7 +112,8 @@ namespace SoftQuadrupoleData
 
     struct SoftQuadrupole
     : public elements::BeamOptic<SoftQuadrupole>,
-      public elements::Thick
+      public elements::Thick,
+      public elements::Alignment
     {
         static constexpr auto name = "SoftQuadrupole";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -122,6 +124,9 @@ namespace SoftQuadrupoleData
          * @param gscale Scaling factor for on-axis field gradient Bz in 1/m^2
          * @param cos_coef cosine coefficients in Fourier expansion of on-axis magnetic field Bz
          * @param sin_coef sine coefficients in Fourier expansion of on-axis magnetic field Bz
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
@@ -131,17 +136,21 @@ namespace SoftQuadrupoleData
             amrex::ParticleReal gscale,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0,
             int mapsteps = 1,
             int nslice = 1
         )
           : Thick(ds, nslice),
+            Alignment(dx, dy, rotation_degree),
             m_gscale(gscale), m_mapsteps(mapsteps), m_id(SoftQuadrupoleData::next_id)
         {
             // next created soft quad has another id for its data
             SoftQuadrupoleData::next_id++;
 
             // validate sin and cos coefficients are the same length
-            m_ncoef = cos_coef.size();
+            m_ncoef = int(cos_coef.size());
             if (m_ncoef != int(sin_coef.size()))
                 throw std::runtime_error("SoftQuadrupole: cos and sin coefficients must have same length!");
 
@@ -190,6 +199,9 @@ namespace SoftQuadrupoleData
         {
             using namespace amrex::literals; // for _rt and _prt
 
+            // shift due to alignment errors of the element
+            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
             amrex::ParticleReal const y = p.pos(RealAoS::y);
@@ -227,6 +239,9 @@ namespace SoftQuadrupoleData
             px = pxout;
             py = pyout;
             pt = ptout;
+
+            // undo shift due to alignment errors of the element
+            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
         }
 
         /** This pushes the reference particle.
@@ -332,7 +347,7 @@ namespace SoftQuadrupoleData
             amrex::ParticleReal bfieldint = 0.0;
             amrex::ParticleReal const z = zeval - zmid;
 
-            if (abs(z)<=zmid)
+            if (std::abs(z) <= zmid)
             {
                bfield = 0.5_prt*cos_data[0];
                bfieldint = z*bfield;

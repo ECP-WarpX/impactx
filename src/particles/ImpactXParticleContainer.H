@@ -28,6 +28,12 @@
 
 namespace impactx
 {
+    enum class CoordSystem
+    {
+        s,  ///< fixed s as the independent variable
+        t   ///< fixed t as the independent variable
+    };
+
     /** AMReX pre-defined Real attributes
      *
      * These are the AMReX pre-defined struct indexes for the Real attributes
@@ -156,7 +162,6 @@ namespace impactx
          *       or AmrCore::InitFromCheckpoint has been made in the ImpactX
          *       class.
          *
-         * @param lev mesh-refinement level
          * @param x positions in x
          * @param y positions in y
          * @param t positions as time-of-flight in c*t
@@ -167,22 +172,33 @@ namespace impactx
          * @param bchchg total charge within a bunch in C
          */
         void
-        AddNParticles (int lev,
-                       amrex::Vector<amrex::ParticleReal> const & x,
-                       amrex::Vector<amrex::ParticleReal> const & y,
-                       amrex::Vector<amrex::ParticleReal> const & t,
-                       amrex::Vector<amrex::ParticleReal> const & px,
-                       amrex::Vector<amrex::ParticleReal> const & py,
-                       amrex::Vector<amrex::ParticleReal> const & pt,
-                       amrex::ParticleReal const & qm,
-                       amrex::ParticleReal const & bchchg);
+        AddNParticles (
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & x,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & y,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & t,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & px,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & py,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & pt,
+            amrex::ParticleReal qm,
+            amrex::ParticleReal bchchg
+        );
+
+        /** Register storage for lost particles
+         *
+         * @param lost_pc particle container for lost particles
+         */
+        void
+        SetLostParticleContainer (ImpactXParticleContainer * lost_pc);
+
+        ImpactXParticleContainer *
+        GetLostParticleContainer ();
 
         /** Set reference particle attributes
          *
          * @param refpart reference particle
          */
         void
-        SetRefParticle (RefPart const refpart);
+        SetRefParticle (RefPart const & refpart);
 
         /** Get reference particle attributes
          *
@@ -195,7 +211,7 @@ namespace impactx
          *
          * @returns refpart
          */
-        RefPart const
+        RefPart const &
         GetRefParticle () const;
 
         /** Update reference particle element edge
@@ -224,7 +240,7 @@ namespace impactx
          *
          * @param order the order of the particle shape
          */
-        void SetParticleShape (int const order);
+        void SetParticleShape (int order);
 
         /** Compute the min and max of the particle position in each dimension
          *
@@ -259,6 +275,25 @@ namespace impactx
         DepositCharge (std::unordered_map<int, amrex::MultiFab> & rho,
                        amrex::Vector<amrex::IntVect> const & ref_ratio);
 
+        /** Get the name of each Real AoS component */
+        std::vector<std::string>
+        RealAoS_names () const;
+
+        /** Get the name of each Real SoA component */
+        std::vector<std::string>
+        RealSoA_names () const;
+
+        /** Get the current coordinate system of particles in this container */
+        CoordSystem
+        GetCoordSystem () const;
+
+        /** Set the current coordinate system of particles in this container
+         *
+         * @param coord_system the new coordinate system the beam particles are in
+         */
+        void
+        SetCoordSystem (CoordSystem coord_system);
+
       private:
 
         //! the reference particle for the beam in the particle container
@@ -267,7 +302,25 @@ namespace impactx
         //! the particle shape
         std::optional<int> m_particle_shape;
 
+        //! a non-owning reference to lost particles, i.e., due to apertures
+        ImpactXParticleContainer* m_particles_lost = nullptr;
+
+        //! the current coordinate system of particles in this container
+        CoordSystem m_coordsystem = CoordSystem::s;
+
     }; // ImpactXParticleContainer
+
+    /** Get the name of each Real AoS component */
+    std::vector<std::string>
+    get_RealAoS_names ();
+
+    /** Get the name of each Real SoA component
+     *
+     * @param num_real_comps number of compile-time + runtime arrays
+     * @return names
+     */
+    std::vector<std::string>
+    get_RealSoA_names (int num_real_comps);
 
 } // namespace impactx
 

@@ -13,27 +13,16 @@
 #include "particles/ImpactXParticleContainer.H"
 
 
-namespace impactx
+namespace impactx::transformation
 {
-namespace transformation
-{
-    /** Direction of the \see CoordinateTransformation
-     */
-    enum class Direction
-    {
-        to_fixed_s,
-        to_fixed_t
-    };
-
     /** Transform the coordinate system of all particles
      *
      * @param pc container of the particles to push
      * @param direction the transformation (to fixed s or to fixed t)
      */
-    void CoordinateTransformation (ImpactXParticleContainer &pc,
-                                   Direction const & direction);
+    void CoordinateTransformation (ImpactXParticleContainer & pc,
+                                   CoordSystem direction);
 
-} // namespace transformation
-} // namespace impactx
+} // namespace impactx::transformation
 
 #endif // IMPACTX_COORDINATE_TRANSFORMATION_H

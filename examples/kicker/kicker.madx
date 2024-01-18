@@ -1,0 +1,9 @@
+beam, particle=electron, energy=2.0;
+
+M1: MONITOR, L=0.0;
+HK1: KICKER, hkick=2.0e-3, vkick=0.0;
+! TKICKER and KICKER are currently treated the exact same in ImpactX
+VK1: TKICKER, hkick=0.0, vkick=3.0e-3;
+
+KICKLATTICE: Line=(M1,HK1,VK1,M1);
+USE, SEQUENCE = KICKLATTICE;

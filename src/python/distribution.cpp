@@ -18,16 +18,16 @@ using namespace impactx;
 
 void init_distribution(py::module& m)
 {
-    py::module_ md = m.def_submodule(
+    py::module_ const md = m.def_submodule(
         "distribution",
         "Particle beam distributions in ImpactX"
     );
 
     py::class_<distribution::Gaussian>(md, "Gaussian")
         .def(py::init<
-                amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
@@ -37,9 +37,9 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::Kurth4D>(md, "Kurth4D")
         .def(py::init<
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
          >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
@@ -50,9 +50,9 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::Kurth6D>(md, "Kurth6D")
         .def(py::init<
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
@@ -64,9 +64,9 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::KVdist>(md, "KVdist")
         .def(py::init<
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
@@ -77,14 +77,14 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::None>(md, "None")
         .def(py::init<>(),
-             "This distribution does nothing"
+             "Sets all values to zero."
         );
 
     py::class_<distribution::Semigaussian>(md, "Semigaussian")
         .def(py::init<
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
@@ -92,11 +92,23 @@ void init_distribution(py::module& m)
              "A 6D Semi-Gaussian distribution (uniform in position, Gaussian in momentum)."
         );
 
+    py::class_<distribution::Thermal>(md, "Thermal")
+        .def(py::init<
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
+             >(),
+             py::arg("k"), py::arg("kT"), py::arg("kT_halo"),
+             py::arg("normalize"), py::arg("normalize_halo"),
+             py::arg("halo")=0.0,
+             "A stationary thermal or bithermal distribution\n\n"
+             "R. D. Ryne, J. Qiang, and A. Adelmann, in Proc. EPAC2004, pp. 1942-1944 (2004)"
+        );
+
     py::class_<distribution::Triangle>(md, "Triangle")
         .def(py::init<
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
@@ -108,9 +120,9 @@ void init_distribution(py::module& m)
 
     py::class_<distribution::Waterbag>(md, "Waterbag")
         .def(py::init<
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const,
-                 amrex::ParticleReal const, amrex::ParticleReal const, amrex::ParticleReal const
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
+                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
              py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
              py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),

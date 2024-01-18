@@ -11,6 +11,7 @@
 #define IMPACTX_NONLINEARLENS_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 #include "mixin/nofinalize.H"
@@ -26,6 +27,7 @@ namespace impactx
     struct NonlinearLens
     : public elements::BeamOptic<NonlinearLens>,
       public elements::Thin,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "NonlinearLens";
@@ -40,10 +42,19 @@ namespace impactx
          *
          * @param knll integrated strength of the nonlinear lens (m)
          * @param cnll distance of singularities from the origin (m)
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error in the transverse plane [degrees]
          */
-        NonlinearLens( amrex::ParticleReal const knll,
-                       amrex::ParticleReal const cnll )
-        : m_knll(knll), m_cnll(cnll)
+        NonlinearLens (
+            amrex::ParticleReal knll,
+            amrex::ParticleReal cnll,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0
+        )
+        : Alignment(dx, dy, rotation_degree),
+          m_knll(knll), m_cnll(cnll)
         {
         }
 
@@ -72,6 +83,9 @@ namespace impactx
             // a complex type with two amrex::ParticleReal
             using Complex = amrex::GpuComplex<amrex::ParticleReal>;
 
+            // shift due to alignment errors of the element
+            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+
             // access AoS data such as positions and cpu/id
             amrex::ParticleReal const x = p.pos(RealAoS::x);
             amrex::ParticleReal const y = p.pos(RealAoS::y);
@@ -89,8 +103,8 @@ namespace impactx
             // assign complex position zeta = (x + iy)/cnll
             Complex zeta(x, y);
             zeta = zeta/m_cnll;
-            Complex re1(1.0_prt, 0.0_prt);
-            Complex im1(0.0_prt, 1.0_prt);
+            Complex const re1(1.0_prt, 0.0_prt);
+            Complex const im1(0.0_prt, 1.0_prt);
 
             // compute croot = sqrt(1-zeta**2)
             Complex croot = amrex::pow(zeta, 2);
@@ -106,9 +120,9 @@ namespace impactx
             dF = dF + carcsin/amrex::pow(croot,3);
 
             // compute momentum kick
-            amrex::ParticleReal kick = -m_knll/m_cnll;
-            amrex::ParticleReal dpx = kick*dF.m_real;
-            amrex::ParticleReal dpy = -kick*dF.m_imag;
+            amrex::ParticleReal const kick = -m_knll/m_cnll;
+            amrex::ParticleReal const dpx = kick*dF.m_real;
+            amrex::ParticleReal const dpy = -kick*dF.m_imag;
 
             // advance position and momentum
             p.pos(RealAoS::x) = x;
@@ -125,6 +139,8 @@ namespace impactx
             py = pyout;
             pt = ptout;
 
+            // undo shift due to alignment errors of the element
+            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
         }
 
         /** This pushes the reference particle. */

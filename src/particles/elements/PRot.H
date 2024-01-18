@@ -18,6 +18,7 @@
 #include <ablastr/constant.H>
 
 #include <AMReX_Extension.H>
+#include <AMReX_Math.H>
 #include <AMReX_REAL.H>
 
 #include <cmath>
@@ -43,7 +44,10 @@ namespace impactx
          * @param phi_in Initial angle of reference trajectory w/r/t z (degrees)
          * @param phi_out Final angle of reference trajectory w/r/t/ z (degrees)
          */
-        PRot( amrex::ParticleReal const phi_in, amrex::ParticleReal const phi_out )
+        PRot (
+            amrex::ParticleReal phi_in,
+            amrex::ParticleReal phi_out
+        )
         : m_phi_in(phi_in * degree2rad), m_phi_out(phi_out * degree2rad)
         {
         }
@@ -62,12 +66,13 @@ namespace impactx
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
-                amrex::ParticleReal & AMREX_RESTRICT px,
-                amrex::ParticleReal & AMREX_RESTRICT py,
-                amrex::ParticleReal & AMREX_RESTRICT pt,
-                RefPart const & refpart) const {
-
+            PType & AMREX_RESTRICT p,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            RefPart const & refpart
+        ) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
             // access AoS data such as positions and cpu/id
@@ -84,27 +89,28 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // store rotation angle and initial, final values of pz
-            amrex::ParticleReal theta = m_phi_out - m_phi_in;
-            amrex::ParticleReal pz = sqrt(1.0_prt - 2.0_prt*pt/beta
-               + pow(pt,2) - pow(py,2) - pow(px + sin(m_phi_in),2));
-            amrex::ParticleReal pzf = pz*cos(theta) - (px +
-                 sin(m_phi_in))*sin(theta);
+            amrex::ParticleReal const theta = m_phi_out - m_phi_in;
+            auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);
+            auto const [sin_phi_in, cos_phi_in] = amrex::Math::sincos(m_phi_in);
+
+            amrex::ParticleReal const pz = sqrt(1.0_prt - 2.0_prt*pt/beta
+               + pow(pt,2) - pow(py,2) - pow(px + sin_phi_in,2));
+            amrex::ParticleReal const pzf = pz*cos_theta - (px + sin_phi_in)*sin_theta;
 
             // advance position and momentum
             p.pos(RealAoS::x) = x*pz/pzf;
-            pxout = px*cos(theta) + (pz - cos(m_phi_in))*sin(theta);
+            pxout = px*cos_theta + (pz - cos_phi_in)*sin_theta;
 
-            p.pos(RealAoS::y) = y + py*x*sin(theta)/pzf;
+            p.pos(RealAoS::y) = y + py*x*sin_theta/pzf;
             pyout = py;
 
-            p.pos(RealAoS::t) = t - (pt - 1.0_prt/beta)*x*sin(theta)/pzf;
+            p.pos(RealAoS::t) = t - (pt - 1.0_prt/beta)*x*sin_theta/pzf;
             ptout = pt;
 
             // assign updated momenta
             px = pxout;
             py = pyout;
             pt = ptout;
-
         }
 
         /** This pushes the reference particle. */
