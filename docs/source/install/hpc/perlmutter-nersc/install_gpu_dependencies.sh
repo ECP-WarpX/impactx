@@ -129,5 +129,5 @@ python3 -m pip install --upgrade matplotlib
 python3 -m pip install --upgrade yt
 # install or update impactx dependencies such as picmistandard
 python3 -m pip install --upgrade -r $HOME/src/impactx/requirements.txt
-python3 -m pip install cupy-cuda11x  # CUDA 11.7 compatible wheel
-python3 -m pip install --upgrade torch  # CUDA 11.7 compatible wheel
+python3 -m pip install cupy-cuda12x  # CUDA 12 compatible wheel
+python3 -m pip install --upgrade torch  # CUDA 12 compatible wheel
