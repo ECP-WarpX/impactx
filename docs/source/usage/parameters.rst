@@ -673,10 +673,8 @@ Numerics and algorithms
     High-order shape factors are computationally more expensive, but may increase the overall accuracy of the results.
     For production runs it is generally safer to use high-order shape factors, such as cubic order.
 
-* ``algo.space_charge`` (``boolean``, optional, default: ``true``)
+* ``algo.space_charge`` (``boolean``, optional, default: ``false``)
     Whether to calculate space charge effects.
-    This is in-development.
-    At the moment, this flag only activates coordinate transformations and charge deposition.
 
 * ``algo.mlmg_relative_tolerance`` (``float``, optional, default: ``1.e-7``)
     The relative precision with which the electrostatic space-charge fields should be calculated.

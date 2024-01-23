@@ -154,7 +154,7 @@ namespace impactx
         }
 
         amrex::ParmParse pp_algo("algo");
-        bool space_charge = true;
+        bool space_charge = false;
         pp_algo.queryAdd("space_charge", space_charge);
         amrex::Print() << " Space Charge effects: " << space_charge << "\n";
 

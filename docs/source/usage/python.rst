@@ -62,11 +62,9 @@ General
 
    .. py:property:: space_charge
 
-      Enable (``True``) or disable (``False``) space charge calculations (default: ``True``).
+      Enable (``True``) or disable (``False``) space charge calculations (default: ``False``).
 
       Whether to calculate space charge effects.
-      This is in-development.
-      At the moment, this flag only activates coordinate transformations and charge deposition.
 
    .. py:property:: mlmg_relative_tolerance
 
