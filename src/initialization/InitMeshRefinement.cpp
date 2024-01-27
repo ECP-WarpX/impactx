@@ -77,6 +77,20 @@ namespace detail
     {
         BL_PROFILE("ImpactX::ResizeMesh");
 
+        {
+            amrex::ParmParse pp_algo("algo");
+            bool space_charge = false;
+            pp_algo.query("space_charge", space_charge);
+            if (!space_charge)
+                ablastr::warn_manager::WMRecordWarning(
+                    "ImpactX::ResizeMesh",
+                    "This is a simulation without space charge. "
+                    "ResizeMesh (and pc.Redistribute) should only be called "
+                    "in space charge simulations.",
+                    ablastr::warn_manager::WarnPriority::high
+                );
+        }
+
         // Extract the min and max of the particle positions
         auto const [x_min, y_min, z_min, x_max, y_max, z_max] = amr_data->m_particle_container->MinAndMaxPositions();
 

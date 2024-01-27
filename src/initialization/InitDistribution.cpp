@@ -106,11 +106,19 @@ namespace impactx
                                                       ref.qm_qeeV(),
                                             bunch_charge * rel_part_this_proc);
 
-        // Resize the mesh to fit the spatial extent of the beam and then
-        // redistribute particles, so they reside on the MPI rank that is
-        // responsible for the respective spatial particle position.
-        this->ResizeMesh();
-        amr_data->m_particle_container->Redistribute();
+        bool space_charge = false;
+        amrex::ParmParse pp_algo("algo");
+        pp_algo.queryAdd("space_charge", space_charge);
+
+        // For pure tracking simulations, we keep the particles split equally
+        // on all MPI ranks, and ignore spatial "RealBox" extents of grids.
+        if (space_charge) {
+            // Resize the mesh to fit the spatial extent of the beam and then
+            // redistribute particles, so they reside on the MPI rank that is
+            // responsible for the respective spatial particle position.
+            this->ResizeMesh();
+            amr_data->m_particle_container->Redistribute();
+        }
     }
 
     void ImpactX::initBeamDistributionFromInputs ()

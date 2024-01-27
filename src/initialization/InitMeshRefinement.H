@@ -28,18 +28,27 @@ namespace impactx::initialization
     amrex::Vector<amrex::Real>
     read_mr_prob_relative ()
     {
+        amrex::ParmParse pp_algo("algo");
         amrex::ParmParse pp_amr("amr");
         amrex::ParmParse pp_geometry("geometry");
 
+        bool space_charge = false;
+        pp_algo.queryAdd("space_charge", space_charge);
+
         int max_level = 0;
         pp_amr.query("max_level", max_level);
+
+        if (max_level > 1 && !space_charge)
+            throw std::runtime_error(
+                "Mesh-refinement (amr.max_level>=0) is only supported with "
+                "space charge modeling (algo.space_charge=1).");
 
         // The box is expanded beyond the min and max of the particle beam.
         amrex::Vector<amrex::Real> prob_relative(max_level + 1, 1.0);
         prob_relative[0] = 3.0;  // top/bottom pad the beam on the lowest level by default by its width
         pp_geometry.queryarr("prob_relative", prob_relative);
 
-        if (prob_relative[0] < 3.0)
+        if (prob_relative[0] < 3.0 && space_charge)
             ablastr::warn_manager::WMRecordWarning(
                     "ImpactX::read_mr_prob_relative",
                     "Dynamic resizing of the mesh uses a geometry.prob_relative "
