@@ -40,4 +40,3 @@ algo.particle_shape = 2
 algo.space_charge = false
 
 amr.n_cell = 40 40 32
-geometry.prob_relative = 3.0
