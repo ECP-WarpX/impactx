@@ -9,6 +9,8 @@
  */
 #include "ImpactXParticleContainer.H"
 
+#include "initialization/AmrCoreData.H"
+
 #include <ablastr/constant.H>
 #include <ablastr/particles/ParticleMoments.H>
 
@@ -51,7 +53,7 @@ namespace impactx
         : amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
               info.SetDynamic(do_omp_dynamic())) {}
 
-    ImpactXParticleContainer::ImpactXParticleContainer (amrex::AmrCore* amr_core)
+    ImpactXParticleContainer::ImpactXParticleContainer (initialization::AmrCoreData* amr_core)
         : amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
     {
         SetParticleSize();

@@ -38,7 +38,7 @@ namespace impactx
     {
         BL_PROFILE("ImpactX::add_particles");
 
-        auto const & ref = m_particle_container->GetRefParticle();
+        auto const & ref = amr_data->m_particle_container->GetRefParticle();
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ref.charge_qe() != 0.0,
             "add_particles: Reference particle charge not yet set!");
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ref.mass_MeV() != 0.0,
@@ -102,15 +102,15 @@ namespace impactx
             distribution.finalize();
         }, distr);
 
-        m_particle_container->AddNParticles(x, y, t, px, py, pt,
-                                            ref.qm_qeeV(),
+        amr_data->m_particle_container->AddNParticles(x, y, t, px, py, pt,
+                                                      ref.qm_qeeV(),
                                             bunch_charge * rel_part_this_proc);
 
         // Resize the mesh to fit the spatial extent of the beam and then
         // redistribute particles, so they reside on the MPI rank that is
         // responsible for the respective spatial particle position.
         this->ResizeMesh();
-        m_particle_container->Redistribute();
+        amr_data->m_particle_container->Redistribute();
     }
 
     void ImpactX::initBeamDistributionFromInputs ()
@@ -154,7 +154,7 @@ namespace impactx
         }
 
         // set charge and mass and energy of ref particle
-        m_particle_container->GetRefParticle()
+        amr_data->m_particle_container->GetRefParticle()
                 .set_charge_qe(qe).set_mass_MeV(massE).set_kin_energy_MeV(kin_energy);
 
         int npart = 1;  // Number of simulation particles
@@ -341,6 +341,6 @@ namespace impactx
         }
 
         amrex::Print() << "Initialized beam distribution parameters" << std::endl;
-        amrex::Print() << "# of particles: " << m_particle_container->TotalNumberOfParticles() << std::endl;
+        amrex::Print() << "# of particles: " << amr_data->m_particle_container->TotalNumberOfParticles() << std::endl;
     }
 } // namespace impactx

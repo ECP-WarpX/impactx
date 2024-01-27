@@ -11,6 +11,7 @@
 #define IMPACTX_PARTICLE_CONTAINER_H
 
 #include "ReferenceParticle.H"
+#include "initialization/AmrCoreData_fwd.H"
 
 #include <AMReX_AmrCoreFwd.H>
 #include <AMReX_BaseFwd.H>
@@ -150,7 +151,7 @@ namespace impactx
         using const_iterator = impactx::ParConstIter;
 
         //! Construct a new particle container
-        ImpactXParticleContainer (amrex::AmrCore* amr_core);
+        ImpactXParticleContainer (initialization::AmrCoreData* amr_core);
 
         //! Destruct a particle container
         virtual ~ImpactXParticleContainer() = default;
