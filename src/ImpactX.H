@@ -12,14 +12,13 @@
 
 #include "particles/distribution/All.H"
 #include "particles/elements/All.H"
-#include "particles/ImpactXParticleContainer.H"
 
-#include <AMReX_AmrCore.H>
-#include <AMReX_MultiFab.H>
+#include "initialization/AmrCoreData.H"
+
+#include <AMReX_REAL.H>
 
 #include <list>
 #include <memory>
-#include <unordered_map>
 
 
 namespace impactx
@@ -28,8 +27,7 @@ namespace impactx
      *
      * This is the central ImpactX simulation class
      */
-    class ImpactX final
-        : public amrex::AmrCore
+    class ImpactX
     {
       public:
         /** Construct an ImpactX simulation object
@@ -47,7 +45,7 @@ namespace impactx
          * This must come first, before particle beams and lattice elements are
          * initialized.
          */
-        void initGrids ();
+        void init_grids ();
 
         /** Initialize the particle beam distribution
          *
@@ -100,32 +98,12 @@ namespace impactx
          */
         void init_warning_logger ();
 
-        //! Tag cells for refinement.  TagBoxArray tags is built on level lev grids.
-        void ErrorEst (int lev,
-                       amrex::TagBoxArray& tags,
-                       amrex::Real time,
-                       int ngrow) override;
+        /** The AMReX core object that contains AMR hierarchy, \see amrex::AmrCore
+         *
+         * Inside here, we store our particle containers and space charge fields.
+         */
+        std::unique_ptr<initialization::AmrCoreData> amr_data;
 
-      private:
-        //! Make a new level from scratch using provided BoxArray and DistributionMapping.
-        //! Only used during initialization.
-        void MakeNewLevelFromScratch (int lev, amrex::Real time, const amrex::BoxArray& ba,
-                                              const amrex::DistributionMapping& dm) override;
-
-        //! Make a new level using provided BoxArray and DistributionMapping and fill
-        //  with interpolated coarse level data.
-        void MakeNewLevelFromCoarse (int lev, amrex::Real time, const amrex::BoxArray& ba,
-                                             const amrex::DistributionMapping& dm) override;
-
-        //! Remake an existing level using provided BoxArray and DistributionMapping
-        //  and fill with existing fine and coarse data.
-        void RemakeLevel (int lev, amrex::Real time, const amrex::BoxArray& ba,
-                                  const amrex::DistributionMapping& dm) override;
-
-        //! Delete level data
-        void ClearLevel (int lev) override;
-
-      public:
         /** Resize the mesh, based on the extent of the bunch of particle
          *
          * This only changes the physical extent of the mesh, but not the
@@ -133,21 +111,28 @@ namespace impactx
          */
         void ResizeMesh ();
 
-        /** these are the physical/beam particles of the simulation */
-        std::unique_ptr<ImpactXParticleContainer> m_particle_container;
-
-        /** former beam particles that got lost in apertures, the wall, etc. */
-        std::unique_ptr<ImpactXParticleContainer> m_particles_lost;
-
-        /** charge density per level */
-        std::unordered_map<int, amrex::MultiFab> m_rho;
-        /** scalar potential per level */
-        std::unordered_map<int, amrex::MultiFab> m_phi;
-        /** space charge field (vector) per level */
-        std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > m_space_charge_field;
-
         /** these are elements defining the accelerator lattice */
         std::list<KnownElements> m_lattice;
+
+        /** Was init_grids already called?
+         *
+         * Some operations, like resizing a simulation in terms of cells and changing blocking
+         * factors are not possible after they were initialized in AMReX. This keeps track
+         * of this.
+         */
+        bool initialized ()
+        {
+            return m_grids_initialized;
+        }
+
+      private:
+        /** Keeps track if init_grids was called.
+         *
+         * Some operations, like resizing a simulation in terms of cells and changing blocking
+         * factors are not possible after they were initialized in AMReX. This keeps track
+         * of this.
+         */
+        bool m_grids_initialized = false;
     };
 
 } // namespace impactx

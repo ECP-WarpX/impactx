@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     BL_PROFILE_VAR("main()", pmain);
     {
         impactx::ImpactX impactX;
-        impactX.initGrids();
+        impactX.init_grids();
         impactX.initBeamDistributionFromInputs();
         impactX.initLatticeElementsFromInputs();
         impactX.evolve();

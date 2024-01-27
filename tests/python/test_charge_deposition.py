@@ -32,10 +32,10 @@ def test_charge_deposition(save_png=True):
     # Future:
     # sim.domain = amr.RealBox([1., 2., 3.], [4., 5., 6.])
     print(f"sim.n_cell={sim.n_cell}")
-    print(f"sim.domain={sim.domain}")
 
     sim.init_grids()
     assert sim.n_cell == [16, 24, 32]
+    print(f"sim.domain={sim.domain}")
 
     sim.init_beam_distribution_from_inputs()
     sim.init_lattice_elements_from_inputs()
