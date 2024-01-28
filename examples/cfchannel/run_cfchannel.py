@@ -55,7 +55,3 @@ sim.lattice.extend(
 
 # run simulation
 sim.evolve()
-
-# clean shutdown
-del sim
-amr.finalize()

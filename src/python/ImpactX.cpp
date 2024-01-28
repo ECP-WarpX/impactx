@@ -362,6 +362,9 @@ void init_ImpactX (py::module& m)
             "if there are unused parameters in the input."
         )
 
+        .def("finalize", &ImpactX::finalize,
+             "Deallocate all contexts and data."
+        )
         .def("init_grids", &ImpactX::init_grids,
              "Initialize AMReX blocks/grids for domain decomposition & space charge mesh.\n\n"
              "This must come first, before particle beams and lattice elements are initialized."

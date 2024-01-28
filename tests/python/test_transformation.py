@@ -80,7 +80,8 @@ def test_transformation():
     coordinate_transformation(pc, direction=CoordSystem.s)
     rbc_s = pc.reduced_beam_characteristics()
 
-    # clean shutdown
+    # finalize simulation
+    sim.finalize()
     del sim
 
     # assert that forward-inverse transformation of the beam leaves beam unchanged

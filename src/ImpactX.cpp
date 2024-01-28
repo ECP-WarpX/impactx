@@ -32,14 +32,33 @@
 #include <memory>
 
 
-namespace impactx
-{
-    ImpactX::ImpactX ()
-    {
+namespace impactx {
+    ImpactX::ImpactX() {
         // todo: if amr.n_cells is provided, overwrite/redefine AmrCore object
 
         // todo: if charge deposition and/or space charge are requested, require
         //       amr.n_cells from user inputs
+    }
+
+    ImpactX::~ImpactX()
+    {
+        if (m_grids_initialized)
+        {
+            this->finalize();
+            m_grids_initialized = false;
+        }
+
+    }
+
+    void ImpactX::finalize ()
+    {
+        m_lattice.clear();
+
+        // this one last
+        amr_data.reset();
+
+        if (amrex::Initialized())
+            amrex::Finalize();
     }
 
     void ImpactX::init_grids ()

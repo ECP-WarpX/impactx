@@ -61,3 +61,6 @@ def test_element_push():
 
     # alternative formulation
     push(pc, elements.Drift(0.25))
+
+    # finalize simulation
+    sim.finalize()

@@ -104,6 +104,9 @@ def test_charge_deposition(save_png=True):
         else:
             plt.show()
 
+    # finalize simulation
+    sim.finalize()
+
 
 # implement a direct script run mode, so we can run this directly too,
 # with interactive matplotlib windows, w/o pytest

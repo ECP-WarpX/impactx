@@ -57,7 +57,3 @@ sim.lattice.extend(multipole)
 
 # run simulation
 sim.evolve()
-
-# clean shutdown
-del sim
-amr.finalize()
