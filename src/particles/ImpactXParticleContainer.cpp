@@ -21,6 +21,7 @@
 #include <AMReX_ParmParse.H>
 #include <AMReX_ParticleTile.H>
 
+#include <algorithm>
 #include <stdexcept>
 
 
@@ -124,7 +125,19 @@ namespace impactx
         // number of particles to add
         int const np = x.size();
 
-        auto& particle_tile = DefineAndReturnParticleTile(0, 0, 0);
+        // we add particles to lev 0, tile 0 of the first box assigned to this proc
+        int lid = 0, gid = 0, tid = 0;
+        {
+            const auto& pmap = ParticleDistributionMap(lid).ProcessorMap();
+            auto it = std::find(pmap.begin(), pmap.end(), amrex::ParallelDescriptor::MyProc());
+            if (it == std::end(pmap)) {
+                amrex::Abort("Attempting to add particles to box that does not exist.");
+            } else {
+                gid = *it;
+            }
+        }
+        auto& particle_tile = DefineAndReturnParticleTile(lid, gid, tid);
+
         auto old_np = particle_tile.numParticles();
         auto new_np = old_np + np;
         particle_tile.resize(new_np);

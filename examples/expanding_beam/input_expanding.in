@@ -37,6 +37,10 @@ algo.space_charge = true
 # Space charge solver with one MR level
 amr.max_level = 1
 amr.n_cell = 16 16 20
+amr.blocking_factor_x = 16
+amr.blocking_factor_y = 16
+amr.blocking_factor_z = 4
+
 geometry.prob_relative = 3.0 1.1
 
 # Space charger solver without MR

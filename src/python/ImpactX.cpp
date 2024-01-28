@@ -92,35 +92,48 @@ void init_ImpactX (py::module& m)
                 amrex::ParmParse pp_amr("amr");
                 amrex::Vector<int> const n_cell_v(n_cell.begin(), n_cell.end());
                 pp_amr.addarr("n_cell", n_cell_v);
-
-                // note, this must be done *before* initGrids is called
-                /*
-                int const max_level = ix.maxLevel();
-                for (int lev=0; lev<=max_level; lev++) {
-                    ix.ClearLevel(lev);
-                    // TODO: more...
-                }
-                if (amrex::ParallelDescriptor::IOProcessor())
-                    ix.printGridSummary(amrex::OutStream(), 0, max_level);
-                */
             },
             "The number of grid points along each direction on the coarsest level."
-        )
+        );
 
+    for (int dir : {0, 1, 2}) {
+        std::string const dir_str = std::vector<std::string>{"x", "y", "z"}.at(dir);
+        std::string const bf_str = "blocking_factor_" + dir_str;
+        impactx
+            .def_property(bf_str.c_str(),
+                  [bf_str](ImpactX & /* ix */) {
+                      amrex::ParmParse pp_amr("amr");
+                      std::vector<int> blocking_factor_dir;
+                      pp_amr.queryarr(bf_str.c_str(), blocking_factor_dir);
+
+                      return blocking_factor_dir;
+                  },
+                  [bf_str](ImpactX &ix, std::vector<int> blocking_factor_dir) {
+                      if (ix.initialized())
+                          throw std::runtime_error("Read-only parameter after init_grids was called.");
+
+                      amrex::ParmParse pp_amr("amr");
+                      pp_amr.addarr(bf_str.c_str(), blocking_factor_dir);
+                  },
+                  "AMReX blocking factor for a direction, per MR level."
+            );
+    }
+
+    impactx
         // from amrex::AmrMesh
         .def_property("max_level",
-            [](ImpactX & ix){ return ix.amr_data->maxLevel(); },
-            [](ImpactX & ix, int /* max_level */) {
+            [](ImpactX & /* ix */){
+                int max_level = 0;
+                amrex::ParmParse pp_amr("amr");
+                pp_amr.query("max_level", max_level);
+                return max_level;
+            },
+            [](ImpactX & ix, int max_level) {
                 if (ix.initialized())
                     throw std::runtime_error("Read-only parameter after init_grids was called.");
 
-                throw std::runtime_error("setting n_cell is not yet implemented");
-                /*
                 amrex::ParmParse pp_amr("amr");
                 pp_amr.add("max_level", max_level);
-                */
-
-                // note, this must be done *before* initGrids is called
             },
             "The maximum mesh-refinement level for the simulation."
         )

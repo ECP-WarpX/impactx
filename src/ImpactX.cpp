@@ -56,27 +56,6 @@ namespace impactx
         // move old diagnostics out of the way
         amrex::UtilCreateCleanDirectory("diags", true);
 
-        // n_cells has been set using temporary values earlier. We now know the true value of
-        // n_cells, so we recompute the Geometry objects for each level here *if* the user
-        // has set n_cells in the inputs file
-        {
-            amrex::Vector<int> n_cell(AMREX_SPACEDIM);
-            amrex::ParmParse const pp_amr("amr");
-            pp_amr.queryarr("n_cell", n_cell);
-
-            amrex::IntVect const lo(amrex::IntVect::TheZeroVector());
-            amrex::IntVect hi(n_cell);
-            hi -= amrex::IntVect::TheUnitVector();
-            amrex::Box index_domain(lo,hi);
-            for (int i = 0; i <= amr_data->maxLevel(); i++)
-            {
-                amr_data->Geom(i).Domain(index_domain);
-                if (i < amr_data->maxLevel()) {
-                    index_domain.refine(amr_data->refRatio(i));
-                }
-            }
-        }
-
         // the particle container has been set to track the same Geometry as ImpactX
 
         // this is the earliest point that we need to know the particle shape,
@@ -154,8 +133,8 @@ namespace impactx
         }
 
         amrex::ParmParse pp_algo("algo");
-        bool space_charge = true;
-        pp_algo.queryAdd("space_charge", space_charge);
+        bool space_charge = false;
+        pp_algo.query("space_charge", space_charge);
         amrex::Print() << " Space Charge effects: " << space_charge << "\n";
 
         // periods through the lattice
@@ -185,7 +164,7 @@ namespace impactx
 
                     // Space-charge calculation: turn off if there is only 1 particle
                     if (space_charge &&
-                        amr_data->m_particle_container->TotalNumberOfParticles(false, false) > 1) {
+                        amr_data->m_particle_container->TotalNumberOfParticles(true, false)) {
 
                         // transform from x',y',t to x,y,z
                         transformation::CoordinateTransformation(
