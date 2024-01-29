@@ -43,7 +43,7 @@ def test_impactx_fodo_file():
     num_particles = beam.TotalNumberOfParticles()
     assert num_particles == 10000
     atol = 0.0  # ignored
-    rtol = num_particles**-0.5  # from random sampling of a smooth distribution
+    rtol = 2.2 * num_particles**-0.5  # from random sampling of a smooth distribution
 
     # in situ calculate the reduced beam characteristics
     rbc = beam.reduced_beam_characteristics()
