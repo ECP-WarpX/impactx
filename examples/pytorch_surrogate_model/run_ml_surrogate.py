@@ -265,4 +265,3 @@ for i in range(N_stage):
 sim.lattice.extend([monitor])
 
 sim.evolve()
-del sim

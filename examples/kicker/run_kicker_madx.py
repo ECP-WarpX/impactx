@@ -48,7 +48,3 @@ sim.lattice.load_file("kicker.madx", nslice=1)
 
 # run simulation
 sim.evolve()
-
-# clean shutdown
-del sim
-amr.finalize()

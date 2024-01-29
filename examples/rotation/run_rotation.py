@@ -57,7 +57,3 @@ sim.lattice.extend(rotated_drift)
 
 # run simulation
 sim.evolve()
-
-# clean shutdown
-del sim
-amr.finalize()

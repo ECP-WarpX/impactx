@@ -64,7 +64,3 @@ sim.periods = 150
 
 # run simulation
 sim.evolve()
-
-# clean shutdown
-del sim
-amr.finalize()

@@ -40,6 +40,14 @@ namespace impactx
         void operator= (ImpactX const&) = delete;
         void operator= (ImpactX &&) = delete;
 
+        /** Destruct the ImpactX simulation object
+         */
+        ~ImpactX ();
+
+        /** Deallocate all contexts and data
+         */
+        void finalize ();
+
         /** Initialize AMReX blocks/grids for domain decomposition & space charge mesh.
          *
          * This must come first, before particle beams and lattice elements are

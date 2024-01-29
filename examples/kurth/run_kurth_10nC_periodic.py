@@ -54,7 +54,3 @@ sim.lattice.extend([monitor, drift1, constf1, drift1, monitor])
 
 # run simulation
 sim.evolve()
-
-# clean shutdown
-del sim
-amr.finalize()

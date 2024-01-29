@@ -37,4 +37,5 @@ def amrex_init(tmpdir):
             ]
         )
         yield
-        amr.finalize()
+        if amr.initialized():
+            amr.finalize()
