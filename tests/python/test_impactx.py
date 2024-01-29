@@ -15,7 +15,7 @@ import amrex.space3d as amr
 import impactx
 from impactx import ImpactX, RefPart, distribution, elements
 
-# FIXME in AMReX
+# FIXME in AMReX via https://github.com/AMReX-Codes/amrex/pull/3727
 # def test_impactx_module():
 #    """
 #    Tests the basic modules we provide.
