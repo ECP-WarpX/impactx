@@ -63,13 +63,13 @@ q5 = elements.ChrPlasmaLens(ds=1.041842576046930486, g=3127.707468391874166, nsl
 q6 = elements.ChrPlasmaLens(ds=0.176038957633108457, g=528.485181135649785, nslice=ns)
 q7 = elements.ChrPlasmaLens(ds=0.331817852986604588, g=996.147787384348956, nslice=ns)
 
-#q1 = elements.ChrPlasmaLens(ds=0.331817852986604588, k=2.98636067687944129, nslice=ns)
-#q2 = elements.ChrPlasmaLens(ds=0.176038957633108457, k=1.584350618697976110, nslice=ns)
-#q3 = elements.ChrPlasmaLens(ds=1.041842576046930486, k=9.37658318442237437, nslice=ns)
-#q4 = elements.ChrPlasmaLens(ds=0.334367090894399520, k=1.50465190902479784, nslice=ns)
-#q5 = elements.ChrPlasmaLens(ds=1.041842576046930486, k=9.37658318442237437, nslice=ns)
-#q6 = elements.ChrPlasmaLens(ds=0.176038957633108457, k=1.584350618697976110, nslice=ns)
-#q7 = elements.ChrPlasmaLens(ds=0.331817852986604588, k=2.98636067687944129, nslice=ns)
+# q1 = elements.ChrPlasmaLens(ds=0.331817852986604588, k=2.98636067687944129, nslice=ns)
+# q2 = elements.ChrPlasmaLens(ds=0.176038957633108457, k=1.584350618697976110, nslice=ns)
+# q3 = elements.ChrPlasmaLens(ds=1.041842576046930486, k=9.37658318442237437, nslice=ns)
+# q4 = elements.ChrPlasmaLens(ds=0.334367090894399520, k=1.50465190902479784, nslice=ns)
+# q5 = elements.ChrPlasmaLens(ds=1.041842576046930486, k=9.37658318442237437, nslice=ns)
+# q6 = elements.ChrPlasmaLens(ds=0.176038957633108457, k=1.584350618697976110, nslice=ns)
+# q7 = elements.ChrPlasmaLens(ds=0.331817852986604588, k=2.98636067687944129, nslice=ns)
 
 lattice_line = [
     monitor,
