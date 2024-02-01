@@ -1,0 +1,73 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 100000
+beam.units = static
+beam.kin_energy = 100.0e3  # 100 GeV nominal energy
+beam.charge = 1.0e-9
+beam.particle = electron
+beam.distribution = gaussian
+beam.sigmaX = 1.288697604e-6
+beam.sigmaY = 1.288697604e-6
+beam.sigmaT = 1.0e-6
+beam.sigmaPx = 3.965223396e-6
+beam.sigmaPy = 3.965223396e-6
+beam.sigmaPt = 0.01  #1% energy spread
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor dr1 q1 dr2 q2 dr2 q3 dr2 q4 dr2 q5 dr2 q6 dr2 q7 dr1 monitor
+lattice.nslice = 1
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+dr1.type = drift_chromatic
+dr1.ds = 1.0
+
+dr2.type = drift_chromatic
+dr2.ds = 2.0
+
+q1.type = plasma_lens_chromatic
+q1.ds = 0.331817852986604588
+q1.k = 2.98636067687944129
+
+q2.type = plasma_lens_chromatic
+q2.ds = 0.176038957633108457
+q2.k = 1.584350618697976110
+
+q3.type = plasma_lens_chromatic
+q3.ds = 1.041842576046930486
+q3.k = 9.37658318442237437
+
+q4.type = plasma_lens_chromatic
+q4.ds = 0.334367090894399520
+q4.k = 1.50465190902479784
+
+q5.type = plasma_lens_chromatic
+q5.ds = 1.041842576046930486
+q5.k = 9.37658318442237437
+
+q6.type = plasma_lens_chromatic
+q6.ds = 0.176038957633108457
+q6.k = 1.584350618697976110
+
+q7.type = plasma_lens_chromatic
+q7.ds = 0.331817852986604588
+q7.k = 2.98636067687944129
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = true
