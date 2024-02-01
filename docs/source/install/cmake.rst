@@ -122,7 +122,7 @@ By default, the most important dependencies of ImpactX are automatically downloa
 CMake Option                  Default & Values                               Description
 ============================= ============================================== ===========================================================
 ``BUILD_SHARED_LIBS``         ON/**OFF**                                     Build shared libraries for dependencies
-``CCACHE_PROGRAM``            First found ``ccache`` executable.             Set to ``-DCCACHE_PROGRAM=NO`` to disable CCache.
+``ImpactX_CCACHE``            **ON**/OFF                                     Search and use CCache to speed up rebuilds.
 ``ImpactX_ablastr_src``       *None*                                         Path to ABLASTR source directory (preferred if set)
 ``ImpactX_ablastr_repo``      ``https://github.com/ECP-WarpX/WarpX.git``     Repository URI to pull and build ABLASTR from
 ``ImpactX_ablastr_branch``    *we set and maintain a compatible commit*      Repository branch for ``ImpactX_ablastr_repo``
