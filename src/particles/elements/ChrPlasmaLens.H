@@ -56,7 +56,7 @@ namespace impactx
         )
         : Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
-          m_g(g), m_unit(unit)
+          m_g(g)
         {
         }
 
