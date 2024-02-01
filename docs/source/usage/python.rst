@@ -673,8 +673,8 @@ This module provides elements for the accelerator lattice.
 
 .. py:class:: impactx.elements.ChrPlasmaLens(ds, g, dx=0, dy=0, rotation=0, nslice=1)
 
-   An active cylindrically symmetric plasma lens, with chromatic effects included.  
-   The Hamiltonian is expanded through second order in the transverse variables 
+   An active cylindrically symmetric plasma lens, with chromatic effects included.
+   The Hamiltonian is expanded through second order in the transverse variables
    (x,px,y,py), with the exact pt dependence retained.
 
    :param ds: Segment length in m.
