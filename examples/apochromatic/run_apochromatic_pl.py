@@ -63,7 +63,25 @@ q5 = elements.ChrPlasmaLens(ds=1.041842576046930486, k=9.37658318442237437, nsli
 q6 = elements.ChrPlasmaLens(ds=0.176038957633108457, k=1.584350618697976110, nslice=ns)
 q7 = elements.ChrPlasmaLens(ds=0.331817852986604588, k=2.98636067687944129, nslice=ns)
 
-lattice_line = [monitor, dr1, q1, dr2, q2, dr2, q3, dr2, q4, dr2, q5, dr2, q6, dr2, q7, dr1, monitor]
+lattice_line = [
+    monitor,
+    dr1,
+    q1,
+    dr2,
+    q2,
+    dr2,
+    q3,
+    dr2,
+    q4,
+    dr2,
+    q5,
+    dr2,
+    q6,
+    dr2,
+    q7,
+    dr1,
+    monitor,
+]
 
 # define the lattice
 sim.lattice.extend(lattice_line)
