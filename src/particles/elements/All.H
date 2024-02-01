@@ -14,6 +14,7 @@
 #include "Buncher.H"
 #include "CFbend.H"
 #include "ChrDrift.H"
+#include "ChrPlasmaLens.H"
 #include "ChrQuad.H"
 #include "ChrUniformAcc.H"
 #include "ConstF.H"
@@ -49,6 +50,7 @@ namespace impactx
         CFbend,
         ChrAcc,
         ChrDrift,
+        ChrPlasmaLens,
         ChrQuad,
         ConstF,
         diagnostics::BeamMonitor,
