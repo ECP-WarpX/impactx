@@ -784,14 +784,14 @@ add_impactx_test(apochromat.py
 # Apochromat drift-plasma lens example ###################################################
 #
 # w/o space charge
-add_impactx_test(apochromat
+add_impactx_test(apochromat_pl
     examples/apochromatic/input_apochromatic_pl.in
       ON  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
     examples/apochromatic/analysis_apochromatic_pl.py
     OFF  # no plot script yet
 )
-add_impactx_test(apochromat.py
+add_impactx_test(apochromat_pl.py
     examples/apochromatic/run_apochromatic_pl.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
