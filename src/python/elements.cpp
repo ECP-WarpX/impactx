@@ -261,6 +261,32 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ChrQuad);
 
+    py::class_<ChrPlasmaLens, elements::Thick, elements::Alignment> py_ChrPlasmaLens(me, "ChrPlasmaLens");
+    py_ChrPlasmaLens
+        .def(py::init<
+                amrex::ParticleReal,
+                amrex::ParticleReal,
+                amrex::ParticleReal,
+                amrex::ParticleReal,
+                amrex::ParticleReal,
+                int
+             >(),
+             py::arg("ds"),
+             py::arg("g"),
+             py::arg("dx") = 0,
+             py::arg("dy") = 0,
+             py::arg("rotation") = 0,
+             py::arg("nslice") = 1,
+             "An active Plasma Lens with chromatic effects included."
+        )
+        .def_property("g",
+            [](ChrPlasmaLens & cq) { return cq.m_g; },
+            [](ChrPlasmaLens & cq, amrex::ParticleReal g) { cq.m_g = g; },
+            "azimuthal magnetic field gradient in T/m"
+        )
+    ;
+    register_beamoptics_push(py_ChrPlasmaLens);
+
     py::class_<ChrAcc, elements::Thick, elements::Alignment> py_ChrAcc(me, "ChrAcc");
     py_ChrAcc
         .def(py::init<

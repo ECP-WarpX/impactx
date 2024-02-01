@@ -671,6 +671,23 @@ This module provides elements for the accelerator lattice.
 
       unit specification for quad strength
 
+.. py:class:: impactx.elements.ChrPlasmaLens(ds, g, dx=0, dy=0, rotation=0, nslice=1)
+
+   An active cylindrically symmetric plasma lens, with chromatic effects included.  
+   The Hamiltonian is expanded through second order in the transverse variables 
+   (x,px,y,py), with the exact pt dependence retained.
+
+   :param ds: Segment length in m.
+   :param g:  Azimuthal magnetic field gradient in T/m (g > 0)
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
+   :param nslice: number of slices used for the application of space charge
+
+   .. py:property:: g
+
+      azimuthal magnetic field gradient in T/m
+
 .. py:class:: impactx.elements.ChrAcc(ds, ez, bz, dx=0, dy=0, rotation=0, nslice=1)
 
    Acceleration in a uniform field Ez, with a uniform solenoidal field Bz.
