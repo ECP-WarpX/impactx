@@ -763,7 +763,7 @@ add_impactx_test(aperture.py
     OFF  # no plot script yet
 )
 
-# Apochromat example ##########################################################
+# Apochromat drift-quad example ##########################################################
 #
 # w/o space charge
 add_impactx_test(apochromat
@@ -778,6 +778,24 @@ add_impactx_test(apochromat.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/apochromatic/analysis_apochromatic.py
+    OFF  # no plot script yet
+)
+
+# Apochromat drift-plasma lens example ###################################################
+#
+# w/o space charge
+add_impactx_test(apochromat_pl
+    examples/apochromatic/input_apochromatic_pl.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/apochromatic/analysis_apochromatic_pl.py
+    OFF  # no plot script yet
+)
+add_impactx_test(apochromat_pl.py
+    examples/apochromatic/run_apochromatic_pl.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/apochromatic/analysis_apochromatic_pl.py
     OFF  # no plot script yet
 )
 
