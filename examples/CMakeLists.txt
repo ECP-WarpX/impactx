@@ -798,3 +798,21 @@ add_impactx_test(alignment.py
     examples/alignment/analysis_alignment.py
     OFF  # no plot script yet
 )
+
+# Tune Calculation ###########################################################
+#
+# w/o space charge
+add_impactx_test(fodo_tune
+    examples/fodo_tune/input_fodo_tune.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/fodo_tune/analysis_fodo_tune.py
+    OFF  # no plot script yet
+)
+add_impactx_test(fodo_tune.py
+    examples/fodo_tune/run_fodo_tune.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/fodo_tune/analysis_fodo_tune.py
+    OFF  # no plot script yet
+)
