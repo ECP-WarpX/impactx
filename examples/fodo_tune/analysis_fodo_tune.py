@@ -88,8 +88,8 @@ print()
 
 
 # Approximate the tune using average phase advance (APA) - 1 period
-tune3 = np.angle(z[5] / z[4]) / (2.0 * np.pi)
-print(f"tune from phase = {tune3}")
+tune3 = np.angle(z[1] / z[0]) / (2.0 * np.pi)
+print(f"tune from phase advance = {tune3}")
 print()
 
 
