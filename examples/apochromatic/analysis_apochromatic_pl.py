@@ -92,7 +92,7 @@ final["divergence_y"] = yp
 print("")
 print("Final Beam:")
 sigx, sigy, sigt, emittance_xf, emittance_yf, emittance_tf = get_moments(final)
-demittance_x = 100 * abs(emittance_xf - emittance_x) / emittance_x 
+demittance_x = 100 * abs(emittance_xf - emittance_x) / emittance_x
 demittance_y = 100 * abs(emittance_yf - emittance_y) / emittance_y
 demittance_t = 100 * abs(emittance_tf - emittance_t) / emittance_t
 
