@@ -5,8 +5,6 @@
 # License: BSD-3-Clause-LBNL
 #
 
-import cmath
-
 import PyNAFF as pnf
 import numpy as np
 import openpmd_api as io
