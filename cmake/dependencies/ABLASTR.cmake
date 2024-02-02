@@ -144,7 +144,7 @@ macro(find_ablastr)
         set(COMPONENT_DIM 3D)
         set(COMPONENT_PRECISION ${ImpactX_PRECISION} P${ImpactX_PRECISION})
 
-        find_package(ABLASTR 24.01 CONFIG REQUIRED COMPONENTS ${COMPONENT_DIM})
+        find_package(ABLASTR 24.02 CONFIG REQUIRED COMPONENTS ${COMPONENT_DIM})
         message(STATUS "ABLASTR: Found version '${ABLASTR_VERSION}'")
     endif()
 
@@ -178,7 +178,7 @@ set(ImpactX_openpmd_src ""
 set(ImpactX_ablastr_repo "https://github.com/ECP-WarpX/WarpX.git"
     CACHE STRING
     "Repository URI to pull and build ABLASTR from if(ImpactX_ablastr_internal)")
-set(ImpactX_ablastr_branch "24.01"
+set(ImpactX_ablastr_branch "24.02"
     CACHE STRING
     "Repository branch for ImpactX_ablastr_repo if(ImpactX_ablastr_internal)")
 
