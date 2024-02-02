@@ -38,7 +38,15 @@ set_cxx17_superbuild()
 # this is an optional tool that stores compiled object files; allows fast
 # re-builds even with "make clean" in between. Mainly used to store AMReX
 # objects
-set_ccache()
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    set(ImpactX_CCACHE_DEFAULT ON)
+else()
+    set(ImpactX_CCACHE_DEFAULT OFF)  # we are a subproject in a superbuild
+endif()
+option(ImpactX_CCACHE "Enable ccache for faster rebuilds" ${ImpactX_CCACHE_DEFAULT})
+if(ImpactX_CCACHE)
+    set_ccache()
+endif()
 
 
 # Output Directories ##########################################################
