@@ -266,23 +266,30 @@ void init_elements(py::module& m)
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
+                int,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 int
              >(),
              py::arg("ds"),
-             py::arg("g"),
+             py::arg("k"),
+             py::arg("units") = 0,
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
              "An active Plasma Lens with chromatic effects included."
         )
-        .def_property("g",
-            [](ChrPlasmaLens & cq) { return cq.m_g; },
-            [](ChrPlasmaLens & cq, amrex::ParticleReal g) { cq.m_g = g; },
-            "azimuthal magnetic field gradient in T/m"
+        .def_property("k",
+            [](ChrQuad & cq) { return cq.m_k; },
+            [](ChrQuad & cq, amrex::ParticleReal k) { cq.m_k = k; },
+            "focusing strength in 1/m^2 (or T/m)"
+        )
+        .def_property("units",
+            [](ChrQuad & cq) { return cq.m_unit; },
+            [](ChrQuad & cq, int unit) { cq.m_unit = unit; },
+            "unit specification for focusing strength"
         )
     ;
     register_beamoptics_push(py_ChrPlasmaLens);

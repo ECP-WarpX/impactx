@@ -678,15 +678,22 @@ This module provides elements for the accelerator lattice.
    (x,px,y,py), with the exact pt dependence retained.
 
    :param ds: Segment length in m.
-   :param g:  Azimuthal magnetic field gradient in T/m (g > 0)
+   :param k:  focusing strength in m^(-2) (if units = 0)
+              = (azimuthal magnetic field gradient in T/m) / (rigidity in T-m)
+          OR  azimuthal magnetic field gradient in T/m (if units = 1)
+   :param units: specification of units for plasma lens focusing strength
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-   .. py:property:: g
+   .. py:property:: k
 
-      azimuthal magnetic field gradient in T/m
+      plasma lens focusing strength in 1/m^2 (or T/m)
+
+   .. py:property:: units
+
+      unit specification for plasma lens focusing strength
 
 .. py:class:: impactx.elements.ChrAcc(ds, ez, bz, dx=0, dy=0, rotation=0, nslice=1)
 

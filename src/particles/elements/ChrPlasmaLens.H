@@ -39,7 +39,12 @@ namespace impactx
          * transverse variables (x,px,y,py), with the exact pt dependence retained.
          *
          * @param ds Segment length in m.
-         * @param g Azimuthal magnetic field gradient in T/m (g > 0)
+         * @param k  plasma lens focusing strength in m^(-2)
+         *           = (azimuthal field gradient in T/m) / (rigidity in T-m)
+         *        OR azimuthal magnetic field gradient in T/m (k > 0)
+         * @param unit  Unit specification
+         *           unit = 0 focusing strength in m^(-2)
+         *           unit = 1 focusing strength in T/m
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
@@ -47,7 +52,8 @@ namespace impactx
          */
         ChrPlasmaLens (
             amrex::ParticleReal ds,
-            amrex::ParticleReal g,
+            amrex::ParticleReal k,
+            int unit,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
@@ -55,7 +61,7 @@ namespace impactx
         )
         : Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
-          m_g(g)
+          m_k(k), m_unit(unit)
         {
         }
 
@@ -95,8 +101,11 @@ namespace impactx
             // access reference particle values to find beta
             amrex::ParticleReal const bet = refpart.beta();
 
-            // normalize focusing strength to magnetic rigidity
-            amrex::ParticleReal g = m_g / refpart.rigidity_Tm();
+            // normalize quad units to MAD-X convention if needed
+            amrex::ParticleReal g = m_k;
+            if (m_unit == 1) {
+                  g = m_k / refpart.rigidity_Tm();
+            }
 
             // compute particle momentum deviation delta + 1
             amrex::ParticleReal delta1;
@@ -190,7 +199,8 @@ namespace impactx
             refpart.s = s + slice_ds;
         }
 
-        amrex::ParticleReal m_g; //! magnetic field gradient in T/m
+        amrex::ParticleReal m_k; //! focusing strength in 1/m^2 (or T/m)
+        int m_unit; //! unit specification for focusing strength
     };
 
 } // namespace impactx

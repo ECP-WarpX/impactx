@@ -367,7 +367,12 @@ Lattice Elements
            This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-            * ``<element_name>.g`` (``float``, in T/m) the azimuthal magnetic field gradient in T/m
+            * ``<element_name>.k`` (``float``, in inverse meters squared OR in T/m) the plasma lens focusing strength
+                = (azimuthal magnetic field gradient in T/m) / (magnetic rigidity in T-m) - if units = 0
+
+             OR = azimuthal magnetic field gradient in T/m - if units = 1
+
+            * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
             * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
             * ``<element_name>.dy`` (``float``, in meters) vertical translation error
             * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
