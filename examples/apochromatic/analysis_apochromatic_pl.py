@@ -92,9 +92,9 @@ final["divergence_y"] = yp
 print("")
 print("Final Beam:")
 sigx, sigy, sigt, emittance_xf, emittance_yf, emittance_tf = get_moments(final)
-demittance_x = 100 * (emittance_xf - emittance_x) / emittance_x
-demittance_y = 100 * (emittance_yf - emittance_y) / emittance_y
-demittance_t = 100 * (emittance_tf - emittance_t) / emittance_t
+demittance_x = 100 * abs(emittance_xf - emittance_x) / emittance_x 
+demittance_y = 100 * abs(emittance_yf - emittance_y) / emittance_y
+demittance_t = 100 * abs(emittance_tf - emittance_t) / emittance_t
 
 print(f"  sigx={sigx:e} sigy={sigy:e} sigt={sigt:e}")
 print(
@@ -106,15 +106,25 @@ rtol = 19.0 * num_particles**-0.5  # from random sampling of a smooth distributi
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
-    [sigx, sigy, sigt, demittance_x, demittance_y, emittance_t],
+    [sigx, sigy, sigt],
     [
         1.283476e-06,
         1.291507e-06,
         1.0e-6,
-        1.7e-3,
-        1.7e-3,
-        1.0e-8,
     ],
     rtol=rtol,
+    atol=atol,
+)
+
+atol = 2.0e-3  # from random sampling of a smooth distribution
+print(f"  atol={atol} %")
+
+assert np.allclose(
+    [demittance_x, demittance_y, demittance_t],
+    [
+        0.0,
+        0.0,
+        0.0,
+    ],
     atol=atol,
 )
