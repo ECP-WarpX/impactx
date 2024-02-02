@@ -68,7 +68,7 @@ namespace impactx
         /** Push all particles */
         using BeamOptic::operator();
 
-        /** This is a chrquad functor, so that a variable of this type can be used like a chrquad function.
+        /** This is a chrplasmalens functor, so that a variable of this type can be used like a chrplasmalens function.
          *
          * @param p Particle AoS data for positions and cpu/id
          * @param px particle momentum in x
@@ -101,7 +101,7 @@ namespace impactx
             // access reference particle values to find beta
             amrex::ParticleReal const bet = refpart.beta();
 
-            // normalize quad units to MAD-X convention if needed
+            // normalize focusing strength units to MAD-X convention if needed
             amrex::ParticleReal g = m_k;
             if (m_unit == 1) {
                   g = m_k / refpart.rigidity_Tm();
@@ -127,7 +127,7 @@ namespace impactx
             amrex::ParticleReal p1 = px;
             amrex::ParticleReal p2 = py;
 
-            // advance transverse position and momentum (focusing quad)
+            // advance transverse position and momentum (focusing)
             p.pos(RealAoS::x) = cos(omega*slice_ds)*x +
                                 sin(omega*slice_ds)/(omega*delta1)*px;
             pxout = -omega*delta1*sin(omega*slice_ds)*x + cos(omega*slice_ds)*px;
