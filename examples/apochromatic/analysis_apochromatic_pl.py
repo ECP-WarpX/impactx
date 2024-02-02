@@ -5,7 +5,6 @@
 # License: BSD-3-Clause-LBNL
 #
 
-
 import numpy as np
 import openpmd_api as io
 from scipy.stats import moment

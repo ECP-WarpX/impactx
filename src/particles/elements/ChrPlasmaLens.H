@@ -18,7 +18,6 @@
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
-#include <AMReX_Print.H>      // for PrintToFile
 
 #include <cmath>
 
