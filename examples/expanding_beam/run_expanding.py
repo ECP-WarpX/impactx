@@ -59,3 +59,6 @@ sim.lattice.extend([monitor, elements.Drift(ds=6.0, nslice=40), monitor])
 
 # run simulation
 sim.evolve()
+
+# clean shutdown
+sim.finalize()

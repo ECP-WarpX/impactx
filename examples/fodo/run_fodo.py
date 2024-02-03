@@ -67,3 +67,6 @@ sim.lattice.extend(fodo)
 
 # run simulation
 sim.evolve()
+
+# clean shutdown
+sim.finalize()

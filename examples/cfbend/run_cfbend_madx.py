@@ -48,3 +48,6 @@ sim.lattice.load_file("chicane.madx", nslice=25)
 
 # run simulation
 sim.evolve()
+
+# clean shutdown
+sim.finalize()

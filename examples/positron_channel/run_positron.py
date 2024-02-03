@@ -69,3 +69,6 @@ sim.periods = 250
 
 # run simulation
 sim.evolve()
+
+# clean shutdown
+sim.finalize()

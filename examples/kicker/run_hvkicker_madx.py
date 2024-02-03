@@ -48,3 +48,6 @@ sim.lattice.load_file("hvkicker.madx", nslice=1)
 
 # run simulation
 sim.evolve()
+
+# clean shutdown
+sim.finalize()

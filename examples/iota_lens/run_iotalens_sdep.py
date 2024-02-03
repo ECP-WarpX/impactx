@@ -92,3 +92,6 @@ sim.periods = 1
 
 # run simulation
 sim.evolve()
+
+# clean shutdown
+sim.finalize()

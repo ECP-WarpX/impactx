@@ -56,3 +56,6 @@ sim.lattice.extend(kicklattice)
 
 # run simulation
 sim.evolve()
+
+# clean shutdown
+sim.finalize()

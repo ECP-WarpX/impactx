@@ -76,3 +76,6 @@ sim.lattice.extend([monitor, drift1, quad1, drift2, quad2, drift1, monitor])
 
 # run simulation
 sim.evolve()
+
+# clean shutdown
+sim.finalize()
