@@ -32,7 +32,12 @@ jobs:
           ccache-openmp-clangsan-
 
     - name: build ImpactX
-      env: {CC: mpicc, CXX: mpic++, OMPI_CC: clang, OMPI_CXX: clang++, CXXFLAGS: -Werror}
+      env:
+        CC: mpicc
+        CXX: mpic++
+        OMPI_CC: clang
+        OMPI_CXX: clang++
+        CXXFLAGS: "-Werror -Wno-error=pass-failed"
       run: |
         export LDFLAGS="${LDFLAGS} -fsanitize=address,undefined -shared-libsan"
         export CXXFLAGS="${CXXFLAGS} -fsanitize=address,undefined -shared-libsan"
