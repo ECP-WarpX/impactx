@@ -59,13 +59,13 @@ C2 = -px[0] * (x[1] - x[2]) + px[1] * (x[2] + x[0]) + px[2] * (-x[0] - x[1])
 C3 = px[0] * (-x[1] - x[2]) - px[1] * (x[2] - x[0]) + px[2] * (x[0] + x[1])
 C4 = px[0] * (x[1] + x[2]) + px[1] * (-x[2] - x[0]) - px[2] * (x[0] - x[1])
 C = -C1 * C2 * C3 * C4
-alphax = -(
+alphax = (
     px[0] ** 2 * (x[1] ** 2 - x[2] ** 2)
     + px[1] ** 2 * (x[2] ** 2 - x[0] ** 2)
     + px[2] ** 2 * (x[0] ** 2 - x[1] ** 2)
 ) / np.sqrt(C)
 betax = (
-    -2.0
+    2.0
     * (
         px[0] * x[0] * (x[2] ** 2 - x[1] ** 2)
         + px[1] * x[1] * (x[0] ** 2 - x[2] ** 2)
@@ -73,6 +73,8 @@ betax = (
     )
     / np.sqrt(C)
 )
+alphax = np.sign(betax)*alphax  #ensure selection of correct sign
+betax = np.sign(betax)*betax   #ensure selection of correct sign
 print(f"Twiss from 4-turn formula: alphax, betax [m] = {alphax}, {betax}")
 
 # Normalize TBT data using Twiss functions:
