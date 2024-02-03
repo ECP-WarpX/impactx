@@ -73,8 +73,8 @@ betax = (
     )
     / np.sqrt(C)
 )
-alphax = np.sign(betax)*alphax  #ensure selection of correct sign
-betax = np.sign(betax)*betax   #ensure selection of correct sign
+alphax = np.sign(betax) * alphax  # ensure selection of correct sign
+betax = np.sign(betax) * betax  # ensure selection of correct sign
 print(f"Twiss from 4-turn formula: alphax, betax [m] = {alphax}, {betax}")
 
 # Normalize TBT data using Twiss functions:
