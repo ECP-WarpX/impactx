@@ -265,3 +265,6 @@ for i in range(N_stage):
 sim.lattice.extend([monitor])
 
 sim.evolve()
+
+# clean shutdown
+sim.finalize()

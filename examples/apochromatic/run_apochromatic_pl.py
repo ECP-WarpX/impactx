@@ -109,3 +109,6 @@ sim.lattice.extend(lattice_line)
 
 # run simulation
 sim.evolve()
+
+# clean shutdown
+sim.finalize()
