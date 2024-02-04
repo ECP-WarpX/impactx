@@ -19,6 +19,20 @@ if(ImpactX_MPI)
 endif()
 
 
+# Add an ImpactX test set (with sub-tests).
+#
+# The test will be run and dependent follow-up tests will be added. The latter
+# can optionally perform an analysis and/or a plot test on the generated data.
+#
+# Parameters
+# ----------
+# name: unique ImpactX test name
+# input: inputs file or Python script
+# is_mpi: run with mpirun?
+# is_python: run as a Python script?
+# analysis_script: an analysis script that validates test output
+# plot_script: a plot script that visualizes test output
+#
 function(add_impactx_test name input is_mpi is_python analysis_script plot_script)
     # cannot run Python tests w/o Python support
     if(is_python AND NOT ImpactX_PYTHON)
@@ -95,6 +109,29 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
         # make HDF5 I/O more robust on various filesystems
         set_property(TEST ${name}.plot APPEND PROPERTY ENVIRONMENT "HDF5_USE_FILE_LOCKING=FALSE")
     endif()
+endfunction()
+
+
+# Add a CTest label to an ImpactX test set.
+#
+# The test set must already been added with add_impactx_test. Labeling it here
+# will add the label to the run test and its optional (dependent) analysis
+# and/or plot follow-up tests.
+#
+# Parameters
+# ----------
+# name: unique ImpactX test name
+# label: ctest LABELS property value to add
+#
+function(label_impactx_test name label)
+    # see add_test calls in add_impactx_test for values
+    set(_test_names "${name}.run;${name}.analysis;${name}.plot")
+
+    foreach(_test_name IN LISTS _test_names)
+        if(TEST ${_test_name})
+            set_property(TEST ${_test_name} APPEND PROPERTY LABELS "${label}")
+        endif()
+    endforeach()
 endfunction()
 
 
@@ -668,6 +705,7 @@ add_impactx_test(thermal
     examples/epac2004_benchmarks/analysis_thermal.py
     OFF  # no plot script yet
 )
+label_impactx_test(thermal slow)
 
 # Bithermal Beam EPAC2004 #####################################################
 #
