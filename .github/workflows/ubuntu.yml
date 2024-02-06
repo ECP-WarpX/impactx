@@ -14,7 +14,7 @@ jobs:
     env:
       CMAKE_GENERATOR: Ninja
       CXXFLAGS: "-Werror"
-      OMP_NUM_THREADS: 2
+      OMP_NUM_THREADS: 4
     steps:
     - uses: actions/checkout@v3
 
@@ -43,7 +43,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=/usr  \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
           -DImpactX_PYTHON=ON
-        cmake --build build -j 2
+        cmake --build build -j 4
 
     - name: run tests
       run: |
@@ -76,7 +76,7 @@ jobs:
     env:
       CMAKE_GENERATOR: Ninja
       CXXFLAGS: "-Werror"
-      OMP_NUM_THREADS: 2
+      OMP_NUM_THREADS: 4
     steps:
     - uses: actions/checkout@v3
 
@@ -106,7 +106,7 @@ jobs:
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
           -DImpactX_MPI=OFF            \
           -DImpactX_PYTHON=ON
-        cmake --build build -j 2
+        cmake --build build -j 4
 
     - name: run tests
       run: |

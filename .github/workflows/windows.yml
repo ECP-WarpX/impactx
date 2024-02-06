@@ -46,7 +46,7 @@ jobs:
               -DHDF5_ENABLE_SZIP_SUPPORT=OFF     `
               -DHDF5_ENABLE_Z_LIB_SUPPORT=OFF
         if(!$?) { Exit $LASTEXITCODE }
-        cmake --build build_hdf5 --config RelWithDebInfo --target install --parallel 2
+        cmake --build build_hdf5 --config RelWithDebInfo --target install --parallel 4
         if(!$?) { Exit $LASTEXITCODE }
 
         $env:HDF5_DIR = "C:/Program Files/HDF_Group/HDF5/1.12.2/cmake/"
@@ -71,7 +71,7 @@ jobs:
               -DopenPMD_USE_HDF5=ON       `
               -DPython_EXECUTABLE=python3
         if(!$?) { Exit $LASTEXITCODE }
-        cmake --build build --config RelWithDebInfo --parallel 2
+        cmake --build build --config RelWithDebInfo --parallel 4
         if(!$?) { Exit $LASTEXITCODE }
     - name: Test
       run: |
@@ -132,7 +132,7 @@ jobs:
             -DHDF5_ENABLE_SZIP_SUPPORT=OFF      ^
             -DHDF5_ENABLE_Z_LIB_SUPPORT=OFF
         if errorlevel 1 exit 1
-        cmake --build build_hdf5 --config Release --target install --parallel 2
+        cmake --build build_hdf5 --config Release --target install --parallel 4
         if errorlevel 1 exit 1
 
         set "HDF5_DIR=C:/Program Files/HDF_Group/HDF5/1.12.2/cmake/"
@@ -163,7 +163,7 @@ jobs:
               -DopenPMD_USE_HDF5=ON          ^
               -DPython_EXECUTABLE=python3
         if errorlevel 1 exit 1
-        cmake --build build --parallel 2
+        cmake --build build --parallel 4
         if errorlevel 1 exit 1
     - name: Test
       shell: cmd
