@@ -252,6 +252,12 @@ namespace impactx
         return get_RealSoA_names(this->NumRealComps());
     }
 
+    std::vector<std::string>
+    ImpactXParticleContainer::intSoA_names () const
+    {
+        return get_intSoA_names(this->NumIntComps());
+    }
+
     CoordSystem
     ImpactXParticleContainer::GetCoordSystem () const
     {
@@ -291,5 +297,23 @@ namespace impactx
         }
 
         return real_soa_names;
+    }
+
+    std::vector<std::string>
+    get_intSoA_names (int num_int_comps)
+    {
+        std::vector<std::string> int_soa_names(num_int_comps);
+
+        // compile-time attributes
+        std::copy(IntSoA::names_s.begin(), IntSoA::names_s.end(), int_soa_names.begin());
+
+        // runtime attributes
+        if (num_int_comps > int(IntSoA::names_s.size()))
+        {
+            // particles lost record their "s" position where they got lost
+            int_soa_names[IntSoA::nattribs] = "s_lost";
+        }
+
+        return int_soa_names;
     }
 } // namespace impactx

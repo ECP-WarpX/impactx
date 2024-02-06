@@ -102,6 +102,13 @@ namespace impactx
         {
             nattribs ///< the number of particles above (always last)
         };
+
+        //! named labels for fixed s
+        static constexpr std::initializer_list<char const *> names_s = {};
+        //! named labels for fixed t
+        static constexpr std::initializer_list<char const *> names_t = {};
+        static_assert(names_s.size() == nattribs);
+        static_assert(names_t.size() == nattribs);
     };
 
     /** AMReX iterator for particle boxes
@@ -276,13 +283,17 @@ namespace impactx
         DepositCharge (std::unordered_map<int, amrex::MultiFab> & rho,
                        amrex::Vector<amrex::IntVect> const & ref_ratio);
 
-        /** Get the name of each Real AoS component */
+        /** Get the name of each ParticleReal AoS component */
         std::vector<std::string>
         RealAoS_names () const;
 
-        /** Get the name of each Real SoA component */
+        /** Get the name of each ParticleReal SoA component */
         std::vector<std::string>
         RealSoA_names () const;
+
+        /** Get the name of each int SoA component */
+        std::vector<std::string>
+        intSoA_names () const;
 
         /** Get the current coordinate system of particles in this container */
         CoordSystem
@@ -311,17 +322,25 @@ namespace impactx
 
     }; // ImpactXParticleContainer
 
-    /** Get the name of each Real AoS component */
+    /** Get the name of each ParticleReal AoS component */
     std::vector<std::string>
     get_RealAoS_names ();
 
-    /** Get the name of each Real SoA component
+    /** Get the name of each ParticleReal SoA component
      *
      * @param num_real_comps number of compile-time + runtime arrays
      * @return names
      */
     std::vector<std::string>
     get_RealSoA_names (int num_real_comps);
+
+    /** Get the name of each int SoA component
+     *
+     * @param num_int_comps number of compile-time + runtime arrays
+     * @return names
+     */
+    std::vector<std::string>
+    get_intSoA_names (int num_int_comps);
 
 } // namespace impactx
 

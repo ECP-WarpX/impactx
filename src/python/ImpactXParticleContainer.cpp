@@ -129,7 +129,9 @@ void init_impactxparticlecontainer(py::module& m)
               "Get the name of each Real AoS component")
 
         .def_property_readonly("RealSoA_names", &ImpactXParticleContainer::RealSoA_names,
-              "Get the name of each Real SoA component")
+              "Get the name of each ParticleReal SoA component")
+        .def_property_readonly("intSoA_names", &ImpactXParticleContainer::intSoA_names,
+               "Get the name of each int SoA component")
     ;
 
     m.def("get_RealAoS_names", &get_RealAoS_names,
@@ -137,5 +139,8 @@ void init_impactxparticlecontainer(py::module& m)
 
     m.def("get_RealSoA_names", &get_RealSoA_names,
           py::arg("num_real_comps"),
-          "Get the name of each Real SoA component\n\nnum_real_comps: pass number of compile-time + runtime arrays");
+          "Get the name of each ParticleReal SoA component\n\nnum_real_comps: pass number of compile-time + runtime arrays");
+    m.def("get_intSoA_names", &get_intSoA_names,
+          py::arg("num_int_comps"),
+          "Get the name of each int SoA component\n\nnum_int_comps: pass number of compile-time + runtime arrays");
 }
