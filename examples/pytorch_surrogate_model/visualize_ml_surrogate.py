@@ -8,6 +8,7 @@
 
 import argparse
 import glob
+import re
 
 from matplotlib import pyplot as plt
 import numpy as np
