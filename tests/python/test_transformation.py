@@ -10,14 +10,10 @@ import numpy as np
 import pytest
 
 from impactx import (
-    Config,
     CoordSystem,
     ImpactX,
-    ImpactXParIter,
-    RefPart,
     coordinate_transformation,
     distribution,
-    elements,
 )
 
 

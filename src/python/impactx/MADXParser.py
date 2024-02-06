@@ -144,8 +144,8 @@ class MADXParser:
     # nonblank_lines inspired by
     # https://stackoverflow.com/questions/4842057/easiest-way-to-ignore-blank-lines-when-reading-a-file-in-python
     def nonblank_lines_to_lowercase(self, f):
-        for l in f:
-            line = l.rstrip().casefold()
+        for ln in f:
+            line = ln.rstrip().casefold()
             if line:
                 yield line
 
@@ -436,9 +436,9 @@ class MADXParser:
                     newlines = []
 
                     # check multiplication and insert that many lines
-                    for l in lines:
-                        if "*" in l:
-                            tmp = l.split("*")
+                    for ln in lines:
+                        if "*" in ln:
+                            tmp = ln.split("*")
 
                             n = 0
                             ll = ""
@@ -453,7 +453,7 @@ class MADXParser:
                             newlines += [ll] * n
 
                         else:
-                            newlines.append(l)
+                            newlines.append(ln)
 
                     self.__line["elem"] = newlines
 
@@ -471,7 +471,7 @@ class MADXParser:
 
         # 14. Oct. 2017,
         # https://stackoverflow.com/questions/7900882/extract-item-from-list-of-dictionaries
-        start = [l for l in self.__lines if l["name"] == self.sequence["name"]][0]
+        start = [ln for ln in self.__lines if ln["name"] == self.sequence["name"]][0]
 
         self._flatten(start)
 
@@ -488,9 +488,9 @@ class MADXParser:
 
         name = line["name"]
 
-        for l in self.__lines:
-            if name in l["name"]:
-                for ll in l["elem"]:
+        for ln in self.__lines:
+            if name in ln["name"]:
+                for ll in ln["elem"]:
                     for lll in self.__lines:
                         if lll["name"] == ll:
                             self.__lattice.append(lll)

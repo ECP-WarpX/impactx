@@ -8,7 +8,7 @@ import amrex.space3d as amr
 import impactx
 
 if impactx.Config.have_mpi:
-    from mpi4py import MPI
+    from mpi4py import MPI  # noqa
 
     print("loaded mpi4py")
 else:
