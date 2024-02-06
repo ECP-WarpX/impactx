@@ -22,7 +22,6 @@ except ImportError:
 from impactx import (
     ImpactX,
     ImpactXParIter,
-    RefPart,
     TransformationDirection,
     coordinate_transformation,
     distribution,

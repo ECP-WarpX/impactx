@@ -11,9 +11,7 @@ from conftest import basepath
 import numpy as np
 import pytest
 
-import amrex.space3d as amr
-import impactx
-from impactx import ImpactX, RefPart, distribution, elements
+from impactx import ImpactX, distribution, elements
 
 # FIXME in AMReX via https://github.com/AMReX-Codes/amrex/pull/3727
 # def test_impactx_module():
