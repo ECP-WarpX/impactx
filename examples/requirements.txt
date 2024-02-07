@@ -3,3 +3,4 @@ numpy
 openpmd-api
 pandas
 scipy
+pynaff
