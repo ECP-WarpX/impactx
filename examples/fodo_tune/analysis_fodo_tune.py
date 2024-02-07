@@ -98,13 +98,13 @@ print()
 output = pnf.naff(
     x, turns=nturns, nterms=4, skipTurns=0, getFullSpectrum=True, window=1
 )
-print(f"tune output from NAFF, using x data:")
+print("tune output from NAFF, using x data:")
 print(output[0, 1], output[1, 1])
 
 output = pnf.naff(
     px, turns=nturns, nterms=4, skipTurns=0, getFullSpectrum=True, window=1
 )
-print(f"tune output from NAFF, using px data:")
+print("tune output from NAFF, using px data:")
 print(output[0, 1], output[1, 1])
 
 output = pnf.naff(
