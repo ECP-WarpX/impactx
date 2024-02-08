@@ -42,23 +42,24 @@ namespace impactx {
 
     ImpactX::~ImpactX()
     {
-        if (m_grids_initialized)
-        {
-            this->finalize();
-            m_grids_initialized = false;
-        }
-
+        this->finalize();
     }
 
     void ImpactX::finalize ()
     {
-        m_lattice.clear();
+        if (m_grids_initialized)
+        {
+            m_lattice.clear();
 
-        // this one last
-        amr_data.reset();
+            // this one last
+            amr_data.reset();
 
-        if (amrex::Initialized())
-            amrex::Finalize();
+            if (amrex::Initialized())
+                amrex::Finalize();
+
+            // only finalize once
+            m_grids_initialized = false;
+        }
     }
 
     void ImpactX::init_grids ()
