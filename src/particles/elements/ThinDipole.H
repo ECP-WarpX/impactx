@@ -133,6 +133,36 @@ namespace impactx
         /** This pushes the reference particle. */
         using Thin::operator();
 
+        /** This pushes the reference particle.
+         *
+         * @param[in,out] refpart reference particle
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void operator() (RefPart & AMREX_RESTRICT refpart) const
+        {
+            using namespace amrex::literals; // for _rt and _prt
+
+            // assign input reference particle values
+            amrex::ParticleReal const x = refpart.x;
+            amrex::ParticleReal const px = refpart.px;
+            amrex::ParticleReal const y = refpart.y;
+            amrex::ParticleReal const py = refpart.py;
+            amrex::ParticleReal const z = refpart.z;
+            amrex::ParticleReal const pz = refpart.pz;
+            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const pt = refpart.pt;
+
+            // calculate expensive terms once
+            auto const [sin_theta, cos_theta] = amrex::Math::sincos(m_theta);
+
+            // advance position and momentum (thin dipole)
+            refpart.px = px*cos_theta - pz*sin_theta;
+            refpart.py = py;
+            refpart.pz = pz*cos_theta + px*sin_theta;
+            refpart.pt = pt;
+
+        }
+
     private:
         amrex::ParticleReal m_theta; //! dipole bending angle (rad)
         amrex::ParticleReal m_rc; //! curvature radius (m)
