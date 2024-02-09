@@ -70,30 +70,30 @@ namespace impactx
         /** This is a dipedge functor, so that a variable of this type can be used like a
          *  dipedge function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t (unchanged)
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle (unused)
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
+                amrex::ParticleReal & AMREX_RESTRICT x,
+                amrex::ParticleReal & AMREX_RESTRICT y,
+                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT t,
                 amrex::ParticleReal & AMREX_RESTRICT px,
                 amrex::ParticleReal & AMREX_RESTRICT py,
                 [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT pt,
+                [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
                 [[maybe_unused]] RefPart const & refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
 
             // shift due to alignment errors of the element
-            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
-
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-
-            // access reference particle values if needed
+            shift_in(x, y, px, py);
 
             // edge focusing matrix elements (zero gap)
             amrex::ParticleReal const R21 = tan(m_psi)/m_rc;
@@ -110,7 +110,7 @@ namespace impactx
             py = py + R43*y;
 
             // undo shift due to alignment errors of the element
-            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle. */

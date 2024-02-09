@@ -59,29 +59,30 @@ namespace impactx
         /** This is a buncher functor, so that a variable of this type can be used like a
          *  buncher function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
+                amrex::ParticleReal & AMREX_RESTRICT x,
+                amrex::ParticleReal & AMREX_RESTRICT y,
+                amrex::ParticleReal & AMREX_RESTRICT t,
                 amrex::ParticleReal & AMREX_RESTRICT px,
                 amrex::ParticleReal & AMREX_RESTRICT py,
                 amrex::ParticleReal & AMREX_RESTRICT pt,
+                [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
                 RefPart const & refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
 
             // shift due to alignment errors of the element
-            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
-
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-            amrex::ParticleReal const t = p.pos(RealAoS::t);
+            shift_in(x, y, px, py);
 
             // access reference particle values to find (beta*gamma)^2
             amrex::ParticleReal const pt_ref = refpart.pt;
@@ -93,13 +94,8 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // advance position and momentum
-            p.pos(RealAoS::x) = x;
             pxout = px + m_k*m_V/(2.0_prt*betgam2)*x;
-
-            p.pos(RealAoS::y) = y;
             pyout = py + m_k*m_V/(2.0_prt*betgam2)*y;
-
-            p.pos(RealAoS::t) = t;
             ptout = pt - m_k*m_V*t;
 
             // assign updated momenta
@@ -108,7 +104,7 @@ namespace impactx
             pt = ptout;
 
             // undo shift due to alignment errors of the element
-            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle. */

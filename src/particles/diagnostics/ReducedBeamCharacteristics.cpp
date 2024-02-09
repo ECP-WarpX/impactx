@@ -33,7 +33,7 @@ namespace impactx::diagnostics
         // reference particle charge in C
         amrex::ParticleReal const q_C = ref_part.charge;
 
-        // preparing access to particle data: AoS and SoA
+        // preparing access to particle data: SoA
         using PType = typename ImpactXParticleContainer::SuperParticleType;
 
         // prepare reduction operations for calculation of mean and min/max values in 6D phase space
@@ -78,10 +78,10 @@ namespace impactx::diagnostics
                 amrex::ParticleReal, amrex::ParticleReal
             >
             {
-                // access AoS particle position data
-                const amrex::ParticleReal p_pos0 = p.pos(0);
-                const amrex::ParticleReal p_pos1 = p.pos(1);
-                const amrex::ParticleReal p_pos2 = p.pos(2);
+                // access particle position data
+                const amrex::ParticleReal p_x = p.rdata(RealSoA::x);
+                const amrex::ParticleReal p_y = p.rdata(RealSoA::y);
+                const amrex::ParticleReal p_t = p.rdata(RealSoA::t);
 
                 // access SoA particle momentum data and weighting
                 const amrex::ParticleReal p_w = p.rdata(RealSoA::w);
@@ -90,20 +90,20 @@ namespace impactx::diagnostics
                 const amrex::ParticleReal p_pt = p.rdata(RealSoA::pt);
 
                 // prepare mean position values
-                const amrex::ParticleReal p_x_mean = p_pos0*p_w;
-                const amrex::ParticleReal p_y_mean = p_pos1*p_w;
-                const amrex::ParticleReal p_t_mean = p_pos2*p_w;
+                const amrex::ParticleReal p_x_mean = p_x * p_w;
+                const amrex::ParticleReal p_y_mean = p_y * p_w;
+                const amrex::ParticleReal p_t_mean = p_t * p_w;
 
-                const amrex::ParticleReal p_px_mean = p_px*p_w;
-                const amrex::ParticleReal p_py_mean = p_py*p_w;
-                const amrex::ParticleReal p_pt_mean = p_pt*p_w;
+                const amrex::ParticleReal p_px_mean = p_px * p_w;
+                const amrex::ParticleReal p_py_mean = p_py * p_w;
+                const amrex::ParticleReal p_pt_mean = p_pt * p_w;
 
                 return {p_w,
                         p_x_mean, p_y_mean, p_t_mean,
                         p_px_mean, p_py_mean, p_pt_mean,
-                        p_pos0, p_pos0,
-                        p_pos1, p_pos1,
-                        p_pos2, p_pos2,
+                        p_x, p_x,
+                        p_y, p_y,
+                        p_t, p_t,
                         p_px, p_px,
                         p_py, p_py,
                         p_pt, p_pt};
@@ -199,13 +199,10 @@ namespace impactx::diagnostics
                 const amrex::ParticleReal p_px = p.rdata(RealSoA::px);
                 const amrex::ParticleReal p_py = p.rdata(RealSoA::py);
                 const amrex::ParticleReal p_pt = p.rdata(RealSoA::pt);
-                // access AoS particle position data
-                const amrex::ParticleReal p_pos0 = p.pos(0);
-                const amrex::ParticleReal p_pos1 = p.pos(1);
-                const amrex::ParticleReal p_pos2 = p.pos(2);
-                const amrex::ParticleReal p_x = p_pos0;
-                const amrex::ParticleReal p_y = p_pos1;
-                const amrex::ParticleReal p_t = p_pos2;
+                // access position data
+                const amrex::ParticleReal p_x = p.rdata(RealSoA::x);
+                const amrex::ParticleReal p_y = p.rdata(RealSoA::y);
+                const amrex::ParticleReal p_t = p.rdata(RealSoA::t);
                 // prepare mean square for positions
                 const amrex::ParticleReal p_x_ms = (p_x-x_mean)*(p_x-x_mean)*p_w;
                 const amrex::ParticleReal p_y_ms = (p_y-y_mean)*(p_y-y_mean)*p_w;

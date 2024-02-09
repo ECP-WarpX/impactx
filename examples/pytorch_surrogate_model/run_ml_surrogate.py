@@ -11,6 +11,14 @@ import tarfile
 from urllib import request
 
 import numpy as np
+
+try:
+    import cupy as cp
+
+    cupy_available = True
+except ImportError:
+    cupy_available = False
+
 from surrogate_model_definitions import surrogate_model
 
 try:
@@ -20,13 +28,33 @@ except ImportError:
     sys.exit(0)
 
 from impactx import (
+    Config,
+    CoordSystem,
     ImpactX,
     ImpactXParIter,
-    TransformationDirection,
     coordinate_transformation,
     distribution,
     elements,
 )
+
+# CPU/GPU logic
+if Config.have_gpu:
+    if cupy_available:
+        array = cp.array
+        stack = cp.stack
+        device = torch.device("cuda")
+    else:
+        print("Warning: GPU found but cupy not available! Try managed...")
+        array = np.array
+        stack = np.stack
+        device = torch.device("cpu")
+    if Config.gpu_backend == "SYCL":
+        print("Warning: SYCL GPU backend not yet implemented for Python")
+
+else:
+    array = np.array
+    stack = np.stack
+    device = torch.device("cpu")
 
 
 def download_and_unzip(url, data_dir):
@@ -50,6 +78,7 @@ model_list = [
     surrogate_model(
         dataset_dir + f"dataset_beam_stage_{i}.pt",
         model_dir + f"beam_stage_{i}_model.pt",
+        device=device,
     )
     for i in range(N_stage)
 ]
@@ -78,47 +107,62 @@ class LPASurrogateStage(elements.Programmable):
         self.ds = surrogate_length
 
     def surrogate_push(self, pc, step):
-        array = np.array
-
         ref_part = pc.ref_particle()
         ref_z_i = ref_part.z
         ref_z_i_LPA = ref_z_i - self.stage_start
         ref_z_f = ref_z_i + self.surrogate_length
 
         ref_part_tensor = torch.tensor(
-            [ref_part.x, ref_part.y, ref_z_i_LPA, ref_part.px, ref_part.py, ref_part.pz]
+            [
+                ref_part.x,
+                ref_part.y,
+                ref_z_i_LPA,
+                ref_part.px,
+                ref_part.py,
+                ref_part.pz,
+            ],
+            dtype=torch.float64,
+            device=device,
         )
-        ref_beta_gamma = np.sqrt(torch.sum(ref_part_tensor[3:] ** 2))
+        ref_beta_gamma = torch.sqrt(torch.sum(ref_part_tensor[3:] ** 2))
 
         with torch.no_grad():
-            ref_part_model_final = self.surrogate_model(ref_part_tensor.float())
+            ref_part_model_final = self.surrogate_model(ref_part_tensor)
         ref_uz_f = ref_part_model_final[5]
         ref_beta_gamma_final = (
             ref_uz_f  # NOT np.sqrt(torch.sum(ref_part_model_final[3:]**2))
         )
-        ref_part_final = torch.tensor([0, 0, ref_z_f, 0, 0, ref_uz_f])
+        ref_part_final = torch.tensor(
+            [0, 0, ref_z_f, 0, 0, ref_uz_f], dtype=torch.float64, device=device
+        )
 
         # transform
-        coordinate_transformation(pc, TransformationDirection.to_fixed_t)
+        coordinate_transformation(pc, direction=CoordSystem.t)
 
         for lvl in range(pc.finest_level + 1):
             for pti in ImpactXParIter(pc, level=lvl):
-                aos = pti.aos()
-                aos_arr = array(aos, copy=False)
-
                 soa = pti.soa()
-                real_arrays = soa.GetRealData()
-                px = array(real_arrays[0], copy=False)
-                py = array(real_arrays[1], copy=False)
-                pt = array(real_arrays[2], copy=False)
-                data_arr = (
-                    torch.tensor(
-                        np.vstack(
-                            [aos_arr["x"], aos_arr["y"], aos_arr["z"], real_arrays[:3]]
-                        )
-                    )
-                    .float()
-                    .T
+                real_arrays = soa.get_real_data()
+                x = array(real_arrays[0], copy=False)
+                y = array(real_arrays[1], copy=False)
+                t = array(real_arrays[2], copy=False)
+                px = array(real_arrays[3], copy=False)
+                py = array(real_arrays[4], copy=False)
+                pt = array(real_arrays[5], copy=False)
+                data_arr = torch.tensor(
+                    stack(
+                        [
+                            x,
+                            y,
+                            t,
+                            px,
+                            py,
+                            py,
+                        ],
+                        axis=1,
+                    ),
+                    dtype=torch.float64,
+                    device=device,
                 )
 
                 data_arr[:, 0] += ref_part.x
@@ -135,7 +179,7 @@ class LPASurrogateStage(elements.Programmable):
                 #     # assume for now it is
 
                 with torch.no_grad():
-                    data_arr_post_model = self.surrogate_model(data_arr.float())
+                    data_arr_post_model = self.surrogate_model(data_arr)
 
                 #  need to add stage start to z
                 data_arr_post_model[:, 2] += self.stage_start
@@ -146,9 +190,9 @@ class LPASurrogateStage(elements.Programmable):
                     data_arr_post_model[:, 3 + ii] -= ref_part_final[3 + ii]
                     data_arr_post_model[:, 3 + ii] /= ref_beta_gamma_final
 
-                aos_arr["x"] = data_arr_post_model[:, 0]
-                aos_arr["y"] = data_arr_post_model[:, 1]
-                aos_arr["z"] = data_arr_post_model[:, 2]
+                x[:] = data_arr_post_model[:, 0]
+                y[:] = data_arr_post_model[:, 1]
+                t[:] = data_arr_post_model[:, 2]
                 px[:] = data_arr_post_model[:, 3]
                 py[:] = data_arr_post_model[:, 4]
                 pt[:] = data_arr_post_model[:, 5]
@@ -160,7 +204,7 @@ class LPASurrogateStage(elements.Programmable):
         ref_part.x = ref_part_final[0]
         ref_part.y = ref_part_final[1]
         ref_part.z = ref_part_final[2]
-        ref_gamma = np.sqrt(1 + ref_beta_gamma_final**2)
+        ref_gamma = torch.sqrt(1 + ref_beta_gamma_final**2)
         ref_part.px = ref_part_final[3]
         ref_part.py = ref_part_final[4]
         ref_part.pz = ref_part_final[5]
@@ -173,7 +217,7 @@ class LPASurrogateStage(elements.Programmable):
         # ref_part.s += pge1.ds
         # ref_part.t += pge1.ds / ref_beta
 
-        coordinate_transformation(pc, TransformationDirection.to_fixed_s)
+        coordinate_transformation(pc, direction=CoordSystem.s)
         ## Done!
 
 

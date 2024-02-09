@@ -10,8 +10,6 @@
 #ifndef IMPACTX_INTEGRATORS_H_
 #define IMPACTX_INTEGRATORS_H_
 
-#include <ablastr/particles/IndexHandling.H>
-
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_REAL.H>       // for ParticleReal
 

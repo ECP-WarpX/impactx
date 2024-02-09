@@ -48,19 +48,17 @@ namespace impactx::transformation
             for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
                 const int np = pti.numParticles();
 
-                // preparing access to particle data: AoS
-                using PType = ImpactXParticleContainer::ParticleType;
-                auto &aos = pti.GetArrayOfStructs();
-                PType *AMREX_RESTRICT aos_ptr = aos().dataPtr();
-
                 // preparing access to particle data: SoA of Reals
                 auto &soa_real = pti.GetStructOfArrays().GetRealData();
+                amrex::ParticleReal *const AMREX_RESTRICT part_x = soa_real[RealSoA::x].dataPtr();
+                amrex::ParticleReal *const AMREX_RESTRICT part_y = soa_real[RealSoA::y].dataPtr();
                 amrex::ParticleReal *const AMREX_RESTRICT part_px = soa_real[RealSoA::px].dataPtr();
                 amrex::ParticleReal *const AMREX_RESTRICT part_py = soa_real[RealSoA::py].dataPtr();
 
                 if (direction == CoordSystem::s) {
                     BL_PROFILE("impactx::transformation::CoordinateTransformation::to_fixed_s");
 
+                    amrex::ParticleReal *const AMREX_RESTRICT part_z = soa_real[RealSoA::z].dataPtr();
                     amrex::ParticleReal *const AMREX_RESTRICT part_pz = soa_real[RealSoA::pz].dataPtr();
 
                     // Design value of pz/mc = beta*gamma
@@ -68,33 +66,34 @@ namespace impactx::transformation
 
                     ToFixedS const to_s(pzd);
                     amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE(long i) {
-                        // access AoS data such as positions and cpu/id
-                        PType &p = aos_ptr[i];
-
-                        // access SoA Real data
+                        amrex::ParticleReal &x = part_x[i];
+                        amrex::ParticleReal &y = part_y[i];
+                        amrex::ParticleReal &z = part_z[i];
                         amrex::ParticleReal &px = part_px[i];
                         amrex::ParticleReal &py = part_py[i];
                         amrex::ParticleReal &pz = part_pz[i];
 
-                        to_s(p, px, py, pz);
+                        to_s(x, y, z, px, py, pz);
                     });
                 } else {
                     BL_PROFILE("impactx::transformation::CoordinateTransformation::to_fixed_t");
 
+                    amrex::ParticleReal *const AMREX_RESTRICT part_t = soa_real[RealSoA::t].dataPtr();
                     amrex::ParticleReal *const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
 
-                    amrex::ParticleReal const ptd = pd;  // Design value of pt/mc2 = -gamma.
+                    // Design value of pt/mc2 = -gamma.
+                    amrex::ParticleReal const ptd = pd;
+
                     ToFixedT const to_t(ptd);
                     amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE(long i) {
-                        // access AoS data such as positions and cpu/id
-                        PType &p = aos_ptr[i];
-
-                        // access SoA Real data
+                        amrex::ParticleReal &x = part_x[i];
+                        amrex::ParticleReal &y = part_y[i];
+                        amrex::ParticleReal &t = part_t[i];
                         amrex::ParticleReal &px = part_px[i];
                         amrex::ParticleReal &py = part_py[i];
                         amrex::ParticleReal &pt = part_pt[i];
 
-                        to_t(p, px, py, pt);
+                        to_t(x, y, t, px, py, pt);
                     });
                 }
             } // end loop over all particle boxes

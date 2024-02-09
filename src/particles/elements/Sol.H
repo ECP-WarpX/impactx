@@ -63,30 +63,31 @@ namespace impactx
 
         /** This is a sol functor, so that a variable of this type can be used like a sol function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-            PType & AMREX_RESTRICT p,
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            amrex::ParticleReal & AMREX_RESTRICT t,
             amrex::ParticleReal & AMREX_RESTRICT px,
             amrex::ParticleReal & AMREX_RESTRICT py,
             amrex::ParticleReal & AMREX_RESTRICT pt,
+            [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
             RefPart const & refpart
         ) const
         {
             using namespace amrex::literals; // for _rt and _prt
 
             // shift due to alignment errors of the element
-            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
-
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-            amrex::ParticleReal const t = p.pos(RealAoS::t);
+            shift_in(x, y, px, py);
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
@@ -97,7 +98,7 @@ namespace impactx
 
             // compute phase advance per unit length (in rad/m) and
             // rotation angle (in rad)
-            amrex::ParticleReal const alpha = m_ks/2.0_prt;
+            amrex::ParticleReal const alpha = m_ks / 2.0_prt;
             amrex::ParticleReal const theta = alpha*slice_ds;
 
             // intialize output values
@@ -125,22 +126,22 @@ namespace impactx
             pt = ptout;
 
             // advance positions and momenta using map for rotation
-            p.pos(RealAoS::x) = cos_theta*xout + sin_theta*yout;
+            x = cos_theta*xout + sin_theta*yout;
             pxout = cos_theta*px + sin_theta*py;
 
-            p.pos(RealAoS::y) = -sin_theta*xout + cos_theta*yout;
+            y = -sin_theta*xout + cos_theta*yout;
             pyout = -sin_theta*px + cos_theta*py;
 
-            p.pos(RealAoS::t) = tout;
+            t = tout;
             ptout = pt;
 
-            // assign updated momenta
+            // assign updated values
             px = pxout;
             py = pyout;
             pt = ptout;
 
             // undo shift due to alignment errors of the element
-            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle.

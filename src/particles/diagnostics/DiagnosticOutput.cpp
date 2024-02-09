@@ -11,13 +11,12 @@
 #include "NonlinearLensInvariants.H"
 #include "ReducedBeamCharacteristics.H"
 
-#include <ablastr/particles/IndexHandling.H>
-
 #include <AMReX_BLProfiler.H> // for BL_PROFILE
 #include <AMReX_Extension.H>  // for AMREX_RESTRICT
 #include <AMReX_ParmParse.H>  // for ParmParse
 #include <AMReX_REAL.H>       // for ParticleReal
 #include <AMReX_Print.H>      // for PrintToFile
+#include <AMReX_ParticleTile.H>     // for constructor of SoAParticle
 
 #include <limits>
 #include <utility>
@@ -115,67 +114,58 @@ namespace impactx::diagnostics
             int const nLevel = tmp.finestLevel();
             for (int lev = 0; lev <= nLevel; ++lev) {
                 // loop over all particle boxes
-                using ParIt = typename decltype(tmp)::ParConstIterType;
-                for (ParIt pti(tmp, lev); pti.isValid(); ++pti) {
+                using MyPinnedParIter = amrex::ParIterSoA<RealSoA::nattribs,IntSoA::nattribs, amrex::PinnedArenaAllocator>;
+                for (MyPinnedParIter pti(tmp, lev); pti.isValid(); ++pti) {
                     const int np = pti.numParticles();
 
-                    // preparing access to particle data: AoS
-                    using PType = ImpactXParticleContainer::ParticleType;
-                    auto const &aos = pti.GetArrayOfStructs();
-                    PType const *const AMREX_RESTRICT aos_ptr = aos().dataPtr();
-
                     // preparing access to particle data: SoA of Reals
-                    auto &soa_real = pti.GetStructOfArrays().GetRealData();
-                    amrex::ParticleReal const *const AMREX_RESTRICT part_px = soa_real[RealSoA::px].dataPtr();
-                    amrex::ParticleReal const *const AMREX_RESTRICT part_py = soa_real[RealSoA::py].dataPtr();
+                    auto const& soa = pti.GetStructOfArrays();
+                    auto const& part_x = soa.GetRealData(RealSoA::x);
+                    auto const& part_y = soa.GetRealData(RealSoA::y);
+                    auto const& part_px = soa.GetRealData(RealSoA::px);
+                    auto const& part_py = soa.GetRealData(RealSoA::py);
 
-                    // TODO: Refactor since this condition is always true here
-                    if (otype == OutputType::PrintNonlinearLensInvariants) {
-                        using namespace amrex::literals;
+                    auto const& part_idcpu = soa.GetIdCPUData().dataPtr();
 
-                        // Parse the diagnostic parameters
-                        amrex::ParmParse pp_diag("diag");
+                    // Parse the diagnostic parameters
+                    amrex::ParmParse pp_diag("diag");
 
-                        amrex::ParticleReal alpha = 0.0;
-                        pp_diag.queryAdd("alpha", alpha);
+                    amrex::ParticleReal alpha = 0.0;
+                    pp_diag.queryAdd("alpha", alpha);
 
-                        amrex::ParticleReal beta = 1.0;
-                        pp_diag.queryAdd("beta", beta);
+                    amrex::ParticleReal beta = 1.0;
+                    pp_diag.queryAdd("beta", beta);
 
-                        amrex::ParticleReal tn = 0.4;
-                        pp_diag.queryAdd("tn", tn);
+                    amrex::ParticleReal tn = 0.4;
+                    pp_diag.queryAdd("tn", tn);
 
-                        amrex::ParticleReal cn = 0.01;
-                        pp_diag.queryAdd("cn", cn);
+                    amrex::ParticleReal cn = 0.01;
+                    pp_diag.queryAdd("cn", cn);
 
-                        NonlinearLensInvariants const nonlinear_lens_invariants(alpha, beta, tn, cn);
+                    NonlinearLensInvariants const nonlinear_lens_invariants(alpha, beta, tn, cn);
 
-                        // print out particles
-                        for (int i = 0; i < np; ++i) {
+                    // print out particles (this hack works only on CPU and on GPUs with
+                    // unified memory access)
+                    for (int i = 0; i < np; ++i) {
+                        amrex::ParticleReal const x = part_x[i];
+                        amrex::ParticleReal const y = part_y[i];
+                        uint64_t const global_id = part_idcpu[i];
 
-                            // access AoS data such as positions and cpu/id
-                            PType const &p = aos_ptr[i];
-                            amrex::ParticleReal const x = p.pos(RealAoS::x);
-                            amrex::ParticleReal const y = p.pos(RealAoS::y);
-                            uint64_t const global_id = ablastr::particles::localIDtoGlobal(p.id(), p.cpu());
+                        amrex::ParticleReal const px = part_px[i];
+                        amrex::ParticleReal const py = part_py[i];
 
-                            // access SoA Real data
-                            amrex::ParticleReal const px = part_px[i];
-                            amrex::ParticleReal const py = part_py[i];
+                        // calculate invariants of motion
+                        NonlinearLensInvariants::Data const HI_out =
+                                nonlinear_lens_invariants(x, y, px, py);
 
-                            // calculate invariants of motion
-                            NonlinearLensInvariants::Data const HI_out =
-                                    nonlinear_lens_invariants(x, y, px, py);
+                        // write particle invariant data to file
+                        file_handler
+                                << global_id << " "
+                                << HI_out.H << " " << HI_out.I << "\n";
 
-                            // write particle invariant data to file
-                            file_handler
-                                    << global_id << " "
-                                    << HI_out.H << " " << HI_out.I << "\n";
-
-                        } // i=0...np
-                    } // if( otype == OutputType::PrintInvariants)
+                    } // i=0...np
                 } // end loop over all particle boxes
-            } // env mesh-refinement level loop
+            } // end mesh-refinement level loop
         }
     }
 

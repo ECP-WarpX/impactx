@@ -17,7 +17,6 @@
 #include "mixin/thin.H"
 #include "mixin/nofinalize.H"
 
-#include <ablastr/particles/IndexHandling.H>
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
 
@@ -69,29 +68,31 @@ namespace impactx
         /** This is an aperture functor, so that a variable of this type can be used like an
          *  aperture function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t (unused)
          * @param px particle momentum in x
          * @param py particle momentum in y
-         * @param pt particle momentum in t
+         * @param pt particle momentum in t (unused)
+         * @param idcpu particle global index
          * @param refpart reference particle (unused)
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-            PType& AMREX_RESTRICT p,
-            [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT px,
-            [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT t,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
             [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT pt,
-            [[maybe_unused]] RefPart const & refpart) const
+            uint64_t & AMREX_RESTRICT idcpu,
+            [[maybe_unused]] RefPart const & refpart
+        ) const
         {
             using namespace amrex::literals; // for _rt and _prt
 
             // shift due to alignment errors of the element
-            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
-
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-            auto const id = p.id();
+            shift_in(x, y, px, py);
 
             // scale horizontal and vertical coordinates
             amrex::ParticleReal const u = x / m_xmax;
@@ -102,19 +103,19 @@ namespace impactx
             {
                 case Shape::rectangular :  // default
                   if (pow(u,2)>1 || pow(v,2) > 1_prt) {
-                     p.id() = -id;
+                      amrex::ParticleIDWrapper{idcpu}.make_invalid();
                   }
                   break;
 
                case Shape::elliptical :
                   if (pow(u,2)+pow(v,2) > 1_prt) {
-                     p.id() = -id;
+                      amrex::ParticleIDWrapper{idcpu}.make_invalid();
                   }
                   break;
             }
 
             // undo shift due to alignment errors of the element
-            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle. */

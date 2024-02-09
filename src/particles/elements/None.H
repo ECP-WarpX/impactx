@@ -51,19 +51,26 @@ namespace impactx
 
         /** Does nothing to a particle.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                [[maybe_unused]] PType& AMREX_RESTRICT p,
+                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT x,
+                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT y,
+                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT t,
                 [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT px,
                 [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT py,
                 [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT pt,
-                [[maybe_unused]] RefPart const & refpart) const
+                [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
+                [[maybe_unused]] RefPart const & refpart
+        ) const
         {
             // nothing to do
         }

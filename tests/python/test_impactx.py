@@ -38,7 +38,7 @@ def test_impactx_fodo_file():
 
     # validate the results
     beam = sim.particle_container()
-    num_particles = beam.TotalNumberOfParticles()
+    num_particles = beam.total_number_of_particles()
     assert num_particles == 10000
     atol = 0.0  # ignored
     rtol = 2.2 * num_particles**-0.5  # from random sampling of a smooth distribution
@@ -108,7 +108,7 @@ def test_impactx_nofile():
     )
     sim.add_particles(bunch_charge_C, distr, npart)
 
-    assert sim.particle_container().TotalNumberOfParticles() == npart
+    assert sim.particle_container().total_number_of_particles() == npart
 
     # init accelerator lattice
     fodo = [
