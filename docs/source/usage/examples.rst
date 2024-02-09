@@ -34,6 +34,7 @@ This section allows you to **download input files** that correspond to different
    examples/epac2004_benchmarks/README.rst
    examples/pytorch_surrogate_model/README.rst
    examples/apochromatic/README.rst
+   examples/fodo_tune/README.rst
 
 
 Unit tests
