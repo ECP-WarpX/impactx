@@ -19,10 +19,9 @@
 
 import re
 
-import pandas as pd
 
 import amrex.space3d as amr
-from impactx import ImpactX, RefPart, distribution, elements
+from impactx import ImpactX, distribution, elements
 
 # Read the input file as a single string, since elements span multiple lines
 

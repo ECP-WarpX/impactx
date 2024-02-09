@@ -11,7 +11,6 @@
 
 import re
 
-import pandas as pd
 
 # Read the input file as a single string, since elements span multiple lines
 
