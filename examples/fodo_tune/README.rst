@@ -1,7 +1,7 @@
 .. _examples-fodo-tune:
 
 Tune Calculation in a Periodic FODO Channel
-============================================
+===========================================
 
 This is identical to the FODO example, except that tracking for 100 periods is used to extract the horizontal tune.
 
