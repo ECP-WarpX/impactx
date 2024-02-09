@@ -802,6 +802,9 @@ add_impactx_test(alignment.py
 # Fermilab Booster thin-kick model ################################################
 #
 # w/o space charge
+# copy MAD-X lattice file
+file(COPY ${ImpactX_SOURCE_DIR}/examples/fodo/fermi-booster-madx-sxf_corr_new
+     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/fermi-booster-madx-sxf_corr_new)
 add_impactx_test(booster.py
     examples/fnal_booster/fnal_booster.py
       OFF  # ImpactX MPI-parallel
