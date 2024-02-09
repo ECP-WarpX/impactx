@@ -23,7 +23,7 @@ beam.mutpt = 0.0
 ###############################################################################
 lattice.periods = 100
 
-lattice.elements = monitor drift1 monitor quad1 monitor drift2 monitor quad2 monitor drift3 monitor
+lattice.elements = monitor drift1 quad1 drift2 quad2 drift3
 lattice.nslice = 1
 
 monitor.type = beam_monitor
