@@ -3,7 +3,7 @@
 Tune Calculation in a Periodic FODO Channel
 ===========================================
 
-This is identical to the FODO example, except that tracking for 100 periods is used to extract the horizontal tune.
+This is identical to the :ref:`FODO example <examples-fodo>`, except that tracking for 100 periods is used to extract the horizontal tune.
 
 Stable FODO cell with a zero-current phase advance of 67.8 degrees, corresponding to Qx = Qy = 0.1883.
 
@@ -20,7 +20,7 @@ The horizontal tune of a single particle is obtained from period-by-period track
 
 In this test, the computed horizontal tune must agree with the nominal value to within acceptable tolerance.
 
-This example requires installation of PyNAFF:  https://pypi.org/project/PyNAFF/
+This example requires installation of `PyNAFF <https://github.com/nkarast/PyNAFF>`__.
 
 Run
 ---
