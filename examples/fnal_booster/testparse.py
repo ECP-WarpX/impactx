@@ -11,7 +11,6 @@
 
 import re
 
-
 # Read the input file as a single string, since elements span multiple lines
 
 with open("fermi-booster-madx-sxf") as f:
