@@ -7,8 +7,7 @@
 # -*- coding: utf-8 -*-
 
 
-import amrex.space3d as amr
-from impactx import ImpactX, RefPart, distribution, elements
+from impactx import ImpactX, distribution
 
 sim = ImpactX()
 
@@ -51,5 +50,4 @@ sim.lattice.load_file("fodo.madx", nslice=25)
 sim.evolve()
 
 # clean shutdown
-del sim
-amr.finalize()
+sim.finalize()

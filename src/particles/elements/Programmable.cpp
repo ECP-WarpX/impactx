@@ -11,6 +11,8 @@
 #include "Programmable.H"
 #include "particles/PushAll.H"
 
+#include <AMReX_BLProfiler.H>
+
 
 namespace impactx
 {
@@ -25,6 +27,7 @@ namespace impactx
             push_all(pc, *this, step, m_threadsafe);
         }
         else {
+            BL_PROFILE("impactx::Push::Programmable");
             m_push(&pc, step);
         }
     }

@@ -362,6 +362,22 @@ Lattice Elements
                (default: ``1``)
             * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
 
+        * ``plasma_lens_chromatic`` for an active cylindrically-symmetric plasma lens, with chromatic effects included.
+           The Hamiltonian is expanded through second order in the transverse variables (x,px,y,py), with the exact pt dependence retained.
+           This requires these additional parameters:
+
+            * ``<element_name>.ds`` (``float``, in meters) the segment length
+            * ``<element_name>.k`` (``float``, in inverse meters squared OR in T/m) the plasma lens focusing strength
+                = (azimuthal magnetic field gradient in T/m) / (magnetic rigidity in T-m) - if units = 0
+
+             OR = azimuthal magnetic field gradient in T/m - if units = 1
+
+            * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
+            * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
+            * ``<element_name>.dy`` (``float``, in meters) vertical translation error
+            * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
+            * ``<element_name>.nslice`` (``integer``) number of slices used for the application of space charge (default: ``1``)
+
         * ``sbend`` for a bending magnet. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
@@ -673,10 +689,8 @@ Numerics and algorithms
     High-order shape factors are computationally more expensive, but may increase the overall accuracy of the results.
     For production runs it is generally safer to use high-order shape factors, such as cubic order.
 
-* ``algo.space_charge`` (``boolean``, optional, default: ``true``)
+* ``algo.space_charge`` (``boolean``, optional, default: ``false``)
     Whether to calculate space charge effects.
-    This is in-development.
-    At the moment, this flag only activates coordinate transformations and charge deposition.
 
 * ``algo.mlmg_relative_tolerance`` (``float``, optional, default: ``1.e-7``)
     The relative precision with which the electrostatic space-charge fields should be calculated.

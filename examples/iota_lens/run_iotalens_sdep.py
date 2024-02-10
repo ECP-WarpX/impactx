@@ -8,7 +8,6 @@
 
 import math
 
-import amrex.space3d as amr
 from impactx import ImpactX, distribution, elements
 
 sim = ImpactX()
@@ -94,5 +93,4 @@ sim.periods = 1
 sim.evolve()
 
 # clean shutdown
-del sim
-amr.finalize()
+sim.finalize()

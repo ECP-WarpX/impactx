@@ -122,7 +122,7 @@ By default, the most important dependencies of ImpactX are automatically downloa
 CMake Option                  Default & Values                               Description
 ============================= ============================================== ===========================================================
 ``BUILD_SHARED_LIBS``         ON/**OFF**                                     Build shared libraries for dependencies
-``CCACHE_PROGRAM``            First found ``ccache`` executable.             Set to ``-DCCACHE_PROGRAM=NO`` to disable CCache.
+``ImpactX_CCACHE``            **ON**/OFF                                     Search and use CCache to speed up rebuilds.
 ``ImpactX_ablastr_src``       *None*                                         Path to ABLASTR source directory (preferred if set)
 ``ImpactX_ablastr_repo``      ``https://github.com/ECP-WarpX/WarpX.git``     Repository URI to pull and build ABLASTR from
 ``ImpactX_ablastr_branch``    *we set and maintain a compatible commit*      Repository branch for ``ImpactX_ablastr_repo``
@@ -139,6 +139,11 @@ CMake Option                  Default & Values                               Des
 ``ImpactX_pyamrex_repo``      ``https://github.com/AMReX-Codes/pyamrex.git`` Repository URI to pull and build pyAMReX from
 ``ImpactX_pyamrex_branch``    *we set and maintain a compatible commit*      Repository branch for ``ImpactX_pyamrex_repo``
 ``ImpactX_pyamrex_internal``  **ON**/OFF                                     Needs a pre-installed pyAMReX module if set to ``OFF``
+``ImpactX_PYTHON_IPO``        **ON**/OFF                                     Build Python w/ interprocedural/link optimization (IPO/LTO)
+``ImpactX_pybind11_src``      *None*                                         Path to pybind11 source directory (preferred if set)
+``ImpactX_pybind11_repo``     ``https://github.com/pybind/pybind11.git``     Repository URI to pull and build pybind11 from
+``ImpactX_pybind11_branch``   *we set and maintain a compatible commit*      Repository branch for ``ImpactX_pybind11_repo``
+``ImpactX_pybind11_internal`` **ON**/OFF                                     Needs a pre-installed pybind11 library if set to ``OFF``
 ============================= ============================================== ===========================================================
 
 For example, one can also build against a local AMReX copy.

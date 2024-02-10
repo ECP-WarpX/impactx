@@ -44,7 +44,7 @@ def test_element_push():
     sim.add_particles(bunch_charge_C, distr, npart)
 
     pc = sim.particle_container()
-    assert pc.TotalNumberOfParticles() == npart
+    assert pc.total_number_of_particles() == npart
 
     # init accelerator lattice
     fodo = [
@@ -61,3 +61,6 @@ def test_element_push():
 
     # alternative formulation
     push(pc, elements.Drift(0.25))
+
+    # finalize simulation
+    sim.finalize()

@@ -153,7 +153,7 @@ Use the following :ref:`cmake commands <building-cmake>` to compile the applicat
          cd $HOME/src/impactx
          rm -rf build_pm_gpu
 
-         cmake -S . -B build_pm_gpu -DImpactX_COMPUTE=CUDA -DImpactX_PSATD=ON -DImpactX_QED_TABLE_GEN=ON -DImpactX_DIMS="1;2;RZ;3"
+         cmake -S . -B build_pm_gpu -DImpactX_COMPUTE=CUDA
          cmake --build build_pm_gpu -j 16
 
       The ImpactX application executables are now in ``$HOME/src/impactx/build_pm_gpu/bin/``.
@@ -164,7 +164,7 @@ Use the following :ref:`cmake commands <building-cmake>` to compile the applicat
          cd $HOME/src/impactx
          rm -rf build_pm_gpu_py
 
-         cmake -S . -B build_pm_gpu_py -DImpactX_COMPUTE=CUDA -DImpactX_PSATD=ON -DImpactX_QED_TABLE_GEN=ON -DImpactX_APP=OFF -DImpactX_PYTHON=ON -DImpactX_DIMS="1;2;RZ;3"
+         cmake -S . -B build_pm_gpu_py -DImpactX_COMPUTE=CUDA -DImpactX_APP=OFF -DImpactX_PYTHON=ON
          cmake --build build_pm_gpu_py -j 16 --target pip_install
 
    .. tab-item:: CPU Nodes
@@ -174,7 +174,7 @@ Use the following :ref:`cmake commands <building-cmake>` to compile the applicat
          cd $HOME/src/impactx
          rm -rf build_pm_cpu
 
-         cmake -S . -B build_pm_cpu -DImpactX_COMPUTE=OMP -DImpactX_PSATD=ON -DImpactX_QED_TABLE_GEN=ON -DImpactX_DIMS="1;2;RZ;3"
+         cmake -S . -B build_pm_cpu -DImpactX_COMPUTE=OMP
          cmake --build build_pm_cpu -j 16
 
       The ImpactX application executables are now in ``$HOME/src/impactx/build_pm_cpu/bin/``.
@@ -184,7 +184,7 @@ Use the following :ref:`cmake commands <building-cmake>` to compile the applicat
 
          rm -rf build_pm_cpu_py
 
-         cmake -S . -B build_pm_cpu_py -DImpactX_COMPUTE=OMP -DImpactX_PSATD=ON -DImpactX_QED_TABLE_GEN=ON -DImpactX_APP=OFF -DImpactX_PYTHON=ON -DImpactX_DIMS="1;2;RZ;3"
+         cmake -S . -B build_pm_cpu_py -DImpactX_COMPUTE=OMP -DImpactX_APP=OFF -DImpactX_PYTHON=ON
          cmake --build build_pm_cpu_py -j 16 --target pip_install
 
 Now, you can :ref:`submit Perlmutter compute jobs <running-cpp-perlmutter>` for ImpactX :ref:`Python (PICMI) scripts <usage-picmi>` (:ref:`example scripts <usage-examples>`).

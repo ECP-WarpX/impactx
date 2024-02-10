@@ -23,7 +23,7 @@ namespace impactx
         BL_PROFILE("ImpactX::validate");
 
         // reference particle initialized?
-        auto const & ref = m_particle_container->GetRefParticle();
+        auto const & ref = amr_data->m_particle_container->GetRefParticle();
         if (ref.kin_energy_MeV() == 0.0)
             throw std::runtime_error("The reference particle energy is zero. Not yet initialized?");
 
@@ -31,10 +31,10 @@ namespace impactx
         // count particles - if no particles are found in our particle container, then a lot of
         // AMReX routines over ParIter won't work, and we have nothing to do here anyway
         {
-            int const nLevelPC = finestLevel();
+            int const nLevelPC = amr_data->finestLevel();
             amrex::Long nParticles = 0;
             for (int lev = 0; lev <= nLevelPC; ++lev) {
-                nParticles += m_particle_container->NumberOfParticlesAtLevel(lev);
+                nParticles += amr_data->m_particle_container->NumberOfParticlesAtLevel(lev);
             }
             if (nParticles == 0)
                 throw std::runtime_error("No particles found. Cannot run evolve without a beam.");

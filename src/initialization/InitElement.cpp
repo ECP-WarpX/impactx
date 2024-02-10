@@ -294,6 +294,17 @@ namespace detail
             pp_element.queryAdd("units", units);
 
             m_lattice.emplace_back( ChrQuad(ds, k, units, a["dx"], a["dy"], a["rotation_degree"], nslice) );
+        } else if (element_type == "plasma_lens_chromatic")
+        {
+            auto a = detail::query_alignment(pp_element);
+            auto const [ds, nslice] = detail::query_ds(pp_element, nslice_default);
+
+            amrex::ParticleReal k;
+            int units = 0;
+            pp_element.get("k", k);
+            pp_element.queryAdd("units", units);
+
+            m_lattice.emplace_back( ChrPlasmaLens(ds, k, units, a["dx"], a["dy"], a["rotation_degree"], nslice) );
         } else if (element_type == "drift_exact")
         {
             auto const [ds, nslice] = detail::query_ds(pp_element, nslice_default);

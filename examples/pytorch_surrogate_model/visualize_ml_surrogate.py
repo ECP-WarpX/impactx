@@ -8,6 +8,7 @@
 
 import argparse
 import glob
+import re
 
 from matplotlib import pyplot as plt
 import numpy as np
@@ -435,7 +436,7 @@ plot_beam_df(
     z_ticks=[-107.3, -106.6],
 )
 if args.save_png:
-    plt.savefig(f"initial_phase_spaces.png")
+    plt.savefig("initial_phase_spaces.png")
 else:
     plt.show()
 

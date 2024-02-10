@@ -6,17 +6,17 @@
 #
 # -*- coding: utf-8 -*-
 
-import amrex.space3d as amr
-from impactx import ImpactX, RefPart, distribution, elements
-
-pp_amr = amr.ParmParse("amr")
-pp_amr.add("max_level", 1)
+from impactx import ImpactX, distribution, elements
 
 sim = ImpactX()
 
 # set numerical parameters and IO control
+sim.max_level = 1
 sim.n_cell = [16, 16, 20]
-# sim.max_level = 1  # TODO: not yet implemented
+sim.blocking_factor_x = [16]
+sim.blocking_factor_y = [16]
+sim.blocking_factor_z = [4]
+
 sim.particle_shape = 2  # B-spline order
 sim.space_charge = True
 sim.dynamic_size = True
@@ -60,5 +60,4 @@ sim.lattice.extend([monitor, elements.Drift(ds=6.0, nslice=40), monitor])
 sim.evolve()
 
 # clean shutdown
-del sim
-amr.finalize()
+sim.finalize()

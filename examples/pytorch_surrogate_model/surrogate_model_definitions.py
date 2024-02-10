@@ -34,11 +34,11 @@ def get_enum_type(type_to_test, EnumClass):
     EnumClass: Enum class
         Enum class to test
     """
-    if type(type_to_test) is EnumClass:  ## Useful ?
+    if isinstance(type_to_test, EnumClass):  ## Useful ?
         return type_to_test
-    if type(type_to_test) is int:
+    if isinstance(type_to_test, int):
         return EnumClass(type_to_test)
-    if type(type_to_test) is str:
+    if isinstance(type_to_test, str):
         return getattr(EnumClass, type_to_test)
 
 
@@ -90,9 +90,10 @@ class OneActNN(ConnectedNN):
 class surrogate_model:
     """ """
 
-    def __init__(self, dataset_file, model_file):
+    def __init__(self, dataset_file, model_file, device):
         self.dataset = torch.load(dataset_file)
-        model_dict = torch.load(model_file, map_location=torch.device("cpu"))
+        self.device = device
+        model_dict = torch.load(model_file)
         n_in = model_dict["model_state_dict"]["stack.0.weight"].shape[1]
         final_layer_key = list(model_dict["model_state_dict"].keys())[-1]
         n_out = model_dict["model_state_dict"][final_layer_key].shape[0]
@@ -112,13 +113,20 @@ class surrogate_model:
         self.neural_network.load_state_dict(model_dict["model_state_dict"])
         self.neural_network.eval()
 
-    def __call__(self, data_arr):
-        data_arr -= self.dataset["source_means"]
-        data_arr /= self.dataset["source_stds"]
-        data_arr = data_arr.float()
+    def __call__(self, data_arr, device=None):
+        data_arr -= torch.tensor(
+            self.dataset["source_means"], dtype=torch.float64, device=device
+        )
+        data_arr /= torch.tensor(
+            self.dataset["source_stds"], dtype=torch.float64, device=device
+        )
         with torch.no_grad():
-            data_arr_post_model = self.neural_network(data_arr)
+            data_arr_post_model = self.neural_network(data_arr.float()).double()
 
-        data_arr_post_model *= self.dataset["target_stds"]
-        data_arr_post_model += self.dataset["target_means"]
+        data_arr_post_model *= torch.tensor(
+            self.dataset["target_stds"], dtype=torch.float64, device=device
+        )
+        data_arr_post_model += torch.tensor(
+            self.dataset["target_means"], dtype=torch.float64, device=device
+        )
         return data_arr_post_model

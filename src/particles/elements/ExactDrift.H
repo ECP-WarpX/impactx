@@ -59,29 +59,36 @@ namespace impactx
         /** This is an exactdrift functor, so that a variable of this type can be used like
          *  an exactdrift function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
+                amrex::ParticleReal & AMREX_RESTRICT x,
+                amrex::ParticleReal & AMREX_RESTRICT y,
+                amrex::ParticleReal & AMREX_RESTRICT t,
                 amrex::ParticleReal & AMREX_RESTRICT px,
                 amrex::ParticleReal & AMREX_RESTRICT py,
                 amrex::ParticleReal & AMREX_RESTRICT pt,
-                RefPart const & refpart) const {
-
+                [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
+                RefPart const & refpart
+        ) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
             // shift due to alignment errors of the element
-            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_in(x, y, px, py);
 
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-            amrex::ParticleReal const t = p.pos(RealAoS::t);
+            // initialize output values
+            amrex::ParticleReal const xout = x;
+            amrex::ParticleReal const yout = y;
+            amrex::ParticleReal const tout = t;
 
             // initialize output values of momenta
             amrex::ParticleReal const pxout = px;
@@ -100,12 +107,11 @@ namespace impactx
                                 1_prt/pow(betgam,2) - pow(px,2) - pow(py,2));
 
             // advance position and momentum (exact drift)
-            p.pos(RealAoS::x) = x + slice_ds * px / pzden;
+            x = xout + slice_ds * px / pzden;
             // pxout = px;
-            p.pos(RealAoS::y) = y + slice_ds * py / pzden;
+            y = yout + slice_ds * py / pzden;
             // pyout = py;
-            p.pos(RealAoS::t) = t - slice_ds * (1_prt/bet +
-                               (pt-1_prt/bet)/pzden);
+            t = tout - slice_ds * (1_prt / bet + (pt-1_prt/bet)/pzden);
             // ptout = pt;
 
             // assign updated momenta
@@ -114,7 +120,7 @@ namespace impactx
             pt = ptout;
 
             // undo shift due to alignment errors of the element
-            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle.

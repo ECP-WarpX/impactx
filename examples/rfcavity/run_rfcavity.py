@@ -6,7 +6,6 @@
 #
 # -*- coding: utf-8 -*-
 
-import amrex.space3d as amr
 from impactx import ImpactX, distribution, elements
 
 sim = ImpactX()
@@ -141,5 +140,4 @@ sim.lattice.extend(
 sim.evolve()
 
 # clean shutdown
-del sim
-amr.finalize()
+sim.finalize()

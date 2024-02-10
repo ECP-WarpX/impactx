@@ -12,8 +12,6 @@
 #include "ImpactXVersion.H"
 #include "particles/ImpactXParticleContainer.H"
 
-#include <ablastr/particles/IndexHandling.H>
-
 #include <AMReX.H>
 #include <AMReX_BLProfiler.H>
 #include <AMReX_REAL.H>
@@ -252,15 +250,6 @@ namespace detail
         auto d_fl = io::Dataset(dtype_fl, {np});
         auto d_ui = io::Dataset(dtype_ui, {np});
 
-        // AoS: Real
-        {
-            std::vector<std::string> real_aos_names = get_RealAoS_names();
-            for (auto real_idx=0; real_idx < RealAoS::nattribs; real_idx++) {
-                auto const component_name = real_aos_names.at(real_idx);
-                getComponentRecord(component_name).resetDataset(d_fl);
-            }
-        }
-
         // reference particle information
         beam.setAttribute( "beta_ref", ref_part.beta() );
         beam.setAttribute( "gamma_ref", ref_part.gamma() );
@@ -278,6 +267,7 @@ namespace detail
 
         // openPMD coarse position: for global coordinates
         {
+
             beam["positionOffset"]["x"].resetDataset(d_fl);
             beam["positionOffset"]["x"].makeConstant(ref_part.x);
             beam["positionOffset"]["y"].resetDataset(d_fl);
@@ -286,7 +276,7 @@ namespace detail
             beam["positionOffset"]["t"].makeConstant(ref_part.t);
         }
 
-        // AoS: Int
+        // unique, global particle index
         beam["id"][scalar].resetDataset(d_ui);
 
         // SoA: Real
@@ -368,9 +358,6 @@ namespace detail
 
         auto & offset = m_offset.at(currentLevel); // ...
 
-        // preparing access to particle data: AoS
-        auto& aos = pti.GetArrayOfStructs();
-
         // series & iteration
         auto series = std::any_cast<io::Series>(m_series);
         io::WriteIterations iterations = series.writeIterations();
@@ -391,36 +378,12 @@ namespace detail
             return detail::get_component_record(beam, std::move(comp_name));
         };
 
-        // AoS: position and particle ID
-        {
-            using vs = std::vector<std::string>;
-            vs const positionComponents{"x", "y", "t"}; // TODO: generalize
-            for (auto currDim = 0; currDim < AMREX_SPACEDIM; currDim++) {
-                std::shared_ptr<amrex::ParticleReal> const curr(
-                    new amrex::ParticleReal[numParticleOnTile],
-                    [](amrex::ParticleReal const *p) { delete[] p; }
-                );
-                for (auto i = 0; i < numParticleOnTile; i++) {
-                    curr.get()[i] = aos[i].pos(currDim);
-                }
-                std::string const& positionComponent = positionComponents[currDim];
-                beam["position"][positionComponent].storeChunk(curr, {offset},
-                                                               {numParticleOnTile64});
-            }
-
-            // save particle ID after converting it to a globally unique ID
-            std::shared_ptr<uint64_t> const ids(
-                new uint64_t[numParticleOnTile],
-                [](uint64_t const *p) { delete[] p; }
-            );
-            for (auto i = 0; i < numParticleOnTile; i++) {
-                ids.get()[i] = ablastr::particles::localIDtoGlobal(aos[i].id(), aos[i].cpu());
-            }
-            beam["id"][scalar].storeChunk(ids, {offset}, {numParticleOnTile64});
-        }
-
-        // SoA: everything else
+        // SoA
         auto const& soa = pti.GetStructOfArrays();
+        //   particle id arrays
+        {
+            beam["id"][scalar].storeChunkRaw(soa.GetIdCPUData().data(), {offset}, {numParticleOnTile64});
+        }
         //   SoA floating point (ParticleReal) properties
         {
             std::vector<std::string> real_soa_names = get_RealSoA_names(soa.NumRealComps());

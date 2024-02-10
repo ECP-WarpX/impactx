@@ -47,7 +47,7 @@ jobs:
 
     - name: run tests
       run: |
-        ctest --test-dir build --output-on-failure
+        ctest --test-dir build --output-on-failure --label-exclude slow
 
     - name: run installed app
       run: |
@@ -110,7 +110,7 @@ jobs:
 
     - name: run tests
       run: |
-        ctest --test-dir build --output-on-failure
+        ctest --test-dir build --output-on-failure --label-exclude slow
 
     - name: run installed app
       run: |

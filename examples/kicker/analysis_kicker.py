@@ -29,15 +29,9 @@ def get_moments(beam):
     meanpy = describe(beam["momentum_y"]).mean
 
     epstrms = beam.cov(ddof=0)
-    emittance_x = (
-        sigx**2 * sigpx**2 - epstrms["position_x"]["momentum_x"] ** 2
-    ) ** 0.5
-    emittance_y = (
-        sigy**2 * sigpy**2 - epstrms["position_y"]["momentum_y"] ** 2
-    ) ** 0.5
-    emittance_t = (
-        sigt**2 * sigpt**2 - epstrms["position_t"]["momentum_t"] ** 2
-    ) ** 0.5
+    emittance_x = (sigx**2 * sigpx**2 - epstrms["position_x"]["momentum_x"] ** 2) ** 0.5
+    emittance_y = (sigy**2 * sigpy**2 - epstrms["position_y"]["momentum_y"] ** 2) ** 0.5
+    emittance_t = (sigt**2 * sigpt**2 - epstrms["position_t"]["momentum_t"] ** 2) ** 0.5
 
     return (sigx, sigy, sigt, emittance_x, emittance_y, emittance_t, meanpx, meanpy)
 

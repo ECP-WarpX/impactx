@@ -261,6 +261,39 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ChrQuad);
 
+    py::class_<ChrPlasmaLens, elements::Thick, elements::Alignment> py_ChrPlasmaLens(me, "ChrPlasmaLens");
+    py_ChrPlasmaLens
+        .def(py::init<
+                amrex::ParticleReal,
+                amrex::ParticleReal,
+                int,
+                amrex::ParticleReal,
+                amrex::ParticleReal,
+                amrex::ParticleReal,
+                int
+             >(),
+             py::arg("ds"),
+             py::arg("k"),
+             py::arg("units") = 0,
+             py::arg("dx") = 0,
+             py::arg("dy") = 0,
+             py::arg("rotation") = 0,
+             py::arg("nslice") = 1,
+             "An active Plasma Lens with chromatic effects included."
+        )
+        .def_property("k",
+            [](ChrQuad & cq) { return cq.m_k; },
+            [](ChrQuad & cq, amrex::ParticleReal k) { cq.m_k = k; },
+            "focusing strength in 1/m^2 (or T/m)"
+        )
+        .def_property("units",
+            [](ChrQuad & cq) { return cq.m_unit; },
+            [](ChrQuad & cq, int unit) { cq.m_unit = unit; },
+            "unit specification for focusing strength"
+        )
+    ;
+    register_beamoptics_push(py_ChrPlasmaLens);
+
     py::class_<ChrAcc, elements::Thick, elements::Alignment> py_ChrAcc(me, "ChrAcc");
     py_ChrAcc
         .def(py::init<

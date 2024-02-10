@@ -85,41 +85,60 @@ void init_ImpactX (py::module& m)
                 pp_amr.getarr("n_cell", n_cell);
                 return n_cell;
             },
-            [](ImpactX & /* ix */, std::array<int, AMREX_SPACEDIM> n_cell) {
+            [](ImpactX & ix, std::array<int, AMREX_SPACEDIM> n_cell) {
+                if (ix.initialized())
+                    throw std::runtime_error("Read-only parameter after init_grids was called.");
+
                 amrex::ParmParse pp_amr("amr");
                 amrex::Vector<int> const n_cell_v(n_cell.begin(), n_cell.end());
                 pp_amr.addarr("n_cell", n_cell_v);
-
-                // note, this must be done *before* initGrids is called
-                /*
-                int const max_level = ix.maxLevel();
-                for (int lev=0; lev<=max_level; lev++) {
-                    ix.ClearLevel(lev);
-                    // TODO: more...
-                }
-                if (amrex::ParallelDescriptor::IOProcessor())
-                    ix.printGridSummary(amrex::OutStream(), 0, max_level);
-                */
             },
             "The number of grid points along each direction on the coarsest level."
-        )
+        );
 
+    for (int dir : {0, 1, 2}) {
+        std::string const dir_str = std::vector<std::string>{"x", "y", "z"}.at(dir);
+        std::string const bf_str = "blocking_factor_" + dir_str;
+        impactx
+            .def_property(bf_str.c_str(),
+                  [bf_str](ImpactX & /* ix */) {
+                      amrex::ParmParse pp_amr("amr");
+                      std::vector<int> blocking_factor_dir;
+                      pp_amr.queryarr(bf_str.c_str(), blocking_factor_dir);
+
+                      return blocking_factor_dir;
+                  },
+                  [bf_str](ImpactX &ix, std::vector<int> blocking_factor_dir) {
+                      if (ix.initialized())
+                          throw std::runtime_error("Read-only parameter after init_grids was called.");
+
+                      amrex::ParmParse pp_amr("amr");
+                      pp_amr.addarr(bf_str.c_str(), blocking_factor_dir);
+                  },
+                  "AMReX blocking factor for a direction, per MR level."
+            );
+    }
+
+    impactx
         // from amrex::AmrMesh
         .def_property("max_level",
-            [](ImpactX & ix){ return ix.maxLevel(); },
-            [](ImpactX & /* ix */, int /* max_level */) {
-                throw std::runtime_error("setting n_cell is not yet implemented");
-                /*
+            [](ImpactX & /* ix */){
+                int max_level = 0;
+                amrex::ParmParse pp_amr("amr");
+                pp_amr.query("max_level", max_level);
+                return max_level;
+            },
+            [](ImpactX & ix, int max_level) {
+                if (ix.initialized())
+                    throw std::runtime_error("Read-only parameter after init_grids was called.");
+
                 amrex::ParmParse pp_amr("amr");
                 pp_amr.add("max_level", max_level);
-                */
-
-                // note, this must be done *before* initGrids is called
             },
             "The maximum mesh-refinement level for the simulation."
         )
         .def_property_readonly("finest_level",
-            [](ImpactX & ix){ return ix.finestLevel(); },
+            [](ImpactX & ix){ return ix.amr_data->finestLevel(); },
             "The currently finest level of mesh-refinement used. This is always less or equal to max_level."
         )
 
@@ -177,12 +196,7 @@ void init_ImpactX (py::module& m)
             [](ImpactX & /* ix */) {
                 return detail::get_or_throw<int>("algo", "particle_shape");
             },
-            [](ImpactX & ix, int const order) {
-                AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ix.m_particle_container,
-                    "particle container not initialized");
-                // todo: why does that not work?
-                //ix.m_particle_container->SetParticleShape(order);
-
+            [](ImpactX & /* ix */, int const order) {
                 amrex::ParmParse pp_ago("algo");
                 pp_ago.add("particle_shape", order);
             },
@@ -348,7 +362,10 @@ void init_ImpactX (py::module& m)
             "if there are unused parameters in the input."
         )
 
-        .def("init_grids", &ImpactX::initGrids,
+        .def("finalize", &ImpactX::finalize,
+             "Deallocate all contexts and data."
+        )
+        .def("init_grids", &ImpactX::init_grids,
              "Initialize AMReX blocks/grids for domain decomposition & space charge mesh.\n\n"
              "This must come first, before particle beams and lattice elements are initialized."
         )
@@ -373,21 +390,21 @@ void init_ImpactX (py::module& m)
 
         .def("particle_container",
              [](ImpactX & ix) -> ImpactXParticleContainer & {
-                return *ix.m_particle_container;
+                return *ix.amr_data->m_particle_container;
              },
              py::return_value_policy::reference_internal,
              "Access the beam particle container."
         )
         .def(
             "rho",
-            [](ImpactX & ix, int const lev) { return &ix.m_rho.at(lev); },
+            [](ImpactX & ix, int const lev) { return &ix.amr_data->m_rho.at(lev); },
             py::arg("lev"),
             py::return_value_policy::reference_internal,
             "charge density per level"
         )
         .def(
             "phi",
-            [](ImpactX & ix, int const lev) { return &ix.m_phi.at(lev); },
+            [](ImpactX & ix, int const lev) { return &ix.amr_data->m_phi.at(lev); },
             py::arg("lev"),
             py::return_value_policy::reference_internal,
             "scalar potential per level"
@@ -395,7 +412,7 @@ void init_ImpactX (py::module& m)
         .def(
             "space_charge_field",
             [](ImpactX & ix, int lev, std::string const & comp) {
-                return &ix.m_space_charge_field.at(lev).at(comp);
+                return &ix.amr_data->m_space_charge_field.at(lev).at(comp);
             },
             py::arg("lev"), py::arg("comp"),
             py::return_value_policy::reference_internal,
@@ -420,17 +437,16 @@ void init_ImpactX (py::module& m)
 
         // from AmrCore->AmrMesh
         .def("Geom",
-            //[](ImpactX const & ix, int const lev) { return ix.Geom(lev); },
-            py::overload_cast< int >(&ImpactX::Geom, py::const_),
+            [](ImpactX const & ix, int const lev) { return ix.amr_data->Geom(lev); },
             py::arg("lev")
         )
         .def("DistributionMap",
-            [](ImpactX const & ix, int const lev) { return ix.DistributionMap(lev); },
+            [](ImpactX const & ix, int const lev) { return ix.amr_data->DistributionMap(lev); },
             //py::overload_cast< int >(&ImpactX::DistributionMap, py::const_),
             py::arg("lev")
         )
         .def("boxArray",
-            [](ImpactX const & ix, int const lev) { return ix.boxArray(lev); },
+            [](ImpactX const & ix, int const lev) { return ix.amr_data->boxArray(lev); },
             //py::overload_cast< int >(&ImpactX::boxArray, py::const_),
             py::arg("lev")
         )

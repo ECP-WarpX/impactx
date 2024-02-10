@@ -62,11 +62,9 @@ General
 
    .. py:property:: space_charge
 
-      Enable (``True``) or disable (``False``) space charge calculations (default: ``True``).
+      Enable (``True``) or disable (``False``) space charge calculations (default: ``False``).
 
       Whether to calculate space charge effects.
-      This is in-development.
-      At the moment, this flag only activates coordinate transformations and charge deposition.
 
    .. py:property:: mlmg_relative_tolerance
 
@@ -393,7 +391,7 @@ This module provides particle beam distributions that can be used to initialize 
 .. py:class:: impactx.distribution.Kurth4D(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A 4D Kurth distribution transversely + a uniform distribution
-   it t + a Gaussian distribution in pt.
+   in t + a Gaussian distribution in pt.
 
 .. py:class:: impactx.distribution.Kurth6D(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
@@ -405,7 +403,7 @@ This module provides particle beam distributions that can be used to initialize 
 .. py:class:: impactx.distribution.KVdist(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A K-V distribution transversely + a uniform distribution
-   it t + a Gaussian distribution in pt.
+   in t + a Gaussian distribution in pt.
 
 .. py:class:: impactx.distribution.None
 
@@ -672,6 +670,30 @@ This module provides elements for the accelerator lattice.
    .. py:property:: units
 
       unit specification for quad strength
+
+.. py:class:: impactx.elements.ChrPlasmaLens(ds, g, dx=0, dy=0, rotation=0, nslice=1)
+
+   An active cylindrically symmetric plasma lens, with chromatic effects included.
+   The Hamiltonian is expanded through second order in the transverse variables
+   (x,px,y,py), with the exact pt dependence retained.
+
+   :param ds: Segment length in m.
+   :param k:  focusing strength in m^(-2) (if units = 0)
+              = (azimuthal magnetic field gradient in T/m) / (rigidity in T-m)
+          OR  azimuthal magnetic field gradient in T/m (if units = 1)
+   :param units: specification of units for plasma lens focusing strength
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
+   :param nslice: number of slices used for the application of space charge
+
+   .. py:property:: k
+
+      plasma lens focusing strength in 1/m^2 (or T/m)
+
+   .. py:property:: units
+
+      unit specification for plasma lens focusing strength
 
 .. py:class:: impactx.elements.ChrAcc(ds, ez, bz, dx=0, dy=0, rotation=0, nslice=1)
 

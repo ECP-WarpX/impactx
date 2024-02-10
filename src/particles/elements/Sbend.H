@@ -62,29 +62,36 @@ namespace impactx
 
         /** This is a sbend functor, so that a variable of this type can be used like a sbend function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
-                amrex::ParticleReal & AMREX_RESTRICT px,
-                amrex::ParticleReal & AMREX_RESTRICT py,
-                amrex::ParticleReal & AMREX_RESTRICT pt,
-                RefPart const & refpart) const {
-
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            amrex::ParticleReal & AMREX_RESTRICT t,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
+            RefPart const & refpart
+        ) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
             // shift due to alignment errors of the element
-            shift_in(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_in(x, y, px, py);
 
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-            amrex::ParticleReal const t = p.pos(RealAoS::t);
+            // intialize output values
+            amrex::ParticleReal xout = x;
+            amrex::ParticleReal yout = y;
+            amrex::ParticleReal tout = t;
 
             // initialize output values of momenta
             amrex::ParticleReal pxout = px;
@@ -104,27 +111,30 @@ namespace impactx
             auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);
 
             // advance position and momentum (sector bend)
-            p.pos(RealAoS::x) = cos_theta*x + m_rc*sin_theta*px
+            xout = cos_theta*x + m_rc*sin_theta*px
                        - (m_rc/bet)*(1.0_prt - cos_theta)*pt;
 
             pxout = -sin_theta/m_rc*x + cos_theta*px - sin_theta/bet*pt;
 
-            p.pos(RealAoS::y) = y + m_rc*theta*py;
+            yout = y + m_rc*theta*py;
 
             // pyout = py;
 
-            p.pos(RealAoS::t) = sin_theta/bet*x + m_rc/bet*(1.0_prt - cos_theta)*px + t
+            tout = sin_theta/bet*x + m_rc/bet*(1.0_prt - cos_theta)*px + t
                        + m_rc*(-theta+sin_theta/(bet*bet))*pt;
 
             // ptout = pt;
 
-            // assign updated momenta
+            // assign updated values
+            x = xout;
+            y = yout;
+            t = tout;
             px = pxout;
             py = pyout;
             pt = ptout;
 
             // undo shift due to alignment errors of the element
-            shift_out(p.pos(RealAoS::x), p.pos(RealAoS::y), px, py);
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle.

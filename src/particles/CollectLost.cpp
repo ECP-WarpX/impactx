@@ -12,6 +12,7 @@
 #include <AMReX_GpuLaunch.H>
 #include <AMReX_GpuQualifiers.H>
 #include <AMReX_Math.H>
+#include <AMReX_Particle.H>
 #include <AMReX_ParticleTransformation.H>
 #include <AMReX_RandomEngine.H>
 
@@ -27,9 +28,9 @@ namespace impactx
         using DstData = ImpactXParticleContainer::ParticleTileType::ParticleTileDataType;
 
         AMREX_GPU_HOST_DEVICE
-        void operator() (DstData const &dst, SrcData const &src, int src_ip, int dst_ip) const noexcept {
-            dst.m_aos[dst_ip] = src.m_aos[src_ip];
-
+        void operator() (DstData const &dst, SrcData const &src, int src_ip, int dst_ip) const noexcept
+        {
+            dst.m_idcpu[dst_ip] = src.m_idcpu[src_ip];
             for (int j = 0; j < SrcData::NAR; ++j)
                 dst.m_rdata[j][dst_ip] = src.m_rdata[j][src_ip];
             for (int j = 0; j < src.m_num_runtime_real; ++j)
@@ -42,7 +43,7 @@ namespace impactx
             //    dst.m_runtime_idata[j][dst_ip] = src.m_runtime_idata[j][src_ip];
 
             // flip id to positive in destination
-            dst.id(dst_ip) = amrex::Math::abs(dst.id(dst_ip));
+            amrex::ParticleIDWrapper{dst.m_idcpu[dst_ip]}.make_valid();
 
             // remember the current s of the ref particle when lost
             dst.m_runtime_rdata[s_index][dst_ip] = s_lost;
@@ -85,7 +86,7 @@ namespace impactx
                 auto const predicate = [] AMREX_GPU_HOST_DEVICE (const SrcData& src, int ip)
                 /* NVCC 11.3.109 chokes in C++17 on this: noexcept */
                 {
-                    return src.id(ip) < 0;
+                    return !amrex::ConstParticleIDWrapper{src.m_idcpu[ip]}.is_valid();
                 };
 
                 auto& ptile_dest = dest.DefineAndReturnParticleTile(
@@ -130,9 +131,11 @@ namespace impactx
                 {
                     int n_removed = 0;
                     auto ptile_src_data = ptile_source.getParticleTileData();
+                    auto const ptile_soa = ptile_source.GetStructOfArrays();
+                    auto const ptile_idcpu = ptile_soa.GetIdCPUData().dataPtr();
                     for (int ip = 0; ip < np; ++ip)
                     {
-                        if (ptile_source.id(ip) < 0)
+                        if (!amrex::ConstParticleIDWrapper{ptile_idcpu[ip]}.is_valid())
                             n_removed++;
                         else
                         {
@@ -141,8 +144,7 @@ namespace impactx
                                 // move down
                                 int const new_index = ip - n_removed;
 
-                                ptile_src_data.m_aos[new_index] = ptile_src_data.m_aos[ip];
-
+                                ptile_src_data.m_idcpu[new_index] = ptile_src_data.m_idcpu[ip];
                                 for (int j = 0; j < SrcData::NAR; ++j)
                                     ptile_src_data.m_rdata[j][new_index] = ptile_src_data.m_rdata[j][ip];
                                 for (int j = 0; j < ptile_src_data.m_num_runtime_real; ++j)

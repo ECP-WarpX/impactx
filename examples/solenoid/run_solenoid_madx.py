@@ -6,8 +6,7 @@
 #
 # -*- coding: utf-8 -*-
 
-import amrex.space3d as amr
-from impactx import ImpactX, RefPart, distribution, elements
+from impactx import ImpactX, distribution
 
 sim = ImpactX()
 
@@ -47,5 +46,4 @@ sim.lattice.load_file("solenoid.madx", nslice=1)
 sim.evolve()
 
 # clean shutdown
-del sim
-amr.finalize()
+sim.finalize()

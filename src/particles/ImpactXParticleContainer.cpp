@@ -9,6 +9,8 @@
  */
 #include "ImpactXParticleContainer.H"
 
+#include "initialization/AmrCoreData.H"
+
 #include <ablastr/constant.H>
 #include <ablastr/particles/ParticleMoments.H>
 
@@ -17,8 +19,9 @@
 #include <AMReX_AmrParGDB.H>
 #include <AMReX_ParallelDescriptor.H>
 #include <AMReX_ParmParse.H>
-#include <AMReX_ParticleTile.H>
+#include <AMReX_Particle.H>
 
+#include <algorithm>
 #include <stdexcept>
 
 
@@ -35,24 +38,24 @@ namespace
 
 namespace impactx
 {
-    ParIter::ParIter (ContainerType& pc, int level)
-        : amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+    ParIterSoA::ParIterSoA (ContainerType& pc, int level)
+        : amrex::ParIterSoA<RealSoA::nattribs, IntSoA::nattribs>(pc, level,
                    amrex::MFItInfo().SetDynamic(do_omp_dynamic())) {}
 
-    ParIter::ParIter (ContainerType& pc, int level, amrex::MFItInfo& info)
-        : amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+    ParIterSoA::ParIterSoA (ContainerType& pc, int level, amrex::MFItInfo& info)
+        : amrex::ParIterSoA<RealSoA::nattribs, IntSoA::nattribs>(pc, level,
               info.SetDynamic(do_omp_dynamic())) {}
 
-    ParConstIter::ParConstIter (ContainerType& pc, int level)
-        : amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+    ParConstIterSoA::ParConstIterSoA (ContainerType& pc, int level)
+        : amrex::ParConstIterSoA<RealSoA::nattribs, IntSoA::nattribs>(pc, level,
               amrex::MFItInfo().SetDynamic(do_omp_dynamic())) {}
 
-    ParConstIter::ParConstIter (ContainerType& pc, int level, amrex::MFItInfo& info)
-        : amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+    ParConstIterSoA::ParConstIterSoA (ContainerType& pc, int level, amrex::MFItInfo& info)
+        : amrex::ParConstIterSoA<RealSoA::nattribs, IntSoA::nattribs>(pc, level,
               info.SetDynamic(do_omp_dynamic())) {}
 
-    ImpactXParticleContainer::ImpactXParticleContainer (amrex::AmrCore* amr_core)
-        : amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
+    ImpactXParticleContainer::ImpactXParticleContainer (initialization::AmrCoreData* amr_core)
+        : amrex::ParticleContainerPureSoA<RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
     {
         SetParticleSize();
     }
@@ -122,7 +125,19 @@ namespace impactx
         // number of particles to add
         int const np = x.size();
 
-        auto& particle_tile = DefineAndReturnParticleTile(0, 0, 0);
+        // we add particles to lev 0, tile 0 of the first box assigned to this proc
+        int lid = 0, gid = 0, tid = 0;
+        {
+            const auto& pmap = ParticleDistributionMap(lid).ProcessorMap();
+            auto it = std::find(pmap.begin(), pmap.end(), amrex::ParallelDescriptor::MyProc());
+            if (it == std::end(pmap)) {
+                amrex::Abort("Attempting to add particles to box that does not exist.");
+            } else {
+                gid = *it;
+            }
+        }
+        auto& particle_tile = DefineAndReturnParticleTile(lid, gid, tid);
+
         auto old_np = particle_tile.numParticles();
         auto new_np = old_np + np;
         particle_tile.resize(new_np);
@@ -142,13 +157,17 @@ namespace impactx
 
         const int cpuid = amrex::ParallelDescriptor::MyProc();
 
-        auto * AMREX_RESTRICT pstructs = particle_tile.GetArrayOfStructs()().dataPtr();
         auto & soa = particle_tile.GetStructOfArrays().GetRealData();
+        amrex::ParticleReal * const AMREX_RESTRICT x_arr = soa[RealSoA::x].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT y_arr = soa[RealSoA::y].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT t_arr = soa[RealSoA::t].dataPtr();
         amrex::ParticleReal * const AMREX_RESTRICT px_arr = soa[RealSoA::px].dataPtr();
         amrex::ParticleReal * const AMREX_RESTRICT py_arr = soa[RealSoA::py].dataPtr();
         amrex::ParticleReal * const AMREX_RESTRICT pt_arr = soa[RealSoA::pt].dataPtr();
         amrex::ParticleReal * const AMREX_RESTRICT qm_arr = soa[RealSoA::qm].dataPtr();
         amrex::ParticleReal * const AMREX_RESTRICT w_arr  = soa[RealSoA::w ].dataPtr();
+
+        uint64_t * const AMREX_RESTRICT idcpu_arr = particle_tile.GetStructOfArrays().GetIdCPUData().dataPtr();
 
         amrex::ParticleReal const * const AMREX_RESTRICT x_ptr = x.data();
         amrex::ParticleReal const * const AMREX_RESTRICT y_ptr = y.data();
@@ -160,12 +179,11 @@ namespace impactx
         amrex::ParallelFor(np,
         [=] AMREX_GPU_DEVICE (int i) noexcept
         {
-            ParticleType& p = pstructs[old_np + i];
-            p.id() = pid + i;
-            p.cpu() = cpuid;
-            p.pos(RealAoS::x) = x_ptr[i];
-            p.pos(RealAoS::y) = y_ptr[i];
-            p.pos(RealAoS::t) = t_ptr[i];
+            idcpu_arr[old_np+i] = amrex::SetParticleIDandCPU(pid + i, cpuid);
+
+            x_arr[old_np+i] = x_ptr[i];
+            y_arr[old_np+i] = y_ptr[i];
+            t_arr[old_np+i] = t_ptr[i];
 
             px_arr[old_np+i] = px_ptr[i];
             py_arr[old_np+i] = py_ptr[i];
@@ -226,15 +244,15 @@ namespace impactx
     }
 
     std::vector<std::string>
-    ImpactXParticleContainer::RealAoS_names () const
-    {
-        return get_RealAoS_names();
-    }
-
-    std::vector<std::string>
     ImpactXParticleContainer::RealSoA_names () const
     {
         return get_RealSoA_names(this->NumRealComps());
+    }
+
+    std::vector<std::string>
+    ImpactXParticleContainer::intSoA_names () const
+    {
+        return get_intSoA_names(this->NumIntComps());
     }
 
     CoordSystem
@@ -247,17 +265,6 @@ namespace impactx
     ImpactXParticleContainer::SetCoordSystem (CoordSystem coord_system)
     {
         m_coordsystem = coord_system;
-    }
-
-    std::vector<std::string>
-    get_RealAoS_names ()
-    {
-        std::vector<std::string> real_aos_names(RealAoS::names_s.size());
-
-        // compile-time attributes
-        std::copy(RealAoS::names_s.begin(), RealAoS::names_s.end(), real_aos_names.begin());
-
-        return real_aos_names;
     }
 
     std::vector<std::string>
@@ -276,5 +283,23 @@ namespace impactx
         }
 
         return real_soa_names;
+    }
+
+    std::vector<std::string>
+    get_intSoA_names (int num_int_comps)
+    {
+        std::vector<std::string> int_soa_names(num_int_comps);
+
+        // compile-time attributes
+        std::copy(IntSoA::names_s.begin(), IntSoA::names_s.end(), int_soa_names.begin());
+
+        // runtime attributes
+        if (num_int_comps > int(IntSoA::names_s.size()))
+        {
+            // particles lost record their "s" position where they got lost
+            int_soa_names[IntSoA::nattribs] = "s_lost";
+        }
+
+        return int_soa_names;
     }
 } // namespace impactx
