@@ -140,23 +140,16 @@ namespace impactx
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (RefPart & AMREX_RESTRICT refpart) const
         {
-            using namespace amrex::literals; // for _rt and _prt
-
             // assign input reference particle values
             amrex::ParticleReal const px = refpart.px;
-            amrex::ParticleReal const py = refpart.py;
             amrex::ParticleReal const pz = refpart.pz;
-            amrex::ParticleReal const pt = refpart.pt;
 
             // calculate expensive terms once
             auto const [sin_theta, cos_theta] = amrex::Math::sincos(m_theta);
 
             // advance position and momentum (thin dipole)
             refpart.px = px*cos_theta - pz*sin_theta;
-            refpart.py = py;
             refpart.pz = pz*cos_theta + px*sin_theta;
-            refpart.pt = pt;
-
         }
 
     private:
