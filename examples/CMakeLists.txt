@@ -868,6 +868,7 @@ add_impactx_test(booster.py
     examples/fnal_booster/analysis_booster.py
     OFF  # no plot script yet
 )
+label_impactx_test(booster.py slow)
 
 # Tune Calculation ###########################################################
 #
