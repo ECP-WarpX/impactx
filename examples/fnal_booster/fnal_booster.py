@@ -17,6 +17,7 @@
 
 # Import the required Python packages
 
+import math
 import re
 
 import amrex.space3d as amr
@@ -80,7 +81,7 @@ def parse_one_group(element, key):
         None
 
 
-def parse_element(element, zprev):
+def parse_element(sim, element, zprev):
     """
     Input: SXF Element String
     Outpu: ImpactX Element
@@ -260,7 +261,7 @@ sim.lattice.append(elements.BeamMonitor("monitor", backend="h5"))
 
 zprev = 0.0
 for element in element_list:  # elements[0:12]:
-    zloc = parse_element(element, zprev)
+    zloc = parse_element(sim, element, zprev)
     zprev = zloc
 
 # Final beam diagnostics
