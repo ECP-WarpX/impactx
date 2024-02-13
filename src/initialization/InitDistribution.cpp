@@ -22,8 +22,10 @@
 #include <AMReX_ParmParse.H>
 #include <AMReX_Print.H>
 
+#include <cmath>
 #include <string>
 #include <type_traits>
+#include <tuple>
 #include <variant>
 
 
@@ -121,6 +123,91 @@ namespace impactx
         }
     }
 
+    void initialization::setDistributionParametersFromTwissInputs (
+        amrex::ParmParse const & pp_dist,
+        amrex::ParticleReal& sigx, amrex::ParticleReal& sigy, amrex::ParticleReal& sigt,
+        amrex::ParticleReal& sigpx, amrex::ParticleReal& sigpy, amrex::ParticleReal& sigpt,
+        amrex::ParticleReal& muxpx, amrex::ParticleReal& muypy, amrex::ParticleReal& mutpt
+    )
+    {
+
+        // Values to be read from input
+        amrex::ParticleReal betax, betay, betat, emittx, emitty, emittt;
+        // If alpha is zero the bunch is in focus
+        amrex::ParticleReal alphax = 0.0, alphay = 0.0, alphat = 0.0;
+
+        // Reading the input Twiss parameters
+        pp_dist.query("alphaX", alphax);
+        pp_dist.query("alphaY", alphay);
+        pp_dist.query("alphaT", alphat);
+        pp_dist.get("betaX", betax);
+        pp_dist.get("betaY", betay);
+        pp_dist.get("betaT", betat);
+        pp_dist.get("emittX", emittx);
+        pp_dist.get("emittY", emitty);
+        pp_dist.get("emittT", emittt);
+
+        if (betax <= 0.0 || betay <= 0.0 || betat <= 0.0) {
+            amrex::Abort("Input Error: The beta function values need to be non-zero positive values in all dimensions.");
+        }
+
+        if (emittx <= 0.0 || emitty <= 0.0 || emittt <= 0.0) {
+            amrex::Abort("Input Error: Emittance values need to be non-zero positive values in all dimensions.");
+        }
+
+        amrex::Vector<amrex::ParticleReal> alphas = {alphax, alphay, alphat};
+        amrex::Vector<amrex::ParticleReal> betas = {betax, betay, betat};
+        amrex::Vector<amrex::ParticleReal> emittances = {emittx, emitty, emittt};
+
+        // calculate Twiss / Courant-Snyder gammas
+        amrex::Vector<amrex::ParticleReal> gammas;
+        for (int i = 0; i < alphas.size(); i++){
+            gammas.push_back((1.0 + pow(alphas[i], 2)) / betas[i]);
+        }
+
+        amrex::Vector<amrex::ParticleReal> sigmas_pos;
+        amrex::Vector<amrex::ParticleReal> sigmas_mom;
+        amrex::Vector<amrex::ParticleReal> correlations;
+
+        // calculate intersections of phase space ellipse with coordinate axes and the correlation factors
+        for (int k = 0; k < betas.size(); k++){
+            sigmas_pos.push_back(sqrt(emittances[k]/gammas[k]));
+            sigmas_mom.push_back(sqrt(emittances[k]/betas[k]));
+
+            correlations.push_back(alphas[k] / sqrt(betas[k] * gammas[k]));
+        }
+
+        sigx = sigmas_pos[0];
+        sigy = sigmas_pos[1];
+        sigt = sigmas_pos[2];
+        sigpx = sigmas_mom[0];
+        sigpy = sigmas_mom[1];
+        sigpt = sigmas_mom[2];
+        muxpx = correlations[0];
+        muypy = correlations[1];
+        mutpt = correlations[2];
+
+    }
+
+    void initialization::setDistributionParametersFromPhaseSpaceInputs (
+        amrex::ParmParse const & pp_dist,
+        amrex::ParticleReal& sigx, amrex::ParticleReal& sigy, amrex::ParticleReal& sigt,
+        amrex::ParticleReal& sigpx, amrex::ParticleReal& sigpy, amrex::ParticleReal& sigpt,
+        amrex::ParticleReal& muxpx, amrex::ParticleReal& muypy, amrex::ParticleReal& mutpt
+    )
+    {
+
+        pp_dist.get("sigmaX", sigx);
+        pp_dist.get("sigmaY", sigy);
+        pp_dist.get("sigmaT", sigt);
+        pp_dist.get("sigmaPx", sigpx);
+        pp_dist.get("sigmaPy", sigpy);
+        pp_dist.get("sigmaPt", sigpt);
+        pp_dist.query("muxpx", muxpx);
+        pp_dist.query("muypy", muypy);
+        pp_dist.query("mutpt", mutpt);
+    }
+
     void ImpactX::initBeamDistributionFromInputs ()
     {
         BL_PROFILE("ImpactX::initBeamDistributionFromInputs");
@@ -171,163 +258,144 @@ namespace impactx
         std::string unit_type;  // System of units
         pp_dist.get("units", unit_type);
 
+        // Beam distributions that all share the same input signature for parameters from a beam ellipse
+        std::set<std::string> distribution_types_from_beam_ellipse = {
+                "gaussian", "kurth4d", "kurth6d", "kvdist", "semigaussian", "triangle", "waterbag"
+        };
+
         std::string distribution_type;  // Beam distribution type
         pp_dist.get("distribution", distribution_type);
 
-        if(distribution_type == "waterbag"){
-          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
-          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
-          pp_dist.get("sigmaX", sigx);
-          pp_dist.get("sigmaY", sigy);
-          pp_dist.get("sigmaT", sigt);
-          pp_dist.get("sigmaPx", sigpx);
-          pp_dist.get("sigmaPy", sigpy);
-          pp_dist.get("sigmaPt", sigpt);
-          pp_dist.query("muxpx", muxpx);
-          pp_dist.query("muypy", muypy);
-          pp_dist.query("mutpt", mutpt);
+        std::string base_dist_type = distribution_type;
+        std::string suffix;
+        std::size_t underscore_position = distribution_type.find("_");
+        bool initialize_from_twiss = false;
 
-          distribution::KnownDistributions const waterbag(distribution::Waterbag(
-              sigx, sigy, sigt,
-              sigpx, sigpy, sigpt,
-              muxpx, muypy, mutpt));
+        // Check if there is an underscore in the distribution type at all
+        if(underscore_position != std::string::npos) {
+            base_dist_type = distribution_type.substr(0, underscore_position);
+            suffix = distribution_type.substr(underscore_position + 1);
 
-          add_particles(bunch_charge, waterbag, npart);
+            /* After separating suffix from base type, check if the base distribution type is in the set of
+             * distributions that all share the same input signature.
+             */
+            if (distribution_types_from_beam_ellipse.find(base_dist_type) != distribution_types_from_beam_ellipse.end())
+            {
+                if (suffix == "from_twiss" || suffix == "from_cs") {
+                    initialize_from_twiss = true;
+                } else {
+                    amrex::Abort("Unknown distribution: " + distribution_type);
+                }
+            } else{
+                amrex::Abort("Unknown distribution: " + distribution_type);
+            }
 
-        } else if (distribution_type == "kurth6d") {
-          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
-          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
-          pp_dist.get("sigmaX", sigx);
-          pp_dist.get("sigmaY", sigy);
-          pp_dist.get("sigmaT", sigt);
-          pp_dist.get("sigmaPx", sigpx);
-          pp_dist.get("sigmaPy", sigpy);
-          pp_dist.get("sigmaPt", sigpt);
-          pp_dist.query("muxpx", muxpx);
-          pp_dist.query("muypy", muypy);
-          pp_dist.query("mutpt", mutpt);
+        }
 
-          distribution::KnownDistributions const kurth6D(distribution::Kurth6D(
-            sigx, sigy, sigt,
-            sigpx, sigpy, sigpt,
-            muxpx, muypy, mutpt));
+        if (distribution_types_from_beam_ellipse.find(base_dist_type) != distribution_types_from_beam_ellipse.end())
+        {
+            amrex::ParticleReal sigx, sigy, sigt, sigpx, sigpy, sigpt;
+            amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
 
-          add_particles(bunch_charge, kurth6D, npart);
+            if (initialize_from_twiss)
+            {
+                initialization::setDistributionParametersFromTwissInputs(
+                    pp_dist,
+                    sigx, sigy, sigt,
+                    sigpx, sigpy, sigpt,
+                    muxpx, muypy, mutpt
+                );
+            } else {
+                initialization::setDistributionParametersFromPhaseSpaceInputs(
+                    pp_dist,
+                    sigx, sigy, sigt,
+                    sigpx, sigpy, sigpt,
+                    muxpx, muypy, mutpt
+                );
+            }
 
-        } else if (distribution_type == "gaussian") {
-          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
-          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
-          pp_dist.get("sigmaX", sigx);
-          pp_dist.get("sigmaY", sigy);
-          pp_dist.get("sigmaT", sigt);
-          pp_dist.get("sigmaPx", sigpx);
-          pp_dist.get("sigmaPy", sigpy);
-          pp_dist.get("sigmaPt", sigpt);
-          pp_dist.query("muxpx", muxpx);
-          pp_dist.query("muypy", muypy);
-          pp_dist.query("mutpt", mutpt);
+            if(base_dist_type == "waterbag"){
 
-          distribution::KnownDistributions const gaussian(distribution::Gaussian(
-            sigx, sigy, sigt,
-            sigpx, sigpy, sigpt,
-            muxpx, muypy, mutpt));
+                distribution::KnownDistributions const waterbag(distribution::Waterbag(
+                        sigx, sigy, sigt,
+                        sigpx, sigpy, sigpt,
+                        muxpx, muypy, mutpt));
 
-          add_particles(bunch_charge, gaussian, npart);
+                add_particles(bunch_charge, waterbag, npart);
 
-        } else if (distribution_type == "kvdist") {
-          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
-          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
-          pp_dist.get("sigmaX", sigx);
-          pp_dist.get("sigmaY", sigy);
-          pp_dist.get("sigmaT", sigt);
-          pp_dist.get("sigmaPx", sigpx);
-          pp_dist.get("sigmaPy", sigpy);
-          pp_dist.get("sigmaPt", sigpt);
-          pp_dist.query("muxpx", muxpx);
-          pp_dist.query("muypy", muypy);
-          pp_dist.query("mutpt", mutpt);
+            } else if (base_dist_type == "kurth6d") {
 
-          distribution::KnownDistributions const kvDist(distribution::KVdist(
-            sigx, sigy, sigt,
-            sigpx, sigpy, sigpt,
-            muxpx, muypy, mutpt));
+                distribution::KnownDistributions const kurth6D(distribution::Kurth6D(
+                        sigx, sigy, sigt,
+                        sigpx, sigpy, sigpt,
+                        muxpx, muypy, mutpt));
 
-          add_particles(bunch_charge, kvDist, npart);
+                add_particles(bunch_charge, kurth6D, npart);
 
-        } else if (distribution_type == "kurth4d") {
-          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
-          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
-          pp_dist.get("sigmaX", sigx);
-          pp_dist.get("sigmaY", sigy);
-          pp_dist.get("sigmaT", sigt);
-          pp_dist.get("sigmaPx", sigpx);
-          pp_dist.get("sigmaPy", sigpy);
-          pp_dist.get("sigmaPt", sigpt);
-          pp_dist.query("muxpx", muxpx);
-          pp_dist.query("muypy", muypy);
-          pp_dist.query("mutpt", mutpt);
+            } else if (base_dist_type == "gaussian") {
 
-          distribution::KnownDistributions const kurth4D(distribution::Kurth4D(
-            sigx, sigy, sigt,
-            sigpx, sigpy, sigpt,
-            muxpx, muypy, mutpt));
+                distribution::KnownDistributions const gaussian(distribution::Gaussian(
+                        sigx, sigy, sigt,
+                        sigpx, sigpy, sigpt,
+                        muxpx, muypy, mutpt));
 
-          add_particles(bunch_charge, kurth4D, npart);
-        } else if (distribution_type == "semigaussian") {
-          amrex::ParticleReal sigx,sigy,sigt,sigpx,sigpy,sigpt;
-          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
-          pp_dist.get("sigmaX", sigx);
-          pp_dist.get("sigmaY", sigy);
-          pp_dist.get("sigmaT", sigt);
-          pp_dist.get("sigmaPx", sigpx);
-          pp_dist.get("sigmaPy", sigpy);
-          pp_dist.get("sigmaPt", sigpt);
-          pp_dist.query("muxpx", muxpx);
-          pp_dist.query("muypy", muypy);
-          pp_dist.query("mutpt", mutpt);
+                add_particles(bunch_charge, gaussian, npart);
 
-          distribution::KnownDistributions const semigaussian(distribution::Semigaussian(
-            sigx, sigy, sigt,
-            sigpx, sigpy, sigpt,
-            muxpx, muypy, mutpt));
+            } else if (base_dist_type == "kvdist") {
 
-          add_particles(bunch_charge, semigaussian, npart);
+                distribution::KnownDistributions const kvDist(distribution::KVdist(
+                        sigx, sigy, sigt,
+                        sigpx, sigpy, sigpt,
+                        muxpx, muypy, mutpt));
 
-        } else if (distribution_type == "triangle") {
-          amrex::ParticleReal sigx, sigy, sigt, sigpx, sigpy, sigpt;
-          amrex::ParticleReal muxpx = 0.0, muypy = 0.0, mutpt = 0.0;
-          pp_dist.get("sigmaX", sigx);
-          pp_dist.get("sigmaY", sigy);
-          pp_dist.get("sigmaT", sigt);
-          pp_dist.get("sigmaPx", sigpx);
-          pp_dist.get("sigmaPy", sigpy);
-          pp_dist.get("sigmaPt", sigpt);
-          pp_dist.query("muxpx", muxpx);
-          pp_dist.query("muypy", muypy);
-          pp_dist.query("mutpt", mutpt);
+                add_particles(bunch_charge, kvDist, npart);
 
-          distribution::KnownDistributions const triangle(distribution::Triangle(
-            sigx, sigy, sigt,
-            sigpx, sigpy, sigpt,
-            muxpx, muypy, mutpt));
+            } else if (base_dist_type == "kurth4d") {
 
-          add_particles(bunch_charge, triangle, npart);
+                distribution::KnownDistributions const kurth4D(distribution::Kurth4D(
+                        sigx, sigy, sigt,
+                        sigpx, sigpy, sigpt,
+                        muxpx, muypy, mutpt));
+
+                add_particles(bunch_charge, kurth4D, npart);
+
+            } else if (base_dist_type == "semigaussian") {
+
+                distribution::KnownDistributions const semigaussian(distribution::Semigaussian(
+                        sigx, sigy, sigt,
+                        sigpx, sigpy, sigpt,
+                        muxpx, muypy, mutpt));
+
+                add_particles(bunch_charge, semigaussian, npart);
+
+            } else if (base_dist_type == "triangle") {
+
+                distribution::KnownDistributions const triangle(distribution::Triangle(
+                        sigx, sigy, sigt,
+                        sigpx, sigpy, sigpt,
+                        muxpx, muypy, mutpt));
+
+                add_particles(bunch_charge, triangle, npart);
+
+            } else {
+                amrex::Abort("Unknown distribution: " + distribution_type);
+            }
 
         } else if (distribution_type == "thermal") {
-          amrex::ParticleReal k, kT, kT_halo, normalize, normalize_halo;
-          amrex::ParticleReal halo = 0.0;
-          pp_dist.get("k", k);
-          pp_dist.get("kT", kT);
-          kT_halo = kT;
-          pp_dist.get("normalize", normalize);
-          normalize_halo = normalize;
-          pp_dist.query("kT_halo", kT_halo);
-          pp_dist.query("normalize_halo", normalize_halo);
-          pp_dist.query("halo", halo);
+            amrex::ParticleReal k, kT, kT_halo, normalize, normalize_halo;
+            amrex::ParticleReal halo = 0.0;
+            pp_dist.get("k", k);
+            pp_dist.get("kT", kT);
+            kT_halo = kT;
+            pp_dist.get("normalize", normalize);
+            normalize_halo = normalize;
+            pp_dist.query("kT_halo", kT_halo);
+            pp_dist.query("normalize_halo", normalize_halo);
+            pp_dist.query("halo", halo);
 
-          distribution::KnownDistributions thermal(distribution::Thermal(k, kT, kT_halo, normalize, normalize_halo, halo));
+            distribution::KnownDistributions thermal(distribution::Thermal(k, kT, kT_halo, normalize, normalize_halo, halo));
 
-          add_particles(bunch_charge, thermal, npart);
+            add_particles(bunch_charge, thermal, npart);
 
         } else {
             amrex::Abort("Unknown distribution: " + distribution_type);

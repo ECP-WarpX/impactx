@@ -98,6 +98,26 @@ namespace impactx::initialization
         amrex::ParticleReal* const AMREX_RESTRICT m_part_py;
         amrex::ParticleReal* const AMREX_RESTRICT m_part_pt;
     };
+
+    /** Initialize the input parameters for all distributions that read phase space ellipse parameters from the input
+     *
+     */
+    void
+    setDistributionParametersFromPhaseSpaceInputs (
+        amrex::ParmParse const & pp_dist,
+        amrex::ParticleReal& sigx, amrex::ParticleReal& sigy, amrex::ParticleReal& sigt,
+        amrex::ParticleReal& sigpx,amrex::ParticleReal& sigpy, amrex::ParticleReal& sigpt,
+        amrex::ParticleReal& muxpx, amrex::ParticleReal& muypy, amrex::ParticleReal& mutpt
+    );
+
+    void
+    setDistributionParametersFromTwissInputs (
+        amrex::ParmParse const & pp_dist,
+        amrex::ParticleReal& sigx, amrex::ParticleReal& sigy, amrex::ParticleReal& sigt,
+        amrex::ParticleReal& sigpx,amrex::ParticleReal& sigpy, amrex::ParticleReal& sigpt,
+        amrex::ParticleReal& muxpx, amrex::ParticleReal& muypy, amrex::ParticleReal& mutpt
+    );
+
 }  // namespace impactx::initialization
 
 #endif  // IMPACTX_INITIALIZATION_INITDISTRIBUTION_H
