@@ -4,7 +4,7 @@
  *
  * This file is part of ImpactX.
  *
- * Authors: Axel Huebl, Chad Mitchell, Ji Qiang
+ * Authors: Axel Huebl, Chad Mitchell, Ji Qiang, Marco Garten
  * License: BSD-3-Clause-LBNL
  */
 #include "initialization/InitDistribution.H"
@@ -25,12 +25,14 @@
 #include <cmath>
 #include <string>
 #include <type_traits>
-#include <tuple>
 #include <variant>
 
 
 namespace impactx
 {
+
+    using namespace amrex::literals; // for _rt and _prt
+
     void
     ImpactX::add_particles (
         amrex::ParticleReal bunch_charge,
@@ -147,45 +149,45 @@ namespace impactx
         pp_dist.get("emittY", emitty);
         pp_dist.get("emittT", emittt);
 
-        if (betax <= 0.0 || betay <= 0.0 || betat <= 0.0) {
+        if (betax <= 0.0_prt || betay <= 0.0_prt || betat <= 0.0_prt) {
             amrex::Abort("Input Error: The beta function values need to be non-zero positive values in all dimensions.");
         }
 
-        if (emittx <= 0.0 || emitty <= 0.0 || emittt <= 0.0) {
+        if (emittx <= 0.0_prt || emitty <= 0.0_prt || emittt <= 0.0_prt) {
             amrex::Abort("Input Error: Emittance values need to be non-zero positive values in all dimensions.");
         }
 
-        amrex::Vector<amrex::ParticleReal> alphas = {alphax, alphay, alphat};
-        amrex::Vector<amrex::ParticleReal> betas = {betax, betay, betat};
-        amrex::Vector<amrex::ParticleReal> emittances = {emittx, emitty, emittt};
+        std::array<amrex::ParticleReal, 3> const alphas = {alphax, alphay, alphat};
+        std::array<amrex::ParticleReal, 3> const betas = {betax, betay, betat};
+        std::array<amrex::ParticleReal, 3> const emittances = {emittx, emitty, emittt};
 
         // calculate Twiss / Courant-Snyder gammas
         amrex::Vector<amrex::ParticleReal> gammas;
-        for (int i = 0; i < alphas.size(); i++){
-            gammas.push_back((1.0 + pow(alphas[i], 2)) / betas[i]);
-        }
+        for (size_t i = 0; i < alphas.size(); i++)
+            gammas.push_back((1.0 + pow(alphas.at(i), 2)) / betas.at(i));
+
 
         amrex::Vector<amrex::ParticleReal> sigmas_pos;
         amrex::Vector<amrex::ParticleReal> sigmas_mom;
         amrex::Vector<amrex::ParticleReal> correlations;
 
         // calculate intersections of phase space ellipse with coordinate axes and the correlation factors
-        for (int k = 0; k < betas.size(); k++){
-            sigmas_pos.push_back(sqrt(emittances[k]/gammas[k]));
-            sigmas_mom.push_back(sqrt(emittances[k]/betas[k]));
+        for (size_t k = 0; k < betas.size(); k++){
+            sigmas_pos.push_back(sqrt(emittances.at(k)/gammas.at(k)));
+            sigmas_mom.push_back(sqrt(emittances.at(k)/betas.at(k)));
 
-            correlations.push_back(alphas[k] / sqrt(betas[k] * gammas[k]));
+            correlations.push_back(alphas.at(k) / sqrt(betas.at(k) * gammas.at(k)));
         }
 
-        sigx = sigmas_pos[0];
-        sigy = sigmas_pos[1];
-        sigt = sigmas_pos[2];
-        sigpx = sigmas_mom[0];
-        sigpy = sigmas_mom[1];
-        sigpt = sigmas_mom[2];
-        muxpx = correlations[0];
-        muypy = correlations[1];
-        mutpt = correlations[2];
+        sigx = sigmas_pos.at(0);
+        sigy = sigmas_pos.at(1);
+        sigt = sigmas_pos.at(2);
+        sigpx = sigmas_mom.at(0);
+        sigpy = sigmas_mom.at(1);
+        sigpt = sigmas_mom.at(2);
+        muxpx = correlations.at(0);
+        muypy = correlations.at(1);
+        mutpt = correlations.at(2);
 
     }
 

@@ -55,6 +55,38 @@ Unlike particles within the beam, the reference particle is described by a set o
 in a global laboratory coordinate system (x,y,z).  The momenta of the reference particle are normalized by :math:`mc`, so that :math:`p_x=\beta_x\gamma`, etc.  A parameteric plot of
 the reference trajectory variables (x,z) allows the user to view the global geometry of the accelerator structure (footprint).
 
+.. _theory-collective-beam-distribution-input:
+
+Beam Distribution Input
+-----------------------
+
+.. figure:: phase_space_ellipse.svg
+   :align: center
+   :width: 75%
+   :alt: phase space ellipse
+
+   Phase space ellipse in the coordinate plane of position :math:`q` (realized as :math:`x`, :math:`y`, and :math:`t`) and associated conjugate momentum :math:`q` (realized as :math:`p_x`, :math:`p_y` and :math:`p_t`).
+
+Particle beam user input in ImpactX can be done in two ways.
+
+The first option is to characterize the distribution via the intersections of the phase space ellipse with the coordinate axes and the correlation terms of the canonical coordinate pairs.
+
+.. math::
+
+   \begin{align}
+        \sigma_q &= \sqrt{\frac{\epsilon}{\gamma}} \\
+        \sigma_p &= \sqrt{\frac{\epsilon}{\beta}} \\
+        \mu_{qp} &= \frac{\alpha}{\sqrt{\beta \gamma}}
+   \end{align}
+
+The units are :math:`[\sigma_q] = \mathrm{m}`, :math:`[\sigma_p] = \mathrm{rad}`, and :math:`[\mu_{qp}] = 1`.
+To convert between normalized and unnormalized emittance, use the relation :math:`\epsilon_\mathrm{n} = (\beta\gamma)_\mathrm{ref} \cdot \epsilon` which uses the momentum of the reference particle.
+**Attention**: Here, :math:`(\beta\gamma)_\mathrm{ref}` are the Lorentz variables for the reference particle momentum and not the Courant-Snyder parameters.
+
+The second option is to specify the distribution via the Courant-Snyder / Twiss parameters :math:`\alpha` and :math:`\beta` along with the unnormalized (geometric, 1-RMS) emittance :math:`\epsilon` for all the spatial coordinates.
+Recall the Courant-Snyder relation :math:`\gamma\beta - \alpha^2 = 1` for conversion from :math:`\gamma` values to our input conventions.
+
+
 
 Assumptions
 -----------
