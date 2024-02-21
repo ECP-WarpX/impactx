@@ -15,6 +15,8 @@ if(ImpactX_MPI)
         ${MPIEXEC_EXECUTABLE}
         ${MPI_ALLOW_ROOT}
         ${MPIEXEC_NUMPROC_FLAG} 3
+        ${MPIEXEC_POSTFLAGS}
+        ${MPIEXEC_PREFLAGS}
     )
 endif()
 
