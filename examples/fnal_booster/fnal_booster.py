@@ -136,7 +136,7 @@ def parse_element(sim, element, zprev):
                     if i == 0:
                         angledeg = kl[i] * 180.0 / math.pi
                         print(f"elements.ThinDipole(theta={angledeg}, rc=1.0)")
-                        sim.lattice.append(elements.ThinDipole(theta=kl[i], rc=1.0))
+                        sim.lattice.append(elements.ThinDipole(theta=angledeg, rc=1.0))
                     else:
                         print(
                             f"elements.Multipole(multiple={i}, K_normal={kl[i]}, K_skew=0.0)"
