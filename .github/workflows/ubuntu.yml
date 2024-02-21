@@ -35,6 +35,11 @@ jobs:
           ccache-openmp-gcc-${{ hashFiles('.github/workflows/ubuntu.yml') }}-
           ccache-openmp-gcc-
 
+    - name: system info
+      run: |
+        cat /proc/cpuinfo
+        lscpu
+
     - name: build ImpactX
       run: |
         cmake -S . -B build            \
