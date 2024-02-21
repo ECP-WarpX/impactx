@@ -14,7 +14,7 @@ jobs:
     env:
       CMAKE_GENERATOR: Ninja
       CXXFLAGS: "-Werror"
-      OMP_NUM_THREADS: 2
+      OMP_NUM_THREADS: 4
     steps:
     - uses: actions/checkout@v3
 
@@ -35,6 +35,11 @@ jobs:
           ccache-openmp-gcc-${{ hashFiles('.github/workflows/ubuntu.yml') }}-
           ccache-openmp-gcc-
 
+    - name: system info
+      run: |
+        cat /proc/cpuinfo
+        lscpu
+
     - name: build ImpactX
       run: |
         cmake -S . -B build            \
@@ -42,8 +47,9 @@ jobs:
           -DBUILD_SHARED_LIBS=ON       \
           -DCMAKE_INSTALL_PREFIX=/usr  \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
-          -DImpactX_PYTHON=ON
-        cmake --build build -j 2
+          -DImpactX_PYTHON=ON          \
+          -DMPIEXEC_POSTFLAGS="--use-hwthread-cpus"
+        cmake --build build -j 4
 
     - name: run tests
       run: |
@@ -76,7 +82,7 @@ jobs:
     env:
       CMAKE_GENERATOR: Ninja
       CXXFLAGS: "-Werror"
-      OMP_NUM_THREADS: 2
+      OMP_NUM_THREADS: 4
     steps:
     - uses: actions/checkout@v3
 
@@ -106,7 +112,7 @@ jobs:
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
           -DImpactX_MPI=OFF            \
           -DImpactX_PYTHON=ON
-        cmake --build build -j 2
+        cmake --build build -j 4
 
     - name: run tests
       run: |

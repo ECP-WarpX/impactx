@@ -52,4 +52,4 @@ jobs:
           -DImpactX_PRECISION=SINGLE   \
           -DAMReX_CUDA_ERROR_CROSS_EXECUTION_SPACE_CALL=ON \
           -DAMReX_CUDA_ERROR_CAPTURE_THIS=ON
-        cmake --build build -j 2
+        cmake --build build -j 4

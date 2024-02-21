@@ -44,8 +44,9 @@ jobs:
         cmake -S . -B build                  \
           -DImpactX_PYTHON=ON                \
           -DCMAKE_BUILD_TYPE=RelWithDebInfo  \
-          -DCMAKE_VERBOSE_MAKEFILE=ON
-        cmake --build build --parallel 2
+          -DCMAKE_VERBOSE_MAKEFILE=ON        \
+          -DMPIEXEC_POSTFLAGS="--use-hwthread-cpus"
+        cmake --build build --parallel 4
 
     - name: run tests
       run: |

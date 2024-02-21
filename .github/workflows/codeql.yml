@@ -62,7 +62,7 @@ jobs:
       - name: Build (C++)
         if: ${{ matrix.language == 'cpp' }}
         run: |
-          $CMAKE --build build -j 2
+          $CMAKE --build build -j 4
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2

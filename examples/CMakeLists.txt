@@ -14,7 +14,9 @@ if(ImpactX_MPI)
     set(MPI_TEST_EXE
         ${MPIEXEC_EXECUTABLE}
         ${MPI_ALLOW_ROOT}
-        ${MPIEXEC_NUMPROC_FLAG} 2
+        ${MPIEXEC_NUMPROC_FLAG} 3
+        ${MPIEXEC_POSTFLAGS}
+        ${MPIEXEC_PREFLAGS}
     )
 endif()
 
@@ -81,7 +83,7 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
     if(is_mpi)
         set_property(TEST ${name}.run APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=1")
     else()
-        set_property(TEST ${name}.run APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=2")
+        set_property(TEST ${name}.run APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=3")
     endif()
 
     # analysis and plots
