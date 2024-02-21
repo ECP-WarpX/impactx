@@ -143,7 +143,9 @@ def parse_element(sim, element, zprev):
                             f"elements.Multipole(multiple={mindex}, K_normal={kl[i]}, K_skew=0.0)"
                         )
                         sim.lattice.append(
-                            elements.Multipole(multiple=mindex, K_normal=kl[i], K_skew=0.0)
+                            elements.Multipole(
+                                multiple=mindex, K_normal=kl[i], K_skew=0.0
+                            )
                         )
         else:
             print("... empty body - ignored")
