@@ -125,7 +125,7 @@ namespace impactx
         }
     }
 
-    void initialization::setDistributionParametersFromTwissInputs (
+    void initialization::set_distribution_parameters_from_twiss_inputs (
         amrex::ParmParse const & pp_dist,
         amrex::ParticleReal& sigx, amrex::ParticleReal& sigy, amrex::ParticleReal& sigt,
         amrex::ParticleReal& sigpx, amrex::ParticleReal& sigpy, amrex::ParticleReal& sigpt,
@@ -150,11 +150,11 @@ namespace impactx
         pp_dist.get("emittT", emittt);
 
         if (betax <= 0.0_prt || betay <= 0.0_prt || betat <= 0.0_prt) {
-            amrex::Abort("Input Error: The beta function values need to be non-zero positive values in all dimensions.");
+            throw std::runtime_error("Input Error: The beta function values need to be non-zero positive values in all dimensions.");
         }
 
         if (emittx <= 0.0_prt || emitty <= 0.0_prt || emittt <= 0.0_prt) {
-            amrex::Abort("Input Error: Emittance values need to be non-zero positive values in all dimensions.");
+            throw std::runtime_error("Input Error: Emittance values need to be non-zero positive values in all dimensions.");
         }
 
         std::array<amrex::ParticleReal, 3> const alphas = {alphax, alphay, alphat};
@@ -191,7 +191,7 @@ namespace impactx
 
     }
 
-    void initialization::setDistributionParametersFromPhaseSpaceInputs (
+    void initialization::set_distribution_parameters_from_phase_space_inputs (
         amrex::ParmParse const & pp_dist,
         amrex::ParticleReal& sigx, amrex::ParticleReal& sigy, amrex::ParticleReal& sigt,
         amrex::ParticleReal& sigpx, amrex::ParticleReal& sigpy, amrex::ParticleReal& sigpt,
@@ -269,31 +269,24 @@ namespace impactx
         pp_dist.get("distribution", distribution_type);
 
         std::string base_dist_type = distribution_type;
-        std::string suffix;
-        std::size_t underscore_position = distribution_type.find("_");
+        // Position of the underscore for splitting off the suffix in case the distribution name either ends in "_from_twiss" or "_from_cs"
+        std::size_t str_pos_from_twiss = distribution_type.rfind("_from_twiss");
+        std::size_t str_pos_from_cs = distribution_type.rfind("_from_cs");
         bool initialize_from_twiss = false;
 
-        // Check if there is an underscore in the distribution type at all
-        if(underscore_position != std::string::npos) {
-            base_dist_type = distribution_type.substr(0, underscore_position);
-            suffix = distribution_type.substr(underscore_position + 1);
-
-            /* After separating suffix from base type, check if the base distribution type is in the set of
-             * distributions that all share the same input signature.
-             */
-            if (distribution_types_from_beam_ellipse.find(base_dist_type) != distribution_types_from_beam_ellipse.end())
-            {
-                if (suffix == "from_twiss" || suffix == "from_cs") {
-                    initialize_from_twiss = true;
-                } else {
-                    amrex::Abort("Unknown distribution: " + distribution_type);
-                }
-            } else{
-                amrex::Abort("Unknown distribution: " + distribution_type);
-            }
-
+        if (str_pos_from_twiss != std::string::npos) { // "_from_twiss" is found
+            // Calculate suffix and base type, consider length of "_from_twiss" = 12
+            base_dist_type = distribution_type.substr(0, str_pos_from_twiss);
+            initialize_from_twiss = true;
+        } else if (str_pos_from_cs != std::string::npos) { // "_from_cs" is found
+            // Calculate suffix and base type, consider length of "_from_cs" = 8
+            base_dist_type = distribution_type.substr(0, str_pos_from_cs);
+            initialize_from_twiss = true;
         }
 
+        /* After separating a potential suffix from its base type, check if the base distribution type is in the set of
+         * distributions that all share the same input signature.
+         */
         if (distribution_types_from_beam_ellipse.find(base_dist_type) != distribution_types_from_beam_ellipse.end())
         {
             amrex::ParticleReal sigx, sigy, sigt, sigpx, sigpy, sigpt;
@@ -301,18 +294,18 @@ namespace impactx
 
             if (initialize_from_twiss)
             {
-                initialization::setDistributionParametersFromTwissInputs(
-                    pp_dist,
-                    sigx, sigy, sigt,
-                    sigpx, sigpy, sigpt,
-                    muxpx, muypy, mutpt
+                initialization::set_distribution_parameters_from_twiss_inputs(
+                        pp_dist,
+                        sigx, sigy, sigt,
+                        sigpx, sigpy, sigpt,
+                        muxpx, muypy, mutpt
                 );
             } else {
-                initialization::setDistributionParametersFromPhaseSpaceInputs(
-                    pp_dist,
-                    sigx, sigy, sigt,
-                    sigpx, sigpy, sigpt,
-                    muxpx, muypy, mutpt
+                initialization::set_distribution_parameters_from_phase_space_inputs(
+                        pp_dist,
+                        sigx, sigy, sigt,
+                        sigpx, sigpy, sigpt,
+                        muxpx, muypy, mutpt
                 );
             }
 
@@ -380,7 +373,7 @@ namespace impactx
                 add_particles(bunch_charge, triangle, npart);
 
             } else {
-                amrex::Abort("Unknown distribution: " + distribution_type);
+                throw std::runtime_error("Unknown distribution: " + distribution_type);
             }
 
         } else if (distribution_type == "thermal") {
@@ -400,7 +393,7 @@ namespace impactx
             add_particles(bunch_charge, thermal, npart);
 
         } else {
-            amrex::Abort("Unknown distribution: " + distribution_type);
+            throw std::runtime_error("Unknown distribution: " + distribution_type);
         }
 
         // print information on the initialized beam
@@ -415,7 +408,7 @@ namespace impactx
         } else if (unit_type == "dynamic") {
             amrex::Print() << "Dynamic units" << std::endl;
         } else {
-            amrex::Abort("Unknown units (static/dynamic): " + unit_type);
+            throw std::runtime_error("Unknown units (static/dynamic): " + unit_type);
         }
 
         amrex::Print() << "Initialized beam distribution parameters" << std::endl;

@@ -118,7 +118,7 @@ namespace impactx::initialization
      * @param mutpt Reference to the variable storing the mean for energy.
      */
     void
-    setDistributionParametersFromPhaseSpaceInputs (
+    set_distribution_parameters_from_phase_space_inputs (
         amrex::ParmParse const & pp_dist,
         amrex::ParticleReal& sigx, amrex::ParticleReal& sigy, amrex::ParticleReal& sigt,
         amrex::ParticleReal& sigpx,amrex::ParticleReal& sigpy, amrex::ParticleReal& sigpt,
@@ -143,7 +143,7 @@ namespace impactx::initialization
      * @param mutpt Reference to the variable storing the mean for energy.
      */
     void
-    setDistributionParametersFromTwissInputs (
+    set_distribution_parameters_from_twiss_inputs (
         amrex::ParmParse const & pp_dist,
         amrex::ParticleReal& sigx, amrex::ParticleReal& sigy, amrex::ParticleReal& sigt,
         amrex::ParticleReal& sigpx,amrex::ParticleReal& sigpy, amrex::ParticleReal& sigpt,
