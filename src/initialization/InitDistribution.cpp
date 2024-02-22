@@ -23,6 +23,7 @@
 #include <AMReX_Print.H>
 
 #include <cmath>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <variant>
@@ -30,8 +31,6 @@
 
 namespace impactx
 {
-
-    using namespace amrex::literals; // for _rt and _prt
 
     void
     ImpactX::add_particles (
@@ -132,6 +131,7 @@ namespace impactx
         amrex::ParticleReal& muxpx, amrex::ParticleReal& muypy, amrex::ParticleReal& mutpt
     )
     {
+        using namespace amrex::literals; // for _rt and _prt
 
         // Values to be read from input
         amrex::ParticleReal betax, betay, betat, emittx, emitty, emittt;
@@ -164,8 +164,7 @@ namespace impactx
         // calculate Twiss / Courant-Snyder gammas
         amrex::Vector<amrex::ParticleReal> gammas;
         for (size_t i = 0; i < alphas.size(); i++)
-            gammas.push_back((1.0 + pow(alphas.at(i), 2)) / betas.at(i));
-
+            gammas.push_back((1.0 + std::pow(alphas.at(i), 2)) / betas.at(i));
 
         amrex::Vector<amrex::ParticleReal> sigmas_pos;
         amrex::Vector<amrex::ParticleReal> sigmas_mom;
@@ -173,10 +172,10 @@ namespace impactx
 
         // calculate intersections of phase space ellipse with coordinate axes and the correlation factors
         for (size_t k = 0; k < betas.size(); k++){
-            sigmas_pos.push_back(sqrt(emittances.at(k)/gammas.at(k)));
-            sigmas_mom.push_back(sqrt(emittances.at(k)/betas.at(k)));
+            sigmas_pos.push_back(std::sqrt(emittances.at(k)/gammas.at(k)));
+            sigmas_mom.push_back(std::sqrt(emittances.at(k)/betas.at(k)));
 
-            correlations.push_back(alphas.at(k) / sqrt(betas.at(k) * gammas.at(k)));
+            correlations.push_back(alphas.at(k) / std::sqrt(betas.at(k) * gammas.at(k)));
         }
 
         sigx = sigmas_pos.at(0);
@@ -188,7 +187,6 @@ namespace impactx
         muxpx = correlations.at(0);
         muypy = correlations.at(1);
         mutpt = correlations.at(2);
-
     }
 
     void initialization::set_distribution_parameters_from_phase_space_inputs (
@@ -198,7 +196,6 @@ namespace impactx
         amrex::ParticleReal& muxpx, amrex::ParticleReal& muypy, amrex::ParticleReal& mutpt
     )
     {
-
         pp_dist.get("sigmaX", sigx);
         pp_dist.get("sigmaY", sigy);
         pp_dist.get("sigmaT", sigt);
@@ -310,68 +307,54 @@ namespace impactx
             }
 
             if(base_dist_type == "waterbag"){
-
                 distribution::KnownDistributions const waterbag(distribution::Waterbag(
                         sigx, sigy, sigt,
                         sigpx, sigpy, sigpt,
                         muxpx, muypy, mutpt));
 
                 add_particles(bunch_charge, waterbag, npart);
-
             } else if (base_dist_type == "kurth6d") {
-
                 distribution::KnownDistributions const kurth6D(distribution::Kurth6D(
                         sigx, sigy, sigt,
                         sigpx, sigpy, sigpt,
                         muxpx, muypy, mutpt));
 
                 add_particles(bunch_charge, kurth6D, npart);
-
             } else if (base_dist_type == "gaussian") {
-
                 distribution::KnownDistributions const gaussian(distribution::Gaussian(
                         sigx, sigy, sigt,
                         sigpx, sigpy, sigpt,
                         muxpx, muypy, mutpt));
 
                 add_particles(bunch_charge, gaussian, npart);
-
             } else if (base_dist_type == "kvdist") {
-
                 distribution::KnownDistributions const kvDist(distribution::KVdist(
                         sigx, sigy, sigt,
                         sigpx, sigpy, sigpt,
                         muxpx, muypy, mutpt));
 
                 add_particles(bunch_charge, kvDist, npart);
-
             } else if (base_dist_type == "kurth4d") {
-
                 distribution::KnownDistributions const kurth4D(distribution::Kurth4D(
                         sigx, sigy, sigt,
                         sigpx, sigpy, sigpt,
                         muxpx, muypy, mutpt));
 
                 add_particles(bunch_charge, kurth4D, npart);
-
             } else if (base_dist_type == "semigaussian") {
-
                 distribution::KnownDistributions const semigaussian(distribution::Semigaussian(
                         sigx, sigy, sigt,
                         sigpx, sigpy, sigpt,
                         muxpx, muypy, mutpt));
 
                 add_particles(bunch_charge, semigaussian, npart);
-
             } else if (base_dist_type == "triangle") {
-
                 distribution::KnownDistributions const triangle(distribution::Triangle(
                         sigx, sigy, sigt,
                         sigpx, sigpy, sigpt,
                         muxpx, muypy, mutpt));
 
                 add_particles(bunch_charge, triangle, npart);
-
             } else {
                 throw std::runtime_error("Unknown distribution: " + distribution_type);
             }
@@ -391,7 +374,6 @@ namespace impactx
             distribution::KnownDistributions thermal(distribution::Thermal(k, kT, kT_halo, normalize, normalize_halo, halo));
 
             add_particles(bunch_charge, thermal, npart);
-
         } else {
             throw std::runtime_error("Unknown distribution: " + distribution_type);
         }
