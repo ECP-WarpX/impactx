@@ -128,40 +128,7 @@ namespace impactx
                 );
 
                 // remove particles with negative ids in source
-                {
-                    int n_removed = 0;
-                    auto ptile_src_data = ptile_source.getParticleTileData();
-                    auto const ptile_soa = ptile_source.GetStructOfArrays();
-                    auto const ptile_idcpu = ptile_soa.GetIdCPUData().dataPtr();
-                    for (int ip = 0; ip < np; ++ip)
-                    {
-                        if (!amrex::ConstParticleIDWrapper{ptile_idcpu[ip]}.is_valid())
-                            n_removed++;
-                        else
-                        {
-                            if (n_removed > 0)
-                            {
-                                // move down
-                                int const new_index = ip - n_removed;
-
-                                ptile_src_data.m_idcpu[new_index] = ptile_src_data.m_idcpu[ip];
-                                for (int j = 0; j < SrcData::NAR; ++j)
-                                    ptile_src_data.m_rdata[j][new_index] = ptile_src_data.m_rdata[j][ip];
-                                for (int j = 0; j < ptile_src_data.m_num_runtime_real; ++j)
-                                    ptile_src_data.m_runtime_rdata[j][new_index] = ptile_src_data.m_runtime_rdata[j][ip];
-
-                                // unused: integer compile-time or runtime attributes
-                                //for (int j = 0; j < SrcData::NAI; ++j)
-                                //    dst.m_idata[j][new_index] = src.m_idata[j][ip];
-                                //for (int j = 0; j < ptile_src_data.m_num_runtime_int; ++j)
-                                //    dst.m_runtime_idata[j][new_index] = src.m_runtime_idata[j][ip];
-                            }
-                        }
-                    }
-                    AMREX_ALWAYS_ASSERT(np_to_move == n_removed);
-                    ptile_source.resize(np - n_removed);
-                }
-
+                amrex::removeInvalidParticles(ptile_source);
             } // particle tile loop
         } // lev
     }
