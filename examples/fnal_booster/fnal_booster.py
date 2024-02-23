@@ -135,8 +135,9 @@ def parse_element(sim, element, zprev):
                 for i in range(len(kl)):
                     if i == 0:
                         angledeg = kl[i] * 180.0 / math.pi
-                        print(f"elements.ThinDipole(theta={angledeg}, rc=1.0)")
-                        sim.lattice.append(elements.ThinDipole(theta=angledeg, rc=1.0))
+                        radius_d = 40.847
+                        print(f"elements.ThinDipole(theta={angledeg}, rc={radius_d})")
+                        sim.lattice.append(elements.ThinDipole(theta=angledeg, rc=radius_d))
                     else:
                         mindex = i + 1
                         print(
@@ -168,6 +169,9 @@ def parse_element(sim, element, zprev):
                 e1 = float(e1)
                 print(f"e1={e1}")
                 h = float(h)
+                radius = 1.0/h
+                gap = 0.025  #unknown parameter, hard-coded to reasonable value
+                fint = 0.5   #unknown parameter, hard-coded to reasonable value
                 print(f"h={h}")
                 if tilt is None:
                     print("... empty tilt - ignored")
@@ -177,10 +181,10 @@ def parse_element(sim, element, zprev):
                     print(f"tilt={tilt}")
                     angledeg = tilt * 180.0 / math.pi
                 print(
-                    f"elements.DipEdge(psi={e1}, rc=1.0, g={h}, K2=0.125, rotation={angledeg})"
+                    f"elements.DipEdge(psi={e1}, rc={radius}, g={gap}, K2={fint}, rotation={angledeg})"
                 )
                 sim.lattice.append(
-                    elements.DipEdge(psi=e1, rc=1.0, g=h, K2=0.125, rotation=angledeg)
+                    elements.DipEdge(psi=e1, rc=radius, g=gap, K2=fint, rotation=angledeg)
                 )
 
         else:
