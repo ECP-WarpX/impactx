@@ -253,14 +253,14 @@ ref.set_charge_qe(1.0).set_mass_MeV(proton_mass_MeV).set_kin_energy_MeV(kin_ener
 
 #   particle bunch
 distr = distribution.Waterbag(
-    sigmaX=7.5719454508539211e-3,   
+    sigmaX=7.5719454508539211e-3,
     sigmaY=2.7610071269547681e-3,
     sigmaT=1.0e-6,
     sigmaPx=2.07765414561e-4,
     sigmaPy=5.697878756896e-4,
     sigmaPt=1.0e-6,  # neglect energy spread
-    muxpx=0.0,   
-    muypy=0.0,  
+    muxpx=0.0,
+    muypy=0.0,
     mutpt=0.0,
 )
 sim.add_particles(bunch_charge_C, distr, npart)
