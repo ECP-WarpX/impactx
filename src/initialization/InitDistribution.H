@@ -4,7 +4,7 @@
  *
  * This file is part of ImpactX.
  *
- * Authors: Axel Huebl, Andrew Myers
+ * Authors: Axel Huebl, Andrew Myers, Marco Garten
  * License: BSD-3-Clause-LBNL
  */
 #ifndef IMPACTX_INITIALIZATION_INITDISTRIBUTION_H
@@ -98,6 +98,58 @@ namespace impactx::initialization
         amrex::ParticleReal* const AMREX_RESTRICT m_part_py;
         amrex::ParticleReal* const AMREX_RESTRICT m_part_pt;
     };
+
+
+    /** Initialize the input parameters for all distributions that read phase space ellipse parameters from the input
+     *
+     * This function sets the distribution parameters based on the provided phase space inputs.
+     * The parameters include the phase space ellipse intersections for position (`sigmaX`, `sigmaY`), time (`sigmaT`),
+     * momentum (`sigmaPx`, `sigmaPy`) and energy (`sigmaPt`), as well as the correlation terms (`muxpx`, `muypy`, `mutpt`).
+     *
+     * @param pp_dist The parameter parser object.
+     * @param sigx Reference to the variable storing the axis intersection of the phase space ellipse for x position.
+     * @param sigy Reference to the variable storing the axis intersection of the phase space ellipse for y position.
+     * @param sigt Reference to the variable storing the axis intersection of the phase space ellipse for time.
+     * @param sigpx Reference to the variable storing the axis intersection of the phase space ellipse for momentum in x direction.
+     * @param sigpy Reference to the variable storing the axis intersection of the phase space ellipse for momentum in y direction.
+     * @param sigpt Reference to the variable storing the axis intersection of the phase space ellipse for energy.
+     * @param muxpx Reference to the variable storing the mean for momentum in x direction.
+     * @param muypy Reference to the variable storing the mean for momentum in y direction.
+     * @param mutpt Reference to the variable storing the mean for energy.
+     */
+    void
+    set_distribution_parameters_from_phase_space_inputs (
+        amrex::ParmParse const & pp_dist,
+        amrex::ParticleReal& sigx, amrex::ParticleReal& sigy, amrex::ParticleReal& sigt,
+        amrex::ParticleReal& sigpx,amrex::ParticleReal& sigpy, amrex::ParticleReal& sigpt,
+        amrex::ParticleReal& muxpx, amrex::ParticleReal& muypy, amrex::ParticleReal& mutpt
+    );
+
+
+    /** Set the distribution parameters from Twiss inputs
+     *
+     * This function reads Courant-Snyder / Twiss parameters from the provided `ParmParse` object and calculates the distribution parameters for a particle beam.
+     * It sets the values for the axis intercepts of the phase space ellipse (`sigmaX`, `sigmaY`, `sigmaT`, and `sigmaPx`, `sigmaPy`, `sigmaPt`) and correlation terms (`muxpx`, `muypy`, `mutpt`)  normally accepted as input.
+     *
+     * @param pp_dist The parameter parser object.
+     * @param sigx Reference to the variable storing the axis intersection of the phase space ellipse for x position.
+     * @param sigy Reference to the variable storing the axis intersection of the phase space ellipse for y position.
+     * @param sigt Reference to the variable storing the axis intersection of the phase space ellipse for time.
+     * @param sigpx Reference to the variable storing the axis intersection of the phase space ellipse for momentum in x direction.
+     * @param sigpy Reference to the variable storing the axis intersection of the phase space ellipse for momentum in y direction.
+     * @param sigpt Reference to the variable storing the axis intersection of the phase space ellipse for energy.
+     * @param muxpx Reference to the variable storing the mean for momentum in x direction.
+     * @param muypy Reference to the variable storing the mean for momentum in y direction.
+     * @param mutpt Reference to the variable storing the mean for energy.
+     */
+    void
+    set_distribution_parameters_from_twiss_inputs (
+        amrex::ParmParse const & pp_dist,
+        amrex::ParticleReal& sigx, amrex::ParticleReal& sigy, amrex::ParticleReal& sigt,
+        amrex::ParticleReal& sigpx,amrex::ParticleReal& sigpy, amrex::ParticleReal& sigpt,
+        amrex::ParticleReal& muxpx, amrex::ParticleReal& muypy, amrex::ParticleReal& mutpt
+    );
+
 }  // namespace impactx::initialization
 
 #endif  // IMPACTX_INITIALIZATION_INITDISTRIBUTION_H

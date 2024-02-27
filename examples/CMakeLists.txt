@@ -147,6 +147,16 @@ add_impactx_test(FODO
     examples/fodo/plot_fodo.py
 )
 
+# FODO Cell w/ Twiss input ####################################################
+#
+add_impactx_test(FODO.Twiss
+        examples/fodo/input_fodo_twiss.in
+        OFF  # ImpactX MPI-parallel
+        OFF  # ImpactX Python interface
+        examples/fodo/analysis_fodo.py
+        examples/fodo/plot_fodo.py
+)
+
 # MPI-Parallel FODO Cell ######################################################
 #
 add_impactx_test(FODO.MPI
@@ -292,6 +302,16 @@ add_impactx_test(kvdist
       OFF  # ImpactX Python interface
     examples/distgen/analysis_kvdist.py
     OFF  # no plot script yet
+)
+
+# K-V Distribution from Twiss Test ############################################
+#
+add_impactx_test(kvdist_from_twiss
+        examples/distgen/input_kvdist_twiss.in
+        OFF  # ImpactX MPI-parallel
+        OFF  # ImpactX Python interface
+        examples/distgen/analysis_kvdist.py
+        OFF  # no plot script yet
 )
 
 # FODO Cell with RF ###########################################################
