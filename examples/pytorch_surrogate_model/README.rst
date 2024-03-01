@@ -33,7 +33,7 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 Run
 ---
 
-This example can be **only** be run with **Python**:
+This example can **only** be run with **Python**:
 
 * **Python** script: ``python3 run_ml_surrogate.py``
 
