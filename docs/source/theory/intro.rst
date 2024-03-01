@@ -142,7 +142,7 @@ The associated covariance matrix may be written explicitly in terms of the above
         \end{pmatrix}
         \begin{pmatrix}
             1 & \mu_{qp} \\
-            \mu_{qp} & 1 
+            \mu_{qp} & 1
         \end{pmatrix}^{-1}
         \begin{pmatrix}
             \lambda_q & 0 \\
@@ -152,7 +152,7 @@ The associated covariance matrix may be written explicitly in terms of the above
             \beta & -\alpha \\
            -\alpha & \gamma
         \end{pmatrix}.
-       
+
 
 Assumptions
 -----------
