@@ -153,6 +153,8 @@ The associated covariance matrix may be written explicitly in terms of the above
            -\alpha & \gamma
         \end{pmatrix}.
 
+Note:  In the special case that :math:`\mu_{qp}=0`, we have :math:`\lambda_q=\sigma_q` and :math:`\lambda_p=\sigma_p`.
+
 
 Assumptions
 -----------
