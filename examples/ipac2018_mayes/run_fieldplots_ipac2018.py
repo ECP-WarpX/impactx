@@ -42,7 +42,7 @@ def run_and_plot(case, r, ax):
     sim.particle_shape = 2  # B-spline order
     sim.space_charge = True
     sim.dynamic_size = True
-    sim.prob_relative = 3.0
+    sim.prob_relative = [4.0]
 
     # space charge solver fine-tuning
     sim.mlmg_relative_tolerance = 1.0e-8
