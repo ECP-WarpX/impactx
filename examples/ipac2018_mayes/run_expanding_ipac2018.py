@@ -6,9 +6,7 @@
 #
 # -*- coding: utf-8 -*-
 
-import numpy as np
 
-import amrex.space3d as amr
 from impactx import ImpactX, distribution, elements
 
 sim = ImpactX()
@@ -69,4 +67,3 @@ sim.evolve()
 
 # clean shutdown
 sim.finalize()
-
