@@ -30,6 +30,7 @@ sim.init_grids()
 # load a cold 10 MeV electron beam
 energy_MeV = 10.0  # reference energy (total)
 mass_MeV = 0.510998950  # electron mass in MeV/c^2
+kin_energy_MeV = energy_MeV - mass_MeV  # reference kinetic energy in MeV
 bunch_charge_C = 1.0e-9  # charge in C
 npart = int(10000)  # number of macro particles
 
