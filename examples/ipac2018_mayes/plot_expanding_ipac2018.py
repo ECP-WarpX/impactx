@@ -7,9 +7,7 @@
 
 
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
 import openpmd_api as io
-import pandas as pd
 
 # collect final beam
 series = io.Series("diags/openPMD/monitor.h5", io.Access.read_only)

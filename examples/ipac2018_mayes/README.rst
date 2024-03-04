@@ -46,8 +46,8 @@ We run the following script to analyze correctness:
 
 .. _examples-guassian-SCdrift:
 
-Space Charge in a Coasting 3D Gaussian Bunch        
-============================================= 
+Space Charge in a Coasting 3D Gaussian Bunch
+=============================================
 
 This example is based on Fig. 4 of:
 
@@ -112,4 +112,3 @@ You can run the following script to visualize the final beam distribution:
    :alt: Final beam distribution when running with full resolution (see inline comments in the input file/script).
 
    Final beam distribution when running with full resolution (see inline comments in the input file/script).
-

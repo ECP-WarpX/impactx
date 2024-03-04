@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 
 import amrex.space3d as amr
-from impactx import ImpactX, RefPart, distribution, elements
+from impactx import ImpactX, distribution, elements
 
 # theory data from eq. (1) in Mayes, sampled to text files in
 theory = pd.read_csv("Ex_Mayes.dat", header=0, sep=r"\s+")
