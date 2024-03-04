@@ -144,9 +144,8 @@ def run_and_plot(case, r, ax):
             color=line_color,
         )
 
-    
     # clean shutdown
-    sim.finalize() 
+    sim.finalize()
 
 
 f = plt.figure()
