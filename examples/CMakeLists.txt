@@ -877,6 +877,21 @@ add_impactx_test(alignment.py
     OFF  # no plot script yet
 )
 
+# Fermilab Booster thin-kick model ################################################
+#
+# w/o space charge
+# copy lattice file & parser
+file(COPY ${ImpactX_SOURCE_DIR}/examples/fnal_booster/fermi-booster-madx-sxf_corr_new
+     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/booster.py)
+add_impactx_test(booster.py
+    examples/fnal_booster/fnal_booster.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/fnal_booster/analysis_booster.py
+    OFF  # no plot script yet
+)
+label_impactx_test(booster.py slow)
+
 # Tune Calculation ###########################################################
 #
 # w/o space charge
