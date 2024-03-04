@@ -699,7 +699,6 @@ add_impactx_test(hvkicker_madx.py
         OFF  # no plot script yet
 )
 
-<<<<<<< HEAD
 # FODO + RF EPAC2004 ##########################################################
 #
 # with space charge
