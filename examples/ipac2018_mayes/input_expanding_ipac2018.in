@@ -3,7 +3,7 @@
 ###############################################################################
 beam.npart = 10000  # outside tests, use 1e5 or more
 beam.units = static
-beam.energy = 9.48900105  # KE corresponding to 10 MeV total energy
+beam.kin_energy = 9.48900105  # KE corresponding to 10 MeV total energy
 beam.charge = 1.0e-9  # 1 nC
 beam.particle = electron
 beam.distribution = gaussian
