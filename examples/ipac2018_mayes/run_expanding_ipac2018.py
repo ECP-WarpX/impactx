@@ -35,7 +35,7 @@ npart = int(10000)  # number of macro particles
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
-ref.set_charge_qe(-1.0).set_mass_MeV(mass_MeV).set_energy_MeV(energy_MeV)
+ref.set_charge_qe(-1.0).set_mass_MeV(mass_MeV).set_kin_energy_MeV(kin_energy_MeV)
 
 #   particle bunch
 r = 0.1  # aspect ratio = sigma_z / sigma_perp:  range 0.01 to 10
