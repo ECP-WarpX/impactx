@@ -899,9 +899,9 @@ add_impactx_test(fodo_tune.py
 #
 # w/ space charge
 # copy nominal field data files
-file(COPY ${ImpactX_SOURCE_DIR}/ipac2018_mayes/Ex_Mayes.dat
+file(COPY ${ImpactX_SOURCE_DIR}/examples/ipac2018_mayes/Ex_Mayes.dat
         DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Ex_Mayes.dat)
-file(COPY ${ImpactX_SOURCE_DIR}/ipac2018_mayes/Ey_Mayes.dat
+file(COPY ${ImpactX_SOURCE_DIR}/examples/ipac2018_mayes/Ey_Mayes.dat
         DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Ey_Mayes.dat)
 add_impactx_test(gaussian-SCfields.py
     examples/ipac2018_mayes/run_fieldplots_ipac2018.py
