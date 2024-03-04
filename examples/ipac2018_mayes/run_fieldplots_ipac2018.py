@@ -65,7 +65,7 @@ def run_and_plot(case, r, ax):
     #   reference particle (Mayes Fig. 1 is for + charge)
     ref = sim.particle_container().ref_particle()
     kinetic_MeV = energy_MeV - mass_MeV
-    ref.set_charge_qe(1.0).set_mass_MeV(mass_MeV).set_energy_MeV(kinetic_MeV)
+    ref.set_charge_qe(1.0).set_mass_MeV(mass_MeV).set_kin_energy_MeV(kinetic_MeV)
 
     #   particle bunch
     sigma_r = 1.0e-3  # fixed at 1 mm
