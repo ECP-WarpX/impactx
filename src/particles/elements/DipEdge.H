@@ -11,6 +11,7 @@
 #define IMPACTX_DIPEDGE_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 #include "mixin/nofinalize.H"
@@ -26,6 +27,7 @@ namespace impactx
     struct DipEdge
     : public elements::BeamOptic<DipEdge>,
       public elements::Thin,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "DipEdge";
@@ -44,10 +46,21 @@ namespace impactx
          * @param rc Radius of curvature in m.
          * @param g Gap parameter in m.
          * @param K2 Fringe field integral (unitless).
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error in the transverse plane [degrees]
          */
-        DipEdge( amrex::ParticleReal const psi, amrex::ParticleReal const rc,
-                 amrex::ParticleReal const g, amrex::ParticleReal const K2 )
-        : m_psi(psi), m_rc(rc), m_g(g), m_K2(K2)
+        DipEdge (
+            amrex::ParticleReal psi,
+            amrex::ParticleReal rc,
+            amrex::ParticleReal g,
+            amrex::ParticleReal K2,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0
+        )
+        : Alignment(dx, dy, rotation_degree),
+          m_psi(psi), m_rc(rc), m_g(g), m_K2(K2)
         {
         }
 
@@ -57,27 +70,30 @@ namespace impactx
         /** This is a dipedge functor, so that a variable of this type can be used like a
          *  dipedge function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t (unchanged)
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle (unused)
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
+                amrex::ParticleReal & AMREX_RESTRICT x,
+                amrex::ParticleReal & AMREX_RESTRICT y,
+                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT t,
                 amrex::ParticleReal & AMREX_RESTRICT px,
                 amrex::ParticleReal & AMREX_RESTRICT py,
                 [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT pt,
+                [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
                 [[maybe_unused]] RefPart const & refpart) const {
 
             using namespace amrex::literals; // for _rt and _prt
 
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-
-            // access reference particle values if needed
+            // shift due to alignment errors of the element
+            shift_in(x, y, px, py);
 
             // edge focusing matrix elements (zero gap)
             amrex::ParticleReal const R21 = tan(m_psi)/m_rc;
@@ -92,6 +108,9 @@ namespace impactx
             // apply edge focusing
             px = px + R21*x;
             py = py + R43*y;
+
+            // undo shift due to alignment errors of the element
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle. */

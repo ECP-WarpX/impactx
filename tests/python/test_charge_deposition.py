@@ -32,10 +32,10 @@ def test_charge_deposition(save_png=True):
     # Future:
     # sim.domain = amr.RealBox([1., 2., 3.], [4., 5., 6.])
     print(f"sim.n_cell={sim.n_cell}")
-    print(f"sim.domain={sim.domain}")
 
     sim.init_grids()
     assert sim.n_cell == [16, 24, 32]
+    print(f"sim.domain={sim.domain}")
 
     sim.init_beam_distribution_from_inputs()
     sim.init_lattice_elements_from_inputs()
@@ -54,29 +54,15 @@ def test_charge_deposition(save_png=True):
 
     half_z = sim.n_cell[2] // 2  # order: x,y,z
 
-    # for GPU runs, copy data from device to host for plotting
-    if impactx.Config.have_gpu:
-        rho_host = amr.MultiFab(
-            rho.box_array(),
-            rho.dm(),
-            rho.n_comp(),
-            rho.n_grow_vect(),
-            amr.MFInfo().set_arena(amrex.The_Pinned_Arena()),
-        )
-        amrex.dtoh_memcpy(rho_host, rho)
-    else:
-        rho_host = rho
-
     # plot data slices
     f = plt.figure()
     ax = f.gca()
-    ng = rho_host.nGrowVect
-    for mfi in rho_host:
+    ng = rho.n_grow_vect
+    for mfi in rho:
         bx = mfi.validbox()
         rbx = amr.RealBox(bx, dr, gm.ProbLo())
 
-        arr = rho_host.array(mfi)
-        arr_np = np.array(arr, copy=False)  # indices: comp, z, y, x
+        arr_np = rho.array(mfi).to_numpy(copy=True)  # indices x, y, z, comp
 
         # shift box to zero-based local mfi index space
         half_z_local = half_z - bx.lo_vect[2]
@@ -88,12 +74,12 @@ def test_charge_deposition(save_png=True):
         comp = 0
         mu = 1.0e6  # m->mu
         im = ax.imshow(
-            # arr_np[comp, half_z, ...] * dV,  # including guard
-            arr_np[comp, half_z_local, ng[1] : -ng[1], ng[0] : -ng[0]]
+            # arr_np[..., half_z, comp] * dV,  # including guard
+            arr_np[ng[0] : -ng[0], ng[1] : -ng[1], half_z_local, comp]
             * dV,  # w/o guard
             origin="lower",
             aspect="auto",
-            extent=[rbx.lo(0) * mu, rbx.hi(0) * mu, rbx.lo(1) * mu, rbx.hi(1) * mu],
+            extent=[rbx.lo(1) * mu, rbx.hi(1) * mu, rbx.lo(0) * mu, rbx.hi(0) * mu],
         )
         cb = f.colorbar(im)
         cb.set_label(r"charge density  [C/m$^3$]")
@@ -103,6 +89,9 @@ def test_charge_deposition(save_png=True):
             plt.savefig("charge_deposition.png")
         else:
             plt.show()
+
+    # finalize simulation
+    sim.finalize()
 
 
 # implement a direct script run mode, so we can run this directly too,

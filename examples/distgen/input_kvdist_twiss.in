@@ -1,0 +1,51 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.kin_energy = 2.0e3
+beam.charge = 1.0e-9
+beam.particle = electron
+beam.distribution = kvdist_from_twiss
+beam.alphaX = -1.5905003499999992
+beam.alphaY = 1.5905003499999992
+beam.alphaT = 0.0
+beam.betaX = 2.8216194100262637
+beam.betaY = 2.8216194100262637
+beam.betaT = 0.5
+beam.emittX = 2e-09
+beam.emittY = 2e-09
+beam.emittT = 2e-06
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor drift1 quad1 drift2 quad2 drift3 monitor
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+drift1.type = drift
+drift1.ds = 0.25
+
+quad1.type = quad
+quad1.ds = 1.0
+quad1.k = 1.0
+
+drift2.type = drift
+drift2.ds = 0.5
+
+quad2.type = quad
+quad2.ds = 1.0
+quad2.k = -1.0
+
+drift3.type = drift
+drift3.ds = 0.25
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false

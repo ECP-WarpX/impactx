@@ -7,8 +7,7 @@
 # -*- coding: utf-8 -*-
 
 
-import amrex.space3d as amr
-from impactx import ImpactX, RefPart, distribution, elements
+from impactx import ImpactX, distribution
 
 sim = ImpactX()
 
@@ -23,7 +22,7 @@ sim.init_grids()
 
 # load a 2 GeV electron beam with an initial
 # unnormalized rms emittance of 2 nm
-energy_MeV = 2.0e3  # reference energy
+kin_energy_MeV = 2.0e3  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
 npart = 10000  # number of macro particles
 
@@ -51,5 +50,4 @@ sim.lattice.load_file("fodo.madx", nslice=25)
 sim.evolve()
 
 # clean shutdown
-del sim
-amr.finalize()
+sim.finalize()

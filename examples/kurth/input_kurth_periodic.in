@@ -3,7 +3,7 @@
 ###############################################################################
 beam.npart = 10000
 beam.units = static
-beam.energy = 2.0e3
+beam.kin_energy = 2.0e3
 beam.charge = 1.0e-8
 beam.particle = proton
 beam.distribution = kurth6d
@@ -40,4 +40,3 @@ algo.particle_shape = 2
 algo.space_charge = false
 
 amr.n_cell = 40 40 32
-geometry.prob_relative = 3.0

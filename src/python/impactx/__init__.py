@@ -12,11 +12,13 @@ if os.name == "nt":
     # add anything in PATH
     paths = os.environ.get("PATH", "")
     for p in paths.split(";"):
-        if os.path.exists(p):
-            os.add_dll_directory(p)
+        p_abs = os.path.abspath(os.path.expanduser(os.path.expandvars(p)))
+        if os.path.exists(p_abs):
+            os.add_dll_directory(p_abs)
 
 # import core bindings to C++
 from . import impactx_pybind as cxx
+from .ImpactXParIter import register_ImpactXParIter_extension
 from .impactx_pybind import *  # noqa
 from .madx_to_impactx import read_beam, read_lattice  # noqa
 
@@ -35,3 +37,6 @@ elements.KnownElementsList.load_file = lambda self, madx_file, nslice=1: self.ex
 
 # MAD-X file reader for reference particle
 RefPart.load_file = read_beam  # noqa
+
+# Pure Python extensions to ImpactX types
+register_ImpactXParIter_extension(cxx)

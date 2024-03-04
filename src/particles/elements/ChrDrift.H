@@ -11,6 +11,7 @@
 #define IMPACTX_CHRDRIFT_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 #include "mixin/nofinalize.H"
@@ -26,6 +27,7 @@ namespace impactx
     struct ChrDrift
     : public elements::BeamOptic<ChrDrift>,
       public elements::Thick,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "ChrDrift";
@@ -37,10 +39,20 @@ namespace impactx
          * transverse variables (x,px,y,py), with the exact pt dependence retained.
          *
          * @param ds Segment length in m
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param nslice number of slices used for the application of space charge
          */
-        ChrDrift( amrex::ParticleReal const ds, int const nslice )
-        : Thick(ds, nslice)
+        ChrDrift (
+            amrex::ParticleReal ds,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0,
+            int nslice = 1
+        )
+        : Thick(ds, nslice),
+          Alignment(dx, dy, rotation_degree)
         {
         }
 
@@ -49,31 +61,41 @@ namespace impactx
 
         /** This is a chrdrift functor, so that a variable of this type can be used like a chrdrift function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
-                amrex::ParticleReal & AMREX_RESTRICT px,
-                amrex::ParticleReal & AMREX_RESTRICT py,
-                amrex::ParticleReal & AMREX_RESTRICT pt,
-                RefPart const & refpart) const {
-
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            amrex::ParticleReal & AMREX_RESTRICT t,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
+            RefPart const & refpart
+        ) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-            amrex::ParticleReal const t = p.pos(RealAoS::t);
+            // shift due to alignment errors of the element
+            shift_in(x, y, px, py);
+
+            // access position data
+            amrex::ParticleReal const xout = x;
+            amrex::ParticleReal const yout = y;
+            amrex::ParticleReal const tout = t;
 
             // initialize output values of momenta
-            amrex::ParticleReal pxout = px;
-            amrex::ParticleReal pyout = py;
-            amrex::ParticleReal ptout = pt;
+            amrex::ParticleReal const pxout = px;
+            amrex::ParticleReal const pyout = py;
+            amrex::ParticleReal const ptout = pt;
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
@@ -87,9 +109,9 @@ namespace impactx
             delta1 = sqrt(1_prt - 2_prt*pt/bet + pow(pt,2));
 
             // advance transverse position and momentum (drift)
-            p.pos(RealAoS::x) = x + slice_ds * px / delta1;
+            x = xout + slice_ds * px / delta1;
             // pxout = px;
-            p.pos(RealAoS::y) = y + slice_ds * py / delta1;
+            y = yout + slice_ds * py / delta1;
             // pyout = py;
 
             // the corresponding symplectic update to t
@@ -98,7 +120,7 @@ namespace impactx
             term = -2_prt + pow(gam,2)*term;
             term = (-1_prt+bet*pt)*term;
             term = term/(2_prt*pow(bet,3)*pow(gam,2));
-            p.pos(RealAoS::t) = t - slice_ds*(1_prt/bet + term/pow(delta1,3));
+            t = tout - slice_ds * (1_prt / bet + term / pow(delta1, 3));
             // ptout = pt;
 
             // assign updated momenta
@@ -106,6 +128,8 @@ namespace impactx
             py = pyout;
             pt = ptout;
 
+            // undo shift due to alignment errors of the element
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle.
@@ -113,8 +137,8 @@ namespace impactx
          * @param[in,out] refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void operator() (RefPart & AMREX_RESTRICT refpart) const {
-
+        void operator() (RefPart & AMREX_RESTRICT refpart) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
             // assign input reference particle values
@@ -142,7 +166,6 @@ namespace impactx
 
             // advance integrated path length
             refpart.s = s + slice_ds;
-
         }
     };
 

@@ -1,0 +1,47 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 100000
+beam.units = static
+beam.kin_energy = 2.0e3
+beam.charge = 1.0e-9
+beam.particle = proton
+beam.distribution = waterbag
+beam.sigmaX = 1.16098260008648811e-3
+beam.sigmaY = 1.16098260008648811e-3
+beam.sigmaT = 1.0e-3
+beam.sigmaPx = 0.580491300043e-3
+beam.sigmaPy = 0.580491300043e-3
+beam.sigmaPt = 2.0e-3
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor quad_err monitor
+lattice.nslice = 1
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+quad_err.type = quad
+quad_err.ds = 1.0
+quad_err.k = 0.25
+quad_err.dx = 0.003
+quad_err.rotation = 30.0
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = true

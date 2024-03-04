@@ -63,13 +63,11 @@ namespace impactx::spacecharge
 
                 amrex::ParticleReal const dt = slice_ds / pc.GetRefParticle().beta() / c0_SI;
 
-                // preparing access to particle data: AoS
-                using PType = ImpactXParticleContainer::ParticleType;
-                auto const & aos = pti.GetArrayOfStructs();
-                PType const * const AMREX_RESTRICT aos_ptr = aos().dataPtr();
-
                 // preparing access to particle data: SoA of Reals
                 auto& soa_real = pti.GetStructOfArrays().GetRealData();
+                amrex::ParticleReal* const AMREX_RESTRICT part_x = soa_real[RealSoA::x].dataPtr();
+                amrex::ParticleReal* const AMREX_RESTRICT part_y = soa_real[RealSoA::y].dataPtr();
+                amrex::ParticleReal* const AMREX_RESTRICT part_z = soa_real[RealSoA::z].dataPtr(); // note: currently for a fixed t
                 amrex::ParticleReal* const AMREX_RESTRICT part_px = soa_real[RealSoA::px].dataPtr();
                 amrex::ParticleReal* const AMREX_RESTRICT part_py = soa_real[RealSoA::py].dataPtr();
                 amrex::ParticleReal* const AMREX_RESTRICT part_pz = soa_real[RealSoA::pz].dataPtr(); // note: currently for a fixed t
@@ -79,10 +77,10 @@ namespace impactx::spacecharge
 
                 // gather to each particle and push momentum
                 amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE (int i) {
-                    // access AoS data such as positions and cpu/id
-                    PType const & AMREX_RESTRICT p = aos_ptr[i];
-
                     // access SoA Real data
+                    amrex::ParticleReal & AMREX_RESTRICT x = part_x[i];
+                    amrex::ParticleReal & AMREX_RESTRICT y = part_y[i];
+                    amrex::ParticleReal & AMREX_RESTRICT z = part_z[i];
                     amrex::ParticleReal & AMREX_RESTRICT px = part_px[i];
                     amrex::ParticleReal & AMREX_RESTRICT py = part_py[i];
                     amrex::ParticleReal & AMREX_RESTRICT pz = part_pz[i];
@@ -90,7 +88,7 @@ namespace impactx::spacecharge
                     // force gather
                     amrex::GpuArray<amrex::Real, 3> const field_interp =
                         ablastr::particles::doGatherVectorFieldNodal (
-                            p.pos(RealAoS::x), p.pos(RealAoS::y), p.pos(RealAoS::t),
+                            x, y, z,
                             scf_arr_x, scf_arr_y, scf_arr_z,
                             invdr,
                             prob_lo);

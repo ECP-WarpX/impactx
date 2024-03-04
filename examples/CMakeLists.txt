@@ -15,10 +15,26 @@ if(ImpactX_MPI)
         ${MPIEXEC_EXECUTABLE}
         ${MPI_ALLOW_ROOT}
         ${MPIEXEC_NUMPROC_FLAG} 2
+        ${MPIEXEC_POSTFLAGS}
+        ${MPIEXEC_PREFLAGS}
     )
 endif()
 
 
+# Add an ImpactX test set (with sub-tests).
+#
+# The test will be run and dependent follow-up tests will be added. The latter
+# can optionally perform an analysis and/or a plot test on the generated data.
+#
+# Parameters
+# ----------
+# name: unique ImpactX test name
+# input: inputs file or Python script
+# is_mpi: run with mpirun?
+# is_python: run as a Python script?
+# analysis_script: an analysis script that validates test output
+# plot_script: a plot script that visualizes test output
+#
 function(add_impactx_test name input is_mpi is_python analysis_script plot_script)
     # cannot run Python tests w/o Python support
     if(is_python AND NOT ImpactX_PYTHON)
@@ -98,6 +114,29 @@ function(add_impactx_test name input is_mpi is_python analysis_script plot_scrip
 endfunction()
 
 
+# Add a CTest label to an ImpactX test set.
+#
+# The test set must already been added with add_impactx_test. Labeling it here
+# will add the label to the run test and its optional (dependent) analysis
+# and/or plot follow-up tests.
+#
+# Parameters
+# ----------
+# name: unique ImpactX test name
+# label: ctest LABELS property value to add
+#
+function(label_impactx_test name label)
+    # see add_test calls in add_impactx_test for values
+    set(_test_names "${name}.run;${name}.analysis;${name}.plot")
+
+    foreach(_test_name IN LISTS _test_names)
+        if(TEST ${_test_name})
+            set_property(TEST ${_test_name} APPEND PROPERTY LABELS "${label}")
+        endif()
+    endforeach()
+endfunction()
+
+
 # FODO Cell ###################################################################
 #
 add_impactx_test(FODO
@@ -106,6 +145,16 @@ add_impactx_test(FODO
       OFF  # ImpactX Python interface
     examples/fodo/analysis_fodo.py
     examples/fodo/plot_fodo.py
+)
+
+# FODO Cell w/ Twiss input ####################################################
+#
+add_impactx_test(FODO.Twiss
+        examples/fodo/input_fodo_twiss.in
+        OFF  # ImpactX MPI-parallel
+        OFF  # ImpactX Python interface
+        examples/fodo/analysis_fodo.py
+        examples/fodo/plot_fodo.py
 )
 
 # MPI-Parallel FODO Cell ######################################################
@@ -253,6 +302,16 @@ add_impactx_test(kvdist
       OFF  # ImpactX Python interface
     examples/distgen/analysis_kvdist.py
     OFF  # no plot script yet
+)
+
+# K-V Distribution from Twiss Test ############################################
+#
+add_impactx_test(kvdist_from_twiss
+        examples/distgen/input_kvdist_twiss.in
+        OFF  # ImpactX MPI-parallel
+        OFF  # ImpactX Python interface
+        examples/distgen/analysis_kvdist.py
+        OFF  # no plot script yet
 )
 
 # FODO Cell with RF ###########################################################
@@ -548,7 +607,7 @@ add_impactx_test(positron_channel.py
     OFF  # no plot script yet
 )
 
-# Cyclotron ############################################################
+# Cyclotron ###################################################################
 #
 # w/o space charge
 add_impactx_test(cyclotron
@@ -566,7 +625,7 @@ add_impactx_test(cyclotron.py
     OFF  # no plot script yet
 )
 
-# Combined-function bend ########################################################
+# Combined-function bend ######################################################
 #
 # w/o space charge
 add_impactx_test(cfbend
@@ -584,7 +643,7 @@ add_impactx_test(cfbend.py
     OFF  # no plot script yet
 )
 
-# Ballistic compression ########################################################
+# Ballistic compression #######################################################
 #
 # w/o space charge
 add_impactx_test(compression
@@ -602,7 +661,7 @@ add_impactx_test(compression.py
     OFF  # no plot script yet
 )
 
-# Kicker test ##########################################################
+# Kicker test #################################################################
 #
 # w/o space charge
 add_impactx_test(kicker
@@ -638,4 +697,200 @@ add_impactx_test(hvkicker_madx.py
         ON   # ImpactX Python interface
         examples/kicker/analysis_kicker.py
         OFF  # no plot script yet
+)
+
+# FODO + RF EPAC2004 ##########################################################
+#
+# with space charge
+add_impactx_test(fodo_rf_sc
+    examples/epac2004_benchmarks/input_fodo_rf_SC.in
+      ON  # ImpactX MPI-parallel
+      OFF # ImpactX Python interface
+    examples/epac2004_benchmarks/analysis_fodo_rf_SC.py
+    OFF  # no plot script yet
+)
+add_impactx_test(fodo_rf_sc.py
+    examples/epac2004_benchmarks/run_fodo_rf_SC.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/epac2004_benchmarks/analysis_fodo_rf_SC.py
+    OFF  # no plot script yet
+)
+
+# Thermal Beam EPAC2004 #######################################################
+#
+# with space charge
+add_impactx_test(thermal
+    examples/epac2004_benchmarks/input_thermal.in
+      ON  # ImpactX MPI-parallel
+      OFF # ImpactX Python interface
+    examples/epac2004_benchmarks/analysis_thermal.py
+    OFF  # no plot script yet
+)
+label_impactx_test(thermal slow)
+
+# Bithermal Beam EPAC2004 #####################################################
+#
+# with space charge
+add_impactx_test(bithermal
+    examples/epac2004_benchmarks/input_bithermal.in
+      ON  # ImpactX MPI-parallel
+      OFF # ImpactX Python interface
+    examples/epac2004_benchmarks/analysis_bithermal.py
+    examples/epac2004_benchmarks/plot_bithermal.py
+)
+
+# Python: Bithermal Beam EPAC2004 #############################################
+#
+# with space charge
+add_impactx_test(bithermal.py
+    examples/epac2004_benchmarks/run_bithermal.py
+      ON  # ImpactX MPI-parallel
+      ON  # ImpactX Python interface
+    examples/epac2004_benchmarks/analysis_bithermal.py
+    examples/epac2004_benchmarks/plot_bithermal.py
+)
+
+# IOTA s-dependent nonlinear lens test ########################################
+#
+# w/o space charge
+add_impactx_test(IOTA_nll
+    examples/iota_lens/input_iotalens_sdep.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/iota_lens/analysis_iotalens_sdep.py
+    OFF  # no plot script yet
+)
+add_impactx_test(IOTA_nll.py
+    examples/iota_lens/run_iotalens_sdep.py
+      OFF   # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/iota_lens/analysis_iotalens_sdep.py
+    OFF  # no plot script yet
+)
+
+# IOTA nonlinear lattice test #################################################
+#
+# w/o space charge
+add_impactx_test(IOTA_lattice
+    examples/iota_lattice/input_iotalattice_sdep.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/iota_lattice/analysis_iotalattice_sdep.py
+    OFF  # no plot script yet
+)
+add_impactx_test(IOTA_lattice.py
+    examples/iota_lattice/run_iotalattice_sdep.py
+      OFF   # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/iota_lattice/analysis_iotalattice_sdep.py
+    OFF  # no plot script yet
+)
+
+# Thin dipole #################################################################
+#
+# w/o space charge
+add_impactx_test(thin_dipole
+    examples/thin_dipole/input_thin_dipole.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/thin_dipole/analysis_thin_dipole.py
+    OFF  # no plot script yet
+)
+add_impactx_test(thin_dipole.py
+    examples/thin_dipole/run_thin_dipole.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/thin_dipole/analysis_thin_dipole.py
+    OFF  # no plot script yet
+)
+
+# Aperture collimation ########################################################
+#
+# w/o space charge
+add_impactx_test(aperture
+    examples/aperture/input_aperture.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/aperture/analysis_aperture.py
+    OFF  # no plot script yet
+)
+add_impactx_test(aperture.py
+    examples/aperture/run_aperture.py
+      OFF  # ImpactX MPI-parallel
+      ON  # ImpactX Python interface
+    examples/aperture/analysis_aperture.py
+    OFF  # no plot script yet
+)
+
+# Apochromat drift-quad example ##########################################################
+#
+# w/o space charge
+add_impactx_test(apochromat
+    examples/apochromatic/input_apochromatic.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/apochromatic/analysis_apochromatic.py
+    OFF  # no plot script yet
+)
+add_impactx_test(apochromat.py
+    examples/apochromatic/run_apochromatic.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/apochromatic/analysis_apochromatic.py
+    OFF  # no plot script yet
+)
+
+# Apochromat drift-plasma lens example ###################################################
+#
+# w/o space charge
+add_impactx_test(apochromat_pl
+    examples/apochromatic/input_apochromatic_pl.in
+      ON  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/apochromatic/analysis_apochromatic_pl.py
+    OFF  # no plot script yet
+)
+add_impactx_test(apochromat_pl.py
+    examples/apochromatic/run_apochromatic_pl.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/apochromatic/analysis_apochromatic_pl.py
+    OFF  # no plot script yet
+)
+
+# Misalignment Quad ###########################################################
+#
+# w/o space charge
+add_impactx_test(alignment
+    examples/alignment/input_alignment.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/alignment/analysis_alignment.py
+    OFF  # no plot script yet
+)
+add_impactx_test(alignment.py
+    examples/alignment/run_alignment.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/alignment/analysis_alignment.py
+    OFF  # no plot script yet
+)
+
+# Tune Calculation ###########################################################
+#
+# w/o space charge
+add_impactx_test(fodo_tune
+    examples/fodo_tune/input_fodo_tune.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/fodo_tune/analysis_fodo_tune.py
+    OFF  # no plot script yet
+)
+add_impactx_test(fodo_tune.py
+    examples/fodo_tune/run_fodo_tune.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/fodo_tune/analysis_fodo_tune.py
+    OFF  # no plot script yet
 )

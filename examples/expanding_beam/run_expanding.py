@@ -6,17 +6,21 @@
 #
 # -*- coding: utf-8 -*-
 
-import amrex.space3d as amr
-from impactx import ImpactX, RefPart, distribution, elements
+from impactx import ImpactX, distribution, elements
 
 sim = ImpactX()
 
 # set numerical parameters and IO control
-sim.n_cell = [56, 56, 48]
+sim.max_level = 1
+sim.n_cell = [16, 16, 20]
+sim.blocking_factor_x = [16]
+sim.blocking_factor_y = [16]
+sim.blocking_factor_z = [4]
+
 sim.particle_shape = 2  # B-spline order
 sim.space_charge = True
 sim.dynamic_size = True
-sim.prob_relative = 3.0
+sim.prob_relative = [3.0, 1.1]
 
 # beam diagnostics
 # sim.diagnostics = False  # benchmarking
@@ -27,13 +31,13 @@ sim.init_grids()
 
 # load a 2 GeV electron beam with an initial
 # unnormalized rms emittance of 2 nm
-energy_MeV = 250  # reference energy
+kin_energy_MeV = 250  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
 npart = 10000  # number of macro particles (outside tests, use 1e5 or more)
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
-ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_energy_MeV(energy_MeV)
+ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_MeV)
 
 #   particle bunch
 distr = distribution.Kurth6D(
@@ -56,5 +60,4 @@ sim.lattice.extend([monitor, elements.Drift(ds=6.0, nslice=40), monitor])
 sim.evolve()
 
 # clean shutdown
-del sim
-amr.finalize()
+sim.finalize()

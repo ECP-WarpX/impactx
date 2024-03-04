@@ -7,16 +7,13 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import pytest
 
 from impactx import (
-    Config,
+    CoordSystem,
     ImpactX,
-    ImpactXParIter,
-    RefPart,
-    TransformationDirection,
     coordinate_transformation,
     distribution,
-    elements,
 )
 
 
@@ -38,15 +35,15 @@ def test_transformation():
 
     # load a 1 GeV electron beam with an initial
     # unnormalized rms emittance of 2 nm
-    energy_MeV = 1e3  # reference energy
-    energy_gamma = energy_MeV / 0.510998950
+    kin_energy_MeV = 1e3  # reference energy
+    energy_gamma = kin_energy_MeV / 0.510998950 + 1.0
     bunch_charge_C = 1.0e-9  # used with space charge
     npart = 10000  # number of macro particles
 
     #   reference particle
     pc = sim.particle_container()
     ref = pc.ref_particle()
-    ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_energy_MeV(energy_MeV)
+    ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_MeV)
 
     #   particle bunch
     distr = distribution.Gaussian(
@@ -61,14 +58,26 @@ def test_transformation():
         mutpt=0.8,
     )
     sim.add_particles(bunch_charge_C, distr, npart)
-
     rbc_s0 = pc.reduced_beam_characteristics()
-    coordinate_transformation(pc, TransformationDirection.to_fixed_t)
+
+    # this must fail: we cannot transform from s to s
+    with pytest.raises(Exception):
+        coordinate_transformation(pc, direction=CoordSystem.s)
+
+    # transform to t
+    coordinate_transformation(pc, direction=CoordSystem.t)
     rbc_t = pc.reduced_beam_characteristics()
-    coordinate_transformation(pc, TransformationDirection.to_fixed_s)
+
+    # this must fail: we cannot transform from t to t
+    with pytest.raises(Exception):
+        coordinate_transformation(pc, direction=CoordSystem.t)
+
+    # transform back to s
+    coordinate_transformation(pc, direction=CoordSystem.s)
     rbc_s = pc.reduced_beam_characteristics()
 
-    # clean shutdown
+    # finalize simulation
+    sim.finalize()
     del sim
 
     # assert that forward-inverse transformation of the beam leaves beam unchanged

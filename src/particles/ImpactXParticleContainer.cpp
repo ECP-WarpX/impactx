@@ -9,6 +9,8 @@
  */
 #include "ImpactXParticleContainer.H"
 
+#include "initialization/AmrCoreData.H"
+
 #include <ablastr/constant.H>
 #include <ablastr/particles/ParticleMoments.H>
 
@@ -17,8 +19,9 @@
 #include <AMReX_AmrParGDB.H>
 #include <AMReX_ParallelDescriptor.H>
 #include <AMReX_ParmParse.H>
-#include <AMReX_ParticleTile.H>
+#include <AMReX_Particle.H>
 
+#include <algorithm>
 #include <stdexcept>
 
 
@@ -35,29 +38,47 @@ namespace
 
 namespace impactx
 {
-    ParIter::ParIter (ContainerType& pc, int level)
-        : amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+    ParIterSoA::ParIterSoA (ContainerType& pc, int level)
+        : amrex::ParIterSoA<RealSoA::nattribs, IntSoA::nattribs>(pc, level,
                    amrex::MFItInfo().SetDynamic(do_omp_dynamic())) {}
 
-    ParIter::ParIter (ContainerType& pc, int level, amrex::MFItInfo& info)
-        : amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+    ParIterSoA::ParIterSoA (ContainerType& pc, int level, amrex::MFItInfo& info)
+        : amrex::ParIterSoA<RealSoA::nattribs, IntSoA::nattribs>(pc, level,
               info.SetDynamic(do_omp_dynamic())) {}
 
-    ParConstIter::ParConstIter (ContainerType& pc, int level)
-        : amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+    ParConstIterSoA::ParConstIterSoA (ContainerType& pc, int level)
+        : amrex::ParConstIterSoA<RealSoA::nattribs, IntSoA::nattribs>(pc, level,
               amrex::MFItInfo().SetDynamic(do_omp_dynamic())) {}
 
-    ParConstIter::ParConstIter (ContainerType& pc, int level, amrex::MFItInfo& info)
-        : amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>(pc, level,
+    ParConstIterSoA::ParConstIterSoA (ContainerType& pc, int level, amrex::MFItInfo& info)
+        : amrex::ParConstIterSoA<RealSoA::nattribs, IntSoA::nattribs>(pc, level,
               info.SetDynamic(do_omp_dynamic())) {}
 
-    ImpactXParticleContainer::ImpactXParticleContainer (amrex::AmrCore* amr_core)
-        : amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
+    ImpactXParticleContainer::ImpactXParticleContainer (initialization::AmrCoreData* amr_core)
+        : amrex::ParticleContainerPureSoA<RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
     {
         SetParticleSize();
     }
 
-    void ImpactXParticleContainer::SetParticleShape (int const order) {
+    void
+    ImpactXParticleContainer::SetLostParticleContainer (ImpactXParticleContainer * lost_pc)
+    {
+        m_particles_lost = lost_pc;
+    }
+
+    ImpactXParticleContainer *
+    ImpactXParticleContainer::GetLostParticleContainer ()
+    {
+        if (m_particles_lost == nullptr)
+        {
+            throw std::logic_error(
+                    "ImpactXParticleContainer::GetLostParticleContainer No lost particle container registered yet.");
+        } else {
+            return m_particles_lost;
+        }
+    }
+
+    void ImpactXParticleContainer::SetParticleShape (int order) {
         if (m_particle_shape.has_value())
         {
             throw std::logic_error(
@@ -82,19 +103,19 @@ namespace impactx
     }
 
     void
-    ImpactXParticleContainer::AddNParticles (int lev,
-                                             amrex::Vector<amrex::ParticleReal> const & x,
-                                             amrex::Vector<amrex::ParticleReal> const & y,
-                                             amrex::Vector<amrex::ParticleReal> const & t,
-                                             amrex::Vector<amrex::ParticleReal> const & px,
-                                             amrex::Vector<amrex::ParticleReal> const & py,
-                                             amrex::Vector<amrex::ParticleReal> const & pt,
-                                             amrex::ParticleReal const & qm,
-                                             amrex::ParticleReal const & bchchg)
+    ImpactXParticleContainer::AddNParticles (
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & x,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & y,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & t,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & px,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & py,
+        amrex::Gpu::DeviceVector<amrex::ParticleReal> const & pt,
+        amrex::ParticleReal qm,
+        amrex::ParticleReal bchchg
+    )
     {
         BL_PROFILE("ImpactX::AddNParticles");
 
-        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(lev == 0, "AddNParticles: only lev=0 is supported yet.");
         AMREX_ALWAYS_ASSERT(x.size() == y.size());
         AMREX_ALWAYS_ASSERT(x.size() == t.size());
         AMREX_ALWAYS_ASSERT(x.size() == px.size());
@@ -104,58 +125,80 @@ namespace impactx
         // number of particles to add
         int const np = x.size();
 
-        // have to resize here, not in the constructor because grids have not
-        // been built when constructor was called.
-        reserveData();
-        resizeData();
-
-        auto& particle_tile = DefineAndReturnParticleTile(0, 0, 0);
-
-        /* Create a temporary tile to obtain data from simulation. This data
-         * is then copied to the permanent tile which is stored on the particle
-         * (particle_tile).
-         */
-        using PinnedTile = amrex::ParticleTile<
-            amrex::Particle<NStructReal, NStructInt>,
-            NArrayReal, NArrayInt,
-            amrex::PinnedArenaAllocator
-        >;
-        PinnedTile pinned_tile;
-        pinned_tile.define(NumRuntimeRealComps(), NumRuntimeIntComps());
-
-        for (int i = 0; i < np; i++)
+        // we add particles to lev 0, tile 0 of the first box assigned to this proc
+        int lid = 0, gid = 0, tid = 0;
         {
-            ParticleType p;
-            p.id() = ParticleType::NextID();
-            p.cpu() = amrex::ParallelDescriptor::MyProc();
-            p.pos(RealAoS::x) = x[i];
-            p.pos(RealAoS::y) = y[i];
-            p.pos(RealAoS::t) = t[i];
-            // write position, creating cpu id, and particle id
-            pinned_tile.push_back(p);
+            const auto& pmap = ParticleDistributionMap(lid).ProcessorMap();
+            auto it = std::find(pmap.begin(), pmap.end(), amrex::ParallelDescriptor::MyProc());
+            if (it == std::end(pmap)) {
+                amrex::Abort("Attempting to add particles to box that does not exist.");
+            } else {
+                gid = *it;
+            }
         }
+        auto& particle_tile = DefineAndReturnParticleTile(lid, gid, tid);
 
-        // write Real attributes (SoA) to particle initialized zero
-        DefineAndReturnParticleTile(0, 0, 0);
-
-        pinned_tile.push_back_real(RealSoA::px, px);
-        pinned_tile.push_back_real(RealSoA::py, py);
-        pinned_tile.push_back_real(RealSoA::pt, pt);
-        pinned_tile.push_back_real(RealSoA::qm, np, qm);
-        pinned_tile.push_back_real(RealSoA::w, np, bchchg/ablastr::constant::SI::q_e/np);
-
-        /* Redistributes particles to their respective tiles (spatial bucket
-         * sort per box over MPI ranks)
-         */
         auto old_np = particle_tile.numParticles();
-        auto new_np = old_np + pinned_tile.numParticles();
+        auto new_np = old_np + np;
         particle_tile.resize(new_np);
-        amrex::copyParticles(
-                particle_tile, pinned_tile, 0, old_np, pinned_tile.numParticles());
+
+        // Update NextID to include particles created in this function
+        int pid;
+#ifdef AMREX_USE_OMP
+#pragma omp critical (add_beam_nextid)
+#endif
+        {
+            pid = ParticleType::NextID();
+            ParticleType::NextID(pid+np);
+        }
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(
+        static_cast<amrex::Long>(pid) + static_cast<amrex::Long>(np) < amrex::LongParticleIds::LastParticleID,
+            "ERROR: overflow on particle id numbers");
+
+        const int cpuid = amrex::ParallelDescriptor::MyProc();
+
+        auto & soa = particle_tile.GetStructOfArrays().GetRealData();
+        amrex::ParticleReal * const AMREX_RESTRICT x_arr = soa[RealSoA::x].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT y_arr = soa[RealSoA::y].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT t_arr = soa[RealSoA::t].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT px_arr = soa[RealSoA::px].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT py_arr = soa[RealSoA::py].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT pt_arr = soa[RealSoA::pt].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT qm_arr = soa[RealSoA::qm].dataPtr();
+        amrex::ParticleReal * const AMREX_RESTRICT w_arr  = soa[RealSoA::w ].dataPtr();
+
+        uint64_t * const AMREX_RESTRICT idcpu_arr = particle_tile.GetStructOfArrays().GetIdCPUData().dataPtr();
+
+        amrex::ParticleReal const * const AMREX_RESTRICT x_ptr = x.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT y_ptr = y.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT t_ptr = t.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT px_ptr = px.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT py_ptr = py.data();
+        amrex::ParticleReal const * const AMREX_RESTRICT pt_ptr = pt.data();
+
+        amrex::ParallelFor(np,
+        [=] AMREX_GPU_DEVICE (int i) noexcept
+        {
+            idcpu_arr[old_np+i] = amrex::SetParticleIDandCPU(pid + i, cpuid);
+
+            x_arr[old_np+i] = x_ptr[i];
+            y_arr[old_np+i] = y_ptr[i];
+            t_arr[old_np+i] = t_ptr[i];
+
+            px_arr[old_np+i] = px_ptr[i];
+            py_arr[old_np+i] = py_ptr[i];
+            pt_arr[old_np+i] = pt_ptr[i];
+            qm_arr[old_np+i] = qm;
+            w_arr[old_np+i]  = bchchg/ablastr::constant::SI::q_e/np;
+        });
+
+        // safety first: in case passed attribute arrays were temporary, we
+        // want to make sure the ParallelFor has ended here
+        amrex::Gpu::streamSynchronize();
     }
 
     void
-    ImpactXParticleContainer::SetRefParticle (RefPart const refpart)
+    ImpactXParticleContainer::SetRefParticle (RefPart const & refpart)
     {
         m_refpart = refpart;
     }
@@ -198,5 +241,65 @@ namespace impactx
         return ablastr::particles::MeanAndStdPositions<
             ImpactXParticleContainer, RealSoA::w
         >(*this);
+    }
+
+    std::vector<std::string>
+    ImpactXParticleContainer::RealSoA_names () const
+    {
+        return get_RealSoA_names(this->NumRealComps());
+    }
+
+    std::vector<std::string>
+    ImpactXParticleContainer::intSoA_names () const
+    {
+        return get_intSoA_names(this->NumIntComps());
+    }
+
+    CoordSystem
+    ImpactXParticleContainer::GetCoordSystem () const
+    {
+        return m_coordsystem;
+    }
+
+    void
+    ImpactXParticleContainer::SetCoordSystem (CoordSystem coord_system)
+    {
+        m_coordsystem = coord_system;
+    }
+
+    std::vector<std::string>
+    get_RealSoA_names (int num_real_comps)
+    {
+        std::vector<std::string> real_soa_names(num_real_comps);
+
+        // compile-time attributes
+        std::copy(RealSoA::names_s.begin(), RealSoA::names_s.end(), real_soa_names.begin());
+
+        // runtime attributes
+        if (num_real_comps > int(RealSoA::names_s.size()))
+        {
+            // particles lost record their "s" position where they got lost
+            real_soa_names[RealSoA::nattribs] = "s_lost";
+        }
+
+        return real_soa_names;
+    }
+
+    std::vector<std::string>
+    get_intSoA_names (int num_int_comps)
+    {
+        std::vector<std::string> int_soa_names(num_int_comps);
+
+        // compile-time attributes
+        std::copy(IntSoA::names_s.begin(), IntSoA::names_s.end(), int_soa_names.begin());
+
+        // runtime attributes
+        if (num_int_comps > int(IntSoA::names_s.size()))
+        {
+            // particles lost record their "s" position where they got lost
+            int_soa_names[IntSoA::nattribs] = "s_lost";
+        }
+
+        return int_soa_names;
     }
 } // namespace impactx

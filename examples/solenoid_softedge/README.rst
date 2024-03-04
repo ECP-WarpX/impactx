@@ -24,18 +24,22 @@ In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`
 Run
 ---
 
-This example can be run as a Python script (``python3 run_solenoid_softedge.py``) or with an app with an input file (``impactx input_solenoid_softedge.in``).
-Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
+This example can be run **either** as:
+
+* **Python** script: ``python3 run_solenoid_softedge.py`` or
+* ImpactX **executable** using an input file: ``impactx input_solenoid_softedge.in``
+
+For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
 .. tab-set::
 
-   .. tab-item:: Python Script
+   .. tab-item:: Python: Script
 
        .. literalinclude:: run_solenoid_softedge.py
           :language: python3
           :caption: You can copy this file from ``examples/solenoid_softedge/run_solenoid_softedge.py``.
 
-   .. tab-item:: App Input File
+   .. tab-item:: Executable: Input File
 
        .. literalinclude:: input_solenoid_softedge.in
           :language: ini

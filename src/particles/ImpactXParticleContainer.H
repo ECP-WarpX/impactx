@@ -11,12 +11,14 @@
 #define IMPACTX_PARTICLE_CONTAINER_H
 
 #include "ReferenceParticle.H"
+#include "initialization/AmrCoreData_fwd.H"
 
 #include <AMReX_AmrCoreFwd.H>
 #include <AMReX_BaseFwd.H>
 #include <AMReX_MultiFab.H>
 #include <AMReX_ParIter.H>
 #include <AMReX_Particles.H>
+#include <AMReX_ParticleTile.H>
 
 #include <AMReX_IntVect.H>
 #include <AMReX_Vector.H>
@@ -28,43 +30,22 @@
 
 namespace impactx
 {
-    /** AMReX pre-defined Real attributes
-     *
-     * These are the AMReX pre-defined struct indexes for the Real attributes
-     * stored in an AoS in ImpactXParticleContainer. We document this here,
-     * because we change the meaning of these "positions" depending on the
-     * coordinate system we are currently in.
-     */
-    struct RealAoS
+    enum class CoordSystem
     {
-        enum
-        {
-            x,  ///< position in x [m] (at fixed s OR fixed t)
-            y,  ///< position in y [m] (at fixed s OR fixed t)
-            t,  ///< c * time-of-flight [m] (at fixed s)
-            nattribs ///< the number of attributes above (always last)
-        };
-
-        // at fixed t, the third component represents the position z
-        enum {
-            z = t  ///< position in z [m] (at fixed t)
-        };
-
-        //! named labels for fixed s
-        static constexpr auto names_s = { "position_x", "position_y", "position_t" };
-        //! named labels for fixed t
-        static constexpr auto names_t = { "position_x", "position_y", "position_z" };
-        static_assert(names_s.size() == nattribs);
-        static_assert(names_t.size() == nattribs);
+        s,  ///< fixed s as the independent variable
+        t   ///< fixed t as the independent variable
     };
 
-    /** This struct indexes the additional Real attributes
+    /** This struct indexes the Real attributes
      *  stored in an SoA in ImpactXParticleContainer
      */
     struct RealSoA
     {
         enum
         {
+            x,   ///< position in x [m] (at fixed s or t)
+            y,   ///< position in y [m] (at fixed s or t)
+            t,   ///< time-of-flight ct [m] (at fixed s)
             px,  ///< momentum in x, scaled by the magnitude of the reference momentum [unitless] (at fixed s or t)
             py,  ///< momentum in y, scaled by the magnitude of the reference momentum [unitless] (at fixed s or t)
             pt,  ///< energy deviation, scaled by speed of light * the magnitude of the reference momentum [unitless] (at fixed s)
@@ -73,28 +54,36 @@ namespace impactx
             nattribs ///< the number of attributes above (always last)
         };
 
-        // at fixed t, the third component represents the momentum in z
+        // at fixed t, the third component represents the position z, the 6th component represents the momentum in z
         enum {
+            z = t,   ///< position in z [m] (at fixed t)
             pz = pt  ///< momentum in z, scaled by the magnitude of the reference momentum [unitless] (at fixed t)
         };
 
         //! named labels for fixed s
-        static constexpr auto names_s = { "momentum_x", "momentum_y", "momentum_t", "qm", "weighting" };
+        static constexpr auto names_s = { "position_x", "position_y", "position_t", "momentum_x", "momentum_y", "momentum_t", "qm", "weighting" };
         //! named labels for fixed t
-        static constexpr auto names_t = { "momentum_x", "momentum_y", "momentum_z", "qm", "weighting" };
+        static constexpr auto names_t = { "position_x", "position_y", "position_z", "momentum_x", "momentum_y", "momentum_z", "qm", "weighting" };
         static_assert(names_s.size() == nattribs);
         static_assert(names_t.size() == nattribs);
     };
 
-    /** This struct indexes the additional Integer attributes
+    /** This struct indexes the Integer attributes
      *  stored in an SoA in ImpactXParticleContainer
      */
     struct IntSoA
     {
         enum
         {
-            nattribs ///< the number of particles above (always last)
+            nattribs ///< the number of attributes above (always last)
         };
+
+        //! named labels for fixed s
+        static constexpr std::initializer_list<char const *> names_s = {};
+        //! named labels for fixed t
+        static constexpr std::initializer_list<char const *> names_t = {};
+        static_assert(names_s.size() == nattribs);
+        static_assert(names_t.size() == nattribs);
     };
 
     /** AMReX iterator for particle boxes
@@ -102,15 +91,15 @@ namespace impactx
      * We subclass here to change the default threading strategy, which is
      * `static` in AMReX, to `dynamic` in ImpactX.
      */
-    class ParIter
-        : public amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
+    class ParIterSoA
+        : public amrex::ParIterSoA<RealSoA::nattribs, IntSoA::nattribs>
     {
     public:
-        using amrex::ParIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>::ParIter;
+        using amrex::ParIterSoA<RealSoA::nattribs, IntSoA::nattribs>::ParIterSoA;
 
-        ParIter (ContainerType& pc, int level);
+        ParIterSoA (ContainerType& pc, int level);
 
-        ParIter (ContainerType& pc, int level, amrex::MFItInfo& info);
+        ParIterSoA (ContainerType& pc, int level, amrex::MFItInfo& info);
     };
 
     /** Const AMReX iterator for particle boxes - data is read only.
@@ -118,15 +107,15 @@ namespace impactx
      * We subclass here to change the default threading strategy, which is
      * `static` in AMReX, to `dynamic` in ImpactX.
      */
-    class ParConstIter
-        : public amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>
+    class ParConstIterSoA
+        : public amrex::ParConstIterSoA<RealSoA::nattribs, IntSoA::nattribs>
     {
     public:
-        using amrex::ParConstIter<0, 0, RealSoA::nattribs, IntSoA::nattribs>::ParConstIter;
+        using amrex::ParConstIterSoA<RealSoA::nattribs, IntSoA::nattribs>::ParConstIterSoA;
 
-        ParConstIter (ContainerType& pc, int level);
+        ParConstIterSoA (ContainerType& pc, int level);
 
-        ParConstIter (ContainerType& pc, int level, amrex::MFItInfo& info);
+        ParConstIterSoA (ContainerType& pc, int level, amrex::MFItInfo& info);
     };
 
     /** Beam Particles in ImpactX
@@ -134,17 +123,17 @@ namespace impactx
      * This class stores particles, distributed over MPI ranks.
      */
     class ImpactXParticleContainer
-        : public amrex::ParticleContainer<0, 0, RealSoA::nattribs, IntSoA::nattribs>
+        : public amrex::ParticleContainerPureSoA<RealSoA::nattribs, IntSoA::nattribs>
     {
     public:
         //! amrex iterator for particle boxes
-        using iterator = impactx::ParIter;
+        using iterator = impactx::ParIterSoA;
 
         //! amrex constant iterator for particle boxes (read-only)
-        using const_iterator = impactx::ParConstIter;
+        using const_iterator = impactx::ParConstIterSoA;
 
         //! Construct a new particle container
-        ImpactXParticleContainer (amrex::AmrCore* amr_core);
+        ImpactXParticleContainer (initialization::AmrCoreData* amr_core);
 
         //! Destruct a particle container
         virtual ~ImpactXParticleContainer() = default;
@@ -156,7 +145,6 @@ namespace impactx
          *       or AmrCore::InitFromCheckpoint has been made in the ImpactX
          *       class.
          *
-         * @param lev mesh-refinement level
          * @param x positions in x
          * @param y positions in y
          * @param t positions as time-of-flight in c*t
@@ -167,22 +155,33 @@ namespace impactx
          * @param bchchg total charge within a bunch in C
          */
         void
-        AddNParticles (int lev,
-                       amrex::Vector<amrex::ParticleReal> const & x,
-                       amrex::Vector<amrex::ParticleReal> const & y,
-                       amrex::Vector<amrex::ParticleReal> const & t,
-                       amrex::Vector<amrex::ParticleReal> const & px,
-                       amrex::Vector<amrex::ParticleReal> const & py,
-                       amrex::Vector<amrex::ParticleReal> const & pt,
-                       amrex::ParticleReal const & qm,
-                       amrex::ParticleReal const & bchchg);
+        AddNParticles (
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & x,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & y,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & t,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & px,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & py,
+            amrex::Gpu::DeviceVector<amrex::ParticleReal> const & pt,
+            amrex::ParticleReal qm,
+            amrex::ParticleReal bchchg
+        );
+
+        /** Register storage for lost particles
+         *
+         * @param lost_pc particle container for lost particles
+         */
+        void
+        SetLostParticleContainer (ImpactXParticleContainer * lost_pc);
+
+        ImpactXParticleContainer *
+        GetLostParticleContainer ();
 
         /** Set reference particle attributes
          *
          * @param refpart reference particle
          */
         void
-        SetRefParticle (RefPart const refpart);
+        SetRefParticle (RefPart const & refpart);
 
         /** Get reference particle attributes
          *
@@ -224,7 +223,7 @@ namespace impactx
          *
          * @param order the order of the particle shape
          */
-        void SetParticleShape (int const order);
+        void SetParticleShape (int order);
 
         /** Compute the min and max of the particle position in each dimension
          *
@@ -259,6 +258,25 @@ namespace impactx
         DepositCharge (std::unordered_map<int, amrex::MultiFab> & rho,
                        amrex::Vector<amrex::IntVect> const & ref_ratio);
 
+        /** Get the name of each ParticleReal SoA component */
+        std::vector<std::string>
+        RealSoA_names () const;
+
+        /** Get the name of each int SoA component */
+        std::vector<std::string>
+        intSoA_names () const;
+
+        /** Get the current coordinate system of particles in this container */
+        CoordSystem
+        GetCoordSystem () const;
+
+        /** Set the current coordinate system of particles in this container
+         *
+         * @param coord_system the new coordinate system the beam particles are in
+         */
+        void
+        SetCoordSystem (CoordSystem coord_system);
+
       private:
 
         //! the reference particle for the beam in the particle container
@@ -267,7 +285,29 @@ namespace impactx
         //! the particle shape
         std::optional<int> m_particle_shape;
 
+        //! a non-owning reference to lost particles, i.e., due to apertures
+        ImpactXParticleContainer* m_particles_lost = nullptr;
+
+        //! the current coordinate system of particles in this container
+        CoordSystem m_coordsystem = CoordSystem::s;
+
     }; // ImpactXParticleContainer
+
+    /** Get the name of each ParticleReal SoA component
+     *
+     * @param num_real_comps number of compile-time + runtime arrays
+     * @return names
+     */
+    std::vector<std::string>
+    get_RealSoA_names (int num_real_comps);
+
+    /** Get the name of each int SoA component
+     *
+     * @param num_int_comps number of compile-time + runtime arrays
+     * @return names
+     */
+    std::vector<std::string>
+    get_intSoA_names (int num_int_comps);
 
 } // namespace impactx
 

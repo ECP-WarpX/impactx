@@ -35,6 +35,11 @@ jobs:
           ccache-openmp-gcc-${{ hashFiles('.github/workflows/ubuntu.yml') }}-
           ccache-openmp-gcc-
 
+    - name: system info
+      run: |
+        cat /proc/cpuinfo
+        lscpu
+
     - name: build ImpactX
       run: |
         cmake -S . -B build            \
@@ -42,12 +47,13 @@ jobs:
           -DBUILD_SHARED_LIBS=ON       \
           -DCMAKE_INSTALL_PREFIX=/usr  \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
-          -DImpactX_PYTHON=ON
-        cmake --build build -j 2
+          -DImpactX_PYTHON=ON          \
+          -DMPIEXEC_POSTFLAGS="--use-hwthread-cpus"
+        cmake --build build -j 4
 
     - name: run tests
       run: |
-        ctest --test-dir build --output-on-failure
+        ctest --test-dir build --output-on-failure --label-exclude slow
 
     - name: run installed app
       run: |
@@ -106,11 +112,11 @@ jobs:
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
           -DImpactX_MPI=OFF            \
           -DImpactX_PYTHON=ON
-        cmake --build build -j 2
+        cmake --build build -j 4
 
     - name: run tests
       run: |
-        ctest --test-dir build --output-on-failure
+        ctest --test-dir build --output-on-failure --label-exclude slow
 
     - name: run installed app
       run: |

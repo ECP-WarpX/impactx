@@ -15,11 +15,8 @@ void init_transformation(py::module& m)
 {
     m.def("coordinate_transformation",
         &transformation::CoordinateTransformation,
+        py::arg("pc"),
+        py::arg("direction"),
         "Transform coordinates from fixed s to fixed to or vice versa."
     );
-
-    py::enum_<transformation::Direction>(m, "TransformationDirection")
-        .value("to_fixed_s", transformation::Direction::to_fixed_s)
-        .value("to_fixed_t", transformation::Direction::to_fixed_t)
-        .export_values();
 }

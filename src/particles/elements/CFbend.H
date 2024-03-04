@@ -11,11 +11,13 @@
 #define IMPACTX_CFBEND_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
+#include <AMReX_Math.H>
 #include <AMReX_REAL.H>
 
 #include <cmath>
@@ -26,6 +28,7 @@ namespace impactx
     struct CFbend
     : public elements::BeamOptic<CFbend>,
       public elements::Thick,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "CFbend";
@@ -40,14 +43,23 @@ namespace impactx
          *           = (gradient in T/m) / (rigidity in T-m)
          *           k > 0 horizontal focusing
          *           k < 0 horizontal defocusing
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param nslice number of slices used for the application of space charge
          */
-        CFbend(
-            amrex::ParticleReal const ds,
-            amrex::ParticleReal const rc,
-            amrex::ParticleReal const k,
-            int const nslice)
-        : Thick(ds, nslice), m_rc(rc), m_k(k)
+        CFbend (
+            amrex::ParticleReal ds,
+            amrex::ParticleReal rc,
+            amrex::ParticleReal k,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0,
+            int nslice = 1
+        )
+        : Thick(ds, nslice),
+          Alignment(dx, dy, rotation_degree),
+          m_rc(rc), m_k(k)
         {
         }
 
@@ -56,26 +68,36 @@ namespace impactx
 
         /** This is a cfbend functor, so that a variable of this type can be used like a cfbend function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
-                amrex::ParticleReal & AMREX_RESTRICT px,
-                amrex::ParticleReal & AMREX_RESTRICT py,
-                amrex::ParticleReal & AMREX_RESTRICT pt,
-                RefPart const & refpart) const
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            amrex::ParticleReal & AMREX_RESTRICT t,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
+            RefPart const & refpart
+        ) const
         {
             using namespace amrex::literals; // for _rt and _prt
 
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-            amrex::ParticleReal const t = p.pos(RealAoS::t);
+            // shift due to alignment errors of the element
+            shift_in(x, y, px, py);
+
+            // initialize output values
+            amrex::ParticleReal xout = x;
+            amrex::ParticleReal yout = y;
+            amrex::ParticleReal tout = t;
 
             // initialize output values of momenta
             amrex::ParticleReal pxout = px;
@@ -96,17 +118,16 @@ namespace impactx
 
             if(gx > 0.0) {
                 // calculate expensive terms once
-                amrex::ParticleReal const sinx = sin(omegax * slice_ds);
-                amrex::ParticleReal const cosx = cos(omegax * slice_ds);
+                auto const [sinx, cosx] = amrex::Math::sincos(omegax * slice_ds);
                 amrex::ParticleReal const r56 = slice_ds/betgam2
                     + (sinx - omegax*slice_ds)/(gx*omegax*pow(bet,2)*pow(m_rc,2));
 
                 // advance position and momentum (focusing)
-                p.pos(RealAoS::x) = cosx*x + sinx/omegax*px - (1.0_prt - cosx)/(gx*bet*m_rc)*pt;
-                pxout = -omegax*sinx*x + cosx*px - sinx/(omegax*bet*m_rc)*pt;
+                x = cosx*xout + sinx/omegax*px - (1.0_prt - cosx)/(gx*bet*m_rc)*pt;
+                pxout = -omegax*sinx*xout + cosx*px - sinx/(omegax*bet*m_rc)*pt;
 
-                p.pos(RealAoS::t) = sinx/(omegax*bet*m_rc)*x + (1.0_prt - cosx)/(gx*bet*m_rc)*px
-                    + t + r56*pt;
+                y = sinx/(omegax*bet*m_rc)*xout + (1.0_prt - cosx)/(gx*bet*m_rc)*px
+                    + tout + r56*pt;
                 ptout = pt;
             } else {
                 // calculate expensive terms once
@@ -116,11 +137,11 @@ namespace impactx
                     + (sinhx - omegax*slice_ds)/(gx*omegax*pow(bet,2)*pow(m_rc,2));
 
                 // advance position and momentum (defocusing)
-                p.pos(RealAoS::x) = coshx*x + sinhx/omegax*px - (1.0_prt - coshx)/(gx*bet*m_rc)*pt;
-                pxout = omegax*sinhx*x + coshx*px - sinhx/(omegax*bet*m_rc)*pt;
+                x = coshx*xout + sinhx/omegax*px - (1.0_prt - coshx)/(gx*bet*m_rc)*pt;
+                pxout = omegax*sinhx*xout + coshx*px - sinhx/(omegax*bet*m_rc)*pt;
 
-                p.pos(RealAoS::t) = sinhx/(omegax*bet*m_rc)*x + (1.0_prt - coshx)/(gx*bet*m_rc)*px
-                    + t + r56*pt;
+                t = sinhx/(omegax*bet*m_rc)*xout + (1.0_prt - coshx)/(gx*bet*m_rc)*px
+                    + tout + r56*pt;
                 ptout = pt;
             }
 
@@ -130,12 +151,11 @@ namespace impactx
 
             if(gy > 0.0) {
                 // calculate expensive terms once
-                amrex::ParticleReal const siny = sin(omegay * slice_ds);
-                amrex::ParticleReal const cosy = cos(omegay * slice_ds);
+                auto const [siny, cosy] = amrex::Math::sincos(omegay * slice_ds);
 
                 // advance position and momentum (focusing)
-                p.pos(RealAoS::y) = cosy*y + siny/omegay*py;
-                pyout = -omegay*siny*y + cosy*py;
+                y = cosy*yout + siny/omegay*py;
+                pyout = -omegay*siny*yout + cosy*py;
 
             } else {
                 // calculate expensive terms once
@@ -143,14 +163,17 @@ namespace impactx
                 amrex::ParticleReal const coshy = cosh(omegay * slice_ds);
 
                 // advance position and momentum (defocusing)
-                p.pos(RealAoS::y) = coshy*y + sinhy/omegay*py;
-                pyout = omegay*sinhy*y + coshy*py;
+                y = coshy*yout + sinhy/omegay*py;
+                pyout = omegay*sinhy*yout + coshy*py;
             }
 
             // assign updated momenta
             px = pxout;
             py = pyout;
             pt = ptout;
+
+            // undo shift due to alignment errors of the element
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle.
@@ -181,9 +204,7 @@ namespace impactx
             amrex::ParticleReal const B = sqrt(pow(pt,2)-1.0_prt)/m_rc;
 
             // calculate expensive terms once
-            //   TODO: use sincos function once wrapped in AMReX
-            amrex::ParticleReal const sin_theta = sin(theta);
-            amrex::ParticleReal const cos_theta = cos(theta);
+            auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);
 
             // advance position and momentum (bend)
             refpart.px = px*cos_theta - pz*sin_theta;

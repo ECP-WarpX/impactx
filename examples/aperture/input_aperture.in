@@ -1,0 +1,53 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.kin_energy = 250.0
+beam.charge = 1.0e-9
+beam.particle = proton
+beam.distribution = waterbag
+beam.sigmaX = 1.559531175539e-3
+beam.sigmaY = 2.205510139392e-3
+beam.sigmaT = 1.0e-3
+beam.sigmaPx = 6.41218345413e-4
+beam.sigmaPy = 9.06819680526e-4
+beam.sigmaPt = 1.0e-3
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor drift collimator monitor
+lattice.nslice = 1
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+drift.type = drift
+drift.ds = 0.123
+
+collimator.type = aperture
+collimator.shape = rectangular
+collimator.xmax = 1.0e-3
+collimator.ymax = 1.5e-3
+
+# work-around for https://github.com/ECP-WarpX/impactx/issues/499
+amrex.the_arena_is_managed = 1
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = true
+diag.backend = h5

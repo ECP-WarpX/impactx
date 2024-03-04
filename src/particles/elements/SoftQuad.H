@@ -12,6 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/integrators/Integrators.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 
@@ -111,7 +112,8 @@ namespace SoftQuadrupoleData
 
     struct SoftQuadrupole
     : public elements::BeamOptic<SoftQuadrupole>,
-      public elements::Thick
+      public elements::Thick,
+      public elements::Alignment
     {
         static constexpr auto name = "SoftQuadrupole";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -122,6 +124,9 @@ namespace SoftQuadrupoleData
          * @param gscale Scaling factor for on-axis field gradient Bz in 1/m^2
          * @param cos_coef cosine coefficients in Fourier expansion of on-axis magnetic field Bz
          * @param sin_coef sine coefficients in Fourier expansion of on-axis magnetic field Bz
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
@@ -131,17 +136,21 @@ namespace SoftQuadrupoleData
             amrex::ParticleReal gscale,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0,
             int mapsteps = 1,
             int nslice = 1
         )
           : Thick(ds, nslice),
+            Alignment(dx, dy, rotation_degree),
             m_gscale(gscale), m_mapsteps(mapsteps), m_id(SoftQuadrupoleData::next_id)
         {
             // next created soft quad has another id for its data
             SoftQuadrupoleData::next_id++;
 
             // validate sin and cos coefficients are the same length
-            m_ncoef = cos_coef.size();
+            m_ncoef = int(cos_coef.size());
             if (m_ncoef != int(sin_coef.size()))
                 throw std::runtime_error("SoftQuadrupole: cos and sin coefficients must have same length!");
 
@@ -173,27 +182,36 @@ namespace SoftQuadrupoleData
         /** This is a soft-edge quadrupole functor, so that a variable of this type can be used
          *  like a soft-edge quadrupole function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-            PType& AMREX_RESTRICT p,
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            amrex::ParticleReal & AMREX_RESTRICT t,
             amrex::ParticleReal & AMREX_RESTRICT px,
             amrex::ParticleReal & AMREX_RESTRICT py,
             amrex::ParticleReal & AMREX_RESTRICT pt,
+            [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
             [[maybe_unused]] RefPart const & refpart
         ) const
         {
             using namespace amrex::literals; // for _rt and _prt
 
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-            amrex::ParticleReal const t = p.pos(RealAoS::t);
+            // shift due to alignment errors of the element
+            shift_in(x, y, px, py);
+
+            // intialize output values
+            amrex::ParticleReal xout = x;
+            amrex::ParticleReal yout = y;
+            amrex::ParticleReal tout = t;
 
             // initialize output values of momenta
             amrex::ParticleReal pxout = px;
@@ -210,23 +228,29 @@ namespace SoftQuadrupoleData
             // so that, e.g., R(3,4) = dyf/dpyi.
 
             // push particles using the linear map
-            p.pos(RealAoS::x) = R(1,1)*x + R(1,2)*px + R(1,3)*y
+            xout = R(1,1)*x + R(1,2)*px + R(1,3)*y
                      + R(1,4)*py + R(1,5)*t + R(1,6)*pt;
             pxout = R(2,1)*x + R(2,2)*px + R(2,3)*y
                   + R(2,4)*py + R(2,5)*t + R(2,6)*pt;
-            p.pos(RealAoS::y) = R(3,1)*x + R(3,2)*px + R(3,3)*y
+            yout = R(3,1)*x + R(3,2)*px + R(3,3)*y
                      + R(3,4)*py + R(3,5)*t + R(3,6)*pt;
             pyout = R(4,1)*x + R(4,2)*px + R(4,3)*y
                   + R(4,4)*py + R(4,5)*t + R(4,6)*pt;
-            p.pos(RealAoS::t) = R(5,1)*x + R(5,2)*px + R(5,3)*y
+            tout = R(5,1)*x + R(5,2)*px + R(5,3)*y
                      + R(5,4)*py + R(5,5)*t + R(5,6)*pt;
             ptout = R(6,1)*x + R(6,2)*px + R(6,3)*y
                   + R(6,4)*py + R(6,5)*t + R(6,6)*pt;
 
-            // assign updated momenta
+            // assign updated values
+            x = xout;
+            y = yout;
+            t = tout;
             px = pxout;
             py = pyout;
             pt = ptout;
+
+            // undo shift due to alignment errors of the element
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle.

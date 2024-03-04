@@ -24,17 +24,11 @@ HPC Systems
 .. toctree::
    :maxdepth: 1
 
-   hpc/cori
    hpc/perlmutter
-..   hpc/summit
-..   hpc/spock
-..   hpc/juwels
-..   hpc/lassen
-..   hpc/quartz
-..   hpc/lawrencium
-..   hpc/ookami
 
 .. tip::
 
    Your HPC system is not in the list?
-   `Open an issue <https://github.com/ECP-WarpX/impactx/issues>`__ and together we can document it!
+   Our instructions are nearly identical to `installing WarpX, documented here <https://warpx.readthedocs.io/en/latest/install/hpc.html#hpc-machines>`__.
+
+   Also, please do not hesitate to `open an issue <https://github.com/ECP-WarpX/impactx/issues>`__ and together we can document how to run on your preferred system!

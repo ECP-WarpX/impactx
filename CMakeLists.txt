@@ -1,7 +1,7 @@
 # Preamble ####################################################################
 #
 cmake_minimum_required(VERSION 3.20.0)
-project(ImpactX VERSION 23.09)
+project(ImpactX VERSION 24.02)
 
 include(${ImpactX_SOURCE_DIR}/cmake/ImpactXFunctions.cmake)
 
@@ -38,7 +38,15 @@ set_cxx17_superbuild()
 # this is an optional tool that stores compiled object files; allows fast
 # re-builds even with "make clean" in between. Mainly used to store AMReX
 # objects
-set_ccache()
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    set(ImpactX_CCACHE_DEFAULT ON)
+else()
+    set(ImpactX_CCACHE_DEFAULT OFF)  # we are a subproject in a superbuild
+endif()
+option(ImpactX_CCACHE "Enable ccache for faster rebuilds" ${ImpactX_CCACHE_DEFAULT})
+if(ImpactX_CCACHE)
+    set_ccache()
+endif()
 
 
 # Output Directories ##########################################################
@@ -80,8 +88,8 @@ option(ImpactX_amrex_internal                    "Download & build AMReX" ON)
 option(ImpactX_openpmd_internal                  "Download & build openPMD-api" ON)
 option(ImpactX_pyamrex_internal                  "Download & build pyAMReX" ON)
 
-set(pyImpactX_VERSION_INFO "" CACHE STRING
-    "PEP-440 conformant version (set by distutils)")
+set(pyImpactX_VERSION_INFO "${ImpactX_VERSION}" CACHE STRING
+    "PEP-440 conformant version (set by setup.py)")
 
 # change the default build type to Release (or RelWithDebInfo) instead of Debug
 set_default_build_type("Release")
@@ -89,6 +97,10 @@ set_default_build_type("Release")
 # Option to enable interprocedural optimization
 # (also know as "link-time optimization" or "whole program optimization")
 option(ImpactX_IPO "Compile ImpactX with interprocedural optimization (will take more time)" OFF)
+option(ImpactX_PYTHON_IPO
+    "Compile Python bindings with interprocedural optimization (IPO) / link-time optimization (LTO)"
+    ON
+)
 
 # this defined the variable BUILD_TESTING which is ON by default
 include(CTest)
@@ -229,7 +241,10 @@ endif()
 # link dependencies
 target_link_libraries(lib PUBLIC ImpactX::thirdparty::ablastr_3d)
 if(ImpactX_PYTHON)
-    target_link_libraries(pyImpactX PRIVATE pybind11::module pybind11::lto pybind11::windows_extras)
+    target_link_libraries(pyImpactX PRIVATE pybind11::module pybind11::windows_extras)
+    if(ImpactX_PYTHON_IPO)
+        target_link_libraries(pyImpactX PRIVATE pybind11::lto)
+    endif()
 endif()
 
 if(ImpactX_OPENPMD)
@@ -331,7 +346,7 @@ file(TO_CMAKE_PATH "${ABS_INSTALL_LIB_DIR}" ABS_INSTALL_LIB_DIR)
 
 install(CODE "file(CREATE_LINK
     $<TARGET_FILE_NAME:lib>
-    \"${ABS_INSTALL_LIB_DIR}/libImpactX$<TARGET_FILE_SUFFIX:lib>\"
+    \"${ABS_INSTALL_LIB_DIR}/libimpactx$<TARGET_FILE_SUFFIX:lib>\"
     COPY_ON_ERROR SYMBOLIC)")
 
 # CMake package file for find_package(ImpactX::ImpactX) in depending projects
@@ -406,6 +421,17 @@ if(ImpactX_PYTHON)
             pyImpactX
             ${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel ${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_requirements
             ${_EXTRA_INSTALL_DEPENDS}
+    )
+
+    # this is for package managers only
+    add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_nodeps
+        ${CMAKE_COMMAND} -E env IMPACTX_MPI=${ImpactX_MPI}
+            ${Python_EXECUTABLE} -m pip install --force-reinstall --no-index --no-deps ${PYINSTALLOPTIONS} --find-links=impactx-whl impactx
+        WORKING_DIRECTORY
+            ${ImpactX_BINARY_DIR}
+        DEPENDS
+            pyImpactX
+            ${ImpactX_CUSTOM_TARGET_PREFIX}pip_wheel
     )
 endif()
 

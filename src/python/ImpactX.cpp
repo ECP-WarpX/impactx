@@ -40,9 +40,11 @@ namespace detail
      * @return the queried value (or throws if not found)
      */
     template< typename T>
-    auto get_or_throw (std::string const prefix, std::string const name)
+    auto get_or_throw (std::string const & prefix, std::string const & name)
     {
         T value;
+        // TODO: if array do queryarr
+        // bool const has_name = amrex::ParmParse(prefix).queryarr(name.c_str(), value);
         bool const has_name = amrex::ParmParse(prefix).query(name.c_str(), value);
 
         if (!has_name)
@@ -58,7 +60,7 @@ void init_ImpactX (py::module& m)
         .def(py::init<>())
 
         .def("load_inputs_file",
-            [](ImpactX const & /* ix */, std::string const filename) {
+            [](ImpactX const & /* ix */, std::string const & filename) {
 #if defined(AMREX_DEBUG) || defined(DEBUG)
                 // note: only in debug, since this is costly for the file
                 // system for highly parallel simulations with MPI
@@ -83,32 +85,60 @@ void init_ImpactX (py::module& m)
                 pp_amr.getarr("n_cell", n_cell);
                 return n_cell;
             },
-            [](ImpactX & /* ix */, std::array<int, AMREX_SPACEDIM> n_cell) {
+            [](ImpactX & ix, std::array<int, AMREX_SPACEDIM> n_cell) {
+                if (ix.initialized())
+                    throw std::runtime_error("Read-only parameter after init_grids was called.");
+
                 amrex::ParmParse pp_amr("amr");
                 amrex::Vector<int> const n_cell_v(n_cell.begin(), n_cell.end());
                 pp_amr.addarr("n_cell", n_cell_v);
-
-                // note, this must be done *before* initGrids is called
-                /*
-                int const max_level = ix.maxLevel();
-                for (int lev=0; lev<=max_level; lev++) {
-                    ix.ClearLevel(lev);
-                    // TODO: more...
-                }
-                if (amrex::ParallelDescriptor::IOProcessor())
-                    ix.printGridSummary(amrex::OutStream(), 0, max_level);
-                */
             },
             "The number of grid points along each direction on the coarsest level."
-        )
+        );
 
+    for (int dir : {0, 1, 2}) {
+        std::string const dir_str = std::vector<std::string>{"x", "y", "z"}.at(dir);
+        std::string const bf_str = "blocking_factor_" + dir_str;
+        impactx
+            .def_property(bf_str.c_str(),
+                  [bf_str](ImpactX & /* ix */) {
+                      amrex::ParmParse pp_amr("amr");
+                      std::vector<int> blocking_factor_dir;
+                      pp_amr.queryarr(bf_str.c_str(), blocking_factor_dir);
+
+                      return blocking_factor_dir;
+                  },
+                  [bf_str](ImpactX &ix, std::vector<int> blocking_factor_dir) {
+                      if (ix.initialized())
+                          throw std::runtime_error("Read-only parameter after init_grids was called.");
+
+                      amrex::ParmParse pp_amr("amr");
+                      pp_amr.addarr(bf_str.c_str(), blocking_factor_dir);
+                  },
+                  "AMReX blocking factor for a direction, per MR level."
+            );
+    }
+
+    impactx
         // from amrex::AmrMesh
-        .def_property_readonly("max_level",
-            [](ImpactX & ix){ return ix.maxLevel(); },
+        .def_property("max_level",
+            [](ImpactX & /* ix */){
+                int max_level = 0;
+                amrex::ParmParse pp_amr("amr");
+                pp_amr.query("max_level", max_level);
+                return max_level;
+            },
+            [](ImpactX & ix, int max_level) {
+                if (ix.initialized())
+                    throw std::runtime_error("Read-only parameter after init_grids was called.");
+
+                amrex::ParmParse pp_amr("amr");
+                pp_amr.add("max_level", max_level);
+            },
             "The maximum mesh-refinement level for the simulation."
         )
         .def_property_readonly("finest_level",
-            [](ImpactX & ix){ return ix.finestLevel(); },
+            [](ImpactX & ix){ return ix.amr_data->finestLevel(); },
             "The currently finest level of mesh-refinement used. This is always less or equal to max_level."
         )
 
@@ -141,9 +171,9 @@ void init_ImpactX (py::module& m)
               [](ImpactX & /* ix */) {
                   return detail::get_or_throw<amrex::Real>("geometry", "prob_relative");
               },
-              [](ImpactX & /* ix */, amrex::Real frac) {
+              [](ImpactX & /* ix */, std::vector<amrex::Real> frac) {
                   amrex::ParmParse pp_geometry("geometry");
-                  pp_geometry.add("prob_relative", frac);
+                  pp_geometry.addarr("prob_relative", frac);
               },
               "The field mesh spans, per direction, multiple times the maximum physical extent of beam particles, as given by this factor."
         )
@@ -166,12 +196,7 @@ void init_ImpactX (py::module& m)
             [](ImpactX & /* ix */) {
                 return detail::get_or_throw<int>("algo", "particle_shape");
             },
-            [](ImpactX & ix, int const order) {
-                AMREX_ALWAYS_ASSERT_WITH_MESSAGE(ix.m_particle_container,
-                    "particle container not initialized");
-                // todo: why does that not work?
-                //ix.m_particle_container->SetParticleShape(order);
-
+            [](ImpactX & /* ix */, int const order) {
                 amrex::ParmParse pp_ago("algo");
                 pp_ago.add("particle_shape", order);
             },
@@ -260,7 +285,7 @@ void init_ImpactX (py::module& m)
              "Enable or disable diagnostics every slice step in elements (default: disabled).\n\n"
              "By default, diagnostics is performed at the beginning and end of the simulation.\n"
              "Enabling this flag will write diagnostics every step and slice step."
-         )
+        )
         .def_property("diag_file_min_digits",
              [](ImpactX & /* ix */) {
                  return detail::get_or_throw<int>("diag", "file_min_digits");
@@ -271,12 +296,37 @@ void init_ImpactX (py::module& m)
              },
              "The minimum number of digits (default: 6) used for the step\n"
              "number appended to the diagnostic file names."
-         )
+        )
+        .def("set_diag_iota_invariants",
+              [](ImpactX & /* ix */, amrex::ParticleReal alpha, amrex::ParticleReal beta, amrex::ParticleReal tn, amrex::ParticleReal cn) {
+                  amrex::ParmParse pp_diag("diag");
+
+                  pp_diag.add("alpha", alpha);
+                  pp_diag.add("beta", beta);
+                  pp_diag.add("tn", tn);
+                  pp_diag.add("cn", cn);
+              },
+              py::arg("alpha"), py::arg("beta"), py::arg("tn"), py::arg("cn"),
+              "Set the Twiss alpha, beta (m), dimensionless strength of the nonlinear insert and "
+              "scale parameter of the nonlinear insert (m^[1/2]) of the IOTA nonlinear lens "
+              "invariants diagnostics."
+        )
+        .def_property("particle_lost_diagnostics_backend",
+                      [](ImpactX & /* ix */) {
+                          return detail::get_or_throw<std::string>("diag", "backend");
+                      },
+                      [](ImpactX & /* ix */, std::string const backend) {
+                          amrex::ParmParse pp_diag("diag");
+                          pp_diag.add("backend", backend);
+                      },
+                      "Diagnostics for particles lost in apertures.\n\n"
+                      "See the ``BeamMonitor`` element for backend values."
+        )
         .def_property("abort_on_warning_threshold",
              [](ImpactX & /* ix */){
                  return detail::get_or_throw<std::string>("impactx", "abort_on_warning_threshold");
              },
-             [](ImpactX & ix, std::string const str_abort_on_warning_threshold) {
+             [](ImpactX & ix, std::string const & str_abort_on_warning_threshold) {
                  amrex::ParmParse pp_impactx("impactx");
                  pp_impactx.add("abort_on_warning_threshold", str_abort_on_warning_threshold);
                  // query input for warning logger variables and set up warning logger accordingly
@@ -312,7 +362,10 @@ void init_ImpactX (py::module& m)
             "if there are unused parameters in the input."
         )
 
-        .def("init_grids", &ImpactX::initGrids,
+        .def("finalize", &ImpactX::finalize,
+             "Deallocate all contexts and data."
+        )
+        .def("init_grids", &ImpactX::init_grids,
              "Initialize AMReX blocks/grids for domain decomposition & space charge mesh.\n\n"
              "This must come first, before particle beams and lattice elements are initialized."
         )
@@ -337,29 +390,29 @@ void init_ImpactX (py::module& m)
 
         .def("particle_container",
              [](ImpactX & ix) -> ImpactXParticleContainer & {
-                return *ix.m_particle_container;
+                return *ix.amr_data->m_particle_container;
              },
              py::return_value_policy::reference_internal,
              "Access the beam particle container."
         )
         .def(
             "rho",
-            [](ImpactX & ix, int const lev) { return &ix.m_rho.at(lev); },
+            [](ImpactX & ix, int const lev) { return &ix.amr_data->m_rho.at(lev); },
             py::arg("lev"),
             py::return_value_policy::reference_internal,
             "charge density per level"
         )
         .def(
             "phi",
-            [](ImpactX & ix, int const lev) { return &ix.m_phi.at(lev); },
+            [](ImpactX & ix, int const lev) { return &ix.amr_data->m_phi.at(lev); },
             py::arg("lev"),
             py::return_value_policy::reference_internal,
             "scalar potential per level"
         )
         .def(
             "space_charge_field",
-            [](ImpactX & ix, int const lev, std::string const comp) {
-                return &ix.m_space_charge_field.at(lev).at(comp);
+            [](ImpactX & ix, int lev, std::string const & comp) {
+                return &ix.amr_data->m_space_charge_field.at(lev).at(comp);
             },
             py::arg("lev"), py::arg("comp"),
             py::return_value_policy::reference_internal,
@@ -384,17 +437,16 @@ void init_ImpactX (py::module& m)
 
         // from AmrCore->AmrMesh
         .def("Geom",
-            //[](ImpactX const & ix, int const lev) { return ix.Geom(lev); },
-            py::overload_cast< int >(&ImpactX::Geom, py::const_),
+            [](ImpactX const & ix, int const lev) { return ix.amr_data->Geom(lev); },
             py::arg("lev")
         )
         .def("DistributionMap",
-            [](ImpactX const & ix, int const lev) { return ix.DistributionMap(lev); },
+            [](ImpactX const & ix, int const lev) { return ix.amr_data->DistributionMap(lev); },
             //py::overload_cast< int >(&ImpactX::DistributionMap, py::const_),
             py::arg("lev")
         )
         .def("boxArray",
-            [](ImpactX const & ix, int const lev) { return ix.boxArray(lev); },
+            [](ImpactX const & ix, int const lev) { return ix.amr_data->boxArray(lev); },
             //py::overload_cast< int >(&ImpactX::boxArray, py::const_),
             py::arg("lev")
         )
@@ -407,7 +459,7 @@ void init_ImpactX (py::module& m)
 //            "ImpactX version")
         .def_property_readonly_static(
             "have_mpi",
-            [](py::object){
+            [](py::object const &){
 #ifdef AMREX_USE_MPI
                 return true;
 #else
@@ -416,7 +468,7 @@ void init_ImpactX (py::module& m)
             })
         .def_property_readonly_static(
             "have_gpu",
-            [](py::object){
+            [](py::object const &){
 #ifdef AMREX_USE_GPU
                 return true;
 #else
@@ -425,7 +477,7 @@ void init_ImpactX (py::module& m)
             })
         .def_property_readonly_static(
             "have_omp",
-            [](py::object){
+            [](py::object const &){
 #ifdef AMREX_USE_OMP
                 return true;
 #else
@@ -434,7 +486,7 @@ void init_ImpactX (py::module& m)
             })
         .def_property_readonly_static(
             "gpu_backend",
-            [](py::object){
+            [](py::object const &){
 #ifdef AMREX_USE_CUDA
                 return "CUDA";
 #elif defined(AMREX_USE_HIP)

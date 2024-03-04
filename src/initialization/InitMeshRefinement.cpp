@@ -19,6 +19,7 @@
 #include <AMReX_REAL.H>
 #include <AMReX_Utility.H>
 
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -26,118 +27,72 @@
 
 namespace impactx
 {
-    /** Tag cells for refinement.  TagBoxArray tags is built on level lev grids.
-     *
-     * @todo this function is not (yet) implemented.
-     */
-    void ImpactX::ErrorEst (int lev, amrex::TagBoxArray& tags, amrex::Real time, int ngrow)
+namespace detail
+{
+    amrex::Vector<amrex::Real>
+    read_mr_prob_relative ()
     {
-        // todo
-        amrex::ignore_unused(lev, tags, time, ngrow);
-    }
+        amrex::ParmParse pp_amr("amr");
+        amrex::ParmParse pp_geometry("geometry");
 
-    /** Make a new level from scratch using provided BoxArray and DistributionMapping.
-     *
-     * Only used during initialization.
-     */
-    void ImpactX::MakeNewLevelFromScratch (int lev, amrex::Real time, const amrex::BoxArray& ba,
-                                          const amrex::DistributionMapping& dm)
-    {
-        amrex::ignore_unused(time);
+        int max_level = 0;
+        pp_amr.query("max_level", max_level);
 
-        // set human-readable tag for each MultiFab
-        auto const tag = [lev]( std::string tagname ) {
-            tagname.append("[l=").append(std::to_string(lev)).append("]");
-            return amrex::MFInfo().SetTag(std::move(tagname));
-        };
+        // The box is expanded beyond the min and max of the particle beam.
+        amrex::Vector<amrex::Real> prob_relative(max_level + 1, 1.0);
+        prob_relative[0] = 3.0;  // top/bottom pad the beam on the lowest level by default by its width
+        pp_geometry.queryarr("prob_relative", prob_relative);
 
-        // charge (rho) mesh
-        amrex::BoxArray const cba = ba;
-        // for MR levels (TODO):
-        //cba.coarsen(refRatio(lev - 1));
-
-        // staggering and number of charge components in the field
-        auto const rho_nodal_flag = amrex::IntVect::TheNodeVector();
-        int const num_components_rho = 1;
-
-        // guard cells for charge deposition
-        int const particle_shape = m_particle_container->GetParticleShape();
-        int num_guards_rho = 0;
-        if (particle_shape % 2 == 0)  // even shape orders
-            num_guards_rho = particle_shape / 2 + 1;
-        else  // odd shape orders
-            num_guards_rho = (particle_shape + 1) / 2;
-
-        m_rho.emplace(
-            lev,
-            amrex::MultiFab{amrex::convert(cba, rho_nodal_flag), dm, num_components_rho, num_guards_rho, tag("rho")});
-
-        // scalar potential
-        auto const phi_nodal_flag = rho_nodal_flag;
-        int const num_components_phi = 1;
-        int const num_guards_phi = num_guards_rho + 1; // todo: I think this just depends on max(MLMG, force calc)
-        m_phi.emplace(
-            lev,
-            amrex::MultiFab{amrex::convert(cba, phi_nodal_flag), dm, num_components_phi, num_guards_phi, tag("phi")});
-
-        // space charge force
-        std::unordered_map<std::string, amrex::MultiFab> f_comp;
-        for (std::string const comp : {"x", "y", "z"})
-        {
-            std::string const str_tag = "space_charge_field_" + comp;
-            f_comp.emplace(
-                comp,
-                amrex::MultiFab{
-                    amrex::convert(cba, rho_nodal_flag),
-                    dm,
-                    num_components_rho,
-                    num_guards_rho,
-                    tag(str_tag)
-                }
+        if (prob_relative[0] < 3.0)
+            ablastr::warn_manager::WMRecordWarning(
+                    "ImpactX::read_mr_prob_relative",
+                    "Dynamic resizing of the mesh uses a geometry.prob_relative "
+                    "padding of less than 3 for level 0. This might result in boundary "
+                    "artifacts for space charge calculation. "
+                    "There is no minimum good value for this parameter, consider "
+                    "doing a convergence test.",
+                    ablastr::warn_manager::WarnPriority::high
             );
+
+        if (prob_relative[0] < 1.0)
+            throw std::runtime_error("geometry.prob_relative must be >= 1.0 (the beam size) on the coarsest level");
+
+        // check that prob_relative[0] > prob_relative[1] > prob_relative[2] ...
+        amrex::Real last_lev_rel = std::numeric_limits<amrex::Real>::max();
+        for (int lev = 0; lev <= max_level; ++lev) {
+            amrex::Real const prob_relative_lvl = prob_relative[lev];
+            if (prob_relative_lvl <= 0.0)
+                throw std::runtime_error("geometry.prob_relative must be strictly positive for all levels");
+            if (prob_relative_lvl > last_lev_rel)
+                throw std::runtime_error("geometry.prob_relative must be descending over refinement levels");
+
+            last_lev_rel = prob_relative_lvl;
         }
-        m_space_charge_field.emplace(lev, std::move(f_comp));
-    }
 
-    /** Make a new level using provided BoxArray and DistributionMapping and fill
-     *  with interpolated coarse level data.
-     *
-     * @todo this function is not (yet) implemented.
-     */
-    void ImpactX::MakeNewLevelFromCoarse (int lev, amrex::Real time, const amrex::BoxArray& ba,
-                                         const amrex::DistributionMapping& dm)
-    {
-        // todo
-        amrex::ignore_unused(lev, time, ba, dm);
+        return prob_relative;
     }
-
-    /** Remake an existing level using provided BoxArray and DistributionMapping
-     *  and fill with existing fine and coarse data.
-     *
-     * @todo this function is not (yet) implemented.
-     */
-    void ImpactX::RemakeLevel (int lev, amrex::Real time, const amrex::BoxArray& ba,
-                              const amrex::DistributionMapping& dm)
-    {
-        // todo
-        amrex::ignore_unused(lev, time, ba, dm);
-    }
-
-    /** Delete level data
-     */
-    void ImpactX::ClearLevel (int lev)
-    {
-        m_rho.erase(lev);
-        m_phi.erase(lev);
-        m_space_charge_field.erase(lev);
-    }
+}
 
     void ImpactX::ResizeMesh ()
     {
         BL_PROFILE("ImpactX::ResizeMesh");
 
+        {
+            amrex::ParmParse pp_algo("algo");
+            bool space_charge = false;
+            pp_algo.query("space_charge", space_charge);
+            if (!space_charge)
+                ablastr::warn_manager::WMRecordWarning(
+                    "ImpactX::ResizeMesh",
+                    "This is a simulation without space charge. "
+                    "ResizeMesh (and pc.Redistribute) should only be called "
+                    "in space charge simulations.",
+                    ablastr::warn_manager::WarnPriority::high
+                );
+        }
+
         // Extract the min and max of the particle positions
-        auto const [x_min, y_min, z_min, x_max, y_max, z_max] = m_particle_container->MinAndMaxPositions();
+        auto const [x_min, y_min, z_min, x_max, y_max, z_max] = amr_data->m_particle_container->MinAndMaxPositions();
 
         // guard for flat beams:
         //   https://github.com/ECP-WarpX/impactx/issues/44
@@ -148,36 +103,27 @@ namespace impactx
         bool dynamic_size = true;
         pp_geometry.query("dynamic_size", dynamic_size);
 
-        amrex::RealBox rb;
+        amrex::Vector<amrex::RealBox> rb(amr_data->finestLevel() + 1);  // extent per level
         if (dynamic_size)
         {
-            // The box is expanded beyond the min and max of particles.
-            // This controlled by the variable `frac` below.
-            amrex::Real frac = 3.0;
-            pp_geometry.query("prob_relative", frac);
+            // The coarsest level is expanded (or reduced) relative the min and max of particles.
+            auto const prob_relative = detail::read_mr_prob_relative();
 
-            if (frac < 3.0)
-                ablastr::warn_manager::WMRecordWarning(
-                    "ImpactX::ResizeMesh",
-                    "Dynamic resizing of the mesh uses a geometry.prob_relative "
-                    "with less than 3x the beam size. This might result in boundary "
-                    "artifacts for space charge calculation. "
-                    "There is no minimum good value for this parameter, consider "
-                    "doing a convergence test.",
-                    ablastr::warn_manager::WarnPriority::high
-                );
-
-            if (frac < 1.0)
-                throw std::runtime_error("geometry.prob_relative must be >= 1.0 (the beam size) on the coarsest level");
-
+            amrex::Real const frac = prob_relative[0];
             amrex::RealVect const beam_min(x_min, y_min, z_min);
             amrex::RealVect const beam_max(x_max, y_max, z_max);
             amrex::RealVect const beam_width(beam_max - beam_min);
 
             amrex::RealVect const beam_padding = beam_width * (frac - 1.0) / 2.0;
             //                           added to the beam extent --^         ^-- box half above/below the beam
-            rb.setLo(beam_min - beam_padding);
-            rb.setHi(beam_max + beam_padding);
+
+            // In AMReX, all levels have the same problem domain, that of the
+            // coarsest level, even if only partly covered.
+            for (int lev = 0; lev <= amr_data->finestLevel(); ++lev)
+            {
+                rb[lev].setLo(beam_min - beam_padding);
+                rb[lev].setHi(beam_max + beam_padding);
+            }
         }
         else
         {
@@ -188,21 +134,28 @@ namespace impactx
             pp_geometry.getarr("prob_lo", prob_lo);
             pp_geometry.getarr("prob_hi", prob_hi);
 
-            rb = {prob_lo.data(), prob_hi.data()};
+            rb[0] = {prob_lo.data(), prob_hi.data()};
+
+            if (amr_data->maxLevel() > 1)
+                amrex::Abort("Did not implement ResizeMesh for static domains and >1 MR levels.");
         }
 
         // updating geometry.prob_lo/hi for consistency
-        amrex::Vector<amrex::Real> const prob_lo = {rb.lo()[0], rb.lo()[1], rb.lo()[2]};
-        amrex::Vector<amrex::Real> const prob_hi = {rb.hi()[0], rb.hi()[1], rb.hi()[2]};
+        amrex::Vector<amrex::Real> const prob_lo = {rb[0].lo()[0], rb[0].lo()[1], rb[0].lo()[2]};
+        amrex::Vector<amrex::Real> const prob_hi = {rb[0].hi()[0], rb[0].hi()[1], rb[0].hi()[2]};
         pp_geometry.addarr("prob_lo", prob_lo);
         pp_geometry.addarr("prob_hi", prob_hi);
 
         // Resize the domain size
-        amrex::Geometry::ResetDefaultProbDomain(rb);
-        for (int lev = 0; lev <= this->max_level; ++lev) {
-            amrex::Geometry g = Geom(lev);
-            g.ProbDomain(rb);
-            amrex::AmrMesh::SetGeometry(lev, g);
+        amrex::Geometry::ResetDefaultProbDomain(rb[0]);
+
+        for (int lev = 0; lev <= amr_data->finestLevel(); ++lev)
+        {
+            amrex::Geometry g = amr_data->Geom(lev);
+            g.ProbDomain(rb[lev]);
+            amr_data->SetGeometry(lev, g);
+
+            amr_data->m_particle_container->SetParticleGeometry(lev, g);
         }
     }
 } // namespace impactx

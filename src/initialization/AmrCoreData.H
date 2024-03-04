@@ -10,13 +10,20 @@
 #ifndef IMPACTX_AMR_CORE_DATA_H
 #define IMPACTX_AMR_CORE_DATA_H
 
+#include "AmrCoreData_fwd.H"
+#include "particles/ImpactXParticleContainer.H"
+
 #include <AMReX_AmrCore.H>
 #include <AMReX_AmrMesh.H>
 #include <AMReX_BoxArray.H>
 #include <AMReX_DistributionMapping.H>
 #include <AMReX_Geometry.H>
+#include <AMReX_MultiFab.H>
 #include <AMReX_REAL.H>
 #include <AMReX_TagBox.H>
+
+#include <string>
+#include <unordered_map>
 
 
 namespace impactx::initialization
@@ -33,7 +40,7 @@ namespace impactx::initialization
     class AmrCoreData final
         : public amrex::AmrCore
     {
-    public:
+      public:
         AmrCoreData (
             amrex::Geometry const& level_0_geom,
             amrex::AmrInfo const& amr_info
@@ -55,7 +62,19 @@ namespace impactx::initialization
 
         ~AmrCoreData() = default;
 
-    private:
+        /** these are the physical/beam particles of the simulation */
+        std::unique_ptr<impactx::ImpactXParticleContainer> m_particle_container;
+
+        /** former beam particles that got lost in apertures, the wall, etc. */
+        std::unique_ptr<impactx::ImpactXParticleContainer> m_particles_lost;
+
+        /** charge density per level */
+        std::unordered_map<int, amrex::MultiFab> m_rho;
+        /** scalar potential per level */
+        std::unordered_map<int, amrex::MultiFab> m_phi;
+        /** space charge field (vector) per level */
+        std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > m_space_charge_field;
+
         void ErrorEst (
             [[maybe_unused]] int lev,
             [[maybe_unused]] amrex::TagBoxArray& tags,

@@ -11,6 +11,7 @@
 #define IMPACTX_CHRACC_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 #include "mixin/nofinalize.H"
@@ -26,6 +27,7 @@ namespace impactx
     struct ChrAcc
     : public elements::BeamOptic<ChrAcc>,
       public elements::Thick,
+      public elements::Alignment,
       public elements::NoFinalize
     {
         static constexpr auto name = "ChrAcc";
@@ -41,11 +43,23 @@ namespace impactx
          *           = (charge * electric field Ez in V/m) / (m*c^2)
          * @param bz magnetic field strength in m^(-1)
          *           = (charge * magnetic field Bz in T) / (m*c)
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param nslice number of slices used for the application of space charge
          */
-        ChrAcc( amrex::ParticleReal const ds, amrex::ParticleReal const ez,
-              amrex::ParticleReal const bz, int const nslice )
-        : Thick(ds, nslice), m_ez(ez), m_bz(bz)
+        ChrAcc (
+            amrex::ParticleReal ds,
+            amrex::ParticleReal ez,
+            amrex::ParticleReal bz,
+            amrex::ParticleReal dx = 0,
+            amrex::ParticleReal dy = 0,
+            amrex::ParticleReal rotation_degree = 0,
+            int nslice = 1
+        )
+        : Thick(ds, nslice),
+          Alignment(dx, dy, rotation_degree),
+          m_ez(ez), m_bz(bz)
         {
         }
 
@@ -54,26 +68,31 @@ namespace impactx
 
         /** This is a chracc functor, so that a variable of this type can be used like a chracc function.
          *
-         * @param p Particle AoS data for positions and cpu/id
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
          * @param px particle momentum in x
          * @param py particle momentum in y
          * @param pt particle momentum in t
+         * @param idcpu particle global index (unused)
          * @param refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                PType& AMREX_RESTRICT p,
-                amrex::ParticleReal & AMREX_RESTRICT px,
-                amrex::ParticleReal & AMREX_RESTRICT py,
-                amrex::ParticleReal & AMREX_RESTRICT pt,
-                RefPart const & refpart) const {
-
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            amrex::ParticleReal & AMREX_RESTRICT t,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
+            RefPart const & refpart
+        ) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
-            // access AoS data such as positions and cpu/id
-            amrex::ParticleReal const x = p.pos(RealAoS::x);
-            amrex::ParticleReal const y = p.pos(RealAoS::y);
-            amrex::ParticleReal const t = p.pos(RealAoS::t);
+            // shift due to alignment errors of the element
+            shift_in(x, y, px, py);
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
@@ -93,11 +112,11 @@ namespace impactx
             amrex::ParticleReal const pti_tot = pti_ref + pt;
             amrex::ParticleReal const ptf_tot = ptf_ref + pt;
             amrex::ParticleReal const pzi_tot = sqrt(pow(pti_tot,2)-1_prt);
-        amrex::ParticleReal const pzf_tot = sqrt(pow(ptf_tot,2)-1_prt);
+            amrex::ParticleReal const pzf_tot = sqrt(pow(ptf_tot,2)-1_prt);
             amrex::ParticleReal const pzi_ref = sqrt(pow(pti_ref,2)-1_prt);
-        amrex::ParticleReal const pzf_ref = sqrt(pow(ptf_ref,2)-1_prt);
+            amrex::ParticleReal const pzf_ref = sqrt(pow(ptf_ref,2)-1_prt);
 
-        amrex::ParticleReal const numer = -ptf_tot + pzf_tot;
+            amrex::ParticleReal const numer = -ptf_tot + pzf_tot;
             amrex::ParticleReal const denom = -pti_tot + pzi_tot;
 
             // compute focusing constant (1/m) and rotation angle (in rad)
@@ -121,8 +140,8 @@ namespace impactx
 
             // the correct symplectic update for t
             tout = t + (pzf_tot - pzf_ref - pzi_tot + pzi_ref)/m_ez;
-        tout = tout + (1_prt/pzi_tot - 1_prt/pzf_tot)*(pow(py-alpha*x,2)+pow(px+alpha*y,2))/(2_prt*m_ez);
-        ptout = pt;
+            tout = tout + (1_prt/pzi_tot - 1_prt/pzf_tot)*(pow(py-alpha*x,2)+pow(px+alpha*y,2))/(2_prt*m_ez);
+            ptout = pt;
 
             // assign intermediate momenta
             px = pxout;
@@ -130,13 +149,13 @@ namespace impactx
             pt = ptout;
 
             // advance positions and momenta using map for rotation
-            p.pos(RealAoS::x) = cos(theta)*xout + sin(theta)*yout;
+            x = cos(theta)*xout + sin(theta)*yout;
             pxout = cos(theta)*px + sin(theta)*py;
 
-            p.pos(RealAoS::y) = -sin(theta)*xout + cos(theta)*yout;
+            y = -sin(theta)*xout + cos(theta)*yout;
             pyout = -sin(theta)*px + cos(theta)*py;
 
-            p.pos(RealAoS::t) = tout;
+            t = tout;
             ptout = pt;
 
             // assign updated momenta
@@ -149,6 +168,8 @@ namespace impactx
             py = py/bgf;
             pt = pt/bgf;
 
+            // undo shift due to alignment errors of the element
+            shift_out(x, y, px, py);
         }
 
         /** This pushes the reference particle.
@@ -156,8 +177,8 @@ namespace impactx
          * @param[in,out] refpart reference particle
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void operator() (RefPart & AMREX_RESTRICT refpart) const {
-
+        void operator() (RefPart & AMREX_RESTRICT refpart) const
+        {
             using namespace amrex::literals; // for _rt and _prt
 
             // assign input reference particle values
@@ -201,7 +222,6 @@ namespace impactx
             refpart.s = s + slice_ds;
         }
 
-    private:
         amrex::ParticleReal m_ez; //! electric field strength in 1/m
         amrex::ParticleReal m_bz; //! magnetic field strength in 1/m
     };

@@ -54,4 +54,4 @@ jobs:
           -DAMReX_AMD_ARCH=gfx900     \
           -DImpactX_COMPUTE=HIP       \
           -DImpactX_PYTHON=ON
-        cmake --build build -j 2
+        cmake --build build -j 4

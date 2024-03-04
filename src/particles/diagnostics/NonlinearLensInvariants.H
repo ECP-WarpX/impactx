@@ -49,7 +49,7 @@ namespace impactx::diagnostics
          * @param cn - scale parameter of the nonlinear insert (m^[1/2])
          *
          */
-        NonlinearLensInvariants(
+        NonlinearLensInvariants (
             amrex::ParticleReal const alpha,
             amrex::ParticleReal const beta,
             amrex::ParticleReal const tn,
@@ -68,10 +68,11 @@ namespace impactx::diagnostics
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         Data operator() (
-                amrex::ParticleReal const x,
-                amrex::ParticleReal const y,
-                amrex::ParticleReal const px,
-                amrex::ParticleReal const py ) const
+            amrex::ParticleReal const x,
+            amrex::ParticleReal const y,
+            amrex::ParticleReal const px,
+            amrex::ParticleReal const py
+        ) const
         {
 
             using namespace amrex::literals; // for _rt and _prt
@@ -80,16 +81,16 @@ namespace impactx::diagnostics
             using Complex = amrex::GpuComplex<amrex::ParticleReal>;
 
             // convert transverse phase space coordinates to normalized units
-            amrex::ParticleReal xn = x/(m_cn*sqrt(m_beta));
-            amrex::ParticleReal yn = y/(m_cn*sqrt(m_beta));
-            amrex::ParticleReal pxn = px*sqrt(m_beta)/m_cn + m_alpha*x;
-            amrex::ParticleReal pyn = py*sqrt(m_beta)/m_cn + m_alpha*y;
+            amrex::ParticleReal const xn = x/(m_cn*sqrt(m_beta));
+            amrex::ParticleReal const yn = y/(m_cn*sqrt(m_beta));
+            amrex::ParticleReal const pxn = px*sqrt(m_beta)/m_cn + m_alpha*xn;
+            amrex::ParticleReal const pyn = py*sqrt(m_beta)/m_cn + m_alpha*yn;
 
             // assign complex position zeta = x + iy
-            Complex zeta(xn, yn);
-            Complex zetaconj(xn, -yn);
-            Complex re1(1.0_prt, 0.0_prt);
-            Complex im1(0.0_prt, 1.0_prt);
+            Complex const zeta(xn, yn);
+            Complex const zetaconj(xn, -yn);
+            Complex const re1(1.0_prt, 0.0_prt);
+            Complex const im1(0.0_prt, 1.0_prt);
 
             // compute croot = sqrt(1-zeta**2)
             Complex croot = amrex::pow(zeta, 2);
@@ -113,7 +114,7 @@ namespace impactx::diagnostics
             amrex::ParticleReal Iinv = Ipotential.m_real;
 
             // compute invariants H and I
-            amrex::ParticleReal Jz = xn*pyn - yn*pxn;
+            amrex::ParticleReal const Jz = xn*pyn - yn*pxn;
             Hinv = (pow(xn,2) + pow(yn,2) + pow(pxn,2) + pow(pyn,2))/2
                  + m_tn*Hinv;
             Iinv = pow(Jz,2) + pow(pxn,2) + pow(xn,2) + m_tn*Iinv;

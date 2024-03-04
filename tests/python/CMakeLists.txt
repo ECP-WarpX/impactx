@@ -17,5 +17,8 @@ add_test(NAME ${pytest_name}
     WORKING_DIRECTORY ${pytest_rundir}
 )
 
+#   limit threads
+set_property(TEST ${pytest_name} APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=2")
+
 #   set PYTHONPATH and PATH (for .dll files)
 impactx_test_set_pythonpath(${pytest_name})

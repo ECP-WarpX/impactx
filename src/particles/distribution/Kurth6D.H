@@ -10,15 +10,17 @@
 #ifndef IMPACTX_DISTRIBUTION_KURTH6D
 #define IMPACTX_DISTRIBUTION_KURTH6D
 
+#include "particles/ReferenceParticle.H"
+
+#include <ablastr/constant.H>
+
 #include <AMReX_Random.H>
 #include <AMReX_REAL.H>
 
 #include <cmath>
 
 
-namespace impactx
-{
-namespace distribution
+namespace impactx::distribution
 {
     struct Kurth6D
     {
@@ -34,16 +36,41 @@ namespace distribution
          * @param sigpx,sigpy,sigpt RMS momentum
          * @param muxpx,muypy,mutpt correlation length-momentum
          */
-         Kurth6D(amrex::ParticleReal const sigx, amrex::ParticleReal const sigy,
-         amrex::ParticleReal const sigt,amrex::ParticleReal const sigpx,
-         amrex::ParticleReal const sigpy,amrex::ParticleReal const sigpt,
-         amrex::ParticleReal const muxpx=0.0, amrex::ParticleReal const muypy=0.0,
-         amrex::ParticleReal const mutpt=0.0
-         )
-          : m_sigmaX(sigx),m_sigmaY(sigy),m_sigmaT(sigt),m_sigmaPx(sigpx),m_sigmaPy(sigpy),
-            m_sigmaPt(sigpt),m_muxpx(muxpx),m_muypy(muypy),m_mutpt(mutpt)
-          {
-          }
+        Kurth6D (
+            amrex::ParticleReal sigx,
+            amrex::ParticleReal sigy,
+            amrex::ParticleReal sigt,
+            amrex::ParticleReal sigpx,
+            amrex::ParticleReal sigpy,
+            amrex::ParticleReal sigpt,
+            amrex::ParticleReal muxpx=0.0,
+            amrex::ParticleReal muypy=0.0,
+            amrex::ParticleReal mutpt=0.0
+        )
+        : m_sigmaX(sigx), m_sigmaY(sigy), m_sigmaT(sigt), m_sigmaPx(sigpx), m_sigmaPy(sigpy),
+          m_sigmaPt(sigpt), m_muxpx(muxpx), m_muypy(muypy), m_mutpt(mutpt)
+        {
+        }
+
+        /** Initialize the distribution.
+         *
+         * Nothing to do here.
+         *
+         * @param bunch_charge charge of the beam in C
+         * @param ref the reference particle
+         */
+        void initialize ([[maybe_unused]] amrex::ParticleReal bunch_charge, [[maybe_unused]] RefPart const & ref)
+        {
+        }
+
+        /** Close and deallocate all data and handles.
+         *
+         * Nothing to do here.
+         */
+        void
+        finalize ()
+        {
+        }
 
         /** Return 1 6D particle coordinate
          *
@@ -57,21 +84,21 @@ namespace distribution
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                amrex::ParticleReal & x,
-                amrex::ParticleReal & y,
-                amrex::ParticleReal & t,
-                amrex::ParticleReal & px,
-                amrex::ParticleReal & py,
-                amrex::ParticleReal & pt,
-                amrex::RandomEngine const& engine) const {
-
+            amrex::ParticleReal & AMREX_RESTRICT x,
+            amrex::ParticleReal & AMREX_RESTRICT y,
+            amrex::ParticleReal & AMREX_RESTRICT t,
+            amrex::ParticleReal & AMREX_RESTRICT px,
+            amrex::ParticleReal & AMREX_RESTRICT py,
+            amrex::ParticleReal & AMREX_RESTRICT pt,
+            amrex::RandomEngine const & engine
+        ) const
+        {
             using namespace amrex::literals;
+            using ablastr::constant::math::pi;
 
             amrex::ParticleReal v,costheta,sintheta,phi,r;
             amrex::ParticleReal L,alpha,pmax,pr,beta,p1,p2;
             amrex::ParticleReal root,a1,a2;
-
-            constexpr amrex::ParticleReal pi = 3.14159265358979_prt;
 
             // Random samples used to define (x,y,z):
             v = amrex::Random(engine);
@@ -110,7 +137,7 @@ namespace distribution
             pt = pr*costheta - p2*sintheta;
 
             // Scale to produce the identity covariance matrix:
-            amrex::ParticleReal c = sqrt(5.0_prt);
+            amrex::ParticleReal const c = sqrt(5.0_prt);
             x = c*x;
             y = c*y;
             t = c*t;
@@ -135,13 +162,13 @@ namespace distribution
             t = a1;
             pt = a2;
         }
+
     private:
-        amrex::ParticleReal m_sigmaX,m_sigmaY,m_sigmaT; //! related RMS sizes (length)
-        amrex::ParticleReal m_sigmaPx,m_sigmaPy,m_sigmaPt; //! RMS momentum
-        amrex::ParticleReal m_muxpx,m_muypy,m_mutpt; //! correlation length-momentum
+        amrex::ParticleReal m_sigmaX, m_sigmaY, m_sigmaT;  //! related RMS sizes (length)
+        amrex::ParticleReal m_sigmaPx, m_sigmaPy, m_sigmaPt;  //! RMS momentum
+        amrex::ParticleReal m_muxpx, m_muypy, m_mutpt;  //! correlation length-momentum
     };
 
-} // namespace distribution
-} // namespace impactx
+} // namespace impactx::distribution
 
 #endif // IMPACTX_DISTRIBUTION_KURTH6D

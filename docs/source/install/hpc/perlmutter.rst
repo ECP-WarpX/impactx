@@ -3,126 +3,224 @@
 Perlmutter (NERSC)
 ==================
 
-.. warning::
-
-   Perlmutter is still in acceptance testing.
-   This page documents our internal testing workflow only.
-
 The `Perlmutter cluster <https://docs.nersc.gov/systems/perlmutter/>`_ is located at NERSC.
 
-If you are new to this system, please see the following resources:
+
+Introduction
+------------
+
+If you are new to this system, **please see the following resources**:
 
 * `NERSC user guide <https://docs.nersc.gov/>`__
 * Batch system: `Slurm <https://docs.nersc.gov/systems/perlmutter/#running-jobs>`__
-* `Jupyter service <https://docs.nersc.gov/services/jupyter/>`__
-* `Production directories <https://docs.nersc.gov/filesystems/perlmutter-scratch/>`__:
+* `Jupyter service <https://jupyter.nersc.gov>`__ (`documentation <https://docs.nersc.gov/services/jupyter/>`__)
+* `Filesystems <https://docs.nersc.gov/filesystems/>`__:
 
-  * ``$PSCRATCH``: per-user production directory (<TBD>TB)
-  * ``/global/cscratch1/sd/m3239``: shared production directory for users in the project ``m3239`` (50TB)
-  * ``/global/cfs/cdirs/m3239/``: community file system for users in the project ``m3239`` (100TB)
+  * ``$HOME``: per-user directory, use only for inputs, source and scripts; backed up (40GB)
+  * ``${CFS}/m3239/``: `community file system <https://docs.nersc.gov/filesystems/community/>`__ for users in the project ``m3239`` (or equivalent); moderate performance (20TB default)
+  * ``$PSCRATCH``: per-user `production directory <https://docs.nersc.gov/filesystems/perlmutter-scratch/>`__; very fast for parallel jobs; purged every 8 weeks (20TB default)
 
 
-Installation
-------------
+.. _building-perlmutter-preparation:
 
-Use the following commands to download the ImpactX source code and switch to the correct branch:
+Preparation
+-----------
+
+Use the following commands to download the ImpactX source code:
 
 .. code-block:: bash
 
    git clone https://github.com/ECP-WarpX/impactx.git $HOME/src/impactx
 
-We use the following modules and environments on the system (``$HOME/perlmutter_impactx.profile``).
+On Perlmutter, you can run either on GPU nodes with fast A100 GPUs (recommended) or CPU nodes.
 
-.. code-block:: bash
+.. tab-set::
 
-   # please set your project account
-   export proj=<yourProject>  # LBNL/AMP: m3906_g
+   .. tab-item:: A100 GPUs
 
-   # required dependencies
-   module load cmake/3.22.0
-   module load cray-hdf5-parallel/1.12.2.1
+      We use system software modules, add environment hints and further dependencies via the file ``$HOME/perlmutter_gpu_impactx.profile``.
+      Create it now:
 
-   # optional: just an additional text editor
-   #module load nano  # TODO: request from support
+      .. code-block:: bash
 
-   # optional: CCache for faster rebuilds
-   export PATH=/global/common/software/spackecp/perlmutter/e4s-22.05/78535/spack/opt/spack/cray-sles15-zen3/gcc-11.2.0/ccache-4.5.1-ybl7xefvggn6hov4dsdxxnztji74tolj/bin:$PATH
+         cp $HOME/src/impactx/docs/source/install/hpc/perlmutter-nersc/perlmutter_gpu_impactx.profile.example $HOME/perlmutter_gpu_impactx.profile
 
-   # Python
-   module load cray-python/3.9.13.1
-   if [ -d "$HOME/sw/perlmutter/venvs/impactx" ]
-   then
-       source $HOME/sw/perlmutter/venvs/impactx/bin/activate
-   fi
+      .. dropdown:: Script Details
+         :color: light
+         :icon: info
+         :animate: fade-in-slide-down
 
-   # an alias to request an interactive batch node for one hour
-   #   for parallel execution, start on the batch node: srun <command>
-   alias getNode="salloc -N 1 --ntasks-per-gpu=1 -t 1:00:00 -q interactive -C gpu --gpu-bind=single:1 -c 32 -G 4 -A $proj"
-   # an alias to run a command on a batch node for up to 30min
-   #   usage: runNode <command>
-   alias runNode="srun -N 1 --ntasks-per-gpu=1 -t 0:30:00 -q interactive -C gpu --gpu-bind=single:1 -c 32 -G 4 -A $proj"
+         .. literalinclude:: perlmutter-nersc/perlmutter_gpu_impactx.profile.example
+            :language: bash
 
-   # GPU-aware MPI
-   export MPICH_GPU_SUPPORT_ENABLED=1
+      Edit the 2nd line of this script, which sets the ``export proj=""`` variable.
+      Perlmutter GPU projects must end in ``..._g``.
+      For example, if you are member of the project ``m3239``, then run ``nano $HOME/perlmutter_gpu_impactx.profile`` and edit line 2 to read:
 
-   # necessary to use CUDA-Aware MPI and run a job
-   export CRAY_ACCEL_TARGET=nvidia80
+      .. code-block:: bash
 
-   # optimize CUDA compilation for A100
-   export AMREX_CUDA_ARCH=8.0
+         export proj="m3239_g"
 
-   # compiler environment hints
-   export CC=cc
-   export CXX=CC
-   export FC=ftn
-   export CUDACXX=$(which nvcc)
-   export CUDAHOSTCXX=CC
+      Exit the ``nano`` editor with ``Ctrl`` + ``O`` (save) and then ``Ctrl`` + ``X`` (exit).
+
+      .. important::
+
+         Now, and as the first step on future logins to Perlmutter, activate these environment settings:
+
+         .. code-block:: bash
+
+            source $HOME/perlmutter_gpu_impactx.profile
+
+      Finally, since Perlmutter does not yet provide software modules for some of our dependencies, install them once:
+
+      .. code-block:: bash
+
+         bash $HOME/src/impactx/docs/source/install/hpc/perlmutter-nersc/install_gpu_dependencies.sh
+         source ${CFS}/${proj%_g}/${USER}/sw/perlmutter/gpu/venvs/impactx/bin/activate
+
+      .. dropdown:: Script Details
+         :color: light
+         :icon: info
+         :animate: fade-in-slide-down
+
+         .. literalinclude:: perlmutter-nersc/install_gpu_dependencies.sh
+            :language: bash
 
 
-We recommend to store the above lines in a file, such as ``$HOME/perlmutter_impactx.profile``, and load it into your shell after a login:
+   .. tab-item:: CPU Nodes
 
-.. code-block:: bash
+      We use system software modules, add environment hints and further dependencies via the file ``$HOME/perlmutter_cpu_impactx.profile``.
+      Create it now:
 
-   source $HOME/perlmutter_impactx.profile
+      .. code-block:: bash
 
-For Python workflows & tests, also install a virtual environment:
+         cp $HOME/src/impactx/docs/source/install/hpc/perlmutter-nersc/perlmutter_cpu_impactx.profile.example $HOME/perlmutter_cpu_impactx.profile
 
-.. code-block:: bash
+      .. dropdown:: Script Details
+         :color: light
+         :icon: info
+         :animate: fade-in-slide-down
 
-   # establish Python dependencies
-   python3 -m pip install --user --upgrade pip
-   python3 -m pip install --user virtualenv
+         .. literalinclude:: perlmutter-nersc/perlmutter_cpu_impactx.profile.example
+            :language: bash
 
-   python3 -m venv $HOME/sw/perlmutter/venvs/impactx
-   source $HOME/sw/perlmutter/venvs/impactx/bin/activate
+      Edit the 2nd line of this script, which sets the ``export proj=""`` variable.
+      For example, if you are member of the project ``m3239``, then run ``nano $HOME/perlmutter_cpu_impactx.profile`` and edit line 2 to read:
 
-   python3 -m pip install --upgrade pip
-   MPICC="cc -target-accel=nvidia80 -shared" python3 -m pip install --upgrade --no-cache-dir -v mpi4py
-   python3 -m pip install --upgrade pytest
-   python3 -m pip install --upgrade -r $HOME/src/impactx/requirements.txt
-   python3 -m pip install --upgrade -r $HOME/src/impactx/examples/requirements.txt
+      .. code-block:: bash
 
-Then, ``cd`` into the directory ``$HOME/src/impactx`` and use the following commands to compile:
+         export proj="m3239"
+
+      Exit the ``nano`` editor with ``Ctrl`` + ``O`` (save) and then ``Ctrl`` + ``X`` (exit).
+
+      .. important::
+
+         Now, and as the first step on future logins to Perlmutter, activate these environment settings:
+
+         .. code-block:: bash
+
+            source $HOME/perlmutter_cpu_impactx.profile
+
+      Finally, since Perlmutter does not yet provide software modules for some of our dependencies, install them once:
+
+      .. code-block:: bash
+
+         bash $HOME/src/impactx/docs/source/install/hpc/perlmutter-nersc/install_cpu_dependencies.sh
+         source ${CFS}/${proj}/${USER}/sw/perlmutter/cpu/venvs/impactx/bin/activate
+
+      .. dropdown:: Script Details
+         :color: light
+         :icon: info
+         :animate: fade-in-slide-down
+
+         .. literalinclude:: perlmutter-nersc/install_cpu_dependencies.sh
+            :language: bash
+
+
+.. _building-perlmutter-compilation:
+
+Compilation
+-----------
+
+Use the following :ref:`cmake commands <building-cmake>` to compile the application executable:
+
+.. tab-set::
+
+   .. tab-item:: A100 GPUs
+
+      .. code-block:: bash
+
+         cd $HOME/src/impactx
+         rm -rf build_pm_gpu
+
+         cmake -S . -B build_pm_gpu -DImpactX_COMPUTE=CUDA
+         cmake --build build_pm_gpu -j 16
+
+      The ImpactX application executables are now in ``$HOME/src/impactx/build_pm_gpu/bin/``.
+      Additionally, the following commands will install ImpactX as a Python module:
+
+      .. code-block:: bash
+
+         cd $HOME/src/impactx
+         rm -rf build_pm_gpu_py
+
+         cmake -S . -B build_pm_gpu_py -DImpactX_COMPUTE=CUDA -DImpactX_APP=OFF -DImpactX_PYTHON=ON
+         cmake --build build_pm_gpu_py -j 16 --target pip_install
+
+   .. tab-item:: CPU Nodes
+
+      .. code-block:: bash
+
+         cd $HOME/src/impactx
+         rm -rf build_pm_cpu
+
+         cmake -S . -B build_pm_cpu -DImpactX_COMPUTE=OMP
+         cmake --build build_pm_cpu -j 16
+
+      The ImpactX application executables are now in ``$HOME/src/impactx/build_pm_cpu/bin/``.
+      Additionally, the following commands will install ImpactX as a Python module:
+
+      .. code-block:: bash
+
+         rm -rf build_pm_cpu_py
+
+         cmake -S . -B build_pm_cpu_py -DImpactX_COMPUTE=OMP -DImpactX_APP=OFF -DImpactX_PYTHON=ON
+         cmake --build build_pm_cpu_py -j 16 --target pip_install
+
+Now, you can :ref:`submit Perlmutter compute jobs <running-cpp-perlmutter>` for ImpactX :ref:`Python (PICMI) scripts <usage-picmi>` (:ref:`example scripts <usage-examples>`).
+Or, you can use the ImpactX executables to submit Perlmutter jobs (:ref:`example inputs <usage-examples>`).
+For executables, you can reference their location in your :ref:`job script <running-cpp-perlmutter>` or copy them to a location in ``$PSCRATCH``.
+
+
+.. _building-perlmutter-update:
+
+Update ImpactX & Dependencies
+-----------------------------
+
+If you already installed ImpactX in the past and want to update it, start by getting the latest source code:
 
 .. code-block:: bash
 
    cd $HOME/src/impactx
-   rm -rf build
 
-   cmake -S . -B build_perlmutter -DImpactX_COMPUTE=CUDA -DImpactX_PYTHON=ON
-   cmake --build build_perlmutter -j 32
+   # read the output of this command - does it look ok?
+   git status
 
-To run all tests, do:
+   # get the latest ImpactX source code
+   git fetch
+   git pull
 
-.. code-block:: bash
+   # read the output of these commands - do they look ok?
+   git status
+   git log # press q to exit
 
-   # work on an interactive node
-   salloc -N 1 --ntasks-per-node=4 -t 1:00:00 -C gpu --gpu-bind=single:1 -c 32 -G 4 --qos=interactive -A m3906_g
+And, if needed,
 
-   # test
-   ctest --test-dir build_perlmutter -E AMReX --output-on-failure
+- :ref:`update the perlmutter_gpu_impactx.profile or perlmutter_cpu_impactx files <building-perlmutter-preparation>`,
+- log out and into the system, activate the now updated environment profile as usual,
+- :ref:`execute the dependency install scripts <building-perlmutter-preparation>`.
 
-The general :ref:`cmake compile-time options <building-cmake>` apply as usual.
+As a last step, clean the build directory ``rm -rf $HOME/src/impactx/build_pm_*`` and rebuild ImpactX.
 
 
 .. _running-cpp-perlmutter:
@@ -130,26 +228,42 @@ The general :ref:`cmake compile-time options <building-cmake>` apply as usual.
 Running
 -------
 
-.. _running-cpp-perlmutter-A100-GPUs:
+.. tab-set::
 
-A100 GPUs (40 GB)
-^^^^^^^^^^^^^^^^^
+   .. tab-item:: A100 (40GB) GPUs
 
-The batch script below can be used to run a ImpactX simulation on multiple nodes (change ``-N`` accordingly) on the supercomputer Perlmutter at NERSC.
-Replace descriptions between chevrons ``<>`` by relevant values, for instance ``<input file>`` could be ``plasma_mirror_inputs``.
-Note that we run one MPI rank per GPU.
+      The batch script below can be used to run a ImpactX simulation on multiple nodes (change ``-N`` accordingly) on the supercomputer Perlmutter at NERSC.
+      This partition as up to `1536 nodes <https://docs.nersc.gov/systems/perlmutter/architecture/>`__.
+
+      Replace descriptions between chevrons ``<>`` by relevant values, for instance ``<input file>`` could be ``plasma_mirror_inputs``.
+      Note that we run one MPI rank per GPU.
+
+      .. literalinclude:: perlmutter-nersc/perlmutter_gpu.sbatch
+         :language: bash
+         :caption: You can copy this file from ``$HOME/src/impactx/docs/source/install/hpc/perlmutter-nersc/perlmutter_gpu.sbatch``.
+
+      To run a simulation, copy the lines above to a file ``perlmutter_gpu.sbatch`` and run
+
+      .. code-block:: bash
+
+         sbatch perlmutter_gpu.sbatch
+
+      to submit the job.
 
 
-.. literalinclude:: ../../../../etc/impactx/perlmutter-nersc/batch_perlmutter.sh
-   :language: bash
+   .. tab-item:: A100 (80GB) GPUs
 
-To run a simulation, copy the lines above to a file ``batch_perlmutter.sh`` and run
+      Perlmutter has `256 nodes <https://docs.nersc.gov/systems/perlmutter/architecture/>`__ that provide 80 GB HBM per A100 GPU.
+      In the A100 (40GB) batch script, replace ``-C gpu`` with ``-C gpu&hbm80g`` to use these large-memory GPUs.
 
-.. code-block:: bash
 
-   sbatch batch_perlmutter.sh
+   .. tab-item:: CPU Nodes
 
-to submit the job.
+      The Perlmutter CPU partition as up to `3072 nodes <https://docs.nersc.gov/systems/perlmutter/architecture/>`__, each with 2x AMD EPYC 7763 CPUs.
+
+      .. literalinclude:: perlmutter-nersc/perlmutter_cpu.sbatch
+         :language: bash
+         :caption: You can copy this file from ``$HOME/src/impactx/docs/source/install/hpc/perlmutter-nersc/perlmutter_cpu.sbatch``.
 
 
 .. _post-processing-perlmutter:
@@ -157,9 +271,36 @@ to submit the job.
 Post-Processing
 ---------------
 
-For post-processing, most users use Python via NERSC's `Jupyter service <https://jupyter.nersc.gov>`__ (`Docs <https://docs.nersc.gov/services/jupyter/>`__).
+For post-processing, most users use Python via NERSC's `Jupyter service <https://jupyter.nersc.gov>`__ (`documentation <https://docs.nersc.gov/services/jupyter/>`__).
 
-Please follow the same guidance as for :ref:`NERSC Cori post-processing <post-processing-cori>`.
+As a one-time preparatory setup, log into Perlmutter via SSH and do *not* source the ImpactX profile script above.
+Create your own Conda environment and `Jupyter kernel <https://docs.nersc.gov/services/jupyter/how-to-guides/#how-to-use-a-conda-environment-as-a-python-kernel>`__ for post-processing:
 
-The Perlmutter ``$PSCRATCH`` filesystem is currently not yet available on Jupyter.
-Thus, store or copy your data to Cori's ``$SCRATCH`` or use the Community FileSystem (CFS) for now.
+.. code-block:: bash
+
+   module load python
+
+   conda config --set auto_activate_base false
+
+   # create conda environment
+   rm -rf $HOME/.conda/envs/impactx-pm-postproc
+   conda create --yes -n impactx-pm-postproc -c conda-forge mamba conda-libmamba-solver
+   conda activate impactx-pm-postproc
+   conda config --set solver libmamba
+   mamba install --yes -c conda-forge python ipykernel ipympl matplotlib numpy pandas yt openpmd-viewer openpmd-api h5py fast-histogram dask dask-jobqueue pyarrow
+
+   # create Jupyter kernel
+   rm -rf $HOME/.local/share/jupyter/kernels/impactx-pm-postproc/
+   python -m ipykernel install --user --name impactx-pm-postproc --display-name ImpactX-PM-PostProcessing
+   echo -e '#!/bin/bash\nmodule load python\nsource activate impactx-pm-postproc\nexec "$@"' > $HOME/.local/share/jupyter/kernels/impactx-pm-postproc/kernel-helper.sh
+   chmod a+rx $HOME/.local/share/jupyter/kernels/impactx-pm-postproc/kernel-helper.sh
+   KERNEL_STR=$(jq '.argv |= ["{resource_dir}/kernel-helper.sh"] + .' $HOME/.local/share/jupyter/kernels/impactx-pm-postproc/kernel.json | jq '.argv[1] = "python"')
+   echo ${KERNEL_STR} | jq > $HOME/.local/share/jupyter/kernels/impactx-pm-postproc/kernel.json
+
+   exit
+
+
+When opening a Jupyter notebook on `https://jupyter.nersc.gov <https://jupyter.nersc.gov>`__, just select ``ImpactX-PM-PostProcessing`` from the list of available kernels on the top right of the notebook.
+
+Additional software can be installed later on, e.g., in a Jupyter cell using ``!mamba install -y -c conda-forge ...``.
+Software that is not available via conda can be installed via ``!python -m pip install ...``.

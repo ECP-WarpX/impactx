@@ -4,7 +4,7 @@
 beam.npart = 10000
 #beam.npart = 100000 #optional for increased precision
 beam.units = static
-beam.energy = 2.0e3
+beam.kin_energy = 2.0e3
 beam.charge = 1.0e-8
 beam.particle = proton
 beam.distribution = kurth6d
