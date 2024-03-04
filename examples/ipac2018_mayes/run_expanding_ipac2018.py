@@ -67,45 +67,6 @@ sim.lattice.extend([monitor, elements.Drift(ds=1.0, nslice=30), monitor])
 # run simulation
 sim.evolve()
 
-# calculate phase space
-#   hack:
-import matplotlib.pyplot as plt
-
-num_plots_per_row = 2
-f, axs = plt.subplots(1, num_plots_per_row, figsize=(7, 2))
-ax_x_px = axs[0]
-ax_z_pz = axs[1]
-
-pc = sim.particle_container()
-lev = pc.GetParticles(0)
-for tile_ind, pt in lev.items():
-    # positions + id + cpuid
-    aos = pt.GetArrayOfStructs()
-    aos_arr = np.array(aos, copy=False)
-
-    # momentum & particle weight
-    real_arrays = pt.GetStructOfArrays().GetRealData()
-    px = np.array(real_arrays[0], copy=False)
-    pz = np.array(real_arrays[2], copy=False)
-
-    print(f"tile_ind={tile_ind}, pt={pt}")
-    print(f"aos_arr={aos_arr}, aos_arr.shape={aos_arr.shape}")
-    print(f"px={px}, px.shape={px.shape}")
-
-    ax_x_px.scatter(aos_arr[()]["x"], px)
-    ax_z_pz.scatter(aos_arr[()]["z"], pz)
-plt.show()
-
-# MPI reduce phase space
-#   TODO SUM up histograms via MPI
-
-# plot phase space
-# import matplotlib.pyplot as plt
-# f = plt.figure()
-# ax = plt.gca()
-# ax.scatter()
-
 # clean shutdown
-#   note: timers turned stop here
-del sim
-amr.finalize()
+sim.finalize()
+
