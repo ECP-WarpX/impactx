@@ -111,7 +111,7 @@ def run_and_plot(case, r, ax):
     line_color = p[0].get_color()
 
     # plot data slices
-    ng = F_x.nGrowVect
+    ng = F_x.n_grow_vect
     # q_e = -1.602176634e-19   # particle charge (not used)
     for mfi in F_x:
         bx = mfi.validbox()
