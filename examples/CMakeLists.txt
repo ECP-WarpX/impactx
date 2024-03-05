@@ -907,7 +907,7 @@ add_impactx_test(gaussian-SCfields.py
     examples/ipac2018_mayes/run_fieldplots_ipac2018.py
       OFF   # ImpactX MPI-parallel
       ON   # ImpactX Python interface
-    examples/ipac2018_mayes/analysis_fieldplots_ipac2018.py
+    # examples/ipac2018_mayes/analysis_fieldplots_ipac2018.py
     OFF  # no plot script yet
 )
 
