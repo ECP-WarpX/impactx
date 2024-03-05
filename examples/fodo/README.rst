@@ -68,7 +68,7 @@ You can run the following script to visualize the beam evolution over time:
       :caption: You can copy this file from ``examples/fodo/plot_fodo.py``.
 
 .. figure:: https://user-images.githubusercontent.com/1353258/180287840-8561f6fd-278f-4856-abd8-04fbdb78c8ff.png
-   :alt: focusing, defocusing and preserved emittane in our FODO cell benchmark.
+   :alt: focusing, defocusing and preserved emittance in our FODO cell benchmark.
 
    FODO transversal beam width and emittance evolution
 

@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # options to run this script
-parser = argparse.ArgumentParser(description="Plot the Bithermal benchmark.")
+parser = argparse.ArgumentParser(description="Plot the quadrupole triplet benchmark.")
 parser.add_argument(
     "--save-png", action="store_true", help="non-interactive run: save to PNGs"
 )
@@ -33,7 +33,7 @@ plt.figure(figsize=(10, 6))
 plt.xscale("linear")
 plt.yscale("linear")
 plt.xlim([xMin, xMax])
-plt.ylim([yMin, yMax])
+# plt.ylim([yMin, yMax])
 plt.xlabel("s (m)", fontsize=30)
 plt.ylabel("CS Twiss beta (m)", fontsize=30)
 plt.xticks(fontsize=25)
@@ -41,9 +41,9 @@ plt.yticks(fontsize=25)
 plt.grid(True)
 
 # Plot the data
-plt.plot(s, beta_x, "b--", label="Horizontal", linewidth=2, linestyle="solid")
+plt.plot(s, beta_x, "b", label="Horizontal", linewidth=2, linestyle="solid")
 
-plt.plot(s, beta_y, "r--", label="Vertical", linewidth=2, linestyle="solid")
+plt.plot(s, beta_y, "r", label="Vertical", linewidth=2, linestyle="solid")
 
 # Show plot
 plt.legend(fontsize=20)
