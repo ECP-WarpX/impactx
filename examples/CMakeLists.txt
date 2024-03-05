@@ -899,17 +899,17 @@ add_impactx_test(fodo_tune.py
 #
 # w/ space charge
 # copy nominal field data files
-#file(COPY ${ImpactX_SOURCE_DIR}/examples/ipac2018_mayes/Ex_Mayes.dat
-#        DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/gaussian-SCfields.py)
-#file(COPY ${ImpactX_SOURCE_DIR}/examples/ipac2018_mayes/Ey_Mayes.dat
-#        DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/gaussian-SCfields.py)
-#add_impactx_test(gaussian-SCfields.py
-#    examples/ipac2018_mayes/run_fieldplots_ipac2018.py
-#      OFF   # ImpactX MPI-parallel
-#      ON   # ImpactX Python interface
-#    examples/ipac2018_mayes/analysis_fieldplots_ipac2018.py
-#    OFF  # no plot script yet
-#)
+file(COPY ${ImpactX_SOURCE_DIR}/examples/ipac2018_mayes/Ex_Mayes.dat
+        DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/gaussian-SCfields.py)
+file(COPY ${ImpactX_SOURCE_DIR}/examples/ipac2018_mayes/Ey_Mayes.dat
+        DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/gaussian-SCfields.py)
+add_impactx_test(gaussian-SCfields.py
+    examples/ipac2018_mayes/run_fieldplots_ipac2018.py
+      OFF   # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/ipac2018_mayes/analysis_fieldplots_ipac2018.py
+    OFF  # no plot script yet
+)
 
 # Space charge in a coasting Gaussian bunch ############################################
 #
