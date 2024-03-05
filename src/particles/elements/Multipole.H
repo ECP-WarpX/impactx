@@ -144,7 +144,6 @@ namespace impactx
         /** This pushes the reference particle. */
         using Thin::operator();
 
-    private:
         int m_multipole; //! multipole index
         int m_mfactorial; //! factorial of multipole index
         amrex::ParticleReal m_Kn; //! integrated normal multipole coefficient

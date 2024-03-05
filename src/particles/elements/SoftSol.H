@@ -545,7 +545,6 @@ namespace SoftSolenoidData
                 SoftSolenoidData::d_sin_coef.erase(m_id);
         }
 
-    private:
         amrex::ParticleReal m_bscale; //! scaling factor for solenoid Bz field
         int m_mapsteps; //! number of map integration steps per slice
         int m_id; //! unique soft solenoid id used for data lookup map

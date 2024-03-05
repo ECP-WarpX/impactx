@@ -221,7 +221,6 @@ namespace impactx
             refpart.s = s + slice_ds;
         }
 
-    private:
         amrex::ParticleReal m_rc; //! bend radius in m
         amrex::ParticleReal m_k;  //! quadrupole strength in m^(-2)
     };

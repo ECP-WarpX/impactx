@@ -154,7 +154,6 @@ namespace impactx
         /** This pushes the reference particle. */
         using Thin::operator();
 
-    private:
         amrex::ParticleReal m_knll; //! integrated strength of the nonlinear lens (m)
         amrex::ParticleReal m_cnll; //! distance of singularities from the origin (m)
     };

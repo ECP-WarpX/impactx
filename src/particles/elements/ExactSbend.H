@@ -197,7 +197,6 @@ namespace impactx
 
         }
 
-    private:
         amrex::ParticleReal m_phi; //! bend angle in radians
         amrex::ParticleReal m_B;  //! magnetic field in T
     };

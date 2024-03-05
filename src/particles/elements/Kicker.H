@@ -134,7 +134,6 @@ namespace impactx
         /** This pushes the reference particle. */
         using Thin::operator();
 
-    private:
         amrex::ParticleReal m_xkick; //! horizontal kick strength
         amrex::ParticleReal m_ykick; //! vertical kick strength
         UnitSystem m_unit; //! Kicks are for 0 dimensionless, or for 1 in T-m."
