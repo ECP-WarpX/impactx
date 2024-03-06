@@ -178,7 +178,6 @@ namespace impactx
             refpart.s = s + slice_ds;
         }
 
-    private:
         amrex::ParticleReal m_k; //! quadrupole strength in 1/m
     };
 

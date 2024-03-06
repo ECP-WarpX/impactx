@@ -152,7 +152,6 @@ namespace impactx
             refpart.pz = pz*cos_theta + px*sin_theta;
         }
 
-    private:
         amrex::ParticleReal m_theta; //! dipole bending angle (rad)
         amrex::ParticleReal m_rc; //! curvature radius (m)
 

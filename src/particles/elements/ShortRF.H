@@ -192,8 +192,6 @@ namespace impactx
 
         }
 
-
-    private:
         amrex::ParticleReal m_V; //! normalized (max) RF voltage drop.
         amrex::ParticleReal m_freq; //! RF frequency in Hz.
         amrex::ParticleReal m_phase; //! reference RF phase in degrees.

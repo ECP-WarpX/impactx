@@ -166,6 +166,11 @@ void init_elements(py::module& m)
 
     py::class_<Aperture, elements::Thin, elements::Alignment> py_Aperture(me, "Aperture");
     py_Aperture
+        .def("__repr__",
+             [](Aperture const & /* ap */) {
+                 return std::string("<impactx.elements.Aperture>");
+             }
+        )
         .def(py::init([](
                  amrex::ParticleReal xmax,
                  amrex::ParticleReal ymax,
@@ -211,6 +216,14 @@ void init_elements(py::module& m)
 
     py::class_<ChrDrift, elements::Thick, elements::Alignment> py_ChrDrift(me, "ChrDrift");
     py_ChrDrift
+        .def("__repr__",
+             [](ChrDrift const & chr_drift) {
+                 std::string r = "<impactx.elements.ChrDrift (ds=";
+                 r.append(std::to_string(chr_drift.ds()))
+                         .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -230,6 +243,16 @@ void init_elements(py::module& m)
 
     py::class_<ChrQuad, elements::Thick, elements::Alignment> py_ChrQuad(me, "ChrQuad");
     py_ChrQuad
+        .def("__repr__",
+             [](ChrQuad const & chr_quad) {
+                 std::string r = "<impactx.elements.ChrQuad (ds=";
+                 r.append(std::to_string(chr_quad.ds()))
+                  .append(", k=")
+                  .append(std::to_string(chr_quad.m_k))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -263,6 +286,16 @@ void init_elements(py::module& m)
 
     py::class_<ChrPlasmaLens, elements::Thick, elements::Alignment> py_ChrPlasmaLens(me, "ChrPlasmaLens");
     py_ChrPlasmaLens
+        .def("__repr__",
+             [](ChrPlasmaLens const & chr_pl_lens) {
+                 std::string r = "<impactx.elements.ChrPlasmaLens (ds=";
+                 r.append(std::to_string(chr_pl_lens.ds()))
+                  .append(", k=")
+                  .append(std::to_string(chr_pl_lens.m_k))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -296,6 +329,18 @@ void init_elements(py::module& m)
 
     py::class_<ChrAcc, elements::Thick, elements::Alignment> py_ChrAcc(me, "ChrAcc");
     py_ChrAcc
+        .def("__repr__",
+             [](ChrAcc const & chr_acc) {
+                 std::string r = "<impactx.elements.ChrAcc (ds=";
+                 r.append(std::to_string(chr_acc.ds()))
+                  .append(", ez=")
+                  .append(std::to_string(chr_acc.m_ez))
+                  .append(", bz=")
+                  .append(std::to_string(chr_acc.m_bz))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -329,6 +374,20 @@ void init_elements(py::module& m)
 
     py::class_<ConstF, elements::Thick, elements::Alignment> py_ConstF(me, "ConstF");
     py_ConstF
+        .def("__repr__",
+             [](ConstF const & constf) {
+                 std::string r = "<impactx.elements.ConstF (ds=";
+                 r.append(std::to_string(constf.ds()))
+                  .append(", kx=")
+                  .append(std::to_string(constf.m_kx))
+                  .append(", ky=")
+                  .append(std::to_string(constf.m_ky))
+                  .append(", kt=")
+                  .append(std::to_string(constf.m_kt))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -369,6 +428,20 @@ void init_elements(py::module& m)
 
     py::class_<DipEdge, elements::Thin, elements::Alignment> py_DipEdge(me, "DipEdge");
     py_DipEdge
+        .def("__repr__",
+             [](DipEdge const & dip_edge) {
+                 std::string r = "<impactx.elements.DipEdge (psi=";
+                 r.append(std::to_string(dip_edge.m_psi))
+                  .append(", rc=")
+                  .append(std::to_string(dip_edge.m_rc))
+                  .append(", g=")
+                  .append(std::to_string(dip_edge.m_g))
+                  .append(", K2=")
+                  .append(std::to_string(dip_edge.m_K2))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -392,6 +465,14 @@ void init_elements(py::module& m)
 
     py::class_<Drift, elements::Thick, elements::Alignment> py_Drift(me, "Drift");
     py_Drift
+        .def("__repr__",
+             [](Drift const & drift) {
+                 std::string r = "<impactx.elements.Drift (ds=";
+                 r.append(std::to_string(drift.ds()))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -411,6 +492,14 @@ void init_elements(py::module& m)
 
     py::class_<ExactDrift, elements::Thick, elements::Alignment> py_ExactDrift(me, "ExactDrift");
     py_ExactDrift
+        .def("__repr__",
+             [](ExactDrift const & exact_drift) {
+                 std::string r = "<impactx.elements.ExactDrift (ds=";
+                 r.append(std::to_string(exact_drift.ds()))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -430,6 +519,18 @@ void init_elements(py::module& m)
 
     py::class_<ExactSbend, elements::Thick, elements::Alignment> py_ExactSbend(me, "ExactSbend");
     py_ExactSbend
+        .def("__repr__",
+             [](ExactSbend const & exact_sbend) {
+                 std::string r = "<impactx.elements.ExactSbend (ds=";
+                 r.append(std::to_string(exact_sbend.ds()))
+                  .append(", phi=")
+                  .append(std::to_string(exact_sbend.m_phi))
+                  .append(", B=")
+                  .append(std::to_string(exact_sbend.m_B))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -453,6 +554,16 @@ void init_elements(py::module& m)
 
     py::class_<Kicker, elements::Thin, elements::Alignment> py_Kicker(me, "Kicker");
     py_Kicker
+        .def("__repr__",
+             [](Kicker const & kicker) {
+                 std::string r = "<impactx.elements.Kicker (xkick=";
+                 r.append(std::to_string(kicker.m_xkick))
+                  .append(", ykick=")
+                  .append(std::to_string(kicker.m_ykick))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init([](
                 amrex::ParticleReal xkick,
                 amrex::ParticleReal ykick,
@@ -483,6 +594,18 @@ void init_elements(py::module& m)
 
     py::class_<Multipole, elements::Thin, elements::Alignment> py_Multipole(me, "Multipole");
     py_Multipole
+        .def("__repr__",
+             [](Multipole const & multipole) {
+                 std::string r = "<impactx.elements.Multipole (multipole=";
+                 r.append(std::to_string(multipole.m_multipole))
+                  .append(", K_normal=")
+                  .append(std::to_string(multipole.m_Kn))
+                  .append(", K_skew=")
+                  .append(std::to_string(multipole.m_Ks))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 int,
                 amrex::ParticleReal,
@@ -491,7 +614,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal
              >(),
-             py::arg("multiple"),
+             py::arg("multipole"),
              py::arg("K_normal"),
              py::arg("K_skew"),
              py::arg("dx") = 0,
@@ -504,6 +627,11 @@ void init_elements(py::module& m)
 
     py::class_<None, elements::Thin> py_None(me, "None");
     py_None
+        .def("__repr__",
+             [](None const & /* none */) {
+                 return std::string("<impactx.elements.None>");
+             }
+        )
         .def(py::init<>(),
              "This element does nothing."
         )
@@ -512,6 +640,16 @@ void init_elements(py::module& m)
 
     py::class_<NonlinearLens, elements::Thin, elements::Alignment> py_NonlinearLens(me, "NonlinearLens");
     py_NonlinearLens
+        .def("__repr__",
+             [](NonlinearLens const & nl) {
+                 std::string r = "<impactx.elements.NonlinearLens (knll=";
+                 r.append(std::to_string(nl.m_knll))
+                  .append(", cnll=")
+                  .append(std::to_string(nl.m_cnll))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -530,6 +668,14 @@ void init_elements(py::module& m)
     register_beamoptics_push(py_NonlinearLens);
 
     py::class_<Programmable>(me, "Programmable", py::dynamic_attr())
+        .def("__repr__",
+             [](Programmable const & prg) {
+                 std::string r = "<impactx.elements.Programmable (ds=";
+                 r.append(std::to_string(prg.ds()))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                  amrex::ParticleReal,
                  int
@@ -575,6 +721,16 @@ void init_elements(py::module& m)
 
     py::class_<Quad, elements::Thick, elements::Alignment> py_Quad(me, "Quad");
     py_Quad
+        .def("__repr__",
+             [](Quad const & quad) {
+                 std::string r = "<impactx.elements.Quad (ds=";
+                 r.append(std::to_string(quad.ds()))
+                  .append(", k=")
+                  .append(std::to_string(quad.m_k))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -596,6 +752,20 @@ void init_elements(py::module& m)
 
     py::class_<RFCavity, elements::Thick, elements::Alignment> py_RFCavity(me, "RFCavity");
     py_RFCavity
+        .def("__repr__",
+             [](RFCavity const & rfc) {
+                 std::string r = "<impactx.elements.RFCavity (ds=";
+                 r.append(std::to_string(rfc.ds()))
+                  .append(", escale=")
+                  .append(std::to_string(rfc.m_escale))
+                  .append(", freq=")
+                  .append(std::to_string(rfc.m_freq))
+                  .append(", phase=")
+                  .append(std::to_string(rfc.m_phase))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -627,6 +797,16 @@ void init_elements(py::module& m)
 
     py::class_<Sbend, elements::Thick, elements::Alignment> py_Sbend(me, "Sbend");
     py_Sbend
+        .def("__repr__",
+             [](Sbend const & sbend) {
+                 std::string r = "<impactx.elements.Sbend (ds=";
+                 r.append(std::to_string(sbend.ds()))
+                  .append(", rc=")
+                  .append(std::to_string(sbend.m_rc))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -648,6 +828,18 @@ void init_elements(py::module& m)
 
     py::class_<CFbend, elements::Thick, elements::Alignment> py_CFbend(me, "CFbend");
     py_CFbend
+        .def("__repr__",
+             [](CFbend const & cfbend) {
+                 std::string r = "<impactx.elements.CFbend (ds=";
+                 r.append(std::to_string(cfbend.ds()))
+                  .append(", rc=")
+                  .append(std::to_string(cfbend.m_rc))
+                  .append(", k=")
+                  .append(std::to_string(cfbend.m_k))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -671,6 +863,16 @@ void init_elements(py::module& m)
 
     py::class_<Buncher, elements::Thin, elements::Alignment> py_Buncher(me, "Buncher");
     py_Buncher
+        .def("__repr__",
+             [](Buncher const & buncher) {
+                 std::string r = "<impactx.elements.Buncher (V=";
+                 r.append(std::to_string(buncher.m_V))
+                  .append(", k=")
+                  .append(std::to_string(buncher.m_k))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -690,6 +892,18 @@ void init_elements(py::module& m)
 
     py::class_<ShortRF, elements::Thin, elements::Alignment> py_ShortRF(me, "ShortRF");
     py_ShortRF
+        .def("__repr__",
+             [](ShortRF const & short_rf) {
+                 std::string r = "<impactx.elements.ShortRF (V=";
+                 r.append(std::to_string(short_rf.m_V))
+                  .append(", freq=")
+                  .append(std::to_string(short_rf.m_freq))
+                  .append(", phase=")
+                  .append(std::to_string(short_rf.m_phase))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -711,6 +925,16 @@ void init_elements(py::module& m)
 
     py::class_<SoftSolenoid, elements::Thick, elements::Alignment> py_SoftSolenoid(me, "SoftSolenoid");
     py_SoftSolenoid
+        .def("__repr__",
+             [](SoftSolenoid const & soft_sol) {
+                 std::string r = "<impactx.elements.SoftSolenoid (ds=";
+                 r.append(std::to_string(soft_sol.ds()))
+                  .append(", bscale=")
+                  .append(std::to_string(soft_sol.m_bscale))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                  amrex::ParticleReal,
                  amrex::ParticleReal,
@@ -738,6 +962,16 @@ void init_elements(py::module& m)
 
     py::class_<Sol, elements::Thick, elements::Alignment> py_Sol(me, "Sol");
     py_Sol
+        .def("__repr__",
+             [](Sol const & soft_sol) {
+                 std::string r = "<impactx.elements.Sol (ds=";
+                 r.append(std::to_string(soft_sol.ds()))
+                  .append(", ks=")
+                  .append(std::to_string(soft_sol.m_ks))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -759,6 +993,16 @@ void init_elements(py::module& m)
 
     py::class_<PRot, elements::Thin> py_PRot(me, "PRot");
     py_PRot
+        .def("__repr__",
+             [](PRot const & prot) {
+                 std::string r = "<impactx.elements.PRot (phi_in=";
+                 r.append(std::to_string(prot.m_phi_in))
+                  .append(", phi_out=")
+                  .append(std::to_string(prot.m_phi_out))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal
@@ -772,6 +1016,16 @@ void init_elements(py::module& m)
 
     py::class_<SoftQuadrupole, elements::Thick, elements::Alignment> py_SoftQuadrupole(me, "SoftQuadrupole");
     py_SoftQuadrupole
+        .def("__repr__",
+             [](SoftQuadrupole const & soft_quad) {
+                 std::string r = "<impactx.elements.SoftQuadrupole (ds=";
+                 r.append(std::to_string(soft_quad.ds()))
+                  .append(", gscale=")
+                  .append(std::to_string(soft_quad.m_gscale))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                  amrex::ParticleReal,
                  amrex::ParticleReal,
@@ -799,6 +1053,16 @@ void init_elements(py::module& m)
 
     py::class_<ThinDipole, elements::Thin, elements::Alignment> py_ThinDipole(me, "ThinDipole");
     py_ThinDipole
+        .def("__repr__",
+             [](ThinDipole const & thin_dp) {
+                 std::string r = "<impactx.elements.ThinDipole (theta=";
+                 r.append(std::to_string(thin_dp.m_theta))
+                  .append(", rc=")
+                  .append(std::to_string(thin_dp.m_rc))
+                  .append(")>");
+                 return r;
+             }
+        )
         .def(py::init<
                 amrex::ParticleReal,
                 amrex::ParticleReal,

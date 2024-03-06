@@ -180,7 +180,6 @@ namespace impactx
             refpart.s = s + slice_ds;
         }
 
-    private:
         amrex::ParticleReal m_ks; //! solenoid strength in 1/m
     };
 

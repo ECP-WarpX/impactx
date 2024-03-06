@@ -116,7 +116,6 @@ namespace impactx
         /** This pushes the reference particle. */
         using Thin::operator();
 
-    private:
         amrex::ParticleReal m_psi; //! pole face angle in rad
         amrex::ParticleReal m_rc; //! bend radius in m
         amrex::ParticleReal m_g; //! gap parameter in m

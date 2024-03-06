@@ -183,7 +183,6 @@ namespace impactx
 
         }
 
-    private:
         amrex::ParticleReal m_rc; //! bend radius in m
     };
 

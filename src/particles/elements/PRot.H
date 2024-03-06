@@ -123,7 +123,6 @@ namespace impactx
         /** This pushes the reference particle. */
         using Thin::operator();
 
-    private:
         amrex::ParticleReal m_phi_in; //! normalized (max) RF voltage drop.
         amrex::ParticleReal m_phi_out; //! RF wavenumber in 1/m.
     };

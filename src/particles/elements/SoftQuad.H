@@ -484,7 +484,6 @@ namespace SoftQuadrupoleData
                 SoftQuadrupoleData::d_sin_coef.erase(m_id);
         }
 
-    private:
         amrex::ParticleReal m_gscale; //! scaling factor for quad field gradient
         int m_mapsteps; //! number of map integration steps per slice
         int m_id; //! unique soft quad id used for data lookup map

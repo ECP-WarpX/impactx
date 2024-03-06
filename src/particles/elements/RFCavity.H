@@ -532,7 +532,6 @@ namespace RFCavityData
                 RFCavityData::d_sin_coef.erase(m_id);
         }
 
-    private:
         amrex::ParticleReal m_escale; //! scaling factor for RF electric field
         amrex::ParticleReal m_freq; //! RF frequency in Hz
         amrex::ParticleReal m_phase; //! RF driven phase in deg
