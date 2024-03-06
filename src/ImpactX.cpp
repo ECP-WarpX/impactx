@@ -72,7 +72,11 @@ namespace impactx {
         init_warning_logger();
 
         // move old diagnostics out of the way
-        amrex::UtilCreateCleanDirectory("diags", true);
+        bool diag_enable = true;
+        amrex::ParmParse("diag").queryAdd("enable", diag_enable);
+        if (diag_enable) {
+            amrex::UtilCreateCleanDirectory("diags", true);
+        }
 
         // the particle container has been set to track the same Geometry as ImpactX
 
