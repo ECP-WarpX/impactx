@@ -176,6 +176,11 @@ General
       If set to ``1``, ImpactX immediately prints every warning message as soon as it is generated. (default: ``0`` for false)
       It is mainly intended for debug purposes, in case a simulation crashes before a global warning report can be printed.
 
+   .. py:property:: verbose
+
+      Controls how much information is printed to the terminal, when running ImpactX.
+      ``0`` for silent, higher is more verbose. Default is ``1``.
+
    .. py:method:: evolve()
 
       Run the main simulation loop for a number of steps.

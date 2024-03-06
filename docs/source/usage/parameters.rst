@@ -52,6 +52,10 @@ Overall simulation parameters
     It is mainly intended for debug purposes, and is best used with ``impactx.always_warn_immediately=1``.
     For more information on the warning logger, see `this section <https://warpx.readthedocs.io/en/latest/developers/warning_logger.html>`__ of the WarpX documentation.
 
+* ``impactx.verbose`` (int: ``0`` for silent, higher is more verbose; default is ``1``) optional
+    Controls how much information is printed to the terminal, when running ImpactX.
+
+
 .. _running-cpp-parameters-box:
 
 

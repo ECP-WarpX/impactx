@@ -23,7 +23,11 @@ namespace impactx
 {
 void ImpactX::init_warning_logger ()
 {
-    amrex::ParmParse const pp_impactx("impactx");
+    amrex::ParmParse pp_impactx("impactx");
+
+    // verbosity
+    int verbose = 1;
+    pp_impactx.queryAdd("verbose", verbose);
 
     // Set the flag to control if ImpactX has to emit a warning message
     // as soon as a warning is recorded
@@ -57,12 +61,21 @@ bool ImpactX::early_param_check ()
 {
     BL_PROFILE("ImpactX::early_param_check");
 
-    amrex::Print() << "\n";
+    // verbosity
+    amrex::ParmParse pp_impactx("impactx");
+    int verbose = 1;
+    pp_impactx.queryAdd("verbose", verbose);
+
+    if (verbose > 0) {
+        amrex::Print() << "\n";
+    }
     amrex::ParmParse::QueryUnusedInputs();
 
     // Print the warning list right after the first step.
-    amrex::Print() << ablastr::warn_manager::GetWMInstance()
-        .PrintGlobalWarnings("FIRST STEP");
+    if (verbose > 0) {
+        amrex::Print() << ablastr::warn_manager::GetWMInstance()
+                          .PrintGlobalWarnings("FIRST STEP");
+    }
 
     return true;
 }

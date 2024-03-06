@@ -362,6 +362,18 @@ void init_ImpactX (py::module& m)
             "if there are unused parameters in the input."
         )
 
+        .def_property("verbose",
+            [](ImpactX & /* ix */){
+                return detail::get_or_throw<int>("impactx", "verbose");
+            },
+            [](ImpactX & /* ix */, int const verbose) {
+                amrex::ParmParse pp_impactx("impactx");
+                pp_impactx.add("verbose", verbose);
+            },
+            "Controls how much information is printed to the terminal, when running ImpactX.\n"
+            "``0`` for silent, higher is more verbose. Default is ``1``."
+        )
+
         .def("finalize", &ImpactX::finalize,
              "Deallocate all contexts and data."
         )

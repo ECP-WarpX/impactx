@@ -18,8 +18,6 @@
 #include "particles/spacecharge/PoissonSolve.H"
 #include "particles/transformation/CoordinateTransformation.H"
 
-#include <ablastr/warn_manager/WarnManager.H>
-
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
 #include <AMReX_BLProfiler.H>
@@ -102,8 +100,15 @@ namespace impactx {
 
         // print AMReX grid summary
         if (amrex::ParallelDescriptor::IOProcessor()) {
-            std::cout << "\nGrids Summary:\n";
-            amr_data->printGridSummary(std::cout, 0, amr_data->finestLevel());
+            // verbosity
+            amrex::ParmParse pp_impactx("impactx");
+            int verbose = 1;
+            pp_impactx.queryAdd("verbose", verbose);
+
+            if (verbose > 0) {
+                std::cout << "\nGrids Summary:\n";
+                amr_data->printGridSummary(std::cout, 0, amr_data->finestLevel());
+            }
         }
 
         // keep track that init is done
@@ -116,6 +121,11 @@ namespace impactx {
 
         validate();
 
+        // verbosity
+        amrex::ParmParse pp_impactx("impactx");
+        int verbose = 1;
+        pp_impactx.queryAdd("verbose", verbose);
+
         // a global step for diagnostics including space charge slice steps in elements
         //   before we start the evolve loop, we are in "step 0" (initial state)
         int global_step = 0;
@@ -126,7 +136,9 @@ namespace impactx {
         amrex::ParmParse pp_diag("diag");
         bool diag_enable = true;
         pp_diag.queryAdd("enable", diag_enable);
-        amrex::Print() << " Diagnostics: " << diag_enable << "\n";
+        if (verbose > 0) {
+            amrex::Print() << " Diagnostics: " << diag_enable << "\n";
+        }
 
         int file_min_digits = 6;
         if (diag_enable)
@@ -155,7 +167,9 @@ namespace impactx {
         amrex::ParmParse pp_algo("algo");
         bool space_charge = false;
         pp_algo.query("space_charge", space_charge);
-        amrex::Print() << " Space Charge effects: " << space_charge << "\n";
+        if (verbose > 0) {
+            amrex::Print() << " Space Charge effects: " << space_charge << "\n";
+        }
 
         // periods through the lattice
         int periods = 1;
@@ -179,8 +193,10 @@ namespace impactx {
                 for (int slice_step = 0; slice_step < nslice; ++slice_step) {
                     BL_PROFILE("ImpactX::evolve::slice_step");
                     global_step++;
-                    amrex::Print() << " ++++ Starting global_step=" << global_step
-                                   << " slice_step=" << slice_step << "\n";
+                    if (verbose > 0) {
+                        amrex::Print() << " ++++ Starting global_step=" << global_step
+                                       << " slice_step=" << slice_step << "\n";
+                    }
 
                     // Space-charge calculation: turn off if there is only 1 particle
                     if (space_charge &&
@@ -241,7 +257,9 @@ namespace impactx {
                     collect_lost_particles(*amr_data->m_particle_container);
 
                     // just prints an empty newline at the end of the slice_step
-                    amrex::Print() << "\n";
+                    if (verbose > 0) {
+                        amrex::Print() << "\n";
+                    }
 
                     // slice-step diagnostics
                     bool slice_step_diagnostics = false;
@@ -311,6 +329,5 @@ namespace impactx {
                 element.finalize();
             }, element_variant);
         }
-
     }
 } // namespace impactx
