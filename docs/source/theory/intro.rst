@@ -102,10 +102,10 @@ Define a beam distribution function :math:`f` by:
 .. math::
 
    \begin{equation}
-       f(\zeta)=\kappa P(L^{-1)\zeta),\quad\quad \kappa=|\det L|^{-1}.
+       f(\zeta)=\kappa P(L^{-1}\zeta),\quad\quad \kappa=|\det L|^{-1}.
    \end{equation}
 
-Then :math:`f` has the desired covariance matrix :math:`\Sigma`.  Samples from :math:`f` are obtained by sampling from :math:`P` and performing the linear transformation :math:`\zeta\mapsto L\zeta'.
+Then :math:`f` has the desired covariance matrix :math:`\Sigma`.  Samples from :math:`f` are obtained by sampling from :math:`P` and performing the linear transformation :math:`\zeta\mapsto L\zeta`.
 
 Let :math:`P` above denote a 2D probability distribution that is radially symmetric, in the sense that:
 
@@ -152,6 +152,7 @@ The associated covariance matrix may be written explicitly in terms of the above
             \beta & -\alpha \\
            -\alpha & \gamma
         \end{pmatrix}.
+   \end{equation}
 
 Note:  In the special case that :math:`\mu_{qp}=0`, we have :math:`\lambda_q=\sigma_q` and :math:`\lambda_p=\sigma_p`.
 
