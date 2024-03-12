@@ -24,8 +24,8 @@ A schematic with more information can be seen in the figure below:
 
 The laser-plasma accelerator elements are modeled with neural networks as surrogates.
 These networks are trained beforehand.
-In this example, pre-trained neural networks are downloaded from `a Zenodo archive <https://zenodo.org/records/10368972>`__ and saved in the ``models`` directory. 
-For more about how these neural network surrogate models were created, 
+In this example, pre-trained neural networks are downloaded from `a Zenodo archive <https://zenodo.org/records/10368972>`__ and saved in the ``models`` directory.
+For more about how these neural network surrogate models were created,
 see this `description of a workflow for training neural networks from WarpX simulation data <https://warpx.readthedocs.io/en/latest/usage/workflows/ml_dataset_training.html>`__.
 
 We use a 1 GeV electron beam with initial normalized rms emittance of 1 mm-mrad.

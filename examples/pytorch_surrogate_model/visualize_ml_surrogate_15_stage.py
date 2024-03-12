@@ -301,7 +301,7 @@ parser.add_argument(
     "--num-stages", "-n", type=int, default=15, help="num stages to plot"
 )
 parser.add_argument(
-    "--stages_to_plot", "-s", type=int, help="num stages to plot", nargs='*'
+    "--stages_to_plot", "-s", type=int, help="num stages to plot", nargs="*"
 )
 args = parser.parse_args()
 
@@ -320,11 +320,11 @@ emit_nx = emit_x * beam_u
 emit_y = impactx_surrogate_reduced_diags["emittance_y"]
 emit_ny = emit_y * beam_u
 
-ix_slice = [0] + [2+9*i for i in range(args.num_stages)]
+ix_slice = [0] + [2 + 9 * i for i in range(args.num_stages)]
 
 ############# plot moments ##############
 fig, axT = plt.subplots(2, 2, figsize=(10, 8))
-ymarker = '^'
+ymarker = "^"
 ######### emittance ##########
 ax = axT[0][0]
 scale = 1e6
@@ -339,7 +339,7 @@ ax.plot(
     emit_ny[ix_slice] * scale,
     "r",
     marker=ymarker,
-    linestyle='None',
+    linestyle="None",
     label="y",
 )
 ax.legend()
@@ -370,7 +370,7 @@ ax.plot(
     impactx_surrogate_reduced_diags["sig_y"][ix_slice] * scale,
     "r",
     marker=ymarker,
-    linestyle='None',
+    linestyle="None",
     label="y",
 )
 ax.legend()
@@ -391,7 +391,7 @@ ax.semilogy(
     impactx_surrogate_reduced_diags["sig_py"][ix_slice] * scale,
     "r",
     marker=ymarker,
-    linestyle='None',
+    linestyle="None",
     label="y",
 )
 ax.legend()
@@ -457,7 +457,9 @@ else:
 if args.stages_to_plot is not None:
     for stage_i in args.stages_to_plot:
         step = ise[stage_i]
-        beam_at_step = beam_impactx_surrogate_series.iterations[step].particles["beam"].to_df()
+        beam_at_step = (
+            beam_impactx_surrogate_series.iterations[step].particles["beam"].to_df()
+        )
         ref_part_step = impactx_surrogate_ref_particle.loc[step]
         ref_u = np.sqrt(ref_part_step["pt"] ** 2 - 1)
         to_t(
@@ -470,7 +472,9 @@ if args.stages_to_plot is not None:
 
         t_offset = impactx_surrogate_ref_particle.loc[step, "t"] * micron
         fig, axT = plt.subplots(3, 3, figsize=(10, 8))
-        fig.suptitle(f"stage {stage_i}, ct={impactx_surrogate_ref_particle.at[step,'t']:.2f} m")
+        fig.suptitle(
+            f"stage {stage_i}, ct={impactx_surrogate_ref_particle.at[step,'t']:.2f} m"
+        )
 
         plot_beam_df(
             beam_at_step,
