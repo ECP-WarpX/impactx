@@ -74,12 +74,12 @@ The first option is to characterize the distribution via the intersections of th
 .. math::
 
    \begin{align}
-        \sigma_q &= \sqrt{\frac{\epsilon}{\gamma}} \\
-        \sigma_p &= \sqrt{\frac{\epsilon}{\beta}} \\
+        \lambda_q &= \sqrt{\frac{\epsilon}{\gamma}} \\
+        \lambda_p &= \sqrt{\frac{\epsilon}{\beta}} \\
         \mu_{qp} &= \frac{\alpha}{\sqrt{\beta \gamma}}
    \end{align}
 
-The units are :math:`[\sigma_q] = \mathrm{m}`, :math:`[\sigma_p] = \mathrm{rad}`, and :math:`[\mu_{qp}] = 1`.
+The units are :math:`[\lambda_q] = \mathrm{m}`, :math:`[\lambda_p] = \mathrm{rad}`, and :math:`[\mu_{qp}] = 1`.
 To convert between normalized and unnormalized emittance, use the relation :math:`\epsilon_\mathrm{n} = (\beta\gamma)_\mathrm{ref} \cdot \epsilon` which uses the momentum of the reference particle.
 **Attention**: Here, :math:`(\beta\gamma)_\mathrm{ref}` are the Lorentz variables for the reference particle momentum and not the Courant-Snyder parameters.
 

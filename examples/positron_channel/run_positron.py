@@ -31,12 +31,12 @@ ref.set_charge_qe(1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_M
 
 #   particle bunch
 distr = distribution.Triangle(
-    sigmaX=5.054566450e-6,
-    sigmaY=5.054566450e-6,
-    sigmaT=8.43732950e-7,
-    sigmaPx=1.01091329e-7,
-    sigmaPy=1.01091329e-7,
-    sigmaPt=1.0e-2,
+    lambdaX=5.054566450e-6,
+    lambdaY=5.054566450e-6,
+    lambdaT=8.43732950e-7,
+    lambdaPx=1.01091329e-7,
+    lambdaPy=1.01091329e-7,
+    lambdaPt=1.0e-2,
     muxpx=0.0,
     muypy=0.0,
     mutpt=0.995037190209989,

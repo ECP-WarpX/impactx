@@ -30,12 +30,12 @@ ref = sim.particle_container().ref_particle().load_file("chicane.madx")
 
 #   particle bunch
 distr = distribution.Waterbag(
-    sigmaX=2.2951017632e-5,
-    sigmaY=1.3084093142e-5,
-    sigmaT=5.5555553e-8,
-    sigmaPx=1.598353425e-6,
-    sigmaPy=2.803697378e-6,
-    sigmaPt=2.000000000e-6,
+    lambdaX=2.2951017632e-5,
+    lambdaY=1.3084093142e-5,
+    lambdaT=5.5555553e-8,
+    lambdaPx=1.598353425e-6,
+    lambdaPy=2.803697378e-6,
+    lambdaPt=2.000000000e-6,
     muxpx=0.933345606203060,
     muypy=0.933345606203060,
     mutpt=0.999999961419755,

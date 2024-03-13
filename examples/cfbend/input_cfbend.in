@@ -7,12 +7,12 @@ beam.kin_energy = 2.0e3  #2 GeV
 beam.charge = 1.0e-9
 beam.particle = electron
 beam.distribution = waterbag
-beam.sigmaX = 5.0e-6  #5 um
-beam.sigmaY = 8.0e-6  #8 um
-beam.sigmaT = 0.0599584916  #200 ps
-beam.sigmaPx = 2.5543422003e-9 #exn = 50 pm-rad
-beam.sigmaPy = 1.5964638752e-9 #eyn = 50 pm-rad
-beam.sigmaPt = 9.0e-4  #approximately dE/E
+beam.lambdaX = 5.0e-6  #5 um
+beam.lambdaY = 8.0e-6  #8 um
+beam.lambdaT = 0.0599584916  #200 ps
+beam.lambdaPx = 2.5543422003e-9 #exn = 50 pm-rad
+beam.lambdaPy = 1.5964638752e-9 #eyn = 50 pm-rad
+beam.lambdaPt = 9.0e-4  #approximately dE/E
 beam.muxpx = 0.0
 beam.muypy = 0.0
 beam.mutpt = 0.0

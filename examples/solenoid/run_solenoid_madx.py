@@ -30,12 +30,12 @@ ref = sim.particle_container().ref_particle().load_file("solenoid.madx")
 
 #   particle bunch
 distr = distribution.Waterbag(
-    sigmaX=1.559531175539e-3,
-    sigmaY=2.205510139392e-3,
-    sigmaT=1.0e-3,
-    sigmaPx=6.41218345413e-4,
-    sigmaPy=9.06819680526e-4,
-    sigmaPt=1.0e-3,
+    lambdaX=1.559531175539e-3,
+    lambdaY=2.205510139392e-3,
+    lambdaT=1.0e-3,
+    lambdaPx=6.41218345413e-4,
+    lambdaPy=9.06819680526e-4,
+    lambdaPt=1.0e-3,
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 

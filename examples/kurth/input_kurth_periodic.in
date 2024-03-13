@@ -7,12 +7,12 @@ beam.kin_energy = 2.0e3
 beam.charge = 1.0e-8
 beam.particle = proton
 beam.distribution = kurth6d
-beam.sigmaX = 1.11e-3
-beam.sigmaY = 1.11e-3
-beam.sigmaT = 3.74036839224568e-4
-beam.sigmaPx = 9.00900900901e-4
-beam.sigmaPy = 9.00900900901e-4
-beam.sigmaPt = 2.6735334467940146e-3
+beam.lambdaX = 1.11e-3
+beam.lambdaY = 1.11e-3
+beam.lambdaT = 3.74036839224568e-4
+beam.lambdaPx = 9.00900900901e-4
+beam.lambdaPy = 9.00900900901e-4
+beam.lambdaPt = 2.6735334467940146e-3
 
 
 ###############################################################################

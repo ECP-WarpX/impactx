@@ -148,12 +148,12 @@ Initial Beam Distributions
 
     * Parameters that describe the phase space ellipse and position-momentum correlations:
 
-        * ``beam.sigmaX`` (``float``, in meters) phase space ellipse intersection with X
-        * ``beam.sigmaY`` (``float``, in meters) phase space ellipse intersection with Y
-        * ``beam.sigmaT`` (``float``, in meters) phase space ellipse intersection with T, normalized by multiplying with the speed of light *c*
-        * ``beam.sigmaPx`` (``float``, in radians) phase space ellipse intersection with Px
-        * ``beam.sigmaPy`` (``float``, in radians) phase space ellipse intersection with Py
-        * ``beam.sigmaPt`` (``float``, in radians) phase space ellipse intersection with Pt
+        * ``beam.lambdaX`` (``float``, in meters) phase space ellipse intersection with X
+        * ``beam.lambdaY`` (``float``, in meters) phase space ellipse intersection with Y
+        * ``beam.lambdaT`` (``float``, in meters) phase space ellipse intersection with T, normalized by multiplying with the speed of light *c*
+        * ``beam.lambdaPx`` (``float``, in radians) phase space ellipse intersection with Px
+        * ``beam.lambdaPy`` (``float``, in radians) phase space ellipse intersection with Py
+        * ``beam.lambdaPt`` (``float``, in radians) phase space ellipse intersection with Pt
         * ``beam.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
         * ``beam.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``beam.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt

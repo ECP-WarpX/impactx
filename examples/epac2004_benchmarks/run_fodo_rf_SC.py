@@ -34,12 +34,12 @@ ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_kin_energy_MeV(kin_energy_
 
 #   particle bunch
 distr = distribution.Kurth6D(
-    sigmaX=9.84722273e-4,
-    sigmaY=6.96967278e-4,
-    sigmaT=4.486799242214e-03,
-    sigmaPx=0.0,
-    sigmaPy=0.0,
-    sigmaPt=0.0,
+    lambdaX=9.84722273e-4,
+    lambdaY=6.96967278e-4,
+    lambdaT=4.486799242214e-03,
+    lambdaPx=0.0,
+    lambdaPy=0.0,
+    lambdaPt=0.0,
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 
