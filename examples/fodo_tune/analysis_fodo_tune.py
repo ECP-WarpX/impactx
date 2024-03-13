@@ -5,9 +5,9 @@
 # License: BSD-3-Clause-LBNL
 #
 
-import PyNAFF as pnf
 import numpy as np
 import openpmd_api as io
+import PyNAFF as pnf
 
 # Collect beam data series
 series = io.Series("diags/openPMD/monitor.h5", io.Access.read_only)

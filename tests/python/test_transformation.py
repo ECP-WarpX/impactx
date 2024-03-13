@@ -8,13 +8,7 @@
 
 import numpy as np
 import pytest
-
-from impactx import (
-    CoordSystem,
-    ImpactX,
-    coordinate_transformation,
-    distribution,
-)
+from impactx import CoordSystem, ImpactX, coordinate_transformation, distribution
 
 
 def test_transformation():

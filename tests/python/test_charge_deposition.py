@@ -10,12 +10,11 @@
 
 import math
 
-from conftest import basepath
-import matplotlib.pyplot as plt
-import numpy as np
-
 import amrex.space3d as amr
 import impactx
+import matplotlib.pyplot as plt
+import numpy as np
+from conftest import basepath
 
 
 def test_charge_deposition(save_png=True):
