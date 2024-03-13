@@ -10,10 +10,10 @@ import argparse
 import glob
 import re
 
-from matplotlib import pyplot as plt
 import numpy as np
 import openpmd_api as io
 import pandas as pd
+from matplotlib import pyplot as plt
 from scipy.constants import c, e, m_e
 
 

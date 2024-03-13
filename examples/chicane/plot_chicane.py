@@ -10,9 +10,9 @@ import glob
 import re
 
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
 import openpmd_api as io
 import pandas as pd
+from matplotlib.ticker import MaxNLocator
 from scipy.stats import moment
 
 
