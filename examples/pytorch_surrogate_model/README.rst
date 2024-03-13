@@ -17,7 +17,7 @@ For more details, see:
 
 A schematic with more information can be seen in the figure below:
 
-.. figure:: https://user-images.githubusercontent.com/10621396/289956389-c7463b99-fb56-490a-8511-22c43f45cdf8.png
+.. figure:: https://private-user-images.githubusercontent.com/10621396/312266448-a51613b6-7ea0-4f5f-b555-66b3db39fefa.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MTAyOTk4ODAsIm5iZiI6MTcxMDI5OTU4MCwicGF0aCI6Ii8xMDYyMTM5Ni8zMTIyNjY0NDgtYTUxNjEzYjYtN2VhMC00ZjVmLWI1NTUtNjZiM2RiMzlmZWZhLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDAzMTMlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQwMzEzVDAzMTMwMFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTZjYmMzNjBlNmUzZDllZjNmODE5YTE0YjU4NzIzNmU5NGQ2YWUxNzEwNWVjOWNlOTY3YzdiNDNkMmI4MmRhMmQmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.lBZTlJNHpCaL8unPe4Hb_DjG25RMlnCUWztv68EqdQs
    :alt: [fig:lpa_schematic] Schematic of the 15 stages of laser-plasma accelerators.
 
    [fig:lpa_schematic] Schematic of the 15 stages of laser-plasma accelerators.
