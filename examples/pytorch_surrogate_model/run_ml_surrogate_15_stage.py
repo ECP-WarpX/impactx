@@ -189,7 +189,7 @@ class LPASurrogateStage(elements.Programmable):
         for lvl in range(pc.finest_level+1):
             for pti in ImpactXParIter(pc, level=lvl):
                 soa = pti.soa()
-                real_arrays = soa.GetRealData()
+                real_arrays = soa.get_real_data()
                 x = array(real_arrays[0], copy=False)
                 y = array(real_arrays[1], copy=False)
                 t = array(real_arrays[2], copy=False)

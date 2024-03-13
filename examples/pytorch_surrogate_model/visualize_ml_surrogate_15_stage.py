@@ -456,7 +456,6 @@ else:
 ####### final ###########
 if args.stages_to_plot is not None:
     for stage_i in args.stages_to_plot:
-    # stage_i = 8
         step = ise[stage_i]
         beam_at_step = beam_impactx_surrogate_series.iterations[step].particles["beam"].to_df()
         ref_part_step = impactx_surrogate_ref_particle.loc[step]
