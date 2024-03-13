@@ -1,31 +1,33 @@
 #!/usr/bin/env python3
 #
-# Copyright 2022-2023 ImpactX contributors
-# Authors: Axel Huebl, Chad Mitchell
+# Copyright 2022-2023 The ImpactX Community
+#
+# Authors: Axel Huebl
 # License: BSD-3-Clause-LBNL
 #
 # -*- coding: utf-8 -*-
 
+import importlib
+
 import amrex.space3d as amr
 import impactx
 import numpy as np
+import pytest
 from impactx import ImpactX, distribution, elements
-from scipy.optimize import minimize
 
-# Call MPI_Init and MPI_Finalize only once:
-if impactx.Config.have_mpi:
-    from mpi4py import MPI  # noqa
-
-verbose = False
+# configure the test
+verbose = True
+gen_name = "Nelder-Mead"  # TuRBO or Nelder-Mead
+max_steps = 60
 
 
-def build_lattice(parameters: tuple, write_particles: bool) -> list:
+def build_lattice(parameters: dict, write_particles: bool) -> list:
     """
     Create the quadrupole triplet.
 
     Parameters
     ----------
-    parameters: tuple
+    parameters: dict
       quadrupole strengths k of quad 1/3 and quad 2.
 
     write_particles: bool
@@ -36,7 +38,7 @@ def build_lattice(parameters: tuple, write_particles: bool) -> list:
     -------
     A lattice for ImpactX: a list of impactx.elements.
     """
-    q1_k, q2_k = parameters
+    q1_k, q2_k = parameters["q1_k"], parameters["q2_k"]
 
     ns = 10  # number of slices per ds in the element
 
@@ -58,13 +60,13 @@ def build_lattice(parameters: tuple, write_particles: bool) -> list:
     return line
 
 
-def run(parameters: tuple, write_particles=False, write_reduced=False) -> dict:
+def run(parameters: dict, write_particles=False, write_reduced=False) -> dict:
     """
     Run an ImpactX simulation with a new set of lattice parameters.
 
     Parameters
     ----------
-    parameters: tuple
+    parameters: dict
       quadrupole strengths k of quad 1/3 and quad 2.
 
     write_particles: bool
@@ -84,8 +86,7 @@ def run(parameters: tuple, write_particles=False, write_reduced=False) -> dict:
 
     sim = ImpactX()
 
-    if verbose is False:
-        sim.verbose = 0
+    sim.verbose = 0
 
     # set numerical parameters and IO control
     sim.particle_shape = 2  # B-spline order
@@ -136,13 +137,13 @@ def run(parameters: tuple, write_particles=False, write_reduced=False) -> dict:
     return rbc
 
 
-def objective(parameters: tuple) -> float:
+def objective(parameters: dict) -> dict:
     """
     A function that is evaluated by the optimizer.
 
     Parameters
     ----------
-    parameters: tuple
+    parameters: dict
       quadrupole strengths k of quad 1/3 and quad 2.
 
     Returns
@@ -161,7 +162,9 @@ def objective(parameters: tuple) -> float:
         rbc["beta_y"],
     )
     if verbose:
-        print(f"alpha_x={alpha_x}, alpha_y={alpha_y}, beta_x={beta_x}, beta_y={beta_y}")
+        print(
+            f"  -> alpha_x={alpha_x}, alpha_y={alpha_y}, beta_x={beta_x}, beta_y={beta_y}"
+        )
     alpha_beta_is = np.array([alpha_x, alpha_y, beta_x, beta_y])
 
     beta_x_goal = 0.55
@@ -170,47 +173,89 @@ def objective(parameters: tuple) -> float:
 
     error = np.sum((alpha_beta_is - alpha_beta_goal) ** 2)
 
-    if np.isnan(error):
-        error = 1.0e99
+    # xopt will ignore NaN results, no cleaning needed
+    rbc["error"] = error
 
-    return error
+    return rbc
 
 
-if __name__ == "__main__":
-    # Initial guess for the quadrople strengths
-    initial_quad_strengths = np.array([-3, 3])
+@pytest.mark.skipif(
+    importlib.util.find_spec("xopt") is None, reason="xopt is not available"
+)
+def test_xopt():
+    from xopt import Xopt
+    from xopt.evaluator import Evaluator
+    from xopt.vocs import VOCS
+
+    if gen_name == "TuRBO":
+        from xopt.generators.bayesian import UpperConfidenceBoundGenerator as Generator
+
+        gen_args = {"turbo_controller": "optimize"}
+    elif gen_name == "Nelder-Mead":
+        from xopt.generators.scipy.neldermead import NelderMeadGenerator as Generator
+
+        gen_args = {}
+    else:
+        raise RuntimeError(f"Unconfigured generator named '{gen_name}'")
 
     # Bounds for values to test: (min, max)
-    positive = (0, None)
-    negative = (None, 0)
-    bounds = [negative, positive]
+    positive = [0, 10]
+    negative = [-10, 0]
 
-    # optimizer specific values
-    # https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html
-    options = {
-        "maxiter": 1000,
-    }
-
-    # Call the optimizer
-    res = minimize(
-        objective,
-        initial_quad_strengths,
-        method="L-BFGS-B",
-        tol=1.0e-8,
-        options=options,
-        bounds=bounds,
+    # define variables and function objectives
+    vocs = VOCS(
+        variables={
+            "q1_k": negative,
+            "q2_k": positive,
+        },
+        objectives={"error": "MINIMIZE"},
     )
 
+    # create Xopt evaluator, generator, and Xopt objects
+    evaluator = Evaluator(function=objective)
+    generator = Generator(vocs=vocs, **gen_args)
+    X = Xopt(evaluator=evaluator, generator=generator, vocs=vocs)
+
+    # Initial guess for the quadrople strengths
+    initial_quad_strengths = {
+        "q1_k": np.array([-3]),
+        "q2_k": np.array([3]),
+    }
+    if gen_name == "TuRBO":
+        # a few random guesses
+        # X.random_evaluate(3)
+        # a few somewhat educated guesses
+        X.evaluate_data(initial_quad_strengths)
+    elif gen_name == "Nelder-Mead":
+        # a few somewhat educated guesses
+        X.generator.initial_point = initial_quad_strengths
+
+    # run optimization for 60 steps (iterations)
+    for i in range(max_steps):
+        X.step()
+
+    # Print all trials
+    if verbose:
+        print(X.data)
+
+        # plot
+        # X.vocs.normalize_inputs(X.data).plot(*X.vocs.variable_names, kind="scatter")
+
+    # Select the best result
+    best_idx, best_error = X.vocs.select_best(X.data)
+    best_run = X.data.iloc[best_idx]
+    best_ks = best_run[["q1_k", "q2_k"]].to_dict(orient="index")[best_idx[0]]
+
     # Print the optimization result
-    print("Optimal parameters for k:", res.x)
-    print("L2 norm of alpha & beta at the optimum:", res.fun)
+    print("Optimal parameters for k:", best_ks)
+    print("L2 norm of alpha & beta at the optimum:", best_run["error"].values[0])
 
     # analytical result:
     #   k: -3.5, 2.75
     #   alpha & beta: 0, 0, 0.55, 0.55
 
-    # final run
-    rbc = run(res.x, write_particles=True, write_reduced=True)
+    # final run w/ detailed I/O on
+    rbc = run(best_ks, write_particles=True, write_reduced=True)
     alpha_x, alpha_y, beta_x, beta_y = (
         rbc["alpha_x"],
         rbc["alpha_y"],
@@ -218,3 +263,11 @@ if __name__ == "__main__":
         rbc["beta_y"],
     )
     print(f"alpha_x={alpha_x} alpha_y={alpha_y}\n beta_x={beta_x}     beta_y={beta_y}")
+
+
+if __name__ == "__main__":
+    # Call MPI_Init and MPI_Finalize only once:
+    if impactx.Config.have_mpi:
+        from mpi4py import MPI  # noqa
+
+    test_xopt()
