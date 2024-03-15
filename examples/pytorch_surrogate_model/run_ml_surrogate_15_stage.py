@@ -16,13 +16,10 @@ try:
     cupy_available = True
 except ImportError:
     cupy_available = False
-from enum import Enum
 import sys
 
 import numpy as np
 import scipy.optimize as opt
-from surrogate_model_definitions import surrogate_model
-
 from impactx import (
     Config,
     CoordSystem,
@@ -32,14 +29,15 @@ from impactx import (
     distribution,
     elements,
 )
+from surrogate_model_definitions import surrogate_model
 
 try:
     import torch
 except ImportError:
     print("Warning: Cannot import PyTorch. Skipping test.")
     sys.exit(0)
-from urllib import request
 import zipfile
+from urllib import request
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
