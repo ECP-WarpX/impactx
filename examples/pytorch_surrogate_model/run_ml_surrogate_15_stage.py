@@ -236,7 +236,6 @@ class LPASurrogateStage(elements.Programmable):
         ref_part.y = ref_part_final[1]
         ref_part.z = ref_part_final[2]
         ref_gamma = torch.sqrt(1 + ref_beta_gamma_final**2)
-        ref_beta = ref_beta_gamma_final / ref_gamma
         ref_part.px = ref_part_final[3]
         ref_part.py = ref_part_final[4]
         ref_part.pz = ref_part_final[5]
@@ -263,21 +262,21 @@ L_drift_before_2nd_stage = abs(ebeam_lpa_z0)
 L_drift_2 = L_drift - L_drift_before_2nd_stage + dL
 
 
-def get_lattice_element_iter(j):
+def get_lattice_element_iter(sim, j):
     assert (
         0 <= j < len(sim.lattice)
     ), f"Argument j must be a nonnegative integer satisfying 0 <= j < {len(sim.lattice)}, not {j}"
     i = 0
     lat_it = sim.lattice.__iter__()
-    el = next(lat_it)
+    next(lat_it)
     while i != j:
-        el = next(lat_it)
+        next(lat_it)
         i += 1
     return lat_it
 
 
-def lens_eqn(k, l, alpha, beta, gamma):
-    return np.tan(k * l) + 2 * alpha / (k * beta - gamma / k)
+def lens_eqn(k, lens_length, alpha, beta, gamma):
+    return np.tan(k * lens_length) + 2 * alpha / (k * beta - gamma / k)
 
 
 k_list = []
@@ -297,10 +296,9 @@ class UpdateConstF(elements.Programmable):
         alpha = rbc[f"alpha_{self.x_or_y}"]
         beta = rbc[f"beta_{self.x_or_y}"]
         gamma = (1 + alpha**2) / beta
-        l = L_lens
         # solve for k_new
         sol = opt.root_scalar(
-            lens_eqn, bracket=[100, 300], args=(l, alpha, beta, gamma)
+            lens_eqn, bracket=[100, 300], args=(L_lens, alpha, beta, gamma)
         )
         k_new = sol.root
         # set lens

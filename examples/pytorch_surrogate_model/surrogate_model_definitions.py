@@ -34,11 +34,11 @@ def get_enum_type(type_to_test, EnumClass):
     EnumClass: Enum class
         Enum class to test
     """
-    if type(type_to_test) is EnumClass:  ## Useful ?
+    if isinstance(type_to_test, EnumClass):  ## Useful ?
         return type_to_test
-    if type(type_to_test) is int:
+    if isinstance(type_to_test, int):
         return EnumClass(type_to_test)
-    if type(type_to_test) is str:
+    if isinstance(type_to_test, str):
         return getattr(EnumClass, type_to_test)
 
 
