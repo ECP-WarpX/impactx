@@ -302,7 +302,7 @@ class UpdateConstF(elements.Programmable):
         )
         k_new = sol.root
         # set lens
-        self_it = get_lattice_element_iter(self.lattice_index)
+        self_it = get_lattice_element_iter(sim, self.lattice_index)
         following_lens = next(self_it)
         k_list.append(k_new)
         following_lens.kx = k_new
