@@ -333,7 +333,9 @@ for i in range(N_stage):
                 monitor,
                 elements.Drift(ds=L_drift_1),
                 monitor,
-                UpdateConstF(sim=sim, stage_i=i, lattice_index=5 + 9 * i, x_or_y=tune_by_x_or_y),
+                UpdateConstF(
+                    sim=sim, stage_i=i, lattice_index=5 + 9 * i, x_or_y=tune_by_x_or_y
+                ),
                 elements.ConstF(ds=L_lens, kx=K, ky=K, kt=Kt),
                 monitor,
                 elements.Drift(ds=L_drift_2),
