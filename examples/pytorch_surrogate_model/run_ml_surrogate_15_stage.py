@@ -283,14 +283,16 @@ k_list = []
 
 
 class UpdateConstF(elements.Programmable):
-    def __init__(self, stage_i, lattice_index, x_or_y):
+    def __init__(self, sim, stage_i, lattice_index, x_or_y):
         elements.Programmable.__init__(self)
+        self.sim = sim
         self.stage_i = stage_i
         self.lattice_index = lattice_index
         self.x_or_y = x_or_y
         self.push = self.set_lens
 
-    def set_lens(self, pc, step):
+    def set_lens(self, step):
+        pc = self.sim.particle_container()
         # get envelope parameters
         rbc = pc.reduced_beam_characteristics()
         alpha = rbc[f"alpha_{self.x_or_y}"]
@@ -331,7 +333,7 @@ for i in range(N_stage):
                 monitor,
                 elements.Drift(ds=L_drift_1),
                 monitor,
-                UpdateConstF(stage_i=i, lattice_index=5 + 9 * i, x_or_y=tune_by_x_or_y),
+                UpdateConstF(sim=sim, stage_i=i, lattice_index=5 + 9 * i, x_or_y=tune_by_x_or_y),
                 elements.ConstF(ds=L_lens, kx=K, ky=K, kt=Kt),
                 monitor,
                 elements.Drift(ds=L_drift_2),
