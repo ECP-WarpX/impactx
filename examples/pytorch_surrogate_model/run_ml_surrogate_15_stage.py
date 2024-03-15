@@ -101,20 +101,7 @@ model_list = [
     for stage_i in range(N_stage)
 ]
 
-
-class RefSet(Enum):
-    BySim = 1
-    ByModel = 2
-    ByCentroid = 3
-    UzBySimRestOnAxis = 5
-    UzByCentroidRestOnAxis = 5
-    UzByModelRestOnAxis = 6
-
-
-ref_part_set_method = RefSet.UzByModelRestOnAxis
-
 pp_amrex = amr.ParmParse("amrex")
-# pp_amrex.add("the_arena_is_managed", 1)
 pp_amrex.add("the_arena_init_size", 0)
 pp_amrex.add("the_device_arena_init_size", 0)
 
