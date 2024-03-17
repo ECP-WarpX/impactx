@@ -15,7 +15,7 @@ jobs:
       CXXFLAGS: "-Werror -Wno-error=pass-failed"
       HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: TRUE
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: install dependencies
       run: |
         set +e

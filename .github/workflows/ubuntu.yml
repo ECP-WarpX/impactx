@@ -16,7 +16,7 @@ jobs:
       CXXFLAGS: "-Werror"
       OMP_NUM_THREADS: 2
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: install dependencies
       run: |
@@ -84,7 +84,7 @@ jobs:
       CXXFLAGS: "-Werror"
       OMP_NUM_THREADS: 2
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: install dependencies
       run: |
