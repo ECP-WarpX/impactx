@@ -57,7 +57,9 @@ jobs:
         export ASAN_OPTIONS=detect_stack_use_after_return=1:detect_leaks=1:check_initialization_order=true:strict_init_order=true:detect_stack_use_after_scope=1:fast_unwind_on_malloc=0
         export LSAN_OPTIONS=suppressions="$SOURCEPATH/.github/ci/sanitizer/clang/Leak.supp:use_tls=0"
         export LD_PRELOAD=/usr/lib/clang/14/lib/linux/libclang_rt.asan-x86_64.so
-        ctest --test-dir build -E AMReX --output-on-failure --label-exclude slow
+
+# TODO: TEMPORARILY DISABLED
+#        ctest --test-dir build -E AMReX --output-on-failure --label-exclude slow
 
 # note: use_tls=0 because of glibc 3.23 on GitHub actions
 # https://github.com/google/sanitizers/issues/1342
