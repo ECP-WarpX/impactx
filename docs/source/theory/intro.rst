@@ -115,6 +115,8 @@ Let :math:`P` above denote a 2D probability distribution that is radially symmet
         P(\zeta)=G(||\zeta||^2)=G(q^2+p^2),\quad\quad \zeta=(q,p)
    \end{equation}
 
+Here :math:`q` denotes a position coordinate (e.g., :math:`x`, :math:`y`, or :math:`t`) and :math:`p` denotes the corresponding conjugate momentum.
+
 Then the resulting distribution :math:`f` has 2D elliptical symmetry, in the sense that:
 
 .. math::
