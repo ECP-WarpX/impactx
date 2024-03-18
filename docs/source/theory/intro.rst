@@ -106,7 +106,7 @@ Define a beam distribution function :math:`f` by:
 .. math::
 
    \begin{equation}
-       f(\zeta)=\kappa P(L^{-1}\zeta),\quad\quad \kappa=|\det L|^{-1}.
+       f(\zeta)=\kappa P(L^{-1}\zeta),\quad\text{ where }\quad \kappa=|\det L|^{-1}.
    \end{equation}
 
 Then :math:`f` has the desired covariance matrix :math:`\Sigma`.  Samples from :math:`f` are obtained by sampling from :math:`P` and performing the linear transformation :math:`\zeta\mapsto L\zeta`.
