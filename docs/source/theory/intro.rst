@@ -94,8 +94,10 @@ Let :math:`P` denote a phase space probability density with unit covariance matr
 .. math::
 
    \begin{equation}
-        \Sigma = LL^T.
+        \Sigma = LL^T,
    \end{equation}
+
+where :math:`L` is a lower triangular matrix.
 
 Define a beam distribution function :math:`f` by:
 
