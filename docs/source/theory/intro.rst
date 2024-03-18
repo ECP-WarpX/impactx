@@ -89,7 +89,7 @@ Recall the Courant-Snyder relation :math:`\gamma\beta - \alpha^2 = 1` for conver
 Distribution Sampling and the Covariance Matrix
 -----------------------------------------------
 
-In Impact-X, beam sampling is performed under the assumption that the initial beam distribution has a centroid (mean phase space vector) that coincides with the phase space origin.  The covariance matrix :math:`\Sigma` is defined by :math:`\Sigma_{ij}=\langle{\zeta_i\zeta_j\rangle}`, where :math:`\zeta` denotes the vector of phase space coordinates.
+In Impact-X, beam sampling is performed under the assumption that the initial beam distribution centroid (mean phase space vector) coincides with the phase space origin.  The covariance matrix :math:`\Sigma` is defined by :math:`\Sigma_{ij}=\langle{\zeta_i\zeta_j\rangle}`, where :math:`\zeta` denotes the vector of phase space coordinates, and indices :math:`i,j` specify the components of :math:`\zeta`.
 
 Let :math:`P` denote a phase space probability density with unit covariance matrix (i.e., equal to the identity matrix).  To produce a phase space density with a target covariance matrix :math:`\Sigma`, we write :math:`\Sigma` in terms of its (lower) Cholesky decomposition as:
 
@@ -106,7 +106,7 @@ Define a beam distribution function :math:`f` by:
 .. math::
 
    \begin{equation}
-       f(\zeta)=\kappa P(L^{-1}\zeta),\quad\text{ where }\quad \kappa=|\det L|^{-1}.
+       f(\zeta)=\kappa P(L^{-1}\zeta),\quad\text{where}\quad \kappa=|\det L|^{-1}.
    \end{equation}
 
 Then :math:`f` has the desired covariance matrix :math:`\Sigma`.  Samples from :math:`f` are obtained by sampling from :math:`P` and performing the linear transformation :math:`\zeta\mapsto L\zeta`.
