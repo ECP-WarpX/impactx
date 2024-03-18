@@ -154,7 +154,7 @@ The associated covariance matrix may be written explicitly in terms of the above
         \end{pmatrix}.
    \end{equation}
 
-Note:  In the special case that :math:`\mu_{qp}=0`, we have :math:`\lambda_q=\sigma_q` and :math:`\lambda_p=\sigma_p`.
+Note:  In the special case that :math:`\mu_{qp}=0`, we have :math:`\lambda_q=\sigma_q` and :math:`\lambda_p=\sigma_p`, where :math:`\sigma_q=\langle{q^2\rangle}^{1/2}` and :math:`\sigma_p=\langle{p^2\rangle}^{1/2}`.
 
 
 Assumptions
