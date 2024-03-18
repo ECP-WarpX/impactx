@@ -131,6 +131,8 @@ The argument of :math:`G` is a quadratic form in :math:`(q,p)`, and it is conven
         \zeta^TS\zeta = \frac{q^2}{\lambda_q^2} + 2\mu_{qp}\frac{qp}{\lambda_q\lambda_p}+\frac{p^2}{\lambda_p^2}=\frac{1}{\epsilon}\left(\gamma q^2+2\alpha qp + \beta p^2\right).
    \end{equation}
 
+Here :math:`\alpha`, :math:`\beta`, and :math:`\gamma` denote the Courant-Snyder Twiss functions, and :math:`\epsilon` denotes the rms (unnormalized) emittance.
+
 The associated covariance matrix may be written explicitly in terms of the above parameters as:
 
 .. math::
