@@ -4,22 +4,22 @@ Initialize a beam from arrays
 =============================
 
 This example demonstrates how a beam can be initalized in ImpactX from array-like structures.
-This allows various applications of interest, 
-such as using a beam from a different simulation, 
+This allows various applications of interest,
+such as using a beam from a different simulation,
 initializing a beam from file,
 or creating a custom distribution.
 This example includes a set of utilities for transforming the beam to the fixed-s coordinates of ImpactX.
 
-In this example, a custom beam is specified at fixed t, transformed to fixed s, and 
-then loaded in ImpactX. The custom beam is a ring in x-y, 
-with radius r=2 mm, 
+In this example, a custom beam is specified at fixed t, transformed to fixed s, and
+then loaded in ImpactX. The custom beam is a ring in x-y,
+with radius r=2 mm,
 radial width :math:`\sigma_r = 5\ \mu`m;
 Gaussian in :math:`p_x` and :math:`p_y` with momentum width :math:`\sigma_p=10`;
 and chirped in z-pz with bunch length :math:`\sigma_z=1` mm,
 mean energy about 10 GeV, 1% uncorrelated energy spread, and z-pz covariance of -0.18.
 
 The transformation utility function reproduces the t-to-s and s-to-t transformations
-done internally in ImpactX.  
+done internally in ImpactX.
 These utility functions are provided in the following script:
 
 .. dropdown:: Script ``transformation_utilities.py``
