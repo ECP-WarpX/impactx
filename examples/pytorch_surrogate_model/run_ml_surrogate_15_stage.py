@@ -80,7 +80,6 @@ ebeam_lpa_z0 = -107e-6
 L_plasma = 0.28
 L_transport = 0.03
 L_stage_period = L_plasma + L_transport
-ebeam_lpa_z0 = -107e-6
 drift_after_LPA = 43e-6
 L_surrogate = abs(ebeam_lpa_z0) + L_plasma + drift_after_LPA
 
