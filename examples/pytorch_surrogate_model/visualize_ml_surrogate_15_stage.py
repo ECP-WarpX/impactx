@@ -80,34 +80,28 @@ def to_t(
     coord_type: TCoords enum, (default is in ref coordinates) whether to get particle data relative to reference coordinate or in the global frame
     """
     if type(data_arr_s) is pd.core.frame.DataFrame:
-        coordinate_columns = [
-            "position_x",
-            "position_y",
-            "position_t",
-            "momentum_x",
-            "momentum_y",
-            "momentum_t",
-        ]
-        assert all(
-            val in data_arr_s.columns for val in coordinate_columns
-        ), f"data_arr_s must have columns {' '.join(coordinate_columns)}"
-        x, y, t, dpx, dpy, dpt = data_arr_s[coordinate_columns].to_numpy().T
+        dx = data_arr_s["position_x"]
+        dy = data_arr_s["position_y"]
+        dt = data_arr_s["position_t"]
+        dpx = data_arr_s["momentum_x"]
+        dpy = data_arr_s["momentum_y"]
+        dpt = data_arr_s["momentum_t"]
 
     elif type(data_arr_s) is np.ndarray:
         assert (
             data_arr_s.shape[1] == 6
         ), f"data_arr_s.shape={data_arr_s.shape} but data_arr_s must be an Nx6 array"
-        x, y, t, dpx, dpy, dpt = data_arr_s.T
+        dx, dy, dt, dpx, dpy, dpt = data_arr_s.T
     else:
         raise Exception(
             f"Incompatible input type {type(data_arr_s)} for data_arr_s, must be pandas DataFrame or Nx6 array-like object"
         )
-    x += ref_pz * dpx * t / (ref_pt + ref_pz * dpt)
-    y += ref_pz * dpy * t / (ref_pt + ref_pz * dpt)
+    dx += ref_pz * dpx * dt / (ref_pt + ref_pz * dpt)
+    dy += ref_pz * dpy * dt / (ref_pt + ref_pz * dpt)
     pz = np.sqrt(
         -1 + (ref_pt + ref_pz * dpt) ** 2 - (ref_pz * dpx) ** 2 - (ref_pz * dpy) ** 2
     )
-    t *= pz / (ref_pt + ref_pz * dpt)
+    dt *= pz / (ref_pt + ref_pz * dpt)
     if type(data_arr_s) is pd.core.frame.DataFrame:
         data_arr_s["momentum_t"] = pz - ref_pz
         dpt = data_arr_s["momentum_t"]
@@ -121,7 +115,7 @@ def to_t(
             ref_z is not None
         ), "Reference particle z coordinate is required to transform to global coordinates"
         print("target global coordinates")
-        t += ref_z
+        dt += ref_z
         dpx *= ref_pz
         dpy *= ref_pz
         dpt += ref_pz
