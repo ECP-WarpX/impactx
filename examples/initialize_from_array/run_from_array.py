@@ -59,14 +59,14 @@ pc = sim.particle_container()
 dx, dy, dz, dpx, dpy, dpz = pycoord.to_ref_part_t_from_lab_t(ref, x, y, z, px, py, pz)
 dx, dy, dt, dpx, dpy, dpt = pycoord.to_s_from_t(ref, dx, dy, dz, dpx, dpy, dpz)
 
-if not on_gpu:
+if not on_gpu: # initialize using cpu-based PODVectors
     dx_podv = amr.PODVector_real_std()
     dy_podv = amr.PODVector_real_std()
     dt_podv = amr.PODVector_real_std()
     dpx_podv = amr.PODVector_real_std()
     dpy_podv = amr.PODVector_real_std()
     dpt_podv = amr.PODVector_real_std()
-else:
+else: # initialize on device using arena/gpu-based PODVectors
     dx_podv = amr.PODVector_real_arena()
     dy_podv = amr.PODVector_real_arena()
     dt_podv = amr.PODVector_real_arena()
