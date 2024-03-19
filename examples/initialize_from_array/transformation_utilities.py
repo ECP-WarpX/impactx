@@ -4,7 +4,7 @@ import numpy as np
 def to_ref_part_t_from_global_t(ref_part, x, y, z, px, py, pz):
     """
     Transform from global coordinates to reference particle coordinates
-    
+
     This function takes particle bunch data and returns the bunch phase space positions relative to a reference particle
 
     Parameters
@@ -43,7 +43,7 @@ def to_ref_part_t_from_global_t(ref_part, x, y, z, px, py, pz):
 def to_global_t_from_ref_part_t(ref_part, dx, dy, dz, dpx, dpy, dpz):
     """
     Transform from reference particle to global coordinates
-    
+
     This function takes particle bunch data relative to a reference particle
     and returns all particle data in the global coordinate frame
 
@@ -117,7 +117,7 @@ def to_s_from_t(ref_part, dx, dy, dz, dpx, dpy, dpz):  # data_arr_t):
 
 
 def to_t_from_s(ref_part, dx, dy, dt, dpx, dpy, dpt):  # data_arr_t):
-    """ 
+    """
     Transform from fixed-t to fixed-s coordinates
 
     This function takes particle bunch data relative to a reference particle
@@ -158,11 +158,12 @@ def to_t_from_s(ref_part, dx, dy, dt, dpx, dpy, dpt):  # data_arr_t):
 
 class MyRefPart:
     """Struct containing reference particle data
-    
+
     This class replicates the data storage of the ImpactX reference particle.
     It is used in coordinate transformations when an ImpactX reference particle isn't available,
     so the transformation syntax works in the context of pyImpactX
     """
+
     def __init__(self, x, y, z, px, py, pz, pt):
         self.attr_list = ["x", "y", "z", "px", "py", "pz", "pt"]
         self.x = x
