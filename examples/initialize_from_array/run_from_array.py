@@ -1,20 +1,18 @@
 import numpy as np
 
 try:
-    import cupy as cp
-
-    cupy_available = True
-    on_gpu = True
+    import torch
+    on_gpu = torch.cuda.is_available()
 except ImportError:
-    cupy_available = False
     on_gpu = False
-
 
 import amrex.space3d as amr
 from impactx import (
     ImpactX,
     elements,
 )
+
+import transformation_utilities as pycoord
 
 ################
 
@@ -38,36 +36,6 @@ zpz_cov_list = [[z_std**2, zpz_std], [zpz_std, pz_std**2]]
 z, pz = np.random.default_rng().multivariate_normal([0, 0], zpz_cov_list, N_part).T
 pz += pz_mean
 
-
-def to_ref_part_from_t(ref_part, x, y, z, px, py, pz):
-    dx = x - ref_part.x
-    dy = y - ref_part.y
-    dz = z - ref_part.z
-    dpx = px - ref_part.px
-    dpy = py - ref_part.py
-    dpz = pz - ref_part.pz
-
-    dpx /= ref_part.pz
-    dpy /= ref_part.pz
-    dpz /= ref_part.pz
-
-    return dx, dy, dz, dpx, dpy, dpz
-
-
-def to_s_from_ref_part(ref_part, dx, dy, dz, dpx, dpy, dpz):  # data_arr_t):
-    """ """
-    ref_pz = ref_part.pz
-    ref_pt = ref_part.pt
-    dxs = dx - ref_pz * dpx * dz / (ref_pz + ref_pz * dpz)
-    dys = dy - ref_pz * dpy * dz / (ref_pz + ref_pz * dpz)
-    pt = -np.sqrt(
-        1 + (ref_pz + ref_pz * dpz) ** 2 + (ref_pz * dpx) ** 2 + (ref_pz * dpy) ** 2
-    )
-    dt = pt * dz / (ref_pz + ref_pz * dpz)
-    dpt = (pt - ref_pt) / ref_pz
-    return dxs, dys, dt, dpx, dpy, dpt
-
-
 sim = ImpactX()
 
 # set numerical parameters and IO control
@@ -82,7 +50,6 @@ sim.init_grids()
 energy_gamma = np.sqrt(1 + pz_mean**2)
 energy_MeV = 0.510998950 * energy_gamma  # reference energy
 bunch_charge_C = 10.0e-15  # used with space charge
-# npart = 500000  # number of macro particles
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
@@ -92,8 +59,8 @@ ref.z = 0
 
 pc = sim.particle_container()
 
-dx, dy, dz, dpx, dpy, dpz = to_ref_part_from_t(ref, x, y, z, px, py, pz)
-dx, dy, dt, dpx, dpy, dpt = to_s_from_ref_part(ref, dx, dy, dz, dpx, dpy, dpz)
+dx, dy, dz, dpx, dpy, dpz = pycoord.to_ref_part_t_from_lab_t(ref, x, y, z, px, py, pz)
+dx, dy, dt, dpx, dpy, dpt = pycoord.to_s_from_t(ref, dx, dy, dz, dpx, dpy, dpz)
 
 if not on_gpu:
     dx_podv = amr.PODVector_real_std()

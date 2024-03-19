@@ -43,7 +43,7 @@ dpt = beam_at_step["momentum_t"]
 dx_t, dy_t, dz, dpx_t, dpy_t, dpz = coord.to_t_from_s(
     ref_part, dx_s, dy_s, dt, dpx_s, dpy_s, dpt
 )
-x, y, z, px, py, pz = coord.from_ref_part_t_to_lab_t(
+x, y, z, px, py, pz = coord.to_lab_t_from_ref_part_t(
     ref_part, dx_t, dy_t, dz, dpx_t, dpy_t, dpz
 )
 

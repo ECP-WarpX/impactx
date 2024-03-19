@@ -16,7 +16,7 @@ def to_ref_part_t_from_lab_t(ref_part, x, y, z, px, py, pz):
     return dx, dy, dz, dpx, dpy, dpz
 
 
-def from_ref_part_t_to_lab_t(ref_part, dx, dy, dz, dpx, dpy, dpz):
+def to_lab_t_from_ref_part_t(ref_part, dx, dy, dz, dpx, dpy, dpz):
     x = dx + ref_part.x
     y = dy + ref_part.y
     z = dz + ref_part.z
