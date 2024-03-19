@@ -2,17 +2,14 @@ import numpy as np
 
 try:
     import torch
+
     on_gpu = torch.cuda.is_available()
 except ImportError:
     on_gpu = False
 
 import amrex.space3d as amr
-from impactx import (
-    ImpactX,
-    elements,
-)
-
 import transformation_utilities as pycoord
+from impactx import ImpactX, elements
 
 ################
 
