@@ -19,9 +19,9 @@ For more details, see:
 A schematic with more information can be seen in the figure below:
 
 .. figure:: https://gist.githubusercontent.com/RTSandberg/cf3f6193b3da12e7fd815f69789fd6f2/raw/2308e412d7482d55811afa2e9a0c6fa97627fc2f/schema_15_stages.png
-   :alt: [fig:lpa_schematic] Schematic of the 15 stages of laser-plasma accelerators.
+   :alt: Schematic of the 15 stages of laser-plasma accelerators.
 
-   [fig:lpa_schematic] Schematic of the 15 stages of laser-plasma accelerators.
+   Schematic of the 15 stages of laser-plasma accelerators.
 
 The laser-plasma accelerator elements are modeled with neural networks as surrogates.
 These networks are trained beforehand.
