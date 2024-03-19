@@ -73,3 +73,8 @@ We run the following script to visualize the ImpactX output and confirm the beam
       :caption: You can copy this file from ``examples/initialize_from_array/visualize_from_array.py``.
 
 The resulting phase space snapshots are shown in the following figure:
+
+.. figure:: https://gist.githubusercontent.com/RTSandberg/613d16def3d025f9415d348a58bddba6/raw/f8d0dfe47f2a75063845b748df4cb3fb9f3b38bb/phase_space.png
+   :alt: [fig:custom_beam] Phase space snapshots of custom beam from arrays, showing the ring in x-y, Gaussian in px-py, and linear correlation in z-pz.
+
+   [fig:custom_beam] Phase space snapshots of custom beam from arrays, showing the ring in x-y, Gaussian in px-py, and linear correlation in z-pz.

@@ -66,6 +66,8 @@ Virtual Test Stands
    examples/positron_channel/README.rst
    examples/pytorch_surrogate_model/README.rst
    examples/apochromatic/README.rst
+   examples/fodo_tune/README.rst
+   examples/initialize_from_array/README.rst
 
 
 Unit tests
