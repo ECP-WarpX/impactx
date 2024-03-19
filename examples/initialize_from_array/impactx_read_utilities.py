@@ -1,10 +1,6 @@
-import argparse
 import glob
 import re
 
-from matplotlib import pyplot as plt
-import numpy as np
-import openpmd_api as io
 import pandas as pd
 
 
