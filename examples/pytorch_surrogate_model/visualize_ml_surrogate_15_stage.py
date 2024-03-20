@@ -78,25 +78,11 @@ def to_t(
     data_arr_s: Nx6 array-like structure containing fixed-s particle coordinates
     ref_z: if transforming to global coordinates
     coord_type: TCoords enum, (default is in ref coordinates) whether to get particle data relative to reference coordinate or in the global frame
-
-    Notes
     """
     if type(data_arr_s) is pd.core.frame.DataFrame:
-        coordinate_columns = [
-            "position_x",
-            "position_y",
-            "position_t",
-            "momentum_x",
-            "momentum_y",
-            "momentum_t",
-        ]
-        assert all(
-            val in data_arr_s.columns for val in coordinate_columns
-        ), f"data_arr_s must have columns {' '.join(coordinate_columns)}"
-        x, y, t, dpx, dpy, dpt = data_arr_s[coordinate_columns].to_numpy().T
-        x = data_arr_s["position_x"]
-        y = data_arr_s["position_y"]
-        t = data_arr_s["position_t"]
+        dx = data_arr_s["position_x"]
+        dy = data_arr_s["position_y"]
+        dt = data_arr_s["position_t"]
         dpx = data_arr_s["momentum_x"]
         dpy = data_arr_s["momentum_y"]
         dpt = data_arr_s["momentum_t"]
@@ -105,17 +91,17 @@ def to_t(
         assert (
             data_arr_s.shape[1] == 6
         ), f"data_arr_s.shape={data_arr_s.shape} but data_arr_s must be an Nx6 array"
-        x, y, t, dpx, dpy, dpt = data_arr_s.T
+        dx, dy, dt, dpx, dpy, dpt = data_arr_s.T
     else:
         raise Exception(
             f"Incompatible input type {type(data_arr_s)} for data_arr_s, must be pandas DataFrame or Nx6 array-like object"
         )
-    x += ref_pz * dpx * t / (ref_pt + ref_pz * dpt)
-    y += ref_pz * dpy * t / (ref_pt + ref_pz * dpt)
+    dx += ref_pz * dpx * dt / (ref_pt + ref_pz * dpt)
+    dy += ref_pz * dpy * dt / (ref_pt + ref_pz * dpt)
     pz = np.sqrt(
         -1 + (ref_pt + ref_pz * dpt) ** 2 - (ref_pz * dpx) ** 2 - (ref_pz * dpy) ** 2
     )
-    t *= pz / (ref_pt + ref_pz * dpt)
+    dt *= pz / (ref_pt + ref_pz * dpt)
     if type(data_arr_s) is pd.core.frame.DataFrame:
         data_arr_s["momentum_t"] = pz - ref_pz
         dpt = data_arr_s["momentum_t"]
@@ -129,7 +115,7 @@ def to_t(
             ref_z is not None
         ), "Reference particle z coordinate is required to transform to global coordinates"
         print("target global coordinates")
-        t += ref_z
+        dt += ref_z
         dpx *= ref_pz
         dpy *= ref_pz
         dpt += ref_pz
@@ -161,8 +147,8 @@ def plot_beam_df(
         alpha=alpha,
         cmap=cmap,
     )
-    ax.set_xlabel(r"x [%s]" % unit_label)
-    ax.set_ylabel(r"y [%s]" % unit_label)
+    ax.set_xlabel(r"x (%s)" % unit_label)
+    ax.set_ylabel(r"y (%s)" % unit_label)
     ax.axes.ticklabel_format(axis="both", style="sci", scilimits=(-2, 2))
     ###########
 
@@ -176,7 +162,7 @@ def plot_beam_df(
         cmap=cmap,
     )
     ax.set_xlabel(r"%s" % unit_z_label)
-    ax.set_ylabel(r"x [%s]" % unit_label)
+    ax.set_ylabel(r"x (%s)" % unit_label)
     ax.axes.ticklabel_format(axis="y", style="sci", scilimits=(-2, 2))
     if z_ticks is not None:
         ax.set_xticks(z_ticks)
@@ -192,7 +178,7 @@ def plot_beam_df(
         cmap=cmap,
     )
     ax.set_xlabel(r"%s" % unit_z_label)
-    ax.set_ylabel(r"y [%s]" % unit_label)
+    ax.set_ylabel(r"y (%s)" % unit_label)
     ax.axes.ticklabel_format(axis="y", style="sci", scilimits=(-2, 2))
     if z_ticks is not None:
         ax.set_xticks(z_ticks)
@@ -256,7 +242,7 @@ def plot_beam_df(
         alpha=alpha,
         cmap=cmap,
     )
-    ax.set_xlabel(r"x [%s]" % unit_label)
+    ax.set_xlabel(r"x (%s)" % unit_label)
     ax.set_ylabel("px")
     ax.axes.ticklabel_format(axis="both", style="sci", scilimits=(-2, 2))
     ############
@@ -269,7 +255,7 @@ def plot_beam_df(
         alpha=alpha,
         cmap=cmap,
     )
-    ax.set_xlabel(r"y [%s]" % unit_label)
+    ax.set_xlabel(r"y (%s)" % unit_label)
     ax.set_ylabel("py")
     ax.axes.ticklabel_format(axis="both", style="sci", scilimits=(-2, 2))
 
@@ -297,6 +283,12 @@ parser = argparse.ArgumentParser(description="Plot the ML surrogate benchmark.")
 parser.add_argument(
     "--save-png", action="store_true", help="non-interactive run: save to PNGs"
 )
+parser.add_argument(
+    "--num-stages", "-n", type=int, default=15, help="num stages to plot"
+)
+parser.add_argument(
+    "--stages_to_plot", "-s", type=int, help="num stages to plot", nargs="*"
+)
 args = parser.parse_args()
 
 impactx_surrogate_reduced_diags = read_time_series(
@@ -314,10 +306,11 @@ emit_nx = emit_x * beam_u
 emit_y = impactx_surrogate_reduced_diags["emittance_y"]
 emit_ny = emit_y * beam_u
 
-ix_slice = [0] + [2 + 9 * i for i in range(8)]
+ix_slice = [0] + [2 + 9 * i for i in range(args.num_stages)]
 
 ############# plot moments ##############
 fig, axT = plt.subplots(2, 2, figsize=(10, 8))
+ymarker = "^"
 ######### emittance ##########
 ax = axT[0][0]
 scale = 1e6
@@ -330,11 +323,13 @@ ax.plot(
 ax.plot(
     impactx_surrogate_reduced_diags["s"][ix_slice],
     emit_ny[ix_slice] * scale,
-    "ro",
+    "r",
+    marker=ymarker,
+    linestyle="None",
     label="y",
 )
 ax.legend()
-ax.set_xlabel("s [m]")
+ax.set_xlabel("s (m)")
 ax.set_ylabel(r"emittance (mm-mrad)")
 ######### energy ##########
 ax = axT[0][1]
@@ -344,7 +339,7 @@ ax.plot(
     beam_gamma[ix_slice] * scale,
     "go",
 )
-ax.set_xlabel("s [m]")
+ax.set_xlabel("s (m)")
 ax.set_ylabel(r"mean energy (GeV)")
 
 ######### width ##########
@@ -359,11 +354,13 @@ ax.plot(
 ax.plot(
     impactx_surrogate_reduced_diags["s"][ix_slice],
     impactx_surrogate_reduced_diags["sig_y"][ix_slice] * scale,
-    "ro",
+    "r",
+    marker=ymarker,
+    linestyle="None",
     label="y",
 )
 ax.legend()
-ax.set_xlabel("s [m]")
+ax.set_xlabel("s (m)")
 ax.set_ylabel(r"beam width ($\mu$m)")
 
 ######### divergence ##########
@@ -378,11 +375,13 @@ ax.semilogy(
 ax.semilogy(
     impactx_surrogate_reduced_diags["s"][ix_slice],
     impactx_surrogate_reduced_diags["sig_py"][ix_slice] * scale,
-    "ro",
+    "r",
+    marker=ymarker,
+    linestyle="None",
     label="y",
 )
 ax.legend()
-ax.set_xlabel("s [m]")
+ax.set_xlabel("s (m)")
 ax.set_ylabel(r"divergence (mrad)")
 
 plt.tight_layout()
@@ -403,8 +402,8 @@ impactx_surrogate_ref_particle = read_time_series("diags/ref_particle.*")
 millimeter = 1.0e3
 micron = 1.0e6
 
-N_stage = 9
-impactx_stage_end_steps = [1] + [3 + 8 * i for i in range(N_stage)]
+N_stage = args.num_stages
+impactx_stage_end_steps = [1] + [3 + 9 * i for i in range(N_stage)]
 ise = impactx_stage_end_steps
 
 # initial
@@ -423,7 +422,7 @@ to_t(
 
 t_offset = impactx_surrogate_ref_particle.loc[step, "t"] * micron
 fig, axT = plt.subplots(3, 3, figsize=(10, 8))
-fig.suptitle(f"initially, ct={impactx_surrogate_ref_particle.at[step,'t']:.2e}")
+fig.suptitle(f"initially, ct={impactx_surrogate_ref_particle.at[step,'t']:.2f} m")
 
 plot_beam_df(
     beam_at_step,
@@ -431,7 +430,7 @@ plot_beam_df(
     alpha=0.6,
     color="red",
     unit_z=1e6,
-    unit_z_label=r"$\xi$ [$\mu$m]",
+    unit_z_label=r"$\xi$ ($\mu$m)",
     t_offset=t_offset,
     z_ticks=[-107.3, -106.6],
 )
@@ -441,36 +440,39 @@ else:
     plt.show()
 
 ####### final ###########
+if args.stages_to_plot is not None:
+    for stage_i in args.stages_to_plot:
+        step = ise[stage_i]
+        beam_at_step = (
+            beam_impactx_surrogate_series.iterations[step].particles["beam"].to_df()
+        )
+        ref_part_step = impactx_surrogate_ref_particle.loc[step]
+        ref_u = np.sqrt(ref_part_step["pt"] ** 2 - 1)
+        to_t(
+            ref_u,
+            ref_part_step["pt"],
+            beam_at_step,
+            ref_z=ref_part_step["z"],
+            coord_type=TCoords.GLOBAL,
+        )
 
+        t_offset = impactx_surrogate_ref_particle.loc[step, "t"] * micron
+        fig, axT = plt.subplots(3, 3, figsize=(10, 8))
+        fig.suptitle(
+            f"stage {stage_i}, ct={impactx_surrogate_ref_particle.at[step,'t']:.2f} m"
+        )
 
-stage_i = 8
-step = ise[stage_i + 1]
-beam_at_step = beam_impactx_surrogate_series.iterations[step].particles["beam"].to_df()
-ref_part_step = impactx_surrogate_ref_particle.loc[step]
-ref_u = np.sqrt(ref_part_step["pt"] ** 2 - 1)
-to_t(
-    ref_u,
-    ref_part_step["pt"],
-    beam_at_step,
-    ref_z=ref_part_step["z"],
-    coord_type=TCoords.GLOBAL,
-)
-
-t_offset = impactx_surrogate_ref_particle.loc[step, "t"] * micron
-fig, axT = plt.subplots(3, 3, figsize=(10, 8))
-fig.suptitle(f"stage {stage_i}, ct={impactx_surrogate_ref_particle.at[step,'t']:.2e}")
-
-plot_beam_df(
-    beam_at_step,
-    axT,
-    alpha=0.6,
-    color="red",
-    unit_z=1e6,
-    unit_z_label=r"$\xi$ [$\mu$m]",
-    t_offset=t_offset,
-    z_ticks=[-107.3, -106.6],
-)
-if args.save_png:
-    plt.savefig(f"stage_{stage_i}_phase_spaces.png")
-else:
-    plt.show()
+        plot_beam_df(
+            beam_at_step,
+            axT,
+            alpha=0.6,
+            color="red",
+            unit_z=1e6,
+            unit_z_label=r"$\xi$ ($\mu$m)",
+            t_offset=t_offset,
+            z_ticks=[-107.3, -106.6],
+        )
+        if args.save_png:
+            plt.savefig(f"stage_{stage_i-1}_phase_spaces.png")
+        else:
+            plt.show()

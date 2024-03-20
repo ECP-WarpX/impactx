@@ -41,7 +41,7 @@ initial = series.iterations[1].particles["beam"].to_df()
 final = series.iterations[last_step].particles["beam"].to_df()
 
 # compare number of particles
-num_particles = 10000
+num_particles = 100000
 assert num_particles == len(initial)
 assert num_particles == len(final)
 
@@ -59,11 +59,11 @@ print(f"  rtol={rtol} (ignored: atol~={atol})")
 assert np.allclose(
     [sigx, sigy, sigt, emittance_x, emittance_y],
     [
-        7.488319e-07,
-        7.501963e-07,
-        9.996533e-08,
-        5.052374e-10,
-        5.130370e-10,
+        7.494325e-07,
+        7.478916e-07,
+        9.976192e-08,
+        5.070297e-10,
+        5.080007e-10,
     ],
     rtol=rtol,
     atol=atol,
@@ -88,12 +88,12 @@ print(f"  rtol={rtol} (ignored: atol~={atol})")
 assert np.allclose(
     [sigx, sigy, sigt, emittance_x, emittance_y, emittance_t],
     [
-        3.062763e-07,
-        2.873031e-07,
-        1.021142e-07,
-        9.090898e-12,
-        9.579053e-12,
-        2.834852e-11,
+        1.590999e-07,
+        1.634865e-07,
+        1.030930e-07,
+        5.031797e-12,
+        5.242205e-12,
+        2.049623e-11,
     ],
     rtol=rtol,
     atol=atol,
