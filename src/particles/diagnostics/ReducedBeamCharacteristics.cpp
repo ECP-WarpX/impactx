@@ -38,9 +38,9 @@ namespace impactx::diagnostics
         using PType = typename ImpactXParticleContainer::SuperParticleType;
 
         // numbers of same type reduction operations in first concurrent batch
-        const size_t num_red_ops_1_sum = 7;  // summation
-        const size_t num_red_ops_1_min = 6;  // minimum
-        const size_t num_red_ops_1_max = 6;  // maximum
+        constexpr size_t num_red_ops_1_sum = 7;  // summation
+        constexpr size_t num_red_ops_1_min = 6;  // minimum
+        constexpr size_t num_red_ops_1_max = 6;  // maximum
 
         // prepare reduction operations for calculation of mean and min/max values in 6D phase space
         amrex::TypeMultiplier<amrex::ReduceOps,
@@ -143,7 +143,7 @@ namespace impactx::diagnostics
         );
 
         // number of reduction operations in second concurrent batch
-        const size_t num_red_ops_2 = 10;
+        constexpr size_t num_red_ops_2 = 10;
         // prepare reduction operations for calculation of mean square and correlation values
         amrex::TypeMultiplier<amrex::ReduceOps, amrex::ReduceOpSum[num_red_ops_2]> reduce_ops_2;
         using ReducedDataT2 = amrex::TypeMultiplier<amrex::ReduceData, amrex::ParticleReal[num_red_ops_2]>;
