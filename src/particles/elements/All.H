@@ -35,6 +35,7 @@
 #include "PRot.H"
 #include "SoftSol.H"
 #include "SoftQuad.H"
+#include "TaperedPL.H"
 #include "ThinDipole.H"
 #include "diagnostics/openPMD.H"
 
@@ -70,6 +71,7 @@ namespace impactx
         SoftSolenoid,
         SoftQuadrupole,
         Sol,
+        TaperedPL,
         ThinDipole
     >;
 
