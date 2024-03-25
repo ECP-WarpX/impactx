@@ -899,7 +899,7 @@ add_impactx_test(fodo_tune.py
 #
 # w/o space charge
 add_impactx_test(initialize_from_array.py
-    examples/fodo_tune/run_from_array.py
+    examples/initialize_from_array/run_from_array.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/initialize_from_array/analyze_from_array.py
