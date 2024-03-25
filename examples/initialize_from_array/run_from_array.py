@@ -56,7 +56,9 @@ ref.z = 0
 
 pc = sim.particle_container()
 
-dx, dy, dz, dpx, dpy, dpz = pycoord.to_ref_part_t_from_global_t(ref, x, y, z, px, py, pz)
+dx, dy, dz, dpx, dpy, dpz = pycoord.to_ref_part_t_from_global_t(
+    ref, x, y, z, px, py, pz
+)
 dx, dy, dt, dpx, dpy, dpt = pycoord.to_s_from_t(ref, dx, dy, dz, dpx, dpy, dpz)
 
 if not on_gpu:  # initialize using cpu-based PODVectors

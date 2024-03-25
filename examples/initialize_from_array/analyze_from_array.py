@@ -12,9 +12,7 @@ import transformation_utilities as coord
 
 print("Initial Beam:")
 
-beam_series = io.Series(
-    "diags/openPMD/monitor.bp", io.Access.read_only
-)
+beam_series = io.Series("diags/openPMD/monitor.bp", io.Access.read_only)
 ref_series = ix_read.read_time_series("diags/ref_particle.*")
 
 num_particles = int(1e5)
