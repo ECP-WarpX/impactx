@@ -12,17 +12,17 @@ import transformation_utilities as coord
 from matplotlib import pyplot as plt
 
 ######## plot phase spaces ###########
-beam_impactx_surrogate_series = io.Series(
+beam_series = io.Series(
     "diags/openPMD/monitor.bp", io.Access.read_only
 )
-impactx_surrogate_steps = list(beam_impactx_surrogate_series.iterations)
-impactx_surrogate_ref_particle = ix_plt.read_time_series("diags/ref_particle.*")
+beam_steps = list(beam_series.iterations)
+ref_series = ix_plt.read_time_series("diags/ref_particle.*")
 
 millimeter = 1.0e3
 micron = 1.0e6
 step = 1
-beam_at_step = beam_impactx_surrogate_series.iterations[step].particles["beam"].to_df()
-ref_part_step = impactx_surrogate_ref_particle.loc[step]
+beam_at_step = beam_series.iterations[step].particles["beam"].to_df()
+ref_part_step = ref_series.loc[step]
 ref_part = coord.MyRefPart(
     ref_part_step["x"],
     ref_part_step["y"],
@@ -43,7 +43,7 @@ dpt = beam_at_step["momentum_t"]
 dx_t, dy_t, dz, dpx_t, dpy_t, dpz = coord.to_t_from_s(
     ref_part, dx_s, dy_s, dt, dpx_s, dpy_s, dpt
 )
-x, y, z, px, py, pz = coord.to_lab_t_from_ref_part_t(
+x, y, z, px, py, pz = coord.to_global_t_from_ref_part_t(
     ref_part, dx_t, dy_t, dz, dpx_t, dpy_t, dpz
 )
 
