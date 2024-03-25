@@ -93,10 +93,6 @@ namespace impactx
             // shift due to alignment errors of the element
             shift_in(x, y, px, py);
 
-            // access reference particle values (final, initial):
-            amrex::ParticleReal const pt_ref = refpart.pt;
-            amrex::ParticleReal const bg = sqrt(pow(pt_ref, 2) - 1.0_prt);
-
             // normalize focusing strength units to MAD-X convention if needed
             amrex::ParticleReal g = m_k;
             if (m_unit == 1) {
