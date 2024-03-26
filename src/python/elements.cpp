@@ -1080,6 +1080,38 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ThinDipole);
 
+    py::class_<TaperedPL, elements::Thin, elements::Alignment> py_TaperedPL(me, "TaperedPL");
+    py_TaperedPL
+        .def("__repr__",
+             [](TaperedPL const & taperedpl) {
+                 std::string r = "<impactx.elements.TaperedPL (taperedpl=";
+                 r.append(std::to_string(taperedpl.m_k))
+                  .append(", k=")
+                  .append(std::to_string(taperedpl.m_taper))
+                  .append(", taper=")
+                  .append(")>");
+                 return r;
+             }
+        )
+        .def(py::init<
+                amrex::ParticleReal,
+                amrex::ParticleReal,
+                int,
+                amrex::ParticleReal,
+                amrex::ParticleReal,
+                amrex::ParticleReal
+             >(),
+             py::arg("k"),
+             py::arg("taper"),
+             py::arg("units") = 0,
+             py::arg("dx") = 0,
+             py::arg("dy") = 0,
+             py::arg("rotation") = 0,
+             "A thin nonlinear plasma lens with transverse taper."
+        )
+    ;
+    register_beamoptics_push(py_TaperedPL);
+
 
     // free-standing push function
     m.def("push", &Push,

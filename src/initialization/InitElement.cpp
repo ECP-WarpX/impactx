@@ -305,6 +305,18 @@ namespace detail
             pp_element.queryAdd("units", units);
 
             m_lattice.emplace_back( ChrPlasmaLens(ds, k, units, a["dx"], a["dy"], a["rotation_degree"], nslice) );
+        } else if (element_type == "tapered_plasma_lens")
+        {
+            auto a = detail::query_alignment(pp_element);
+
+            amrex::ParticleReal k;
+            amrex::ParticleReal taper;
+            int units = 0;
+            pp_element.get("k", k);
+            pp_element.get("taper", taper);
+            pp_element.queryAdd("units", units);
+
+            m_lattice.emplace_back( TaperedPL(k, taper, units, a["dx"], a["dy"], a["rotation_degree"]) );
         } else if (element_type == "drift_exact")
         {
             auto const [ds, nslice] = detail::query_ds(pp_element, nslice_default);
