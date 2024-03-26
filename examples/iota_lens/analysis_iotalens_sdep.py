@@ -4,10 +4,8 @@
 # Authors: Axel Huebl, Chad Mitchell
 # License: BSD-3-Clause-LBNL
 #
-import glob
-
 import numpy as np
-import pandas as pd
+import openpmd_api as io
 from scipy.stats import moment
 
 
@@ -25,26 +23,11 @@ def get_moments(beam):
     return (meanH, sigH, meanI, sigI)
 
 
-def read_all_files(file_pattern):
-    """Read in all CSV files from each MPI rank (and potentially OpenMP
-    thread). Concatenate into one Pandas dataframe.
-    Returns
-    -------
-    pandas.DataFrame
-    """
-    return pd.concat(
-        (
-            pd.read_csv(filename, delimiter=r"\s+")
-            for filename in glob.glob(file_pattern)
-        ),
-        axis=0,
-        ignore_index=True,
-    ).set_index("id")
-
-
 # initial/final beam
-initial = read_all_files("diags/nonlinear_lens_invariants_000000.*")
-final = read_all_files("diags/nonlinear_lens_invariants_final.*")
+series = io.Series("diags/openPMD/monitor.h5", io.Access.read_only)
+last_step = list(series.iterations)[-1]
+initial = series.iterations[1].particles["beam"].to_df()
+final = series.iterations[last_step].particles["beam"].to_df()
 
 # compare number of particles
 num_particles = 10000

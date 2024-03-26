@@ -307,12 +307,15 @@ namespace detail
         std::string profile_name = "impactx::Push::" + std::string(BeamMonitor::name);
         BL_PROFILE(profile_name);
 
+        // preparing to access reference particle data: RefPart
+        RefPart & ref_part = pc.GetRefParticle();
+
+        // optional: add and calculate additional particle properties
+        add_optional_properties(m_series_name, pc);
+
         // component names
         std::vector<std::string> real_soa_names = pc.RealSoA_names();
         std::vector<std::string> int_soa_names = pc.intSoA_names();
-
-        // preparing to access reference particle data: RefPart
-        RefPart & ref_part = pc.GetRefParticle();
 
         // pinned memory copy
         PinnedContainer pinned_pc = pc.make_alike<amrex::PinnedArenaAllocator>();

@@ -18,6 +18,7 @@
 
 #include <cmath>
 
+
 namespace impactx::diagnostics
 {
     /** Compute invariants within the nonlinear magnetic insert element
@@ -74,17 +75,16 @@ namespace impactx::diagnostics
             amrex::ParticleReal const py
         ) const
         {
-
             using namespace amrex::literals; // for _rt and _prt
 
             // a complex type with two amrex::ParticleReal
             using Complex = amrex::GpuComplex<amrex::ParticleReal>;
 
             // convert transverse phase space coordinates to normalized units
-            amrex::ParticleReal const xn = x/(m_cn*sqrt(m_beta));
-            amrex::ParticleReal const yn = y/(m_cn*sqrt(m_beta));
-            amrex::ParticleReal const pxn = px*sqrt(m_beta)/m_cn + m_alpha*xn;
-            amrex::ParticleReal const pyn = py*sqrt(m_beta)/m_cn + m_alpha*yn;
+            amrex::ParticleReal const xn = x/(m_cn*std::sqrt(m_beta));
+            amrex::ParticleReal const yn = y/(m_cn*std::sqrt(m_beta));
+            amrex::ParticleReal const pxn = px*std::sqrt(m_beta)/m_cn + m_alpha*xn;
+            amrex::ParticleReal const pyn = py*std::sqrt(m_beta)/m_cn + m_alpha*yn;
 
             // assign complex position zeta = x + iy
             Complex const zeta(xn, yn);
@@ -115,9 +115,9 @@ namespace impactx::diagnostics
 
             // compute invariants H and I
             amrex::ParticleReal const Jz = xn*pyn - yn*pxn;
-            Hinv = (pow(xn,2) + pow(yn,2) + pow(pxn,2) + pow(pyn,2))/2
+            Hinv = (std::pow(xn,2) + std::pow(yn,2) + std::pow(pxn,2) + std::pow(pyn,2))/2
                  + m_tn*Hinv;
-            Iinv = pow(Jz,2) + pow(pxn,2) + pow(xn,2) + m_tn*Iinv;
+            Iinv = std::pow(Jz,2) + std::pow(pxn,2) + std::pow(xn,2) + m_tn*Iinv;
 
             return {Hinv, Iinv};
 
@@ -128,7 +128,6 @@ namespace impactx::diagnostics
         amrex::ParticleReal m_beta; //! Twiss beta (m)
         amrex::ParticleReal m_tn; //! dimensionless strength of the nonlinear insert
         amrex::ParticleReal m_cn; //! scale parameter of the nonlinear insert (m^[1/2])
-
     };
 
 } // namespace impactx

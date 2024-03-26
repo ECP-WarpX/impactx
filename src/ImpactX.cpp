@@ -158,12 +158,6 @@ namespace impactx {
                                           "diags/ref_particle",
                                           global_step);
 
-            // print the initial values of the two invariants H and I
-            std::string const diag_name = amrex::Concatenate("diags/nonlinear_lens_invariants_", global_step, file_min_digits);
-            diagnostics::DiagnosticOutput(*amr_data->m_particle_container,
-                                          diagnostics::OutputType::PrintNonlinearLensInvariants,
-                                          diag_name);
-
             // print the initial values of reduced beam characteristics
             diagnostics::DiagnosticOutput(*amr_data->m_particle_container,
                                           diagnostics::OutputType::PrintReducedBeamCharacteristics,
@@ -303,12 +297,6 @@ namespace impactx {
             diagnostics::DiagnosticOutput(*amr_data->m_particle_container,
                                           diagnostics::OutputType::PrintRefParticle,
                                           "diags/ref_particle_final",
-                                          global_step);
-
-            // print the final values of the two invariants H and I
-            diagnostics::DiagnosticOutput(*amr_data->m_particle_container,
-                                          diagnostics::OutputType::PrintNonlinearLensInvariants,
-                                          "diags/nonlinear_lens_invariants_final",
                                           global_step);
 
             // print the final values of the reduced beam characteristics

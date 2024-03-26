@@ -116,15 +116,6 @@ General
       The minimum number of digits (default: ``6``) used for the step
       number appended to the diagnostic file names.
 
-   .. py:method:: set_diag_iota_invariants(alpha, beta, tn, cn)
-
-      Set the parameters of the IOTA nonlinear lens invariants diagnostics.
-
-      :param float alpha: Twiss alpha
-      :param float beta: Twiss beta (m)
-      :param float tn: dimensionless strength of the nonlinear insert
-      :param float cn: scale parameter of the nonlinear insert (m^[1/2])
-
    .. py:property:: particle_lost_diagnostics_backend
 
       Diagnostics for particles lost in apertures.
@@ -609,6 +600,32 @@ This module provides elements for the accelerator lattice.
    :param name: name of the series
    :param backend: I/O backend, e.g., ``bp``, ``h5``, ``json``
    :param encoding: openPMD iteration encoding: (v)ariable based, (f)ile based, (g)roup based (default)
+
+   .. py:property:: name
+
+      name of the series
+
+   .. py:property:: nonlinear_lens_invariants
+
+      Compute and output the invariants H and I within the nonlinear magnetic insert element
+
+   .. py:property:: alpha
+
+      Twiss alpha of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.
+      Horizontal and vertical values must be equal.
+
+   .. py:property:: beta
+
+      Twiss beta (in meters) of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.
+      Horizontal and vertical values must be equal.
+
+   .. py:property:: tn
+
+      Dimensionless strength of the IOTA nonlinear magnetic insert element used for computing H and I.
+
+   .. py:property:: cn
+
+      Scale factor (in meters^(1/2)) of the IOTA nonlinear magnetic insert element used for computing H and I.
 
 .. py:class:: impactx.elements.Programmable
 

@@ -382,6 +382,22 @@ namespace detail
             std::string openpmd_encoding{"g"};
             pp_element.queryAdd("encoding", openpmd_encoding);
 
+            // optional: add and calculate additional particle properties
+            // property: nonlinear lens invariants
+            bool add_nll_invariants = false;
+            pp_element.queryAdd("nonlinear_lens_invariants", add_nll_invariants);
+            if (add_nll_invariants)
+            {
+                amrex::ParticleReal alpha = 0.0;
+                pp_element.queryAdd("alpha", alpha);
+                amrex::ParticleReal beta = 1.0;
+                pp_element.queryAdd("beta", beta);
+                amrex::ParticleReal tn = 0.4;
+                pp_element.queryAdd("tn", tn);
+                amrex::ParticleReal cn = 0.01;
+                pp_element.queryAdd("cn", cn);
+            }
+
             m_lattice.emplace_back(diagnostics::BeamMonitor(openpmd_name, openpmd_backend, openpmd_encoding));
         } else if (element_type == "line")
         {

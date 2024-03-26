@@ -214,6 +214,7 @@ qe3.k = -6.69148177
 # Beam Monitor: Diagnostics
 monitor.type = beam_monitor
 monitor.backend = h5
+monitor.nonlinear_lens_invariants = true
 
 
 ###############################################################################
