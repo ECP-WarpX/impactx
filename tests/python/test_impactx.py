@@ -95,12 +95,12 @@ def test_impactx_nofile():
 
     #   particle bunch
     distr = distribution.Waterbag(
-        sigmaX=3.9984884770e-5,
-        sigmaY=3.9984884770e-5,
-        sigmaT=1.0e-3,
-        sigmaPx=2.6623538760e-5,
-        sigmaPy=2.6623538760e-5,
-        sigmaPt=2.0e-3,
+        lambdaX=3.9984884770e-5,
+        lambdaY=3.9984884770e-5,
+        lambdaT=1.0e-3,
+        lambdaPx=2.6623538760e-5,
+        lambdaPy=2.6623538760e-5,
+        lambdaPt=2.0e-3,
         muxpx=-0.846574929020762,
         muypy=0.846574929020762,
         mutpt=0.0,
@@ -211,12 +211,12 @@ def test_impactx_resting_refparticle():
     #   reference particle: init intentionally missing
     #   particle bunch
     gaussian = distribution.Gaussian(
-        sigmaX=4.0e-5,
-        sigmaY=5.0e-5,
-        sigmaT=1.0e-3,
-        sigmaPx=1.0e-5,
-        sigmaPy=3.0e-5,
-        sigmaPt=2.0e-3,
+        lambdaX=4.0e-5,
+        lambdaY=5.0e-5,
+        lambdaT=1.0e-3,
+        lambdaPx=1.0e-5,
+        lambdaPy=3.0e-5,
+        lambdaPt=2.0e-3,
     )
     with pytest.raises(
         RuntimeError,

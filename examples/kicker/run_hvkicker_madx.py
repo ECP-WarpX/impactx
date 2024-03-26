@@ -30,12 +30,12 @@ ref = sim.particle_container().ref_particle().load_file("hvkicker.madx")
 
 #   particle bunch
 distr = distribution.Waterbag(
-    sigmaX=4.0e-3,
-    sigmaY=4.0e-3,
-    sigmaT=1.0e-3,
-    sigmaPx=3.0e-4,
-    sigmaPy=3.0e-4,
-    sigmaPt=2.0e-3,
+    lambdaX=4.0e-3,
+    lambdaY=4.0e-3,
+    lambdaT=1.0e-3,
+    lambdaPx=3.0e-4,
+    lambdaPy=3.0e-4,
+    lambdaPt=2.0e-3,
 )
 sim.add_particles(bunch_charge_C, distr, npart)
 

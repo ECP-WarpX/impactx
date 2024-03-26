@@ -121,8 +121,8 @@ emittance_y = list(map(lambda step_val: step_val[1][4] * nm_rad, moments))
 # print beam transversal size over steps
 f = plt.figure(figsize=(9, 4.8))
 ax1 = f.gca()
-im_sigx = ax1.plot(z, sigx, label=r"$\sigma_x$")
-im_sigy = ax1.plot(z, sigy, label=r"$\sigma_y$")
+im_sigx = ax1.plot(z, sigx, label=r"$\lambda_x$")
+im_sigy = ax1.plot(z, sigy, label=r"$\lambda_y$")
 ax2 = ax1.twinx()
 ax2.set_prop_cycle(None)  # reset color cycle
 im_emittance_x = ax2.plot(z, emittance_x, ":", label=r"$\epsilon_x$")
@@ -132,14 +132,14 @@ ax1.legend(
     handles=im_sigx + im_sigy + im_emittance_x + im_emittance_y, loc="lower center"
 )
 ax1.set_xlabel(r"$z$ [m]")
-ax1.set_ylabel(r"$\sigma_{x,y}$ [mm]")
+ax1.set_ylabel(r"$\lambda_{x,y}$ [mm]")
 # ax2.set_ylabel(r"$\epsilon_{x,y}$ [mm-mrad]")
 ax2.set_ylabel(r"$\epsilon_{x,y}$ [nm]")
 ax2.set_ylim([1.5, 2.5])
 ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.tight_layout()
 if args.save_png:
-    plt.savefig("fodo_sigma.png")
+    plt.savefig("fodo_lambda.png")
 else:
     plt.show()
 

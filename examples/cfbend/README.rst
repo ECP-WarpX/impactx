@@ -11,7 +11,7 @@ C. Steier et al, "Status of the Conceptual Design of ALS-U", IPAC2017, WEPAB104,
 
 A 2 GeV electron bunch with normalized transverse rms emittance of 50 pm undergoes a 3.76 deg bend.
 
-In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
+In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
 
 Run

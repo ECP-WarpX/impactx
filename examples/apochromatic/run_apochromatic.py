@@ -31,12 +31,12 @@ ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_
 
 #   particle bunch
 distr = distribution.Gaussian(
-    sigmaX=1.288697604e-6,
-    sigmaY=1.288697604e-6,
-    sigmaT=1.0e-6,
-    sigmaPx=3.965223396e-6,
-    sigmaPy=3.965223396e-6,
-    sigmaPt=0.01,  # 1% energy spread
+    lambdaX=1.288697604e-6,
+    lambdaY=1.288697604e-6,
+    lambdaT=1.0e-6,
+    lambdaPx=3.965223396e-6,
+    lambdaPy=3.965223396e-6,
+    lambdaPt=0.01,  # 1% energy spread
     muxpx=0.0,
     muypy=0.0,
     mutpt=0.0,

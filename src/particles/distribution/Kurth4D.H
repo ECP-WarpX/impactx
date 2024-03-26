@@ -29,24 +29,24 @@ namespace impactx::distribution
          *
          * Return sampling from a 4D Kurth + uniform distribution.
          *
-         * @param sigx,sigy,sigt for zero correlation, these are the related
+         * @param lambdax,lambday,lambdat for zero correlation, these are the related
          *                                   RMS sizes (in meters)
-         * @param sigpx,sigpy,sigpt RMS momentum
+         * @param lambdapx,lambdapy,lambdapt RMS momentum
          * @param muxpx,muypy,mutpt correlation length-momentum
          */
         Kurth4D (
-            amrex::ParticleReal sigx,
-            amrex::ParticleReal sigy,
-            amrex::ParticleReal sigt,
-            amrex::ParticleReal sigpx,
-            amrex::ParticleReal sigpy,
-            amrex::ParticleReal sigpt,
+            amrex::ParticleReal lambdax,
+            amrex::ParticleReal lambday,
+            amrex::ParticleReal lambdat,
+            amrex::ParticleReal lambdapx,
+            amrex::ParticleReal lambdapy,
+            amrex::ParticleReal lambdapt,
             amrex::ParticleReal muxpx=0.0,
             amrex::ParticleReal muypy=0.0,
             amrex::ParticleReal mutpt=0.0
         )
-        : m_sigmaX(sigx), m_sigmaY(sigy), m_sigmaT(sigt), m_sigmaPx(sigpx), m_sigmaPy(sigpy),
-          m_sigmaPt(sigpt), m_muxpx(muxpx), m_muypy(muypy), m_mutpt(mutpt)
+        : m_lambdaX(lambdax), m_lambdaY(lambday), m_lambdaT(lambdat), m_lambdaPx(lambdapx), m_lambdaPy(lambdapy),
+          m_lambdaPt(lambdapt), m_muxpx(muxpx), m_muypy(muypy), m_mutpt(mutpt)
         {
         }
 
@@ -141,25 +141,25 @@ namespace impactx::distribution
 
             // Transform to produce the desired second moments/correlations:
             root = sqrt(1.0_prt-m_muxpx*m_muxpx);
-            a1 = m_sigmaX*x/root;
-            a2 = m_sigmaPx*(-m_muxpx*x/root+px);
+            a1 = m_lambdaX * x / root;
+            a2 = m_lambdaPx * (-m_muxpx * x / root + px);
             x = a1;
             px = a2;
             root = sqrt(1.0_prt-m_muypy*m_muypy);
-            a1 = m_sigmaY*y/root;
-            a2 = m_sigmaPy*(-m_muypy*y/root+py);
+            a1 = m_lambdaY * y / root;
+            a2 = m_lambdaPy * (-m_muypy * y / root + py);
             y = a1;
             py = a2;
             root = sqrt(1.0_prt-m_mutpt*m_mutpt);
-            a1 = m_sigmaT*t/root;
-            a2 = m_sigmaPt*(-m_mutpt*t/root+pt);
+            a1 = m_lambdaT * t / root;
+            a2 = m_lambdaPt * (-m_mutpt * t / root + pt);
             t = a1;
             pt = a2;
         }
 
     private:
-        amrex::ParticleReal m_sigmaX, m_sigmaY, m_sigmaT;  //! related RMS sizes (length)
-        amrex::ParticleReal m_sigmaPx, m_sigmaPy, m_sigmaPt;  //! RMS momentum
+        amrex::ParticleReal m_lambdaX, m_lambdaY, m_lambdaT;  //! related position axis intercepts (length) of the phase space ellipse
+        amrex::ParticleReal m_lambdaPx, m_lambdaPy, m_lambdaPt;  //! related momentum axis intercepts of the phase space ellipse
         amrex::ParticleReal m_muxpx, m_muypy, m_mutpt;  //! correlation length-momentum
     };
 
