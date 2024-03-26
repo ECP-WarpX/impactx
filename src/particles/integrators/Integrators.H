@@ -62,16 +62,16 @@ namespace impactx::integrators
 
    /** A second-order symplectic integrator based on a Hamiltonian
     *  splitting H = H_1 + H_2 + H_3.  This is the result of applying
-    *  the two-terms splitting of symp2_integrate twice in succession.  
+    *  the two-terms splitting of symp2_integrate twice in succession.
     *  The form shown here appears, for example, in:
     *
     *  R. D. Ryne, Computational Methods in Accelerator Physics,
     *  USPAS lecture notes, 2009.
     *
-    * @param refpart  Reference particle data           
+    * @param refpart  Reference particle data
     * @param zin  Initial value of independent variable (z-location)
     * @param zout  Final value of independent variable (z-location)
-    * @param nsteps  Number of integration steps     
+    * @param nsteps  Number of integration steps
     * @param element  Element defining the two maps associated with H_1 and H_2
     */
     template <typename T_Element>
@@ -112,15 +112,15 @@ namespace impactx::integrators
     *  the method of Yoshida.
     *
     *  H. Yoshida, Phys. Lett. A 150, 292-268 (1990).
-    *  
+    *
     *  The form shown here appears, for example, in:
     *
     *  E. Forest and R. D. Ruth, Physica D 43, 105-117 (1990).
     *
-    * @param refpart  Reference particle data           
+    * @param refpart  Reference particle data
     * @param zin  Initial value of independent variable (z-location)
     * @param zout  Final value of independent variable (z-location)
-    * @param nsteps  Number of integration steps     
+    * @param nsteps  Number of integration steps
     * @param element  Element defining the two maps associated with H_1 and H_2
     */
     template <typename T_Element>
