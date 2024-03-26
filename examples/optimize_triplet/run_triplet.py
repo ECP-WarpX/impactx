@@ -108,12 +108,12 @@ def run(parameters: tuple, write_particles=False, write_reduced=False) -> dict:
 
     #   particle bunch
     distr = distribution.Waterbag(
-        sigmaX=2.0e-4,
-        sigmaY=2.0e-4,
-        sigmaT=3.1622776602e-5,
-        sigmaPx=1.1180339887e-5,
-        sigmaPy=1.1180339887e-5,
-        sigmaPt=3.1622776602e-5,
+        lambdaX=2.0e-4,
+        lambdaY=2.0e-4,
+        lambdaT=3.1622776602e-5,
+        lambdaPx=1.1180339887e-5,
+        lambdaPy=1.1180339887e-5,
+        lambdaPt=3.1622776602e-5,
         muxpx=0.894427190999916,
         muypy=-0.894427190999916,
         mutpt=0.0,
