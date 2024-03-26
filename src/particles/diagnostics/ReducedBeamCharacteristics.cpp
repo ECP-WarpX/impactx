@@ -37,10 +37,13 @@ namespace impactx::diagnostics
         // preparing access to particle data: SoA
         using PType = typename ImpactXParticleContainer::SuperParticleType;
 
+        /* The variables below need to be static to work around an MSVC bug
+         * https://stackoverflow.com/questions/55136414/constexpr-variable-captured-inside-lambda-loses-its-constexpr-ness
+         */
         // numbers of same type reduction operations in first concurrent batch
-        constexpr size_t num_red_ops_1_sum = 7;  // summation
-        constexpr size_t num_red_ops_1_min = 6;  // minimum
-        constexpr size_t num_red_ops_1_max = 6;  // maximum
+        static constexpr std::size_t num_red_ops_1_sum = 7;  // summation
+        static constexpr std::size_t num_red_ops_1_min = 6;  // minimum
+        static constexpr std::size_t num_red_ops_1_max = 6;  // maximum
 
         // prepare reduction operations for calculation of mean and min/max values in 6D phase space
         amrex::TypeMultiplier<amrex::ReduceOps,
@@ -115,7 +118,8 @@ namespace impactx::diagnostics
          * px_min, py_min, pt_min
          */
         amrex::constexpr_for<0, num_red_ops_1_min> ([&](auto i) {
-            values_per_rank_min[i] = amrex::get<i + num_red_ops_1_sum>(r1);
+            constexpr std::size_t idx = i + num_red_ops_1_sum;
+            values_per_rank_min[i] = amrex::get<idx>(r1);
         });
 
         std::vector<amrex::ParticleReal> values_per_rank_max(num_red_ops_1_max);
@@ -125,7 +129,8 @@ namespace impactx::diagnostics
          * px_max, py_max, pt_max
          */
         amrex::constexpr_for<0, num_red_ops_1_max> ([&](auto i) {
-            values_per_rank_max[i] = amrex::get<i + num_red_ops_1_sum + num_red_ops_1_min>(r1);
+            constexpr std::size_t idx = i + num_red_ops_1_sum + num_red_ops_1_min;
+            values_per_rank_max[i] = amrex::get<idx>(r1);
         });
 
         // reduced sum over mpi ranks (allreduce)
@@ -142,8 +147,11 @@ namespace impactx::diagnostics
                 amrex::ParallelDescriptor::Communicator()
         );
 
+        /* The variable below needs to be static to work around an MSVC bug
+         * https://stackoverflow.com/questions/55136414/constexpr-variable-captured-inside-lambda-loses-its-constexpr-ness
+         */
         // number of reduction operations in second concurrent batch
-        constexpr size_t num_red_ops_2 = 10;
+        static constexpr std::size_t num_red_ops_2 = 10;
         // prepare reduction operations for calculation of mean square and correlation values
         amrex::TypeMultiplier<amrex::ReduceOps, amrex::ReduceOpSum[num_red_ops_2]> reduce_ops_2;
         using ReducedDataT2 = amrex::TypeMultiplier<amrex::ReduceData, amrex::ParticleReal[num_red_ops_2]>;
