@@ -89,7 +89,7 @@ Recall the Courant-Snyder relation :math:`\gamma\beta - \alpha^2 = 1` for conver
 Distribution Sampling and the Covariance Matrix
 -----------------------------------------------
 
-In Impact-X, beam sampling is performed under the assumption that the initial beam distribution centroid (mean phase space vector) coincides with the phase space origin.  The covariance matrix :math:`\Sigma` is defined by :math:`\Sigma_{ij}=\langle{\zeta_i\zeta_j\rangle}`, where :math:`\zeta` denotes the vector of phase space coordinates, and indices :math:`i,j` specify the components of :math:`\zeta`.
+In ImpactX, beam sampling is performed under the assumption that the initial beam distribution centroid (mean phase space vector) coincides with the phase space origin.  The covariance matrix :math:`\Sigma` is defined by :math:`\Sigma_{ij}=\langle{\zeta_i\zeta_j\rangle}`, where :math:`\zeta` denotes the vector of phase space coordinates, and indices :math:`i,j` specify the components of :math:`\zeta`.
 
 Let :math:`P` denote a phase space probability density with unit covariance matrix (i.e., equal to the identity matrix).  To produce a phase space density with a target covariance matrix :math:`\Sigma`, we write :math:`\Sigma` in terms of its (lower) Cholesky decomposition as:
 
