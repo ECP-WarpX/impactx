@@ -6,6 +6,7 @@
 #
 
 import argparse
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,7 +19,11 @@ parser.add_argument(
 args = parser.parse_args()
 
 # read reduced diagnostics
-data = np.loadtxt("diags/reduced_beam_characteristics.0.0", skiprows=1)
+rdc_name = "diags/reduced_beam_characteristics.0"
+if os.path.exists(rdc_name):
+    data = np.loadtxt(rdc_name, skiprows=1)
+else:  # OpenMP
+    data = np.loadtxt(rdc_name + ".0", skiprows=1)
 s = data[:, 1]
 beta_x = data[:, 33]
 beta_y = data[:, 34]
