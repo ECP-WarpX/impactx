@@ -12,7 +12,7 @@ import transformation_utilities as coord
 from matplotlib import pyplot as plt
 
 ######## plot phase spaces ###########
-beam_series = io.Series("diags/openPMD/monitor.bp", io.Access.read_only)
+beam_series = io.Series("diags/openPMD/monitor.h5", io.Access.read_only)
 beam_steps = list(beam_series.iterations)
 ref_series = ix_plt.read_time_series("diags/ref_particle.*")
 
