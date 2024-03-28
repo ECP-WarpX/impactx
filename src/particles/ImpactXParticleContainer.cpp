@@ -58,6 +58,26 @@ namespace impactx
         : amrex::ParticleContainerPureSoA<RealSoA::nattribs, IntSoA::nattribs>(amr_core->GetParGDB())
     {
         SetParticleSize();
+
+        // name compile-time attributes
+        m_real_soa_names.resize(RealSoA::names_s.size());
+        m_int_soa_names.resize(IntSoA::names_s.size());
+        std::copy(RealSoA::names_s.begin(), RealSoA::names_s.end(), m_real_soa_names.begin());
+        std::copy(IntSoA::names_s.begin(), IntSoA::names_s.end(), m_int_soa_names.begin());
+    }
+
+    void
+    ImpactXParticleContainer::AddRealComp (std::string const & name, bool communicate)
+    {
+        m_real_soa_names.push_back(name);
+        amrex::ParticleContainerPureSoA<RealSoA::nattribs, IntSoA::nattribs>::AddRealComp(communicate);
+    }
+
+    void
+    ImpactXParticleContainer::AddIntComp (std::string const & name, bool communicate)
+    {
+        m_int_soa_names.push_back(name);
+        amrex::ParticleContainerPureSoA<RealSoA::nattribs, IntSoA::nattribs>::AddIntComp(communicate);
     }
 
     void
@@ -246,13 +266,13 @@ namespace impactx
     std::vector<std::string>
     ImpactXParticleContainer::RealSoA_names () const
     {
-        return get_RealSoA_names(this->NumRealComps());
+        return m_real_soa_names;
     }
 
     std::vector<std::string>
     ImpactXParticleContainer::intSoA_names () const
     {
-        return get_intSoA_names(this->NumIntComps());
+        return m_int_soa_names;
     }
 
     CoordSystem
@@ -265,41 +285,5 @@ namespace impactx
     ImpactXParticleContainer::SetCoordSystem (CoordSystem coord_system)
     {
         m_coordsystem = coord_system;
-    }
-
-    std::vector<std::string>
-    get_RealSoA_names (int num_real_comps)
-    {
-        std::vector<std::string> real_soa_names(num_real_comps);
-
-        // compile-time attributes
-        std::copy(RealSoA::names_s.begin(), RealSoA::names_s.end(), real_soa_names.begin());
-
-        // runtime attributes
-        if (num_real_comps > int(RealSoA::names_s.size()))
-        {
-            // particles lost record their "s" position where they got lost
-            real_soa_names[RealSoA::nattribs] = "s_lost";
-        }
-
-        return real_soa_names;
-    }
-
-    std::vector<std::string>
-    get_intSoA_names (int num_int_comps)
-    {
-        std::vector<std::string> int_soa_names(num_int_comps);
-
-        // compile-time attributes
-        std::copy(IntSoA::names_s.begin(), IntSoA::names_s.end(), int_soa_names.begin());
-
-        // runtime attributes
-        if (num_int_comps > int(IntSoA::names_s.size()))
-        {
-            // particles lost record their "s" position where they got lost
-            int_soa_names[IntSoA::nattribs] = "s_lost";
-        }
-
-        return int_soa_names;
     }
 } // namespace impactx
