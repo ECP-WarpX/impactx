@@ -186,7 +186,8 @@ if __name__ == "__main__":
     bounds = [negative, positive]
 
     # optimizer specific values
-    # https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html
+    #   https://docs.scipy.org/doc/scipy/reference/optimize.minimize-neldermead.html
+    #   https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html
     options = {
         "maxiter": 1000,
     }
@@ -195,7 +196,8 @@ if __name__ == "__main__":
     res = minimize(
         objective,
         initial_quad_strengths,
-        method="L-BFGS-B",
+        method="Nelder-Mead",
+        # method="L-BFGS-B",
         tol=1.0e-8,
         options=options,
         bounds=bounds,
