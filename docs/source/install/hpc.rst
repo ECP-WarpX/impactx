@@ -25,6 +25,7 @@ HPC Systems
    :maxdepth: 1
 
    hpc/perlmutter
+   hpc/lumi
 
 .. tip::
 
