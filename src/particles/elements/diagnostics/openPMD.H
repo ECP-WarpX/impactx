@@ -17,6 +17,8 @@
 #include <AMReX_REAL.H>
 
 #include <any>
+#include <string>
+#include <vector>
 
 
 namespace impactx::diagnostics
@@ -86,11 +88,15 @@ namespace detail
          * And write reference particle.
          *
          * @param[in] pc particle container
+         * @param[in] real_soa_names ParticleReal component names
+         * @param[in] int_soa_names integer component names
          * @param[in] ref_part reference particle
          * @param[in] step global step for diagnostics
          */
         void prepare (
             PinnedContainer & pc,
+            std::vector<std::string> const & real_soa_names,
+            std::vector<std::string> const & int_soa_names,
             RefPart const & ref_part,
             int step
         );
@@ -110,10 +116,14 @@ namespace detail
         /** Write a tile of particles
          *
          * @param pti particle tile iterator
+         * @param[in] real_soa_names ParticleReal component names
+         * @param[in] int_soa_names integer component names
          * @param ref_part reference particle
          */
         void operator() (
             PinnedContainer::ParIterType & pti,
+            std::vector<std::string> const & real_soa_names,
+            std::vector<std::string> const & int_soa_names,
             RefPart const & ref_part
         );
 

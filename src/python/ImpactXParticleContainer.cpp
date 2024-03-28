@@ -30,7 +30,8 @@ void init_impactxparticlecontainer(py::module& m)
     py::class_<
         ParIterSoA,
         amrex::ParIterSoA<RealSoA::nattribs, IntSoA::nattribs>
-    >(m, "ImpactXParIter")
+    > py_pariter_soa(m, "ImpactXParIter");
+    py_pariter_soa
         .def(py::init<ParIterSoA::ContainerType&, int>(),
              py::arg("particle_container"), py::arg("level"))
         .def(py::init<ParIterSoA::ContainerType&, int, amrex::MFItInfo&>(),
@@ -40,7 +41,8 @@ void init_impactxparticlecontainer(py::module& m)
     py::class_<
         ParConstIterSoA,
         amrex::ParConstIterSoA<RealSoA::nattribs, IntSoA::nattribs>
-    >(m, "ImpactXParConstIter")
+    > py_parconstiter_soa(m, "ImpactXParConstIter");
+    py_parconstiter_soa
         .def(py::init<ParConstIterSoA::ContainerType&, int>(),
              py::arg("particle_container"), py::arg("level"))
         .def(py::init<ParConstIterSoA::ContainerType&, int, amrex::MFItInfo&>(),
@@ -140,10 +142,6 @@ void init_impactxparticlecontainer(py::module& m)
                "Get the name of each int SoA component")
     ;
 
-    m.def("get_RealSoA_names", &get_RealSoA_names,
-          py::arg("num_real_comps"),
-          "Get the name of each ParticleReal SoA component\n\nnum_real_comps: pass number of compile-time + runtime arrays");
-    m.def("get_intSoA_names", &get_intSoA_names,
-          py::arg("num_int_comps"),
-          "Get the name of each int SoA component\n\nnum_int_comps: pass number of compile-time + runtime arrays");
+    py_pariter_soa.def("pc", &ParIterSoA::pc);
+    py_parconstiter_soa.def("pc", &ParConstIterSoA::pc);
 }

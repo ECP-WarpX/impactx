@@ -90,7 +90,7 @@ namespace impactx {
         // alloc particle containers
         //   the lost particles have an extra runtime attribute: s when it was lost
         bool comm = true;
-        amr_data->m_particles_lost->AddRealComp(comm);
+        amr_data->m_particles_lost->AddRealComp("s_lost", comm);
 
         //   have to resize here, not in the constructor because grids have not
         //   been built when constructor was called.
