@@ -40,9 +40,7 @@ namespace impactx::diagnostics
 
         // write file header per MPI RANK
         if (!append) {
-            if (otype == OutputType::PrintNonlinearLensInvariants) {
-                file_handler << "id H I\n";
-            } else if (otype == OutputType::PrintRefParticle) {
+            if (otype == OutputType::PrintRefParticle) {
                 file_handler << "step s x y z t px py pz pt\n";
             } else if (otype == OutputType::PrintReducedBeamCharacteristics) {
                 file_handler << "step" << " " << "s" << " " << "ref_beta_gamma" << " "
