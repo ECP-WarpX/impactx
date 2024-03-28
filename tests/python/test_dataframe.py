@@ -7,9 +7,15 @@
 #
 # -*- coding: utf-8 -*-
 
+import importlib
+
+import pytest
 from impactx import ImpactX, distribution, elements
 
 
+@pytest.mark.skipif(
+    importlib.util.find_spec("pandas") is None, reason="pandas is not available"
+)
 def test_df_pandas():
     """
     This tests using ImpactX and Pandas Dataframes
