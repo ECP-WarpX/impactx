@@ -162,9 +162,17 @@ The batch script below can be used to run an ImpactX simulation on multiple node
 Replace descriptions between chevrons ``<>`` by relevant values, for instance ``<project id>`` or the concete inputs file.
 Copy the executable or point to it via ``EXE`` and adjust the path for the ``INPUTS`` variable accordingly.
 
-.. literalinclude:: lumi-csc/submit.sh
+.. literalinclude:: lumi-csc/lumi.sbatch
    :language: bash
-   :caption: You can copy this file from ``$HOME/src/impactx/docs/source/install/hpc/lumi-csc/submit.sh``.
+   :caption: You can copy this file from ``$HOME/src/impactx/docs/source/install/hpc/lumi-csc/lumi.sbatch``.
+
+To run a simulation, copy the lines above to a file ``lumi.sbatch`` and run
+
+.. code-block:: bash
+
+   sbatch lumi.sbatch
+
+to submit the job.
 
 
 .. _post-processing-lumi:
