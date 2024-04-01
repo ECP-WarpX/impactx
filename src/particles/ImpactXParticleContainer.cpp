@@ -22,6 +22,7 @@
 #include <AMReX_Particle.H>
 
 #include <algorithm>
+#include <iterator>
 #include <stdexcept>
 
 
@@ -66,9 +67,42 @@ namespace impactx
         std::copy(IntSoA::names_s.begin(), IntSoA::names_s.end(), m_int_soa_names.begin());
     }
 
+    bool ImpactXParticleContainer::HasRealComp (std::string const & name)
+    {
+        return std::find(m_real_soa_names.begin(), m_real_soa_names.end(), name) != std::end(m_real_soa_names);
+    }
+
+    bool ImpactXParticleContainer::HasIntComp (std::string const & name)
+    {
+        return std::find(m_int_soa_names.begin(), m_int_soa_names.end(), name) != std::end(m_int_soa_names);
+    }
+
+    int ImpactXParticleContainer::GetRealCompIndex (std::string const & name)
+    {
+        const auto it = std::find(m_real_soa_names.begin(), m_real_soa_names.end(), name);
+
+        if (it == m_real_soa_names.end())
+            throw std::runtime_error("GetRealCompIndex: Component " + name + " does not exist!");
+        else
+            return std::distance(m_real_soa_names.begin(), it);
+    }
+
+    int ImpactXParticleContainer::GetIntCompIndex (std::string const & name)
+    {
+        const auto it = std::find(m_int_soa_names.begin(), m_int_soa_names.end(), name);
+
+        if (it == m_int_soa_names.end())
+            throw std::runtime_error("GetIntCompIndex: Component " + name + " does not exist!");
+        else
+            return std::distance(m_int_soa_names.begin(), it);
+    }
+
     void
     ImpactXParticleContainer::AddRealComp (std::string const & name, bool communicate)
     {
+        if (std::find(m_real_soa_names.begin(), m_real_soa_names.end(), name) != std::end(m_real_soa_names))
+            throw std::runtime_error("AddRealComp: Component " + name + " already exists!");
+
         m_real_soa_names.push_back(name);
         amrex::ParticleContainerPureSoA<RealSoA::nattribs, IntSoA::nattribs>::AddRealComp(communicate);
     }
@@ -76,6 +110,9 @@ namespace impactx
     void
     ImpactXParticleContainer::AddIntComp (std::string const & name, bool communicate)
     {
+        if (std::find(m_int_soa_names.begin(), m_int_soa_names.end(), name) != std::end(m_int_soa_names))
+            throw std::runtime_error("AddIntComp: Component " + name + " already exists!");
+
         m_int_soa_names.push_back(name);
         amrex::ParticleContainerPureSoA<RealSoA::nattribs, IntSoA::nattribs>::AddIntComp(communicate);
     }
