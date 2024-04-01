@@ -142,6 +142,38 @@ namespace impactx
         //! Destruct a particle container
         virtual ~ImpactXParticleContainer() = default;
 
+        /** Check if a container has a ParticleReal component
+         *
+         * @param name component name to check
+         * @return true if found, else false
+         */
+        bool HasRealComp (std::string const & name);
+
+        /** Check if a container has an Integer component
+         *
+         * @param name component name to check
+         * @return true if found, else false
+         */
+        bool HasIntComp (std::string const & name);
+
+        /** Get the ParticleReal SoA index of a component
+         *
+         * This throws a runtime exception if the component does not exist.
+         *
+         * @param name component name to query index for
+         * @return zero-based index
+         */
+        int GetRealCompIndex (std::string const & name);
+
+        /** Get the Integer SoA index of a component
+         *
+         * This throws a runtime exception if the component does not exist.
+         *
+         * @param name component name to query index for
+         * @return zero-based index
+         */
+        int GetIntCompIndex (std::string const & name);
+
         /** Add a ParticleReal component
          *
          * @param name a unique name of the component, not colliding with RealSoA
