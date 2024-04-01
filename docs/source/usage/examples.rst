@@ -29,6 +29,7 @@ Single Particle Dynamics
    examples/kicker/README.rst
    examples/thin_dipole/README.rst
    examples/aperture/README.rst
+   examples/iota_lens/README.rst
 
 
 
@@ -41,6 +42,7 @@ Space Charge
    examples/expanding_beam/README.rst
    examples/cfchannel/README.rst
    examples/kurth/README.rst
+   examples/epac2004_benchmarks/README.rst
 
 
 Lattice Design & Optimization
@@ -60,7 +62,6 @@ Virtual Test Stands
    :maxdepth: 1
 
    examples/cyclotron/README.rst
-   examples/iota_lens/README.rst
    examples/iota_lattice/README.rst
    examples/positron_channel/README.rst
    examples/pytorch_surrogate_model/README.rst
