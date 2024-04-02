@@ -3,39 +3,69 @@
 Examples
 ========
 
-This section allows you to **download input files** that correspond to different physical situations or test different code features.
+This section demonstrates use cases and benchmarks of ImpactX, each correspond to various physical situations and/or test different code features.
+Each example provides detailed **input scripts** that can be used as templates for your research projects.
+
+
+Single Particle Dynamics
+------------------------
 
 .. toctree::
    :maxdepth: 1
 
    examples/fodo/README.rst
    examples/chicane/README.rst
-   examples/cfchannel/README.rst
-   examples/expanding_beam/README.rst
-   examples/kurth/README.rst
    examples/alignment/README.rst
+   examples/rotation/README.rst
    examples/rfcavity/README.rst
    examples/fodo_rf/README.rst
    examples/fodo_chromatic/README.rst
    examples/multipole/README.rst
-   examples/iota_lens/README.rst
-   examples/iota_lattice/README.rst
    examples/solenoid/README.rst
-   examples/rotation/README.rst
    examples/solenoid_softedge/README.rst
    examples/quadrupole_softedge/README.rst
-   examples/positron_channel/README.rst
-   examples/cyclotron/README.rst
    examples/cfbend/README.rst
    examples/compression/README.rst
    examples/kicker/README.rst
    examples/thin_dipole/README.rst
    examples/aperture/README.rst
+   examples/iota_lens/README.rst
+
+
+
+Space Charge
+------------
+
+.. toctree::
+   :maxdepth: 1
+
+   examples/expanding_beam/README.rst
+   examples/cfchannel/README.rst
+   examples/kurth/README.rst
    examples/epac2004_benchmarks/README.rst
-   examples/pytorch_surrogate_model/README.rst
-   examples/apochromatic/README.rst
+
+
+Lattice Design & Optimization
+-----------------------------
+
+.. toctree::
+   :maxdepth: 1
+
    examples/fodo_tune/README.rst
    examples/optimize_triplet/README.rst
+
+
+Virtual Test Stands
+-------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   examples/cyclotron/README.rst
+   examples/iota_lattice/README.rst
+   examples/positron_channel/README.rst
+   examples/pytorch_surrogate_model/README.rst
+   examples/apochromatic/README.rst
 
 
 Unit tests
