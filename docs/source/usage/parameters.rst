@@ -539,7 +539,7 @@ Lattice Elements
             * ``<element_name>.nonlinear_lens_invariants`` (``boolean``, default value: ``false``)
 
                 Compute and output the invariants H and I within the nonlinear magnetic insert element (see: ``nonlinear_lens``).
-                Invariants associated with a single short segment of the nonlinear magnetic insert described by V. Danilov and S. Nagaitsev, PRSTAB 13, 084002 (2010), Sect. V.A.
+                Invariants associated with the nonlinear magnetic insert described by V. Danilov and S. Nagaitsev, PRSTAB 13, 084002 (2010), Sect. V.A.
 
                 * ``<element_name>.alpha`` (``float``, unitless) Twiss alpha of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.
                   Horizontal and vertical values must be equal.
