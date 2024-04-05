@@ -21,11 +21,6 @@ sim.slice_step_diagnostics = True
 # domain decomposition & space charge mesh
 sim.init_grids()
 
-# diagnostics: IOTA nonlinear lens invariants calculation
-sim.set_diag_iota_invariants(
-    alpha=1.376381920471173, beta=1.892632003628881, tn=0.4, cn=0.01
-)
-
 # init particle beam
 energy_MeV = 2.5
 bunch_charge_C = 1.0e-9  # used with space charge
@@ -51,6 +46,11 @@ sim.add_particles(bunch_charge_C, distr, npart)
 
 # add beam diagnostics
 monitor = elements.BeamMonitor("monitor", backend="h5")
+monitor.nonlinear_lens_invariants = True
+monitor.alpha = 1.376381920471173
+monitor.beta = 1.892632003628881
+monitor.tn = 0.4
+monitor.cn = 0.01
 
 # init accelerator lattice
 ns = 10  # number of slices per ds in the element

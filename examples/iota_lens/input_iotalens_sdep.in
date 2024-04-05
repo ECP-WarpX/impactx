@@ -92,18 +92,15 @@ const.nslice = 1
 # Beam Monitor: Diagnostics
 monitor.type = beam_monitor
 monitor.backend = h5
+monitor.nonlinear_lens_invariants = true
+monitor.alpha = 1.376381920471173
+monitor.beta = 1.892632003628881
+monitor.tn = 0.4
+monitor.cn = 0.01
+
 
 ###############################################################################
 # Algorithms
 ###############################################################################
 algo.particle_shape = 2
 algo.space_charge = false
-
-
-###############################################################################
-# Diagnostics
-###############################################################################
-diag.alpha = 1.376381920471173
-diag.beta = 1.892632003628881
-diag.tn = 0.4
-diag.cn = 0.01

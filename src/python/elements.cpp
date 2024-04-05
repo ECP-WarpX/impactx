@@ -17,6 +17,35 @@ namespace py = pybind11;
 using namespace impactx;
 
 
+namespace detail
+{
+    /** Helper Function for Property Getters
+     *
+     * This queries an amrex::ParmParse entry. This throws a
+     * std::runtime_error if the entry is not found.
+     *
+     * This handles most common throw exception logic in ImpactX instead of
+     * going over library boundaries via amrex::Abort().
+     *
+     * @tparam T type of the amrex::ParmParse entry
+     * @param prefix the prefix, e.g., "impactx" or "amr"
+     * @param name the actual key of the entry, e.g., "particle_shape"
+     * @return the queried value (or throws if not found)
+     */
+    template< typename T>
+    auto get_or_throw (std::string const & prefix, std::string const & name)
+    {
+        T value;
+        // TODO: if array do queryarr
+        // bool const has_name = amrex::ParmParse(prefix).queryarr(name.c_str(), value);
+        bool const has_name = amrex::ParmParse(prefix).query(name.c_str(), value);
+
+        if (!has_name)
+            throw std::runtime_error(prefix + "." + name + " is not set yet");
+        return value;
+    }
+}
+
 namespace
 {
     /** Registers the mixin BeamOptics::operator methods
@@ -159,7 +188,54 @@ void init_elements(py::module& m)
              py::arg("encoding") = "g",
              "This element writes the particle beam out to openPMD data."
         )
+        .def_property_readonly("name",
+            &diagnostics::BeamMonitor::series_name,
+            "name of the series"
+        )
+        .def_property("nonlinear_lens_invariants",
+            [](diagnostics::BeamMonitor & bm) { return detail::get_or_throw<bool>(bm.series_name(), "nonlinear_lens_invariants"); },
+            [](diagnostics::BeamMonitor & bm, bool nonlinear_lens_invariants) {
+                amrex::ParmParse pp_element(bm.series_name());
+                pp_element.add("nonlinear_lens_invariants", nonlinear_lens_invariants);
+            },
+            "Compute and output the invariants H and I within the nonlinear magnetic insert element"
+        )
+        .def_property("alpha",
+            [](diagnostics::BeamMonitor & bm) { return detail::get_or_throw<amrex::Real>(bm.series_name(), "alpha"); },
+            [](diagnostics::BeamMonitor & bm, amrex::Real alpha) {
+                amrex::ParmParse pp_element(bm.series_name());
+                pp_element.add("alpha", alpha);
+            },
+            "Twiss alpha of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.\n"
+            "Horizontal and vertical values must be equal."
+        )
+        .def_property("beta",
+            [](diagnostics::BeamMonitor & bm) { return detail::get_or_throw<amrex::Real>(bm.series_name(), "beta"); },
+            [](diagnostics::BeamMonitor & bm, amrex::Real beta) {
+                amrex::ParmParse pp_element(bm.series_name());
+                pp_element.add("beta", beta);
+            },
+            "Twiss beta (in meters) of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.\n"
+            "Horizontal and vertical values must be equal."
+        )
+        .def_property("tn",
+            [](diagnostics::BeamMonitor & bm) { return detail::get_or_throw<amrex::Real>(bm.series_name(), "tn"); },
+            [](diagnostics::BeamMonitor & bm, amrex::Real tn) {
+                amrex::ParmParse pp_element(bm.series_name());
+                pp_element.add("tn", tn);
+            },
+            "Dimensionless strength of the IOTA nonlinear magnetic insert element used for computing H and I."
+        )
+        .def_property("cn",
+            [](diagnostics::BeamMonitor & bm) { return detail::get_or_throw<amrex::Real>(bm.series_name(), "cn"); },
+            [](diagnostics::BeamMonitor & bm, amrex::Real cn) {
+                amrex::ParmParse pp_element(bm.series_name());
+                pp_element.add("cn", cn);
+            },
+            "Scale factor (in meters^(1/2)) of the IOTA nonlinear magnetic insert element used for computing H and I."
+        )
     ;
+
     register_beamoptics_push(py_BeamMonitor);
 
     // beam optics
