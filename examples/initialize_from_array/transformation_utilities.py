@@ -5,7 +5,10 @@ def to_ref_part_t_from_global_t(ref_part, x, y, z, px, py, pz):
     """
     Transform from global coordinates to reference particle coordinates
 
-    This function takes particle bunch data and returns the bunch phase space positions relative to a reference particle
+    This function takes particle bunch data and returns the bunch phase space positions relative to a reference particle.
+    It is assumed that the local and global coordinate frames align.
+    That is, the beam transverse directions x and y are the global x and y directions
+    and the beam z direction is the global z direction.
 
     Parameters
     ---
@@ -42,10 +45,13 @@ def to_ref_part_t_from_global_t(ref_part, x, y, z, px, py, pz):
 
 def to_global_t_from_ref_part_t(ref_part, dx, dy, dz, dpx, dpy, dpz):
     """
-    Transform from reference particle to global coordinates
+    Transform from reference particle to global coordinates.
 
     This function takes particle bunch data relative to a reference particle
-    and returns all particle data in the global coordinate frame
+    and returns all particle data in the global coordinate frame.
+    It is assumed that the local and global coordinate frames align.
+    That is, the beam transverse directions x and y are the global x and y directions
+    and the beam z direction is the global z direction.
 
     Parameters
     ---

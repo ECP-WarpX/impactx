@@ -1,15 +1,18 @@
-import numpy as np
-
-try:
-    import torch
-
-    on_gpu = torch.cuda.is_available()
-except ImportError:
-    on_gpu = False
+#!/usr/bin/env python3
+#
+# Copyright 2022-2023 ImpactX contributors
+# Authors: Ryan Sandberg, Axel Huebl, Chad Mitchell
+# License: BSD-3-Clause-LBNL
+#
+# -*- coding: utf-8 -*-
 
 import amrex.space3d as amr
-import transformation_utilities as pycoord
 from impactx import ImpactX, elements
+from impactx import Config, ImpactX, elements
+import numpy as np
+import transformation_utilities as pycoord
+
+on_gpu = Config.have_gpu
 
 ################
 
@@ -76,18 +79,18 @@ else:  # initialize on device using arena/gpu-based PODVectors
     dpy_podv = amr.PODVector_real_arena()
     dpt_podv = amr.PODVector_real_arena()
 
-for element in dx:
-    dx_podv.push_back(element)
-for element in dy:
-    dy_podv.push_back(element)
-for element in dt:
-    dt_podv.push_back(element)
-for element in dpx:
-    dpx_podv.push_back(element)
-for element in dpy:
-    dpy_podv.push_back(element)
-for element in dpt:
-    dpt_podv.push_back(element)
+for p_dx in dx:
+    dx_podv.push_back(p_dx)
+for p_dy in dy:
+    dy_podv.push_back(p_dy)
+for p_dt in dt:
+    dt_podv.push_back(p_dt)
+for p_dpx in dpx:
+    dpx_podv.push_back(p_dpx)
+for p_dpy in dpy:
+    dpy_podv.push_back(p_dpy)
+for p_dpt in dpt:
+    dpt_podv.push_back(p_dpt)
 
 pc.add_n_particles(
     dx_podv, dy_podv, dt_podv, dpx_podv, dpy_podv, dpt_podv, qm_eev, bunch_charge_C
