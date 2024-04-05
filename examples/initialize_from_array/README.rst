@@ -11,7 +11,7 @@ or creating a custom distribution.
 This example includes a set of utilities for transforming the beam to the fixed-s coordinates of ImpactX.
 
 In this example, a custom beam is specified at fixed t, transformed to fixed s, and
-then loaded in ImpactX. 
+then loaded in ImpactX.
 The custom beam is a ring in x-y,
 with radius r=2 mm,
 radial width :math:`\sigma_r = 5\ \mu`m;

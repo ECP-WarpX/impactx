@@ -7,10 +7,9 @@
 # -*- coding: utf-8 -*-
 
 import amrex.space3d as amr
-from impactx import ImpactX, elements
-from impactx import Config, ImpactX, elements
 import numpy as np
 import transformation_utilities as pycoord
+from impactx import Config, ImpactX, elements
 
 on_gpu = Config.have_gpu
 
