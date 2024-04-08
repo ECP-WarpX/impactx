@@ -11,7 +11,6 @@ import numpy as np
 import transformation_utilities as pycoord
 from impactx import Config, ImpactX, elements
 
-
 ################
 
 N_part = int(1e5)
