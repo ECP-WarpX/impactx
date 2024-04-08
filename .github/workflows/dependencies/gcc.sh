@@ -24,6 +24,7 @@ sudo apt-get install -y \
 python3 -m pip install -U pip
 python3 -m pip install -U build packaging setuptools wheel
 python3 -m pip install -U cmake pytest
+python3 -m pip install -U -r requirements.txt
 python3 -m pip install -U -r examples/requirements.txt
 
 python3 -m pip install -U openPMD-validator

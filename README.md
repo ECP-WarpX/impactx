@@ -122,7 +122,7 @@ In order to run our tests, you need to have a few Python packages installed:
 ```console
 python3 -m pip install --upgrade pip
 python3 -m pip install --upgrade build packaging setuptools wheel pytest
-python3 -m pip install --upgrade -r examples/requirements.txt
+python3 -m pip install --upgrade -r tests/python/requirements.txt
 ```
 
 You can run all our tests with:

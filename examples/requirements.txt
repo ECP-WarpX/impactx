@@ -1,3 +1,4 @@
+-r ../requirements.txt
 matplotlib
 numpy
 openpmd-api
