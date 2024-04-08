@@ -29,6 +29,7 @@ Optional dependencies include:
 
   - `mpi4py <https://mpi4py.readthedocs.io>`__
   - `numpy <https://numpy.org>`__
+  - `quantiphy <https://quantiphy.readthedocs.io/>`__
   - `openPMD-api <https://github.com/openPMD/openPMD-api>`__
   - see our ``requirements.txt`` file for compatible versions
 
@@ -66,7 +67,7 @@ Conda (Linux/macOS/Windows)
 
       .. code-block:: bash
 
-         conda create -n impactx-cpu-mpich-dev -c conda-forge blaspp boost ccache cmake compilers git lapackpp "openpmd-api=*=mpi_mpich*" python numpy pandas scipy yt pkg-config matplotlib mamba ninja mpich pip virtualenv
+         conda create -n impactx-cpu-mpich-dev -c conda-forge blaspp boost ccache cmake compilers git lapackpp "openpmd-api=*=mpi_mpich*" python numpy pandas quantiphy scipy yt pkg-config matplotlib mamba ninja mpich pip virtualenv
          conda activate impactx-cpu-mpich-dev
 
          # compile ImpactX with -DImpactX_MPI=ON
@@ -76,7 +77,7 @@ Conda (Linux/macOS/Windows)
 
       .. code-block:: bash
 
-         conda create -n impactx-cpu-dev -c conda-forge blaspp boost ccache cmake compilers git lapackpp openpmd-api python numpy pandas scipy yt pkg-config matplotlib mamba ninja pip virtualenv
+         conda create -n impactx-cpu-dev -c conda-forge blaspp boost ccache cmake compilers git lapackpp openpmd-api python numpy pandas quantiphy scipy yt pkg-config matplotlib mamba ninja pip virtualenv
          conda activate impactx-cpu-dev
 
          # compile ImpactX with -DImpactX_MPI=OFF
@@ -138,7 +139,7 @@ Now install the WarpX/ImpactX dependencies in a new development environment:
 
    # installation
    spack install
-   python3 -m pip install jupyter matplotlib numpy openpmd-api openpmd-viewer pandas scipy virtualenv yt
+   python3 -m pip install jupyter matplotlib numpy openpmd-api openpmd-viewer pandas quantiphy scipy virtualenv yt
 
 In new terminal sessions, re-activate the environment with
 

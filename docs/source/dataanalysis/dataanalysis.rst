@@ -3,6 +3,8 @@
 Data Analysis
 =============
 
+.. _dataanalysis-monitor:
+
 Beam Monitor
 ------------
 
@@ -13,6 +15,8 @@ For data analysis of openPMD data, see examples of `many supported tools, Python
 `Exporting data to ASCII <https://openpmd-api.readthedocs.io/en/latest/analysis/pandas.html#openpmd-to-ascii>`__ is possible, too.
 
 See also `WarpX' documentation on openPMD <https://warpx.readthedocs.io/en/latest/dataanalysis/formats.html>`__.
+
+.. _dataanalysis-monitor-refparticle:
 
 Additional Beam Attributes
 """"""""""""""""""""""""""
@@ -49,6 +53,8 @@ Example to print the integrated orbit path length ``s`` at each beam monitor pos
        print(f"step {k_i:>3}: s_ref={s_ref}")
 
 
+.. _dataanalysis-beam-characteristics:
+
 Reduced Beam Characteristics
 ----------------------------
 
@@ -78,3 +84,35 @@ The code writes out the values in an ASCII file prefixed ``reduced_beam_characte
     Courant-Snyder (Twiss) beta (unit: meter)
 * ``charge``
     Cumulated beam charge (unit: Coulomb)
+
+
+.. _dataanalysis-plot:
+
+Interactive Analysis
+--------------------
+
+When steering ImpactX from Python, one can at any point visualize the beam phase space with:
+
+.. code-block:: python
+
+   import matplotlib.pyplot as plt
+
+   from impactx import ImpactX, RefPart, distribution, elements
+
+   sim = ImpactX()
+
+   # ... setup and simulate ...
+
+   pc = sim.particle_container()
+
+   fig = pc.plot_phasespace()
+
+   # note: figure data available on MPI rank zero
+   if fig is not None:
+       fig.savefig("phase_space.png")
+       plt.show()
+
+.. figure:: https://user-images.githubusercontent.com/1353258/295041638-8410ba76-9bd2-4dae-9810-5ec9f33dd372.png
+   :alt: In situ visualization of the beam phase space projections.
+
+   In situ visualization of the beam phase space projections.
