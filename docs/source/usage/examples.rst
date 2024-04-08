@@ -32,7 +32,6 @@ Single Particle Dynamics
    examples/iota_lens/README.rst
 
 
-
 Space Charge
 ------------
 
@@ -43,6 +42,19 @@ Space Charge
    examples/cfchannel/README.rst
    examples/kurth/README.rst
    examples/epac2004_benchmarks/README.rst
+
+
+Beam Distributions
+------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   examples/initialize_from_array/README.rst
+
+.. note::
+
+   We need to document the ``examples/distgen/`` examples here.
 
 
 Lattice Design & Optimization
@@ -67,7 +79,6 @@ Virtual Test Stands
    examples/pytorch_surrogate_model/README.rst
    examples/apochromatic/README.rst
    examples/fodo_tune/README.rst
-   examples/initialize_from_array/README.rst
 
 
 Unit tests
