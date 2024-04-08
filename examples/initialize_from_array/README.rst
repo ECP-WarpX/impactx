@@ -1,7 +1,12 @@
 .. _examples-from-array:
 
-Initialize a beam from arrays
+Initialize a Beam from Arrays
 =============================
+
+
+.. note::
+
+   This example is an early draft of this workflow and will be simplified in future versions of ImpactX, adding direct support for NumPy and CuPy arrays.
 
 This example demonstrates how a beam can be initalized in ImpactX from array-like structures.
 This allows various applications of interest,

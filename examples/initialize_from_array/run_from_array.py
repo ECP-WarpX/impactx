@@ -11,7 +11,6 @@ import numpy as np
 import transformation_utilities as pycoord
 from impactx import Config, ImpactX, elements
 
-on_gpu = Config.have_gpu
 
 ################
 
@@ -63,7 +62,7 @@ dx, dy, dz, dpx, dpy, dpz = pycoord.to_ref_part_t_from_global_t(
 )
 dx, dy, dt, dpx, dpy, dpt = pycoord.to_s_from_t(ref, dx, dy, dz, dpx, dpy, dpz)
 
-if not on_gpu:  # initialize using cpu-based PODVectors
+if not Config.have_gpu:  # initialize using cpu-based PODVectors
     dx_podv = amr.PODVector_real_std()
     dy_podv = amr.PODVector_real_std()
     dt_podv = amr.PODVector_real_std()

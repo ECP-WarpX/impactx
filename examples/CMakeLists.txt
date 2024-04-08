@@ -906,7 +906,8 @@ add_impactx_test(triplet.py
     examples/optimize_triplet/plot_triplet.py
 )
 label_impactx_test(triplet.py slow)
-# Initialize From Array ###########################################################
+
+# Initialize a Beam from Arrays ##############################################
 #
 # w/o space charge
 add_impactx_test(initialize_from_array.py

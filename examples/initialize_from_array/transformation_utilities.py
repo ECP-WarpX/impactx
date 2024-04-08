@@ -11,7 +11,7 @@ def to_ref_part_t_from_global_t(ref_part, x, y, z, px, py, pz):
     and the beam z direction is the global z direction.
 
     Parameters
-    ---
+    ----------
     ref_part: reference particle object, either from ImpactX or from the class defined in this file, MyRefPart
     x: array-like, global beam particle x-positions
     y: array-like, global beam particle y-positions
@@ -54,7 +54,7 @@ def to_global_t_from_ref_part_t(ref_part, dx, dy, dz, dpx, dpy, dpz):
     and the beam z direction is the global z direction.
 
     Parameters
-    ---
+    ----------
     ref_part: reference particle object, either from ImpactX or from the class defined in this file, MyRefPart
     dx: array-like, beam particle x-positions relative to reference particle x value, ``ref_part.x``
     dy: array-like, beam particle y-positions relative to reference particle y value, ``ref_part.y``
@@ -92,7 +92,7 @@ def to_s_from_t(ref_part, dx, dy, dz, dpx, dpy, dpz):  # data_arr_t):
     That is, spatial distance is transformed to time delay from the reference particle.
 
     Parameters
-    ---
+    ----------
     ref_part: reference particle object, either from ImpactX or from the class defined in this file, MyRefPart
     dx: array-like, beam particle x-positions relative to reference particle at fixed t
     dy: array-like, beam particle y-positions relative to reference particle at fixed t
@@ -131,7 +131,7 @@ def to_t_from_s(ref_part, dx, dy, dt, dpx, dpy, dpt):  # data_arr_t):
     That is, time delay is transformed to spatial distance from the reference particle.
 
     Parameters
-    ---
+    ----------
     ref_part: reference particle object, either from ImpactX or from the class defined in this file, MyRefPart
     dx: array-like, beam particle x-positions relative to reference particle at fixed s
     dy: array-like, beam particle y-positions relative to reference particle at fixed s
