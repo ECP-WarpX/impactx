@@ -55,11 +55,6 @@ void init_impactxparticlecontainer(py::module& m)
     >(m, "ImpactXParticleContainer")
         //.def(py::init<>())
 
-        .def_property_readonly_static("RealSoA",
-            [](py::object /* pc */){ return py::type::of<RealSoA>(); },
-            "RealSoA attribute name labels"
-        )
-
         .def_property_readonly("coord_system",
             &ImpactXParticleContainer::GetCoordSystem,
             "Get the current coordinate system of particles in this container"

@@ -9,7 +9,6 @@
 #include <particles/elements/All.H>
 #include <AMReX.H>
 
-#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -71,51 +70,6 @@ void init_elements(py::module& m)
         "elements",
         "Accelerator lattice elements in ImpactX"
     );
-
-    using KnownElementsList = std::list<KnownElements>;
-    py::class_<KnownElementsList> kel(me, "KnownElementsList");
-    kel
-        .def(py::init<>())
-        .def(py::init<KnownElements>())
-        .def(py::init([](py::list const & l){
-            auto v = new KnownElementsList;
-            for (auto const & handle : l)
-                v->push_back(handle.cast<KnownElements>());
-            return v;
-        }))
-
-        .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(std::move(el)); },
-             "Add a single element to the list.")
-
-        .def("extend",
-             [](KnownElementsList &v, KnownElementsList const & l) {
-                 for (auto const & el : l)
-                    v.push_back(el);
-                 return v;
-             },
-             "Add a list of elements to the list.")
-        .def("extend",
-             [](KnownElementsList &v, py::list const & l) {
-                 for (auto const & handle : l)
-                 {
-                    auto el = handle.cast<KnownElements>();
-                    v.push_back(el);
-                 }
-                 return v;
-             },
-             "Add a list of elements to the list."
-         )
-
-        .def("clear", &KnownElementsList::clear,
-             "Clear the list to become empty.")
-        .def("pop_back", &KnownElementsList::pop_back,
-             "Return and remove the last element of the list.")
-        .def("__len__", [](const KnownElementsList &v) { return v.size(); },
-             "The length of the list.")
-        .def("__iter__", [](KnownElementsList &v) {
-            return py::make_iterator(v.begin(), v.end());
-        }, py::keep_alive<0, 1>()) /* Keep list alive while iterator is used */
-    ;
 
     // mixin classes
 
@@ -250,16 +204,16 @@ void init_elements(py::module& m)
         .def(py::init([](
                  amrex::ParticleReal xmax,
                  amrex::ParticleReal ymax,
-                 std::string shape,
+                 std::string const & shape,
                  amrex::ParticleReal dx,
                  amrex::ParticleReal dy,
                  amrex::ParticleReal rotation_degree
              )
              {
                  if (shape != "rectangular" && shape != "elliptical")
-                     throw std::runtime_error("shape must be \"rectangular\" or \"elliptical\"");
+                     throw std::runtime_error(R"(shape must be "rectangular" or "elliptical")");
 
-                 Aperture::Shape s = shape == "rectangular" ?
+                 Aperture::Shape const s = shape == "rectangular" ?
                      Aperture::Shape::rectangular :
                      Aperture::Shape::elliptical;
                  return new Aperture(xmax, ymax, s, dx, dy, rotation_degree);
@@ -273,8 +227,27 @@ void init_elements(py::module& m)
              "A short collimator element applying a transverse aperture boundary."
         )
         .def_property("shape",
-            [](Aperture & ap) { return ap.m_shape; },
-            [](Aperture & ap, Aperture::Shape shape) { ap.m_shape = shape; },
+            [](Aperture & ap)
+            {
+                switch (ap.m_shape)
+                {
+                    case Aperture::Shape::rectangular :  // default
+                        return "rectangular";
+                    case Aperture::Shape::elliptical :
+                        return "elliptical";
+                    default:
+                        throw std::runtime_error("Unknown shape");
+                }
+            },
+            [](Aperture & ap, std::string const & shape)
+            {
+                if (shape != "rectangular" && shape != "elliptical")
+                    throw std::runtime_error(R"(shape must be "rectangular" or "elliptical")");
+
+                ap.m_shape = shape == "rectangular" ?
+                    Aperture::Shape::rectangular :
+                    Aperture::Shape::elliptical;
+            },
             "aperture type (rectangular, elliptical)"
         )
         .def_property("xmax",
@@ -1162,4 +1135,51 @@ void init_elements(py::module& m)
         py::arg("pc"), py::arg("element"), py::arg("step")=0,
         "Push particles through an element"
     );
+
+
+    // all-element type list
+    using KnownElementsList = std::list<KnownElements>;
+    py::class_<KnownElementsList> kel(me, "KnownElementsList");
+    kel
+        .def(py::init<>())
+        .def(py::init<KnownElements>())
+        .def(py::init([](py::list const & l){
+            auto v = new KnownElementsList;
+            for (auto const & handle : l)
+                v->push_back(handle.cast<KnownElements>());
+            return v;
+        }))
+
+        .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(std::move(el)); },
+             "Add a single element to the list.")
+
+        .def("extend",
+             [](KnownElementsList &v, KnownElementsList const & l) {
+                 for (auto const & el : l)
+                     v.push_back(el);
+                 return v;
+             },
+             "Add a list of elements to the list.")
+        .def("extend",
+             [](KnownElementsList &v, py::list const & l) {
+                 for (auto const & handle : l)
+                 {
+                     auto el = handle.cast<KnownElements>();
+                     v.push_back(el);
+                 }
+                 return v;
+             },
+             "Add a list of elements to the list."
+        )
+
+        .def("clear", &KnownElementsList::clear,
+             "Clear the list to become empty.")
+        .def("pop_back", &KnownElementsList::pop_back,
+             "Return and remove the last element of the list.")
+        .def("__len__", [](const KnownElementsList &v) { return v.size(); },
+             "The length of the list.")
+        .def("__iter__", [](KnownElementsList &v) {
+            return py::make_iterator(v.begin(), v.end());
+        }, py::keep_alive<0, 1>()) /* Keep list alive while iterator is used */
+    ;
 }
