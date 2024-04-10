@@ -88,6 +88,7 @@ namespace impactx::spacecharge
             sorted_phi.emplace_back(&phi[lev]);
         }
 
+        const bool is_solver_multigrid = true;
         const bool do_single_precision_comms = false;
         ablastr::fields::computePhi(
             sorted_rho,
@@ -101,6 +102,7 @@ namespace impactx::spacecharge
             pc.GetParGDB()->DistributionMap(),
             pc.GetParGDB()->boxArray(),
             poisson_boundary_handler,
+            is_solver_multigrid,
             do_single_precision_comms,
             rel_ref_ratio
             /*
