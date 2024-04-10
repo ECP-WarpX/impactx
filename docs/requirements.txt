@@ -8,6 +8,7 @@ breathe
 # docutils 0.17 breaks HTML tags & RTD theme
 # https://github.com/sphinx-doc/sphinx/issues/9001
 docutils<=0.16
+pybind11-stubgen  # type hints in pyi files
 pygments
 recommonmark
 sphinx>=2.0
