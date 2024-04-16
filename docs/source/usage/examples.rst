@@ -51,10 +51,7 @@ Beam Distributions
    :maxdepth: 1
 
    examples/initialize_from_array/README.rst
-
-.. note::
-
-   We need to document the ``examples/distgen/`` examples here.
+   examples/distgen/README.rst
 
 
 Lattice Design & Optimization
