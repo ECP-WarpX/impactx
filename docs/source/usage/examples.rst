@@ -48,9 +48,13 @@ Beam Distributions
 ------------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    examples/initialize_from_array/README
+
+.. toctree::
+   :maxdepth: 2
+
    examples/distgen/README
    examples/distgen/README.rst   #subsection here
 
