@@ -48,11 +48,11 @@ Beam Distributions
 ------------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   examples/initialize_from_array/README.rst
-   examples/distgen/README.rst
-
+   examples/initialize_from_array/README
+   examples/distgen/README
+   examples/distgen/README.rst   #subsection here
 
 Lattice Design & Optimization
 -----------------------------
