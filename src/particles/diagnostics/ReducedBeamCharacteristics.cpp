@@ -205,11 +205,11 @@ namespace impactx::diagnostics
             values_per_rank_2nd[i] = amrex::get<i>(r2);
         });
 
-        // reduced sum over mpi ranks (reduce to IO rank)
-        amrex::ParallelDescriptor::ReduceRealSum(
+        // reduced sum over mpi ranks (allreduce)
+        amrex::ParallelAllReduce::Sum(
             values_per_rank_2nd.data(),
             values_per_rank_2nd.size(),
-            amrex::ParallelDescriptor::IOProcessorNumber()
+            amrex::ParallelDescriptor::Communicator()
         );
 
         // minimum values
