@@ -56,7 +56,6 @@ Beam Distributions
    :maxdepth: 2
 
    examples/distgen/README
-   examples/distgen/README.rst   #subsection here
 
 Lattice Design & Optimization
 -----------------------------
