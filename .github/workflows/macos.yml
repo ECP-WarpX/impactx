@@ -82,6 +82,8 @@ jobs:
       run: |
         sudo cmake --build build --target install
 
+        export DYLD_LIBRARY_PATH=/usr/local/lib:${DYLD_LIBRARY_PATH}
+
         impactx.MPI.OMP.DP.OPMD examples/fodo/input_fodo.in algo.particle_shape = 1 || \
         { cat Backtrace.0.0; exit 1; }
         impactx.MPI.OMP.DP.OPMD examples/fodo/input_fodo.in algo.particle_shape = 2 || \
