@@ -259,8 +259,6 @@ namespace impactx::diagnostics
         amrex::ParticleReal const alpha_t = - tpt / emittance_t;
 
         std::unordered_map<std::string, amrex::ParticleReal> data;
-        data["s"] = ref_part.s;  // TODO: remove when the output gets rerouted to openPMD
-        data["ref_beta_gamma"] = ref_part.beta_gamma();  // TODO: remove when the output gets rerouted to openPMD
         data["x_mean"] = x_mean;
         data["x_min"] = x_min;
         data["x_max"] = x_max;
@@ -294,7 +292,7 @@ namespace impactx::diagnostics
         data["beta_x"] = beta_x;
         data["beta_y"] = beta_y;
         data["beta_t"] = beta_t;
-        data["charge_C"] = charge;  // TODO: remove when the output gets rerouted to openPMD
+        data["charge_C"] = charge;
 
         return data;
     }

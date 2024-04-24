@@ -257,6 +257,7 @@ namespace detail
         // reference particle information
         beam.setAttribute( "beta_ref", ref_part.beta() );
         beam.setAttribute( "gamma_ref", ref_part.gamma() );
+        beam.setAttribute( "beta_gamma_ref", ref_part.beta_gamma() );
         beam.setAttribute( "s_ref", ref_part.s );
         beam.setAttribute( "x_ref", ref_part.x );
         beam.setAttribute( "y_ref", ref_part.y );

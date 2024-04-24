@@ -41,9 +41,9 @@ namespace impactx::diagnostics
         // write file header per MPI RANK
         if (!append) {
             if (otype == OutputType::PrintRefParticle) {
-                file_handler << "step s x y z t px py pz pt\n";
+                file_handler << "step s beta gamma beta_gamma x y z t px py pz pt\n";
             } else if (otype == OutputType::PrintReducedBeamCharacteristics) {
-                file_handler << "step" << " " << "s" << " " << "ref_beta_gamma" << " "
+                file_handler << "step" << " "
                              << "x_mean" << " " << "x_min" << " " << "x_max" << " "
                              << "y_mean" << " " << "y_min" << " " << "y_max" << " "
                              << "t_mean" << " " << "t_min" << " " << "t_max" << " "
@@ -65,6 +65,9 @@ namespace impactx::diagnostics
             RefPart const ref_part = pc.GetRefParticle();
 
             amrex::ParticleReal const s = ref_part.s;
+            amrex::ParticleReal const beta = ref_part.beta();
+            amrex::ParticleReal const gamma = ref_part.gamma();
+            amrex::ParticleReal const beta_gamma = ref_part.beta_gamma();
             amrex::ParticleReal const x = ref_part.x;
             amrex::ParticleReal const y = ref_part.y;
             amrex::ParticleReal const z = ref_part.z;
@@ -77,6 +80,7 @@ namespace impactx::diagnostics
             // write particle data to file
             file_handler
                     << step << " " << s << " "
+                    << beta << " " << gamma << " " << beta_gamma << " "
                     << x << " " << y << " " << z << " " << t << " "
                     << px << " " << py << " " << pz << " " << pt << "\n";
         } // if( otype == OutputType::PrintRefParticle)
@@ -84,7 +88,7 @@ namespace impactx::diagnostics
             std::unordered_map<std::string, amrex::ParticleReal> const rbc =
                 diagnostics::reduced_beam_characteristics(pc);
 
-            file_handler << step << " " << rbc.at("s") << " " << rbc.at("ref_beta_gamma") << " "
+            file_handler << step << " "
                          << rbc.at("x_mean") << " " << rbc.at("x_min") << " " << rbc.at("x_max") << " "
                          << rbc.at("y_mean") << " " << rbc.at("y_min") << " " << rbc.at("y_max") << " "
                          << rbc.at("t_mean") << " " << rbc.at("t_min") << " " << rbc.at("t_max") << " "
