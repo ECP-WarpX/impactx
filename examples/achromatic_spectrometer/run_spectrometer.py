@@ -30,12 +30,12 @@ ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_
 
 #   particle bunch
 distr = distribution.Waterbag(
-    sigmaX=3.162277660e-6,
-    sigmaY=3.162277660e-6,
-    sigmaT=1.0e-3,
-    sigmaPx=3.16227766017e-4,
-    sigmaPy=3.16227766017e-4,
-    sigmaPt=2.0e-2,
+    lambdaX=3.162277660e-6,
+    lambdaY=3.162277660e-6,
+    lambdaT=1.0e-3,
+    lambdaPx=3.16227766017e-4,
+    lambdaPy=3.16227766017e-4,
+    lambdaPt=2.0e-2,
     muxpx=0.0,
     muypy=0.0,
     mutpt=0.0,
