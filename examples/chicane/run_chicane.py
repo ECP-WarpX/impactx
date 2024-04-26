@@ -48,8 +48,9 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 
 # design the accelerator lattice
 ns = 25  # number of slices per ds in the element
-rc = 10.35  # bend radius (meters)
+rc = 10.3462283686195526  # bend radius (meters)
 psi = 0.048345620280243  # pole face rotation angle (radians)
+lb = 0.500194828041958  # projected bend length (meters)
 
 # Drift elements
 dr1 = elements.Drift(ds=5.0058489435, nslice=ns)
@@ -57,8 +58,8 @@ dr2 = elements.Drift(ds=1.0, nslice=ns)
 dr3 = elements.Drift(ds=2.0, nslice=ns)
 
 # Bend elements
-sbend1 = elements.Sbend(ds=0.50037, rc=-rc, nslice=ns)
-sbend2 = elements.Sbend(ds=0.50037, rc=rc, nslice=ns)
+sbend1 = elements.Sbend(ds=lb, rc=-rc, nslice=ns)
+sbend2 = elements.Sbend(ds=lb, rc=rc, nslice=ns)
 
 # Dipole Edge Focusing elements
 dipedge1 = elements.DipEdge(psi=-psi, rc=-rc, g=0.0, K2=0.0)
