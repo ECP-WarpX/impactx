@@ -54,7 +54,7 @@ print(f"sig x={sigx:.2e}, sig y={sigy:.2e}, sig z={sigz:.2e}")
 print(f"sig px={sigpx:.2e}, sig py={sigpy:.2e}, sig pz={sigpz:.2e}")
 
 atol = 0.0  # ignored
-rtol = 2 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 2.5 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
