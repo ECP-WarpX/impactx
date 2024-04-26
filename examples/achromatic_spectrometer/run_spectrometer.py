@@ -49,12 +49,12 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 ns = 25  # number of slices per ds in the element
 
 # specify thick tapered plasma lens element
-lens_length = 0.02  #length in m
+lens_length = 0.02  # length in m
 num_lenses = 10
-focal_length = 0.5  #focal length in m
+focal_length = 0.5  # focal length in m
 dtaper = 11.488289081903567  # 1/(horizontal dispersion in m)
 ds = lens_length / num_lenses
-dk = 1.0/(focal_length * num_lenses)
+dk = 1.0 / (focal_length * num_lenses)
 
 # drifts appearing the drift-kick sequence
 ds_half = ds / 2.0
