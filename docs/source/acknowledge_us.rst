@@ -47,6 +47,16 @@ Further ImpactX References
   Proc. of Platform for Advanced Scientific Computing (PASC'24), *submitted*, 2024.
   `arXiv:2402.17248 <http://arxiv.org/abs/2402.17248>`__
 
+- Mitchell C E, Huebl A, Qiang J, Lehe R, Garten M, Sandberg R T, Vay J-L.
+  **ImpactX Modeling of Benchmark Tests for Space Charge Validation**.
+  68th ICFA Advanced Beam Dynamics Workshop on High-Intensity and High-Brightness Hadron Beams (HB2023), THBP44, pp. 583-586, 2023.
+  `DOI:10.18429/JACoW-HB2023-THBP44 <https://doi.org/10.18429/JACoW-HB2023-THBP44>`__
+
+- Mitchell C E, Huebl A, Qiang J, Lehe R, Garten M, Sandberg R T, Vay J-L.
+  **Community Modeling Tools for High Brightness Beam Physics**.
+  68th ICFA Advanced Beam Dynamics Workshop on High-Intensity and High-Brightness Hadron Beams (HB2023), TUA2I2, pp. 81-85, 2023.
+  `DOI:10.18429/JACoW-HB2023-TUA2I2 <https://doi.org/10.18429/JACoW-HB2023-TUA2I2>`__
+
 - Sandberg R T, Lehe R, Mitchell C E, Garten M, Qiang J, Vay J-L and Huebl A.
   **Hybrid Beamline Element ML-Training for Surrogates in the ImpactX Beam-Dynamics Code**.
   14th International Particle Accelerator Conference (IPAC'23), WEPA101, 2023.
