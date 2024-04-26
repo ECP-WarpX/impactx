@@ -50,7 +50,7 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 ns = 25  # number of slices per ds in the element
 rc = 10.3462283686195526  # bend radius (meters)
 psi = 0.048345620280243  # pole face rotation angle (radians)
-lb = 0.500194828041958  # projected bend length (meters)
+lb = 0.500194828041958  # bend arc length (meters)
 
 # Drift elements
 dr1 = elements.Drift(ds=5.0058489435, nslice=ns)
