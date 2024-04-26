@@ -19,9 +19,8 @@ sim.slice_step_diagnostics = True
 # domain decomposition & space charge mesh
 sim.init_grids()
 
-# load a 2 GeV electron beam with an initial
-# unnormalized rms emittance of 2 nm
-kin_energy_MeV = 2.0e3  # reference energy
+# load a 1 GeV electron beam
+kin_energy_MeV = 1.0e3  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
 npart = 10000  # number of macro particles
 
@@ -31,14 +30,14 @@ ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_
 
 #   particle bunch
 distr = distribution.Waterbag(
-    sigmaX=3.9984884770e-5,
-    sigmaY=3.9984884770e-5,
+    sigmaX=3.162277660e-6,
+    sigmaY=3.162277660e-6,
     sigmaT=1.0e-3,
-    sigmaPx=2.6623538760e-5,
-    sigmaPy=2.6623538760e-5,
-    sigmaPt=2.0e-3,
-    muxpx=-0.846574929020762,
-    muypy=0.846574929020762,
+    sigmaPx=3.16227766017e-4,
+    sigmaPy=3.16227766017e-4,
+    sigmaPt=2.0e-2,
+    muxpx=0.0,
+    muypy=0.0,
     mutpt=0.0,
 )
 sim.add_particles(bunch_charge_C, distr, npart)
@@ -46,23 +45,37 @@ sim.add_particles(bunch_charge_C, distr, npart)
 # add beam diagnostics
 monitor = elements.BeamMonitor("monitor", backend="h5")
 
-# design the accelerator lattice)
+# design the accelerator lattice
 ns = 25  # number of slices per ds in the element
-fodo = [
-    monitor,
-    elements.Drift(ds=0.25, nslice=ns),
-    monitor,
-    elements.Quad(ds=1.0, k=1.0, nslice=ns),
-    monitor,
-    elements.Drift(ds=0.5, nslice=ns),
-    monitor,
-    elements.Quad(ds=1.0, k=-1.0, nslice=ns),
-    monitor,
-    elements.Drift(ds=0.25, nslice=ns),
-    monitor,
-]
-# assign a fodo segment
-sim.lattice.extend(fodo)
+
+# specify thick tapered plasma lens element
+lens_length = 0.02  #length in m
+num_lenses = 10
+focal_length = 0.5  #focal length in m
+dtaper = 11.488289081903567  # 1/(horizontal dispersion in m)
+ds = lens_length / num_lenses
+dk = 1.0/(focal_length * num_lenses)
+
+# drifts appearing the drift-kick sequence
+ds_half = ds / 2.0
+dr = elements.Drift(ds=ds_half, nslice=ns)
+
+# define the lens segments
+thick_lens = []
+for j in range(0, num_lenses):
+    pl = elements.TaperedPL(k=dk, taper=dtaper, units=0)
+    segment = [dr, pl, dr]
+    thick_lens.extend(segment)
+
+bend = elements.ExactSbend(ds=1.0, phi=10.0, B=0.0, nslice=ns)
+drift = elements.Drift(ds=1.0, nslice=ns)
+
+# specify the lattice sequence
+sim.lattice.append(monitor)
+sim.lattice.append(bend)
+sim.lattice.extend(thick_lens)
+sim.lattice.append(drift)
+sim.lattice.append(monitor)
 
 # run simulation
 sim.evolve()

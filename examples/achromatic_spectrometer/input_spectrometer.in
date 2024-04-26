@@ -33,23 +33,22 @@ bend1.phi = 10.0
 bend1.B = 0.0
 
 plasma_lens.type = line
-plasma_lens.elements = plend dr pl dr pl dr pl dr pl dr p1 dr p1 dr p1 dr p1 dr p1 dr p1end
+plasma_lens.elements = drend pl dr pl dr pl dr pl dr pl dr pl dr pl dr pl dr pl dr pl drend
 
-p1end.type = tapered_plasma_lens
-p1end.k = 125.0
-p1end.taper = 11.488289081903567
-p1end.units = 0
+drend.type = drift
+drend.ds = 0.001
 
-p1.type = tapered_plasma_lens
-p1.k = 250.0  #focal length 0.5 m
-p1.taper = 11.488289081903567
-p1.units = 0
+pl.type = tapered_plasma_lens
+pl.k = 0.2  #focal length 0.5 m
+pl.taper = 11.488289081903567
+pl.units = 0
 
 dr.type = drift
-dr.ds = 0.25
+dr.ds = 0.002
 
 drift1.type = drift
 drift1.ds = 1.0
+
 
 ###############################################################################
 # Algorithms
