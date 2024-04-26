@@ -8,11 +8,11 @@ D3: drift, L=2.0;
 ! theta=0.50037/10.35;
 ! inv_rho=1.0/10.35
 ! TODO put `angle=theta` for SBENDs and `e1=theta` for DIPEDGEs with their right sign
-SB1: sbend, L=0.50037, angle=-0.04834492753623188, e1=0.000, e2=0.000, k1=0.00;
-SB2: sbend, L=0.50037, angle=0.04834492753623188, e1=0.000, e2=0.000, k1=0.00;
+SB1: sbend, L=0.500194828041958, angle=-0.04834492753623188, e1=0.000, e2=0.000, k1=0.00;
+SB2: sbend, L=0.500194828041958, angle=0.04834492753623188, e1=0.000, e2=0.000, k1=0.00;
 ! dipole edge elements
-DIPE1: dipedge, H=-0.0966183574879227, e1=-0.048345620280243, fint=0.000, hgap=0.000, tilt=0.00;
-DIPE2: dipedge, H=0.0966183574879227, e1=0.048345620280243, fint=0.000, hgap=0.000, tilt=0.00;
+DIPE1: dipedge, H=-0.096653578905433, e1=-0.048345620280243, fint=0.000, hgap=0.000, tilt=0.00;
+DIPE2: dipedge, H=0.096653578905433, e1=0.048345620280243, fint=0.000, hgap=0.000, tilt=0.00;
 
 CHICANE:     Line=(M1,SB1,DIPE1,D1,DIPE2,SB2,D2,SB2,DIPE2,D1,DIPE1,SB1,D3,M1);
 USE, SEQUENCE = CHICANE;
