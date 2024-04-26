@@ -894,3 +894,21 @@ add_impactx_test(fodo_tune.py
     examples/fodo_tune/analysis_fodo_tune.py
     OFF  # no plot script yet
 )
+
+# Achromatic Spectrometer ########################################################
+#
+# w/o space charge
+add_impactx_test(spectrometer
+    examples/achromatic_spectrometer/input_spectrometer.in
+      ON   # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/achromatic_spectrometer/analysis_spectrometer.py
+    OFF  # no plot script yet
+)
+add_impactx_test(spectrometer.py
+    examples/achromatic_spectrometer/run_spectrometer.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/achromatic_spectrometer/analysis_spectrometer.py
+    OFF  # no plot script yet
+)
