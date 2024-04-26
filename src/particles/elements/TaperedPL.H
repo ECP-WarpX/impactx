@@ -108,13 +108,13 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // advance position and momentum
-            // xout = x;
+            xout = x;
             pxout = px - g * ( x + m_taper/2.0 * (pow(x,2) + pow(y,2)) );
 
-            // yout = y;
+            yout = y;
             pyout = py - g * ( y + m_taper * x * y );
 
-            // tout = t;
+            tout = t;
             ptout = pt;
 
             // assign updated values
