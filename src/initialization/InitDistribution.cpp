@@ -166,24 +166,24 @@ namespace impactx
         for (size_t i = 0; i < alphas.size(); i++)
             gammas.push_back((1.0 + std::pow(alphas.at(i), 2)) / betas.at(i));
 
-        amrex::Vector<amrex::ParticleReal> sigmas_pos;
-        amrex::Vector<amrex::ParticleReal> sigmas_mom;
+        amrex::Vector<amrex::ParticleReal> lambdas_pos;
+        amrex::Vector<amrex::ParticleReal> lambdas_mom;
         amrex::Vector<amrex::ParticleReal> correlations;
 
         // calculate intersections of phase space ellipse with coordinate axes and the correlation factors
         for (size_t k = 0; k < betas.size(); k++){
-            sigmas_pos.push_back(std::sqrt(emittances.at(k)/gammas.at(k)));
-            sigmas_mom.push_back(std::sqrt(emittances.at(k)/betas.at(k)));
+            lambdas_pos.push_back(std::sqrt(emittances.at(k)/gammas.at(k)));
+            lambdas_mom.push_back(std::sqrt(emittances.at(k)/betas.at(k)));
 
             correlations.push_back(alphas.at(k) / std::sqrt(betas.at(k) * gammas.at(k)));
         }
 
-        sigx = sigmas_pos.at(0);
-        sigy = sigmas_pos.at(1);
-        sigt = sigmas_pos.at(2);
-        sigpx = sigmas_mom.at(0);
-        sigpy = sigmas_mom.at(1);
-        sigpt = sigmas_mom.at(2);
+        sigx = lambdas_pos.at(0);
+        sigy = lambdas_pos.at(1);
+        sigt = lambdas_pos.at(2);
+        sigpx = lambdas_mom.at(0);
+        sigpy = lambdas_mom.at(1);
+        sigpt = lambdas_mom.at(2);
         muxpx = correlations.at(0);
         muypy = correlations.at(1);
         mutpt = correlations.at(2);
@@ -196,12 +196,12 @@ namespace impactx
         amrex::ParticleReal& muxpx, amrex::ParticleReal& muypy, amrex::ParticleReal& mutpt
     )
     {
-        pp_dist.get("sigmaX", sigx);
-        pp_dist.get("sigmaY", sigy);
-        pp_dist.get("sigmaT", sigt);
-        pp_dist.get("sigmaPx", sigpx);
-        pp_dist.get("sigmaPy", sigpy);
-        pp_dist.get("sigmaPt", sigpt);
+        pp_dist.get("lambdaX", sigx);
+        pp_dist.get("lambdaY", sigy);
+        pp_dist.get("lambdaT", sigt);
+        pp_dist.get("lambdaPx", sigpx);
+        pp_dist.get("lambdaPy", sigpy);
+        pp_dist.get("lambdaPt", sigpt);
         pp_dist.query("muxpx", muxpx);
         pp_dist.query("muypy", muypy);
         pp_dist.query("mutpt", mutpt);

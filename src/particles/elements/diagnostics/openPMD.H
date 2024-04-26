@@ -17,6 +17,8 @@
 #include <AMReX_REAL.H>
 
 #include <any>
+#include <string>
+#include <vector>
 
 
 namespace impactx::diagnostics
@@ -86,11 +88,15 @@ namespace detail
          * And write reference particle.
          *
          * @param[in] pc particle container
+         * @param[in] real_soa_names ParticleReal component names
+         * @param[in] int_soa_names integer component names
          * @param[in] ref_part reference particle
          * @param[in] step global step for diagnostics
          */
         void prepare (
             PinnedContainer & pc,
+            std::vector<std::string> const & real_soa_names,
+            std::vector<std::string> const & int_soa_names,
             RefPart const & ref_part,
             int step
         );
@@ -110,10 +116,14 @@ namespace detail
         /** Write a tile of particles
          *
          * @param pti particle tile iterator
+         * @param[in] real_soa_names ParticleReal component names
+         * @param[in] int_soa_names integer component names
          * @param ref_part reference particle
          */
         void operator() (
             PinnedContainer::ParIterType & pti,
+            std::vector<std::string> const & real_soa_names,
+            std::vector<std::string> const & int_soa_names,
             RefPart const & ref_part
         );
 
@@ -138,10 +148,10 @@ namespace detail
         finalize ();
 
     private:
-        std::string m_series_name; //! ...
-        std::string m_OpenPMDFileType; //! ...
-        std::any m_series; //! openPMD::Series; ...
-        int m_step = 0; //! ...
+        std::string m_series_name; //! openPMD filename
+        std::string m_OpenPMDFileType; //! openPMD backend: usually HDF5 (h5) or ADIOS2 (bp/bp4/bp5) or ADIOS2 SST (sst)
+        std::any m_series; //! openPMD::Series that holds potentially multiple outputs
+        int m_step = 0; //! global step for output
 
         int m_file_min_digits = 6; //! minimum number of digits to iteration number in file name
 
@@ -152,6 +162,17 @@ namespace detail
         std::vector<uint64_t> m_offset;
 
     };
+
+    /** Calculate additional particle properties.
+     *
+     * @param[in] element_name name of the element (for input queries)
+     * @param[inout] pc particle container
+     */
+    void
+    add_optional_properties (
+        std::string const & element_name,
+        ImpactXParticleContainer & pc
+    );
 
 } // namespace impactx::diagnostics
 

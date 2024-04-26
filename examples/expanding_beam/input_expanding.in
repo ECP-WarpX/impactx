@@ -7,12 +7,12 @@ beam.kin_energy = 250.0
 beam.charge = 1.0e-9
 beam.particle = electron
 beam.distribution = kurth6d
-beam.sigmaX = 4.472135955e-4
-beam.sigmaY = 4.472135955e-4
-beam.sigmaT = 9.12241869e-7
-beam.sigmaPx = 0.0
-beam.sigmaPy = 0.0
-beam.sigmaPt = 0.0
+beam.lambdaX = 4.472135955e-4
+beam.lambdaY = 4.472135955e-4
+beam.lambdaT = 9.12241869e-7
+beam.lambdaPx = 0.0
+beam.lambdaPy = 0.0
+beam.lambdaPt = 0.0
 
 
 ###############################################################################

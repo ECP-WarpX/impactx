@@ -103,16 +103,16 @@ namespace impactx::initialization
     /** Initialize the input parameters for all distributions that read phase space ellipse parameters from the input
      *
      * This function sets the distribution parameters based on the provided phase space inputs.
-     * The parameters include the phase space ellipse intersections for position (`sigmaX`, `sigmaY`), time (`sigmaT`),
-     * momentum (`sigmaPx`, `sigmaPy`) and energy (`sigmaPt`), as well as the correlation terms (`muxpx`, `muypy`, `mutpt`).
+     * The parameters include the phase space ellipse intersections for position (`lambdaX`, `lambdaY`), time (`lambdaT`),
+     * momentum (`lambdaPx`, `lambdaPy`) and energy (`lambdaPt`), as well as the correlation terms (`muxpx`, `muypy`, `mutpt`).
      *
      * @param pp_dist The parameter parser object.
-     * @param sigx Reference to the variable storing the axis intersection of the phase space ellipse for x position.
-     * @param sigy Reference to the variable storing the axis intersection of the phase space ellipse for y position.
-     * @param sigt Reference to the variable storing the axis intersection of the phase space ellipse for time.
-     * @param sigpx Reference to the variable storing the axis intersection of the phase space ellipse for momentum in x direction.
-     * @param sigpy Reference to the variable storing the axis intersection of the phase space ellipse for momentum in y direction.
-     * @param sigpt Reference to the variable storing the axis intersection of the phase space ellipse for energy.
+     * @param lambdax Reference to the variable storing the axis intersection of the phase space ellipse for x position.
+     * @param lambday Reference to the variable storing the axis intersection of the phase space ellipse for y position.
+     * @param lambdat Reference to the variable storing the axis intersection of the phase space ellipse for time.
+     * @param lambdapx Reference to the variable storing the axis intersection of the phase space ellipse for momentum in x direction.
+     * @param lambdapy Reference to the variable storing the axis intersection of the phase space ellipse for momentum in y direction.
+     * @param lambdapt Reference to the variable storing the axis intersection of the phase space ellipse for energy.
      * @param muxpx Reference to the variable storing the mean for momentum in x direction.
      * @param muypy Reference to the variable storing the mean for momentum in y direction.
      * @param mutpt Reference to the variable storing the mean for energy.
@@ -120,8 +120,8 @@ namespace impactx::initialization
     void
     set_distribution_parameters_from_phase_space_inputs (
         amrex::ParmParse const & pp_dist,
-        amrex::ParticleReal& sigx, amrex::ParticleReal& sigy, amrex::ParticleReal& sigt,
-        amrex::ParticleReal& sigpx,amrex::ParticleReal& sigpy, amrex::ParticleReal& sigpt,
+        amrex::ParticleReal& lambdax, amrex::ParticleReal& lambday, amrex::ParticleReal& lambdat,
+        amrex::ParticleReal& lambdapx,amrex::ParticleReal& lambdapy, amrex::ParticleReal& lambdapt,
         amrex::ParticleReal& muxpx, amrex::ParticleReal& muypy, amrex::ParticleReal& mutpt
     );
 
@@ -129,15 +129,15 @@ namespace impactx::initialization
     /** Set the distribution parameters from Twiss inputs
      *
      * This function reads Courant-Snyder / Twiss parameters from the provided `ParmParse` object and calculates the distribution parameters for a particle beam.
-     * It sets the values for the axis intercepts of the phase space ellipse (`sigmaX`, `sigmaY`, `sigmaT`, and `sigmaPx`, `sigmaPy`, `sigmaPt`) and correlation terms (`muxpx`, `muypy`, `mutpt`)  normally accepted as input.
+     * It sets the values for the axis intercepts of the phase space ellipse (`lambdaX`, `lambdaY`, `lambdaT`, and `lambdaPx`, `lambdaPy`, `lambdaPt`) and correlation terms (`muxpx`, `muypy`, `mutpt`)  normally accepted as input.
      *
      * @param pp_dist The parameter parser object.
-     * @param sigx Reference to the variable storing the axis intersection of the phase space ellipse for x position.
-     * @param sigy Reference to the variable storing the axis intersection of the phase space ellipse for y position.
-     * @param sigt Reference to the variable storing the axis intersection of the phase space ellipse for time.
-     * @param sigpx Reference to the variable storing the axis intersection of the phase space ellipse for momentum in x direction.
-     * @param sigpy Reference to the variable storing the axis intersection of the phase space ellipse for momentum in y direction.
-     * @param sigpt Reference to the variable storing the axis intersection of the phase space ellipse for energy.
+     * @param lambdax Reference to the variable storing the axis intersection of the phase space ellipse for x position.
+     * @param lambday Reference to the variable storing the axis intersection of the phase space ellipse for y position.
+     * @param lambdat Reference to the variable storing the axis intersection of the phase space ellipse for time.
+     * @param lambdapx Reference to the variable storing the axis intersection of the phase space ellipse for momentum in x direction.
+     * @param lambdapy Reference to the variable storing the axis intersection of the phase space ellipse for momentum in y direction.
+     * @param lambdapt Reference to the variable storing the axis intersection of the phase space ellipse for energy.
      * @param muxpx Reference to the variable storing the mean for momentum in x direction.
      * @param muypy Reference to the variable storing the mean for momentum in y direction.
      * @param mutpt Reference to the variable storing the mean for energy.
@@ -145,8 +145,8 @@ namespace impactx::initialization
     void
     set_distribution_parameters_from_twiss_inputs (
         amrex::ParmParse const & pp_dist,
-        amrex::ParticleReal& sigx, amrex::ParticleReal& sigy, amrex::ParticleReal& sigt,
-        amrex::ParticleReal& sigpx,amrex::ParticleReal& sigpy, amrex::ParticleReal& sigpt,
+        amrex::ParticleReal& lambdax, amrex::ParticleReal& lambday, amrex::ParticleReal& lambdat,
+        amrex::ParticleReal& lambdapx,amrex::ParticleReal& lambdapy, amrex::ParticleReal& lambdapt,
         amrex::ParticleReal& muxpx, amrex::ParticleReal& muypy, amrex::ParticleReal& mutpt
     );
 

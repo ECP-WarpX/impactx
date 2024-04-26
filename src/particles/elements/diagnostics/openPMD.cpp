@@ -24,6 +24,7 @@ namespace io = openPMD;
 
 #include <string>
 #include <utility>
+#include <vector>
 
 
 namespace impactx::diagnostics
@@ -217,6 +218,8 @@ namespace detail
 
     void BeamMonitor::prepare (
         PinnedContainer & pc,
+        std::vector<std::string> const & real_soa_names,
+        std::vector<std::string> const & int_soa_names,
         RefPart const & ref_part,
         int step
     ) {
@@ -281,7 +284,6 @@ namespace detail
 
         // SoA: Real
         {
-            std::vector<std::string> real_soa_names = get_RealSoA_names(pc.NumRealComps());
             for (auto real_idx = 0; real_idx < pc.NumRealComps(); real_idx++) {
                 auto const component_name = real_soa_names.at(real_idx);
                 getComponentRecord(component_name).resetDataset(d_fl);
@@ -289,6 +291,8 @@ namespace detail
         }
         // SoA: Int
         static_assert(IntSoA::nattribs == 0); // not yet used
+        if (!int_soa_names.empty())
+            throw std::runtime_error("BeamMonitor: int_soa_names output not yet implemented!");
 #else
         amrex::ignore_unused(pc, step);
 #endif
@@ -305,6 +309,13 @@ namespace detail
 
         // preparing to access reference particle data: RefPart
         RefPart & ref_part = pc.GetRefParticle();
+
+        // optional: add and calculate additional particle properties
+        add_optional_properties(m_series_name, pc);
+
+        // component names
+        std::vector<std::string> real_soa_names = pc.RealSoA_names();
+        std::vector<std::string> int_soa_names = pc.intSoA_names();
 
         // pinned memory copy
         PinnedContainer pinned_pc = pc.make_alike<amrex::PinnedArenaAllocator>();
@@ -323,7 +334,7 @@ namespace detail
         */
 
         // prepare element access & write reference particle
-        this->prepare(pinned_pc, ref_part, step);
+        this->prepare(pinned_pc, real_soa_names, int_soa_names, ref_part, step);
 
         // loop over refinement levels
         int const nLevel = pinned_pc.finestLevel();
@@ -335,7 +346,7 @@ namespace detail
             // note: openPMD-api is not thread-safe, so do not run OMP parallel here
             for (ParIt pti(pinned_pc, lev); pti.isValid(); ++pti) {
                 // write beam particles relative to reference particle
-                this->operator()(pti, ref_part);
+                this->operator()(pti, real_soa_names, int_soa_names, ref_part);
             } // end loop over all particle boxes
         } // end mesh-refinement level loop
 
@@ -350,6 +361,8 @@ namespace detail
     void
     BeamMonitor::operator() (
         PinnedContainer::ParIterType & pti,
+        std::vector<std::string> const & real_soa_names,
+        std::vector<std::string> const & int_soa_names,
         RefPart const & ref_part
     )
     {
@@ -386,7 +399,6 @@ namespace detail
         }
         //   SoA floating point (ParticleReal) properties
         {
-            std::vector<std::string> real_soa_names = get_RealSoA_names(soa.NumRealComps());
             for (auto real_idx=0; real_idx < soa.NumRealComps(); real_idx++) {
                 auto const component_name = real_soa_names.at(real_idx);
                 getComponentRecord(component_name).storeChunkRaw(
@@ -396,10 +408,11 @@ namespace detail
         //   SoA integer (int) properties (not yet used)
         {
             static_assert(IntSoA::nattribs == 0); // not yet used
+            if (!int_soa_names.empty())
+                throw std::runtime_error("BeamMonitor: int_soa_names output not yet implemented!");
             /*
             // comment this in once IntSoA::nattribs is > 0
 
-            std::vector<std::string> int_soa_names(IntSoA::names_s.size);
             std::copy(IntSoA::names_s.begin(), IntSoA::names_s.end(), int_soa_names.begin());
 
             for (auto int_idx=0; int_idx < RealSoA::nattribs; int_idx++) {

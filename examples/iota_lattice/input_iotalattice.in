@@ -7,12 +7,12 @@ beam.kin_energy = 2.5
 beam.charge = 1.0e-9
 beam.particle = proton
 beam.distribution = waterbag
-beam.sigmaX = 1.588960728035e-3
-beam.sigmaY = 2.496625268437e-3
-beam.sigmaT = 1.0e-3
-beam.sigmaPx = 2.8320397837724e-3
-beam.sigmaPy = 1.802433091137e-3
-beam.sigmaPt = 0.0
+beam.lambdaX = 1.588960728035e-3
+beam.lambdaY = 2.496625268437e-3
+beam.lambdaT = 1.0e-3
+beam.lambdaPx = 2.8320397837724e-3
+beam.lambdaPy = 1.802433091137e-3
+beam.lambdaPt = 0.0
 beam.muxpx = 0.0
 beam.muypy = 0.0
 beam.mutpt = 0.0
@@ -214,6 +214,7 @@ qe3.k = -6.69148177
 # Beam Monitor: Diagnostics
 monitor.type = beam_monitor
 monitor.backend = h5
+monitor.nonlinear_lens_invariants = true
 
 
 ###############################################################################

@@ -41,12 +41,12 @@ def test_transformation():
 
     #   particle bunch
     distr = distribution.Gaussian(
-        sigmaX=3e-6,
-        sigmaY=3e-6,
-        sigmaT=1e-2,
-        sigmaPx=1.33 / energy_gamma,
-        sigmaPy=1.33 / energy_gamma,
-        sigmaPt=100 / energy_gamma,
+        lambdaX=3e-6,
+        lambdaY=3e-6,
+        lambdaT=1e-2,
+        lambdaPx=1.33 / energy_gamma,
+        lambdaPy=1.33 / energy_gamma,
+        lambdaPt=100 / energy_gamma,
         muxpx=-0.5,
         muypy=0.4,
         mutpt=0.8,

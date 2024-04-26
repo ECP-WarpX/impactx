@@ -14,7 +14,7 @@ in all three phase planes.
 The particle distribution should remain unchanged, to within the level expected due to numerical particle noise.
 This is tested using the second moments of the distribution.
 
-In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
+In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
 
 Run
@@ -71,7 +71,7 @@ phase advance from 121 degrees to 74 degrees.
 The particle distribution should remain unchanged, to within the level expected due to numerical particle noise.
 This is tested using the second moments of the distribution.
 
-In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`
+In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`
 
 
 Run

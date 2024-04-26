@@ -148,12 +148,12 @@ Initial Beam Distributions
 
     * Parameters that describe the phase space ellipse and position-momentum correlations:
 
-        * ``beam.sigmaX`` (``float``, in meters) phase space ellipse intersection with X
-        * ``beam.sigmaY`` (``float``, in meters) phase space ellipse intersection with Y
-        * ``beam.sigmaT`` (``float``, in meters) phase space ellipse intersection with T, normalized by multiplying with the speed of light *c*
-        * ``beam.sigmaPx`` (``float``, in radians) phase space ellipse intersection with Px
-        * ``beam.sigmaPy`` (``float``, in radians) phase space ellipse intersection with Py
-        * ``beam.sigmaPt`` (``float``, in radians) phase space ellipse intersection with Pt
+        * ``beam.lambdaX`` (``float``, in meters) phase space ellipse intersection with X
+        * ``beam.lambdaY`` (``float``, in meters) phase space ellipse intersection with Y
+        * ``beam.lambdaT`` (``float``, in meters) phase space ellipse intersection with T, normalized by multiplying with the speed of light *c*
+        * ``beam.lambdaPx`` (``float``, in radians) phase space ellipse intersection with Px
+        * ``beam.lambdaPy`` (``float``, in radians) phase space ellipse intersection with Py
+        * ``beam.lambdaPt`` (``float``, in radians) phase space ellipse intersection with Pt
         * ``beam.muxpx`` (``float``, dimensionless, default: ``0``) correlation X-Px
         * ``beam.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``beam.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
@@ -552,6 +552,21 @@ Lattice Elements
                 openPMD `iteration encoding <https://openpmd-api.readthedocs.io/en/0.14.0/usage/concepts.html#iteration-and-series>`__: (v)ariable based, (f)ile based, (g)roup based (default)
                 variable based is an `experimental feature with ADIOS2 <https://openpmd-api.readthedocs.io/en/0.14.0/backends/adios2.html#experimental-new-adios2-schema>`__.
 
+            * ``<element_name>.nonlinear_lens_invariants`` (``boolean``, default value: ``false``)
+
+                Compute and output the invariants H and I within the nonlinear magnetic insert element (see: ``nonlinear_lens``).
+                Invariants associated with the nonlinear magnetic insert described by V. Danilov and S. Nagaitsev, PRSTAB 13, 084002 (2010), Sect. V.A.
+
+                * ``<element_name>.alpha`` (``float``, unitless) Twiss alpha of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.
+                  Horizontal and vertical values must be equal.
+
+                * ``<element_name>.beta`` (``float``, meters) Twiss beta of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.
+                  Horizontal and vertical values must be equal.
+
+                * ``<element_name>.tn`` (``float``, unitless) dimensionless strength of the IOTA nonlinear magnetic insert element used for computing H and I.
+
+                * ``<element_name>.cn`` (``float``, meters^(1/2)) scale factor of the IOTA nonlinear magnetic insert element used for computing H and I.
+
         * ``line`` a sub-lattice (line) of elements to append to the lattice.
 
             * ``<element_name>.elements`` (``list of strings``) optional (default: no elements)
@@ -709,26 +724,6 @@ Diagnostics and output
 
   Diagnostics for particles lost in apertures, stored as ``diags/openPMD/particles_lost.*`` at the end of the simulation.
   See the ``beam_monitor`` element for backend values.
-
-.. _running-cpp-parameters-diagnostics-reduced:
-
-Reduced Diagnostics
-^^^^^^^^^^^^^^^^^^^
-
-Reduced diagnostics allow the user to compute some reduced quantity (invariants of motion, particle temperature, max of a field, ...) and write a small amount of data to text files.
-Reduced diagnostics are run *in situ* with the simulation.
-
-Diagnostics related to integrable optics in the IOTA nonlinear magnetic insert element:
-
-* ``diag.alpha`` (``float``, unitless) Twiss alpha of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.
-  Horizontal and vertical values must be equal.
-
-* ``diag.beta`` (``float``, meters) Twiss beta of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.
-  Horizontal and vertical values must be equal.
-
-* ``diag.tn`` (``float``, unitless) dimensionless strength of the IOTA nonlinear magnetic insert element used for computing H and I.
-
-* ``diag.cn`` (``float``, meters^(1/2)) scale factor of the IOTA nonlinear magnetic insert element used for computing H and I.
 
 
 .. _running-cpp-parameters-diagnostics-insitu:

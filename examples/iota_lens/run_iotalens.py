@@ -19,9 +19,6 @@ sim.slice_step_diagnostics = True
 # domain decomposition & space charge mesh
 sim.init_grids()
 
-# diagnostics: IOTA nonlinear lens invariants calculation
-sim.set_diag_iota_invariants(alpha=0.0, beta=1.0, tn=0.4, cn=0.01)
-
 # load a 2.5 MeV proton beam
 kin_energy_MeV = 2.5  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
@@ -33,14 +30,22 @@ ref.set_charge_qe(1.0).set_mass_MeV(938.27208816).set_kin_energy_MeV(kin_energy_
 
 #   particle bunch
 distr = distribution.Waterbag(
-    sigmaX=2.0e-3,
-    sigmaY=2.0e-3,
-    sigmaT=1.0e-3,
-    sigmaPx=3.0e-4,
-    sigmaPy=3.0e-4,
-    sigmaPt=0.0,
+    lambdaX=2.0e-3,
+    lambdaY=2.0e-3,
+    lambdaT=1.0e-3,
+    lambdaPx=3.0e-4,
+    lambdaPy=3.0e-4,
+    lambdaPt=0.0,
 )
 sim.add_particles(bunch_charge_C, distr, npart)
+
+# add beam diagnostics
+monitor = elements.BeamMonitor("monitor", backend="h5")
+monitor.nonlinear_lens_invariants = True
+monitor.alpha = 0.0
+monitor.beta = 1.0
+monitor.tn = 0.4
+monitor.cn = 0.01
 
 # design the accelerator lattice
 constEnd = elements.ConstF(ds=0.05, kx=1.0, ky=1.0, kt=1.0e-12)
@@ -48,7 +53,11 @@ nllens = elements.NonlinearLens(knll=4.0e-6, cnll=0.01)
 const = elements.ConstF(ds=0.1, kx=1.0, ky=1.0, kt=1.0e-12)
 
 num_lenses = 18
-nllens_lattice = [constEnd] + [nllens, const] * (num_lenses - 1) + [nllens, constEnd]
+nllens_lattice = (
+    [monitor, constEnd]
+    + [nllens, const] * (num_lenses - 1)
+    + [nllens, constEnd, monitor]
+)
 
 # add elements to the lattice segment
 sim.lattice.extend(nllens_lattice)

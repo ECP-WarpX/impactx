@@ -21,7 +21,7 @@ namespace impactx
 {
     struct CopyAndMarkNegative
     {
-        static constexpr int s_index = 0; //!< index of runtime attribute in destination for position s where particle got lost
+        int s_index; //!< runtime index of runtime attribute in destination for position s where particle got lost
         amrex::ParticleReal s_lost; //!< position s in meters where particle got lost
 
         using SrcData = ImpactXParticleContainer::ParticleTileType::ConstParticleTileDataType;
@@ -57,6 +57,7 @@ namespace impactx
         using SrcData = ImpactXParticleContainer::ParticleTileType::ConstParticleTileDataType;
 
         ImpactXParticleContainer& dest = *source.GetLostParticleContainer();
+        const int s_runtime_index = dest.GetRealCompIndex("s_lost") - dest.NArrayReal;
 
         RefPart const ref_part = source.GetRefParticle();
         auto const s_lost = ref_part.s;
@@ -122,7 +123,7 @@ namespace impactx
                     ptile_dest,
                     ptile_source,
                     predicate,
-                    CopyAndMarkNegative{s_lost},
+                    CopyAndMarkNegative{s_runtime_index, s_lost},
                     0,
                     dst_index
                 );

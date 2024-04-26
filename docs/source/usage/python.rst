@@ -116,15 +116,6 @@ General
       The minimum number of digits (default: ``6``) used for the step
       number appended to the diagnostic file names.
 
-   .. py:method:: set_diag_iota_invariants(alpha, beta, tn, cn)
-
-      Set the parameters of the IOTA nonlinear lens invariants diagnostics.
-
-      :param float alpha: Twiss alpha
-      :param float beta: Twiss beta (m)
-      :param float tn: dimensionless strength of the nonlinear insert
-      :param float cn: scale parameter of the nonlinear insert (m^[1/2])
-
    .. py:property:: particle_lost_diagnostics_backend
 
       Diagnostics for particles lost in apertures.
@@ -379,33 +370,33 @@ This module provides particle beam distributions that can be used to initialize 
 .. py:module:: impactx.distribution
    :synopsis: Particle beam distributions in ImpactX
 
-.. py:class:: impactx.distribution.Gaussian(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
+.. py:class:: impactx.distribution.Gaussian(lambdax, lambday, lambdat, lambdapx, lambdapy, lambdapt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A 6D Gaussian distribution.
 
-   :param sigx: for zero correlation, these are the related RMS sizes (in meters)
-   :param sigy: see sigx
-   :param sigt: see sigx
-   :param sigpx: RMS momentum
-   :param sigpy: see sigpx
-   :param sigpt: see sigpx
+   :param lambdax: phase space position axis intercept; for zero correlation, these are the related RMS sizes (in meters)
+   :param lambday: see lambdax
+   :param lambdat: see lambdax
+   :param lambdapx: phase space momentum axis intercept; for zero correlation, these are the related normalized RMS momenta (in radians)
+   :param lambdapy: see lambdapx
+   :param lambdapt: see lambdapx
    :param muxpx: correlation length-momentum
    :param muypy: see muxpx
    :param mutpt: see muxpx
 
-.. py:class:: impactx.distribution.Kurth4D(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
+.. py:class:: impactx.distribution.Kurth4D(lambdax, lambday, lambdat, lambdapx, lambdapy, lambdapt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A 4D Kurth distribution transversely + a uniform distribution
    in t + a Gaussian distribution in pt.
 
-.. py:class:: impactx.distribution.Kurth6D(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
+.. py:class:: impactx.distribution.Kurth6D(lambdax, lambday, lambdat, lambdapx, lambdapy, lambdapt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A 6D Kurth distribution.
 
    R. Kurth, Quarterly of Applied Mathematics vol. 32, pp. 325-329 (1978)
    C. Mitchell, K. Hwang and R. D. Ryne, IPAC2021, WEPAB248 (2021)
 
-.. py:class:: impactx.distribution.KVdist(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
+.. py:class:: impactx.distribution.KVdist(lambdax, lambday, lambdat, lambdapx, lambdapy, lambdapt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A K-V distribution transversely + a uniform distribution
    in t + a Gaussian distribution in pt.
@@ -414,18 +405,18 @@ This module provides particle beam distributions that can be used to initialize 
 
    This distribution sets all values to zero.
 
-.. py:class:: impactx.distribution.Semigaussian(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
+.. py:class:: impactx.distribution.Semigaussian(lambdax, lambday, lambdat, lambdapx, lambdapy, lambdapt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A 6D Semi-Gaussian distribution (uniform in position, Gaussian in momentum).
 
-.. py:class:: impactx.distribution.Triangle(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
+.. py:class:: impactx.distribution.Triangle(lambdax, lambday, lambdat, lambdapx, lambdapy, lambdapt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A triangle distribution for laser-plasma acceleration related applications.
 
    A ramped, triangular current profile with a Gaussian energy spread (possibly correlated).
    The transverse distribution is a 4D waterbag.
 
-.. py:class:: impactx.distribution.Waterbag(sigx, sigy, sigt, sigpx, sigpy, sigpt, muxpx=0.0, muypy=0.0, mutpt=0.0)
+.. py:class:: impactx.distribution.Waterbag(lambdax, lambday, lambdat, lambdapx, lambdapy, lambdapt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A 6D Waterbag distribution.
 
@@ -609,6 +600,32 @@ This module provides elements for the accelerator lattice.
    :param name: name of the series
    :param backend: I/O backend, e.g., ``bp``, ``h5``, ``json``
    :param encoding: openPMD iteration encoding: (v)ariable based, (f)ile based, (g)roup based (default)
+
+   .. py:property:: name
+
+      name of the series
+
+   .. py:property:: nonlinear_lens_invariants
+
+      Compute and output the invariants H and I within the nonlinear magnetic insert element
+
+   .. py:property:: alpha
+
+      Twiss alpha of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.
+      Horizontal and vertical values must be equal.
+
+   .. py:property:: beta
+
+      Twiss beta (in meters) of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.
+      Horizontal and vertical values must be equal.
+
+   .. py:property:: tn
+
+      Dimensionless strength of the IOTA nonlinear magnetic insert element used for computing H and I.
+
+   .. py:property:: cn
+
+      Scale factor (in meters^(1/2)) of the IOTA nonlinear magnetic insert element used for computing H and I.
 
 .. py:class:: impactx.elements.Programmable
 

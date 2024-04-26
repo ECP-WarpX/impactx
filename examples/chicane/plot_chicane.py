@@ -133,8 +133,8 @@ ax0.set_ylim([0, None])
 ax0.set_ylabel(r"$x$ [m]")
 
 ax1 = axs[1]
-im_sigx = ax1.plot(z, sigx, label=r"$\sigma_x$")
-im_sigt = ax1.plot(z, sigt, label=r"$\sigma_t$")
+im_sigx = ax1.plot(z, sigx, label=r"$\lambda_x$")
+im_sigt = ax1.plot(z, sigt, label=r"$\lambda_t$")
 ax2 = ax1.twinx()
 ax2.set_prop_cycle(None)  # reset color cycle
 im_emittance_x = ax2.plot(z, emittance_x, ":", label=r"$\epsilon_x$")
@@ -144,7 +144,7 @@ ax1.legend(
     handles=im_sigx + im_sigt + im_emittance_x + im_emittance_t, loc="upper right"
 )
 ax1.set_xlabel(r"$z$ [m]")
-ax1.set_ylabel(r"$\sigma_{x,t}$ [mm]")
+ax1.set_ylabel(r"$\lambda_{x,t}$ [mm]")
 # ax2.set_ylabel(r"$\epsilon_{x,y}$ [mm-mrad]")
 ax2.set_ylabel(r"$\epsilon_{x,t}$ [nm]")
 ax1.set_ylim([0, None])
@@ -152,7 +152,7 @@ ax2.set_ylim([0, None])
 ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.tight_layout()
 if args.save_png:
-    plt.savefig("chicane_sigma.png")
+    plt.savefig("chicane_lambda.png")
 else:
     plt.show()
 

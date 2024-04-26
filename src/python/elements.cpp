@@ -9,13 +9,41 @@
 #include <particles/elements/All.H>
 #include <AMReX.H>
 
-#include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace py = pybind11;
 using namespace impactx;
 
+
+namespace detail
+{
+    /** Helper Function for Property Getters
+     *
+     * This queries an amrex::ParmParse entry. This throws a
+     * std::runtime_error if the entry is not found.
+     *
+     * This handles most common throw exception logic in ImpactX instead of
+     * going over library boundaries via amrex::Abort().
+     *
+     * @tparam T type of the amrex::ParmParse entry
+     * @param prefix the prefix, e.g., "impactx" or "amr"
+     * @param name the actual key of the entry, e.g., "particle_shape"
+     * @return the queried value (or throws if not found)
+     */
+    template< typename T>
+    auto get_or_throw (std::string const & prefix, std::string const & name)
+    {
+        T value;
+        // TODO: if array do queryarr
+        // bool const has_name = amrex::ParmParse(prefix).queryarr(name.c_str(), value);
+        bool const has_name = amrex::ParmParse(prefix).query(name.c_str(), value);
+
+        if (!has_name)
+            throw std::runtime_error(prefix + "." + name + " is not set yet");
+        return value;
+    }
+}
 
 namespace
 {
@@ -42,51 +70,6 @@ void init_elements(py::module& m)
         "elements",
         "Accelerator lattice elements in ImpactX"
     );
-
-    using KnownElementsList = std::list<KnownElements>;
-    py::class_<KnownElementsList> kel(me, "KnownElementsList");
-    kel
-        .def(py::init<>())
-        .def(py::init<KnownElements>())
-        .def(py::init([](py::list const & l){
-            auto v = new KnownElementsList;
-            for (auto const & handle : l)
-                v->push_back(handle.cast<KnownElements>());
-            return v;
-        }))
-
-        .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(std::move(el)); },
-             "Add a single element to the list.")
-
-        .def("extend",
-             [](KnownElementsList &v, KnownElementsList const & l) {
-                 for (auto const & el : l)
-                    v.push_back(el);
-                 return v;
-             },
-             "Add a list of elements to the list.")
-        .def("extend",
-             [](KnownElementsList &v, py::list const & l) {
-                 for (auto const & handle : l)
-                 {
-                    auto el = handle.cast<KnownElements>();
-                    v.push_back(el);
-                 }
-                 return v;
-             },
-             "Add a list of elements to the list."
-         )
-
-        .def("clear", &KnownElementsList::clear,
-             "Clear the list to become empty.")
-        .def("pop_back", &KnownElementsList::pop_back,
-             "Return and remove the last element of the list.")
-        .def("__len__", [](const KnownElementsList &v) { return v.size(); },
-             "The length of the list.")
-        .def("__iter__", [](KnownElementsList &v) {
-            return py::make_iterator(v.begin(), v.end());
-        }, py::keep_alive<0, 1>()) /* Keep list alive while iterator is used */
-    ;
 
     // mixin classes
 
@@ -159,7 +142,54 @@ void init_elements(py::module& m)
              py::arg("encoding") = "g",
              "This element writes the particle beam out to openPMD data."
         )
+        .def_property_readonly("name",
+            &diagnostics::BeamMonitor::series_name,
+            "name of the series"
+        )
+        .def_property("nonlinear_lens_invariants",
+            [](diagnostics::BeamMonitor & bm) { return detail::get_or_throw<bool>(bm.series_name(), "nonlinear_lens_invariants"); },
+            [](diagnostics::BeamMonitor & bm, bool nonlinear_lens_invariants) {
+                amrex::ParmParse pp_element(bm.series_name());
+                pp_element.add("nonlinear_lens_invariants", nonlinear_lens_invariants);
+            },
+            "Compute and output the invariants H and I within the nonlinear magnetic insert element"
+        )
+        .def_property("alpha",
+            [](diagnostics::BeamMonitor & bm) { return detail::get_or_throw<amrex::Real>(bm.series_name(), "alpha"); },
+            [](diagnostics::BeamMonitor & bm, amrex::Real alpha) {
+                amrex::ParmParse pp_element(bm.series_name());
+                pp_element.add("alpha", alpha);
+            },
+            "Twiss alpha of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.\n"
+            "Horizontal and vertical values must be equal."
+        )
+        .def_property("beta",
+            [](diagnostics::BeamMonitor & bm) { return detail::get_or_throw<amrex::Real>(bm.series_name(), "beta"); },
+            [](diagnostics::BeamMonitor & bm, amrex::Real beta) {
+                amrex::ParmParse pp_element(bm.series_name());
+                pp_element.add("beta", beta);
+            },
+            "Twiss beta (in meters) of the bare linear lattice at the location of output for the nonlinear IOTA invariants H and I.\n"
+            "Horizontal and vertical values must be equal."
+        )
+        .def_property("tn",
+            [](diagnostics::BeamMonitor & bm) { return detail::get_or_throw<amrex::Real>(bm.series_name(), "tn"); },
+            [](diagnostics::BeamMonitor & bm, amrex::Real tn) {
+                amrex::ParmParse pp_element(bm.series_name());
+                pp_element.add("tn", tn);
+            },
+            "Dimensionless strength of the IOTA nonlinear magnetic insert element used for computing H and I."
+        )
+        .def_property("cn",
+            [](diagnostics::BeamMonitor & bm) { return detail::get_or_throw<amrex::Real>(bm.series_name(), "cn"); },
+            [](diagnostics::BeamMonitor & bm, amrex::Real cn) {
+                amrex::ParmParse pp_element(bm.series_name());
+                pp_element.add("cn", cn);
+            },
+            "Scale factor (in meters^(1/2)) of the IOTA nonlinear magnetic insert element used for computing H and I."
+        )
     ;
+
     register_beamoptics_push(py_BeamMonitor);
 
     // beam optics
@@ -174,16 +204,16 @@ void init_elements(py::module& m)
         .def(py::init([](
                  amrex::ParticleReal xmax,
                  amrex::ParticleReal ymax,
-                 std::string shape,
+                 std::string const & shape,
                  amrex::ParticleReal dx,
                  amrex::ParticleReal dy,
                  amrex::ParticleReal rotation_degree
              )
              {
                  if (shape != "rectangular" && shape != "elliptical")
-                     throw std::runtime_error("shape must be \"rectangular\" or \"elliptical\"");
+                     throw std::runtime_error(R"(shape must be "rectangular" or "elliptical")");
 
-                 Aperture::Shape s = shape == "rectangular" ?
+                 Aperture::Shape const s = shape == "rectangular" ?
                      Aperture::Shape::rectangular :
                      Aperture::Shape::elliptical;
                  return new Aperture(xmax, ymax, s, dx, dy, rotation_degree);
@@ -197,8 +227,27 @@ void init_elements(py::module& m)
              "A short collimator element applying a transverse aperture boundary."
         )
         .def_property("shape",
-            [](Aperture & ap) { return ap.m_shape; },
-            [](Aperture & ap, Aperture::Shape shape) { ap.m_shape = shape; },
+            [](Aperture & ap)
+            {
+                switch (ap.m_shape)
+                {
+                    case Aperture::Shape::rectangular :  // default
+                        return "rectangular";
+                    case Aperture::Shape::elliptical :
+                        return "elliptical";
+                    default:
+                        throw std::runtime_error("Unknown shape");
+                }
+            },
+            [](Aperture & ap, std::string const & shape)
+            {
+                if (shape != "rectangular" && shape != "elliptical")
+                    throw std::runtime_error(R"(shape must be "rectangular" or "elliptical")");
+
+                ap.m_shape = shape == "rectangular" ?
+                    Aperture::Shape::rectangular :
+                    Aperture::Shape::elliptical;
+            },
             "aperture type (rectangular, elliptical)"
         )
         .def_property("xmax",
@@ -1118,4 +1167,51 @@ void init_elements(py::module& m)
         py::arg("pc"), py::arg("element"), py::arg("step")=0,
         "Push particles through an element"
     );
+
+
+    // all-element type list
+    using KnownElementsList = std::list<KnownElements>;
+    py::class_<KnownElementsList> kel(me, "KnownElementsList");
+    kel
+        .def(py::init<>())
+        .def(py::init<KnownElements>())
+        .def(py::init([](py::list const & l){
+            auto v = new KnownElementsList;
+            for (auto const & handle : l)
+                v->push_back(handle.cast<KnownElements>());
+            return v;
+        }))
+
+        .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(std::move(el)); },
+             "Add a single element to the list.")
+
+        .def("extend",
+             [](KnownElementsList &v, KnownElementsList const & l) {
+                 for (auto const & el : l)
+                     v.push_back(el);
+                 return v;
+             },
+             "Add a list of elements to the list.")
+        .def("extend",
+             [](KnownElementsList &v, py::list const & l) {
+                 for (auto const & handle : l)
+                 {
+                     auto el = handle.cast<KnownElements>();
+                     v.push_back(el);
+                 }
+                 return v;
+             },
+             "Add a list of elements to the list."
+        )
+
+        .def("clear", &KnownElementsList::clear,
+             "Clear the list to become empty.")
+        .def("pop_back", &KnownElementsList::pop_back,
+             "Return and remove the last element of the list.")
+        .def("__len__", [](const KnownElementsList &v) { return v.size(); },
+             "The length of the list.")
+        .def("__iter__", [](KnownElementsList &v) {
+            return py::make_iterator(v.begin(), v.end());
+        }, py::keep_alive<0, 1>()) /* Keep list alive while iterator is used */
+    ;
 }

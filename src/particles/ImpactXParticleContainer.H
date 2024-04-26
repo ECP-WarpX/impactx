@@ -100,6 +100,8 @@ namespace impactx
         ParIterSoA (ContainerType& pc, int level);
 
         ParIterSoA (ContainerType& pc, int level, amrex::MFItInfo& info);
+
+        ContainerType * pc () { return m_pc; }
     };
 
     /** Const AMReX iterator for particle boxes - data is read only.
@@ -116,6 +118,8 @@ namespace impactx
         ParConstIterSoA (ContainerType& pc, int level);
 
         ParConstIterSoA (ContainerType& pc, int level, amrex::MFItInfo& info);
+
+        ContainerType const * pc () const { return m_pc; }
     };
 
     /** Beam Particles in ImpactX
@@ -137,6 +141,52 @@ namespace impactx
 
         //! Destruct a particle container
         virtual ~ImpactXParticleContainer() = default;
+
+        /** Check if a container has a ParticleReal component
+         *
+         * @param name component name to check
+         * @return true if found, else false
+         */
+        bool HasRealComp (std::string const & name);
+
+        /** Check if a container has an Integer component
+         *
+         * @param name component name to check
+         * @return true if found, else false
+         */
+        bool HasIntComp (std::string const & name);
+
+        /** Get the ParticleReal SoA index of a component
+         *
+         * This throws a runtime exception if the component does not exist.
+         *
+         * @param name component name to query index for
+         * @return zero-based index
+         */
+        int GetRealCompIndex (std::string const & name);
+
+        /** Get the Integer SoA index of a component
+         *
+         * This throws a runtime exception if the component does not exist.
+         *
+         * @param name component name to query index for
+         * @return zero-based index
+         */
+        int GetIntCompIndex (std::string const & name);
+
+        /** Add a ParticleReal component
+         *
+         * @param name a unique name of the component, not colliding with RealSoA
+         * @param communicate participate in MPI communication when particles move
+         */
+        void AddRealComp (std::string const & name, bool communicate=true);
+
+        /** Add an Integer component
+         *
+         * @param name a unique name of the component, not colliding with IntSoA
+         * @param communicate participate in MPI communication when particles move
+         */
+        void AddIntComp (std::string const & name, bool communicate=true);
 
         /** Add new particles to the container for fixed s.
          *
@@ -291,23 +341,13 @@ namespace impactx
         //! the current coordinate system of particles in this container
         CoordSystem m_coordsystem = CoordSystem::s;
 
+        //! ParticleReal component names
+        std::vector<std::string> m_real_soa_names;
+
+        //! Int component names
+        std::vector<std::string> m_int_soa_names;
+
     }; // ImpactXParticleContainer
-
-    /** Get the name of each ParticleReal SoA component
-     *
-     * @param num_real_comps number of compile-time + runtime arrays
-     * @return names
-     */
-    std::vector<std::string>
-    get_RealSoA_names (int num_real_comps);
-
-    /** Get the name of each int SoA component
-     *
-     * @param num_int_comps number of compile-time + runtime arrays
-     * @return names
-     */
-    std::vector<std::string>
-    get_intSoA_names (int num_int_comps);
 
 } // namespace impactx
 

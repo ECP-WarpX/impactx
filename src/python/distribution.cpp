@@ -29,8 +29,8 @@ void init_distribution(py::module& m)
                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
                 amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
-             py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
-             py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
+             py::arg("lambdaX"), py::arg("lambdaY"), py::arg("lambdaT"),
+             py::arg("lambdaPx"), py::arg("lambdaPy"), py::arg("lambdaPt"),
              py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0,
              "A 6D Gaussian distribution"
         );
@@ -41,8 +41,8 @@ void init_distribution(py::module& m)
                  amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
                  amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
          >(),
-             py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
-             py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
+             py::arg("lambdaX"), py::arg("lambdaY"), py::arg("lambdaT"),
+             py::arg("lambdaPx"), py::arg("lambdaPy"), py::arg("lambdaPt"),
              py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0,
              "A 4D Kurth distribution transversely + a uniform distribution\n"
              "in t + a Gaussian distribution in pt"
@@ -54,8 +54,8 @@ void init_distribution(py::module& m)
                  amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
                  amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
-             py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
-             py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
+             py::arg("lambdaX"), py::arg("lambdaY"), py::arg("lambdaT"),
+             py::arg("lambdaPx"), py::arg("lambdaPy"), py::arg("lambdaPt"),
              py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0,
              "A 6D Kurth distribution\n\n"
              "R. Kurth, Quarterly of Applied Mathematics vol. 32, pp. 325-329 (1978)\n"
@@ -68,8 +68,8 @@ void init_distribution(py::module& m)
                  amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
                  amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
-             py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
-             py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
+             py::arg("lambdaX"), py::arg("lambdaY"), py::arg("lambdaT"),
+             py::arg("lambdaPx"), py::arg("lambdaPy"), py::arg("lambdaPt"),
              py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0,
              "A K-V distribution transversely + a uniform distribution\n"
              "in t + a Gaussian distribution in pt"
@@ -86,8 +86,8 @@ void init_distribution(py::module& m)
                  amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
                  amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
-             py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
-             py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
+             py::arg("lambdaX"), py::arg("lambdaY"), py::arg("lambdaT"),
+             py::arg("lambdaPx"), py::arg("lambdaPy"), py::arg("lambdaPt"),
              py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0,
              "A 6D Semi-Gaussian distribution (uniform in position, Gaussian in momentum)."
         );
@@ -110,8 +110,8 @@ void init_distribution(py::module& m)
                  amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
                  amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
-             py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
-             py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
+             py::arg("lambdaX"), py::arg("lambdaY"), py::arg("lambdaT"),
+             py::arg("lambdaPx"), py::arg("lambdaPy"), py::arg("lambdaPt"),
              py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0,
              "A triangle distribution for laser-plasma acceleration related applications.\n\n"
              "A ramped, triangular current profile with a Gaussian energy spread (possibly correlated).\n"
@@ -124,8 +124,8 @@ void init_distribution(py::module& m)
                  amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal,
                  amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal
              >(),
-             py::arg("sigmaX"), py::arg("sigmaY"), py::arg("sigmaT"),
-             py::arg("sigmaPx"), py::arg("sigmaPy"), py::arg("sigmaPt"),
+             py::arg("lambdaX"), py::arg("lambdaY"), py::arg("lambdaT"),
+             py::arg("lambdaPx"), py::arg("lambdaPy"), py::arg("lambdaPt"),
              py::arg("muxpx")=0.0, py::arg("muypy")=0.0, py::arg("mutpt")=0.0,
              "A 6D Waterbag distribution"
         );

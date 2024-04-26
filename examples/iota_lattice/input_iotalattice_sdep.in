@@ -7,12 +7,12 @@ beam.kin_energy = 2.5
 beam.charge = 1.0e-9
 beam.particle = proton
 beam.distribution = waterbag
-beam.sigmaX = 1.865379469388e-003
-beam.sigmaY = 2.0192133150418e-003
-beam.sigmaT = 1.0e-3
-beam.sigmaPx = 1.402566720991e-003
-beam.sigmaPy = 9.57593913381e-004
-beam.sigmaPt = 0.0
+beam.lambdaX = 1.865379469388e-003
+beam.lambdaY = 2.0192133150418e-003
+beam.lambdaT = 1.0e-3
+beam.lambdaPx = 1.402566720991e-003
+beam.lambdaPy = 9.57593913381e-004
+beam.lambdaPt = 0.0
 beam.muxpx = 0.482260919078473
 beam.muypy = 0.762127656873158
 beam.mutpt = 0.0
@@ -271,6 +271,11 @@ qe3.k = -6.69148177
 # Beam Monitor: Diagnostics
 monitor.type = beam_monitor
 monitor.backend = h5
+monitor.nonlinear_lens_invariants = true
+monitor.alpha = 1.376381920471173
+monitor.beta = 1.892632003628881
+monitor.tn = 0.4
+monitor.cn = 0.01
 
 
 ###############################################################################
@@ -284,8 +289,3 @@ algo.space_charge = false
 # Diagnostics
 ###############################################################################
 diag.slice_step_diagnostics = true
-
-diag.alpha = 1.376381920471173
-diag.beta = 1.892632003628881
-diag.tn = 0.4
-diag.cn = 0.01

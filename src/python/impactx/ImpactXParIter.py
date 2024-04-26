@@ -7,14 +7,14 @@ License: BSD-3-Clause-LBNL
 """
 
 
-def soa_real_comps(self, num_comps):
+def soa_real_comps(pti, num_comps):
     """
     Name the ImpactX ParticleReal components in SoA.
 
     Parameters
     ----------
-    self : impactx_pybind module
-      used to query freestanding functions
+    pti : ImpactXParIter or ImpactXParConstIter
+      used to query particle container component names
     num_comps : int
       number of components to generate names for.
 
@@ -22,7 +22,7 @@ def soa_real_comps(self, num_comps):
     -------
     A list of length num_comps with values.
     """
-    names = self.get_RealSoA_names(num_comps)
+    names = pti.pc().RealSoA_names
 
     if len(names) != num_comps:
         raise RuntimeError(
@@ -32,14 +32,14 @@ def soa_real_comps(self, num_comps):
     return names
 
 
-def soa_int_comps(self, num_comps):
+def soa_int_comps(pti, num_comps):
     """
     Name the ImpactX int components in SoA.
 
     Parameters
     ----------
-    self : impactx_pybind module
-      used to query freestanding functions
+    pti : ImpactXParIter or ImpactXParConstIter
+      used to query particle container component names
     num_comps : int
       number of components to generate names for.
 
@@ -47,7 +47,7 @@ def soa_int_comps(self, num_comps):
     -------
     A list of length num_comps with values.
     """
-    names = self.get_intSoA_names(num_comps)
+    names = pti.pc().intSoA_names
 
     if len(names) != num_comps:
         raise RuntimeError(
@@ -57,13 +57,19 @@ def soa_int_comps(self, num_comps):
     return names
 
 
-def soa(self, impactx_pybind):
-    """Get the StructOfArrays on the current tile"""
+def soa(self):
+    """Get the StructOfArrays on the current tile
+
+    Parameters
+    ----------
+    self : ImpactXParIter or ImpactXParConstIter
+      used to query particle container component names
+    """
     soa = super(type(self), self).soa()
 
     # overwrite name providers
-    soa.soa_real_comps = lambda num_comps: soa_real_comps(impactx_pybind, num_comps)
-    soa.soa_int_comps = lambda num_comps: soa_int_comps(impactx_pybind, num_comps)
+    soa.soa_real_comps = lambda num_comps: soa_real_comps(self, num_comps)
+    soa.soa_int_comps = lambda num_comps: soa_int_comps(self, num_comps)
 
     return soa
 
@@ -71,5 +77,5 @@ def soa(self, impactx_pybind):
 def register_ImpactXParIter_extension(impactx_pybind):
     """ImpactXParIter helper methods"""
 
-    impactx_pybind.ImpactXParIter.soa = lambda self: soa(self, impactx_pybind)
-    impactx_pybind.ImpactXParConstIter.soa = lambda self: soa(self, impactx_pybind)
+    impactx_pybind.ImpactXParIter.soa = soa
+    impactx_pybind.ImpactXParConstIter.soa = soa

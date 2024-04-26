@@ -8,12 +8,12 @@ beam.kin_energy = 2.0e3
 beam.charge = 1.0e-8
 beam.particle = proton
 beam.distribution = waterbag
-beam.sigmaX = 1.2154443728379865788e-3
-beam.sigmaY = 1.2154443728379865788e-3
-beam.sigmaT = 4.0956844276541331005e-4
-beam.sigmaPx = 8.2274435782286157175e-4
-beam.sigmaPy = 8.2274435782286157175e-4
-beam.sigmaPt = 2.4415943602685364584e-3
+beam.lambdaX = 1.2154443728379865788e-3
+beam.lambdaY = 1.2154443728379865788e-3
+beam.lambdaT = 4.0956844276541331005e-4
+beam.lambdaPx = 8.2274435782286157175e-4
+beam.lambdaPy = 8.2274435782286157175e-4
+beam.lambdaPt = 2.4415943602685364584e-3
 
 
 ###############################################################################
