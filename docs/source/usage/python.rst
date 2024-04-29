@@ -831,11 +831,14 @@ This module provides elements for the accelerator lattice.
    A soft-edge solenoid.
 
    :param ds: Segment length in m.
-   :param bscale: Scaling factor for on-axis magnetic field Bz in inverse meters
+   :param bscale: Scaling factor for on-axis magnetic field Bz in inverse meters (if units = 0)
+              = (magnetic field Bz in T) / (rigidity in T-m)
+          OR  Magnetic field Bz in T (SI units, if units = 1)
    :param cos_coefficients: array of ``float`` cosine coefficients in Fourier expansion of on-axis magnetic field Bz
             (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
    :param sin_coefficients: array of ``float`` sine coefficients in Fourier expansion of on-axis magnetic field Bz
             (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
+   :param units: specification of units for scaling of the on-axis longitudinal magnetic field
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]

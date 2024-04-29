@@ -369,11 +369,16 @@ Lattice Elements
         * ``solenoid_softedge`` for a soft-edge solenoid. This requires these additional parameters:
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
-            * ``<element_name>.bscale`` (``float``, in inverse meters) Scaling factor for on-axis magnetic field Bz
+            * ``<element_name>.bscale`` (``float``, in inverse meters) Scaling factor for on-axis longitudinal magnetic field
+                = (magnetic field Bz in T) / (magnetic rigidity in T-m) - if units = 0
+
+             OR = magnetic field Bz in T - if units = 1
+
             * ``<element_name>.cos_coefficients`` (array of ``float``) cos coefficients in Fourier expansion of the on-axis magnetic field Bz
               (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
             * ``<element_name>.sin_coefficients`` (array of ``float``) sin coefficients in Fourier expansion of the on-axis magnetic field Bz
               (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
+            * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
             * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
             * ``<element_name>.dy`` (``float``, in meters) vertical translation error
             * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
