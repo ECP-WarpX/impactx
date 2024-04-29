@@ -7,10 +7,11 @@
 # -*- coding: utf-8 -*-
 
 import amrex.space3d as amr
-import impactx
 import numpy as np
-from impactx import ImpactX, distribution, elements
 from scipy.optimize import minimize
+
+import impactx
+from impactx import ImpactX, distribution, elements
 
 # Call MPI_Init and MPI_Finalize only once:
 if impactx.Config.have_mpi:

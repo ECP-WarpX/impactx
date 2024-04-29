@@ -10,9 +10,10 @@
 import importlib
 
 import amrex.space3d as amr
-import impactx
 import numpy as np
 import pytest
+
+import impactx
 from impactx import ImpactX, distribution, elements
 
 # configure the test
