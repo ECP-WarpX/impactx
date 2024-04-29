@@ -401,7 +401,7 @@ This module provides particle beam distributions that can be used to initialize 
    A K-V distribution transversely + a uniform distribution
    in t + a Gaussian distribution in pt.
 
-.. py:class:: impactx.distribution.None
+.. py:class:: impactx.distribution.Empty
 
    This distribution sets all values to zero.
 
@@ -564,7 +564,7 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
 
-.. py::class:: impactx.elements.None
+.. py::class:: impactx.elements.Empty
 
    This element does nothing.
 

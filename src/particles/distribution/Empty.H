@@ -7,8 +7,8 @@
  * Authors: Chad Mitchell, Axel Huebl
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_DISTRIBUTION_NONE
-#define IMPACTX_DISTRIBUTION_NONE
+#ifndef IMPACTX_DISTRIBUTION_EMPTY_H
+#define IMPACTX_DISTRIBUTION_EMPTY_H
 
 #include "particles/ReferenceParticle.H"
 
@@ -18,11 +18,11 @@
 
 namespace impactx::distribution
 {
-    struct None
+    struct Empty
     {
         /** This distribution sets all values to zero.
          */
-        None()
+        Empty()
         {
         }
 
@@ -81,4 +81,4 @@ namespace impactx::distribution
 
 } // namespace impactx::distribution
 
-#endif // IMPACTX_DISTRIBUTION_NONE
+#endif // IMPACTX_DISTRIBUTION_EMPTY_H

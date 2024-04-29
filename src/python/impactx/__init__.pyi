@@ -17,7 +17,6 @@ from __future__ import annotations
 import os as os
 
 from amrex import space3d as amr
-
 from impactx.impactx_pybind import (
     Config,
     CoordSystem,

@@ -14,7 +14,7 @@
 #include "Kurth4D.H"
 #include "Kurth6D.H"
 #include "KVdist.H"
-#include "None.H"
+#include "Empty.H"
 #include "Semigaussian.H"
 #include "Thermal.H"
 #include "Triangle.H"
@@ -26,7 +26,7 @@
 namespace impactx::distribution
 {
     using KnownDistributions = std::variant<
-        None, /* must be first, so KnownDistributions creates a default constructor */
+        Empty, /* must be first, so KnownDistributions creates a default constructor */
         Gaussian,
         Kurth4D,
         Kurth6D,

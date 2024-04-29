@@ -11,7 +11,6 @@ import importlib
 
 import matplotlib.pyplot as plt
 import pytest
-
 from impactx import ImpactX, amr, distribution, elements
 
 

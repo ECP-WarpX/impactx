@@ -674,11 +674,11 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Multipole);
 
-    py::class_<None, elements::Thin> py_None(me, "None");
+    py::class_<Empty, elements::Thin> py_None(me, "Empty");
     py_None
         .def("__repr__",
-             [](None const & /* none */) {
-                 return std::string("<impactx.elements.None>");
+             [](Empty const & /* none */) {
+                 return std::string("<impactx.elements.Empty>");
              }
         )
         .def(py::init<>(),

@@ -24,7 +24,7 @@
 #include "ExactSbend.H"
 #include "Kicker.H"
 #include "Multipole.H"
-#include "None.H"
+#include "Empty.H"
 #include "NonlinearLens.H"
 #include "Programmable.H"
 #include "Quad.H"
@@ -44,7 +44,7 @@
 namespace impactx
 {
     using KnownElements = std::variant<
-        None, /* must be first, so KnownElements creates a default constructor */
+        Empty, /* must be first, so KnownElements creates a default constructor */
         Aperture,
         Buncher,
         CFbend,
