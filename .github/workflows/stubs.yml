@@ -19,6 +19,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      if: github.event_name != 'push' || github.repository != 'ECP-WarpX/impactx' || github.ref != 'refs/heads/development'
+
+    - uses: actions/checkout@v4
+      if: github.event_name == 'push' && github.repository == 'ECP-WarpX/impactx' && github.ref == 'refs/heads/development'
+      with:
+        token: ${{ secrets.IMPACTX_PUSH_TOKEN }}
 
     - name: Pull Remote Changes
       if: github.event_name == 'push' && github.repository == 'ECP-WarpX/impactx' && github.ref == 'refs/heads/development'
