@@ -59,7 +59,7 @@ Reduced Beam Characteristics
 ----------------------------
 
 ImpactX calculates reduced beam characteristics based on the beam moments during runtime.  These include averaged positions, momenta, beam emittances and Courant-Snyder (Twiss) parameters.
-Averaged positions and momenta are given as deviations with respect to the reference particle (see `Coordinates and Units <theory-coordinates-and-units>`_).
+For computing beam moments (as elsewhere), positions and momenta are given as deviations with respect to the reference particle (see :ref:`Coordinates and Units <theory-coordinates-and-units>`).
 The reduced beam characteristics are calculated before, after, and during each step of the simulation.
 If ``diag.slice_step_diagnostics`` is enabled, they will also be calculated during each slice of each beamline element.
 
