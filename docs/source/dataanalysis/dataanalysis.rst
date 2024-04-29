@@ -58,9 +58,12 @@ Example to print the integrated orbit path length ``s`` at each beam monitor pos
 Reduced Beam Characteristics
 ----------------------------
 
-ImpactX calculates reduced beam characteristics based on the beam moments during runtime.  These include averaged positions, momenta, beam emittances and Courant-Snyder (Twiss) parameters.
+ImpactX calculates reduced beam characteristics based on the beam moments during runtime.
+These include averaged positions, momenta, beam emittances and Courant-Snyder (Twiss) parameters.
 For computing beam moments (as elsewhere), positions and momenta are given as deviations with respect to the reference particle (see :ref:`Coordinates and Units <theory-coordinates-and-units>`).
-The reduced beam characteristics are calculated before, after, and during each step of the simulation.
+
+The reduced beam characteristics are stored with the output of the beam monitor element.
+They are also calculated before, after, and during each step of the simulation.
 If ``diag.slice_step_diagnostics`` is enabled, they will also be calculated during each slice of each beamline element.
 
 The code writes out the values in an ASCII file prefixed ``reduced_beam_characteristics`` containing the follow columns:
