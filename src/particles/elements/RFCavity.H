@@ -379,7 +379,7 @@ namespace RFCavityData
             }
             else if (z < -zmid)
             {
-               efieldint = -zmid*efield;
+               efieldint = -zmid*0.5_prt*cos_data[0];
                for (int j=1; j < m_ncoef; ++j)
                {
                  efieldint = efieldint - zlen*sin_data[j]*cos(j*pi)/(j*2*pi);
@@ -387,7 +387,7 @@ namespace RFCavityData
             }
             else
             {
-               efieldint = zmid*efield;
+               efieldint = zmid*0.5_prt*cos_data[0];;
                for (int j=1; j < m_ncoef; ++j)
                {
                  efieldint = efieldint - zlen*sin_data[j]*cos(j*pi)/(j*2*pi);
