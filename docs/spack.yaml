@@ -22,6 +22,7 @@ spack:
   - py-sphinx
   - py-breathe
   - py-recommonmark
+  - py-pybind11-stubgen
   - py-pygments
   - py-sphinx-copybutton
   - py-sphinx-design

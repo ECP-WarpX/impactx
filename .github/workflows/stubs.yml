@@ -1,0 +1,84 @@
+name: 🔄 Update Stub Files
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.head_ref }}-subs
+  cancel-in-progress: true
+
+jobs:
+  # Build and install libamrex as AMReX CMake project
+  stubs:
+    name: Stubs
+    runs-on: ubuntu-22.04
+    env:
+      CC: gcc
+      CXX: g++
+      CXXFLAGS: "-O1"
+      OMP_NUM_THREAD: 4
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Pull Remote Changes
+      if: github.event_name == 'push' && github.repository == 'ECP-WarpX/impactx' && github.ref == 'refs/heads/development'
+      run: git pull
+
+    - uses: actions/setup-python@v4
+      name: Install Python
+      with:
+        python-version: '3.9'
+
+    - name: Dependencies
+      run: |
+        .github/workflows/dependencies/gcc-openmpi.sh
+        python3 -m pip install -U pip setuptools wheel
+        python3 -m pip install -U pip mpi4py pytest pybind11-stubgen pre-commit
+
+    - name: Set Up Cache
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/ccache
+        key: ccache-${{ github.workflow }}-${{ github.job }}-git-${{ github.sha }}
+        restore-keys: |
+             ccache-${{ github.workflow }}-${{ github.job }}-git-
+
+    - name: Build & Install
+      run: |
+        export CCACHE_COMPRESS=1
+        export CCACHE_COMPRESSLEVEL=10
+        export CCACHE_MAXSIZE=200M
+        ccache -z
+
+        cmake -S . -B build            \
+          -DCMAKE_VERBOSE_MAKEFILE=ON  \
+          -DImpactX_PYTHON=ON          \
+          -DMPIEXEC_POSTFLAGS="--use-hwthread-cpus"
+        cmake --build build -j 4 --target pip_install
+
+        ccache -s
+        du -hs ~/.cache/ccache
+
+    - name: Update Stubs
+      run: |
+        .github/update_stub.sh
+
+    - name: Run pre-commit cleanup
+      run: |
+        git add .
+        pre-commit run -a || true
+        git add .
+
+    - name: Update Install
+      run: |
+        cmake --build build -j 4 --target pip_install
+
+    - name: Unit tests
+      run: |
+        mpiexec -np 1 python3 -m pytest tests/python/
+
+    - uses: stefanzweifel/git-auto-commit-action@v5
+      name: Commit Updated Stub Files
+      if: github.event_name == 'push' && github.repository == 'ECP-WarpX/impactx' && github.ref == 'refs/heads/development'
+      with:
+        commit_message: Update Stub Files
