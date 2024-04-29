@@ -377,6 +377,22 @@ namespace RFCavityData
                       zlen*sin_data[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
                }
             }
+            else if (z < -zmid)
+            {
+               efieldint = -zmid*efield;
+               for (int j=1; j < m_ncoef; ++j)
+               {
+                 efieldint = efieldint - zlen*sin_data[j]*cos(j*pi)/(j*2*pi);
+               }
+            }
+            else
+            {
+               efieldint = zmid*efield;
+               for (int j=1; j < m_ncoef; ++j)
+               {
+                 efieldint = efieldint - zlen*sin_data[j]*cos(j*pi)/(j*2*pi);
+               }
+            }
             return std::make_tuple(efield, efieldp, efieldint);
         }
 
