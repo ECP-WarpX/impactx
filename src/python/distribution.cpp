@@ -75,7 +75,7 @@ void init_distribution(py::module& m)
              "in t + a Gaussian distribution in pt"
         );
 
-    py::class_<distribution::None>(md, "None")
+    py::class_<distribution::Empty>(md, "Empty")
         .def(py::init<>(),
              "Sets all values to zero."
         );

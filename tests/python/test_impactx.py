@@ -10,7 +10,6 @@
 import numpy as np
 import pytest
 from conftest import basepath
-
 from impactx import ImpactX, distribution, elements
 
 # FIXME in AMReX via https://github.com/AMReX-Codes/amrex/pull/3727

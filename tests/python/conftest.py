@@ -3,9 +3,8 @@
 import os
 
 import amrex.space3d as amr
-import pytest
-
 import impactx
+import pytest
 
 if impactx.Config.have_mpi:
     from mpi4py import MPI  # noqa

@@ -20,8 +20,6 @@ import sys
 
 import numpy as np
 import scipy.optimize as opt
-from surrogate_model_definitions import surrogate_model
-
 from impactx import (
     Config,
     CoordSystem,
@@ -31,6 +29,7 @@ from impactx import (
     distribution,
     elements,
 )
+from surrogate_model_definitions import surrogate_model
 
 try:
     import torch

@@ -7,8 +7,8 @@
  * Authors: Axel Huebl
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_NONE_H
-#define IMPACTX_NONE_H
+#ifndef IMPACTX_ELEMENT_EMPTY_H
+#define IMPACTX_ELEMENT_EMPTY_H
 
 #include "particles/ImpactXParticleContainer.H"
 #include "mixin/thin.H"
@@ -20,7 +20,7 @@
 
 namespace impactx
 {
-    struct None
+    struct Empty
     : public elements::Thin,
       public elements::NoFinalize
     {
@@ -29,7 +29,7 @@ namespace impactx
 
         /** This element does nothing.
          */
-        None ()
+        Empty ()
         {
         }
 
@@ -81,4 +81,4 @@ namespace impactx
 
 } // namespace impactx
 
-#endif // IMPACTX_NONE_H
+#endif // IMPACTX_ELEMENT_EMPTY_H
