@@ -7,7 +7,6 @@
 # -*- coding: utf-8 -*-
 
 import amrex.space3d as amr
-
 from impactx import ImpactX, distribution, elements
 
 # work-around for https://github.com/ECP-WarpX/impactx/issues/499

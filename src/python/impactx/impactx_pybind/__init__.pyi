@@ -16,8 +16,9 @@ from __future__ import annotations
 
 import typing
 
-import amrex.space3d.amrex_3d_pybind
 import pybind11_stubgen.typing_ext
+
+import amrex.space3d.amrex_3d_pybind
 from amrex import space3d as amr
 
 from . import distribution, elements

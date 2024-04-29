@@ -6,10 +6,10 @@
 #
 # -*- coding: utf-8 -*-
 
-import amrex.space3d as amr
 import numpy as np
 import transformation_utilities as pycoord
 
+import amrex.space3d as amr
 from impactx import Config, ImpactX, elements
 
 ################

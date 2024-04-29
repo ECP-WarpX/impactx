@@ -2,9 +2,9 @@
 
 import os
 
-import amrex.space3d as amr
 import pytest
 
+import amrex.space3d as amr
 import impactx
 
 if impactx.Config.have_mpi:

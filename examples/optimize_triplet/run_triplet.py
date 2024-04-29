@@ -6,10 +6,10 @@
 #
 # -*- coding: utf-8 -*-
 
-import amrex.space3d as amr
 import numpy as np
 from scipy.optimize import minimize
 
+import amrex.space3d as amr
 import impactx
 from impactx import ImpactX, distribution, elements
 

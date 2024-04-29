@@ -10,11 +10,11 @@
 
 import math
 
-import amrex.space3d as amr
 import matplotlib.pyplot as plt
 import numpy as np
 from conftest import basepath
 
+import amrex.space3d as amr
 import impactx
 
 
