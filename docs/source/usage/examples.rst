@@ -30,6 +30,7 @@ Single Particle Dynamics
    examples/thin_dipole/README.rst
    examples/aperture/README.rst
    examples/iota_lens/README.rst
+   examples/achromatic_spectrometer/README.rst
 
 
 Space Charge

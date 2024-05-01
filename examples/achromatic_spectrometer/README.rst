@@ -1,20 +1,17 @@
-.. _examples-fodo:
+.. _examples-spectrometer:
 
-FODO Cell
-=========
+Achromatic Spectrometer
+========================
 
-Stable FODO cell with a zero-current phase advance of 67.8 degrees.
+A spectrometer beamline using a bending dipole.  A transversely-tapered plasma lens is added for chromatic correction.  The tapered plasma
+lens design is based on:
 
-The matched Twiss parameters at entry are:
+C. A. Lindstrom, presentation at the EuroNNAc Special Topics Workshop 2022:
+"Solutions and challenges for a multi-stage plasma accelerator",
 
-* :math:`\beta_\mathrm{x} = 2.82161941` m
-* :math:`\alpha_\mathrm{x} = -1.59050035`
-* :math:`\beta_\mathrm{y} = 2.82161941` m
-* :math:`\alpha_\mathrm{y} = 1.59050035`
+https://agenda.infn.it/event/28376/contributions/178724/attachments/96899/133588/Lindstr%C3%B8m,%20EuroNNAc%20workshop,%2022%20Sep%202022.pdf
 
-We use a 2 GeV electron beam with initial unnormalized rms emittance of 2 nm.
-
-The second moments of the particle distribution after the FODO cell should coincide with the second moments of the particle distribution before the FODO cell, to within the level expected due to noise due to statistical sampling.
+We use a 1 GeV electron beam with initial normalized rms emittance of 2 microns.
 
 In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
@@ -24,8 +21,8 @@ Run
 
 This example can be run **either** as:
 
-* **Python** script: ``python3 run_fodo.py`` or
-* ImpactX **executable** using an input file: ``impactx input_fodo.in``
+* **Python** script: ``python3 run_spectrometer.py`` or
+* ImpactX **executable** using an input file: ``impactx input_spectrometer.in``
 
 For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
@@ -33,15 +30,15 @@ For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with `
 
    .. tab-item:: Python: Script
 
-       .. literalinclude:: run_fodo.py
+       .. literalinclude:: run_spectrometer.py
           :language: python3
-          :caption: You can copy this file from ``examples/fodo/run_fodo.py``.
+          :caption: You can copy this file from ``examples/achromatic_spectrometer/run_spectrometer.py``.
 
    .. tab-item:: Executable: Input File
 
-       .. literalinclude:: input_fodo.in
+       .. literalinclude:: input_spectrometer.in
           :language: ini
-          :caption: You can copy this file from ``examples/fodo/input_fodo.in``.
+          :caption: You can copy this file from ``examples/achromatic_spectrometer/input_spectrometer.in``.
 
 
 Analyze
@@ -49,30 +46,8 @@ Analyze
 
 We run the following script to analyze correctness:
 
-.. dropdown:: Script ``analysis_fodo.py``
+.. dropdown:: Script ``analysis_spectrometer.py``
 
-   .. literalinclude:: analysis_fodo.py
+   .. literalinclude:: analysis_spectrometer.py
       :language: python3
-      :caption: You can copy this file from ``examples/fodo/analysis_fodo.py``.
-
-
-Visualize
----------
-
-You can run the following script to visualize the beam evolution over time:
-
-.. dropdown:: Script ``plot_fodo.py``
-
-   .. literalinclude:: plot_fodo.py
-      :language: python3
-      :caption: You can copy this file from ``examples/fodo/plot_fodo.py``.
-
-.. figure:: https://user-images.githubusercontent.com/1353258/180287840-8561f6fd-278f-4856-abd8-04fbdb78c8ff.png
-   :alt: focusing, defocusing and preserved emittane in our FODO cell benchmark.
-
-   FODO transversal beam width and emittance evolution
-
-.. figure:: https://user-images.githubusercontent.com/1353258/180287845-eb0210a7-2500-4aa9-844c-67fb094329d3.png
-   :alt: focusing, defocusing and phase space rotation in our FODO cell benchmark.
-
-   FODO transversal beam width and phase space evolution
+      :caption: You can copy this file from ``examples/achromatic_spectrometer/analysis_spectrometer.py``.
