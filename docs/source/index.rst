@@ -86,7 +86,10 @@ Theory
    :maxdepth: 1
    :hidden:
 
-   theory/intro
+   theory/concepts
+   theory/coordinates_units
+   theory/beam_distribution
+   theory/assumptions
 
 Development
 -----------
