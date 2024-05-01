@@ -38,6 +38,7 @@ One can set the number of slice steps through each lattice element for the appli
    Currently, space charge kicks are calculated in 3D.
    A 2D space-charge solver for purely transversal effects will be added in the future.
 
+.. _theory-coordinates-and-units:
 
 Coordinates and Units
 ---------------------
