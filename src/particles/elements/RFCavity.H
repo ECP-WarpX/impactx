@@ -377,17 +377,9 @@ namespace RFCavityData
                       zlen*sin_data[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
                }
             }
-            else if (z < -zmid)
+            else  // endpoint of the RF, outsize zlen
             {
-               efieldint = -zmid*0.5_prt*cos_data[0];
-               for (int j=1; j < m_ncoef; ++j)
-               {
-                 efieldint = efieldint - zlen*sin_data[j]*cos(j*pi)/(j*2*pi);
-               }
-            }
-            else
-            {
-               efieldint = zmid*0.5_prt*cos_data[0];;
+               efieldint = std::copysign(z, z)*zmid*0.5_prt*cos_data[0];;
                for (int j=1; j < m_ncoef; ++j)
                {
                  efieldint = efieldint - zlen*sin_data[j]*cos(j*pi)/(j*2*pi);
