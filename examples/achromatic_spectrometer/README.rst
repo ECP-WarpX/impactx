@@ -1,12 +1,13 @@
-.. _examples-spectrometer:
+.. _examples-achromatic-spectrometer:
 
 Achromatic Spectrometer
-========================
+=======================
 
-A spectrometer beamline using a bending dipole.  A transversely-tapered plasma lens is added for chromatic correction.  The tapered plasma
-lens design is based on:
+A spectrometer beamline using a bending dipole.
+A transversely-tapered plasma lens is added for chromatic correction.
+The tapered plasma lens design is based on:
 
-C. A. Lindstrom, presentation at the EuroNNAc Special Topics Workshop 2022:
+C. A. Lindstrom, presentation at the EuroNNAc Special Topics Workshop 2022, `slides <https://agenda.infn.it/event/28376/contributions/178724/attachments/96899/133588/Lindstr%C3%B8m,%20EuroNNAc%20workshop,%2022%20Sep%202022.pdf>`__
 "Solutions and challenges for a multi-stage plasma accelerator",
 
 https://agenda.infn.it/event/28376/contributions/178724/attachments/96899/133588/Lindstr%C3%B8m,%20EuroNNAc%20workshop,%2022%20Sep%202022.pdf

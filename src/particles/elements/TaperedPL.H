@@ -84,7 +84,7 @@ namespace impactx
             amrex::ParticleReal & AMREX_RESTRICT py,
             amrex::ParticleReal & AMREX_RESTRICT pt,
             [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
-            RefPart const & refpart
+            RefPart const & AMREX_RESTRICT refpart
         ) const
         {
 
@@ -96,7 +96,7 @@ namespace impactx
             // normalize focusing strength units to MAD-X convention if needed
             amrex::ParticleReal g = m_k;
             if (m_unit == 1) {
-                  g = m_k / refpart.rigidity_Tm();
+                g = m_k / refpart.rigidity_Tm();
             }
 
             // intialize output values
@@ -109,7 +109,7 @@ namespace impactx
 
             // advance position and momentum
             xout = x;
-            pxout = px - g * ( x + m_taper/2.0 * (pow(x,2) + pow(y,2)) );
+            pxout = px - g * ( x + m_taper*0.5_prt * (std::pow(x, 2) + std::pow(y, 2)) );
 
             yout = y;
             pyout = py - g * ( y + m_taper * x * y );

@@ -918,9 +918,7 @@ This module provides elements for the accelerator lattice.
 
 .. py:class:: impactx.elements.TaperedPL(k, taper, units, dx=0, dy=0, rotation=0)
 
-   An active cylindrically symmetric plasma lens, with chromatic effects included.
-   The Hamiltonian is expanded through second order in the transverse variables
-   (x,px,y,py), with the exact pt dependence retained.
+   A thin nonlinear plasma lens with transverse taper.
 
    :param k:  integrated focusing strength in m^(-1) (if units = 0)
               = (length in m) * (azimuthal magnetic field gradient in T/m) / (rigidity in T-m)

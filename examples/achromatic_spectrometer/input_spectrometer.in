@@ -39,7 +39,7 @@ drend.type = drift
 drend.ds = 0.001
 
 pl.type = tapered_plasma_lens
-pl.k = 0.2  #focal length 0.5 m
+pl.k = 0.2  # focal length 0.5 m
 pl.taper = 11.488289081903567
 pl.units = 0
 
