@@ -12,7 +12,7 @@ C. A. Lindstrom, presentation at the EuroNNAc Special Topics Workshop 2022, `sli
 
 https://agenda.infn.it/event/28376/contributions/178724/attachments/96899/133588/Lindstr%C3%B8m,%20EuroNNAc%20workshop,%2022%20Sep%202022.pdf
 
-We use a 1 GeV electron beam with initial normalized rms emittance of 2 microns.
+We use a 1 GeV electron beam with initial normalized rms emittance of 2 microns and 2% rms relative energy spread.
 
 In this test, the initial and final values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
