@@ -516,7 +516,14 @@ Lattice Elements
             * ``<element_name>.dy`` (``float``, in meters) vertical translation error
             * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
 
-        * ``tapered_pl`` for a thin nonlinear (tapered) plasma lens.
+        * ``tapered_pl`` for a thin nonlinear plasma lens with transverse (horizontal) taper.
+
+          .. math::
+
+             B_x = g \left( y + \frac{xy}{D_x} \right), \quad \quad B_y = -g \left(x + \frac{x^2 + y^2}{2 D_x} \right)
+
+          where :math:`g` is the (linear) field gradient in T/m and :math:`D_x` is the targeted horizontal dispersion in m.
+
           This requires these additional parameters:
 
             * ``<element_name>.k`` (``float``, in inverse meters OR in T) the integrated plasma lens focusing strength

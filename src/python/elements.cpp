@@ -1156,7 +1156,14 @@ void init_elements(py::module& m)
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
-             "A thin nonlinear plasma lens with transverse taper."
+             R"doc(A thin nonlinear plasma lens with A thin nonlinear plasma lens with transverse (horizontal) taper
+
+             .. math::
+
+                B_x = g \left( y + \frac{xy}{D_x} \right), \quad \quad B_y = -g \left(x + \frac{x^2 + y^2}{2 D_x} \right)
+
+             where :math:`g` is the (linear) field gradient in T/m and :math:`D_x` is the targeted horizontal dispersion in m.
+             )doc"
         )
     ;
     register_beamoptics_push(py_TaperedPL);
