@@ -937,7 +937,13 @@ class TaperedPL(Thin, Alignment):
         rotation: float = 0,
     ) -> None:
         """
-        A thin nonlinear plasma lens with transverse taper.
+        A thin nonlinear plasma lens with A thin nonlinear plasma lens with transverse (horizontal) taper
+
+                     .. math::
+
+                        B_x = g \\left( y + \\frac{xy}{D_x} \\right), \\quad \\quad B_y = -g \\left(x + \\frac{x^2 + y^2}{2 D_x} \\right)
+
+                     where :math:`g` is the (linear) field gradient in T/m and :math:`D_x` is the targeted horizontal dispersion in m.
         """
 
     def __repr__(self) -> str: ...
