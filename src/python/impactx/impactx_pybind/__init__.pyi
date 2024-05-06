@@ -739,6 +739,7 @@ def push(
         | elements.SoftSolenoid
         | elements.SoftQuadrupole
         | elements.Sol
+        | elements.TaperedPL
         | elements.ThinDipole
     ),
     step: int = 0,

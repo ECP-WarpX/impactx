@@ -37,6 +37,7 @@ __all__ = [
     "SoftQuadrupole",
     "SoftSolenoid",
     "Sol",
+    "TaperedPL",
     "Thick",
     "Thin",
     "ThinDipole",
@@ -570,6 +571,7 @@ class KnownElementsList:
             | SoftSolenoid
             | SoftQuadrupole
             | Sol
+            | TaperedPL
             | ThinDipole
         ),
     ) -> None: ...
@@ -610,6 +612,7 @@ class KnownElementsList:
             | SoftSolenoid
             | SoftQuadrupole
             | Sol
+            | TaperedPL
             | ThinDipole
         ),
     ) -> None:
@@ -913,6 +916,28 @@ class Sol(Thick, Alignment):
     ) -> None:
         """
         An ideal hard-edge Solenoid magnet.
+        """
+
+    def __repr__(self) -> str: ...
+    def push(
+        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+    ) -> None:
+        """
+        Push first the reference particle, then all other particles.
+        """
+
+class TaperedPL(Thin, Alignment):
+    def __init__(
+        self,
+        k: float,
+        taper: float,
+        units: int = 0,
+        dx: float = 0,
+        dy: float = 0,
+        rotation: float = 0,
+    ) -> None:
+        """
+        A thin nonlinear plasma lens with transverse taper.
         """
 
     def __repr__(self) -> str: ...
