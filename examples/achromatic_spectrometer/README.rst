@@ -4,13 +4,21 @@ Achromatic Spectrometer
 =======================
 
 A spectrometer beamline using a bending dipole.
-A transversely-tapered plasma lens is added for chromatic correction.
+A :py:class:`transversely-tapered plasma lens <impactx.elements.impactx.elements.TaperedPL>` is added for chromatic correction.
 The tapered plasma lens design is based on:
 
 C. A. Lindstrom, presentation at the EuroNNAc Special Topics Workshop 2022, `slides <https://agenda.infn.it/event/28376/contributions/178724/attachments/96899/133588/Lindstr%C3%B8m,%20EuroNNAc%20workshop,%2022%20Sep%202022.pdf>`__
 "Solutions and challenges for a multi-stage plasma accelerator",
 
 https://agenda.infn.it/event/28376/contributions/178724/attachments/96899/133588/Lindstr%C3%B8m,%20EuroNNAc%20workshop,%2022%20Sep%202022.pdf
+
+with a transverse (horizontal) taper
+
+.. math::
+
+   B_x = g \left( y + \frac{xy}{D_x} \right), \quad \quad B_y = -g \left(x + \frac{x^2 + y^2}{2 D_x} \right)
+
+where :math:`g` is the (linear) field gradient in T/m and :math:`D_x` is the targeted horizontal dispersion in m.
 
 We use a 1 GeV electron beam with initial normalized rms emittance of 2 microns and 2% rms relative energy spread.
 

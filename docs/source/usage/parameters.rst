@@ -516,17 +516,24 @@ Lattice Elements
             * ``<element_name>.dy`` (``float``, in meters) vertical translation error
             * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
 
-        * ``tapered_pl`` for a thin nonlinear (tapered) plasma lens.
+        * ``tapered_pl`` for a thin nonlinear plasma lens with transverse (horizontal) taper.
+
+          .. math::
+
+             B_x = g \left( y + \frac{xy}{D_x} \right), \quad \quad B_y = -g \left(x + \frac{x^2 + y^2}{2 D_x} \right)
+
+          where :math:`g` is the (linear) field gradient in T/m and :math:`D_x` is the targeted horizontal dispersion in m.
+
           This requires these additional parameters:
 
             * ``<element_name>.k`` (``float``, in inverse meters OR in T) the integrated plasma lens focusing strength
-                = (length in m) * (azimuthal magnetic field gradient in T/m) / (magnetic rigidity in T-m) - if units = 0
+                = (length in m) * (magnetic field gradient :math:`g` in T/m) / (magnetic rigidity in T-m) - if units = 0
 
-             OR = (length in m) * (azimuthal magnetic field gradient in T/m) - if units = 1
+             OR = (length in m) * (magnetic field gradient :math:`g` in T/m) - if units = 1
 
             * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
             * ``<element_name>.taper`` (``float``, in 1/meters) horizontal taper parameter
-                = 1 / (target horizontal dispersion in m)
+                = 1 / (target horizontal dispersion :math:`D_x` in m)
 
             * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
             * ``<element_name>.dy`` (``float``, in meters) vertical translation error

@@ -918,14 +918,20 @@ This module provides elements for the accelerator lattice.
 
 .. py:class:: impactx.elements.TaperedPL(k, taper, units, dx=0, dy=0, rotation=0)
 
-   A thin nonlinear plasma lens with transverse taper.
+   A thin nonlinear plasma lens with transverse (horizontal) taper
+
+   .. math::
+
+      B_x = g \left( y + \frac{xy}{D_x} \right), \quad \quad B_y = -g \left(x + \frac{x^2 + y^2}{2 D_x} \right)
+
+   where :math:`g` is the (linear) field gradient in T/m and :math:`D_x` is the targeted horizontal dispersion in m.
 
    :param k:  integrated focusing strength in m^(-1) (if units = 0)
-              = (length in m) * (azimuthal magnetic field gradient in T/m) / (rigidity in T-m)
+              = (length in m) * (magnetic field gradient :math:`g` in T/m) / (magnetic rigidity in T-m)
           OR  integrated focusing strength in T (if units = 1)
-              = (length in m) * (azimuthal magnetic field gradient in T/m)
+              = (length in m) * (magnetic field gradient :math:`g` in T/m)
    :param taper: horizontal taper parameter in m^(-1)
-              = 1 / (target horizontal dispersion in m)
+              = 1 / (target horizontal dispersion :math:`D_x` in m)
    :param units: specification of units for plasma lens focusing strength
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
