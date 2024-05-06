@@ -916,6 +916,33 @@ This module provides elements for the accelerator lattice.
 
    * G. Ripken and F. Schmidt, Thin-Lens Formalism for Tracking, CERN/SL/95-12 (AP), 1995.
 
+.. py:class:: impactx.elements.TaperedPL(k, taper, units, dx=0, dy=0, rotation=0)
+
+   A thin nonlinear plasma lens with transverse taper.
+
+   :param k:  integrated focusing strength in m^(-1) (if units = 0)
+              = (length in m) * (azimuthal magnetic field gradient in T/m) / (rigidity in T-m)
+          OR  integrated focusing strength in T (if units = 1)
+              = (length in m) * (azimuthal magnetic field gradient in T/m)
+   :param taper: horizontal taper parameter in m^(-1)
+              = 1 / (target horizontal dispersion in m)
+   :param units: specification of units for plasma lens focusing strength
+   :param dx: horizontal translation error in m
+   :param dy: vertical translation error in m
+   :param rotation: rotation error in the transverse plane [degrees]
+
+   .. py:property:: k
+
+      integrated plasma lens focusing strength in 1/m (or T)
+
+   .. py:property:: taper
+
+      horizontal taper parameter in 1/m
+
+   .. py:property:: units
+
+      unit specification for plasma lens focusing strength
+
 
 Coordinate Transformation
 -------------------------
