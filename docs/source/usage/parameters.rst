@@ -527,13 +527,13 @@ Lattice Elements
           This requires these additional parameters:
 
             * ``<element_name>.k`` (``float``, in inverse meters OR in T) the integrated plasma lens focusing strength
-                = (length in m) * (azimuthal magnetic field gradient in T/m) / (magnetic rigidity in T-m) - if units = 0
+                = (length in m) * (magnetic field gradient :math:`g` in T/m) / (magnetic rigidity in T-m) - if units = 0
 
-             OR = (length in m) * (azimuthal magnetic field gradient in T/m) - if units = 1
+             OR = (length in m) * (magnetic field gradient :math:`g` in T/m) - if units = 1
 
             * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
             * ``<element_name>.taper`` (``float``, in 1/meters) horizontal taper parameter
-                = 1 / (target horizontal dispersion in m)
+                = 1 / (target horizontal dispersion :math:`D_x` in m)
 
             * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
             * ``<element_name>.dy`` (``float``, in meters) vertical translation error
