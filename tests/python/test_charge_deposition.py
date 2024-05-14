@@ -14,15 +14,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from conftest import basepath
 
-import amrex.space3d as amr
-import impactx
+from impactx import ImpactX, amr
 
 
 def test_charge_deposition(save_png=True):
     """
     Deposit charge and access/plot it
     """
-    sim = impactx.ImpactX()
+    sim = ImpactX()
 
     sim.n_cell = [16, 24, 32]
     sim.load_inputs_file(basepath + "/examples/fodo/input_fodo.in")
@@ -97,4 +96,9 @@ def test_charge_deposition(save_png=True):
 # implement a direct script run mode, so we can run this directly too,
 # with interactive matplotlib windows, w/o pytest
 if __name__ == "__main__":
+    amr.initialize([])
+
     test_charge_deposition(save_png=False)
+
+    if amr.initialized():
+        amr.finalize()
