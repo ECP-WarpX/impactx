@@ -6,6 +6,7 @@
 #include "pyImpactX.H"
 
 #include <ImpactX.H>
+#include <particles/transformation/CoordinateTransformation.H>
 
 #include <AMReX.H>
 #include <AMReX_ParmParse.H>
@@ -358,6 +359,32 @@ void init_ImpactX (py::module& m)
             },
             "Controls how much information is printed to the terminal, when running ImpactX.\n"
             "``0`` for silent, higher is more verbose. Default is ``1``."
+        )
+
+        .def("deposit_charge",
+            [](ImpactX & ix) {
+                // transform from x',y',t to x,y,z
+                transformation::CoordinateTransformation(
+                        *(ix.amr_data)->m_particle_container,
+                        CoordSystem::t);
+
+                // Note: The following operation assume that
+                // the particles are in x, y, z coordinates.
+
+                // Resize the mesh, based on `m_particle_container` extent
+                ix.ResizeMesh();
+
+                // Redistribute particles in the new mesh in x, y, z
+                ix.amr_data->m_particle_container->Redistribute();
+
+                // charge deposition
+                ix.amr_data->m_particle_container->DepositCharge(ix.amr_data->m_rho, ix.amr_data->refRatio());
+
+                // transform from x,y,z to x',y',t
+                transformation::CoordinateTransformation(*(ix.amr_data)->m_particle_container,
+                                                         CoordSystem::s);
+            },
+            "Deposit charge in x,y,z."
         )
 
         .def("finalize", &ImpactX::finalize,
