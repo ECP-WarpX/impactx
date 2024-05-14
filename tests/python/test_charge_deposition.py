@@ -26,7 +26,6 @@ def test_charge_deposition(save_png=True):
 
     sim.n_cell = [16, 24, 32]
     sim.load_inputs_file(basepath + "/examples/fodo/input_fodo.in")
-    sim.space_charge = True
     sim.slice_step_diagnostics = False
 
     # Future:
@@ -41,6 +40,8 @@ def test_charge_deposition(save_png=True):
     sim.init_lattice_elements_from_inputs()
 
     sim.evolve()
+
+    sim.deposit_charge()
 
     rho = sim.rho(lev=0)
     rs = rho.sum_unique(comp=0, local=False)
