@@ -23,14 +23,14 @@ sim.init_grids()
 # unnormalized rms emittance of 2 nm
 kin_energy_MeV = 2.0e3  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
-npart = 10000  # number of macro particles
+npart = 8000000  # number of macro particles
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
 ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_MeV)
 
 #   particle bunch
-distr = distribution.Waterbag(
+distr = distribution.Gaussian(
     lambdaX=3.9984884770e-5,
     lambdaY=3.9984884770e-5,
     lambdaT=1.0e-3,

@@ -6,6 +6,8 @@
 #
 # -*- coding: utf-8 -*-
 
+import numpy as np
+import amrex.space3d as amr #new for loop
 from impactx import ImpactX, distribution, elements
 
 sim = ImpactX()
@@ -23,14 +25,14 @@ sim.init_grids()
 # normalized transverse rms emittance of 1 um
 kin_energy_MeV = 5.0e3  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
-npart = 10000  # number of macro particles
+npart = 1000000  # number of macro particles
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
 ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_MeV)
 
 #   particle bunch
-distr = distribution.Waterbag(
+distr = distribution.Gaussian(
     lambdaX=2.2951017632e-5,
     lambdaY=1.3084093142e-5,
     lambdaT=5.5555553e-8,
@@ -78,6 +80,33 @@ sim.lattice.append(monitor)
 
 # run simulation
 sim.evolve()
+#sim.deposit() #need to add
+
+# option 1 - ParticleContainer class - works!
+#beam = sim.particle_container().to_df() 
+#print(beam)
+
+# option 2 - AMReX MultiFab (aka field) - check
+rho_mfab = sim.rho(lev=0)
+rho_list = rho_mfab.to_numpy()
+
+for rho in rho_list:
+    print(rho)
+
+''' option 2 - AMReX MultiFab - More involved method
+
+# include this for an AMReX MultiFab (aka field)
+#rho = sim.rho(lev=0)
+#gm = sim.Geom(lev=0)
+#dr = gm.data().CellSize()
+
+for mfi in rho:
+        bx = mfi.validbox()
+        rbx = amr.RealBox(bx, dr, gm.ProbLo())
+
+        arr_np = rho.array(mfi).to_numpy(copy=True)  # indices x, y, z, comp
+        print(arr_np)
+'''
 
 # clean shutdown
 sim.finalize()
