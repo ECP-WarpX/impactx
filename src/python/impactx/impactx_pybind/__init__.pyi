@@ -106,6 +106,11 @@ class ImpactX:
         """
 
     def boxArray(self, lev: int) -> amrex.space3d.amrex_3d_pybind.BoxArray: ...
+    def deposit_charge(self) -> None:
+        """
+        Deposit charge in x,y,z.
+        """
+
     def evolve(self) -> None:
         """
         Run the main simulation loop for a number of steps.
