@@ -295,11 +295,11 @@ impactx_surrogate_ref_particle = read_time_series("diags/ref_particle.*")
 impactx_surrogate_reduced_diags = read_time_series(
     "diags/reduced_beam_characteristics.*"
 )
-ref_gamma = np.sqrt(1 + impactx_surrogate_ref_particle["ref_beta_gamma"] ** 2)
+ref_gamma = impactx_surrogate_ref_particle["gamma"]
 beam_gamma = (
     ref_gamma
     - impactx_surrogate_reduced_diags["pt_mean"]
-    * impactx_surrogate_ref_particle["ref_beta_gamma"]
+    * impactx_surrogate_ref_particle["beta_gamma"]
 )
 beam_u = np.sqrt(beam_gamma**2 - 1)
 emit_x = impactx_surrogate_reduced_diags["emittance_x"]
