@@ -272,7 +272,7 @@ namespace detail
 
         // total particle bunch information
         //   @see impactx::diagnostics::reduced_beam_characteristics
-        for(const auto &kv : m_rbc) {
+        for (const auto &kv : m_rbc) {
             beam.setAttribute(kv.first, kv.second);
         }
 
