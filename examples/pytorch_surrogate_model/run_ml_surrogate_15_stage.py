@@ -94,10 +94,18 @@ def download_and_unzip(url, data_dir):
 data_url = "https://zenodo.org/records/10810754/files/models.zip?download=1"
 download_and_unzip(data_url, "models.zip")
 
+# it was found that the PyTorch multithreaded defaults interfere with MPI-enabled AMReX
+# when initializing the models
+# so we manually set the number of threads
+if Config.have_mpi:
+    n_threads = torch.get_num_threads()
+    torch.set_num_threads(1)
 model_list = [
     surrogate_model(f"models/beam_stage_{stage_i}_model.pt", device=device)
     for stage_i in range(N_stage)
 ]
+if Config.have_mpi:
+    torch.set_num_threads(n_threads)
 
 pp_amrex = amr.ParmParse("amrex")
 pp_amrex.add("the_arena_init_size", 0)
