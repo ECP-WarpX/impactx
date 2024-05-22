@@ -94,9 +94,9 @@ def download_and_unzip(url, data_dir):
 data_url = "https://zenodo.org/records/10810754/files/models.zip?download=1"
 download_and_unzip(data_url, "models.zip")
 
-# it was found that the PyTorch multithreaded defaults interfere with MPI-enabled AMReX
-# when initializing the models
-# so we manually set the number of threads
+# It was found that the PyTorch multithreaded defaults interfere with MPI-enabled AMReX
+# when initializing the models: https://github.com/AMReX-Codes/pyamrex/issues/322
+# So we manually set the number of threads to serial (1).
 if Config.have_mpi:
     n_threads = torch.get_num_threads()
     torch.set_num_threads(1)
