@@ -43,7 +43,7 @@ namespace impactx::diagnostics
             if (otype == OutputType::PrintRefParticle) {
                 file_handler << "step s beta gamma beta_gamma x y z t px py pz pt\n";
             } else if (otype == OutputType::PrintReducedBeamCharacteristics) {
-                file_handler << "step" << " "
+                file_handler << "step" << " " << "s" << " "
                              << "x_mean" << " " << "x_min" << " " << "x_max" << " "
                              << "y_mean" << " " << "y_min" << " " << "y_max" << " "
                              << "t_mean" << " " << "t_min" << " " << "t_max" << " "
@@ -88,7 +88,9 @@ namespace impactx::diagnostics
             std::unordered_map<std::string, amrex::ParticleReal> const rbc =
                 diagnostics::reduced_beam_characteristics(pc);
 
-            file_handler << step << " "
+            amrex::ParticleReal const s = pc.GetRefParticle().s;
+
+            file_handler << step << " " << s << " "
                          << rbc.at("x_mean") << " " << rbc.at("x_min") << " " << rbc.at("x_max") << " "
                          << rbc.at("y_mean") << " " << rbc.at("y_min") << " " << rbc.at("y_max") << " "
                          << rbc.at("t_mean") << " " << rbc.at("t_min") << " " << rbc.at("t_max") << " "

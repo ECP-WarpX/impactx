@@ -69,6 +69,8 @@ The code writes out the values in an ASCII file prefixed ``reduced_beam_characte
 
 * ``step``
     Iteration within the simulation
+* ``s``
+    Reference particle coordinate ``s`` (unit: meter)
 * ``x_mean/min/max``, ``y_mean/min/max``, ``t_mean/min/max``
     Average / minimum / maximum beam particle position in the dimensions of ``x``, ``y`` (transverse coordinates, unit: meter), and ``t`` (normalized time difference :math:`ct`, unit: meter)
 * ``sig_x``, ``sig_y``, ``sig_t``
