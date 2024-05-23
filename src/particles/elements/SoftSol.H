@@ -126,9 +126,14 @@ namespace SoftSolenoidData
         /** A soft-edge solenoid
          *
          * @param ds Segment length in m
-         * @param bscale Scaling factor for on-axis magnetic field Bz in 1/m
+         * @param bscale Scaling factor for on-axis longitudinal magnetic field in 1/m (MAD-X convention)
+         *           = (Bz in T) / (rigidity in T-m)
+         *        OR Magnetic field Bz in T (SI units)
          * @param cos_coef cosine coefficients in Fourier expansion of on-axis magnetic field Bz
          * @param sin_coef sine coefficients in Fourier expansion of on-axis magnetic field Bz
+         * @param unit  Unit specification
+         *           unit = 0 MADX convention (default)
+         *           unit = 1 SI units
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
@@ -141,6 +146,7 @@ namespace SoftSolenoidData
             amrex::ParticleReal bscale,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
+            int unit,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
@@ -149,7 +155,7 @@ namespace SoftSolenoidData
         )
           : Thick(ds, nslice),
             Alignment(dx, dy, rotation_degree),
-            m_bscale(bscale), m_mapsteps(mapsteps), m_id(SoftSolenoidData::next_id)
+            m_bscale(bscale), m_unit(unit), m_mapsteps(mapsteps), m_id(SoftSolenoidData::next_id)
        {
            // next created soft solenoid has another id for its data
            SoftSolenoidData::next_id++;
@@ -445,7 +451,10 @@ namespace SoftSolenoidData
             amrex::ParticleReal const pt = refpart.pt;
 
             // Define parameters and intermediate constants
-            amrex::ParticleReal const B0 = m_bscale;
+            amrex::ParticleReal const B0 =
+                m_unit == 1 ?
+                m_bscale / refpart.rigidity_Tm() :
+                m_bscale;
 
             // push the reference particle
             auto [bz, bzp, bzint] = Sol_Bfield(zeval);
@@ -491,7 +500,10 @@ namespace SoftSolenoidData
             amrex::ParticleReal const z = zeval;
 
             // Define parameters and intermediate constants
-            amrex::ParticleReal const B0 = m_bscale;
+            amrex::ParticleReal const B0 =
+                m_unit == 1 ?
+                m_bscale / refpart.rigidity_Tm() :
+                m_bscale;
 
             // push the reference particle
             auto [bz, bzp, bzint] = Sol_Bfield(z);
@@ -546,6 +558,7 @@ namespace SoftSolenoidData
         }
 
         amrex::ParticleReal m_bscale; //! scaling factor for solenoid Bz field
+        int m_unit; //! unit specification for quad strength
         int m_mapsteps; //! number of map integration steps per slice
         int m_id; //! unique soft solenoid id used for data lookup map
 

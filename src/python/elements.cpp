@@ -992,6 +992,7 @@ void init_elements(py::module& m)
                  amrex::ParticleReal,
                  amrex::ParticleReal,
                  amrex::ParticleReal,
+                 amrex::ParticleReal,
                  int,
                  int
              >(),
@@ -999,6 +1000,7 @@ void init_elements(py::module& m)
              py::arg("bscale"),
              py::arg("cos_coefficients"),
              py::arg("sin_coefficients"),
+             py::arg("unit") = 0,
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
@@ -1156,7 +1158,7 @@ void init_elements(py::module& m)
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
-             R"doc(A thin nonlinear plasma lens with A thin nonlinear plasma lens with transverse (horizontal) taper
+             R"doc(A thin nonlinear plasma lens with transverse (horizontal) taper
 
              .. math::
 
