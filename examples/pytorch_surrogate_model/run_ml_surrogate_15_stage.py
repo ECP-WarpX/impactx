@@ -16,7 +16,6 @@ try:
     cupy_available = True
 except ImportError:
     cupy_available = False
-import sys
 
 import numpy as np
 import scipy.optimize as opt
@@ -36,7 +35,10 @@ try:
     import torch
 except ImportError:
     print("Warning: Cannot import PyTorch. Skipping test.")
+    import sys
+
     sys.exit(0)
+
 import zipfile
 from urllib import request
 
@@ -91,6 +93,10 @@ def download_and_unzip(url, data_dir):
         zip_dataset.extractall()
 
 
+print(
+    "Downloading trained models from Zenodo.org - this might take a minute...",
+    flush=True,
+)
 data_url = "https://zenodo.org/records/10810754/files/models.zip?download=1"
 download_and_unzip(data_url, "models.zip")
 
@@ -299,8 +305,7 @@ class UpdateConstF(elements.Programmable):
         self.x_or_y = x_or_y
         self.push = self.set_lens
 
-    def set_lens(self, step):
-        pc = self.sim.particle_container()
+    def set_lens(self, pc, step):
         # get envelope parameters
         rbc = pc.reduced_beam_characteristics()
         alpha = rbc[f"alpha_{self.x_or_y}"]
