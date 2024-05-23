@@ -886,6 +886,7 @@ class SoftSolenoid(Thick, Alignment):
         bscale: float,
         cos_coefficients: list[float],
         sin_coefficients: list[float],
+        unit: float = 0,
         dx: float = 0,
         dy: float = 0,
         rotation: float = 0,
@@ -937,7 +938,7 @@ class TaperedPL(Thin, Alignment):
         rotation: float = 0,
     ) -> None:
         """
-        A thin nonlinear plasma lens with A thin nonlinear plasma lens with transverse (horizontal) taper
+        A thin nonlinear plasma lens with transverse (horizontal) taper
 
                      .. math::
 
