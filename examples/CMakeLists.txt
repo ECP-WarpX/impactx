@@ -918,7 +918,7 @@ add_impactx_test(initialize_from_array.py
     examples/initialize_from_array/visualize_from_array.py
 )
 
-# Achromatic Spectrometer ########################################################
+# Achromatic Spectrometer ####################################################
 #
 # w/o space charge
 add_impactx_test(spectrometer
@@ -935,3 +935,15 @@ add_impactx_test(spectrometer.py
     examples/achromatic_spectrometer/analysis_spectrometer.py
     OFF  # no plot script yet
 )
+
+# PyTorch Surrogate: Staged LPA ##############################################
+#
+add_impactx_test(pytorch_surrogate_model
+    examples/pytorch_surrogate_model/run_ml_surrogate_15_stage.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/pytorch_surrogate_model/analyze_ml_surrogate_15_stage.py
+    examples/pytorch_surrogate_model/visualize_ml_surrogate_15_stage.py
+)
+label_impactx_test(pytorch_surrogate_model slow)
+label_impactx_test(pytorch_surrogate_model.MPI slow)
