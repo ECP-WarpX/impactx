@@ -27,6 +27,7 @@ Reference particle:
 
 * ``beta_ref`` reference particle normalized velocity :math:`\beta = v/c`
 * ``gamma_ref`` reference particle Lorentz factor :math:`\gamma = 1/\sqrt{1-\beta^2}`
+* ``beta_gamma_ref`` reference particle momentum normalized to rest mass :math:`\beta\gamma = p/(mc)`
 * ``s_ref`` integrated orbit path length, in meters
 * ``x_ref`` horizontal position x, in meters
 * ``y_ref`` vertical position y, in meters
@@ -36,8 +37,10 @@ Reference particle:
 * ``py_ref`` momentum in y, normalized to mass*c, :math:`p_y = \gamma \beta_y`
 * ``pz_ref`` momentum in z, normalized to mass*c, :math:`p_z = \gamma \beta_z`
 * ``pt_ref`` energy, normalized by rest energy, :math:`p_t = -\gamma`
-* ``mass`` reference rest mass, in kg
-* ``charge`` reference charge, in C
+* ``mass_ref`` reference rest mass, in kg
+* ``charge_ref`` reference charge, in C
+
+Bunch properties: all properties listed in :ref:`Reduced Beam Characteristics <dataanalysis-beam-characteristics>`.
 
 Example to print the integrated orbit path length ``s`` at each beam monitor position:
 
@@ -70,8 +73,8 @@ The code writes out the values in an ASCII file prefixed ``reduced_beam_characte
 
 * ``step``
     Iteration within the simulation
-* ``s``, ``ref_beta_gamma``
-    Reference particle coordinate ``s`` (unit: meter) and relativistic momentum normalized by the particle mass and the speed of light (unit: dimensionless)
+* ``s``
+    Reference particle coordinate ``s`` (unit: meter)
 * ``x_mean/min/max``, ``y_mean/min/max``, ``t_mean/min/max``
     Average / minimum / maximum particle displacement with respect to the reference particle in the dimensions of ``x``, ``y`` (transverse coordinates, unit: meter), and ``t`` (normalized time difference :math:`ct`, unit: meter)
 * ``sig_x``, ``sig_y``, ``sig_t``

@@ -21,7 +21,9 @@
 namespace impactx::diagnostics
 {
     /** Compute momenta of the beam distribution
-      */
+     *
+     * This uses an MPI Allreduce and returns a result on all ranks.
+     */
     std::unordered_map<std::string, amrex::ParticleReal>
     reduced_beam_characteristics (ImpactXParticleContainer const & pc);
 

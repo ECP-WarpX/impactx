@@ -18,6 +18,7 @@
 
 #include <any>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 
@@ -160,6 +161,12 @@ namespace detail
          * This MUST be updated by prepare() before the next step's output.
          */
         std::vector<uint64_t> m_offset;
+
+        /** Reduced Beam Characteristics
+         *
+         * In situ calculated particle bunch moments.
+         */
+        std::unordered_map<std::string, amrex::ParticleReal> m_rbc;
 
     };
 

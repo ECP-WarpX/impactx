@@ -11,6 +11,7 @@
 #include "openPMD.H"
 #include "ImpactXVersion.H"
 #include "particles/ImpactXParticleContainer.H"
+#include "particles/diagnostics/ReducedBeamCharacteristics.H"
 
 #include <AMReX.H>
 #include <AMReX_BLProfiler.H>
@@ -256,6 +257,7 @@ namespace detail
         // reference particle information
         beam.setAttribute( "beta_ref", ref_part.beta() );
         beam.setAttribute( "gamma_ref", ref_part.gamma() );
+        beam.setAttribute( "beta_gamma_ref", ref_part.beta_gamma() );
         beam.setAttribute( "s_ref", ref_part.s );
         beam.setAttribute( "x_ref", ref_part.x );
         beam.setAttribute( "y_ref", ref_part.y );
@@ -265,8 +267,14 @@ namespace detail
         beam.setAttribute( "py_ref", ref_part.py );
         beam.setAttribute( "pz_ref", ref_part.pz );
         beam.setAttribute( "pt_ref", ref_part.pt );
-        beam.setAttribute( "mass", ref_part.mass );
-        beam.setAttribute( "charge", ref_part.charge );
+        beam.setAttribute( "mass_ref", ref_part.mass );
+        beam.setAttribute( "charge_ref", ref_part.charge );
+
+        // total particle bunch information
+        //   @see impactx::diagnostics::reduced_beam_characteristics
+        for (const auto &kv : m_rbc) {
+            beam.setAttribute(kv.first, kv.second);
+        }
 
         // openPMD coarse position: for global coordinates
         {
@@ -312,6 +320,10 @@ namespace detail
 
         // optional: add and calculate additional particle properties
         add_optional_properties(m_series_name, pc);
+
+        // optional: calculate total particle bunch information
+        m_rbc.clear();
+        m_rbc = diagnostics::reduced_beam_characteristics(pc);
 
         // component names
         std::vector<std::string> real_soa_names = pc.RealSoA_names();

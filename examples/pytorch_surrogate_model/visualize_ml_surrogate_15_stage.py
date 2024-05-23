@@ -291,14 +291,15 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+impactx_surrogate_ref_particle = read_time_series("diags/ref_particle.*")
 impactx_surrogate_reduced_diags = read_time_series(
     "diags/reduced_beam_characteristics.*"
 )
-ref_gamma = np.sqrt(1 + impactx_surrogate_reduced_diags["ref_beta_gamma"] ** 2)
+ref_gamma = impactx_surrogate_ref_particle["gamma"]
 beam_gamma = (
     ref_gamma
     - impactx_surrogate_reduced_diags["pt_mean"]
-    * impactx_surrogate_reduced_diags["ref_beta_gamma"]
+    * impactx_surrogate_ref_particle["beta_gamma"]
 )
 beam_u = np.sqrt(beam_gamma**2 - 1)
 emit_x = impactx_surrogate_reduced_diags["emittance_x"]
@@ -315,13 +316,13 @@ ymarker = "^"
 ax = axT[0][0]
 scale = 1e6
 ax.plot(
-    impactx_surrogate_reduced_diags["s"][ix_slice],
+    impactx_surrogate_ref_particle["s"][ix_slice],
     emit_nx[ix_slice] * scale,
     "bo",
     label="x",
 )
 ax.plot(
-    impactx_surrogate_reduced_diags["s"][ix_slice],
+    impactx_surrogate_ref_particle["s"][ix_slice],
     emit_ny[ix_slice] * scale,
     "r",
     marker=ymarker,
@@ -335,7 +336,7 @@ ax.set_ylabel(r"emittance (mm-mrad)")
 ax = axT[0][1]
 scale = m_e * c**2 / e * 1e-9
 ax.plot(
-    impactx_surrogate_reduced_diags["s"][ix_slice],
+    impactx_surrogate_ref_particle["s"][ix_slice],
     beam_gamma[ix_slice] * scale,
     "go",
 )
@@ -346,13 +347,13 @@ ax.set_ylabel(r"mean energy (GeV)")
 ax = axT[1][0]
 scale = 1e6
 ax.plot(
-    impactx_surrogate_reduced_diags["s"][ix_slice],
+    impactx_surrogate_ref_particle["s"][ix_slice],
     impactx_surrogate_reduced_diags["sig_x"][ix_slice] * scale,
     "bo",
     label="x",
 )
 ax.plot(
-    impactx_surrogate_reduced_diags["s"][ix_slice],
+    impactx_surrogate_ref_particle["s"][ix_slice],
     impactx_surrogate_reduced_diags["sig_y"][ix_slice] * scale,
     "r",
     marker=ymarker,
@@ -367,13 +368,13 @@ ax.set_ylabel(r"beam width ($\mu$m)")
 ax = axT[1][1]
 scale = 1e3
 ax.semilogy(
-    impactx_surrogate_reduced_diags["s"][ix_slice],
+    impactx_surrogate_ref_particle["s"][ix_slice],
     impactx_surrogate_reduced_diags["sig_px"][ix_slice] * scale,
     "bo",
     label="x",
 )
 ax.semilogy(
-    impactx_surrogate_reduced_diags["s"][ix_slice],
+    impactx_surrogate_ref_particle["s"][ix_slice],
     impactx_surrogate_reduced_diags["sig_py"][ix_slice] * scale,
     "r",
     marker=ymarker,
@@ -397,7 +398,6 @@ beam_impactx_surrogate_series = io.Series(
     "diags/openPMD/monitor.bp", io.Access.read_only
 )
 impactx_surrogate_steps = list(beam_impactx_surrogate_series.iterations)
-impactx_surrogate_ref_particle = read_time_series("diags/ref_particle.*")
 
 millimeter = 1.0e3
 micron = 1.0e6
