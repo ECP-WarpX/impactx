@@ -27,4 +27,5 @@ python3 -m pip install -U cmake pytest
 python3 -m pip install -U -r requirements.txt
 python3 -m pip install -U -r examples/requirements.txt
 
-python3 -m pip install -U openPMD-validator
+# extra tests
+python3 -m pip install -U -r examples/requirements_extra.txt
