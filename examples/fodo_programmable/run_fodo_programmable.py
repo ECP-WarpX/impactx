@@ -6,16 +6,8 @@
 #
 # -*- coding: utf-8 -*-
 
-import numpy as np
 
-try:
-    import cupy as cp
-
-    cupy_available = True
-except ImportError:
-    cupy_available = False
-
-from impactx import Config, ImpactX, distribution, elements
+from impactx import ImpactX, distribution, elements
 
 sim = ImpactX()
 
@@ -65,28 +57,15 @@ def my_drift(pge, pti, refpart):
     :param pti: particle iterator for the current tile or box
     :param refpart: the reference particle
     """
-    # CPU/GPU logic
-    if Config.have_gpu:
-        if cupy_available:
-            array = cp.array
-        else:
-            print("Warning: GPU found but cupy not available! Try managed...")
-            array = np.array
-        if Config.gpu_backend == "SYCL":
-            print("Warning: SYCL GPU backend not yet implemented for Python")
-
-    else:
-        array = np.array
-
     # access particle attributes
-    soa = pti.soa()
-    real_arrays = soa.get_real_data()
-    x = array(real_arrays[0], copy=False)
-    y = array(real_arrays[1], copy=False)
-    t = array(real_arrays[2], copy=False)
-    px = array(real_arrays[3], copy=False)
-    py = array(real_arrays[4], copy=False)
-    pt = array(real_arrays[5], copy=False)
+    soa = pti.soa().to_xp()  # automatic: NumPy (CPU) or CuPy (GPU)
+
+    x = soa.real["position_x"]
+    y = soa.real["position_y"]
+    t = soa.real["position_t"]
+    px = soa.real["momentum_x"]
+    py = soa.real["momentum_y"]
+    pt = soa.real["momentum_t"]
 
     # length of the current slice
     slice_ds = pge.ds / pge.nslice
