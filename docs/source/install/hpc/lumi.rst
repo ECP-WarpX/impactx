@@ -4,8 +4,13 @@ LUMI (CSC)
 ==========
 
 The `LUMI cluster <https://www.lumi-supercomputer.eu>`__ is located at CSC (Finland).
-Each node contains 4 AMD MI250X GPUs, each with 2 Graphics Compute Dies (GCDs) for a total of 8 GCDs per node.
+LUMI has multiple partitions.
+
+On **LUMI-G**, each node contains `four (4) AMD MI250X GPUs <https://docs.lumi-supercomputer.eu/hardware/lumig/>`__, each with 2 Graphics Compute Dies (GCDs) for a total of 8 GCDs per node.
 You can think of the 8 GCDs as 8 separate GPUs, each having 64 GB of high-bandwidth memory (HBM2E).
+
+On **LUMI-C**, each node contains `two (2) AMD EPYC 7763 CPUs <https://docs.lumi-supercomputer.eu/hardware/lumic/>`__.
+
 
 Introduction
 ------------
@@ -36,54 +41,111 @@ Use the following commands to download the ImpactX source code:
 
    git clone https://github.com/ECP-WarpX/impactx.git $HOME/src/impactx
 
-We use system software modules, add environment hints and further dependencies via the file ``$HOME/lumi_impactx.profile``.
-Create it now:
+On LUMI, you can run either with fast MI250X GPUs (LUMI-G, recommended) or CPU nodes (LUMI-C).
 
-.. code-block:: bash
+.. tab-set::
 
-   cp $HOME/src/impactx/docs/source/install/hpc/lumi-csc/lumi_impactx.profile.example $HOME/lumi_impactx.profile
+   .. tab-item:: MI250X GPUs
 
-.. dropdown:: Script Details
-   :color: light
-   :icon: info
-   :animate: fade-in-slide-down
+      We use system software modules, add environment hints and further dependencies via the file ``$HOME/lumi_gpu_impactx.profile``.
+      Create it now:
 
-   .. literalinclude:: lumi-csc/lumi_impactx.profile.example
-      :language: bash
+      .. code-block:: bash
 
-Edit the 2nd line of this script, which sets the ``export proj="project_..."`` variable using a text editor
-such as ``nano``, ``emacs``, or ``vim`` (all available by default on LUMI login nodes).
-You can find out your project name by running ``lumi-ldap-userinfo`` on LUMI.
-For example, if you are member of the project ``project_465000962``, then run ``nano $HOME/lumi_impactx.profile`` and edit line 2 to read:
+         cp $HOME/src/impactx/docs/source/install/hpc/lumi-csc/lumi_gpu_impactx.profile.example $HOME/lumi_gpu_impactx.profile
 
-.. code-block:: bash
+      .. dropdown:: Script Details
+         :color: light
+         :icon: info
+         :animate: fade-in-slide-down
 
-   export proj="project_465000962"
+         .. literalinclude:: lumi-csc/lumi_gpu_impactx.profile.example
+            :language: bash
 
-Exit the ``nano`` editor with ``Ctrl`` + ``O`` (save) and then ``Ctrl`` + ``X`` (exit).
+      Edit the 2nd line of this script, which sets the ``export proj="project_..."`` variable using a text editor
+      such as ``nano``, ``emacs``, or ``vim`` (all available by default on LUMI login nodes).
+      You can find out your project name by running ``lumi-ldap-userinfo`` on LUMI.
+      For example, if you are member of the project ``project_465000962``, then run ``nano $HOME/lumi_gpu_impactx.profile`` and edit line 2 to read:
 
-.. important::
+      .. code-block:: bash
 
-   Now, and as the first step on future logins to LUMI, activate these environment settings:
+         export proj="project_465000962"
 
-   .. code-block:: bash
+      Exit the ``nano`` editor with ``Ctrl`` + ``O`` (save) and then ``Ctrl`` + ``X`` (exit).
 
-      source $HOME/lumi_impactx.profile
+      .. important::
 
-Finally, since LUMI does not yet provide software modules for some of our dependencies, install them once:
+         Now, and as the first step on future logins to LUMI, activate these environment settings:
 
-.. code-block:: bash
+         .. code-block:: bash
 
-   bash $HOME/src/impactx/docs/source/install/hpc/lumi-csc/install_dependencies.sh
-   source $HOME/sw/lumi/gpu/venvs/impactx-lumi/bin/activate
+            source $HOME/lumi_gpu_impactx.profile
 
-.. dropdown:: Script Details
-   :color: light
-   :icon: info
-   :animate: fade-in-slide-down
+      Finally, since LUMI does not yet provide software modules for some of our dependencies, install them once:
 
-   .. literalinclude:: lumi-csc/install_dependencies.sh
-      :language: bash
+      .. code-block:: bash
+
+         bash $HOME/src/impactx/docs/source/install/hpc/lumi-csc/install_gpu_dependencies.sh
+         source $HOME/sw/lumi/gpu/venvs/impactx-gpu-lumi/bin/activate
+
+      .. dropdown:: Script Details
+         :color: light
+         :icon: info
+         :animate: fade-in-slide-down
+
+         .. literalinclude:: lumi-csc/install_gpu_dependencies.sh
+            :language: bash
+
+   .. tab-item:: CPU Nodes
+
+      We use system software modules, add environment hints and further dependencies via the file ``$HOME/lumi_cpu_impactx.profile``.
+      Create it now:
+
+      .. code-block:: bash
+
+         cp $HOME/src/impactx/docs/source/install/hpc/lumi-csc/lumi_cpu_impactx.profile.example $HOME/lumi_cpu_impactx.profile
+
+      .. dropdown:: Script Details
+         :color: light
+         :icon: info
+         :animate: fade-in-slide-down
+
+         .. literalinclude:: lumi-csc/lumi_cpu_impactx.profile.example
+            :language: bash
+
+      Edit the 2nd line of this script, which sets the ``export proj="project_..."`` variable using a text editor
+      such as ``nano``, ``emacs``, or ``vim`` (all available by default on LUMI login nodes).
+      You can find out your project name by running ``lumi-ldap-userinfo`` on LUMI.
+      For example, if you are member of the project ``project_465000962``, then run ``nano $HOME/lumi_cpu_impactx.profile`` and edit line 2 to read:
+
+      .. code-block:: bash
+
+         export proj="project_465000962"
+
+      Exit the ``nano`` editor with ``Ctrl`` + ``O`` (save) and then ``Ctrl`` + ``X`` (exit).
+
+      .. important::
+
+         Now, and as the first step on future logins to LUMI, activate these environment settings:
+
+         .. code-block:: bash
+
+            source $HOME/lumi_cpu_impactx.profile
+
+      Finally, since LUMI does not yet provide software modules for some of our dependencies, install them once:
+
+      .. code-block:: bash
+
+         bash $HOME/src/impactx/docs/source/install/hpc/lumi-csc/install_cpu_dependencies.sh
+         source $HOME/sw/lumi/cpu/venvs/impactx-cpu-lumi/bin/activate
+
+      .. dropdown:: Script Details
+         :color: light
+         :icon: info
+         :animate: fade-in-slide-down
+
+         .. literalinclude:: lumi-csc/install_cpu_dependencies.sh
+            :language: bash
 
 
 .. _building-lumi-compilation:
@@ -93,29 +155,51 @@ Compilation
 
 Use the following :ref:`cmake commands <building-cmake>` to compile the application executable:
 
-.. code-block:: bash
+.. tab-set::
 
-   cd $HOME/src/impactx
-   rm -rf build_lumi
+   .. tab-item:: MI250X GPUs
 
-   cmake -S . -B build_lumi -DImpactX_COMPUTE=HIP
-   cmake --build build_lumi -j 16
+      .. code-block:: bash
 
-The ImpactX application executables are now in ``$HOME/src/impactx/build_lumi/bin/``.
-Additionally, the following commands will install ImpactX as a Python module:
+         cd $HOME/src/impactx
 
-.. code-block:: bash
+         cmake --fresh -S . -B build_lumi_gpu -DImpactX_COMPUTE=HIP
+         cmake --build build_lumi_gpu -j 16
 
-   rm -rf build_lumi_py
+      The ImpactX application executables are now in ``$HOME/src/impactx/build_lumi_gpu/bin/``.
+      Additionally, the following commands will install ImpactX as a Python module:
 
-   cmake -S . -B build_lumi_py -DImpactX_COMPUTE=HIP -DImpactX_PYTHON=ON
-   cmake --build build_lumi_py -j 16 --target pip_install
+      .. code-block:: bash
+
+         cmake --fresh -S . -B build_lumi_gpu_py -DImpactX_COMPUTE=HIP -DImpactX_PYTHON=ON
+         cmake --build build_lumi_gpu_py -j 16 --target pip_install
+
+   .. tab-item:: CPU Nodes
+
+      .. code-block:: bash
+
+         cd $HOME/src/impactx
+
+         cmake --fresh -S . -B build_lumi_cpu
+         cmake --build build_lumi_cpu -j 16
+
+      The ImpactX application executables are now in ``$HOME/src/impactx/build_lumi_cpu/bin/``.
+      Additionally, the following commands will install ImpactX as a Python module:
+
+      .. code-block:: bash
+
+         cmake --fresh -S . -B build_lumi_cpu_py -DImpactX_PYTHON=ON
+         cmake --build build_lumi_cpu_py -j 16 --target pip_install
+
+Now, you can :ref:`submit LUMI compute jobs <running-cpp-lumi>` for ImpactX :ref:`Python scripts <usage-picmi>` (:ref:`example scripts <usage-examples>`).
+Or, you can use the ImpactX executables to submit LUMI jobs (:ref:`example inputs <usage-examples>`).
+For executables, you can reference their location in your :ref:`job script <running-cpp-lumi>` or copy them to a location in ``/project/$proj`` or ``/scratch/$proj``.
 
 
 .. _building-lumi-update:
 
 Update ImpactX & Dependencies
----------------------------
+-----------------------------
 
 If you already installed ImpactX in the past and want to update it, start by getting the latest source code:
 
@@ -136,11 +220,11 @@ If you already installed ImpactX in the past and want to update it, start by get
 
 And, if needed,
 
-- :ref:`update the lumi_impactx.profile file <building-lumi-preparation>`,
+- :ref:`update the lumi_gpu_impactx.profile and lumi_cpu_impactx.profile files <building-lumi-preparation>`,
 - log out and into the system, activate the now updated environment profile as usual,
 - :ref:`execute the dependency install scripts <building-lumi-preparation>`.
 
-As a last step, clean the build directory ``rm -rf $HOME/src/impactx/build_lumi`` and rebuild ImpactX.
+As the last step, :ref:`recompile ImpactX <building-lumi-compilation>`.
 
 
 .. _running-cpp-lumi:
@@ -148,31 +232,55 @@ As a last step, clean the build directory ``rm -rf $HOME/src/impactx/build_lumi`
 Running
 -------
 
-.. _running-cpp-lumi-MI250X-GPUs:
+On LUMI, compute jobs are run via the `Slurm <https://docs.lumi-supercomputer.eu/runjobs/scheduled-jobs/slurm-quickstart/>`__ resource manager.
+There are various `Slurm priority queues <https://docs.lumi-supercomputer.eu/runjobs/scheduled-jobs/partitions/>`__ besides the defaults documented below.
 
-MI250X GPUs (2x64 GB)
-^^^^^^^^^^^^^^^^^^^^^
+For interactive runs on a single node, simply use the aliases ``getNode`` or ``runNode ...`` that are defined by the ``lumi_*_impactx.profile``.
+For runs on multiple nodes, use and adjust the templates below.
 
-The GPU partition on the supercomputer LUMI at CSC has up to `2978 nodes <https://docs.lumi-supercomputer.eu/hardware/lumig/>`__, each with 8 Graphics Compute Dies (GCDs).
-ImpactX runs one MPI rank per Graphics Compute Die.
+.. tab-set::
 
-For interactive runs, simply use the aliases ``getNode`` or ``runNode ...``.
+   .. tab-item:: MI250X GPUs (2x64 GB)
 
-The batch script below can be used to run an ImpactX simulation on multiple nodes (change ``-N`` accordingly).
-Replace descriptions between chevrons ``<>`` by relevant values, for instance ``<project id>`` or the concete inputs file.
-Copy the executable or point to it via ``EXE`` and adjust the path for the ``INPUTS`` variable accordingly.
+      The **LUMI-G** (GPU) partition on the supercomputer LUMI at CSC has up to `2978 nodes <https://docs.lumi-supercomputer.eu/hardware/lumig/>`__, each with 8 Graphics Compute Dies (GCDs).
+      ImpactX runs one MPI rank per Graphics Compute Die.
 
-.. literalinclude:: lumi-csc/lumi.sbatch
-   :language: bash
-   :caption: You can copy this file from ``$HOME/src/impactx/docs/source/install/hpc/lumi-csc/lumi.sbatch``.
+      The batch script below can be used to run an ImpactX simulation on multiple nodes (change ``-N`` accordingly).
+      Replace descriptions between chevrons ``<>`` by relevant values, for instance ``<project id>`` or the concete inputs file.
+      Copy the executable or point to it via ``EXE`` and adjust the path for the ``INPUTS`` variable accordingly.
 
-To run a simulation, copy the lines above to a file ``lumi.sbatch`` and run
+      .. literalinclude:: lumi-csc/lumi_gpu.sbatch
+         :language: bash
+         :caption: You can copy this file from ``$HOME/src/impactx/docs/source/install/hpc/lumi-csc/lumi_gpu.sbatch``.
 
-.. code-block:: bash
+      To run a simulation, copy the lines above to a file ``lumi_gpu.sbatch`` and run
 
-   sbatch lumi.sbatch
+      .. code-block:: bash
 
-to submit the job.
+         sbatch lumi_gpu.sbatch
+
+      to submit the job.
+
+   .. tab-item:: CPU Nodes
+
+      The **LUMI-C** (CPU) partition on the supercomputer LUMI at CSC has up to `2048 nodes <https://docs.lumi-supercomputer.eu/hardware/lumic/>`__.
+      ImpactX runs 16 MPI ranks per node, each with 8 OpenMP threads.
+
+      The batch script below can be used to run an ImpactX simulation on multiple nodes (change ``-N`` accordingly).
+      Replace descriptions between chevrons ``<>`` by relevant values, for instance ``<project id>`` or the concete inputs file.
+      Copy the executable or point to it via ``EXE`` and adjust the path for the ``INPUTS`` variable accordingly.
+
+      .. literalinclude:: lumi-csc/lumi_cpu.sbatch
+         :language: bash
+         :caption: You can copy this file from ``$HOME/src/impactx/docs/source/install/hpc/lumi-csc/lumi_cpu.sbatch``.
+
+      To run a simulation, copy the lines above to a file ``lumi_cpu.sbatch`` and run
+
+      .. code-block:: bash
+
+         sbatch lumi_cpu.sbatch
+
+      to submit the job.
 
 
 .. _post-processing-lumi:
@@ -180,9 +288,11 @@ to submit the job.
 Post-Processing
 ---------------
 
-.. note::
+LUMI provides a `Jupyter Lab service <https://docs.lumi-supercomputer.eu/runjobs/webui/jupyter/>`__ that can be used for interactive post-processing.
 
-   TODO: Document any Jupyter or data services.
+You can reuse your CPU ImpactX virtual environment for post-processing in Jupyter Lab:
+* Python: ``Cray-python (3.10.10)``
+* Virtual environment path: ``${HOME}/sw/lumi/cpu/venvs/impactx-cpu-lumi/`` (replace ``${HOME}`` with the output of ``echo ${HOME}``)
 
 
 .. _known-lumi-issues:

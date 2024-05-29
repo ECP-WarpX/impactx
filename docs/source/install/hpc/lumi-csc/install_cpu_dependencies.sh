@@ -14,14 +14,14 @@ set -eu -o pipefail
 
 # Check: ######################################################################
 #
-#   Was lumi_warpx.profile sourced and configured correctly?
-if [ -z ${proj-} ]; then echo "WARNING: The 'proj' variable is not yet set in your lumi_impactx.profile file! Please edit its line 2 to continue!"; exit 1; fi
+#   Was lumi_cpu_impactx.profile sourced and configured correctly?
+if [ -z ${proj-} ]; then echo "WARNING: The 'proj' variable is not yet set in your lumi_cpu_impactx.profile file! Please edit its line 2 to continue!"; exit 1; fi
 
 
 # Remove old dependencies #####################################################
 #
 SRC_DIR="${HOME}/src"
-SW_DIR="${HOME}/sw/lumi/gpu"
+SW_DIR="${HOME}/sw/lumi/cpu"
 rm -rf ${SW_DIR}
 mkdir -p ${SW_DIR}
 mkdir -p ${SRC_DIR}
@@ -48,15 +48,15 @@ then
 else
   git clone -b v1.21.1 https://github.com/Blosc/c-blosc.git ${SRC_DIR}/c-blosc
 fi
-rm -rf ${SRC_DIR}/c-blosc-lu-build
+rm -rf ${SRC_DIR}/c-blosc-build
 cmake -S ${SRC_DIR}/c-blosc             \
-      -B ${build_dir}/c-blosc-lu-build  \
+      -B ${build_dir}/c-blosc-build  \
       -DBUILD_TESTS=OFF                 \
       -DBUILD_BENCHMARKS=OFF            \
       -DDEACTIVATE_AVX2=OFF             \
-      -DCMAKE_INSTALL_PREFIX=${HOME}/sw/lumi/gpu/c-blosc-1.21.1
-cmake --build ${build_dir}/c-blosc-lu-build --target install --parallel 16
-rm -rf ${build_dir}/c-blosc-lu-build
+      -DCMAKE_INSTALL_PREFIX=${SW_DIR}/c-blosc-1.21.1
+cmake --build ${build_dir}/c-blosc-build --target install --parallel 16
+rm -rf ${build_dir}/c-blosc-build
 
 # HDF5 (for openPMD)
 if [ -d ${SRC_DIR}/hdf5 ]
@@ -86,17 +86,17 @@ then
 else
   git clone -b v2.8.3 https://github.com/ornladios/ADIOS2.git ${SRC_DIR}/adios2
 fi
-rm -rf ${SRC_DIR}/adios2-lu-build
+rm -rf ${SRC_DIR}/adios2-build
 cmake -S ${SRC_DIR}/adios2             \
-      -B ${build_dir}/adios2-lu-build  \
+      -B ${build_dir}/adios2-build  \
       -DADIOS2_USE_Blosc=ON            \
       -DADIOS2_USE_Fortran=OFF         \
       -DADIOS2_USE_HDF5=OFF            \
       -DADIOS2_USE_Python=OFF          \
       -DADIOS2_USE_ZeroMQ=OFF          \
-      -DCMAKE_INSTALL_PREFIX=${HOME}/sw/lumi/gpu/adios2-2.8.3
-cmake --build ${build_dir}/adios2-lu-build --target install -j 16
-rm -rf ${build_dir}/adios2-lu-build
+      -DCMAKE_INSTALL_PREFIX=${HOME}/sw/lumi/cpu/adios2-2.8.3
+cmake --build ${build_dir}/adios2-build --target install -j 16
+rm -rf ${build_dir}/adios2-build
 
 
 # Python ######################################################################
@@ -104,9 +104,9 @@ rm -rf ${build_dir}/adios2-lu-build
 python3 -m pip install --upgrade pip
 python3 -m pip install --upgrade virtualenv
 python3 -m pip cache purge
-rm -rf ${SW_DIR}/venvs/impactx-lumi
-python3 -m venv ${SW_DIR}/venvs/impactx-lumi
-source ${SW_DIR}/venvs/impactx-lumi/bin/activate
+rm -rf ${SW_DIR}/venvs/impactx-cpu-lumi
+python3 -m venv ${SW_DIR}/venvs/impactx-cpu-lumi
+source ${SW_DIR}/venvs/impactx-cpu-lumi/bin/activate
 python3 -m pip install --upgrade pip
 python3 -m pip install --upgrade build
 python3 -m pip install --upgrade packaging
@@ -122,6 +122,6 @@ python3 -m pip install --upgrade matplotlib
 python3 -m pip install --upgrade yt
 # install or update ImpactX dependencies
 python3 -m pip install --upgrade -r ${SRC_DIR}/impactx/requirements.txt
-# cupy: no ROCm 5.2 Python wheels
-#python3 -m pip install --upgrade torch --index-url https://download.pytorch.org/whl/rocm5.4.2
-#python3 -m pip install --upgrade optimas[all]
+# ML & optimization
+python3 -m pip install --upgrade torch --index-url https://download.pytorch.org/whl/cpu
+python3 -m pip install --upgrade optimas[all]
