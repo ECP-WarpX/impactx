@@ -6,8 +6,7 @@
 #
 # -*- coding: utf-8 -*-
 
-import numpy as np
-import amrex.space3d as amr #new for loop
+
 from impactx import ImpactX, distribution, elements
 
 sim = ImpactX()
@@ -80,11 +79,11 @@ sim.lattice.append(monitor)
 
 # run simulation
 sim.evolve()
-#sim.deposit() #need to add
+# sim.deposit() #need to add
 
 # option 1 - ParticleContainer class - works!
-#beam = sim.particle_container().to_df() 
-#print(beam)
+# beam = sim.particle_container().to_df()
+# print(beam)
 
 # option 2 - AMReX MultiFab (aka field) - check
 rho_mfab = sim.rho(lev=0)
@@ -93,7 +92,7 @@ rho_list = rho_mfab.to_numpy()
 for rho in rho_list:
     print(rho)
 
-''' option 2 - AMReX MultiFab - More involved method
+""" option 2 - AMReX MultiFab - More involved method
 
 # include this for an AMReX MultiFab (aka field)
 #rho = sim.rho(lev=0)
@@ -106,7 +105,7 @@ for mfi in rho:
 
         arr_np = rho.array(mfi).to_numpy(copy=True)  # indices x, y, z, comp
         print(arr_np)
-'''
+"""
 
 # clean shutdown
 sim.finalize()
