@@ -147,13 +147,22 @@ set_target_properties(lib PROPERTIES
     WINDOWS_EXPORT_ALL_SYMBOLS ON
 )
 
+#FFTW path - *Added lines
+set(FFTW_ROOT /Users/alexgauss/opt/anaconda3/envs/impactx-cpu-dev) #Conda environment path - Specific to my local machine
+set(FFTW_INCLUDE_DIR ${FFTW_ROOT}/include)
+set(FFTW_LIBRARY ${FFTW_ROOT}/lib/libfftw3.dylib)
+include_directories(${FFTW_INCLUDE_DIR})
+link_directories(${FFTW_ROOT}/lib)
+
 # executable application
 #   note: we currently avoid a dependency on a core library
 #         for simpler usage, but could make this an option
 if(ImpactX_APP)
-    add_executable(app)
+    #add_executable(app)
+    add_executable(app src/particles/ChargeBinning.cpp src/particles/WakeConvolution.cpp)
     add_executable(ImpactX::app ALIAS app)
-    target_link_libraries(app PRIVATE lib)
+    #target_link_libraries(app PRIVATE lib)
+    target_link_libraries(app PRIVATE lib ${FFTW_LIBRARY})
     set(_BUILDINFO_SRC app)
     list(APPEND _ALL_TARGETS app)
 endif()

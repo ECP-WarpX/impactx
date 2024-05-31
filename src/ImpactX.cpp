@@ -29,6 +29,11 @@
 #include <iostream>
 #include <memory>
 
+//*New Lines
+#include <vector>
+#include <fftw3.h>
+#include "particles/ChargeBinning.H"
+#include "particles/WakeConvolution.H"
 
 namespace impactx {
     ImpactX::ImpactX() {
@@ -197,6 +202,53 @@ namespace impactx {
                     if (verbose > 0) {
                         amrex::Print() << " ++++ Starting global_step=" << global_step
                                        << " slice_step=" << slice_step << "\n";
+                    }
+
+                    // CSR Wakefield Response
+                    bool element_has_csr = true;  // TODO: only dipoles, quads, ...
+                    if (element_has_csr) 
+                    {
+                        // Measure beam size, extract the min, max of particle positions
+                        auto const [x_min, y_min, t_min, x_max, y_max, t_max] =
+                            amr_data->m_particle_container->MinAndMaxPositions();
+                        
+                        using amrex::Real;
+
+                        // Set parameters for charge deposition
+                        bool is_unity_particle_weight = true;
+                        bool GetNumberDensity = true;
+                        
+                        int num_bins = 100;  // Set resolution
+                        Real bin_min = t_min;
+                        Real bin_max = t_max;
+                        Real bin_size = (bin_max - bin_min) / num_bins;
+
+                        // Allocate memory for the charge profile
+                        Real* dptr_data = new Real[num_bins]();
+                        auto& particle_container = *(amr_data->m_particle_container);
+
+                        // Call charge deposition function
+                        DepositCharge1D(particle_container, dptr_data, num_bins, bin_min, bin_size, is_unity_particle_weight);
+
+                        // Call charge density derivative function
+                        std::vector<double> charge_distribution(dptr_data, dptr_data + num_bins);
+                        std::vector<double> slopes(num_bins - 1);
+                        DerivativeCharge1D(charge_distribution, slopes, num_bins, bin_size, GetNumberDensity); //Use number derivatives for convolution with CSR
+
+                        // Call wake function
+                        std::vector<double> wake_function(num_bins);
+                        for (int i = 0; i < num_bins; ++i) 
+                        {
+                            double s = bin_min + i * bin_size;
+                            wake_function[i] = W_L_CSR(s, 10.35);
+                        }
+
+                        // Call convolution function
+                        std::vector<double> convoluted_wakefield;
+                        Convolve_FFT(slopes, wake_function, bin_size, convoluted_wakefield);
+
+                        // Kick particles with wake
+                        
                     }
 
                     // Space-charge calculation: turn off if there is only 1 particle
