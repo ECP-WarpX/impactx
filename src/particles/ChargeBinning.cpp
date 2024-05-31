@@ -15,9 +15,9 @@ void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, Real* dptr_data, 
 
     //Determine the number of grid levels in the simulation
     int const nlevs = std::max(0, myspc.finestLevel() + 1);
-    
+
     //Loop over each grid level
-    for (int lev = 0; lev < nlevs; ++lev) 
+    for (int lev = 0; lev < nlevs; ++lev)
     {
         //OpenMP parallelization if enabled
         #ifdef AMREX_USE_OMP
@@ -49,7 +49,7 @@ void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, Real* dptr_data, 
                     //Access particle z-position directly
                     ParticleReal z = pos_z[i]; //(Macro)Particle longitudinal position at i
                     auto const w = (Real)d_w[i]; //(Macro)Particle weight at i
-                    
+
                     /*
                     Weight w is given in [number of particles]:
                     For w = 1 --> macroparticle = 1 particle
@@ -68,7 +68,7 @@ void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, Real* dptr_data, 
                     {
                         HostDevice::Atomic::Add(&dptr_data[bin], e_charge);  //Unity weight: Add elementary charge of 1 particle
                     }
-                    else 
+                    else
                     {
                         HostDevice::Atomic::Add(&dptr_data[bin], charge_contribution);  //Non-unity weight: Add calculated charge from >1 particle
                     }

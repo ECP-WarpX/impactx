@@ -206,18 +206,18 @@ namespace impactx {
 
                     // CSR Wakefield Response
                     bool element_has_csr = true;  // TODO: only dipoles, quads, ...
-                    if (element_has_csr) 
+                    if (element_has_csr)
                     {
                         // Measure beam size, extract the min, max of particle positions
                         auto const [x_min, y_min, t_min, x_max, y_max, t_max] =
                             amr_data->m_particle_container->MinAndMaxPositions();
-                        
+
                         using amrex::Real;
 
                         // Set parameters for charge deposition
                         bool is_unity_particle_weight = true;
                         bool GetNumberDensity = true;
-                        
+
                         int num_bins = 100;  // Set resolution
                         Real bin_min = t_min;
                         Real bin_max = t_max;
@@ -237,7 +237,7 @@ namespace impactx {
 
                         // Call wake function
                         std::vector<double> wake_function(num_bins);
-                        for (int i = 0; i < num_bins; ++i) 
+                        for (int i = 0; i < num_bins; ++i)
                         {
                             double s = bin_min + i * bin_size;
                             wake_function[i] = W_L_CSR(s, 10.35);
@@ -248,7 +248,7 @@ namespace impactx {
                         Convolve_FFT(slopes, wake_function, bin_size, convoluted_wakefield);
 
                         // Kick particles with wake
-                        
+
                     }
 
                     // Space-charge calculation: turn off if there is only 1 particle

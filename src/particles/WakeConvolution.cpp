@@ -25,27 +25,27 @@ the longitudinal CSR wake function, and their associated functions
 */
 
 //Step Function
-double unit_step(double s) 
+double unit_step(double s)
 {
     return s >= 0 ? 1.0 : 0.0; //If true return 1, else 0
 }
 
 //Alpha Function
-double alpha(double s) 
+double alpha(double s)
 {
     return 1.0 - alpha_1 * std::sqrt(s) - (1.0 - 2 * alpha_1) * s;
 }
 
 //Resistive Wall Wake Functions
 
-double W_T_RF(double s, double a, double g, double L) 
+double W_T_RF(double s, double a, double g, double L)
 {
     double s0 = (0.169 * std::pow(a, 1.79) * std::pow(g, 0.38)) / std::pow(L, 1.17);
     double term = std::sqrt(std::abs(s) / s0) * std::exp(-std::sqrt(std::abs(s) / s0));
     return (4 * Z0 * c * s0 * unit_step(s)) / (M_PI * std::pow(a, 4)) * term;
 }
 
-double W_L_RF(double s, double a, double g, double L) 
+double W_L_RF(double s, double a, double g, double L)
 {
     double s00 = g * std::pow((a / (alpha(g / L) * L)), 2) / 8.0;
     return (Z0 * c * unit_step(s) * std::exp(-std::sqrt(std::abs(s) / s00))) / (M_PI * std::pow(a, 2));
@@ -80,12 +80,12 @@ void Convolve_FFT(const std::vector<double>& beam_profile, const std::vector<dou
     //Zero-pad the input arrays to be the size of the convolution output length 'n'
     for (int i = 0; i < n; ++i)
     {
-        if (i < beam_profile.size()) 
+        if (i < beam_profile.size())
         {
             in1[i][0] = std::isfinite(beam_profile[i]) ? beam_profile[i] : 0.0; //Ensure no nans
             in1[i][1] = 0.0;
-        } 
-        else 
+        }
+        else
         {
             in1[i][0] = 0.0;
             in1[i][1] = 0.0;
@@ -95,7 +95,7 @@ void Convolve_FFT(const std::vector<double>& beam_profile, const std::vector<dou
         {
             in2[i][0] = std::isfinite(wake_func[i]) ? wake_func[i] : 0.0; //Ensure no nans
             in2[i][1] = 0.0;
-        } 
+        }
         else
         {
             in2[i][0] = 0.0;
