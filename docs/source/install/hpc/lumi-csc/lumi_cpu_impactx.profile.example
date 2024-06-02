@@ -3,6 +3,7 @@
 
 # required dependencies
 module load LUMI/23.09  partition/C
+module load PrgEnv-aocc
 module load buildtools/23.09
 
 # optional: just an additional text editor
