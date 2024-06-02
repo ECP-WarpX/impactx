@@ -122,6 +122,6 @@ python3 -m pip install --upgrade matplotlib
 python3 -m pip install --upgrade yt
 # install or update ImpactX dependencies
 python3 -m pip install --upgrade -r ${SRC_DIR}/impactx/requirements.txt
-# ML & optimization
-python3 -m pip install --upgrade torch --index-url https://download.pytorch.org/whl/cpu
-python3 -m pip install --upgrade optimas[all]
+# ML & optimization (optional)
+#python3 -m pip install --upgrade torch --index-url https://download.pytorch.org/whl/cpu
+#python3 -m pip install --upgrade optimas[all]
