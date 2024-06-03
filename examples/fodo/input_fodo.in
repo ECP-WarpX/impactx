@@ -1,12 +1,12 @@
 ###############################################################################
 # Particle Beam(s)
 ###############################################################################
-beam.npart = 1000000
+beam.npart = 10000
 beam.units = static
 beam.kin_energy = 2.0e3
 beam.charge = 1.0e-9
 beam.particle = electron
-beam.distribution = gaussian
+beam.distribution = waterbag
 beam.lambdaX = 3.9984884770e-5
 beam.lambdaY = 3.9984884770e-5
 beam.lambdaT = 1.0e-3

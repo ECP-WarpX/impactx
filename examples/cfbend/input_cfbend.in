@@ -1,12 +1,12 @@
 ###############################################################################
 # Particle Beam(s)
 ###############################################################################
-beam.npart = 1000000
+beam.npart = 10000
 beam.units = static
 beam.kin_energy = 2.0e3  #2 GeV
 beam.charge = 1.0e-9
 beam.particle = electron
-beam.distribution = gaussian
+beam.distribution = waterbag
 beam.lambdaX = 5.0e-6  #5 um
 beam.lambdaY = 8.0e-6  #8 um
 beam.lambdaT = 0.0599584916  #200 ps

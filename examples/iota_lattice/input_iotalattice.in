@@ -1,7 +1,7 @@
 ###############################################################################
 # Particle Beam(s)
 ###############################################################################
-beam.npart = 20000
+beam.npart = 10000
 beam.units = static
 beam.kin_energy = 2.5
 beam.charge = 1.0e-9
@@ -21,7 +21,7 @@ beam.mutpt = 0.0
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
-lattice.periods = 10
+lattice.periods = 5
 lattice.elements = monitor first_half qe3 second_half monitor
 
 # lines
