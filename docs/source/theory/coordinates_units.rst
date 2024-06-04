@@ -10,7 +10,7 @@ denotes the difference between the arrival time of the particle and the arrival 
 The momenta conjugate to x, y, and t are denoted px, py, and pt, respectively.  These variables are normalized by the magnitude of the momentum of the reference particle, and are therefore dimensionless.
 In a region of zero vector potential, for example, :math:`p_x = \Delta(\beta_x\gamma)/(\beta_0\gamma_0)`, where :math:`\beta_0` and :math:`\gamma_0` denote the relativistic
 factors associated with the reference velocity.  In a region of zero scalar potential, pt denotes the deviation from the reference energy normalized by the design momentum
-times the speed of light, so that :math:`p_t = \Delta(\gamma)/(\beta_0\gamma_0)`.
+times the speed of light, so that :math:`p_t = -\Delta(\gamma)/(\beta_0\gamma_0)`.
 
 Unlike particles within the beam, the reference particle is described by a set of 8 phase space variables (x [m], px, y [m], py, z [m], pz, t [m], pt) that are specified
 in a global laboratory coordinate system (x,y,z).  The momenta of the reference particle are normalized by :math:`mc`, so that :math:`p_x=\beta_x\gamma`, etc.  A parameteric plot of
