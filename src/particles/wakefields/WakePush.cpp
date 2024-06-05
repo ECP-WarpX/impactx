@@ -52,7 +52,7 @@ namespace impactx::wakepush
                 amrex::ParticleReal const push_consts = 1.0 / (c0_SI * pz_ref_SI);
 
                 //Gather particles and push momentum
-                amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE (int i) 
+                amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE (int i)
                 {
                     //Access SoA Real data
                     amrex::ParticleReal & AMREX_RESTRICT x = part_x[i];
