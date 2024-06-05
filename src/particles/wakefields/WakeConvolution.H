@@ -1,7 +1,7 @@
 #ifndef WAKE_CONVOLUTION_H
 #define WAKE_CONVOLUTION_H
 
-#include "../ImpactXParticleContainer.H"
+#include "../ImpactXParticleContainer.H" 
 
 using namespace amrex;
 

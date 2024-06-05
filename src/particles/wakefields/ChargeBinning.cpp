@@ -1,7 +1,7 @@
 #include "ChargeBinning.H"
 #include "../ImpactXParticleContainer.H" //Includes all necessary AMReX headers
 
-#include <cmath>
+#include <cmath> 
 #include <iostream>
 #include <vector>
 #include <algorithm>

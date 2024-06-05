@@ -31,7 +31,7 @@
 
 #include <vector>
 #include <fftw3.h>
-#include "particles/wakefields/ChargeBinning.H"
+#include "particles/wakefields/ChargeBinning.H" 
 #include "particles/wakefields/WakeConvolution.H"
 #include "particles/wakefields/WakePush.H"
 
