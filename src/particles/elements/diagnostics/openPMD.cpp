@@ -139,6 +139,7 @@ namespace detail
 
     void BeamMonitor::finalize ()
     {
+#ifdef ImpactX_USE_OPENPMD
         // close shared series alias
         if (m_series.has_value())
         {
@@ -150,6 +151,7 @@ namespace detail
         // remove from unique series map
         if (m_unique_series.count(m_series_name) != 0u)
             m_unique_series.erase(m_series_name);
+#endif // ImpactX_USE_OPENPMD
     }
 
     BeamMonitor::BeamMonitor (std::string series_name, std::string backend, std::string encoding) :
@@ -303,7 +305,7 @@ namespace detail
             throw std::runtime_error("BeamMonitor: int_soa_names output not yet implemented!");
 #else
         amrex::ignore_unused(pc, step);
-#endif
+#endif // ImpactX_USE_OPENPMD
     }
 
     void
@@ -312,6 +314,7 @@ namespace detail
         int step
     )
     {
+#ifdef ImpactX_USE_OPENPMD
         std::string profile_name = "impactx::Push::" + std::string(BeamMonitor::name);
         BL_PROFILE(profile_name);
 
@@ -368,6 +371,9 @@ namespace detail
 
         // close iteration
         iteration.close();
+#else
+        amrex::ignore_unused(pc, step);
+#endif // ImpactX_USE_OPENPMD
     }
 
     void
@@ -446,7 +452,7 @@ namespace detail
         series.flush();
 #else
         amrex::ignore_unused(pti, ref_part);
-#endif
+#endif   // ImpactX_USE_OPENPMD
     }
 
 } // namespace impactx::diagnostics
