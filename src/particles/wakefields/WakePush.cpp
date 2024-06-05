@@ -4,7 +4,7 @@
 #include <AMReX_BLProfiler.H>
 #include <AMReX_REAL.H>
 #include <AMReX_SPACE.H>
- 
+
 namespace impactx::wakepush
 {
     void WakePush(ImpactXParticleContainer & pc, const std::vector<double>& convoluted_wakefield, amrex::ParticleReal const slice_ds)
