@@ -247,6 +247,20 @@ namespace impactx {
                         std::vector<double> convoluted_wakefield;
                         Convolve_FFT(slopes, wake_function, bin_size, convoluted_wakefield, 1);
 
+                        /*
+                        //Check convolution
+                        std::cout << "Convoluted wakefield: ";
+                        std::ofstream outfile("convoluted_wakefield.txt");
+                        for (int i = 0; i < convoluted_wakefield.size(); ++i)
+                        {
+                            std::cout << convoluted_wakefield[i] << " ";
+                            outfile << convoluted_wakefield[i] << std::endl;
+                        }
+                        std::cout << std::endl;
+                        outfile.close();
+                        delete[] dptr_data;
+                        */
+                        
                         // Kick particles with wake
                         impactx::wakepush::WakePush(particle_container, convoluted_wakefield, bin_size);
                     }
