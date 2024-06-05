@@ -29,11 +29,11 @@
 #include <iostream>
 #include <memory>
 
-//*New Lines
 #include <vector>
 #include <fftw3.h>
-#include "particles/ChargeBinning.H"
-#include "particles/WakeConvolution.H"
+#include "particles/wakefields/ChargeBinning.H"
+#include "particles/wakefields/WakeConvolution.H"
+#include "particles/wakefields/WakePush.H"
 
 namespace impactx {
     ImpactX::ImpactX() {
@@ -240,15 +240,27 @@ namespace impactx {
                         for (int i = 0; i < num_bins; ++i)
                         {
                             double s = bin_min + i * bin_size;
-                            wake_function[i] = W_L_CSR(s, 10.35);
+                            wake_function[i] = W_L_CSR(s, 7.613657587094493); // Use R from input file
                         }
 
                         // Call convolution function
                         std::vector<double> convoluted_wakefield;
-                        Convolve_FFT(slopes, wake_function, bin_size, convoluted_wakefield);
+                        Convolve_FFT(slopes, wake_function, bin_size, convoluted_wakefield, 1);
+
+                        // Check convolution
+                        std::cout << "Convoluted wakefield: ";
+                        std::ofstream outfile("convoluted_wakefield.txt");
+                        for (int i = 0; i < convoluted_wakefield.size(); ++i)
+                        {
+                            std::cout << convoluted_wakefield[i] << " ";
+                            outfile << convoluted_wakefield[i] << std::endl;
+                        }
+                        std::cout << std::endl;
+                        outfile.close();
+                        delete[] dptr_data;
 
                         // Kick particles with wake
-
+                        impactx::wakepush::WakePush(particle_container, convoluted_wakefield, bin_size);
                     }
 
                     // Space-charge calculation: turn off if there is only 1 particle

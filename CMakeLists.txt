@@ -159,7 +159,7 @@ link_directories(${FFTW_ROOT}/lib)
 #         for simpler usage, but could make this an option
 if(ImpactX_APP)
     #add_executable(app)
-    add_executable(app src/particles/ChargeBinning.cpp src/particles/WakeConvolution.cpp)
+    add_executable(app src/particles/wakefields/ChargeBinning.cpp src/particles/wakefields/WakeConvolution.cpp src/particles/wakefields/WakePush.cpp)
     add_executable(ImpactX::app ALIAS app)
     #target_link_libraries(app PRIVATE lib)
     target_link_libraries(app PRIVATE lib ${FFTW_LIBRARY})

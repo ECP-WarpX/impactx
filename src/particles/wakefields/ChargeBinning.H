@@ -1,7 +1,7 @@
 #ifndef CHARGE_BINNING_H
 #define CHARGE_BINNING_H
 
-#include "ImpactXParticleContainer.H"
+#include "../ImpactXParticleContainer.H"
 
 using namespace amrex;
 
