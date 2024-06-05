@@ -260,7 +260,7 @@ namespace impactx {
                         outfile.close();
                         delete[] dptr_data;
                         */
-                        
+
                         // Kick particles with wake
                         impactx::wakepush::WakePush(particle_container, convoluted_wakefield, bin_size);
                     }
