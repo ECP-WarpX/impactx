@@ -48,7 +48,7 @@ namespace impactx::wakepush
                 amrex::ParticleReal* const AMREX_RESTRICT part_pz = soa_real[RealSoA::pz].dataPtr(); //Note: Currently for a fixed t
 
                 //Obtain constants for force normalization
-                amrex::ParticleReal const push_consts = 1.0 / (c0_SI * pz_ref_SI);
+                amrex::ParticleReal const push_consts = 1.0 / ((ablastr::constant::SI::c) * pz_ref_SI);
 
                 //Gather particles and push momentum
                 amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE (int i)
