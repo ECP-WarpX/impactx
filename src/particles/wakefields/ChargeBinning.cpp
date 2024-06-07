@@ -86,7 +86,7 @@ void DerivativeCharge1D(std::vector<double>& charge_distribution, std::vector<do
         //Compute the charge density derivative
         double charge_derivative = (charge_distribution[i + 1] - charge_distribution[i]) / bin_size;
 
-        // If GetNumberDensity = True, convert charge density derivative to number density derivative for CSR convolution
+        //If GetNumberDensity = True, convert charge density derivative to number density derivative for CSR convolution
         if (GetNumberDensity)
         {
             slopes[i] = charge_derivative / e_charge;

@@ -9,6 +9,7 @@
  */
 #include "ImpactX.H"
 #include "initialization/InitAmrCore.H"
+#include "initialization/InitDistribution.H"
 #include "particles/CollectLost.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
@@ -17,6 +18,7 @@
 #include "particles/spacecharge/GatherAndPush.H"
 #include "particles/spacecharge/PoissonSolve.H"
 #include "particles/transformation/CoordinateTransformation.H"
+#include "particles/elements/Sbend.H"
 
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
@@ -36,6 +38,7 @@
 #include "particles/wakefields/WakePush.H"
 
 namespace impactx {
+
     ImpactX::ImpactX() {
         // todo: if amr.n_cells is provided, overwrite/redefine AmrCore object
 
@@ -129,6 +132,7 @@ namespace impactx {
 
     void ImpactX::evolve ()
     {
+        
         BL_PROFILE("ImpactX::evolve");
 
         validate();
@@ -205,7 +209,35 @@ namespace impactx {
                     }
 
                     // CSR Wakefield Response
-                    bool element_has_csr = true;  // TODO: only dipoles, quads, ...
+ 
+                    bool element_has_csr = false; //Updates to true for example with bend element
+                    double R = 0.0; //Updates for bend element rc
+       
+                    std::visit([&R, &element_has_csr](auto &&element)
+                    {
+                        if constexpr (std::is_same_v<std::decay_t<decltype(element)>, Sbend>)
+                        {
+                            R = element.m_rc;
+                            std::cout << "My radius of curvature is:" << R << std::endl;
+                            element_has_csr = true;
+                        }
+                        else if constexpr (std::is_same_v<std::decay_t<decltype(element)>, CFbend>)
+                        {
+                            R = element.m_rc;
+                            std::cout << "My radius of curvature is:" << R << std::endl;
+                            element_has_csr = true;
+                        }
+                        /*
+                        else if constexpr (std::is_same_v<std::decay_t<decltype(element)>, ExactSbend>) //Currently internal calculation for m_rc
+                        {
+                            R = element.m_rc;
+                            std::cout << "My radius of curvature is:" << R << std::endl;
+                            element_has_csr = true;
+                        }
+                        */
+                    }, element_variant);
+
+                    //Enter loop if lattice has bend element
                     if (element_has_csr)
                     {
                         // Measure beam size, extract the min, max of particle positions
@@ -236,18 +268,23 @@ namespace impactx {
                         DerivativeCharge1D(charge_distribution, slopes, num_bins, bin_size, GetNumberDensity); //Use number derivatives for convolution with CSR
 
                         // Call wake function
+
+                        //Read in external variable bunch_charge
+                        std::cout << "My beam charge is:" << bunch_charge << std::endl;
+
                         std::vector<double> wake_function(num_bins);
                         for (int i = 0; i < num_bins; ++i)
                         {
                             double s = bin_min + i * bin_size;
-                            wake_function[i] = W_L_CSR(s, 7.613657587094493); // Use R from input file
+                            wake_function[i] = W_L_CSR(s, R, bunch_charge);
                         }
 
                         // Call convolution function
                         std::vector<double> convoluted_wakefield;
                         Convolve_FFT(slopes, wake_function, bin_size, convoluted_wakefield, 1);
 
-                        // Check convolution
+                        /*
+                        Check convolution
                         std::cout << "Convoluted wakefield: ";
                         std::ofstream outfile("convoluted_wakefield.txt");
                         for (int i = 0; i < convoluted_wakefield.size(); ++i)
@@ -258,6 +295,7 @@ namespace impactx {
                         std::cout << std::endl;
                         outfile.close();
                         delete[] dptr_data;
+                        */
 
                         // Kick particles with wake
                         impactx::wakepush::WakePush(particle_container, convoluted_wakefield, bin_size);

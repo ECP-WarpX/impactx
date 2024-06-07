@@ -1,5 +1,6 @@
 #include "WakeConvolution.H"
 #include "../ImpactXParticleContainer.H" //Includes all necessary AMReX headers
+#include "../../initialization/InitDistribution.H"
  
 #include <cmath>
 #include <iostream>
@@ -8,14 +9,6 @@
 #include <fftw3.h> //Fastest Fourier Transform in the West
 
 using namespace amrex;
-
-//Wake Function Parameters - Parameters from paper Bane et al., 2003
-//double a = 5.9e-03;  //Iris radius [m]
-//double g = 7.49e-03;  //Gap [m]
-//double L = 8.75e-03;  //Period length [m]
-
-//double R = 10.35; //For Chicane
-//double R = 7.613657587094493 //For CF Bend
 
 /*
 Wake Functions:
@@ -54,13 +47,12 @@ double W_L_RF(double s, double a, double g, double L)
 
 //CSR Wake Function
 
-double beam_charge = 1.0e-09;
-double N = beam_charge / e;
-double rc = e * e / (4 * M_PI * epsilon_0 * m_e * std::pow(c, 2));
-double kappa = (2 * rc * m_e * std::pow(c, 2)) / std::pow(3, 1.0/3.0) / std::pow(7.613657587094493, 2.0/3.0); //Assumes R = 7.613657587094493
-
-double W_L_CSR(double s, double R)
+double W_L_CSR(double s, amrex::ParticleReal R, amrex::ParticleReal beam_charge)
 {
+    double N = beam_charge / e;
+    double rc = e * e / (4 * M_PI * epsilon_0 * m_e * std::pow(c, 2));
+    double kappa = (2 * rc * m_e * std::pow(c, 2)) / std::pow(3, 1.0/3.0) / std::pow(R, 2.0/3.0);
+
     return - (N * kappa * unit_step(s)) / std::pow(std::abs(s), 1.0/3.0);
 }
 
@@ -69,7 +61,7 @@ double W_L_CSR(double s, double R)
 void Convolve_FFT(const std::vector<double>& beam_profile, const std::vector<double>& wake_func, double delta_t, std::vector<double>& result, int padding_factor)
 {
     //Length of convolution result
-    int original_n = beam_profile.size() + wake_func.size() - 1; //Output size is n = 2*N - 1, where N = size of signals 1,2
+    int original_n = beam_profile.size() + wake_func.size() - 1; //Output size is n = 2N - 1, where N = size of signals 1,2
 
     //Add padding factor to control amount of zero-padding
     int n = static_cast<int>(original_n * padding_factor);

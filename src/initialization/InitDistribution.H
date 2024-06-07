@@ -17,6 +17,8 @@
 
 #include <utility>  // for std::move
 
+// Declare the external variable
+extern amrex::ParticleReal bunch_charge;
 
 namespace impactx::initialization
 {
