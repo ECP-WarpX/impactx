@@ -132,7 +132,7 @@ namespace impactx {
 
     void ImpactX::evolve ()
     {
-        
+
         BL_PROFILE("ImpactX::evolve");
 
         validate();

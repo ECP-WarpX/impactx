@@ -29,8 +29,7 @@ namespace impactx::wakepush
                 const int np = pti.numParticles();
 
                 //Physical constants and reference quantities
-                amrex::ParticleReal const c0_SI = 2.99792458e8;
-                amrex::ParticleReal const mc_SI = pc.GetRefParticle().mass * c0_SI;
+                amrex::ParticleReal const mc_SI = pc.GetRefParticle().mass * (ablastr::constant::SI::c);
                 amrex::ParticleReal const pz_ref_SI = pc.GetRefParticle().beta_gamma() * mc_SI;
                 amrex::ParticleReal const gamma = pc.GetRefParticle().gamma();
                 amrex::ParticleReal const inv_gamma2 = 1.0_prt / (gamma * gamma);
@@ -49,7 +48,7 @@ namespace impactx::wakepush
                 amrex::ParticleReal* const AMREX_RESTRICT part_pz = soa_real[RealSoA::pz].dataPtr(); //Note: Currently for a fixed t
 
                 //Obtain constants for force normalization
-                amrex::ParticleReal const push_consts = 1.0 / (c0_SI * pz_ref_SI);
+                amrex::ParticleReal const push_consts = 1.0 / ((ablastr::constant::SI::c) * pz_ref_SI);
 
                 //Gather particles and push momentum
                 amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE (int i)
