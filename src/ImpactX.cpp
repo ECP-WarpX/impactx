@@ -209,10 +209,10 @@ namespace impactx {
                     }
 
                     // CSR Wakefield Response
- 
+
                     bool element_has_csr = false; // Updates to true for example with bend element
                     double R = 0.0; // Updates for bend element rc
-       
+
                     //Define lambda function inside of std::visit
                     std::visit([&R, &element_has_csr](auto &&element)
                     {
