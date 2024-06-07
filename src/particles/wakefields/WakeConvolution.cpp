@@ -1,7 +1,7 @@
 #include "WakeConvolution.H"
 #include "../ImpactXParticleContainer.H" //Includes all necessary AMReX headers
 #include "../../initialization/InitDistribution.H"
- 
+
 #include <cmath>
 #include <iostream>
 #include <vector>
