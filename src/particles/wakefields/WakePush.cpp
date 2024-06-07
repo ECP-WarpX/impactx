@@ -30,7 +30,7 @@ namespace impactx::wakepush
 
                 //Physical constants and reference quantities
                 amrex::ParticleReal const c0_SI = 2.99792458e8;
-                amrex::ParticleReal const mc_SI = pc.GetRefParticle().mass * c0_SI;
+                amrex::ParticleReal const mc_SI = pc.GetRefParticle().mass * (ablastr::constant::SI::c);
                 amrex::ParticleReal const pz_ref_SI = pc.GetRefParticle().beta_gamma() * mc_SI;
                 amrex::ParticleReal const gamma = pc.GetRefParticle().gamma();
                 amrex::ParticleReal const inv_gamma2 = 1.0_prt / (gamma * gamma);
