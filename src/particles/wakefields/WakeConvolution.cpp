@@ -36,22 +36,22 @@ double W_T_RF(double s, double a, double g, double L)
 {
     double s0 = (0.169 * std::pow(a, 1.79) * std::pow(g, 0.38)) / std::pow(L, 1.17);
     double term = std::sqrt(std::abs(s) / s0) * std::exp(-std::sqrt(std::abs(s) / s0));
-    return (4 * Z0 * c * s0 * unit_step(s)) / (M_PI * std::pow(a, 4)) * term;
+    return (4 * Z0 * ablastr::constant::SI::c * s0 * unit_step(s)) / (M_PI * std::pow(a, 4)) * term;
 }
 
 double W_L_RF(double s, double a, double g, double L)
 {
     double s00 = g * std::pow((a / (alpha(g / L) * L)), 2) / 8.0;
-    return (Z0 * c * unit_step(s) * std::exp(-std::sqrt(std::abs(s) / s00))) / (M_PI * std::pow(a, 2));
+    return (Z0 * ablastr::constant::SI::c * unit_step(s) * std::exp(-std::sqrt(std::abs(s) / s00))) / (M_PI * std::pow(a, 2));
 }
 
 //CSR Wake Function
 
 double W_L_CSR(double s, amrex::ParticleReal R, amrex::ParticleReal beam_charge)
 {
-    double N = beam_charge / e;
-    double rc = e * e / (4 * M_PI * epsilon_0 * m_e * std::pow(c, 2));
-    double kappa = (2 * rc * m_e * std::pow(c, 2)) / std::pow(3, 1.0/3.0) / std::pow(R, 2.0/3.0);
+    double N = beam_charge / ablastr::constant::SI::q_e;
+    double rc = std::pow(ablastr::constant::SI::q_e, 2) / (4 * M_PI * ablastr::constant::SI::ep0 * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2));
+    double kappa = (2 * rc * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2)) / std::pow(3, 1.0/3.0) / std::pow(R, 2.0/3.0);
 
     return - (N * kappa * unit_step(s)) / std::pow(std::abs(s), 1.0/3.0);
 }

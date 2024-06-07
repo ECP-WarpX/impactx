@@ -7,11 +7,7 @@
 using namespace amrex;
 
 //Constants
-constexpr double e = 1.602e-19;  // Elementary charge [C]
-constexpr double c = 3.0e8;  //Speed of light [m/s]
-constexpr double m_e = 9.109e-31;  //Electron mass [kg]
 constexpr double Z0 = 377;  //Free space impedance [Ohm]
-constexpr double epsilon_0 = 8.854e-12;  //Vacuum permittivity [F/m]
 constexpr double alpha_1 = 0.4648;
 
 //Step Function

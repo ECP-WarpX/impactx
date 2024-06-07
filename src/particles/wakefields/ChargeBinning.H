@@ -5,9 +5,6 @@
 
 using namespace amrex;
 
-//Constants
-constexpr Real e_charge = 1.602e-19; //Elementary charge in [C]
-
 //Function to calculate charge density profile
 void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, Real* dptr_data, int num_bins, Real bin_min, Real bin_size, bool is_unity_particle_weight);
 

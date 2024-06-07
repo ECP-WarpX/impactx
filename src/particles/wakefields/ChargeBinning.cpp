@@ -61,12 +61,12 @@ void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, Real* dptr_data, 
                     if (bin < 0 || bin >= num_bins) { return; } //Discard if bin index is out of range
 
                     //Calculate the charge contribution of the macro particle
-                    Real charge_contribution = w * e_charge;
+                    Real charge_contribution = w * ablastr::constant::SI::q_e;
 
                     //Add to histogram bin
                     if (is_unity_particle_weight)
                     {
-                        HostDevice::Atomic::Add(&dptr_data[bin], e_charge);  //Unity weight: Add elementary charge of 1 particle
+                        HostDevice::Atomic::Add(&dptr_data[bin], ablastr::constant::SI::q_e);  //Unity weight: Add elementary charge of 1 particle
                     }
                     else
                     {
@@ -89,7 +89,7 @@ void DerivativeCharge1D(std::vector<double>& charge_distribution, std::vector<do
         //If GetNumberDensity = True, convert charge density derivative to number density derivative for CSR convolution
         if (GetNumberDensity)
         {
-            slopes[i] = charge_derivative / e_charge;
+            slopes[i] = charge_derivative / ablastr::constant::SI::q_e;
         }
         else
         {
