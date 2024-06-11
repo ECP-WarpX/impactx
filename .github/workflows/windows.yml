@@ -35,6 +35,10 @@ jobs:
         7z.exe x -r hdf5-1_12_2.tar.gz
         7z.exe x -r hdf5-1_12_2.tar
     - name: Install Dependencies
+      env:
+        # Work-around for windows-latest GH runner issue, see
+        # https://github.com/actions/runner-images/issues/10004
+        CXXFLAGS: "/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR"
       run: |
         cmake -S hdf5-hdf5-1_12_2 -B build_hdf5  `
               -DCMAKE_BUILD_TYPE=RelWithDebInfo  `
@@ -58,6 +62,10 @@ jobs:
         python3 -m pip install -U -r examples/requirements.txt
         python3 -m pip install -U openPMD-validator
     - name: Build
+      env:
+        # Work-around for windows-latest GH runner issue, see
+        # https://github.com/actions/runner-images/issues/10004
+        CXXFLAGS: "/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR"
       run: |
         $env:HDF5_DIR = "C:/Program Files/HDF_Group/HDF5/1.12.2/cmake/"
         cmake -S . -B build               `
