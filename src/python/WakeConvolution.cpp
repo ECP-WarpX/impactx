@@ -21,10 +21,10 @@ void init_wakeconvolution(py::module &m)
     //Use a lambda to wrap the convolve_fft function
     md.def("convolve_fft", [](
         const std::vector<double>& beam_profile,
-        const std::vector<double>& wake_func, 
+        const std::vector<double>& wake_func,
         double delta_t,
         std::vector<double>& result,
-        int padding_factor) 
+        int padding_factor)
     {
         convolve_fft(beam_profile, wake_func, delta_t, result, padding_factor);
     }, "FFT Convolution");
