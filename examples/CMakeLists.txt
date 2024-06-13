@@ -859,10 +859,10 @@ add_impactx_test(alignment.py
 #
 # w/o space charge
 # copy lattice file & parser
-file(COPY ${ImpactX_SOURCE_DIR}/examples/fnal_booster/fermi-booster-madx-sxf_corr_new
+file(COPY ${ImpactX_SOURCE_DIR}/examples/fnal_booster/fermi-booster-madx-3_no-sc
      DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/booster.py)
 add_impactx_test(booster.py
-    examples/fnal_booster/fnal_booster.py
+    examples/fnal_booster/fnal_booster_no-sc.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
     examples/fnal_booster/analysis_booster.py
