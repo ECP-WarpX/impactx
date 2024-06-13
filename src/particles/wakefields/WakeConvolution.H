@@ -17,13 +17,13 @@ double unit_step(double s);
 double alpha(double s);
 
 //Resistive Wall Wake Functions
-double W_T_RF(double s, double a, double g, double L);
-double W_L_RF(double s, double a, double g, double L);
+double w_t_rf(double s, double a, double g, double L);
+double w_l_rf(double s, double a, double g, double L);
 
 //CSR Wake Function
-double W_L_CSR(double s, amrex::ParticleReal R, amrex::ParticleReal beam_charge);
+double w_l_csr(double s, amrex::ParticleReal R, amrex::ParticleReal beam_charge);
 
 //Function to perform FFT-based convolution
-void Convolve_FFT(const std::vector<double>& beam_profile, const std::vector<double>& wake_func, double delta_t, std::vector<double>& result, int padding_factor);
+void convolve_fft(const std::vector<double>& beam_profile, const std::vector<double>& wake_func, double delta_t, std::vector<double>& result, int padding_factor);
 
 #endif // WAKE_CONVOLUTION_H

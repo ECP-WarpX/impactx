@@ -10,4 +10,5 @@ target_sources(pyImpactX
     ImpactXParticleContainer.cpp
     ReferenceParticle.cpp
     transformation.cpp
+    WakeConvolution.cpp
 )

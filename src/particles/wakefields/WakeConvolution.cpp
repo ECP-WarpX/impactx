@@ -1,6 +1,6 @@
 #include "WakeConvolution.H"
-#include "../ImpactXParticleContainer.H" //Includes all necessary AMReX headers
-#include "../../initialization/InitDistribution.H"
+#include "particles/ImpactXParticleContainer.H" //Includes all necessary AMReX headers
+#include "initialization/InitDistribution.H"
 
 #include <cmath>
 #include <iostream>
@@ -32,14 +32,14 @@ double alpha(double s)
 
 //Resistive Wall Wake Functions
 
-double W_T_RF(double s, double a, double g, double L)
+double w_t_rf(double s, double a, double g, double L)
 {
     double s0 = (0.169 * std::pow(a, 1.79) * std::pow(g, 0.38)) / std::pow(L, 1.17);
     double term = std::sqrt(std::abs(s) / s0) * std::exp(-std::sqrt(std::abs(s) / s0));
     return (4 * Z0 * ablastr::constant::SI::c * s0 * unit_step(s)) / (M_PI * std::pow(a, 4)) * term;
 }
 
-double W_L_RF(double s, double a, double g, double L)
+double w_l_rf(double s, double a, double g, double L)
 {
     double s00 = g * std::pow((a / (alpha(g / L) * L)), 2) / 8.0;
     return (Z0 * ablastr::constant::SI::c * unit_step(s) * std::exp(-std::sqrt(std::abs(s) / s00))) / (M_PI * std::pow(a, 2));
@@ -47,7 +47,7 @@ double W_L_RF(double s, double a, double g, double L)
 
 //CSR Wake Function
 
-double W_L_CSR(double s, amrex::ParticleReal R, amrex::ParticleReal beam_charge)
+double w_l_csr(double s, amrex::ParticleReal R, amrex::ParticleReal beam_charge)
 {
     double N = beam_charge / ablastr::constant::SI::q_e;
     double rc = std::pow(ablastr::constant::SI::q_e, 2) / (4 * M_PI * ablastr::constant::SI::ep0 * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2));
@@ -58,7 +58,7 @@ double W_L_CSR(double s, amrex::ParticleReal R, amrex::ParticleReal beam_charge)
 
 //Convolution Function
 
-void Convolve_FFT(const std::vector<double>& beam_profile, const std::vector<double>& wake_func, double delta_t, std::vector<double>& result, int padding_factor)
+void convolve_fft(const std::vector<double>& beam_profile, const std::vector<double>& wake_func, double delta_t, std::vector<double>& result, int padding_factor)
 {
     //Length of convolution result
     int original_n = beam_profile.size() + wake_func.size() - 1; //Output size is n = 2N - 1, where N = size of signals 1,2

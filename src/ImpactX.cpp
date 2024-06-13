@@ -277,12 +277,12 @@ namespace impactx {
                         for (int i = 0; i < num_bins; ++i)
                         {
                             double s = bin_min + i * bin_size;
-                            wake_function[i] = W_L_CSR(s, R, bunch_charge);
+                            wake_function[i] = w_l_csr(s, R, bunch_charge);
                         }
 
                         // Call convolution function
                         std::vector<double> convoluted_wakefield;
-                        Convolve_FFT(slopes, wake_function, bin_size, convoluted_wakefield, 1);
+                        convolve_fft(slopes, wake_function, bin_size, convoluted_wakefield, 1);
 
                         /*
                         Check convolution
