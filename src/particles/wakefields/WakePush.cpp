@@ -34,7 +34,7 @@ namespace impactx::wakepush
                 amrex::ParticleReal const gamma = pc.GetRefParticle().gamma();
                 amrex::ParticleReal const inv_gamma2 = 1.0_prt / (gamma * gamma);
 
-                amrex::ParticleReal const dt = slice_ds / pc.GetRefParticle().beta() / c0_SI;
+                amrex::ParticleReal const dt = slice_ds / pc.GetRefParticle().beta() / ablastr::constant::SI::c;
 
                 //Access data from StructOfArrays (soa)
                 auto& soa_real = pti.GetStructOfArrays().GetRealData();
