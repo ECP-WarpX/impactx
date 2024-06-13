@@ -147,10 +147,14 @@ def parse_element(sim, element, zprev):
                         anglerad = kl[i]
                         if anglerad != 0.0:
                             angledeg = anglerad * 180.0 / math.pi
-                            radius_d = lrad/anglerad
-                            print(f"elements.ThinDipole(theta={angledeg}, rc={radius_d}, rotation={tilt_deg})")
+                            radius_d = lrad / anglerad
+                            print(
+                                f"elements.ThinDipole(theta={angledeg}, rc={radius_d}, rotation={tilt_deg})"
+                            )
                             sim.lattice.append(
-                               elements.ThinDipole(theta=angledeg, rc=radius_d, rotation=tilt_deg)
+                                elements.ThinDipole(
+                                    theta=angledeg, rc=radius_d, rotation=tilt_deg
+                                )
                             )
                     else:
                         mindex = i + 1
@@ -159,7 +163,10 @@ def parse_element(sim, element, zprev):
                         )
                         sim.lattice.append(
                             elements.Multipole(
-                                multipole=mindex, K_normal=kl[i], K_skew=0.0, rotation=tilt_deg
+                                multipole=mindex,
+                                K_normal=kl[i],
+                                K_skew=0.0,
+                                rotation=tilt_deg,
                             )
                         )
         else:
@@ -264,30 +271,30 @@ ref = sim.particle_container().ref_particle()
 ref.set_charge_qe(1.0).set_mass_MeV(proton_mass_MeV).set_kin_energy_MeV(kin_energy_MeV)
 
 #   particle bunch
-# From a match using 4-turn formulas 
-#distr = distribution.Waterbag(
+# From a match using 4-turn formulas
+# distr = distribution.Waterbag(
 #    sigmaX=7.545488303758604032642680754e-3,
-#    sigmaY=2.74317757142162884165706298e-3, 
+#    sigmaY=2.74317757142162884165706298e-3,
 #    sigmaT=1.0e-6,
 #    sigmaPx=2.08465300969673977368e-4,
 #    sigmaPy=5.68752317084618977707e-4,
 #    sigmaPt=1.0e-16,  # neglect energy spread
 #    muxpx=0.016566526192137,
 #    muypy=0.128290261343269,
-#    mutpt=0.0, 
-#)
+#    mutpt=0.0,
+# )
 # From a match using MAD-X
 distr = distribution.Waterbag(
     sigmaX=7.549405055263145227715095781e-3,
     sigmaY=2.74238571935065604835554295e-3,
     sigmaT=1.0e-6,
     sigmaPx=2.08316555979527016894e-4,
-    sigmaPy=5.68903160813796778519e-4,   
+    sigmaPy=5.68903160813796778519e-4,
     sigmaPt=1.0e-16,  # neglect energy spread
     muxpx=0.025766706724881,
     muypy=0.128470451397117,
     mutpt=0.0,
-)   
+)
 sim.add_particles(bunch_charge_C, distr, npart)
 
 # Initial beam diagnostics
@@ -301,7 +308,7 @@ for element in element_list:  # elements[0:12]:
     zprev = zloc
 
 # Final beam diagnostics
-#sim.lattice.append(elements.BeamMonitor("monitor", backend="h5"))
+# sim.lattice.append(elements.BeamMonitor("monitor", backend="h5"))
 
 # number of periods
 sim.periods = 1
