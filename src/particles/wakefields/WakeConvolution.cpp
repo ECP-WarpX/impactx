@@ -2,13 +2,15 @@
 #include "particles/ImpactXParticleContainer.H" //Includes all necessary AMReX headers
 #include "initialization/InitDistribution.H"
 
+#ifdef ImpactX_USE_FFT
+#   include <fftw3.h> //Fastest Fourier Transform in the West
+#endif
+
+#include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <stdexcept>
 #include <vector>
-#include <algorithm>
-#include <fftw3.h> //Fastest Fourier Transform in the West
-
-using namespace amrex;
 
 /*
 Wake Functions:
@@ -60,6 +62,7 @@ double w_l_csr(double s, amrex::ParticleReal R, amrex::ParticleReal beam_charge)
 
 void convolve_fft(const std::vector<double>& beam_profile, const std::vector<double>& wake_func, double delta_t, std::vector<double>& result, int padding_factor)
 {
+#ifdef ImpactX_USE_FFT
     //Length of convolution result
     int original_n = beam_profile.size() + wake_func.size() - 1; //Output size is n = 2N - 1, where N = size of signals 1,2
 
@@ -145,4 +148,7 @@ void convolve_fft(const std::vector<double>& beam_profile, const std::vector<dou
     fftw_free(out1);
     fftw_free(out2);
     fftw_free(conv_result);
+#else
+    throw std::runtime_error("convolve_fft: To use this function, recompile with ImpactX_FFT=ON.");
+#endif
 }

@@ -1,10 +1,9 @@
 #ifndef WAKE_CONVOLUTION_H
 #define WAKE_CONVOLUTION_H
 
-#include "../ImpactXParticleContainer.H"
-#include "../../initialization/InitDistribution.H"
+#include "particles/ImpactXParticleContainer.H"
+#include "initialization/InitDistribution.H"
 
-using namespace amrex;
 
 //Constants
 constexpr double Z0 = 377;  //Free space impedance [Ohm]
