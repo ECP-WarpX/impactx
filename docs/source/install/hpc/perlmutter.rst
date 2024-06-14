@@ -187,7 +187,7 @@ Use the following :ref:`cmake commands <building-cmake>` to compile the applicat
          cmake -S . -B build_pm_cpu_py -DImpactX_COMPUTE=OMP -DImpactX_APP=OFF -DImpactX_PYTHON=ON
          cmake --build build_pm_cpu_py -j 16 --target pip_install
 
-Now, you can :ref:`submit Perlmutter compute jobs <running-cpp-perlmutter>` for ImpactX :ref:`Python (PICMI) scripts <usage-picmi>` (:ref:`example scripts <usage-examples>`).
+Now, you can :ref:`submit Perlmutter compute jobs <running-cpp-perlmutter>` for ImpactX :ref:`Python scripts <usage-python>` (:ref:`example scripts <usage-examples>`).
 Or, you can use the ImpactX executables to submit Perlmutter jobs (:ref:`example inputs <usage-examples>`).
 For executables, you can reference their location in your :ref:`job script <running-cpp-perlmutter>` or copy them to a location in ``$PSCRATCH``.
 

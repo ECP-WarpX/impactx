@@ -1,4 +1,4 @@
-.. _usage-picmi:
+.. _usage-python:
 
 Parameters: Python
 ==================
@@ -367,9 +367,6 @@ Initial Beam Distributions
 
 This module provides particle beam distributions that can be used to initialize particle beams in an :py:class:`impactx.ParticleContainer`.
 
-.. py:module:: impactx.distribution
-   :synopsis: Particle beam distributions in ImpactX
-
 .. py:class:: impactx.distribution.Gaussian(lambdax, lambday, lambdat, lambdapx, lambdapy, lambdapt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A 6D Gaussian distribution.
@@ -429,9 +426,6 @@ Lattice Elements
 ----------------
 
 This module provides elements for the accelerator lattice.
-
-.. py:module:: impactx.elements
-   :synopsis: Accelerator lattice elements in ImpactX
 
 .. py:class:: impactx.elements.KnownElementsList
 
@@ -633,12 +627,26 @@ This module provides elements for the accelerator lattice.
 
    This element can be programmed to receive callback hooks into Python functions.
 
+   :param ds: Segment length in m.
+   :param nslice: number of slices used for the application of space charge
+
+   .. py:property:: push
+
+      This is a function hook for pushing the whole particle container.
+      Either this function is implemented or ``beam_particles`` and ``ref_particle`` are needed.
+      This accepts a function or lambda with the following arguments:
+
+      .. py:method:: user_defined_function(pc: impactx.ParticleContainer, step: int)
+
+         This function is called for the particle container as it passes through the element.
+         Note that the reference particle must be updated *before* the beam particles are pushed.
+
    .. py:property:: beam_particles
 
       This is a function hook for pushing all beam particles.
       This accepts a function or lambda with the following arguments:
 
-      .. py:method:: user_defined_function(pti: ImpactXParIter, refpart: RefPart)
+      .. py:method:: user_defined_beam_function(pti: impactx.ImpactXParIter, refpart: impactx.RefPart)
 
          This function is called repeatedly for all particle tiles or boxes in the beam particle container.
          Particles can be pushed and are relative to the reference particle
@@ -648,7 +656,7 @@ This module provides elements for the accelerator lattice.
       This is a function hook for pushing the reference particle.
       This accepts a function or lambda with the following argument:
 
-      .. py:method:: another_user_defined_function(refpart: RefPart)
+      .. py:method:: user_defined_refpart_function(refpart: impactx.RefPart)
 
          This function is called for the reference particle as it passes through the element.
          The reference particle is updated *before* the beam particles are pushed.

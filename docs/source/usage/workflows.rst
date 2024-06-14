@@ -5,15 +5,11 @@ Workflows
 
 This section collects typical user workflows and best practices for ImpactX.
 
+.. toctree::
+   :maxdepth: 1
+
+   workflows/add_element
+
 .. note::
 
-   TODO: Add more workflows as in https://warpx.readthedocs.io/en/latest/usage/workflows.html
-
-.. toctree::
-   :maxdepth: 2
-
-..   workflows/parallelization
-..   workflows/profiling
-   workflows/debugging
-..   workflows/libensemble
-..   workflows/plot_distribution_mapping
+   We will add more `workflows as in WarpX <https://warpx.readthedocs.io/en/latest/usage/workflows.html>`__ over time.

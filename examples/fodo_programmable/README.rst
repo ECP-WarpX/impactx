@@ -4,7 +4,7 @@ FODO Cell, Programmable Element
 ===============================
 
 This implements the same FODO cell as the :ref:`stable FODO cell example <examples-fodo>`.
-However, in the example here we define *additional user-defined, custom elements* (:py:class:`impactx.elements.Programmable`) from the :ref:`ImpactX Python APIs <usage-picmi>`.
+However, in the example here we define *additional user-defined, custom elements* (:py:class:`impactx.elements.Programmable`) from the :ref:`ImpactX Python APIs <usage-python>`.
 
 More generally, ImpactX exposes all data structures through `pyAMReX for adding additional computation <https://pyamrex.readthedocs.io/en/latest/usage/compute.html>`__, enabling rapid prototyping of new elements on both CPU and GPU.
 
