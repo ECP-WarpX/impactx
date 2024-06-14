@@ -6,6 +6,9 @@ Add New Beamline Elements
 In ImpactX, one can easily add new beamline elements as a user.
 There are multiple ways to add new elements to ImpactX, you can pick the one that fits your needs best.
 
+The workflows described here apply both for thin kicks or thick elements.
+Thick elements can also use soft-edged fringe fields (see `existing soft-edged elements for implementation details <https://github.com/ECP-WarpX/impactx/tree/development/src/particles/elements>`__).
+
 
 Python Programmable Element
 ---------------------------
@@ -84,4 +87,5 @@ Pull requests that added a new element and can be taken as examples are:
   * `Chromatic Plasma Lens <https://github.com/ECP-WarpX/impactx/pull/514>`__
   * `Thin-Kick Dipole <https://github.com/ECP-WarpX/impactx/pull/472>`__
   * `Chromatic Elements for Drift, Quad, Uniform Focusing+Solenoid <https://github.com/ECP-WarpX/impactx/pull/356>`__
+  * `Quadrupole with Soft-Edge Fringe Fields <https://github.com/ECP-WarpX/impactx/pull/322>`__
   * other pull requests under the `component: elements <https://github.com/ECP-WarpX/impactx/pulls?q=is%3Apr+label%3A%22component%3A+elements%22+is%3Amerged+>`__ label
