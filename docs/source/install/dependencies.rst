@@ -20,6 +20,9 @@ Optional dependencies include:
   - `OpenMP 3.1+ <https://www.openmp.org>`__: for threaded CPU execution or
   - `CUDA Toolkit 11.0+ (11.3+ recommended) <https://developer.nvidia.com/cuda-downloads>`__: for Nvidia GPU support (see `matching host-compilers <https://gist.github.com/ax3l/9489132>`_) or
   - `ROCm 5.2+ (5.5+ recommended) <https://gpuopen.com/learn/amd-lab-notes/amd-lab-notes-rocm-installation-readme/>`__: for AMD GPU support
+- `FFTW3 <http://www.fftw.org>`__: for algorithms such as IGF space charge solver or CSR
+
+  - also needs the ``pkg-config`` tool on Unix
 - `openPMD-api 0.15.2+ <https://github.com/openPMD/openPMD-api>`__: we automatically download and compile a copy of openPMD-api for openPMD I/O support
 
   - see `optional I/O backends <https://github.com/openPMD/openPMD-api#dependencies>`__
@@ -67,7 +70,7 @@ Conda (Linux/macOS/Windows)
 
       .. code-block:: bash
 
-         conda create -n impactx-cpu-mpich-dev -c conda-forge blaspp boost ccache cmake compilers git lapackpp "openpmd-api=*=mpi_mpich*" python numpy pandas quantiphy scipy yt pkg-config matplotlib mamba ninja mpich pip virtualenv
+         conda create -n impactx-cpu-mpich-dev -c conda-forge blaspp boost ccache cmake compilers git lapackpp "openpmd-api=*=mpi_mpich*" python numpy pandas quantiphy scipy yt "fftw=*=mpi_mpich*" pkg-config matplotlib mamba ninja mpich pip virtualenv
          conda activate impactx-cpu-mpich-dev
 
          # compile ImpactX with -DImpactX_MPI=ON
@@ -77,7 +80,7 @@ Conda (Linux/macOS/Windows)
 
       .. code-block:: bash
 
-         conda create -n impactx-cpu-dev -c conda-forge blaspp boost ccache cmake compilers git lapackpp openpmd-api python numpy pandas quantiphy scipy yt pkg-config matplotlib mamba ninja pip virtualenv
+         conda create -n impactx-cpu-dev -c conda-forge blaspp boost ccache cmake compilers git lapackpp openpmd-api python numpy pandas quantiphy scipy yt fftw pkg-config matplotlib mamba ninja pip virtualenv
          conda activate impactx-cpu-dev
 
          # compile ImpactX with -DImpactX_MPI=OFF
@@ -166,11 +169,13 @@ Brew (macOS/Linux)
    brew install adios2      # for openPMD
    brew install ccache
    brew install cmake
+   brew install fftw        # for IGF, CSR
    brew install git
    brew install hdf5-mpi    # for openPMD
    brew install libomp
    brew unlink gcc
    brew link --force libomp
+   brew install pkg-config  # for fftw
    brew install open-mpi
    brew install openblas    # for PSATD in RZ
    brew install openpmd-api # for openPMD
@@ -204,7 +209,7 @@ The `Advanced Package Tool (APT) <https://en.wikipedia.org/wiki/APT_(software)>`
       .. code-block:: bash
 
          sudo apt update
-         sudo apt install build-essential ccache cmake g++ git libhdf5-openmpi-dev libopenmpi-dev pkg-config python3 python3-matplotlib python3-numpy python3-pandas python3-pip python3-scipy python3-venv
+         sudo apt install build-essential ccache cmake g++ git libfftw3-mpi-dev libfftw3-dev libhdf5-openmpi-dev libopenmpi-dev pkg-config python3 python3-matplotlib python3-numpy python3-pandas python3-pip python3-scipy python3-venv
 
          # optional:
          # for CUDA, either install
@@ -220,7 +225,7 @@ The `Advanced Package Tool (APT) <https://en.wikipedia.org/wiki/APT_(software)>`
       .. code-block:: bash
 
          sudo apt update
-         sudo apt install build-essential ccache cmake g++ git libhdf5-dev pkg-config python3 python3-matplotlib python3-numpy python3-pandas python3-pip python3-scipy python3-venv
+         sudo apt install build-essential ccache cmake g++ git libfftw3-dev libfftw3-dev libhdf5-dev pkg-config python3 python3-matplotlib python3-numpy python3-pandas python3-pip python3-scipy python3-venv
 
          # optional:
          # for CUDA, either install
