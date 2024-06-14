@@ -273,24 +273,24 @@ ref.set_charge_qe(1.0).set_mass_MeV(proton_mass_MeV).set_kin_energy_MeV(kin_ener
 #   particle bunch
 # From a match using 4-turn formulas
 # distr = distribution.Waterbag(
-#    sigmaX=7.545488303758604032642680754e-3,
-#    sigmaY=2.74317757142162884165706298e-3,
-#    sigmaT=1.0e-6,
-#    sigmaPx=2.08465300969673977368e-4,
-#    sigmaPy=5.68752317084618977707e-4,
-#    sigmaPt=1.0e-16,  # neglect energy spread
+#    lambdaX=7.545488303758604032642680754e-3,
+#    lambdaY=2.74317757142162884165706298e-3,
+#    lambdaT=1.0e-6,
+#    lambdaPx=2.08465300969673977368e-4,
+#    lambdaPy=5.68752317084618977707e-4,
+#    lambdaPt=1.0e-16,  # neglect energy spread
 #    muxpx=0.016566526192137,
 #    muypy=0.128290261343269,
 #    mutpt=0.0,
 # )
 # From a match using MAD-X
 distr = distribution.Waterbag(
-    sigmaX=7.549405055263145227715095781e-3,
-    sigmaY=2.74238571935065604835554295e-3,
-    sigmaT=1.0e-6,
-    sigmaPx=2.08316555979527016894e-4,
-    sigmaPy=5.68903160813796778519e-4,
-    sigmaPt=1.0e-16,  # neglect energy spread
+    lambdaX=7.549405055263145227715095781e-3,
+    lambdaY=2.74238571935065604835554295e-3,
+    lambdaT=1.0e-6,
+    lambdaPx=2.08316555979527016894e-4,
+    lambdaPy=5.68903160813796778519e-4,
+    lambdaPt=1.0e-16,  # neglect energy spread
     muxpx=0.025766706724881,
     muypy=0.128470451397117,
     mutpt=0.0,
