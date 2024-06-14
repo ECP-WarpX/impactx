@@ -167,10 +167,6 @@ if(ImpactX_APP)
     list(APPEND _ALL_TARGETS app)
 endif()
 
-if(ImpactX_FFT)
-    # target_link_libraries(lib PUBLIC ${FFTW_LIBRARY})
-endif()
-
 # build Python module (this is always a shared library)
 if(ImpactX_PYTHON)
     add_library(pyImpactX MODULE src/python/pyImpactX.cpp)
@@ -294,6 +290,9 @@ impactx_set_binary_name()
 
 # Defines #####################################################################
 #
+if(ImpactX_FFT)
+    target_compile_definitions(lib PUBLIC ImpactX_USE_FFT)
+endif()
 if(ImpactX_OPENPMD)
     target_compile_definitions(lib PUBLIC ImpactX_USE_OPENPMD)
 endif()
