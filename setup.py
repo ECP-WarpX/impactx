@@ -95,6 +95,7 @@ class CMakeBuild(build_ext):
             "-DPython_EXECUTABLE=" + sys.executable,
             ## variants
             "-DImpactX_COMPUTE=" + ImpactX_COMPUTE,
+            "-DImpactX_FFT:BOOL=" + ImpactX_FFT,
             "-DImpactX_MPI:BOOL=" + ImpactX_MPI,
             "-DImpactX_PRECISION=" + ImpactX_PRECISION,
             #'-DImpactX_PARTICLES_PRECISION=' + ImpactX_PARTICLES_PRECISION,
@@ -175,6 +176,7 @@ PYIMPACTX_libdir = os.environ.get("PYIMPACTX_LIBDIR")
 # ... build ImpactX libraries with CMake
 #   note: changed default for SHARED, MPI, TESTING and EXAMPLES
 ImpactX_COMPUTE = os.environ.get("IMPACTX_COMPUTE", "OMP")
+ImpactX_FFT = os.environ.get("IMPACTX_FFT", "OFF")
 ImpactX_MPI = os.environ.get("IMPACTX_MPI", "OFF")
 ImpactX_PRECISION = os.environ.get("IMPACTX_PRECISION", "DOUBLE")
 #   already prepared as a list 1;2;3

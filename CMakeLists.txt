@@ -62,6 +62,7 @@ impactx_set_default_install_dirs()
 #
 include(CMakeDependentOption)
 option(ImpactX_APP           "Build the ImpactX executable application"     ON)
+option(ImpactX_FFT           "FFT-based solvers"                            OFF)
 option(ImpactX_MPI           "Multi-node support (message-passing)"         ON)
 option(ImpactX_OPENPMD       "openPMD I/O (HDF5, ADIOS)"                    ON)
 option(ImpactX_PYTHON        "Python bindings"                              OFF)
@@ -101,6 +102,10 @@ option(ImpactX_PYTHON_IPO
     "Compile Python bindings with interprocedural optimization (IPO) / link-time optimization (LTO)"
     ON
 )
+
+if(ImpactX_FFT)
+    set(ABLASTR_FFT ON CACHE STRING "FFT-based solvers" FORCE)
+endif()
 
 # this defined the variable BUILD_TESTING which is ON by default
 include(CTest)
@@ -147,24 +152,19 @@ set_target_properties(lib PROPERTIES
     WINDOWS_EXPORT_ALL_SYMBOLS ON
 )
 
-#FFTW path - *Added lines
-set(FFTW_ROOT /Users/alexgauss/opt/anaconda3/envs/impactx-cpu-dev) #Conda environment path - Specific to my local machine
-set(FFTW_INCLUDE_DIR ${FFTW_ROOT}/include)
-set(FFTW_LIBRARY ${FFTW_ROOT}/lib/libfftw3.dylib)
-include_directories(${FFTW_INCLUDE_DIR})
-link_directories(${FFTW_ROOT}/lib)
-
 # executable application
 #   note: we currently avoid a dependency on a core library
 #         for simpler usage, but could make this an option
 if(ImpactX_APP)
-    #add_executable(app)
-    add_executable(app src/particles/wakefields/ChargeBinning.cpp src/particles/wakefields/WakeConvolution.cpp src/particles/wakefields/WakePush.cpp)
+    add_executable(app)
     add_executable(ImpactX::app ALIAS app)
     target_link_libraries(app PRIVATE lib)
-    target_link_libraries(lib PUBLIC ${FFTW_LIBRARY})
     set(_BUILDINFO_SRC app)
     list(APPEND _ALL_TARGETS app)
+endif()
+
+if(ImpactX_FFT)
+    # target_link_libraries(lib PUBLIC ${FFTW_LIBRARY})
 endif()
 
 # build Python module (this is always a shared library)
