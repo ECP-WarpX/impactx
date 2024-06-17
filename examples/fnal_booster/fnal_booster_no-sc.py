@@ -264,7 +264,7 @@ tot_energy_MeV = 1.3382720881600001e3  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
 proton_mass_MeV = 9.3827208815999996e2
 kin_energy_MeV = tot_energy_MeV - proton_mass_MeV
-npart = 100000  # number of macro particles
+npart = 10000  # number of macro particles
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
