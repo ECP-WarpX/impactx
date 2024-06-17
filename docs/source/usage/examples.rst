@@ -35,6 +35,7 @@ This section allows you to **download input files** that correspond to different
    examples/pytorch_surrogate_model/README.rst
    examples/apochromatic/README.rst
    examples/fodo_tune/README.rst
+   examples/fnal_booster/README.rst
 
 
 Unit tests
