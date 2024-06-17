@@ -104,7 +104,7 @@ CMake Option                    Default & Values                             Des
 ``CMAKE_VERBOSE_MAKEFILE``      ON/**OFF**                                   Print all compiler commands to the terminal during build
 ``ImpactX_APP``                 **ON**/OFF                                   Build the ImpactX executable application
 ``ImpactX_COMPUTE``             NOACC/**OMP**/CUDA/SYCL/HIP                  On-node, accelerated computing backend
-``ImpactX_FFT``                 ON/**OFF**                                   FFT-based solvers (IGF Space-Charge, CSR, ...)
+``ImpactX_FFT``                 ON/**OFF**                                   FFT-based solvers (IGF Space Charge, CSR, ...)
 ``ImpactX_IPO``                 ON/**OFF**                                   Compile ImpactX with interprocedural optimization (aka LTO)
 ``ImpactX_MPI``                 **ON**/OFF                                   Multi-node support (message-passing)
 ``ImpactX_MPI_THREAD_MULTIPLE`` **ON**/OFF                                   MPI thread-multiple support, i.e. for ``async_io``
