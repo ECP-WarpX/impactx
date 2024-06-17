@@ -3,8 +3,8 @@
 FNAL Booster Model
 ===================
 
-This example is based on a thin-kick model of the Fermilab Booster ring originally created in MAD-X, 
-and contributed by F. Schmidt (CERN).  The lattice file is expressed in SXF format, and it is parsed and 
+This example is based on a thin-kick model of the Fermilab Booster ring originally created in MAD-X,
+and contributed by F. Schmidt (CERN).  The lattice file is expressed in SXF format, and it is parsed and
 executed in ImpactX using a Python script.  A complete set of input and output files can be found on Zenodo:
 
 https://doi.org/10.5281/zenodo.11645618
