@@ -66,6 +66,7 @@ impactx_set_default_install_dirs()
 #
 include(CMakeDependentOption)
 option(ImpactX_APP           "Build the ImpactX executable application"     ON)
+option(ImpactX_FFT           "FFT-based solvers (IGF Space Charge, CSR)"    OFF)
 option(ImpactX_MPI           "Multi-node support (message-passing)"         ON)
 option(ImpactX_OPENPMD       "openPMD I/O (HDF5, ADIOS)"                    ON)
 option(ImpactX_PYTHON        "Python bindings"                              OFF)
@@ -105,6 +106,10 @@ option(ImpactX_PYTHON_IPO
     "Compile Python bindings with interprocedural optimization (IPO) / link-time optimization (LTO)"
     ON
 )
+
+if(ImpactX_FFT)
+    set(ABLASTR_FFT ON CACHE STRING "FFT-based solvers" FORCE)
+endif()
 
 # this defined the variable BUILD_TESTING which is ON by default
 include(CTest)
@@ -285,6 +290,9 @@ impactx_set_binary_name()
 
 # Defines #####################################################################
 #
+if(ImpactX_FFT)
+    target_compile_definitions(lib PUBLIC ImpactX_USE_FFT)
+endif()
 if(ImpactX_OPENPMD)
     target_compile_definitions(lib PUBLIC ImpactX_USE_OPENPMD)
 endif()
