@@ -11,6 +11,7 @@
 #include "openPMD.H"
 #include "ImpactXVersion.H"
 #include "particles/ImpactXParticleContainer.H"
+#include "particles/diagnostics/ReducedBeamCharacteristics.H"
 
 #include <AMReX.H>
 #include <AMReX_BLProfiler.H>
@@ -138,6 +139,7 @@ namespace detail
 
     void BeamMonitor::finalize ()
     {
+#ifdef ImpactX_USE_OPENPMD
         // close shared series alias
         if (m_series.has_value())
         {
@@ -149,6 +151,7 @@ namespace detail
         // remove from unique series map
         if (m_unique_series.count(m_series_name) != 0u)
             m_unique_series.erase(m_series_name);
+#endif // ImpactX_USE_OPENPMD
     }
 
     BeamMonitor::BeamMonitor (std::string series_name, std::string backend, std::string encoding) :
@@ -256,6 +259,7 @@ namespace detail
         // reference particle information
         beam.setAttribute( "beta_ref", ref_part.beta() );
         beam.setAttribute( "gamma_ref", ref_part.gamma() );
+        beam.setAttribute( "beta_gamma_ref", ref_part.beta_gamma() );
         beam.setAttribute( "s_ref", ref_part.s );
         beam.setAttribute( "x_ref", ref_part.x );
         beam.setAttribute( "y_ref", ref_part.y );
@@ -265,8 +269,14 @@ namespace detail
         beam.setAttribute( "py_ref", ref_part.py );
         beam.setAttribute( "pz_ref", ref_part.pz );
         beam.setAttribute( "pt_ref", ref_part.pt );
-        beam.setAttribute( "mass", ref_part.mass );
-        beam.setAttribute( "charge", ref_part.charge );
+        beam.setAttribute( "mass_ref", ref_part.mass );
+        beam.setAttribute( "charge_ref", ref_part.charge );
+
+        // total particle bunch information
+        //   @see impactx::diagnostics::reduced_beam_characteristics
+        for (const auto &kv : m_rbc) {
+            beam.setAttribute(kv.first, kv.second);
+        }
 
         // openPMD coarse position: for global coordinates
         {
@@ -295,7 +305,7 @@ namespace detail
             throw std::runtime_error("BeamMonitor: int_soa_names output not yet implemented!");
 #else
         amrex::ignore_unused(pc, step);
-#endif
+#endif // ImpactX_USE_OPENPMD
     }
 
     void
@@ -304,6 +314,7 @@ namespace detail
         int step
     )
     {
+#ifdef ImpactX_USE_OPENPMD
         std::string profile_name = "impactx::Push::" + std::string(BeamMonitor::name);
         BL_PROFILE(profile_name);
 
@@ -312,6 +323,10 @@ namespace detail
 
         // optional: add and calculate additional particle properties
         add_optional_properties(m_series_name, pc);
+
+        // optional: calculate total particle bunch information
+        m_rbc.clear();
+        m_rbc = diagnostics::reduced_beam_characteristics(pc);
 
         // component names
         std::vector<std::string> real_soa_names = pc.RealSoA_names();
@@ -356,6 +371,9 @@ namespace detail
 
         // close iteration
         iteration.close();
+#else
+        amrex::ignore_unused(pc, step);
+#endif // ImpactX_USE_OPENPMD
     }
 
     void
@@ -434,7 +452,7 @@ namespace detail
         series.flush();
 #else
         amrex::ignore_unused(pti, ref_part);
-#endif
+#endif   // ImpactX_USE_OPENPMD
     }
 
 } // namespace impactx::diagnostics

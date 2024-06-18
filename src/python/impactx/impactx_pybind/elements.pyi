@@ -577,7 +577,38 @@ class KnownElementsList:
     ) -> None: ...
     @typing.overload
     def __init__(self, arg0: list) -> None: ...
-    def __iter__(self) -> typing.Iterator: ...
+    def __iter__(
+        self,
+    ) -> typing.Iterator[
+        Empty
+        | Aperture
+        | Buncher
+        | CFbend
+        | ChrAcc
+        | ChrDrift
+        | ChrPlasmaLens
+        | ChrQuad
+        | ConstF
+        | BeamMonitor
+        | DipEdge
+        | Drift
+        | ExactDrift
+        | ExactSbend
+        | Kicker
+        | Multipole
+        | NonlinearLens
+        | Programmable
+        | PRot
+        | Quad
+        | RFCavity
+        | Sbend
+        | ShortRF
+        | SoftSolenoid
+        | SoftQuadrupole
+        | Sol
+        | TaperedPL
+        | ThinDipole
+    ]: ...
     def __len__(self) -> int:
         """
         The length of the list.
@@ -886,6 +917,7 @@ class SoftSolenoid(Thick, Alignment):
         bscale: float,
         cos_coefficients: list[float],
         sin_coefficients: list[float],
+        unit: float = 0,
         dx: float = 0,
         dy: float = 0,
         rotation: float = 0,
@@ -937,7 +969,7 @@ class TaperedPL(Thin, Alignment):
         rotation: float = 0,
     ) -> None:
         """
-        A thin nonlinear plasma lens with A thin nonlinear plasma lens with transverse (horizontal) taper
+        A thin nonlinear plasma lens with transverse (horizontal) taper
 
                      .. math::
 

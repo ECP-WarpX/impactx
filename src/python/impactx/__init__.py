@@ -18,9 +18,11 @@ if os.name == "nt":
 
 # import core bindings to C++
 from . import impactx_pybind as cxx
+from .extensions.ImpactXParIter import register_ImpactXParIter_extension
+from .extensions.ImpactXParticleContainer import (
+    register_ImpactXParticleContainer_extension,
+)
 from .impactx_pybind import *  # noqa
-from .ImpactXParIter import register_ImpactXParIter_extension
-from .ImpactXParticleContainer import register_ImpactXParticleContainer_extension
 from .madx_to_impactx import read_beam, read_lattice  # noqa
 
 __version__ = cxx.__version__

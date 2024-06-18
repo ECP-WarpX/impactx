@@ -1,0 +1,38 @@
+# please set your project account
+#export proj="project_..."
+
+# required dependencies
+module load LUMI/23.09  partition/C
+module load PrgEnv-aocc
+module load buildtools/23.09
+
+# optional: just an additional text editor
+module load nano
+
+# optional: for openPMD support
+SW_DIR="${HOME}/sw/lumi/cpu"
+export CMAKE_PREFIX_PATH=${SW_DIR}/c-blosc-1.21.1:${CMAKE_PREFIX_PATH}
+export CMAKE_PREFIX_PATH=${SW_DIR}/hdf5-1.14.1.2:${CMAKE_PREFIX_PATH}
+export CMAKE_PREFIX_PATH=${SW_DIR}/adios2-2.8.3:${CMAKE_PREFIX_PATH}
+export PATH=${SW_DIR}/adios2-2.8.3/bin:${PATH}
+export PATH=${SW_DIR}/hdf5-1.14.1.2/bin:${PATH}
+
+# optional: for Python bindings or libEnsemble
+module load cray-python/3.10.10
+
+if [ -d "${SW_DIR}/venvs/impactx-cpu-lumi" ]
+then
+  source ${SW_DIR}/venvs/impactx-cpu-lumi/bin/activate
+fi
+
+# an alias to request an interactive batch node for one hour
+#   for paralle execution, start on the batch node: srun <command>
+alias getNode="salloc -A $proj -J impactx -t 01:00:00 -p small -N 1 --ntasks-per-node=16 --cpus-per-task=8"
+# an alias to run a command on a batch node for up to 30min
+#   usage: runNode <command>
+alias runNode="srun -A $proj -J impactx -t 00:30:00 -p small -N 1 --ntasks-per-node=16 --cpus-per-task=8"
+
+# compiler environment hints
+export CC=$(which cc)
+export CXX=$(which CC)
+export FC=$(which ftn)

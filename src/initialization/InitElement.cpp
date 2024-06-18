@@ -252,15 +252,17 @@ namespace detail
 
             amrex::ParticleReal bscale;
             int mapsteps = mapsteps_default;
+            int units = 0;
             Sol_field_data const bz;
             std::vector<amrex::ParticleReal> cos_coef = bz.default_cos_coef;
             std::vector<amrex::ParticleReal> sin_coef = bz.default_sin_coef;
             pp_element.get("bscale", bscale);
+            pp_element.queryAdd("units", units);
             pp_element.queryAdd("mapsteps", mapsteps);
             detail::queryAddResize(pp_element, "cos_coefficients", cos_coef);
             detail::queryAddResize(pp_element, "sin_coefficients", sin_coef);
 
-            m_lattice.emplace_back( SoftSolenoid(ds, bscale, cos_coef, sin_coef, a["dx"], a["dy"], a["rotation_degree"], mapsteps, nslice) );
+            m_lattice.emplace_back( SoftSolenoid(ds, bscale, cos_coef, sin_coef, units, a["dx"], a["dy"], a["rotation_degree"], mapsteps, nslice) );
         } else if (element_type == "quadrupole_softedge")
         {
             auto const [ds, nslice] = detail::query_ds(pp_element, nslice_default);

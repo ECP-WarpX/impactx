@@ -69,10 +69,10 @@ or
 
 .. code-block:: bash
 
-   # run with a PICMI input script:
+   # run with a Python input script:
    mpirun -np <n_ranks> python <python_script>
 
-Here, ``<n_ranks>`` is the number of MPI ranks used, and ``<input_file>`` is the name of the input file (``<python_script>`` is the name of the :ref:`PICMI <usage-picmi>` script).
+Here, ``<n_ranks>`` is the number of MPI ranks used, and ``<input_file>`` is the name of the input file (``<python_script>`` is the name of the :ref:`Python <usage-python>` script).
 Note that the actual executable might have a longer name, depending on build options.
 
 We used the copied executable in the current directory (``./``); if you installed with a package manager, skip the ``./`` because ImpactX is in your ``PATH``.

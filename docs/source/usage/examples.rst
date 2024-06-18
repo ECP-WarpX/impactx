@@ -31,6 +31,7 @@ Single Particle Dynamics
    examples/aperture/README.rst
    examples/iota_lens/README.rst
    examples/achromatic_spectrometer/README.rst
+   examples/fodo_programmable/README.rst
 
 
 Space Charge

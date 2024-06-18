@@ -16,7 +16,6 @@ try:
     cupy_available = True
 except ImportError:
     cupy_available = False
-import sys
 
 import numpy as np
 import scipy.optimize as opt
@@ -36,7 +35,10 @@ try:
     import torch
 except ImportError:
     print("Warning: Cannot import PyTorch. Skipping test.")
+    import sys
+
     sys.exit(0)
+
 import zipfile
 from urllib import request
 
@@ -91,13 +93,25 @@ def download_and_unzip(url, data_dir):
         zip_dataset.extractall()
 
 
+print(
+    "Downloading trained models from Zenodo.org - this might take a minute...",
+    flush=True,
+)
 data_url = "https://zenodo.org/records/10810754/files/models.zip?download=1"
 download_and_unzip(data_url, "models.zip")
 
+# It was found that the PyTorch multithreaded defaults interfere with MPI-enabled AMReX
+# when initializing the models: https://github.com/AMReX-Codes/pyamrex/issues/322
+# So we manually set the number of threads to serial (1).
+if Config.have_mpi:
+    n_threads = torch.get_num_threads()
+    torch.set_num_threads(1)
 model_list = [
     surrogate_model(f"models/beam_stage_{stage_i}_model.pt", device=device)
     for stage_i in range(N_stage)
 ]
+if Config.have_mpi:
+    torch.set_num_threads(n_threads)
 
 pp_amrex = amr.ParmParse("amrex")
 pp_amrex.add("the_arena_init_size", 0)
@@ -291,8 +305,7 @@ class UpdateConstF(elements.Programmable):
         self.x_or_y = x_or_y
         self.push = self.set_lens
 
-    def set_lens(self, step):
-        pc = self.sim.particle_container()
+    def set_lens(self, pc, step):
         # get envelope parameters
         rbc = pc.reduced_beam_characteristics()
         alpha = rbc[f"alpha_{self.x_or_y}"]

@@ -29,7 +29,7 @@ class CopyPreBuild(build):
     def run(self):
         # remove existing build directory
         #   by default, this stays around. we want to make sure generated
-        #   files like libwarpx.(2d|3d|rz).(so|pyd) are always only the
+        #   files like libimpactx.(so|pyd) are always only the
         #   ones we want to package and not ones from an earlier wheel's stage
         if os.path.exists(self.build_base):
             shutil.rmtree(self.build_base)
@@ -37,23 +37,9 @@ class CopyPreBuild(build):
         # call superclass
         build.run(self)
 
-        # matches: impactx_pybind.*.(so|pyd)
-        re_libprefix = re.compile(r"impactx_pybind\..*\.(?:so|pyd)")
-        libs_found = []
-        for lib_name in os.listdir(PYIMPACTX_libdir):
-            if re_libprefix.match(lib_name):
-                lib_path = os.path.join(PYIMPACTX_libdir, lib_name)
-                libs_found.append(lib_path)
-        if len(libs_found) == 0:
-            raise RuntimeError(
-                "Error: no pre-build pyImpactX libraries found in "
-                "PYIMPACTX_libdir='{}'".format(PYIMPACTX_libdir)
-            )
-
-        # copy external libs into collection of files in a temporary build dir
+        # copy Python module artifacts and sources
         dst_path = os.path.join(self.build_lib, "impactx")
-        for lib_path in libs_found:
-            shutil.copy(lib_path, dst_path)
+        shutil.copytree(PYIMPACTX_libdir, dst_path, dirs_exist_ok=True)
 
 
 class CMakeExtension(Extension):
@@ -237,7 +223,7 @@ with open("./requirements.txt") as f:
 setup(
     name="impactx",
     # note PEP-440 syntax: x.y.zaN but x.y.z.devN
-    version="24.04",
+    version="24.06",
     packages=["impactx"],
     # Python sources:
     package_dir={"": "src/python"},

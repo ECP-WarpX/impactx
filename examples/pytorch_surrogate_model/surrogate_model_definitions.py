@@ -8,8 +8,14 @@
 
 from enum import Enum
 
-import torch
-from torch import nn
+try:
+    import torch
+    from torch import nn
+except ImportError:
+    print("Warning: Cannot import PyTorch. Skipping test.")
+    import sys
+
+    sys.exit(0)
 
 
 class Activation(Enum):
