@@ -26,22 +26,21 @@ def test_wake(save_png=True):
         sim.init_beam_distribution_from_inputs()
         sim.init_lattice_elements_from_inputs()
 
-        sim.evolve()
+        sim.evolve() #Add following script inside of evolve for CSR along lattice
 
         # Deposit charge
         sim.deposit_charge()
 
         # Check for CSR elements and perform necessary calculations
         element_has_csr = True
-        R = 10.35  # Units [m]
+        R = 10.35 #Units [m] TODO: Read in value
+        beam_charge = 1.0e-09 #Units [C] TODO: Read in value
 
         # Enter loop if lattice has bend element
         if element_has_csr:
             # Measure beam size, extract the min, max of particle positions
             pc = sim.particle_container()
-            x_min, y_min, t_min, x_max, y_max, t_max = (
-                pc.min_and_max_positions()
-            )  # Check this
+            x_min, y_min, t_min, x_max, y_max, t_max = pc.min_and_max_positions()
 
             # Set parameters for charge deposition
             is_unity_particle_weight = True
