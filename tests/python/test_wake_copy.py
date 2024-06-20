@@ -26,15 +26,15 @@ def test_wake(save_png=True):
         sim.init_beam_distribution_from_inputs()
         sim.init_lattice_elements_from_inputs()
 
-        sim.evolve() #Add following script inside of evolve for CSR along lattice
+        sim.evolve()  # Add following script inside of evolve for CSR along lattice
 
         # Deposit charge
         sim.deposit_charge()
 
         # Check for CSR elements and perform necessary calculations
         element_has_csr = True
-        R = 10.35 #Units [m] TODO: Read in value
-        beam_charge = 1.0e-09 #Units [C] TODO: Read in value
+        R = 10.35  # Units [m] TODO: Read in value
+        beam_charge = 1.0e-09  # Units [C] TODO: Read in value
 
         # Enter loop if lattice has bend element
         if element_has_csr:
