@@ -417,7 +417,7 @@ This module provides particle beam distributions that can be used to initialize 
 
    A 6D Waterbag distribution.
 
-.. py:class:: impactx.distribution.Thermal(k, kT, kT_halo, normalize, normalize_halo, halo)
+.. py:class:: impactx.distribution.Thermal(k, kT, kT_halo, normalize, normalize_halo, halo=0.0)
 
    A 6D stationary thermal or bithermal distribution.
 
@@ -539,7 +539,7 @@ This module provides elements for the accelerator lattice.
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.Kicker(xkick, ykick, units, dx=0, dy=0, rotation=0)
+.. py:class:: impactx.elements.Kicker(xkick, ykick, units="dimensionless", dx=0, dy=0, rotation=0)
 
    A thin transverse kicker.
 
@@ -675,7 +675,7 @@ This module provides elements for the accelerator lattice.
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.ChrQuad(ds, k, units, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.ChrQuad(ds, k, units=0, dx=0, dy=0, rotation=0, nslice=1)
 
    A Quadrupole magnet, with chromatic effects included.  The Hamiltonian is expanded
    through second order in the transverse variables (x,px,y,py), with the exact pt
@@ -701,7 +701,7 @@ This module provides elements for the accelerator lattice.
 
       unit specification for quad strength
 
-.. py:class:: impactx.elements.ChrPlasmaLens(ds, g, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.ChrPlasmaLens(ds, k, units=0, dx=0, dy=0, rotation=0, nslice=1)
 
    An active cylindrically symmetric plasma lens, with chromatic effects included.
    The Hamiltonian is expanded through second order in the transverse variables
@@ -750,7 +750,7 @@ This module provides elements for the accelerator lattice.
 
       magnetic field strength in 1/m
 
-.. py:class:: impactx.elements.RFCavity(ds, escale, freq, phase, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1)
+.. py:class:: impactx.elements.RFCavity(ds, escale, freq, phase, cos_coefficients, sin_coefficients, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1)
 
    A radiofrequency cavity.
 
@@ -779,7 +779,7 @@ This module provides elements for the accelerator lattice.
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.ExactSbend(ds, phi, B, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.ExactSbend(ds, phi, B=0.0, dx=0, dy=0, rotation=0, nslice=1)
 
    An ideal sector bend using the exact nonlinear map.  The model consists of a uniform bending field B_y with a hard edge.  Pole faces are
    normal to the entry and exit velocity of the reference particle.
@@ -807,7 +807,7 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
 
-.. py:class:: impactx.elements.ShortRF(V, freq, phase, dx=0, dy=0, rotation=0)
+.. py:class:: impactx.elements.ShortRF(V, freq, phase=-90.0, dx=0, dy=0, rotation=0)
 
    A short RF cavity element (MAD-X model).
 
@@ -818,35 +818,19 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
 
-.. py:class:: impactx.elements.ChrUniformAcc(ds, k, dx=0, dy=0, rotation=0, nslice=1)
-
-   A region of constant Ez and Bz for uniform acceleration, with chromatic effects included.
-   The Hamiltonian is expanded through second order in the transverse variables (x,px,y,py),
-   with the exact pt dependence retained.
-
-   :param ds: Segment length in m.
-   :param ez: Electric field strength in m^(-1)
-              = (particle charge in C * field Ez in V/m) / (particle mass in kg * (speed of light in m/s)^2)
-   :param bz: Magnetic field strength in m^(-1)
-              = (particle charge in C * field Bz in T) / (particle mass in kg * speed of light in m/s)
-   :param dx: horizontal translation error in m
-   :param dy: vertical translation error in m
-   :param rotation: rotation error in the transverse plane [degrees]
-   :param nslice: number of slices used for the application of space charge
-
-.. py:class:: impactx.elements.SoftSolenoid(ds, bscale, cos_coefficients, sin_coefficients, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1)
+.. py:class:: impactx.elements.SoftSolenoid(ds, bscale, cos_coefficients, sin_coefficients, unit=0, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1)
 
    A soft-edge solenoid.
 
    :param ds: Segment length in m.
-   :param bscale: Scaling factor for on-axis magnetic field Bz in inverse meters (if units = 0)
+   :param bscale: Scaling factor for on-axis magnetic field Bz in inverse meters (if unit = 0)
               = (magnetic field Bz in T) / (rigidity in T-m)
-          OR  Magnetic field Bz in T (SI units, if units = 1)
+          OR  Magnetic field Bz in T (SI units, if unit = 1)
    :param cos_coefficients: array of ``float`` cosine coefficients in Fourier expansion of on-axis magnetic field Bz
             (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
    :param sin_coefficients: array of ``float`` sine coefficients in Fourier expansion of on-axis magnetic field Bz
             (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
-   :param units: specification of units for scaling of the on-axis longitudinal magnetic field
+   :param unit: specification of units for scaling of the on-axis longitudinal magnetic field
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
@@ -870,9 +854,6 @@ This module provides elements for the accelerator lattice.
 
    :param phi_in: angle of the reference particle with respect to the longitudinal (z) axis in the original frame in degrees
    :param phi_out: angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame in degrees
-   :param dx: horizontal translation error in m
-   :param dy: vertical translation error in m
-   :param rotation: rotation error in the transverse plane [degrees]
 
 .. py:class:: impactx.elements.Aperture(xmax, ymax, shape="rectangular", dx=0, dy=0, rotation=0)
 
@@ -927,7 +908,7 @@ This module provides elements for the accelerator lattice.
 
    * G. Ripken and F. Schmidt, Thin-Lens Formalism for Tracking, CERN/SL/95-12 (AP), 1995.
 
-.. py:class:: impactx.elements.TaperedPL(k, taper, units, dx=0, dy=0, rotation=0)
+.. py:class:: impactx.elements.TaperedPL(k, taper, units=0, dx=0, dy=0, rotation=0)
 
    A thin nonlinear plasma lens with transverse (horizontal) taper
 
