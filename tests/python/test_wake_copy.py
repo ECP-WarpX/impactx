@@ -41,8 +41,6 @@ def test_wake(save_png=True):
         element_has_csr = True
         R = 10.35  # Units [m] TODO: Read in value
         beam_charge = 1.0e-09  # Units [C] TODO: Read in value
-        R = 10.35  # Units [m] TODO: Read in value
-        beam_charge = 1.0e-09  # Units [C] TODO: Read in value
 
         # Enter loop if lattice has bend element
         if element_has_csr:
@@ -51,7 +49,6 @@ def test_wake(save_png=True):
             pc = sim.particle_container()
             x_min, y_min, t_min, x_max, y_max, t_max = pc.min_and_max_positions()
             print(f"x_min: {x_min}, y_min: {y_min}, t_min: {t_min}")
-            print(f"x_max: {x_max}, y_max: {y_max}, t_max: {t_max}")
 
             # Set parameters for charge deposition
             is_unity_particle_weight = True
@@ -62,7 +59,7 @@ def test_wake(save_png=True):
             bin_max = t_max
             bin_size = (bin_max - bin_min) / num_bins
 
-            padding_factor = 1  # Make plotting script compatible
+            padding_factor = 1
             sigma_t = 1.9975134930563207e-05
 
             # Allocate memory for the charge profile
