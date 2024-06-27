@@ -60,11 +60,11 @@ double w_l_csr(double s, amrex::ParticleReal R, amrex::ParticleReal beam_charge)
 
 //Convolution Function
 
-void convolve_fft(const std::vector<double>& beam_profile, const std::vector<double>& wake_func, double delta_t, std::vector<double>& result, int padding_factor)
+void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size, int wake_func_size, double delta_t, double* result, int padding_factor)
 {
 #ifdef ImpactX_USE_FFT
     //Length of convolution result
-    int original_n = beam_profile.size() + wake_func.size() - 1; //Output size is n = 2N - 1, where N = size of signals 1,2
+    int original_n = beam_profile_size + wake_func_size - 1; //Output size is n = 2N - 1, where N = size of signals 1,2
 
     //Add padding factor to control amount of zero-padding
     int n = static_cast<int>(original_n * padding_factor);
@@ -79,7 +79,7 @@ void convolve_fft(const std::vector<double>& beam_profile, const std::vector<dou
     //Zero-pad the input arrays to be the size of the convolution output length 'n'
     for (int i = 0; i < n; ++i)
     {
-        if (i < beam_profile.size())
+        if (i < beam_profile_size)
         {
             in1[i][0] = std::isfinite(beam_profile[i]) ? beam_profile[i] : 0.0; //Ensure no nans
             in1[i][1] = 0.0;
@@ -90,7 +90,7 @@ void convolve_fft(const std::vector<double>& beam_profile, const std::vector<dou
             in1[i][1] = 0.0;
         }
 
-        if (i < wake_func.size())
+        if (i < wake_func_size)
         {
             in2[i][0] = std::isfinite(wake_func[i]) ? wake_func[i] : 0.0; //Ensure no nans
             in2[i][1] = 0.0;
@@ -133,7 +133,6 @@ void convolve_fft(const std::vector<double>& beam_profile, const std::vector<dou
     fftw_execute(p3);
 
     //Normalize result by the output size and multiply result by bin size
-    result.resize(n);
     for (int i = 0; i < n; ++i)
     {
         result[i] = out1[i][0] / n * delta_t;

@@ -32,7 +32,6 @@
 #include <memory>
 
 #include <vector>
-#include <fftw3.h>
 #include "particles/wakefields/ChargeBinning.H"
 #include "particles/wakefields/WakeConvolution.H"
 #include "particles/wakefields/WakePush.H"
@@ -208,9 +207,9 @@ namespace impactx {
                                        << " slice_step=" << slice_step << "\n";
                     }
 
-                    // CSR Wakefield Response
+                    //CSR Wakefield Response
 
-                    bool element_has_csr = false; // Updates to true for example with bend element
+                    /*bool element_has_csr = false; // Updates to true for example with bend element
                     double R = 0.0; // Updates for bend element rc
 
                     //Define lambda function inside of std::visit
@@ -228,17 +227,17 @@ namespace impactx {
                             std::cout << "My radius of curvature is:" << R << std::endl;
                             element_has_csr = true;
                         }
-                        /*
+                        
                         else if constexpr (std::is_same_v<std::decay_t<decltype(element)>, ExactSbend>) //Currently internal calculation for m_rc
                         {
                             R = element.m_rc;
                             std::cout << "My radius of curvature is:" << R << std::endl;
                             element_has_csr = true;
                         }
-                        */
+                        
                     }, element_variant);
 
-                    //Enter loop if lattice has bend element
+                    Enter loop if lattice has bend element
                     if (element_has_csr)
                     {
                         // Measure beam size, extract the min, max of particle positions
@@ -260,17 +259,17 @@ namespace impactx {
                         Real* dptr_data = new Real[num_bins]();
                         auto& particle_container = *(amr_data->m_particle_container);
 
-                        // Call charge deposition function
+                        //Call charge deposition function
                         DepositCharge1D(particle_container, dptr_data, num_bins, bin_min, bin_size, is_unity_particle_weight);
 
                         // Call charge density derivative function
                         std::vector<double> charge_distribution(dptr_data, dptr_data + num_bins);
                         std::vector<double> slopes(num_bins - 1);
-                        DerivativeCharge1D(charge_distribution, slopes, num_bins, bin_size, GetNumberDensity); //Use number derivatives for convolution with CSR
+                        DerivativeCharge1D(charge_distribution.data(), slopes.data(), num_bins, bin_size, GetNumberDensity); //Use number derivatives for convolution with CSR
 
                         // Call wake function
 
-                        //Read in external variable bunch_charge
+                        // Read in external variable bunch_charge
                         std::cout << "My beam charge is:" << bunch_charge << std::endl;
 
                         std::vector<double> wake_function(num_bins);
@@ -281,11 +280,10 @@ namespace impactx {
                         }
 
                         // Call convolution function
-                        std::vector<double> convoluted_wakefield;
-                        convolve_fft(slopes, wake_function, bin_size, convoluted_wakefield, 1);
+                        std::vector<double> convoluted_wakefield(2 * num_bins - 1);
+                        convolve_fft(slopes.data(), wake_function.data(), slopes.size(), wake_function.size(), bin_size, convoluted_wakefield.data(), 1);
 
-                        /*
-                        Check convolution
+                        //Check convolution
                         std::cout << "Convoluted wakefield: ";
                         std::ofstream outfile("convoluted_wakefield.txt");
                         for (int i = 0; i < convoluted_wakefield.size(); ++i)
@@ -296,11 +294,10 @@ namespace impactx {
                         std::cout << std::endl;
                         outfile.close();
                         delete[] dptr_data;
-                        */
 
                         // Kick particles with wake
                         impactx::wakepush::WakePush(particle_container, convoluted_wakefield, bin_size);
-                    }
+                    }*/
 
                     // Space-charge calculation: turn off if there is only 1 particle
                     if (space_charge &&

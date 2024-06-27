@@ -78,7 +78,7 @@ void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, Real* dptr_data, 
     }
 }
 
-void DerivativeCharge1D(std::vector<double>& charge_distribution, std::vector<double>& slopes, int num_bins, Real bin_size, bool GetNumberDensity)
+void DerivativeCharge1D(double* charge_distribution, double* slopes, int num_bins, Real bin_size, bool GetNumberDensity)
 {
 
     for (int i = 0; i < num_bins - 1; ++i)

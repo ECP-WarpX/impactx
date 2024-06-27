@@ -23,6 +23,6 @@ double w_l_rf(double s, double a, double g, double L);
 double w_l_csr(double s, amrex::ParticleReal R, amrex::ParticleReal beam_charge);
 
 //Function to perform FFT-based convolution
-void convolve_fft(const std::vector<double>& beam_profile, const std::vector<double>& wake_func, double delta_t, std::vector<double>& result, int padding_factor);
+void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size, int wake_func_size, double delta_t, double* result, int padding_factor);
 
 #endif // WAKE_CONVOLUTION_H
