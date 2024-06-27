@@ -227,14 +227,14 @@ namespace impactx {
                             std::cout << "My radius of curvature is:" << R << std::endl;
                             element_has_csr = true;
                         }
-                        
+
                         else if constexpr (std::is_same_v<std::decay_t<decltype(element)>, ExactSbend>) //Currently internal calculation for m_rc
                         {
                             R = element.m_rc;
                             std::cout << "My radius of curvature is:" << R << std::endl;
                             element_has_csr = true;
                         }
-                        
+
                     }, element_variant);
 
                     Enter loop if lattice has bend element

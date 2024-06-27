@@ -4,6 +4,7 @@ from conftest import basepath
 
 from impactx import ImpactX, amr, wakeconvolution
 
+
 def test_wake(save_png=True):
     """
     Run ImpactX, calculate wakefield convolution from particle data, and plot the output
@@ -61,7 +62,7 @@ def test_wake(save_png=True):
             bin_max = t_max
             bin_size = (bin_max - bin_min) / num_bins
 
-            padding_factor = 1 # Make plotting script compatible
+            padding_factor = 1  # Make plotting script compatible
             sigma_t = 1.9975134930563207e-05
 
             # Allocate memory for the charge profile
@@ -119,9 +120,11 @@ def test_wake(save_png=True):
             normalized_s_values = s_values / sigma_t
 
             plt.figure()
-            plt.plot(normalized_s_values, convoluted_wakefield, label="Convoluted Wakefield")
-            plt.xlim(left = -5)
-            plt.xlim(right = 5)
+            plt.plot(
+                normalized_s_values, convoluted_wakefield, label="Convoluted Wakefield"
+            )
+            plt.xlim(left=-5)
+            plt.xlim(right=5)
             plt.xlabel("Longitudinal Position s/sigma_s")
             plt.ylabel("Wakefield (V C/m)")
             plt.legend()
