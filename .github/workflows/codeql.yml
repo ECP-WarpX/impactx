@@ -46,7 +46,7 @@ jobs:
       - name: Configure (C++)
         if: ${{ matrix.language == 'cpp' }}
         run: |
-          $CMAKE -S . -B build -DImpactX_PYTHON=OFF
+          $CMAKE -S . -B build -DImpactX_FFT=ON -DImpactX_PYTHON=OFF
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3

@@ -47,6 +47,7 @@ jobs:
         cmake -S . -B build            \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
           -DImpactX_COMPUTE=CUDA       \
+          -DImpactX_FFT=ON             \
           -DImpactX_PYTHON=ON          \
           -DAMReX_CUDA_ARCH=6.0        \
           -DImpactX_PRECISION=SINGLE   \

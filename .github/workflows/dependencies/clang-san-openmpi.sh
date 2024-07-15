@@ -17,6 +17,8 @@ sudo apt-get install -y \
     gnupg               \
     libc++-dev          \
     libc++abi-dev       \
+    libfftw3-dev        \
+    libfftw3-mpi-dev    \
     libhdf5-openmpi-dev \
     libomp-dev          \
     libopenmpi-dev      \

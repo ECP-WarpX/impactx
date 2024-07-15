@@ -25,6 +25,7 @@ jobs:
         brew install adios2
         brew install ccache
         brew install cmake
+        brew install fftw
         brew install hdf5-mpi
         brew install libomp
         brew link --overwrite --force libomp
@@ -67,6 +68,7 @@ jobs:
 
         cmake -S . -B build            \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
+          -DImpactX_FFT=ON             \
           -DImpactX_PYTHON=ON          \
           -DPython_EXECUTABLE=$(which python3)
         cmake --build build -j 3
