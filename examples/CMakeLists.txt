@@ -256,20 +256,34 @@ add_impactx_test(cfchannel
 
 # Constant Focusing Channel with Space Charge #################################
 #
-add_impactx_test(cfchannel_spacecharge
-    examples/cfchannel/input_cfchannel_10nC.in
+add_impactx_test(cfchannel_spacecharge_mlmg
+    examples/cfchannel/input_cfchannel_10nC_mlmg.in
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
+    examples/cfchannel/analysis_cfchannel_10nC.py
+    OFF  # no plot script yet
+)
+add_impactx_test(cfchannel_spacecharge_fft
+    examples/cfchannel/input_cfchannel_10nC_fft.in
+    OFF  # ImpactX MPI-parallel
+    OFF  # ImpactX Python interface
     examples/cfchannel/analysis_cfchannel_10nC.py
     OFF  # no plot script yet
 )
 
 # Python: Constant Focusing Channel with Space Charge #########################
 #
-add_impactx_test(cfchannel_spacecharge.py
-    examples/cfchannel/run_cfchannel_10nC.py
+add_impactx_test(cfchannel_spacecharge_mlmg.py
+    examples/cfchannel/run_cfchannel_10nC_mlmg.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
+    examples/cfchannel/analysis_cfchannel_10nC.py
+    OFF  # no plot script yet
+)
+add_impactx_test(cfchannel_spacecharge_fft.py
+    examples/cfchannel/run_cfchannel_10nC_fft.py
+    OFF  # ImpactX MPI-parallel
+    ON   # ImpactX Python interface
     examples/cfchannel/analysis_cfchannel_10nC.py
     OFF  # no plot script yet
 )
@@ -366,20 +380,34 @@ add_impactx_test(multipole
 
 # Expanding Beam Test #########################################################
 #
-add_impactx_test(expanding_beam
-    examples/expanding_beam/input_expanding.in
+add_impactx_test(expanding_beam_mlmg
+    examples/expanding_beam/input_expanding_mlmg.in
       OFF  # ImpactX MPI-parallel
       OFF  # ImpactX Python interface
+    examples/expanding_beam/analysis_expanding.py
+    OFF  # no plot script yet
+)
+add_impactx_test(expanding_beam_fft
+    examples/expanding_beam/input_expanding_fft.in
+    OFF  # ImpactX MPI-parallel
+    OFF  # ImpactX Python interface
     examples/expanding_beam/analysis_expanding.py
     OFF  # no plot script yet
 )
 
 # Python: Expanding Beam Test #################################################
 #
-add_impactx_test(expanding_beam.py
-    examples/expanding_beam/run_expanding.py
+add_impactx_test(expanding_beam_mlmg.py
+    examples/expanding_beam/run_expanding_mlmg.py
       OFF  # ImpactX MPI-parallel
       ON   # ImpactX Python interface
+    examples/expanding_beam/analysis_expanding.py
+    OFF  # no plot script yet
+)
+add_impactx_test(expanding_beam_fft.py
+    examples/expanding_beam/run_expanding_fft.py
+    OFF  # ImpactX MPI-parallel
+    ON   # ImpactX Python interface
     examples/expanding_beam/analysis_expanding.py
     OFF  # no plot script yet
 )
