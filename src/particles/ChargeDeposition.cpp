@@ -64,7 +64,6 @@ namespace impactx
                     tilebox.grow(rho_at_level.nGrowVect());
                     amrex::RealBox const grid_box{tilebox, gm.CellSize(), gm.ProbLo()};
                     amrex::Real const * const AMREX_RESTRICT xyzmin_ptr = grid_box.lo();
-                    std::array<amrex::Real, 3> const xyzmin = {xyzmin_ptr[0], xyzmin_ptr[1], xyzmin_ptr[2]};
 
                     // mesh-refinement: for when we do not deposit on the same level
                     // note: would need to communicate the deposited-to boxes afterwards
@@ -76,8 +75,9 @@ namespace impactx
                     // in SI [C]
                     amrex::ParticleReal const charge = m_refpart.charge;
 
-                    // cell size of the mesh to deposit to
-                    std::array<amrex::Real, 3> const & AMREX_RESTRICT dx = {gm.CellSize(0), gm.CellSize(1), gm.CellSize(2)};
+                    // lower end and inverse cell size of the mesh to deposit to
+                    amrex::XDim3 const xyzmin = {xyzmin_ptr[0], xyzmin_ptr[1], xyzmin_ptr[2]};
+                    amrex::XDim3 const dinv = {1.0_rt/gm.CellSize(0), 1.0_rt/gm.CellSize(1), 1.0_rt/gm.CellSize(2)};
 
                     // RZ modes (unused)
                     int const n_rz_azimuthal_modes = 0;
@@ -86,7 +86,7 @@ namespace impactx
                             (pti, wp, charge, ion_lev, &rho_at_level,
                              local_rho_fab,
                              m_particle_shape.value(),
-                             dx, xyzmin, n_rz_azimuthal_modes);
+                             dinv, xyzmin, n_rz_azimuthal_modes);
                 }
             }
 
