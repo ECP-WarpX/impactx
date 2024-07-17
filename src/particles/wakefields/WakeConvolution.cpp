@@ -51,11 +51,10 @@ double w_l_rf(double s, double a, double g, double L)
 
 double w_l_csr(double s, amrex::ParticleReal R, amrex::ParticleReal beam_charge)
 {
-    double N = beam_charge / ablastr::constant::SI::q_e;
     double rc = std::pow(ablastr::constant::SI::q_e, 2) / (4 * M_PI * ablastr::constant::SI::ep0 * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2));
     double kappa = (2 * rc * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2)) / std::pow(3, 1.0/3.0) / std::pow(R, 2.0/3.0);
 
-    return - (N * kappa * unit_step(s)) / std::pow(std::abs(s), 1.0/3.0);
+    return - (kappa * unit_step(s)) / std::pow(std::abs(s), 1.0/3.0);
 }
 
 //Convolution Function
@@ -70,8 +69,8 @@ void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size
     int n = static_cast<int>(original_n * padding_factor);
 
     //Allocate memory for FFTW inputs and outputs
-    fftw_complex *in1 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n); //Allocate memory for 'n' complex numbers and
-    fftw_complex *in2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n); //Convert void pointer --> fftw_complex pointer
+    fftw_complex *in1 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n); //Allocate memory for 'n' complex numbers for inputs (zero-padded) and outputs
+    fftw_complex *in2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n); 
     fftw_complex *out1 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
     fftw_complex *out2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
     fftw_complex *conv_result = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
@@ -81,7 +80,7 @@ void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size
     {
         if (i < beam_profile_size)
         {
-            in1[i][0] = std::isfinite(beam_profile[i]) ? beam_profile[i] : 0.0; //Ensure no nans
+            in1[i][0] = std::isfinite(beam_profile[i]) ? beam_profile[i] : 0.0; //Print NaN was produced if 0
             in1[i][1] = 0.0;
         }
         else
@@ -92,7 +91,7 @@ void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size
 
         if (i < wake_func_size)
         {
-            in2[i][0] = std::isfinite(wake_func[i]) ? wake_func[i] : 0.0; //Ensure no nans
+            in2[i][0] = std::isfinite(wake_func[i]) ? wake_func[i] : 0.0; //Print NaN was produced if 0
             in2[i][1] = 0.0;
         }
         else

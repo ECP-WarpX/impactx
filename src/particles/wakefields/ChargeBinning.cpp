@@ -51,9 +51,9 @@ void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, Real* dptr_data, 
                     auto const w = (Real)d_w[i]; //(Macro)Particle weight at i
 
                     /*
-                    Weight w is given in [number of particles]:
-                    For w = 1 --> macroparticle = 1 particle
-                    For w > 1 --> macroparticle > 1 particle
+                    Weight w is given in [number of electrons]:
+                    For w = 1 --> macroparticle = 1 electron making up a macroparticle
+                    For w > 1 --> macroparticle > 1 electrons making up a macroparticle
                     */
 
                     //Calculate bin index based on z-position
@@ -63,14 +63,18 @@ void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, Real* dptr_data, 
                     //Calculate the charge contribution of the macro particle
                     Real charge_contribution = w * ablastr::constant::SI::q_e;
 
+                    //Divide charge by bin size to get binned charge density
+                    double charge_density = charge_contribution / bin_size;
+                    double unity_density = ablastr::constant::SI::q_e / bin_size;
+
                     //Add to histogram bin
                     if (is_unity_particle_weight)
                     {
-                        HostDevice::Atomic::Add(&dptr_data[bin], ablastr::constant::SI::q_e);  //Unity weight: Add elementary charge of 1 particle
+                        HostDevice::Atomic::Add(&dptr_data[bin], unity_density);  //Unity weight: Add elementary charge of 1 particle
                     }
                     else
                     {
-                        HostDevice::Atomic::Add(&dptr_data[bin], charge_contribution);  //Non-unity weight: Add calculated charge from >1 particle
+                        HostDevice::Atomic::Add(&dptr_data[bin], charge_density);  //Non-unity weight: Add calculated charge from >1 particle
                     }
                 });
             }

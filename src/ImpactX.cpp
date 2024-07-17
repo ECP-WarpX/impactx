@@ -209,7 +209,7 @@ namespace impactx {
 
                     //CSR Wakefield Response
 
-                    /*bool element_has_csr = false; // Updates to true for example with bend element
+                    bool element_has_csr = false; // Updates to true for example with bend element
                     double R = 0.0; // Updates for bend element rc
 
                     //Define lambda function inside of std::visit
@@ -218,26 +218,25 @@ namespace impactx {
                         if constexpr (std::is_same_v<std::decay_t<decltype(element)>, Sbend>)
                         {
                             R = element.m_rc;
-                            std::cout << "My radius of curvature is:" << R << std::endl;
+                            R = std::abs(R);
                             element_has_csr = true;
                         }
                         else if constexpr (std::is_same_v<std::decay_t<decltype(element)>, CFbend>)
                         {
                             R = element.m_rc;
-                            std::cout << "My radius of curvature is:" << R << std::endl;
+                            R = std::abs(R);
                             element_has_csr = true;
                         }
 
-                        else if constexpr (std::is_same_v<std::decay_t<decltype(element)>, ExactSbend>) //Currently internal calculation for m_rc
+                        /*else if constexpr (std::is_same_v<std::decay_t<decltype(element)>, ExactSbend>) //Currently internal calculation for m_rc
                         {
                             R = element.m_rc;
-                            std::cout << "My radius of curvature is:" << R << std::endl;
                             element_has_csr = true;
-                        }
+                        }*/
 
                     }, element_variant);
 
-                    Enter loop if lattice has bend element
+                    //Enter loop if lattice has bend element
                     if (element_has_csr)
                     {
                         // Measure beam size, extract the min, max of particle positions
@@ -247,9 +246,10 @@ namespace impactx {
                         using amrex::Real;
 
                         // Set parameters for charge deposition
-                        bool is_unity_particle_weight = true;
+                        bool is_unity_particle_weight = false; //Only true if w = 1
                         bool GetNumberDensity = true;
 
+                        int padding_factor = 1; // Set amount of zero-padding
                         int num_bins = 100;  // Set resolution
                         Real bin_min = t_min;
                         Real bin_max = t_max;
@@ -270,7 +270,7 @@ namespace impactx {
                         // Call wake function
 
                         // Read in external variable bunch_charge
-                        std::cout << "My beam charge is:" << bunch_charge << std::endl;
+                        //std::cout << "My beam charge is:" << bunch_charge << std::endl;
 
                         std::vector<double> wake_function(num_bins);
                         for (int i = 0; i < num_bins; ++i)
@@ -280,10 +280,10 @@ namespace impactx {
                         }
 
                         // Call convolution function
-                        std::vector<double> convoluted_wakefield(2 * num_bins - 1);
-                        convolve_fft(slopes.data(), wake_function.data(), slopes.size(), wake_function.size(), bin_size, convoluted_wakefield.data(), 1);
+                        std::vector<double> convoluted_wakefield(padding_factor * (2 * num_bins - 1));
+                        convolve_fft(slopes.data(), wake_function.data(), slopes.size(), wake_function.size(), bin_size, convoluted_wakefield.data(), padding_factor);
 
-                        //Check convolution
+                        /*Check convolution
                         std::cout << "Convoluted wakefield: ";
                         std::ofstream outfile("convoluted_wakefield.txt");
                         for (int i = 0; i < convoluted_wakefield.size(); ++i)
@@ -293,11 +293,11 @@ namespace impactx {
                         }
                         std::cout << std::endl;
                         outfile.close();
-                        delete[] dptr_data;
+                        delete[] dptr_data;*/
 
                         // Kick particles with wake
-                        impactx::wakepush::WakePush(particle_container, convoluted_wakefield, bin_size);
-                    }*/
+                        impactx::wakepush::WakePush(particle_container, convoluted_wakefield, slice_ds, bin_size, t_min, num_bins, padding_factor);
+                    }
 
                     // Space-charge calculation: turn off if there is only 1 particle
                     if (space_charge &&

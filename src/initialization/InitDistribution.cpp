@@ -221,7 +221,7 @@ namespace impactx
         amrex::ParticleReal kin_energy = 0.0;  // Beam kinetic energy (MeV)
         pp_dist.get("kin_energy", kin_energy);
 
-        amrex::ParticleReal bunch_charge = 0.0;  // Bunch charge (C) - Define externally to make global variable
+        //amrex::ParticleReal bunch_charge = 0.0;  // Bunch charge (C) - Define externally to make global variable
         pp_dist.get("charge", bunch_charge);
 
         std::string particle_type;  // Particle type
