@@ -118,7 +118,7 @@ namespace impactx
 
                tout = t + (slice_ds/betgam2)*pt;
                // ptout = pt;
-            } else {
+            } else if (m_k < 0.0) {
                // advance position and momentum (defocusing quad)
                xout = cosh(omega*slice_ds)*x + sinh(omega*slice_ds)/omega*px;
                pxout = omega*sinh(omega*slice_ds)*x + cosh(omega*slice_ds)*px;
@@ -128,6 +128,7 @@ namespace impactx
 
                tout = t + (slice_ds/betgam2)*pt;
                // ptout = pt;
+            } else {
             }
 
             // assign updated values
