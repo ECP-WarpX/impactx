@@ -101,10 +101,19 @@ set_default_build_type("Release")
 
 # Option to enable interprocedural optimization
 # (also know as "link-time optimization" or "whole program optimization")
-option(ImpactX_IPO "Compile ImpactX with interprocedural optimization (will take more time)" OFF)
+set(_ImpactX_IPO_DEFAULT OFF)
+set(_ImpactX_PYTHON_IPO_DEFAULT ON)
+if(DEFINED CMAKE_INTERPROCEDURAL_OPTIMIZATION)
+    set(_ImpactX_IPO_DEFAULT ${CMAKE_INTERPROCEDURAL_OPTIMIZATION})
+    set(_ImpactX_PYTHON_IPO_DEFAULT ${CMAKE_INTERPROCEDURAL_OPTIMIZATION})
+endif()
+option(ImpactX_IPO
+    "Compile ImpactX with interprocedural optimization (will take more time)"
+    ${_ImpactX_IPO_DEFAULT}
+)
 option(ImpactX_PYTHON_IPO
     "Compile Python bindings with interprocedural optimization (IPO) / link-time optimization (LTO)"
-    ON
+    ${_ImpactX_PYTHON_IPO_DEFAULT}
 )
 
 if(ImpactX_FFT)
@@ -244,7 +253,7 @@ set_target_properties(${_ALL_TARGETS} PROPERTIES
 
 # Interprocedural optimization
 if(ImpactX_IPO)
-    enable_IPO("${_ALL_TARGETS}")
+    impactx_enable_IPO("${_ALL_TARGETS}")
 endif()
 
 # link dependencies
@@ -252,7 +261,13 @@ target_link_libraries(lib PUBLIC ImpactX::thirdparty::ablastr_3d)
 if(ImpactX_PYTHON)
     target_link_libraries(pyImpactX PRIVATE pybind11::module pybind11::windows_extras)
     if(ImpactX_PYTHON_IPO)
-        target_link_libraries(pyImpactX PRIVATE pybind11::lto)
+        if(DEFINED CMAKE_INTERPROCEDURAL_OPTIMIZATION)
+            impactx_enable_IPO(pyImpactX)
+        else()
+            # conditionally defined target in pybind11
+            # https://github.com/pybind/pybind11/blob/v2.12.0/tools/pybind11Common.cmake#L397-L403
+            target_link_libraries(pyImpactX PRIVATE pybind11::lto)
+        endif()
     endif()
 endif()
 
