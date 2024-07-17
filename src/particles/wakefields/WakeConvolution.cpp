@@ -70,7 +70,7 @@ void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size
 
     //Allocate memory for FFTW inputs and outputs
     fftw_complex *in1 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n); //Allocate memory for 'n' complex numbers for inputs (zero-padded) and outputs
-    fftw_complex *in2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n); 
+    fftw_complex *in2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
     fftw_complex *out1 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
     fftw_complex *out2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
     fftw_complex *conv_result = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
