@@ -313,7 +313,7 @@ void init_elements(py::module& m)
              >(),
              py::arg("ds"),
              py::arg("k"),
-             py::arg("units") = 0,
+             py::arg("unit") = 0,
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
@@ -325,7 +325,7 @@ void init_elements(py::module& m)
             [](ChrQuad & cq, amrex::ParticleReal k) { cq.m_k = k; },
             "quadrupole strength in 1/m^2 (or T/m)"
         )
-        .def_property("units",
+        .def_property("unit",
             [](ChrQuad & cq) { return cq.m_unit; },
             [](ChrQuad & cq, int unit) { cq.m_unit = unit; },
             "unit specification for quad strength"
@@ -356,7 +356,7 @@ void init_elements(py::module& m)
              >(),
              py::arg("ds"),
              py::arg("k"),
-             py::arg("units") = 0,
+             py::arg("unit") = 0,
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
@@ -368,7 +368,7 @@ void init_elements(py::module& m)
             [](ChrQuad & cq, amrex::ParticleReal k) { cq.m_k = k; },
             "focusing strength in 1/m^2 (or T/m)"
         )
-        .def_property("units",
+        .def_property("unit",
             [](ChrQuad & cq) { return cq.m_unit; },
             [](ChrQuad & cq, int unit) { cq.m_unit = unit; },
             "unit specification for focusing strength"
@@ -646,27 +646,27 @@ void init_elements(py::module& m)
         .def(py::init([](
                 amrex::ParticleReal xkick,
                 amrex::ParticleReal ykick,
-                std::string const & units,
+                std::string const & unit,
                 amrex::ParticleReal dx,
                 amrex::ParticleReal dy,
                 amrex::ParticleReal rotation_degree
              )
              {
-                 if (units != "dimensionless" && units != "T-m")
-                     throw std::runtime_error(R"(units must be "dimensionless" or "T-m")");
+                 if (unit != "dimensionless" && unit != "T-m")
+                     throw std::runtime_error(R"(unit must be "dimensionless" or "T-m")");
 
-                 Kicker::UnitSystem const u = units == "dimensionless" ?
+                 Kicker::UnitSystem const u = unit == "dimensionless" ?
                                             Kicker::UnitSystem::dimensionless :
                                             Kicker::UnitSystem::Tm;
                  return new Kicker(xkick, ykick, u, dx, dy, rotation_degree);
              }),
              py::arg("xkick"),
              py::arg("ykick"),
-             py::arg("units") = "dimensionless",
+             py::arg("unit") = "dimensionless",
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
-             R"(A thin transverse kicker element. Kicks are for units "dimensionless" or in "T-m".)"
+             R"(A thin transverse kicker element. Kicks are for unit "dimensionless" or in "T-m".)"
         )
         .def_property("xkick",
             [](Kicker & kicker) { return kicker.m_xkick; },
@@ -678,7 +678,7 @@ void init_elements(py::module& m)
             [](Kicker & kicker, amrex::ParticleReal ykick) { kicker.m_ykick = ykick; },
             "vertical kick strength (dimensionless OR T-m)"
         )
-        // TODO units
+        // TODO unit
     ;
     register_beamoptics_push(py_Kicker);
 
@@ -1341,7 +1341,7 @@ void init_elements(py::module& m)
              >(),
              py::arg("k"),
              py::arg("taper"),
-             py::arg("units") = 0,
+             py::arg("unit") = 0,
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
@@ -1357,14 +1357,14 @@ void init_elements(py::module& m)
         .def_property("k",
             [](TaperedPL & taperedpl) { return taperedpl.m_k; },
             [](TaperedPL & taperedpl, amrex::ParticleReal k) { taperedpl.m_k = k; },
-            "integrated focusing strength in m^(-1) (if units = 0) or integrated focusing strength in T (if units = 1)"
+            "integrated focusing strength in m^(-1) (if unit = 0) or integrated focusing strength in T (if unit = 1)"
         )
         .def_property("taper",
             [](TaperedPL & taperedpl) { return taperedpl.m_taper; },
             [](TaperedPL & taperedpl, amrex::ParticleReal taper) { taperedpl.m_taper = taper; },
             "horizontal taper parameter in m^(-1) = 1 / (target horizontal dispersion in m)"
         )
-        .def_property("units",
+        .def_property("unit",
             [](TaperedPL & taperedpl) { return taperedpl.m_unit; },
             [](TaperedPL & taperedpl, int unit) { taperedpl.m_unit = unit; },
             "specification of units for plasma lens focusing strength"

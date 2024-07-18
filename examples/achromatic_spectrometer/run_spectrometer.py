@@ -63,7 +63,7 @@ dr = elements.Drift(ds=ds_half, nslice=ns)
 # define the lens segments
 thick_lens = []
 for _ in range(0, num_lenses):
-    pl = elements.TaperedPL(k=dk, taper=dtaper, units=0)
+    pl = elements.TaperedPL(k=dk, taper=dtaper, unit=0)
     segment = [dr, pl, dr]
     thick_lens.extend(segment)
 
