@@ -647,9 +647,9 @@ void init_elements(py::module& m)
                 amrex::ParticleReal xkick,
                 amrex::ParticleReal ykick,
                 std::string const & units,
-                amrex::ParticleReal,
-                amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal dx,
+                amrex::ParticleReal dy,
+                amrex::ParticleReal rotation_degree
              )
              {
                  if (units != "dimensionless" && units != "T-m")
@@ -658,7 +658,7 @@ void init_elements(py::module& m)
                  Kicker::UnitSystem const u = units == "dimensionless" ?
                                             Kicker::UnitSystem::dimensionless :
                                             Kicker::UnitSystem::Tm;
-                 return new Kicker(xkick, ykick, u);
+                 return new Kicker(xkick, ykick, u, dx, dy, rotation_degree);
              }),
              py::arg("xkick"),
              py::arg("ykick"),
