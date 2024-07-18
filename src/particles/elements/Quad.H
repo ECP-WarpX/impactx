@@ -129,6 +129,7 @@ namespace impactx
                tout = t + (slice_ds/betgam2)*pt;
                // ptout = pt;
             } else {
+                // nothing to do for zero focusing strength
             }
 
             // assign updated values
