@@ -969,6 +969,21 @@ void init_elements(py::module& m)
              py::arg("rotation") = 0,
              "A short RF cavity element."
         )
+        .def_property("V",
+            [](ShortRF & short_rf) { return short_rf.m_V; },
+            [](ShortRF & short_rf, amrex::ParticleReal V) { short_rf.m_V = V; },
+            "Normalized RF voltage V = maximum energy gain/(m*c^2)"
+        )
+        .def_property("freq",
+            [](ShortRF & short_rf) { return short_rf.m_freq; },
+            [](ShortRF & short_rf, int freq) { short_rf.m_freq = freq; },
+            "RF frequency in Hz"
+        )
+        .def_property("phase",
+            [](ShortRF & short_rf) { return short_rf.m_phase; },
+            [](ShortRF & short_rf, int phase) { short_rf.m_phase = phase; },
+            "RF synchronous phase in degrees (phase = 0 corresponds to maximum energy gain, phase = -90 corresponds go zero energy gain for bunching)"
+        )
     ;
     register_beamoptics_push(py_ShortRF);
 
