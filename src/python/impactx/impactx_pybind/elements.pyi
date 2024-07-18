@@ -885,6 +885,31 @@ class ShortRF(Thin, Alignment):
         Push first the reference particle, then all other particles.
         """
 
+    @property
+    def V(self) -> float:
+        """
+        Normalized RF voltage V = maximum energy gain/(m*c^2)
+        """
+
+    @V.setter
+    def V(self, arg1: float) -> None: ...
+    @property
+    def freq(self) -> float:
+        """
+        RF frequency in Hz
+        """
+
+    @freq.setter
+    def freq(self, arg1: int) -> None: ...
+    @property
+    def phase(self) -> float:
+        """
+        RF synchronous phase in degrees (phase = 0 corresponds to maximum energy gain, phase = -90 corresponds go zero energy gain for bunching)
+        """
+
+    @phase.setter
+    def phase(self, arg1: int) -> None: ...
+
 class SoftQuadrupole(Thick, Alignment):
     def __init__(
         self,
