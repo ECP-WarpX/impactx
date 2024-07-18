@@ -509,6 +509,26 @@ void init_elements(py::module& m)
              py::arg("rotation") = 0,
              "Edge focusing associated with bend entry or exit."
         )
+        .def_property("psi",
+            [](DipEdge & dip_edge) { return dip_edge.m_psi; },
+            [](DipEdge & dip_edge, amrex::ParticleReal psi) { dip_edge.m_psi = psi; },
+            "Pole face angle in rad"
+        )
+        .def_property("rc",
+            [](DipEdge & dip_edge) { return dip_edge.m_rc; },
+            [](DipEdge & dip_edge, amrex::ParticleReal rc) { dip_edge.m_rc = rc; },
+            "Radius of curvature in m"
+        )
+        .def_property("g",
+            [](DipEdge & dip_edge) { return dip_edge.m_g; },
+            [](DipEdge & dip_edge, amrex::ParticleReal g) { dip_edge.m_g = g; },
+            "Gap parameter in m"
+        )
+        .def_property("K2",
+            [](DipEdge & dip_edge) { return dip_edge.m_K2; },
+            [](DipEdge & dip_edge, amrex::ParticleReal K2) { dip_edge.m_K2 = K2; },
+            "Fringe field integral (unitless)"
+        )
     ;
     register_beamoptics_push(py_DipEdge);
 
@@ -598,6 +618,16 @@ void init_elements(py::module& m)
              py::arg("nslice") = 1,
              "An ideal sector bend using the exact nonlinear map.  When B = 0, the reference bending radius is defined by r0 = length / (angle in rad), corresponding to a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B."
         )
+        .def_property("phi",
+            [](ExactSbend & exact_sbend) { return exact_sbend.m_phi; },
+            [](ExactSbend & exact_sbend, amrex::ParticleReal phi) { exact_sbend.m_phi = phi; },
+            "Bend angle in degrees"
+        )
+        .def_property("B",
+            [](ExactSbend & exact_sbend) { return exact_sbend.m_B; },
+            [](ExactSbend & exact_sbend, amrex::ParticleReal B) { exact_sbend.m_B = B; },
+            "Magnetic field in Tesla; when B = 0 (default), the reference bending radius is defined by r0 = length / (angle in rad), corresponding to a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B"
+        )
     ;
     register_beamoptics_push(py_ExactSbend);
 
@@ -638,6 +668,17 @@ void init_elements(py::module& m)
              py::arg("rotation") = 0,
              R"(A thin transverse kicker element. Kicks are for units "dimensionless" or in "T-m".)"
         )
+        .def_property("xkick",
+            [](Kicker & kicker) { return kicker.m_xkick; },
+            [](Kicker & kicker, amrex::ParticleReal xkick) { kicker.m_xkick = xkick; },
+            "horizontal kick strength (dimensionless OR T-m)"
+        )
+        .def_property("ykick",
+            [](Kicker & kicker) { return kicker.m_ykick; },
+            [](Kicker & kicker, amrex::ParticleReal ykick) { kicker.m_ykick = ykick; },
+            "vertical kick strength (dimensionless OR T-m)"
+        )
+        // TODO units
     ;
     register_beamoptics_push(py_Kicker);
 
@@ -670,6 +711,21 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              "A general thin multipole element."
+        )
+        .def_property("multipole",
+            [](Multipole & multipole) { return multipole.m_multipole; },
+            [](Multipole & multipole, amrex::ParticleReal multipole_index) { multipole.m_multipole = multipole_index; },
+            "index m (m=1 dipole, m=2 quadrupole, m=3 sextupole etc.)"
+        )
+        .def_property("K_normal",
+            [](Multipole & multipole) { return multipole.m_Kn; },
+            [](Multipole & multipole, amrex::ParticleReal K_normal) { multipole.m_Kn = K_normal; },
+            "Integrated normal multipole coefficient (1/meter^m)"
+        )
+        .def_property("K_skew",
+            [](Multipole & multipole) { return multipole.m_Ks; },
+            [](Multipole & multipole, amrex::ParticleReal K_skew) { multipole.m_Ks = K_skew; },
+            "Integrated skew multipole coefficient (1/meter^m)"
         )
     ;
     register_beamoptics_push(py_Multipole);
@@ -712,6 +768,16 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              "Single short segment of the nonlinear magnetic insert element."
+        )
+        .def_property("knll",
+            [](NonlinearLens & nl) { return nl.m_knll; },
+            [](NonlinearLens & nl, amrex::ParticleReal knll) { nl.m_knll = knll; },
+            "integrated strength of the nonlinear lens (m)"
+        )
+        .def_property("cnll",
+            [](NonlinearLens & nl) { return nl.m_cnll; },
+            [](NonlinearLens & nl, amrex::ParticleReal cnll) { nl.m_cnll = cnll; },
+            "distance of singularities from the origin (m)"
         )
     ;
     register_beamoptics_push(py_NonlinearLens);
@@ -796,6 +862,11 @@ void init_elements(py::module& m)
              py::arg("nslice") = 1,
              "A Quadrupole magnet."
         )
+        .def_property("k",
+            [](Quad & quad) { return quad.m_k; },
+            [](Quad & quad, amrex::ParticleReal k) { quad.m_k = k; },
+            "Quadrupole strength in m^(-2) (MADX convention) = (gradient in T/m) / (rigidity in T-m) k > 0 horizontal focusing k < 0 horizontal defocusing"
+        )
     ;
     register_beamoptics_push(py_Quad);
 
@@ -841,6 +912,28 @@ void init_elements(py::module& m)
              py::arg("nslice") = 1,
              "An RF cavity."
         )
+        .def_property("escale",
+            [](RFCavity & rfc) { return rfc.m_escale; },
+            [](RFCavity & rfc, amrex::ParticleReal escale) { rfc.m_escale = escale; },
+            "scaling factor for on-axis RF electric field in 1/m = (peak on-axis electric field Ez in MV/m) / (particle rest energy in MeV)"
+        )
+        .def_property("freq",
+            [](RFCavity & rfc) { return rfc.m_freq; },
+            [](RFCavity & rfc, amrex::ParticleReal freq) { rfc.m_freq = freq; },
+            "RF frequency in Hz"
+        )
+        .def_property("phase",
+            [](RFCavity & rfc) { return rfc.m_phase; },
+            [](RFCavity & rfc, amrex::ParticleReal phase) { rfc.m_phase = phase; },
+            "RF driven phase in degrees"
+        )
+        // TODO cos_coefficients
+        // TODO sin_coefficients
+        .def_property("mapsteps",
+            [](RFCavity & rfc) { return rfc.m_mapsteps; },
+            [](RFCavity & rfc, int mapsteps) { rfc.m_mapsteps = mapsteps; },
+            "number of integration steps per slice used for map and reference particle push in applied fields"
+        )
     ;
     register_beamoptics_push(py_RFCavity);
 
@@ -871,6 +964,11 @@ void init_elements(py::module& m)
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
              "An ideal sector bend."
+        )
+        .def_property("rc",
+            [](Sbend & sbend) { return sbend.m_rc; },
+            [](Sbend & sbend, amrex::ParticleReal rc) { sbend.m_rc = rc; },
+            "Radius of curvature in m"
         )
     ;
     register_beamoptics_push(py_Sbend);
@@ -907,6 +1005,16 @@ void init_elements(py::module& m)
              py::arg("nslice") = 1,
              "An ideal combined function bend (sector bend with quadrupole component)."
         )
+        .def_property("rc",
+            [](CFbend & cfbend) { return cfbend.m_rc; },
+            [](CFbend & cfbend, amrex::ParticleReal rc) { cfbend.m_rc = rc; },
+            "Radius of curvature in m"
+        )
+        .def_property("k",
+            [](CFbend & cfbend) { return cfbend.m_k; },
+            [](CFbend & cfbend, amrex::ParticleReal k) { cfbend.m_k = k; },
+            "Quadrupole strength in m^(-2) (MADX convention) = (gradient in T/m) / (rigidity in T-m) k > 0 horizontal focusing k < 0 horizontal defocusing"
+        )
     ;
     register_beamoptics_push(py_CFbend);
 
@@ -935,6 +1043,16 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              "A short linear RF cavity element at zero-crossing for bunching."
+        )
+        .def_property("V",
+            [](Buncher & buncher) { return buncher.m_V; },
+            [](Buncher & buncher, amrex::ParticleReal V) { buncher.m_V = V; },
+            "Normalized RF voltage drop V = Emax*L/(c*Brho)"
+        )
+        .def_property("k",
+            [](Buncher & buncher) { return buncher.m_k; },
+            [](Buncher & buncher, amrex::ParticleReal k) { buncher.m_k = k; },
+            "Wavenumber of RF in 1/m"
         )
     ;
     register_beamoptics_push(py_Buncher);
@@ -976,12 +1094,12 @@ void init_elements(py::module& m)
         )
         .def_property("freq",
             [](ShortRF & short_rf) { return short_rf.m_freq; },
-            [](ShortRF & short_rf, int freq) { short_rf.m_freq = freq; },
+            [](ShortRF & short_rf, amrex::ParticleReal freq) { short_rf.m_freq = freq; },
             "RF frequency in Hz"
         )
         .def_property("phase",
             [](ShortRF & short_rf) { return short_rf.m_phase; },
-            [](ShortRF & short_rf, int phase) { short_rf.m_phase = phase; },
+            [](ShortRF & short_rf, amrex::ParticleReal phase) { short_rf.m_phase = phase; },
             "RF synchronous phase in degrees (phase = 0 corresponds to maximum energy gain, phase = -90 corresponds go zero energy gain for bunching)"
         )
     ;
@@ -1023,6 +1141,23 @@ void init_elements(py::module& m)
              py::arg("nslice") = 1,
              "A soft-edge solenoid."
         )
+        .def_property("bscale",
+            [](SoftSolenoid & soft_sol) { return soft_sol.m_bscale; },
+            [](SoftSolenoid & soft_sol, amrex::ParticleReal bscale) { soft_sol.m_bscale = bscale; },
+            "Scaling factor for on-axis magnetic field Bz in inverse meters (if unit = 0) or magnetic field Bz in T (SI units, if unit = 1)"
+        )
+        // TODO cos_coefficients
+        // TODO sin_coefficients
+        .def_property("unit",
+            [](SoftSolenoid & soft_sol) { return soft_sol.m_unit; },
+            [](SoftSolenoid & soft_sol, amrex::ParticleReal unit) { soft_sol.m_unit = unit; },
+            "specification of units for scaling of the on-axis longitudinal magnetic field"
+        )
+        .def_property("mapsteps",
+            [](SoftSolenoid & soft_sol) { return soft_sol.m_mapsteps; },
+            [](SoftSolenoid & soft_sol, int mapsteps) { soft_sol.m_mapsteps = mapsteps; },
+            "number of integration steps per slice used for map and reference particle push in applied fields"
+        )
     ;
     register_beamoptics_push(py_SoftSolenoid);
 
@@ -1054,6 +1189,11 @@ void init_elements(py::module& m)
              py::arg("nslice") = 1,
              "An ideal hard-edge Solenoid magnet."
         )
+        .def_property("ks",
+            [](Sol & soft_sol) { return soft_sol.m_ks; },
+            [](Sol & soft_sol, amrex::ParticleReal ks) { soft_sol.m_ks = ks; },
+            "Solenoid strength in m^(-1) (MADX convention) in (magnetic field Bz in T) / (rigidity in T-m)"
+        )
     ;
     register_beamoptics_push(py_Sol);
 
@@ -1076,6 +1216,16 @@ void init_elements(py::module& m)
              py::arg("phi_in"),
              py::arg("phi_out"),
              "An exact pole-face rotation in the x-z plane. Both angles are in degrees."
+        )
+        .def_property("phi_in",
+            [](PRot & prot) { return prot.m_phi_in; },
+            [](PRot & prot, amrex::ParticleReal phi_in) { prot.m_phi_in = phi_in; },
+            "angle of the reference particle with respect to the longitudinal (z) axis in the original frame in degrees"
+        )
+        .def_property("phi_out",
+            [](PRot & prot) { return prot.m_phi_out; },
+            [](PRot & prot, amrex::ParticleReal phi_out) { prot.m_phi_out = phi_out; },
+            "angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame in degrees"
         )
     ;
     register_beamoptics_push(py_PRot);
@@ -1114,6 +1264,18 @@ void init_elements(py::module& m)
              py::arg("nslice") = 1,
              "A soft-edge quadrupole."
         )
+        .def_property("gscale",
+            [](SoftQuadrupole & soft_quad) { return soft_quad.m_gscale; },
+            [](SoftQuadrupole & soft_quad, amrex::ParticleReal gscale) { soft_quad.m_gscale = gscale; },
+            "Scaling factor for on-axis field gradient in inverse meters"
+        )
+        // TODO cos_coefficients
+        // TODO sin_coefficients
+        .def_property("mapsteps",
+            [](SoftQuadrupole & soft_quad) { return soft_quad.m_mapsteps; },
+            [](SoftQuadrupole & soft_quad, int mapsteps) { soft_quad.m_mapsteps = mapsteps; },
+            "number of integration steps per slice used for map and reference particle push in applied fields"
+        )
     ;
     register_beamoptics_push(py_SoftQuadrupole);
 
@@ -1142,6 +1304,16 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              "A thin kick model of a dipole bend."
+        )
+        .def_property("theta",
+            [](ThinDipole & thin_dp) { return thin_dp.m_theta; },
+            [](ThinDipole & thin_dp, amrex::ParticleReal theta) { thin_dp.m_theta = theta; },
+            "Bend angle (degrees)"
+        )
+        .def_property("rc",
+            [](ThinDipole & thin_dp) { return thin_dp.m_rc; },
+            [](ThinDipole & thin_dp, amrex::ParticleReal rc) { thin_dp.m_rc = rc; },
+            "Effective curvature radius (meters)"
         )
     ;
     register_beamoptics_push(py_ThinDipole);
@@ -1181,6 +1353,21 @@ void init_elements(py::module& m)
 
              where :math:`g` is the (linear) field gradient in T/m and :math:`D_x` is the targeted horizontal dispersion in m.
              )doc"
+        )
+        .def_property("k",
+            [](TaperedPL & taperedpl) { return taperedpl.m_k; },
+            [](TaperedPL & taperedpl, amrex::ParticleReal k) { taperedpl.m_k = k; },
+            "integrated focusing strength in m^(-1) (if units = 0) or integrated focusing strength in T (if units = 1)"
+        )
+        .def_property("taper",
+            [](TaperedPL & taperedpl) { return taperedpl.m_taper; },
+            [](TaperedPL & taperedpl, amrex::ParticleReal taper) { taperedpl.m_taper = taper; },
+            "horizontal taper parameter in m^(-1) = 1 / (target horizontal dispersion in m)"
+        )
+        .def_property("units",
+            [](TaperedPL & taperedpl) { return taperedpl.m_unit; },
+            [](TaperedPL & taperedpl, int unit) { taperedpl.m_unit = unit; },
+            "specification of units for plasma lens focusing strength"
         )
     ;
     register_beamoptics_push(py_TaperedPL);
