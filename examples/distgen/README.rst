@@ -71,9 +71,9 @@ We run the following script to analyze correctness:
 A Kapchinskij-Vladimirskij (K-V) distribution
 ===============================================
 
-A 4D K-V distribution in the transverse phase space variables ( + a longitudinally uniform distribution in t + a Gaussian distribution in p_t ).
+A 4D K-V distribution in the transverse phase space variables ( + a longitudinally uniform distribution in :math:`t` + a Gaussian distribution in :math:`p_t` ).
 
-In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree wi>
+In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
 
 Run
@@ -122,7 +122,7 @@ A K-V distribution initialized from Twiss functions
 
 Identical to the previous example (examples-kvdist), but initialized using Courant-Snyder Twiss functions.
 
-In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree wi>
+In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
 
 Run
@@ -169,11 +169,10 @@ We run the following script to analyze correctness:
 A 4D Kurth Distribution
 ============================
 
-A 4D Kurth distribution in the transverse phase space variables ( + a longitudinally uniform distribution in t + a Gaussian distribution in p_t ).
+A 4D Kurth distribution in the transverse phase space variables ( + a longitudinally uniform distribution in :math:`t` + a Gaussian distribution in :math:`p_t` ).
 
 
-In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree wi>
-
+In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
 Run
 ---
@@ -221,7 +220,7 @@ A Semigaussian distribution
 
 A 6D semigaussian distribution (uniform in position, Gaussian in momentum).
 
-In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree wi>
+In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
 
 Run
