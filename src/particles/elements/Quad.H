@@ -95,10 +95,10 @@ namespace impactx
 
             // access reference particle values to find beta*gamma^2
             amrex::ParticleReal const pt_ref = refpart.pt;
-            amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
+            amrex::ParticleReal const betgam2 = std::pow(pt_ref, 2) - 1.0_prt;
 
             // compute phase advance per unit length in s (in rad/m)
-            amrex::ParticleReal const omega = sqrt(std::abs(m_k));
+            amrex::ParticleReal const omega = std::sqrt(std::abs(m_k));
 
             // intialize output values
             amrex::ParticleReal xout = x;
@@ -108,26 +108,28 @@ namespace impactx
             amrex::ParticleReal pyout = py;
             amrex::ParticleReal const ptout = pt;
 
-            if(m_k > 0.0) {
-               // advance position and momentum (focusing quad)
-               xout = cos(omega*slice_ds)*x + sin(omega*slice_ds)/omega*px;
-               pxout = -omega*sin(omega*slice_ds)*x + cos(omega*slice_ds)*px;
+            if (m_k > 0.0) {
+                // advance position and momentum (focusing quad)
+                xout = std::cos(omega*slice_ds)*x + std::sin(omega*slice_ds)/omega*px;
+                pxout = -omega*std::sin(omega*slice_ds)*x + std::cos(omega*slice_ds)*px;
 
-               yout = cosh(omega*slice_ds)*y + sinh(omega*slice_ds)/omega*py;
-               pyout = omega*sinh(omega*slice_ds)*y + cosh(omega*slice_ds)*py;
+                yout = std::cosh(omega*slice_ds)*y + std::sinh(omega*slice_ds)/omega*py;
+                pyout = omega*std::sinh(omega*slice_ds)*y + std::cosh(omega*slice_ds)*py;
 
-               tout = t + (slice_ds/betgam2)*pt;
-               // ptout = pt;
+                tout = t + (slice_ds/betgam2)*pt;
+                // ptout = pt;
+            } else if (m_k < 0.0) {
+                // advance position and momentum (defocusing quad)
+                xout = std::cosh(omega*slice_ds)*x + std::sinh(omega*slice_ds)/omega*px;
+                pxout = omega*std::sinh(omega*slice_ds)*x + std::cosh(omega*slice_ds)*px;
+
+                yout = std::cos(omega*slice_ds)*y + std::sin(omega*slice_ds)/omega*py;
+                pyout = -omega*std::sin(omega*slice_ds)*y + std::cos(omega*slice_ds)*py;
+
+                tout = t + (slice_ds/betgam2)*pt;
+                // ptout = pt;
             } else {
-               // advance position and momentum (defocusing quad)
-               xout = cosh(omega*slice_ds)*x + sinh(omega*slice_ds)/omega*px;
-               pxout = omega*sinh(omega*slice_ds)*x + cosh(omega*slice_ds)*px;
-
-               yout = cos(omega*slice_ds)*y + sin(omega*slice_ds)/omega*py;
-               pyout = -omega*sin(omega*slice_ds)*y + cos(omega*slice_ds)*py;
-
-               tout = t + (slice_ds/betgam2)*pt;
-               // ptout = pt;
+                // nothing to do for zero focusing strength
             }
 
             // assign updated values
@@ -166,7 +168,7 @@ namespace impactx
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // assign intermediate parameter
-            amrex::ParticleReal const step = slice_ds / sqrt(pow(pt,2)-1.0_prt);
+            amrex::ParticleReal const step = slice_ds / std::sqrt(std::pow(pt,2)-1.0_prt);
 
             // advance position and momentum (straight element)
             refpart.x = x + step*px;
