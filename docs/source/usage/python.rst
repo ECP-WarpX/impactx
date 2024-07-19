@@ -539,13 +539,13 @@ This module provides elements for the accelerator lattice.
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.Kicker(xkick, ykick, units="dimensionless", dx=0, dy=0, rotation=0)
+.. py:class:: impactx.elements.Kicker(xkick, ykick, unit="dimensionless", dx=0, dy=0, rotation=0)
 
    A thin transverse kicker.
 
    :param xkick: horizontal kick strength (dimensionless OR T-m)
    :param ykick: vertical kick strength (dimensionless OR T-m)
-   :param units: specification of units (``"dimensionless"`` in units of the magnetic rigidity of the reference particle or ``"T-m"``)
+   :param unit: specification of units (``"dimensionless"`` in units of the magnetic rigidity of the reference particle or ``"T-m"``)
 
 .. py:class:: impactx.elements.Multipole(multipole, K_normal, K_skew, dx=0, dy=0, rotation=0)
 
@@ -675,19 +675,19 @@ This module provides elements for the accelerator lattice.
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.ChrQuad(ds, k, units=0, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.ChrQuad(ds, k, unit=0, dx=0, dy=0, rotation=0, nslice=1)
 
    A Quadrupole magnet, with chromatic effects included.  The Hamiltonian is expanded
    through second order in the transverse variables (x,px,y,py), with the exact pt
    dependence retained.
 
    :param ds: Segment length in m.
-   :param k:  Quadrupole strength in m^(-2) (MADX convention, if units = 0)
+   :param k:  Quadrupole strength in m^(-2) (MADX convention, if unit = 0)
               = (gradient in T/m) / (rigidity in T-m)
-          OR  Quadrupole strength in T/m (MaryLie convention, if units = 1)
+          OR  Quadrupole strength in T/m (MaryLie convention, if unit = 1)
               k > 0 horizontal focusing
               k < 0 horizontal defocusing
-   :param units: specification of units for quadrupole field strength
+   :param unit: specification of units for quadrupole field strength
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
@@ -697,21 +697,21 @@ This module provides elements for the accelerator lattice.
 
       quadrupole strength in 1/m^2 (or T/m)
 
-   .. py:property:: units
+   .. py:property:: unit
 
       unit specification for quad strength
 
-.. py:class:: impactx.elements.ChrPlasmaLens(ds, k, units=0, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.ChrPlasmaLens(ds, k, unit=0, dx=0, dy=0, rotation=0, nslice=1)
 
    An active cylindrically symmetric plasma lens, with chromatic effects included.
    The Hamiltonian is expanded through second order in the transverse variables
    (x,px,y,py), with the exact pt dependence retained.
 
    :param ds: Segment length in m.
-   :param k:  focusing strength in m^(-2) (if units = 0)
+   :param k:  focusing strength in m^(-2) (if unit = 0)
               = (azimuthal magnetic field gradient in T/m) / (rigidity in T-m)
-          OR  azimuthal magnetic field gradient in T/m (if units = 1)
-   :param units: specification of units for plasma lens focusing strength
+          OR  azimuthal magnetic field gradient in T/m (if unit = 1)
+   :param unit: specification of units for plasma lens focusing strength
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
@@ -721,7 +721,7 @@ This module provides elements for the accelerator lattice.
 
       plasma lens focusing strength in 1/m^2 (or T/m)
 
-   .. py:property:: units
+   .. py:property:: unit
 
       unit specification for plasma lens focusing strength
 
@@ -908,7 +908,7 @@ This module provides elements for the accelerator lattice.
 
    * G. Ripken and F. Schmidt, Thin-Lens Formalism for Tracking, CERN/SL/95-12 (AP), 1995.
 
-.. py:class:: impactx.elements.TaperedPL(k, taper, units=0, dx=0, dy=0, rotation=0)
+.. py:class:: impactx.elements.TaperedPL(k, taper, unit=0, dx=0, dy=0, rotation=0)
 
    A thin nonlinear plasma lens with transverse (horizontal) taper
 
@@ -918,13 +918,13 @@ This module provides elements for the accelerator lattice.
 
    where :math:`g` is the (linear) field gradient in T/m and :math:`D_x` is the targeted horizontal dispersion in m.
 
-   :param k:  integrated focusing strength in m^(-1) (if units = 0)
+   :param k:  integrated focusing strength in m^(-1) (if unit = 0)
               = (length in m) * (magnetic field gradient :math:`g` in T/m) / (magnetic rigidity in T-m)
-          OR  integrated focusing strength in T (if units = 1)
+          OR  integrated focusing strength in T (if unit = 1)
               = (length in m) * (magnetic field gradient :math:`g` in T/m)
    :param taper: horizontal taper parameter in m^(-1)
               = 1 / (target horizontal dispersion :math:`D_x` in m)
-   :param units: specification of units for plasma lens focusing strength
+   :param unit: specification of units for plasma lens focusing strength
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
@@ -937,7 +937,7 @@ This module provides elements for the accelerator lattice.
 
       horizontal taper parameter in 1/m
 
-   .. py:property:: units
+   .. py:property:: unit
 
       unit specification for plasma lens focusing strength
 

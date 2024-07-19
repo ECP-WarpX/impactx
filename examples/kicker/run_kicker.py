@@ -46,8 +46,8 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 # design the accelerator lattice
 kicklattice = [
     monitor,
-    elements.Kicker(xkick=2.0e-3, ykick=0.0, units="dimensionless"),
-    elements.Kicker(xkick=0.0, ykick=3.0e-3, units="dimensionless"),
+    elements.Kicker(xkick=2.0e-3, ykick=0.0, unit="dimensionless"),
+    elements.Kicker(xkick=0.0, ykick=3.0e-3, unit="dimensionless"),
     monitor,
 ]
 # assign a lattice
