@@ -336,6 +336,14 @@ class ImpactX:
     @periods.setter
     def periods(self, arg1: int) -> None: ...
     @property
+    def poisson_solver(self) -> str:
+        """
+        The numerical solver to solve the Poisson equation when calculating space charge effects. Either multigrid (default) or fft.
+        """
+
+    @poisson_solver.setter
+    def poisson_solver(self, arg1: str) -> None: ...
+    @property
     def prob_relative(self) -> float:
         """
         The field mesh spans, per direction, multiple times the maximum physical extent of beam particles, as given by this factor.
