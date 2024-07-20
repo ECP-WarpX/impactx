@@ -1,0 +1,45 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+#beam.npart = 100000  # optional for increased precision
+beam.units = static
+beam.kin_energy = 2.0e3
+beam.charge = 1.0e-8
+beam.particle = proton
+beam.distribution = waterbag
+beam.lambdaX = 1.2154443728379865788e-3
+beam.lambdaY = 1.2154443728379865788e-3
+beam.lambdaT = 4.0956844276541331005e-4
+beam.lambdaPx = 8.2274435782286157175e-4
+beam.lambdaPy = 8.2274435782286157175e-4
+beam.lambdaPt = 2.4415943602685364584e-3
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor constf1 monitor
+lattice.nslice = 50
+#lattice.nslice = 60 # optional for increased precision
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+constf1.type = constf
+constf1.ds = 2.0
+constf1.kx = 1.0
+constf1.ky = 1.0
+constf1.kt = 1.0
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = true
+algo.poisson_solver = "fft"
+
+amr.n_cell = 48 48 40
+#amr.n_cell = 72 72 64  # optional for increased precision
+geometry.prob_relative = 1.1

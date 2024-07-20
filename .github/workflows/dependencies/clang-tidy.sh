@@ -16,6 +16,8 @@ sudo apt-get install -y \
     clang-tidy          \
     cmake               \
     gnupg               \
+    libfftw3-dev        \
+    libfftw3-mpi-dev    \
     libhdf5-openmpi-dev \
     libomp-dev          \
     libopenmpi-dev      \

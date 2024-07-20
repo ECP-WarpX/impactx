@@ -44,6 +44,7 @@ jobs:
       run: |
         cmake -S . -B build                  \
           -DpyAMReX_IPO=OFF                  \
+          -DImpactX_FFT=ON                   \
           -DImpactX_PYTHON=ON                \
           -DImpactX_PYTHON_IPO=OFF           \
           -DCMAKE_BUILD_TYPE=RelWithDebInfo  \

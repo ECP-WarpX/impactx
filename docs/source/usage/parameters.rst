@@ -691,6 +691,20 @@ Numerics and algorithms
 * ``algo.space_charge`` (``boolean``, optional, default: ``false``)
     Whether to calculate space charge effects.
 
+* ``algo.poisson_solver`` (``string``, optional, default: ``"multigrid"``)
+    The numerical solver to solve the Poisson equation when calculating space charge effects.
+    Options:
+
+    * ``multigrid``: Poisson's equation is solved using an iterative multigrid (MLMG) solver.
+      See the `AMReX documentation <https://amrex-codes.github.io/amrex/docs_html/LinearSolvers.html#>`__ for details of the MLMG solver.
+
+    * ``fft``: Poisson's equation is solved using an Integrated Green Function method (which requires FFT calculations).
+      See these references for more details `Qiang et al. (2006) <https://doi.org/10.1103/PhysRevSTAB.9.044204>`__ (+ `Erratum <https://doi.org/10.1103/PhysRevSTAB.10.129901>`__).
+      It only works in 3D and it requires the compilation flag ``-DImpactX_FFT=ON``.
+      If mesh refinement is enabled, this solver only works on the coarsest level.
+      On the refined patches, the Poisson equation is solved with the multigrid solver.
+      The boundary conditions are assumed to be open.
+
 * ``algo.mlmg_relative_tolerance`` (``float``, optional, default: ``1.e-7``)
     The relative precision with which the electrostatic space-charge fields should be calculated.
     More specifically, the space-charge fields are computed with an iterative Multi-Level Multi-Grid (MLMG) solver.
