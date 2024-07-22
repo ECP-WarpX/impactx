@@ -72,3 +72,12 @@ You can run the following script to visualize the beam evolution over time:
    :alt: Beam transversal compression in our chicane example.
 
    Chicane beam width and emittance evolution
+
+CSR
+---------
+
+We run the following CSR wakefield scripts to apply CSR wake effects as the beam traverses the bends:
+
+input_chicane_csr.in
+run_chicane_csr.py
+analysis_chicane_csr.py
