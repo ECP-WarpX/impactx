@@ -125,5 +125,3 @@ We run the following script to analyze correctness:
    .. literalinclude:: analysis_chicane_csr.py
       :language: python3
       :caption: You can copy this file from ``examples/chicane/analysis_chicane_csr.py``.
-
-
