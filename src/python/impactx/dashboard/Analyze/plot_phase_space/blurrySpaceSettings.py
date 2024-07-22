@@ -97,9 +97,27 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
         cbar_ypy = plot_2d(ypy, y_edges, py_edges, ax_ypy)
         cbar_tpt = plot_2d(tpt, t_edges, pt_edges, ax_tpt)
     else:
-        ax_xpx.text(0.5, 0.5, 'No data available', horizontalalignment='center', verticalalignment='center')
-        ax_ypy.text(0.5, 0.5, 'No data available', horizontalalignment='center', verticalalignment='center')
-        ax_tpt.text(0.5, 0.5, 'No data available', horizontalalignment='center', verticalalignment='center')
+        ax_xpx.text(
+            0.5,
+            0.5,
+            "No data available",
+            horizontalalignment="center",
+            verticalalignment="center",
+        )
+        ax_ypy.text(
+            0.5,
+            0.5,
+            "No data available",
+            horizontalalignment="center",
+            verticalalignment="center",
+        )
+        ax_tpt.text(
+            0.5,
+            0.5,
+            "No data available",
+            horizontalalignment="center",
+            verticalalignment="center",
+        )
 
     # Annotations
     fig.canvas.manager.set_window_title("Phase Space")
@@ -120,54 +138,40 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
 
     # Adding legends
     leg = ax_xpx.legend(
-        title=(
-            "ε_n,x = {}\n"
-            "σ_x = {}\n"
-            "β_x = {}\n"
-            "α_x = {:.3g}"
-        ).format(
-            Quantity(rbc['emittance_x'], 'm').render(prec=3),
-            Quantity(rbc['sig_x'], 'm').render(prec=3),
-            Quantity(rbc['beta_x'], 'm').render(prec=3),
-            rbc['alpha_x']
+        title=("ε_n,x = {}\n" "σ_x = {}\n" "β_x = {}\n" "α_x = {:.3g}").format(
+            Quantity(rbc["emittance_x"], "m").render(prec=3),
+            Quantity(rbc["sig_x"], "m").render(prec=3),
+            Quantity(rbc["beta_x"], "m").render(prec=3),
+            rbc["alpha_x"],
         ),
         loc="upper right",
         framealpha=0.8,
-        handles=[]
+        handles=[],
     )
     leg._legend_box.sep = 0
 
     leg = ax_ypy.legend(
-        title=(
-            "ε_n,y = {}\n"
-            "σ_y = {}\n"
-            "β_y = {}\n"
-            "α_y = {:.3g}"
-        ).format(
-            Quantity(rbc['emittance_y'], 'm').render(prec=3),
-            Quantity(rbc['sig_y'], 'm').render(prec=3),
-            Quantity(rbc['beta_y'], 'm').render(prec=3),
-            rbc['alpha_y']
+        title=("ε_n,y = {}\n" "σ_y = {}\n" "β_y = {}\n" "α_y = {:.3g}").format(
+            Quantity(rbc["emittance_y"], "m").render(prec=3),
+            Quantity(rbc["sig_y"], "m").render(prec=3),
+            Quantity(rbc["beta_y"], "m").render(prec=3),
+            rbc["alpha_y"],
         ),
         loc="upper right",
         framealpha=0.8,
-        handles=[]
+        handles=[],
     )
     leg._legend_box.sep = 0
 
     leg = ax_tpt.legend(
-        title=(
-            "ε_n,t = {}\n"
-            "σ_ct = {}\n"
-            "σ_pt = {:.3g}"
-        ).format(
-            Quantity(rbc['emittance_t'], 'm').render(prec=3),
-            Quantity(rbc['sig_t'], 'm').render(prec=3),
-            rbc['sig_pt']
+        title=("ε_n,t = {}\n" "σ_ct = {}\n" "σ_pt = {:.3g}").format(
+            Quantity(rbc["emittance_t"], "m").render(prec=3),
+            Quantity(rbc["sig_t"], "m").render(prec=3),
+            rbc["sig_pt"],
         ),
         loc="upper right",
         framealpha=0.8,
-        handles=[]
+        handles=[],
     )
     leg._legend_box.sep = 0
 

@@ -1,5 +1,5 @@
 from trame.app import get_server
-from trame.widgets  import vuetify
+from trame.widgets import vuetify
 
 # -----------------------------------------------------------------------------
 # Trame setup
@@ -12,8 +12,9 @@ state, ctrl = server.state, server.controller
 # Helpful
 # -----------------------------------------------------------------------------
 
+
 class Optimize:
-    
+
     def card():
         with vuetify.VCard(style="width: 680px; height: 300px"):
             with vuetify.VCardTitle("Optimizer Settings"):

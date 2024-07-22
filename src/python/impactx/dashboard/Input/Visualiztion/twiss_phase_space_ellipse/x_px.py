@@ -1,14 +1,17 @@
 import warnings
 
 # Ignore mpld3 warning
-warnings.filterwarnings("ignore", message="Blended transforms not yet supported. Zoom behavior may not work as expected.", category=UserWarning, module="mpld3.mplexporter.exporter")
-
-from trame.app import get_server
-from trame.ui.vuetify import SinglePageWithDrawerLayout
-from trame.widgets import vuetify, matplotlib
+warnings.filterwarnings(
+    "ignore",
+    message="Blended transforms not yet supported. Zoom behavior may not work as expected.",
+    category=UserWarning,
+    module="mpld3.mplexporter.exporter",
+)
 
 import matplotlib.pyplot as plt
 import numpy as np
+from trame.app import get_server
+from trame.widgets import matplotlib, vuetify
 
 # -----------------------------------------------------------------------------
 # Trame setup
@@ -32,25 +35,32 @@ state.alpha_t = 1
 state.beta_t = 1
 state.epsilon_t = 1
 
+
 # Update plots on parameter change
 @state.change("alpha_x", "beta_x", "epsilon_x")
 def on_params_change_x(**kwargs):
     visualizeTwiss.update_plot_x()
 
+
 @state.change("alpha_y", "beta_y", "epsilon_y")
 def on_params_change_y(**kwargs):
     visualizeTwiss.update_plot_y()
+
 
 @state.change("alpha_t", "beta_t", "epsilon_t")
 def on_params_change_t(**kwargs):
     visualizeTwiss.update_plot_t()
 
+
 # -----------------------------------------------------------------------------
 # Functions
 # -----------------------------------------------------------------------------
 
+
 class visualizeTwiss:
-    def draw_phase_space_ellipse(alpha, beta, epsilon, title, xlabel, ylabel, n_points=100):
+    def draw_phase_space_ellipse(
+        alpha, beta, epsilon, title, xlabel, ylabel, n_points=100
+    ):
         """
         Draw a phase space ellipse using Twiss parameters and beam emittance.
 
@@ -90,24 +100,26 @@ class visualizeTwiss:
         p = q0 * np.sin(theta) + p0 * np.cos(theta)
 
         # Create the plot with a smaller size
-        fig, ax = plt.subplots(figsize=(3.25, 2.25)) 
-        
-        ax.plot(q, p, label=f'ε={epsilon}, α={alpha}, β={beta}', linestyle='-', marker='o')
+        fig, ax = plt.subplots(figsize=(3.25, 2.25))
+
+        ax.plot(
+            q, p, label=f"ε={epsilon}, α={alpha}, β={beta}", linestyle="-", marker="o"
+        )
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-        legend = ax.legend(loc='upper right')
-        legend.get_frame().set_facecolor('lightgray') 
+        legend = ax.legend(loc="upper right")
+        legend.get_frame().set_facecolor("lightgray")
         legend.get_frame().set_alpha(0.8)
-        legend.get_frame().set_edgecolor('black')
+        legend.get_frame().set_edgecolor("black")
         legend.get_frame().set_linewidth(1.5)
         ax.grid(True)
-        ax.axis('equal')
+        ax.axis("equal")
 
         # Fix axis limits
         # ax.set_xlim([-10, 10])
         # ax.set_ylim([-10, 10])
 
-        fig.subplots_adjust(left=0.2, bottom=0.2, right=.97, top=.95)
+        fig.subplots_adjust(left=0.2, bottom=0.2, right=0.97, top=0.95)
 
         return fig
 
@@ -115,7 +127,14 @@ class visualizeTwiss:
         alpha = state.alpha_x
         beta = state.beta_x
         epsilon = state.epsilon_x
-        fig = visualizeTwiss.draw_phase_space_ellipse(alpha, beta, epsilon, title='Phase Space Ellipse (x-px)', xlabel='x', ylabel='p_x')
+        fig = visualizeTwiss.draw_phase_space_ellipse(
+            alpha,
+            beta,
+            epsilon,
+            title="Phase Space Ellipse (x-px)",
+            xlabel="x",
+            ylabel="p_x",
+        )
         ctrl.matplotlib_figure_update_x(fig)
         plt.close(fig)
 
@@ -123,7 +142,14 @@ class visualizeTwiss:
         alpha = state.alpha_y
         beta = state.beta_y
         epsilon = state.epsilon_y
-        fig = visualizeTwiss.draw_phase_space_ellipse(alpha, beta, epsilon, title='Phase Space Ellipse (y-py)', xlabel='y', ylabel='p_y')
+        fig = visualizeTwiss.draw_phase_space_ellipse(
+            alpha,
+            beta,
+            epsilon,
+            title="Phase Space Ellipse (y-py)",
+            xlabel="y",
+            ylabel="p_y",
+        )
         ctrl.matplotlib_figure_update_y(fig)
         plt.close(fig)
 
@@ -131,7 +157,14 @@ class visualizeTwiss:
         alpha = state.alpha_t
         beta = state.beta_t
         epsilon = state.epsilon_t
-        fig = visualizeTwiss.draw_phase_space_ellipse(alpha, beta, epsilon, title='Phase Space Ellipse (t-pt)', xlabel='t', ylabel='p_t')
+        fig = visualizeTwiss.draw_phase_space_ellipse(
+            alpha,
+            beta,
+            epsilon,
+            title="Phase Space Ellipse (t-pt)",
+            xlabel="t",
+            ylabel="p_t",
+        )
         ctrl.matplotlib_figure_update_t(fig)
         plt.close(fig)
 
@@ -140,7 +173,11 @@ class visualizeTwiss:
             with vuetify.VCardText():
                 with vuetify.VRow(classes="pl-1"):
                     vuetify.VIcon("mdi-chart-arc")
-                    vuetify.VCardTitle("Phase Space Ellipse (x-px)", classes="text-subtitle-2", style="color: black;")
+                    vuetify.VCardTitle(
+                        "Phase Space Ellipse (x-px)",
+                        classes="text-subtitle-2",
+                        style="color: black;",
+                    )
             vuetify.VDivider()
             matplotlib_figure = matplotlib.Figure()
             ctrl.matplotlib_figure_update_x = matplotlib_figure.update
@@ -150,7 +187,11 @@ class visualizeTwiss:
             with vuetify.VCardText():
                 with vuetify.VRow(classes="pl-1"):
                     vuetify.VIcon("mdi-chart-arc")
-                    vuetify.VCardTitle("Phase Space Ellipse (y-py)", classes="text-subtitle-2", style="color: black;")
+                    vuetify.VCardTitle(
+                        "Phase Space Ellipse (y-py)",
+                        classes="text-subtitle-2",
+                        style="color: black;",
+                    )
             vuetify.VDivider()
             matplotlib_figure = matplotlib.Figure()
             ctrl.matplotlib_figure_update_y = matplotlib_figure.update
@@ -160,10 +201,15 @@ class visualizeTwiss:
             with vuetify.VCardText():
                 with vuetify.VRow(classes="pl-1"):
                     vuetify.VIcon("mdi-chart-arc")
-                    vuetify.VCardTitle("Phase Space Ellipse (t-pt)", classes="text-subtitle-2", style="color: black;")
+                    vuetify.VCardTitle(
+                        "Phase Space Ellipse (t-pt)",
+                        classes="text-subtitle-2",
+                        style="color: black;",
+                    )
             vuetify.VDivider()
             matplotlib_figure = matplotlib.Figure()
             ctrl.matplotlib_figure_update_t = matplotlib_figure.update
+
 
 # -----------------------------------------------------------------------------
 # Layout
@@ -180,4 +226,3 @@ class visualizeTwiss:
 #                     visualizeTwiss.card_y()
 #                 with vuetify.VCol(cols=4):
 #                     visualizeTwiss.card_t()
-

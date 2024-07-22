@@ -1,9 +1,8 @@
-
+from Input.trameFunctions import trameFunctions
+from Toolbar.exportTemplate import retrieve_state_content
 from trame.app import get_server
 from trame.widgets import vuetify
-from Toolbar.exportTemplate import retrieve_state_content
 
-from Input.trameFunctions import trameFunctions
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
@@ -19,9 +18,11 @@ state.selectedVisualization = None
 # Trigger
 # -----------------------------------------------------------------------------
 
+
 @ctrl.trigger("export")
 def on_export_click():
     return retrieve_state_content()
+
 
 @state.change("selectedWorkflow")
 def on_selectedWorkflow_change(selectedWorkflow, **kwargs):
@@ -29,25 +30,27 @@ def on_selectedWorkflow_change(selectedWorkflow, **kwargs):
     if selectedWorkflow == None:
         state.isSelectedWorkflow = "Please select a workflow"
 
+
 # -----------------------------------------------------------------------------
 # Common toolbar elements
 # -----------------------------------------------------------------------------
 
+
 class toolbarElements:
-    
+
     def select_workflow():
         vuetify.VCombobox(
-        placeholder="Select Workflow",
-        v_model=("selectedWorkflow",),
-        items=(["DataFrameTest", "Optimize Triplet"],),
-        clearable=True,
-        error_messages=("isSelectedWorkflow",),
-        dense=True,
-        hide_details=True,
-        style="max-width: 175px",
-        classes="mr-2",
-    )
-    
+            placeholder="Select Workflow",
+            v_model=("selectedWorkflow",),
+            items=(["DataFrameTest", "Optimize Triplet"],),
+            clearable=True,
+            error_messages=("isSelectedWorkflow",),
+            dense=True,
+            hide_details=True,
+            style="max-width: 175px",
+            classes="mr-2",
+        )
+
     def select_visualization():
         vuetify.VCombobox(
             placeholder="Select Visualization",
@@ -67,7 +70,7 @@ class toolbarElements:
             hide_details=True,
             dense=True,
             style="max-width: 250px",
-            disabled=("disableRunSimulationButton",True),
+            disabled=("disableRunSimulationButton", True),
         )
 
     def run_simulation_button():
@@ -75,15 +78,15 @@ class toolbarElements:
             "Run Simulation",
             style="background-color: #00313C; color: white; margin: 0 20px;",
             click=ctrl.run_simulation,
-            disabled=("disableRunSimulationButton",True),
+            disabled=("disableRunSimulationButton", True),
         )
-    
+
     def export_input_data():
         vuetify.VIcon(
             "mdi-download",
             style="color: #00313C; margin: 0 10px;",
             click="utils.download('input.in', trigger('export'), 'text/plain')",
-            disabled=("disableRunSimulationButton",True),
+            disabled=("disableRunSimulationButton", True),
         )
 
     def switch_theme():
@@ -94,7 +97,7 @@ class toolbarElements:
 
     def file_upload():
         vuetify.VFileInput(
-            #Allows users to upload file, but nothing more than that.
+            # Allows users to upload file, but nothing more than that.
             label="Upload Input File",
             clearable=True,
             chips=True,
@@ -106,7 +109,7 @@ class toolbarElements:
 
     def kill_button():
         return trameFunctions.create_button("Kill")
-            
+
     def stop_button():
         return trameFunctions.create_button("Stop")
 
@@ -118,15 +121,15 @@ class toolbarElements:
             label="2D",
             hide_details=True,
         )
+
     def checkbox_3d():
-        vuetify.VCheckbox(
-            label="3D", 
-            classes="px-2",
-            hide_details=True)
-    
+        vuetify.VCheckbox(label="3D", classes="px-2", hide_details=True)
+
+
 # -----------------------------------------------------------------------------
 # Content
 # -----------------------------------------------------------------------------
+
 
 class toolbars:
 
@@ -140,7 +143,7 @@ class toolbars:
         toolbarElements.run_simulation_button(),
         toolbarElements.export_input_data(),
         toolbarElements.switch_theme(),
-    
+
     def analyzeToolbar():
         vuetify.VSpacer()
         toolbarElements.checkbox_2d()
@@ -150,7 +153,7 @@ class toolbars:
         toolbarElements.run_simulation_button()
         toolbarElements.export_input_data()
         toolbarElements.switch_theme()
-        
+
     def latticeToolbar():
         toolbarElements.file_upload()
         vuetify.VSpacer()

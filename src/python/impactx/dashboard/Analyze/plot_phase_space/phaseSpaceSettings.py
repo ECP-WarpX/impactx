@@ -18,7 +18,6 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
     """
     import matplotlib.pyplot as plt
     import numpy as np
-    from quantiphy import Quantity
     from scipy.stats import gaussian_kde
 
     # Beam Characteristics
@@ -48,23 +47,35 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
         def scatter_density_plot(ax, x, y, xlabel, ylabel, title):
             xy = np.vstack([x, y])
             z = gaussian_kde(xy)(xy)
-            scatter = ax.scatter(x, y, c=z, cmap='viridis', alpha=0.5)
+            scatter = ax.scatter(x, y, c=z, cmap="viridis", alpha=0.5)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             ax.set_title(title)
             return scatter
 
         scatter_xpx = scatter_density_plot(
-            ax_xpx, df["position_x"], df["momentum_x"],
-            "Δ x [mm]", "Δ p_x [mrad]", "Longitudinal Phase Space"
+            ax_xpx,
+            df["position_x"],
+            df["momentum_x"],
+            "Δ x [mm]",
+            "Δ p_x [mrad]",
+            "Longitudinal Phase Space",
         )
         scatter_ypy = scatter_density_plot(
-            ax_ypy, df["position_y"], df["momentum_y"],
-            "Δ y [mm]", "Δ p_y [mrad]", "Transverse Phase Space (y)"
+            ax_ypy,
+            df["position_y"],
+            df["momentum_y"],
+            "Δ y [mm]",
+            "Δ p_y [mrad]",
+            "Transverse Phase Space (y)",
         )
         scatter_tpt = scatter_density_plot(
-            ax_tpt, df["position_t"], df["momentum_t"],
-            "Δ ct [mm]", "Δ p_t [p_0 · c]", "Transverse Phase Space (t)"
+            ax_tpt,
+            df["position_t"],
+            df["momentum_t"],
+            "Δ ct [mm]",
+            "Δ p_t [p_0 · c]",
+            "Transverse Phase Space (t)",
         )
 
         fig.colorbar(scatter_xpx, ax=ax_xpx, label="Particle Density")
@@ -72,9 +83,27 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
         fig.colorbar(scatter_tpt, ax=ax_tpt, label="Particle Density")
 
     else:
-        ax_xpx.text(0.5, 0.5, 'No data available', horizontalalignment='center', verticalalignment='center')
-        ax_ypy.text(0.5, 0.5, 'No data available', horizontalalignment='center', verticalalignment='center')
-        ax_tpt.text(0.5, 0.5, 'No data available', horizontalalignment='center', verticalalignment='center')
+        ax_xpx.text(
+            0.5,
+            0.5,
+            "No data available",
+            horizontalalignment="center",
+            verticalalignment="center",
+        )
+        ax_ypy.text(
+            0.5,
+            0.5,
+            "No data available",
+            horizontalalignment="center",
+            verticalalignment="center",
+        )
+        ax_tpt.text(
+            0.5,
+            0.5,
+            "No data available",
+            horizontalalignment="center",
+            verticalalignment="center",
+        )
 
     # Annotations
     fig.canvas.manager.set_window_title("Phase Space")

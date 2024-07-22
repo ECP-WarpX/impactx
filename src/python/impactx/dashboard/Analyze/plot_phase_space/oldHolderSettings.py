@@ -1,5 +1,6 @@
 ### Only the single plot shows deltaX_delxaP_X
 
+
 def adjusted_settings_plot(pc, num_bins=50, root_rank=0):
     import matplotlib.pyplot as plt
     import numpy as np
@@ -26,7 +27,7 @@ def adjusted_settings_plot(pc, num_bins=50, root_rank=0):
 
     # Simple scatter plot of position_x and momentum_x with density coloring
     fig, ax = plt.subplots(figsize=(8, 4), constrained_layout=True)
-    scatter = ax.scatter(df.position_x, df.momentum_x, c=z, cmap='viridis', alpha=0.5)
+    scatter = ax.scatter(df.position_x, df.momentum_x, c=z, cmap="viridis", alpha=0.5)
     ax.set_xlabel("Delta x [mm]")
     ax.set_ylabel("Delta p_x [mrad]")
 
