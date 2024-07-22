@@ -179,7 +179,7 @@ class latticeConfiguration:
         with vuetify.VDialog(v_model=("showDialog", False), width="1200px"):
             latticeConfiguration.dialog_lattice_elementList()
         
-        with vuetify.VDialog(v_model=("showDialog_settings", False), width="300px"):
+        with vuetify.VDialog(v_model=("showDialog_settings", False), width="500px"):
             latticeConfiguration.dialog_lattice_settings()
             
         with vuetify.VCard(style="width: 696px;"):
@@ -296,24 +296,55 @@ class latticeConfiguration:
 
     def dialog_lattice_settings():
         with vuetify.VCard():
-            with vuetify.VCardTitle("Settings", classes="text-subtitle-2 pa-3"):
-                vuetify.VSpacer()
+            with vuetify.VTabs(
+                v_model=("tab","Settings")
+            ):
+                vuetify.VTab("Settings")
+                vuetify.VTab("Variable Referencing")
             vuetify.VDivider()
-            with vuetify.VContainer(fluid=True):
-                with vuetify.VRow(no_gutters=True, align="center"):
-                    with vuetify.VCol(no_gutters=True, cols="auto"):
-                        vuetify.VListItem(
-                            "nslice",
-                            classes="ma-0 pl-0 font-weight-bold"
-                        )
-                    with vuetify.VCol(no_gutters=True):
-                        vuetify.VTextField(
-                            v_model=("nsliceDefaultValue",),
-                            change=(ctrl.nsliceDefaultChange, "['nslice', $event]"),
-                            placeholder="Value",
-                            dense=True,
-                            outlined=True,
-                            hide_details=True,
-                            style="max-width: 75px",
-                            classes="ma-0 pa-0"
-                        )
+            with vuetify.VTabsItems(v_model="tab"):
+                with vuetify.VTabItem():
+                    with vuetify.VContainer(fluid=True):
+                        with vuetify.VRow(no_gutters=True, align="center"):
+                            with vuetify.VCol(no_gutters=True, cols="auto"):
+                                vuetify.VListItem(
+                                    "nslice",
+                                    classes="ma-0 pl-0 font-weight-bold"
+                                )
+                            with vuetify.VCol(no_gutters=True):
+                                vuetify.VTextField(
+                                    v_model=("nsliceDefaultValue",),
+                                    change=(ctrl.nsliceDefaultChange, "['nslice', $event]"),
+                                    placeholder="Value",
+                                    dense=True,
+                                    outlined=True,
+                                    hide_details=True,
+                                    style="max-width: 75px",
+                                    classes="ma-0 pa-0"
+                                )
+                with vuetify.VTabItem():
+                    with vuetify.VContainer(fluid=True, style="background-color: #f5f5f5; padding: 16px; border-radius: 8px;"):
+                        with vuetify.VRow():
+                            with vuetify.VCol(cols="3"):
+                                vuetify.VTextField(
+                                    label="Variables",
+                                    style="max-width: 100px; font-family: 'Courier New', monospace;",
+                                )
+                            with vuetify.VCol(cols="1"):
+                                vuetify.VInput(
+                                    "=",
+                                    style="max-width: 40px; font-family: 'Courier New', monospace; text-align: center; margin-top: 25px;"
+                                )
+                            with vuetify.VCol(cols="7"):
+                                vuetify.VTextField(
+                                    label="Formula",
+                                    style="max-width: 300px; font-family: 'Courier New', monospace;",
+                                )
+                            with vuetify.VCol(cols="1"):
+                                vuetify.VIcon(
+                                    "mdi-plus",
+                                    hide_details=True,
+                                    classes="ma-0"
+                                )
+
+
