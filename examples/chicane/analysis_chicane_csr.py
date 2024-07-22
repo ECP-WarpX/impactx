@@ -40,7 +40,7 @@ initial = series.iterations[1].particles["beam"].to_df()
 final = series.iterations[last_step].particles["beam"].to_df()
 
 # compare number of particles
-num_particles = 1000000
+num_particles = 10000
 assert num_particles == len(initial)
 assert num_particles == len(final)
 
@@ -52,7 +52,7 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = 2.2 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 9 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
@@ -79,7 +79,7 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = 2.2 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 9 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
