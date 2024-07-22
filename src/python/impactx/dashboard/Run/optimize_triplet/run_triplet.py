@@ -6,10 +6,20 @@ from trame.app import get_server
 server = get_server(client_type="vue2")
 state, ctrl = server.state, server.controller
 
+import numpy as np
+
 # -----------------------------------------------------------------------------
 # Trame Code
 # -----------------------------------------------------------------------------
-from Analyze.analyzeFunctions import analyzeFunctions # to load in distribution and lattice inputs
+from Analyze.analyzeFunctions import (
+    analyzeFunctions,  # to load in distribution and lattice inputs
+)
+from scipy.optimize import minimize
+
+import amrex.space3d as amr
+import impactx
+from impactx import ImpactX, elements
+
 ### state.npart
 ### state.particle_shape - yet to be added
 ### state.space_charge - yet to be added
@@ -31,12 +41,6 @@ from Analyze.analyzeFunctions import analyzeFunctions # to load in distribution 
 #
 # -*- coding: utf-8 -*-
 
-import numpy as np
-from scipy.optimize import minimize
-
-import amrex.space3d as amr
-import impactx
-from impactx import ImpactX, distribution, elements
 
 # Call MPI_Init and MPI_Finalize only once:
 if impactx.Config.have_mpi:
@@ -141,8 +145,8 @@ def run(parameters: tuple, write_particles=False, write_reduced=False) -> dict:
     #     lambdaPy=1.1180339887e-5,
     #     lambdaPt=3.1622776602e-5,
     #     muxpx=0.894427190999916,
-        # muypy=-0.894427190999916,
-        # mutpt=0.0,
+    # muypy=-0.894427190999916,
+    # mutpt=0.0,
     # )
     distr = analyzeFunctions.read_distribution_file()
     sim.add_particles(bunch_charge_C, distr, npart)
@@ -204,6 +208,7 @@ def objective(parameters: tuple) -> float:
 
 
 # if __name__ == "__main__":
+
 
 def run_optimize_triplet():
     # Initial guess for the quadrople strengths

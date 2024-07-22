@@ -11,19 +11,14 @@ from trame.app import get_server
 
 server = get_server(client_type="vue2")
 state, ctrl = server.state, server.controller
-from Analyze.plot_phase_space.phaseSpaceSettings import adjusted_settings_plot
-from Analyze.analyzeFunctions import analyzeFunctions
-
 import importlib
 
-import matplotlib.pyplot as plt
 import pytest
+from Analyze.analyzeFunctions import analyzeFunctions
+from Analyze.plot_phase_space.phaseSpaceSettings import adjusted_settings_plot
 
-from impactx import ImpactX, amr, distribution, elements
+from impactx import ImpactX
 
-from mpi4py import MPI
-
-import os
 
 @pytest.mark.skipif(
     importlib.util.find_spec("pandas") is None, reason="pandas is not available"

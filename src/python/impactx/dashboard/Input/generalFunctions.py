@@ -1,13 +1,11 @@
-
-import webbrowser
-import subprocess
-import os
-
 import inspect
+import os
 import re
+import subprocess
+import webbrowser
 
 from trame.app import get_server
-from impactx import distribution, elements
+
 
 # -----------------------------------------------------------------------------
 # Server setup
@@ -22,8 +20,9 @@ state, ctrl = server.state, server.controller
 ANSI_RED = "\033[91m"
 ANSI_RESET = "\033[0m"
 
+
 class generalFunctions:
-    
+
     def documentation(section_name):
         """
         Function that opens tab to section_name link
@@ -36,18 +35,18 @@ class generalFunctions:
             url = "https://impactx.readthedocs.io/en/latest/usage/python.html#general"
         else:
             raise ValueError(f"Invalid section name: {section_name}")
-        
-        if 'WSL_DISTRO_NAME' in os.environ:
-            subprocess.run(['explorer.exe', url])
+
+        if "WSL_DISTRO_NAME" in os.environ:
+            subprocess.run(["explorer.exe", url])
         else:
             webbrowser.open_new_tab(url)
 
-# -----------------------------------------------------------------------------
-# Validation functions
-# -----------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
+    # Validation functions
+    # -----------------------------------------------------------------------------
 
     def determine_input_type(value):
-        """"
+        """ "
         Used to help find out the value type
         """
         try:
@@ -57,7 +56,7 @@ class generalFunctions:
                 return float(value), float
             except ValueError:
                 return value, str
-        
+
     def validate_against(input_value, value_type):
         """
         Function which returns error message if
@@ -93,7 +92,7 @@ class generalFunctions:
 
         else:
             return ["Unknown type"]
-        
+
     def update_runSimulation_validation_checking():
         """
         Function to check if any input fields are not
@@ -105,13 +104,17 @@ class generalFunctions:
         # Check for errors in distribution parameters
         for param in state.selectedDistributionParameters:
             if param["parameter_error_message"]:
-                error_details.append(f"{param['parameter_name']}: {param['parameter_error_message']}")
+                error_details.append(
+                    f"{param['parameter_name']}: {param['parameter_error_message']}"
+                )
 
         # Check for errors in lattice parameters
         for lattice in state.selectedLatticeList:
-            for param in lattice['parameters']:
-                if param['parameter_error_message']:
-                    error_details.append(f"Lattice {lattice['name']} - {param['parameter_name']}: {param['parameter_error_message']}")
+            for param in lattice["parameters"]:
+                if param["parameter_error_message"]:
+                    error_details.append(
+                        f"Lattice {lattice['name']} - {param['parameter_name']}: {param['parameter_error_message']}"
+                    )
 
         # Check for errors in input card
         if state.npart_validation:
@@ -131,9 +134,9 @@ class generalFunctions:
 
         state.disableRunSimulationButton = bool(error_details)
 
-# -----------------------------------------------------------------------------
-# Class, parameter, default value, and default type retrievals
-# -----------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
+    # Class, parameter, default value, and default type retrievals
+    # -----------------------------------------------------------------------------
 
     def findAllClasses(module_name):
         """
@@ -146,14 +149,13 @@ class generalFunctions:
                 results.append((name, attr))
         return results
 
-
     def findInitDocstringForClasses(classes):
         """
         Retrieves the __init__ docstring of given classes
         """
         docstrings = {}
         for name, cls in classes:
-            init_method = getattr(cls, '__init__', None)
+            init_method = getattr(cls, "__init__", None)
             if init_method:
                 docstring = cls.__init__.__doc__
                 docstrings[name] = docstring
@@ -165,26 +167,28 @@ class generalFunctions:
         Aimed to retrieve parameter names/values/types.
         """
         parameters = []
-        docstring = re.search(r'\((.*?)\)', docstring).group(1)  # Return class name and init signature
-        docstring = docstring.split(',')
+        docstring = re.search(r"\((.*?)\)", docstring).group(
+            1
+        )  # Return class name and init signature
+        docstring = docstring.split(",")
 
         for parameter in docstring:
-            if parameter.startswith('self'):
+            if parameter.startswith("self"):
                 continue
-            
+
             name = parameter
             default = None
-            parameter_type = 'Any' 
+            parameter_type = "Any"
 
-            if ':' in parameter:
-                split_by_semicolon = parameter.split(':', 1)
+            if ":" in parameter:
+                split_by_semicolon = parameter.split(":", 1)
                 name = split_by_semicolon[0].strip()
                 type_and_default = split_by_semicolon[1].strip()
-                if '=' in type_and_default:
-                    split_by_equals = type_and_default.split('=', 1)
+                if "=" in type_and_default:
+                    split_by_equals = type_and_default.split("=", 1)
                     parameter_type = split_by_equals[0].strip()
                     default = split_by_equals[1].strip()
-                    if (default.startswith("'") and default.endswith("'")):
+                    if default.startswith("'") and default.endswith("'"):
                         default = default[1:-1]
                 else:
                     parameter_type = type_and_default
@@ -192,7 +196,7 @@ class generalFunctions:
             parameters.append((name, default, parameter_type))
 
         return parameters
-    
+
     def classAndParametersAndDefaultValueAndType(module_name):
         """
         Given module_name, outputs a dictionary.
@@ -200,7 +204,7 @@ class generalFunctions:
         Values are dictionaries of parameter information,
         such as default name/value/type.
         """
-        
+
         classes = generalFunctions.findAllClasses(module_name)
         docstrings = generalFunctions.findInitDocstringForClasses(classes)
 
@@ -217,7 +221,9 @@ class generalFunctions:
         Given module_name, outputs a list
         of all class names in module_name.
         """
-        return list(generalFunctions.classAndParametersAndDefaultValueAndType(module_name))
+        return list(
+            generalFunctions.classAndParametersAndDefaultValueAndType(module_name)
+        )
 
     def convert_to_correct_type(value, desired_type):
         """

@@ -1,20 +1,22 @@
 import pandas as pd
-from impactx import distribution, elements
+
+from impactx import distribution
 
 distribution_parameters_file_path = "output_distribution_parameters.txt"
 latticeElement_parameters_file_path = "output_latticeElements_parameters.txt"
 
+
 class analyzeFunctions:
 
-# -----------------------------------------------------------------------------
-# Functions for Beam Characteristic and Ref particle data table
-# -----------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
+    # Functions for Beam Characteristic and Ref particle data table
+    # -----------------------------------------------------------------------------
 
     def load_data(file_path):
         """
         Function to read provided file_path
         """
-        df = pd.read_csv(file_path, sep=' ')
+        df = pd.read_csv(file_path, sep=" ")
         return df
 
     def convert_to_dict(combined_data):
@@ -22,9 +24,11 @@ class analyzeFunctions:
         Function to convert data into dictionary format.
         Used to have correct dataType in Vuetify data table.
         """
-        dictionary = combined_data.to_dict(orient='records')
+        dictionary = combined_data.to_dict(orient="records")
         columns = combined_data.columns
-        headers = [{"text": column.strip(), "value": column.strip()} for column in columns]
+        headers = [
+            {"text": column.strip(), "value": column.strip()} for column in columns
+        ]
         return dictionary, headers
 
     def combine_files(file1_name, file2_name):
@@ -33,7 +37,7 @@ class analyzeFunctions:
         """
         file1 = analyzeFunctions.load_data(file1_name)
         file2 = analyzeFunctions.load_data(file2_name)
-        return pd.merge(file1, file2, how='outer')
+        return pd.merge(file1, file2, how="outer")
 
     def filter_headers(allHeaders, selected_headers):
         """
@@ -42,7 +46,7 @@ class analyzeFunctions:
         """
         filtered_headers = []
         for selectedHeader in allHeaders:
-            if selectedHeader['value'] in selected_headers:
+            if selectedHeader["value"] in selected_headers:
                 filtered_headers.append(selectedHeader)
         return filtered_headers
 
@@ -59,10 +63,10 @@ class analyzeFunctions:
                     filtered_row[key] = value
             filtered_data.append(filtered_row)
         return filtered_data
-    
-# -----------------------------------------------------------------------------
-# Helper functions to read lattice elements and distribution parameter list
-# -----------------------------------------------------------------------------
+
+    # -----------------------------------------------------------------------------
+    # Helper functions to read lattice elements and distribution parameter list
+    # -----------------------------------------------------------------------------
 
     def read_latticeElements_file():
         """
@@ -86,12 +90,9 @@ class analyzeFunctions:
         Reads distribution file path line by line.
         """
         file_path = distribution_parameters_file_path
-        safe_env = {
-            "distribution": distribution,
-            "distr": None
-        }
+        safe_env = {"distribution": distribution, "distr": None}
 
         with open(file_path, "r") as file:
             exec(file.read(), safe_env)
-        
+
         return safe_env["distr"]
