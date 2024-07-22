@@ -10,7 +10,6 @@ jobs:
   build_win_msvc:
     name: MSVC w/o MPI shared
     runs-on: windows-latest
-    if: github.event.pull_request.draft == false
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
@@ -81,15 +80,16 @@ jobs:
         if(!$?) { Exit $LASTEXITCODE }
         cmake --build build --config RelWithDebInfo --parallel 4
         if(!$?) { Exit $LASTEXITCODE }
-    - name: Test
-      run: |
-        ctest --test-dir build --build-config RelWithDebInfo --output-on-failure -E AMReX
-        if(!$?) { Exit $LASTEXITCODE }
     - name: Install
       run: |
         cmake --build build --config RelWithDebInfo --target install
         if(!$?) { Exit $LASTEXITCODE }
         cmake --build build --config RelWithDebInfo --target pip_install
+        if(!$?) { Exit $LASTEXITCODE }
+    - name: Test
+      run: |
+        $env:PATH += ";D:\a\impactx\impactx\build\bin\RelWithDebInfo\"
+        python3 -m pytest -s -vvv tests/python/
         if(!$?) { Exit $LASTEXITCODE }
     - name: validate created openPMD files
       run: Get-ChildItem -Path build -Recurse -Filter *.h5 | %{openPMD_check_h5 -i $_}
