@@ -1,0 +1,88 @@
+twiss_parameters = {
+    'Empty': [],
+    'Waterbag': [
+        ('alphaX', '0', 'float'),
+        ('alphaY', '0', 'float'),
+        ('alphaT', '0', 'float'),
+        ('betaX', None, 'float'),
+        ('betaY', None, 'float'),
+        ('betaT', None, 'float'),
+        ('emittX', None, 'float'),
+        ('emittY', None, 'float'),
+        ('emittT', None, 'float')
+    ],
+    'Kurth6D': [
+        ('alphaX', '0', 'float'),
+        ('alphaY', '0', 'float'),
+        ('alphaT', '0', 'float'),
+        ('betaX', None, 'float'),
+        ('betaY', None, 'float'),
+        ('betaT', None, 'float'),
+        ('emittX', None, 'float'),
+        ('emittY', None, 'float'),
+        ('emittT', None, 'float')
+    ],
+    'Gaussian': [
+        ('alphaX', '0', 'float'),
+        ('alphaY', '0', 'float'),
+        ('alphaT', '0', 'float'),
+        ('betaX', None, 'float'),
+        ('betaY', None, 'float'),
+        ('betaT', None, 'float'),
+        ('emittX', None, 'float'),
+        ('emittY', None, 'float'),
+        ('emittT', None, 'float')
+    ],
+    'KVdist': [
+        ('alphaX', '0', 'float'),
+        ('alphaY', '0', 'float'),
+        ('alphaT', '0', 'float'),
+        ('betaX', None, 'float'),
+        ('betaY', None, 'float'),
+        ('betaT', None, 'float'),
+        ('emittX', None, 'float'),
+        ('emittY', None, 'float'),
+        ('emittT', None, 'float')
+    ],
+    'Kurth4D': [
+        ('alphaX', '0', 'float'),
+        ('alphaY', '0', 'float'),
+        ('alphaT', '0', 'float'),
+        ('betaX', None, 'float'),
+        ('betaY', None, 'float'),
+        ('betaT', None, 'float'),
+        ('emittX', None, 'float'),
+        ('emittY', None, 'float'),
+        ('emittT', None, 'float')
+    ],
+    'Semigaussian': [
+        ('alphaX', '0', 'float'),
+        ('alphaY', '0', 'float'),
+        ('alphaT', '0', 'float'),
+        ('betaX', None, 'float'),
+        ('betaY', None, 'float'),
+        ('betaT', None, 'float'),
+        ('emittX', None, 'float'),
+        ('emittY', None, 'float'),
+        ('emittT', None, 'float')
+    ],
+    'Triangle': [
+        ('alphaX', '0', 'float'),
+        ('alphaY', '0', 'float'),
+        ('alphaT', '0', 'float'),
+        ('betaX', None, 'float'),
+        ('betaY', None, 'float'),
+        ('betaT', None, 'float'),
+        ('emittX', None, 'float'),
+        ('emittY', None, 'float'),
+        ('emittT', None, 'float')
+    ],
+    'Thermal': [
+        ('k', None, 'float'),
+        ('kT', None, 'float'),
+        ('kT_halo', None, 'float'),
+        ('normalize', None, 'float'),
+        ('normalize_halo', None, 'float'),
+        ('halo', '0.0', 'float')
+    ],
+}
