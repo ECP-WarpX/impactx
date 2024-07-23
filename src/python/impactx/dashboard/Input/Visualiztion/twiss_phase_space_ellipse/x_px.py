@@ -58,6 +58,8 @@ def on_params_change_t(**kwargs):
 
 
 class visualizeTwiss:
+
+    @staticmethod
     def draw_phase_space_ellipse(
         alpha, beta, epsilon, title, xlabel, ylabel, n_points=100
     ):
@@ -123,6 +125,7 @@ class visualizeTwiss:
 
         return fig
 
+    @staticmethod
     def update_plot_x(**kwargs):
         alpha = state.alpha_x
         beta = state.beta_x
@@ -138,6 +141,7 @@ class visualizeTwiss:
         ctrl.matplotlib_figure_update_x(fig)
         plt.close(fig)
 
+    @staticmethod
     def update_plot_y(**kwargs):
         alpha = state.alpha_y
         beta = state.beta_y
@@ -153,6 +157,7 @@ class visualizeTwiss:
         ctrl.matplotlib_figure_update_y(fig)
         plt.close(fig)
 
+    @staticmethod
     def update_plot_t(**kwargs):
         alpha = state.alpha_t
         beta = state.beta_t
@@ -168,6 +173,7 @@ class visualizeTwiss:
         ctrl.matplotlib_figure_update_t(fig)
         plt.close(fig)
 
+    @staticmethod
     def card_x():
         with vuetify.VCard(style="width: 340px; height: 300px"):
             with vuetify.VCardText():
@@ -182,6 +188,7 @@ class visualizeTwiss:
             matplotlib_figure = matplotlib.Figure()
             ctrl.matplotlib_figure_update_x = matplotlib_figure.update
 
+    @staticmethod
     def card_y():
         with vuetify.VCard(style="width: 340px; height: 300px"):
             with vuetify.VCardText():
@@ -196,6 +203,7 @@ class visualizeTwiss:
             matplotlib_figure = matplotlib.Figure()
             ctrl.matplotlib_figure_update_y = matplotlib_figure.update
 
+    @staticmethod
     def card_t():
         with vuetify.VCard(style="width: 340px; height: 300px"):
             with vuetify.VCardText():
@@ -209,20 +217,3 @@ class visualizeTwiss:
             vuetify.VDivider()
             matplotlib_figure = matplotlib.Figure()
             ctrl.matplotlib_figure_update_t = matplotlib_figure.update
-
-
-# -----------------------------------------------------------------------------
-# Layout
-# -----------------------------------------------------------------------------
-
-# with SinglePageWithDrawerLayout(server) as layout:
-
-#     with layout.content:
-#         with vuetify.VContainer(fluid=True):
-#             with vuetify.VRow():
-#                 with vuetify.VCol(cols=4):
-#                     visualizeTwiss.card_x()
-#                 with vuetify.VCol(cols=4):
-#                     visualizeTwiss.card_y()
-#                 with vuetify.VCol(cols=4):
-#                     visualizeTwiss.card_t()

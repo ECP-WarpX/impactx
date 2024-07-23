@@ -22,6 +22,8 @@ conversion_factors = {
 
 
 class inputFunctions:
+
+    @staticmethod
     def value_of_kin_energy_MeV(kineticEnergyOnDisplayValue, OldUnit):
         state.kin_energy_MeV = (
             kineticEnergyOnDisplayValue
@@ -30,6 +32,7 @@ class inputFunctions:
         )
         return state.kin_energy_MeV
 
+    @staticmethod
     def update_kin_energy_on_display(old_unit, new_unit, kin_energy_value):
         value_in_mev = inputFunctions.value_of_kin_energy_MeV(
             kin_energy_value, old_unit

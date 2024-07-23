@@ -192,7 +192,7 @@ def on_move_latticeElementIndex_up_click(index):
 
 
 @ctrl.add("move_latticeElementIndex_down")
-def on_move_latticeElementIndex_up_click(index):
+def on_move_latticeElementIndex_down_click(index):
     if index < len(state.selectedLatticeList) - 1:
         state.selectedLatticeList[index], state.selectedLatticeList[index + 1] = (
             state.selectedLatticeList[index + 1],
@@ -221,6 +221,7 @@ def update_default_value(parameter_name, new_value):
 
 class latticeConfiguration:
 
+    @staticmethod
     def card():
         with vuetify.VDialog(v_model=("showDialog", False), width="1200px"):
             latticeConfiguration.dialog_lattice_elementList()
@@ -341,6 +342,7 @@ class latticeConfiguration:
                                             style="width: 100px;",
                                         )
 
+    @staticmethod
     def dialog_lattice_elementList():
         with vuetify.VCard():
             with vuetify.VCardTitle("Elements", classes="text-subtitle-2 pa-3"):
@@ -381,6 +383,7 @@ class latticeConfiguration:
                             style="width: 100px;",
                         )
 
+    @staticmethod
     def dialog_lattice_settings():
         with vuetify.VCard():
             with vuetify.VTabs(v_model=("tab", "Settings")):

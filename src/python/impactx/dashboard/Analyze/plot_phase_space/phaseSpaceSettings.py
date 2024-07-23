@@ -21,7 +21,7 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
     from scipy.stats import gaussian_kde
 
     # Beam Characteristics
-    rbc = self.reduced_beam_characteristics()
+    # rbc = self.reduced_beam_characteristics()
 
     # update for plot unit system
     m2mm = 1.0e3
@@ -74,7 +74,7 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
             df["position_t"],
             df["momentum_t"],
             "Δ ct [mm]",
-            "Δ p_t [p_0 · c]",
+            "Delta p_t [p_0 . c]",
             "Transverse Phase Space (t)",
         )
 

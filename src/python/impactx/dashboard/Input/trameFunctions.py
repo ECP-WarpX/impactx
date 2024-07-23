@@ -21,6 +21,7 @@ terminal_button_styles = {
 
 class trameFunctions:
 
+    @staticmethod
     def create_route(route_title, mdi_icon):
         state[route_title] = False  # Does not display route by default
 
@@ -33,6 +34,7 @@ class trameFunctions:
             with vuetify.VListItemContent():
                 vuetify.VListItemTitle(route_title)
 
+    @staticmethod
     def create_section(title, content, expand_section_index):
         with vuetify.VExpansionPanels(v_model=(expand_section_index,), accordion=True):
             with vuetify.VExpansionPanel():
@@ -41,6 +43,7 @@ class trameFunctions:
                 with vuetify.VExpansionPanelContent():
                     vuetify.VCardText(content)
 
+    @staticmethod
     def create_button(label):
         return vuetify.VBtn(
             label,

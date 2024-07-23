@@ -27,7 +27,7 @@ def on_export_click():
 @state.change("selectedWorkflow")
 def on_selectedWorkflow_change(selectedWorkflow, **kwargs):
     # print(f"Selected workflow is {selectedWorkflow}")
-    if selectedWorkflow == None:
+    if selectedWorkflow is None:
         state.isSelectedWorkflow = "Please select a workflow"
 
 
@@ -38,6 +38,7 @@ def on_selectedWorkflow_change(selectedWorkflow, **kwargs):
 
 class toolbarElements:
 
+    @staticmethod
     def select_workflow():
         vuetify.VCombobox(
             placeholder="Select Workflow",
@@ -51,6 +52,7 @@ class toolbarElements:
             classes="mr-2",
         )
 
+    @staticmethod
     def select_visualization():
         vuetify.VCombobox(
             placeholder="Select Visualization",
@@ -62,6 +64,7 @@ class toolbarElements:
             style="max-width: 250px",
         )
 
+    @staticmethod
     def plot_options():
         vuetify.VSelect(
             v_model=("active_plot", "1D plots over s"),
@@ -73,6 +76,7 @@ class toolbarElements:
             disabled=("disableRunSimulationButton", True),
         )
 
+    @staticmethod
     def run_simulation_button():
         vuetify.VBtn(
             "Run Simulation",
@@ -81,6 +85,7 @@ class toolbarElements:
             disabled=("disableRunSimulationButton", True),
         )
 
+    @staticmethod
     def export_input_data():
         vuetify.VIcon(
             "mdi-download",
@@ -89,12 +94,14 @@ class toolbarElements:
             disabled=("disableRunSimulationButton", True),
         )
 
+    @staticmethod
     def switch_theme():
         vuetify.VSwitch(
             v_model="$vuetify.theme.dark",
             hide_details=True,
         )
 
+    @staticmethod
     def file_upload():
         vuetify.VFileInput(
             # Allows users to upload file, but nothing more than that.
@@ -107,21 +114,26 @@ class toolbarElements:
             style="max-width: 175px;",
         )
 
+    @staticmethod
     def kill_button():
         return trameFunctions.create_button("Kill")
 
+    @staticmethod
     def stop_button():
         return trameFunctions.create_button("Stop")
 
+    @staticmethod
     def start_button():
         return trameFunctions.create_button("Start")
 
+    @staticmethod
     def checkbox_2d():
         vuetify.VCheckbox(
             label="2D",
             hide_details=True,
         )
 
+    @staticmethod
     def checkbox_3d():
         vuetify.VCheckbox(label="3D", classes="px-2", hide_details=True)
 
@@ -133,8 +145,8 @@ class toolbarElements:
 
 class toolbars:
 
+    @staticmethod
     def runToolbar():
-
         toolbarElements.stop_button(),
         toolbarElements.start_button(),
         toolbarElements.kill_button(),
@@ -144,6 +156,7 @@ class toolbars:
         toolbarElements.export_input_data(),
         toolbarElements.switch_theme(),
 
+    @staticmethod
     def analyzeToolbar():
         vuetify.VSpacer()
         toolbarElements.checkbox_2d()
@@ -154,6 +167,7 @@ class toolbars:
         toolbarElements.export_input_data()
         toolbarElements.switch_theme()
 
+    @staticmethod
     def latticeToolbar():
         toolbarElements.file_upload()
         vuetify.VSpacer()

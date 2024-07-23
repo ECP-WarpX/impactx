@@ -22,6 +22,7 @@ ANSI_RESET = "\033[0m"
 
 class generalFunctions:
 
+    @staticmethod
     def documentation(section_name):
         """
         Function that opens tab to section_name link
@@ -44,6 +45,7 @@ class generalFunctions:
     # Validation functions
     # -----------------------------------------------------------------------------
 
+    @staticmethod
     def determine_input_type(value):
         """ "
         Used to help find out the value type
@@ -56,6 +58,7 @@ class generalFunctions:
             except ValueError:
                 return value, str
 
+    @staticmethod
     def validate_against(input_value, value_type):
         """
         Function which returns error message if
@@ -92,6 +95,7 @@ class generalFunctions:
         else:
             return ["Unknown type"]
 
+    @staticmethod
     def update_runSimulation_validation_checking():
         """
         Function to check if any input fields are not
@@ -137,6 +141,7 @@ class generalFunctions:
     # Class, parameter, default value, and default type retrievals
     # -----------------------------------------------------------------------------
 
+    @staticmethod
     def findAllClasses(module_name):
         """
         Returns list of all classes in given module_name
@@ -148,6 +153,7 @@ class generalFunctions:
                 results.append((name, attr))
         return results
 
+    @staticmethod
     def findInitDocstringForClasses(classes):
         """
         Retrieves the __init__ docstring of given classes
@@ -160,6 +166,7 @@ class generalFunctions:
                 docstrings[name] = docstring
         return docstrings
 
+    @staticmethod
     def extractParameters(docstring):
         """
         Parses specific information from docstrings.
@@ -196,6 +203,7 @@ class generalFunctions:
 
         return parameters
 
+    @staticmethod
     def classAndParametersAndDefaultValueAndType(module_name):
         """
         Given module_name, outputs a dictionary.
@@ -215,6 +223,7 @@ class generalFunctions:
 
         return result
 
+    @staticmethod
     def selectClasses(module_name):
         """
         Given module_name, outputs a list
@@ -224,6 +233,7 @@ class generalFunctions:
             generalFunctions.classAndParametersAndDefaultValueAndType(module_name)
         )
 
+    @staticmethod
     def convert_to_correct_type(value, desired_type):
         """
         Converts given value to the desired_type.
