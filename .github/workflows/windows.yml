@@ -28,6 +28,19 @@ jobs:
         restore-keys: |
           ccache-windows-winmsvc-${{ hashFiles('.github/workflows/windows.yml') }}-
           ccache-windows-winmsvc-
+    - name: Install Windows SDK
+      run: |
+        $ErrorActionPreference = 'Stop'
+        $installerPath = "$env:TEMP\winsdksetup.exe"
+        Invoke-WebRequest -Uri https://go.microsoft.com/fwlink/?linkid=2120843 -OutFile $installerPath
+        Start-Process -FilePath $installerPath -ArgumentList "/Quiet", "/Features", "+", "/Include", "Debuggers" -NoNewWindow -Wait
+    - name: Verify WinDbg installation
+      run: |
+        if (Test-Path "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\windbg.exe") {
+          Write-Output "WinDbg installed successfully."
+        } else {
+          Write-Error "WinDbg installation failed."
+        }
     - name: Download Dependencies
       run: |
         Invoke-WebRequest https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.tar.gz -OutFile hdf5-1_12_2.tar.gz
@@ -89,7 +102,7 @@ jobs:
     - name: Test
       run: |
         $env:PATH += ";D:\a\impactx\impactx\build\bin\RelWithDebInfo\"
-        python3 -m pytest -s -vvv tests/python/
+        cdb -c "g;q" python3 -m pytest -s -vvv tests/python/
         if(!$?) { Exit $LASTEXITCODE }
     - name: validate created openPMD files
       run: Get-ChildItem -Path build -Recurse -Filter *.h5 | %{openPMD_check_h5 -i $_}
