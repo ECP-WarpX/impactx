@@ -11,7 +11,7 @@ class analyzeFunctions:
     # -----------------------------------------------------------------------------
     # Functions for Beam Characteristic and Ref particle data table
     # -----------------------------------------------------------------------------
-    
+
     @staticmethod
     def load_data(file_path):
         """
