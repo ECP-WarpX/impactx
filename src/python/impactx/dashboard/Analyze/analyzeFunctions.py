@@ -1,6 +1,6 @@
 import pandas as pd
 
-from impactx import elements, distribution
+from impactx import distribution
 
 distribution_parameters_file_path = "output_distribution_parameters.txt"
 latticeElement_parameters_file_path = "output_latticeElements_parameters.txt"

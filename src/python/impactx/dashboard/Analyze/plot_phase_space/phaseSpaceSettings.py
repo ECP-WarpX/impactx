@@ -22,7 +22,6 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
 
     # Beam Characteristics
     # rbc = self.reduced_beam_characteristics()
-
     # update for plot unit system
     m2mm = 1.0e3
     rad2mrad = 1.0e3
