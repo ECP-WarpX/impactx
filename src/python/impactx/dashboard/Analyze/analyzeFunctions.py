@@ -9,7 +9,8 @@ class analyzeFunctions:
     # -----------------------------------------------------------------------------
     # Functions for Beam Characteristic and Ref particle data table
     # -----------------------------------------------------------------------------
-
+    
+    @staticmethod
     def load_data(file_path):
         """
         Function to read provided file_path
@@ -17,6 +18,7 @@ class analyzeFunctions:
         df = pd.read_csv(file_path, sep=" ")
         return df
 
+    @staticmethod
     def convert_to_dict(combined_data):
         """
         Function to convert data into dictionary format.
@@ -29,6 +31,7 @@ class analyzeFunctions:
         ]
         return dictionary, headers
 
+    @staticmethod
     def combine_files(file1_name, file2_name):
         """
         Function to merge two files together.
@@ -37,6 +40,7 @@ class analyzeFunctions:
         file2 = analyzeFunctions.load_data(file2_name)
         return pd.merge(file1, file2, how="outer")
 
+    @staticmethod
     def filter_headers(allHeaders, selected_headers):
         """
         Function to retrieve only retrieve
@@ -48,6 +52,7 @@ class analyzeFunctions:
                 filtered_headers.append(selectedHeader)
         return filtered_headers
 
+    @staticmethod
     def filter_data(allData, selected_headers):
         """
         Function to retrieve only retrieve data for
