@@ -158,6 +158,9 @@ class generalFunctions:
         """
         Retrieves the __init__ docstring of given classes
         """
+        if not isinstance(classes, (list, tuple)):
+            raise TypeError("The 'classes' argument must be a list or tuple.")
+
         docstrings = {}
         for name, cls in classes:
             init_method = getattr(cls, "__init__", None)
