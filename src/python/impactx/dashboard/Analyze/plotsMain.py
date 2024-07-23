@@ -96,7 +96,7 @@ def update_plot():
     """
     if state.active_plot == "Plot Over S":
         update_data_table()
-        ctrl.plotly_figure_update(plot_over_s())
+        plot_over_s()
         state.show_table = True
     elif state.active_plot == "Phase Space Plots":
         state.show_table = False
