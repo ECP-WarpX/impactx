@@ -152,6 +152,7 @@ def on_distribution_parameter_change(parameter_name, parameter_value, parameter_
 
 class distributionParameters:
 
+    @staticmethod
     def card():
         with vuetify.VCard(style="width: 340px; height: 300px"):
             with vuetify.VCardTitle("Distribution Parameters"):

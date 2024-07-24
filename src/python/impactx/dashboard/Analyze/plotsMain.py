@@ -140,6 +140,7 @@ def run_simulation_and_store():
 
 class AnalyzeSimulation:
 
+    @staticmethod
     def card():
         with vuetify.VContainer():
             with vuetify.VCard(v_if=("show_table")):
@@ -158,7 +159,7 @@ class AnalyzeSimulation:
                         dense=True,
                         height="250px",
                     )
-
+    @staticmethod
     def plot():
         with vuetify.VContainer(
             v_if="active_plot === 'Plot Over S'", style="height: 90vh; width: 100vh;"

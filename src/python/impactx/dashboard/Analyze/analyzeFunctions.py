@@ -1,6 +1,7 @@
 import pandas as pd
 
 from impactx import distribution
+from impactx import elements
 
 distribution_parameters_file_path = "output_distribution_parameters.txt"
 latticeElement_parameters_file_path = "output_latticeElements_parameters.txt"
@@ -73,6 +74,7 @@ class analyzeFunctions:
     # Helper functions to read lattice elements and distribution parameter list
     # -----------------------------------------------------------------------------
 
+    @staticmethod
     def read_latticeElements_file():
         """
         Function to help run impactX simulation
@@ -89,6 +91,7 @@ class analyzeFunctions:
                     elements_list.append(eval(f"elements.{element_code}"))
         return elements_list
 
+    @staticmethod
     def read_distribution_file():
         """
         Function to help run impactX simulation
