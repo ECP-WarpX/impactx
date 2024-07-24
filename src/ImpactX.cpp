@@ -281,7 +281,7 @@ namespace impactx {
                         for (int i = 0; i < num_bins; ++i)
                         {
                             double s = bin_min + i * bin_size;
-                            wake_function[i] = w_l_csr(s, R, bunch_charge);
+                            wake_function[i] = w_l_csr(s, R);
                         }
 
                         // Call convolution function
@@ -301,7 +301,7 @@ namespace impactx {
                         delete[] dptr_data;*/
 
                         // Kick particles with wake
-                        impactx::wakepush::WakePush(particle_container, convoluted_wakefield, slice_ds, bin_size, t_min, num_bins, padding_factor);
+                        impactx::wakepush::WakePush(particle_container, convoluted_wakefield, slice_ds, bin_size, t_min, padding_factor);
                     }
 
                     // Space-charge calculation: turn off if there is only 1 particle

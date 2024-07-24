@@ -34,13 +34,10 @@ void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, Real* dptr_data, 
 
                 //Access particle weights and momenta
                 amrex::ParticleReal* const AMREX_RESTRICT d_w = soa.GetRealData(impactx::RealSoA::w).dataPtr();
-                amrex::ParticleReal* const AMREX_RESTRICT d_px = soa.GetRealData(impactx::RealSoA::px).dataPtr();
-                amrex::ParticleReal* const AMREX_RESTRICT d_py = soa.GetRealData(impactx::RealSoA::py).dataPtr();
-                amrex::ParticleReal* const AMREX_RESTRICT d_pt = soa.GetRealData(impactx::RealSoA::pt).dataPtr();
 
                 //Access particle positions
-                amrex::ParticleReal* const AMREX_RESTRICT pos_x = soa.GetRealData(impactx::RealSoA::x).dataPtr();
-                amrex::ParticleReal* const AMREX_RESTRICT pos_y = soa.GetRealData(impactx::RealSoA::y).dataPtr();
+                //amrex::ParticleReal* const AMREX_RESTRICT pos_x = soa.GetRealData(impactx::RealSoA::x).dataPtr();
+                //amrex::ParticleReal* const AMREX_RESTRICT pos_y = soa.GetRealData(impactx::RealSoA::y).dataPtr();
                 amrex::ParticleReal* const AMREX_RESTRICT pos_z = soa.GetRealData(impactx::RealSoA::z).dataPtr();
 
                 //Parallel loop over particles

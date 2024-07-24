@@ -3,7 +3,7 @@
 #include "initialization/InitDistribution.H"
 
 #ifdef ImpactX_USE_FFT
-#   include <fftw3.h> //Fastest Fourier Transform in the West
+#include <fftw3.h> //Fastest Fourier Transform in the West
 #endif
 
 #include <algorithm>
@@ -49,7 +49,7 @@ double w_l_rf(double s, double a, double g, double L)
 
 //CSR Wake Function
 
-double w_l_csr(double s, amrex::ParticleReal R, amrex::ParticleReal beam_charge)
+double w_l_csr(double s, amrex::ParticleReal R)
 {
     double rc = std::pow(ablastr::constant::SI::q_e, 2) / (4 * M_PI * ablastr::constant::SI::ep0 * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2));
     double kappa = (2 * rc * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2)) / std::pow(3, 1.0/3.0) / std::pow(R, 2.0/3.0);
