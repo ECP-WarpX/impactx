@@ -61,8 +61,8 @@ void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, Real* dptr_data, 
                     Real charge_contribution = w * ablastr::constant::SI::q_e;
 
                     //Divide charge by bin size to get binned charge density
-                    double charge_density = charge_contribution / bin_size;
-                    double unity_density = ablastr::constant::SI::q_e / bin_size;
+                    Real charge_density = charge_contribution / bin_size;
+                    Real unity_density = ablastr::constant::SI::q_e / bin_size;
 
                     //Add to histogram bin
                     if (is_unity_particle_weight)

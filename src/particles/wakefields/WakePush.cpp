@@ -63,7 +63,7 @@ namespace impactx::wakepush
                     double lower_bound = padding_factor * 2 * bin_min;
                     int idx = static_cast<int>((z - lower_bound) / bin_size); //Find index position along z
 
-                    amrex::ParticleReal const F_L = convoluted_wakefield[idx];
+                    amrex::ParticleReal F_L = convoluted_wakefield[idx];
 
                     //Update longitudinal momentum
                     pz -=  push_consts * slice_ds * F_L;
