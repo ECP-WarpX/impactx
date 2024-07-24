@@ -1,7 +1,7 @@
 from Input.trameFunctions import trameFunctions
 from Toolbar.exportTemplate import retrieve_state_content
 from trame.app import get_server
-from trame.widgets import vuetify
+from trame.widgets import vuetify, xterm
 
 # -----------------------------------------------------------------------------
 # Trame setup
@@ -34,7 +34,11 @@ def on_selectedWorkflow_change(selectedWorkflow, **kwargs):
 # -----------------------------------------------------------------------------
 # Common toolbar elements
 # -----------------------------------------------------------------------------
-
+terminal_button_styles = {
+    "background-color": "#2E86C1",
+    "color": "white",
+    "margin": "0 20px",
+}
 
 class toolbarElements:
 
@@ -114,6 +118,10 @@ class toolbarElements:
             style="max-width: 175px;",
         )
 
+    def run_simulation():
+        ctrl.terminal_println("Running simulation...")
+        ctrl.terminal_println("Simulation complete.")
+
     @staticmethod
     def kill_button():
         return trameFunctions.create_button("Kill")
@@ -124,7 +132,12 @@ class toolbarElements:
 
     @staticmethod
     def start_button():
-        return trameFunctions.create_button("Start")
+        vuetify.VBtn(
+            "START",
+            style=terminal_button_styles,
+            classes="mx-1",
+            click=toolbarElements.run_simulation,
+        )
 
     @staticmethod
     def checkbox_2d():

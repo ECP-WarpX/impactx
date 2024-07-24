@@ -93,8 +93,10 @@ def application():
 
         with layout.content:
             router.RouterView()
-            with xterm.XTerm(shell=["/bin/bash"], v_if="$route.path == '/Run'") as term:
+            with xterm.XTerm(v_if="$route.path == '/Run'") as term:
                 ctrl.clear = term.clear
+                ctrl.terminal_println = term.writeln
+        return term
     return layout
 
 
