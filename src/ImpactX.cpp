@@ -180,6 +180,14 @@ namespace impactx {
             amrex::Print() << " Space Charge effects: " << space_charge << "\n";
         }
 
+        bool csr = false;
+        int csr_bins = 100;
+        pp_algo.query("csr", csr);
+        pp_algo.query("csr_bins", csr_bins);
+        if (verbose > 0) {
+            amrex::Print() << " CSR effects: " << csr << "\n";
+        }
+
         // periods through the lattice
         int periods = 1;
         amrex::ParmParse("lattice").queryAdd("periods", periods);
@@ -237,7 +245,7 @@ namespace impactx {
                     }, element_variant);
 
                     //Enter loop if lattice has bend element
-                    if (element_has_csr)
+                    if (csr && element_has_csr)
                     {
                         // Measure beam size, extract the min, max of particle positions
                         auto const [x_min, y_min, t_min, x_max, y_max, t_max] =
@@ -250,7 +258,7 @@ namespace impactx {
                         bool GetNumberDensity = true;
 
                         int padding_factor = 1; // Set amount of zero-padding
-                        int num_bins = 100;  // Set resolution
+                        int num_bins = csr_bins;  // Set resolution
                         Real bin_min = t_min;
                         Real bin_max = t_max;
                         Real bin_size = (bin_max - bin_min) / num_bins;
@@ -268,9 +276,6 @@ namespace impactx {
                         DerivativeCharge1D(charge_distribution.data(), slopes.data(), num_bins, bin_size, GetNumberDensity); //Use number derivatives for convolution with CSR
 
                         // Call wake function
-
-                        // Read in external variable bunch_charge
-                        //std::cout << "My beam charge is:" << bunch_charge << std::endl;
 
                         std::vector<double> wake_function(num_bins);
                         for (int i = 0; i < num_bins; ++i)
