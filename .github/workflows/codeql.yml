@@ -30,10 +30,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Packages (C++)
+      - name: Install Packages
         run: |
           sudo apt-get update
-          sudo apt-get install --yes cmake openmpi-bin libopenmpi-dev libhdf5-openmpi-dev
+          sudo apt-get install --yes cmake openmpi-bin libfftw3-dev libfftw3-mpi-dev libopenmpi-dev libhdf5-openmpi-dev
 
           python -m pip install --upgrade pip
           python -m pip install --upgrade wheel
@@ -46,7 +46,7 @@ jobs:
       - name: Configure (C++)
         if: ${{ matrix.language == 'cpp' }}
         run: |
-          $CMAKE -S . -B build -DImpactX_PYTHON=OFF
+          $CMAKE -S . -B build -DImpactX_FFT=ON -DImpactX_PYTHON=OFF
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -58,6 +58,8 @@ jobs:
       - name: Build (py)
         uses: github/codeql-action/autobuild@v3
         if: ${{ matrix.language == 'python' }}
+        env:
+          IMPACTX_FFT: ON
 
       - name: Build (C++)
         if: ${{ matrix.language == 'cpp' }}

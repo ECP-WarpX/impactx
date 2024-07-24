@@ -5,6 +5,7 @@
 module load LUMI/23.09  partition/C
 module load PrgEnv-aocc
 module load buildtools/23.09
+module load cray-fftw/3.3.10.5
 
 # optional: just an additional text editor
 module load nano

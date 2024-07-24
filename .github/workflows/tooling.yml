@@ -8,7 +8,7 @@ concurrency:
 
 jobs:
   clangsanitizer:
-    name: Clang UBSAN
+    name: Clang ASAN UBSAN
     runs-on: ubuntu-22.04
     if: github.event.pull_request.draft == false
     steps:
@@ -37,29 +37,32 @@ jobs:
         CXX: mpic++
         OMPI_CC: clang
         OMPI_CXX: clang++
-        CXXFLAGS: "-Werror -Wno-error=pass-failed"
-#      run: |
-#        export LDFLAGS="${LDFLAGS} -fsanitize=address,undefined -shared-libsan"
-#        export CXXFLAGS="${CXXFLAGS} -fsanitize=address,undefined -shared-libsan"
+        MPICH_CC: clang
+        MPICH_CXX: clang++
+        CXXFLAGS: "-Werror -Wno-error=pass-failed -fsanitize=address,undefined -shared-libsan"
+        LDFLAGS: "-fsanitize=address,undefined -shared-libsan -fno-omit-frame-pointer"
       run: |
-        export LDFLAGS="${LDFLAGS} -fsanitize=undefined"
-        export CXXFLAGS="${CXXFLAGS} -fsanitize=undefined"
         cmake -S . -B build                  \
+          -DpyAMReX_IPO=OFF                  \
+          -DImpactX_FFT=ON                   \
           -DImpactX_PYTHON=ON                \
+          -DImpactX_PYTHON_IPO=OFF           \
           -DCMAKE_BUILD_TYPE=RelWithDebInfo  \
           -DCMAKE_VERBOSE_MAKEFILE=ON        \
           -DMPIEXEC_POSTFLAGS="--use-hwthread-cpus"
         cmake --build build --parallel 4
 
     - name: run tests
+      env:
+        ASAN_OPTIONS: detect_stack_use_after_return=1:detect_leaks=1:check_initialization_order=true:strict_init_order=true:detect_stack_use_after_scope=1:fast_unwind_on_malloc=0
+        LD_LIBRARY_PATH: /usr/lib/clang/14/lib/linux/
+        LD_PRELOAD: /usr/lib/clang/14/lib/linux/libclang_rt.asan-x86_64.so
       run: |
-        SOURCEPATH="$(pwd)"
-        export ASAN_OPTIONS=detect_stack_use_after_return=1:detect_leaks=1:check_initialization_order=true:strict_init_order=true:detect_stack_use_after_scope=1:fast_unwind_on_malloc=0
-        export LSAN_OPTIONS=suppressions="$SOURCEPATH/.github/ci/sanitizer/clang/Leak.supp:use_tls=0"
-        export LD_PRELOAD=/usr/lib/clang/14/lib/linux/libclang_rt.asan-x86_64.so
+        export LSAN_OPTIONS=suppressions="$(pwd)/.github/ci/sanitizer/clang/Leak.supp:use_tls=0"
+        ctest --test-dir build -E AMReX --output-on-failure --label-exclude slow
 
-# TODO: TEMPORARILY DISABLED
-#        ctest --test-dir build -E AMReX --output-on-failure --label-exclude slow
-
-# note: use_tls=0 because of glibc 3.23 on GitHub actions
-# https://github.com/google/sanitizers/issues/1342
+# notes:
+# * -shared-libsan because we build shared libs
+# * use_tls=0 because of glibc 3.23 on GitHub actions
+#   https://github.com/google/sanitizers/issues/1342
+# * LD_PRELOAD because we run also components (e.g., Python code) that we did not compile with sanitizers

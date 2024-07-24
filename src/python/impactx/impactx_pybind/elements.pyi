@@ -201,6 +201,23 @@ class Buncher(Thin, Alignment):
         Push first the reference particle, then all other particles.
         """
 
+    @property
+    def V(self) -> float:
+        """
+        Normalized RF voltage drop V = Emax*L/(c*Brho)
+        """
+
+    @V.setter
+    def V(self, arg1: float) -> None: ...
+    @property
+    def k(self) -> float:
+        """
+        Wavenumber of RF in 1/m
+        """
+
+    @k.setter
+    def k(self, arg1: float) -> None: ...
+
 class CFbend(Thick, Alignment):
     def __init__(
         self,
@@ -223,6 +240,23 @@ class CFbend(Thick, Alignment):
         """
         Push first the reference particle, then all other particles.
         """
+
+    @property
+    def k(self) -> float:
+        """
+        Quadrupole strength in m^(-2) (MADX convention) = (gradient in T/m) / (rigidity in T-m) k > 0 horizontal focusing k < 0 horizontal defocusing
+        """
+
+    @k.setter
+    def k(self, arg1: float) -> None: ...
+    @property
+    def rc(self) -> float:
+        """
+        Radius of curvature in m
+        """
+
+    @rc.setter
+    def rc(self, arg1: float) -> None: ...
 
 class ChrAcc(Thick, Alignment):
     def __init__(
@@ -290,7 +324,7 @@ class ChrPlasmaLens(Thick, Alignment):
         self,
         ds: float,
         k: float,
-        units: int = 0,
+        unit: int = 0,
         dx: float = 0,
         dy: float = 0,
         rotation: float = 0,
@@ -317,20 +351,20 @@ class ChrPlasmaLens(Thick, Alignment):
     @k.setter
     def k(self, arg1: float) -> None: ...
     @property
-    def units(self) -> int:
+    def unit(self) -> int:
         """
         unit specification for focusing strength
         """
 
-    @units.setter
-    def units(self, arg1: int) -> None: ...
+    @unit.setter
+    def unit(self, arg1: int) -> None: ...
 
 class ChrQuad(Thick, Alignment):
     def __init__(
         self,
         ds: float,
         k: float,
-        units: int = 0,
+        unit: int = 0,
         dx: float = 0,
         dy: float = 0,
         rotation: float = 0,
@@ -357,13 +391,13 @@ class ChrQuad(Thick, Alignment):
     @k.setter
     def k(self, arg1: float) -> None: ...
     @property
-    def units(self) -> int:
+    def unit(self) -> int:
         """
         unit specification for quad strength
         """
 
-    @units.setter
-    def units(self, arg1: int) -> None: ...
+    @unit.setter
+    def unit(self, arg1: int) -> None: ...
 
 class ConstF(Thick, Alignment):
     def __init__(
@@ -436,6 +470,39 @@ class DipEdge(Thin, Alignment):
         """
         Push first the reference particle, then all other particles.
         """
+
+    @property
+    def K2(self) -> float:
+        """
+        Fringe field integral (unitless)
+        """
+
+    @K2.setter
+    def K2(self, arg1: float) -> None: ...
+    @property
+    def g(self) -> float:
+        """
+        Gap parameter in m
+        """
+
+    @g.setter
+    def g(self, arg1: float) -> None: ...
+    @property
+    def psi(self) -> float:
+        """
+        Pole face angle in rad
+        """
+
+    @psi.setter
+    def psi(self, arg1: float) -> None: ...
+    @property
+    def rc(self) -> float:
+        """
+        Radius of curvature in m
+        """
+
+    @rc.setter
+    def rc(self, arg1: float) -> None: ...
 
 class Drift(Thick, Alignment):
     def __init__(
@@ -516,18 +583,35 @@ class ExactSbend(Thick, Alignment):
         Push first the reference particle, then all other particles.
         """
 
+    @property
+    def B(self) -> float:
+        """
+        Magnetic field in Tesla; when B = 0 (default), the reference bending radius is defined by r0 = length / (angle in rad), corresponding to a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B
+        """
+
+    @B.setter
+    def B(self, arg1: float) -> None: ...
+    @property
+    def phi(self) -> float:
+        """
+        Bend angle in degrees
+        """
+
+    @phi.setter
+    def phi(self, arg1: float) -> None: ...
+
 class Kicker(Thin, Alignment):
     def __init__(
         self,
         xkick: float,
         ykick: float,
-        units: str = "dimensionless",
+        unit: str = "dimensionless",
         dx: float = 0,
         dy: float = 0,
         rotation: float = 0,
     ) -> None:
         """
-        A thin transverse kicker element. Kicks are for units "dimensionless" or in "T-m".
+        A thin transverse kicker element. Kicks are for unit "dimensionless" or in "T-m".
         """
 
     def __repr__(self) -> str: ...
@@ -537,6 +621,23 @@ class Kicker(Thin, Alignment):
         """
         Push first the reference particle, then all other particles.
         """
+
+    @property
+    def xkick(self) -> float:
+        """
+        horizontal kick strength (dimensionless OR T-m)
+        """
+
+    @xkick.setter
+    def xkick(self, arg1: float) -> None: ...
+    @property
+    def ykick(self) -> float:
+        """
+        vertical kick strength (dimensionless OR T-m)
+        """
+
+    @ykick.setter
+    def ykick(self, arg1: float) -> None: ...
 
 class KnownElementsList:
     @typing.overload
@@ -696,6 +797,31 @@ class Multipole(Thin, Alignment):
         Push first the reference particle, then all other particles.
         """
 
+    @property
+    def K_normal(self) -> float:
+        """
+        Integrated normal multipole coefficient (1/meter^m)
+        """
+
+    @K_normal.setter
+    def K_normal(self, arg1: float) -> None: ...
+    @property
+    def K_skew(self) -> float:
+        """
+        Integrated skew multipole coefficient (1/meter^m)
+        """
+
+    @K_skew.setter
+    def K_skew(self, arg1: float) -> None: ...
+    @property
+    def multipole(self) -> int:
+        """
+        index m (m=1 dipole, m=2 quadrupole, m=3 sextupole etc.)
+        """
+
+    @multipole.setter
+    def multipole(self, arg1: float) -> None: ...
+
 class NonlinearLens(Thin, Alignment):
     def __init__(
         self,
@@ -717,6 +843,23 @@ class NonlinearLens(Thin, Alignment):
         Push first the reference particle, then all other particles.
         """
 
+    @property
+    def cnll(self) -> float:
+        """
+        distance of singularities from the origin (m)
+        """
+
+    @cnll.setter
+    def cnll(self, arg1: float) -> None: ...
+    @property
+    def knll(self) -> float:
+        """
+        integrated strength of the nonlinear lens (m)
+        """
+
+    @knll.setter
+    def knll(self, arg1: float) -> None: ...
+
 class PRot(Thin):
     def __init__(self, phi_in: float, phi_out: float) -> None:
         """
@@ -730,6 +873,23 @@ class PRot(Thin):
         """
         Push first the reference particle, then all other particles.
         """
+
+    @property
+    def phi_in(self) -> float:
+        """
+        angle of the reference particle with respect to the longitudinal (z) axis in the original frame in degrees
+        """
+
+    @phi_in.setter
+    def phi_in(self, arg1: float) -> None: ...
+    @property
+    def phi_out(self) -> float:
+        """
+        angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame in degrees
+        """
+
+    @phi_out.setter
+    def phi_out(self, arg1: float) -> None: ...
 
 class Programmable:
     ds: float
@@ -814,6 +974,15 @@ class Quad(Thick, Alignment):
         Push first the reference particle, then all other particles.
         """
 
+    @property
+    def k(self) -> float:
+        """
+        Quadrupole strength in m^(-2) (MADX convention) = (gradient in T/m) / (rigidity in T-m) k > 0 horizontal focusing k < 0 horizontal defocusing
+        """
+
+    @k.setter
+    def k(self, arg1: float) -> None: ...
+
 class RFCavity(Thick, Alignment):
     def __init__(
         self,
@@ -841,6 +1010,39 @@ class RFCavity(Thick, Alignment):
         Push first the reference particle, then all other particles.
         """
 
+    @property
+    def escale(self) -> float:
+        """
+        scaling factor for on-axis RF electric field in 1/m = (peak on-axis electric field Ez in MV/m) / (particle rest energy in MeV)
+        """
+
+    @escale.setter
+    def escale(self, arg1: float) -> None: ...
+    @property
+    def freq(self) -> float:
+        """
+        RF frequency in Hz
+        """
+
+    @freq.setter
+    def freq(self, arg1: float) -> None: ...
+    @property
+    def mapsteps(self) -> int:
+        """
+        number of integration steps per slice used for map and reference particle push in applied fields
+        """
+
+    @mapsteps.setter
+    def mapsteps(self, arg1: int) -> None: ...
+    @property
+    def phase(self) -> float:
+        """
+        RF driven phase in degrees
+        """
+
+    @phase.setter
+    def phase(self, arg1: float) -> None: ...
+
 class Sbend(Thick, Alignment):
     def __init__(
         self,
@@ -863,6 +1065,15 @@ class Sbend(Thick, Alignment):
         Push first the reference particle, then all other particles.
         """
 
+    @property
+    def rc(self) -> float:
+        """
+        Radius of curvature in m
+        """
+
+    @rc.setter
+    def rc(self, arg1: float) -> None: ...
+
 class ShortRF(Thin, Alignment):
     def __init__(
         self,
@@ -884,6 +1095,31 @@ class ShortRF(Thin, Alignment):
         """
         Push first the reference particle, then all other particles.
         """
+
+    @property
+    def V(self) -> float:
+        """
+        Normalized RF voltage V = maximum energy gain/(m*c^2)
+        """
+
+    @V.setter
+    def V(self, arg1: float) -> None: ...
+    @property
+    def freq(self) -> float:
+        """
+        RF frequency in Hz
+        """
+
+    @freq.setter
+    def freq(self, arg1: float) -> None: ...
+    @property
+    def phase(self) -> float:
+        """
+        RF synchronous phase in degrees (phase = 0 corresponds to maximum energy gain, phase = -90 corresponds go zero energy gain for bunching)
+        """
+
+    @phase.setter
+    def phase(self, arg1: float) -> None: ...
 
 class SoftQuadrupole(Thick, Alignment):
     def __init__(
@@ -909,6 +1145,23 @@ class SoftQuadrupole(Thick, Alignment):
         """
         Push first the reference particle, then all other particles.
         """
+
+    @property
+    def gscale(self) -> float:
+        """
+        Scaling factor for on-axis field gradient in inverse meters
+        """
+
+    @gscale.setter
+    def gscale(self, arg1: float) -> None: ...
+    @property
+    def mapsteps(self) -> int:
+        """
+        number of integration steps per slice used for map and reference particle push in applied fields
+        """
+
+    @mapsteps.setter
+    def mapsteps(self, arg1: int) -> None: ...
 
 class SoftSolenoid(Thick, Alignment):
     def __init__(
@@ -936,6 +1189,31 @@ class SoftSolenoid(Thick, Alignment):
         Push first the reference particle, then all other particles.
         """
 
+    @property
+    def bscale(self) -> float:
+        """
+        Scaling factor for on-axis magnetic field Bz in inverse meters (if unit = 0) or magnetic field Bz in T (SI units, if unit = 1)
+        """
+
+    @bscale.setter
+    def bscale(self, arg1: float) -> None: ...
+    @property
+    def mapsteps(self) -> int:
+        """
+        number of integration steps per slice used for map and reference particle push in applied fields
+        """
+
+    @mapsteps.setter
+    def mapsteps(self, arg1: int) -> None: ...
+    @property
+    def unit(self) -> int:
+        """
+        specification of units for scaling of the on-axis longitudinal magnetic field
+        """
+
+    @unit.setter
+    def unit(self, arg1: float) -> None: ...
+
 class Sol(Thick, Alignment):
     def __init__(
         self,
@@ -958,12 +1236,21 @@ class Sol(Thick, Alignment):
         Push first the reference particle, then all other particles.
         """
 
+    @property
+    def ks(self) -> float:
+        """
+        Solenoid strength in m^(-1) (MADX convention) in (magnetic field Bz in T) / (rigidity in T-m)
+        """
+
+    @ks.setter
+    def ks(self, arg1: float) -> None: ...
+
 class TaperedPL(Thin, Alignment):
     def __init__(
         self,
         k: float,
         taper: float,
-        units: int = 0,
+        unit: int = 0,
         dx: float = 0,
         dy: float = 0,
         rotation: float = 0,
@@ -985,6 +1272,31 @@ class TaperedPL(Thin, Alignment):
         """
         Push first the reference particle, then all other particles.
         """
+
+    @property
+    def k(self) -> float:
+        """
+        integrated focusing strength in m^(-1) (if unit = 0) or integrated focusing strength in T (if unit = 1)
+        """
+
+    @k.setter
+    def k(self, arg1: float) -> None: ...
+    @property
+    def taper(self) -> float:
+        """
+        horizontal taper parameter in m^(-1) = 1 / (target horizontal dispersion in m)
+        """
+
+    @taper.setter
+    def taper(self, arg1: float) -> None: ...
+    @property
+    def unit(self) -> int:
+        """
+        specification of units for plasma lens focusing strength
+        """
+
+    @unit.setter
+    def unit(self, arg1: int) -> None: ...
 
 class Thick:
     def __init__(self, ds: float, nslice: float = 1) -> None:
@@ -1042,3 +1354,20 @@ class ThinDipole(Thin, Alignment):
         """
         Push first the reference particle, then all other particles.
         """
+
+    @property
+    def rc(self) -> float:
+        """
+        Effective curvature radius (meters)
+        """
+
+    @rc.setter
+    def rc(self, arg1: float) -> None: ...
+    @property
+    def theta(self) -> float:
+        """
+        Bend angle (degrees)
+        """
+
+    @theta.setter
+    def theta(self, arg1: float) -> None: ...

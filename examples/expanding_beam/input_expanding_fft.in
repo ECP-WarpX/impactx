@@ -1,0 +1,50 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000  # outside tests, use 1e5 or more
+beam.units = static
+beam.kin_energy = 250.0
+beam.charge = 1.0e-9
+beam.particle = electron
+beam.distribution = kurth6d
+beam.lambdaX = 4.472135955e-4
+beam.lambdaY = 4.472135955e-4
+beam.lambdaT = 9.12241869e-7
+beam.lambdaPx = 0.0
+beam.lambdaPy = 0.0
+beam.lambdaPt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor drift1 monitor
+lattice.nslice = 40
+
+drift1.type = drift
+drift1.ds = 6.0
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = true
+algo.poisson_solver = "fft"
+
+# Space charge solver with one MR level
+amr.max_level = 1
+amr.n_cell = 16 16 20
+amr.blocking_factor_x = 16
+amr.blocking_factor_y = 16
+amr.blocking_factor_z = 4
+
+geometry.prob_relative = 1.2 1.1
+
+# Space charger solver without MR
+#amr.max_level = 0
+#amr.n_cell = 56 56 48
+#geometry.prob_relative = 3.0

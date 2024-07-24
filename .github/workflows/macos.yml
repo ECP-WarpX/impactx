@@ -25,6 +25,7 @@ jobs:
         brew install adios2
         brew install ccache
         brew install cmake
+        brew install fftw
         brew install hdf5-mpi
         brew install libomp
         brew link --overwrite --force libomp
@@ -57,13 +58,23 @@ jobs:
           ccache-macos-appleclang-
     - name: build ImpactX
       run: |
+        export CCACHE_COMPRESS=1
+        export CCACHE_COMPRESSLEVEL=10
+        export CCACHE_MAXSIZE=100M
+        export CCACHE_SLOPPINESS=time_macros
+        ccache -z
+
         source py-venv/bin/activate
 
         cmake -S . -B build            \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
+          -DImpactX_FFT=ON             \
           -DImpactX_PYTHON=ON          \
           -DPython_EXECUTABLE=$(which python3)
         cmake --build build -j 3
+
+        du -hs ~/Library/Caches/ccache
+        ccache -s
 
     - name: run tests
       run: |

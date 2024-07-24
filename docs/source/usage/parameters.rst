@@ -290,14 +290,14 @@ Lattice Elements
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
             * ``<element_name>.k`` (``float``, in inverse meters squared OR in T/m) the quadrupole strength
-                = (magnetic field gradient in T/m) / (magnetic rigidity in T-m) - if units = 0
+                = (magnetic field gradient in T/m) / (magnetic rigidity in T-m) - if unit = 0
 
-             OR = magnetic field gradient in T/m - if units = 1
+             OR = magnetic field gradient in T/m - if unit = 1
 
               * k > 0 horizontal focusing
               * k < 0 horizontal defocusing
 
-            * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
+            * ``<element_name>.unit`` (``integer``) specification of units (default: ``0``)
             * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
             * ``<element_name>.dy`` (``float``, in meters) vertical translation error
             * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
@@ -324,11 +324,11 @@ Lattice Elements
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
             * ``<element_name>.k`` (``float``, in inverse meters squared OR in T/m) the plasma lens focusing strength
-                = (azimuthal magnetic field gradient in T/m) / (magnetic rigidity in T-m) - if units = 0
+                = (azimuthal magnetic field gradient in T/m) / (magnetic rigidity in T-m) - if unit = 0
 
-             OR = azimuthal magnetic field gradient in T/m - if units = 1
+             OR = azimuthal magnetic field gradient in T/m - if unit = 1
 
-            * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
+            * ``<element_name>.unit`` (``integer``) specification of units (default: ``0``)
             * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
             * ``<element_name>.dy`` (``float``, in meters) vertical translation error
             * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
@@ -370,15 +370,15 @@ Lattice Elements
 
             * ``<element_name>.ds`` (``float``, in meters) the segment length
             * ``<element_name>.bscale`` (``float``, in inverse meters) Scaling factor for on-axis longitudinal magnetic field
-                = (magnetic field Bz in T) / (magnetic rigidity in T-m) - if units = 0
+                = (magnetic field Bz in T) / (magnetic rigidity in T-m) - if unit = 0
 
-             OR = magnetic field Bz in T - if units = 1
+             OR = magnetic field Bz in T - if unit = 1
 
             * ``<element_name>.cos_coefficients`` (array of ``float``) cos coefficients in Fourier expansion of the on-axis magnetic field Bz
               (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
             * ``<element_name>.sin_coefficients`` (array of ``float``) sin coefficients in Fourier expansion of the on-axis magnetic field Bz
               (optional); default is a thin-shell model from `DOI:10.1016/J.NIMA.2022.166706 <https://doi.org/10.1016/j.nima.2022.166706>`__
-            * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
+            * ``<element_name>.unit`` (``integer``) specification of units (default: ``0``)
             * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
             * ``<element_name>.dy`` (``float``, in meters) vertical translation error
             * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
@@ -497,7 +497,7 @@ Lattice Elements
 
             * ``<element_name>.xkick`` (``float``, dimensionless OR in T-m) the horizontal kick strength
             * ``<element_name>.ykick`` (``float``, dimensionless OR in T-m) the vertical kick strength
-            * ``<element_name>.units`` (``string``) specification of units: ``dimensionless`` (default, in units of the magnetic rigidity of the reference particle) or ``T-m``
+            * ``<element_name>.unit`` (``string``) specification of units: ``dimensionless`` (default, in units of the magnetic rigidity of the reference particle) or ``T-m``
             * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
             * ``<element_name>.dy`` (``float``, in meters) vertical translation error
             * ``<element_name>.rotation`` (``float``, in degrees) rotation error in the transverse plane
@@ -532,11 +532,11 @@ Lattice Elements
           This requires these additional parameters:
 
             * ``<element_name>.k`` (``float``, in inverse meters OR in T) the integrated plasma lens focusing strength
-                = (length in m) * (magnetic field gradient :math:`g` in T/m) / (magnetic rigidity in T-m) - if units = 0
+                = (length in m) * (magnetic field gradient :math:`g` in T/m) / (magnetic rigidity in T-m) - if unit = 0
 
-             OR = (length in m) * (magnetic field gradient :math:`g` in T/m) - if units = 1
+             OR = (length in m) * (magnetic field gradient :math:`g` in T/m) - if unit = 1
 
-            * ``<element_name>.units`` (``integer``) specification of units (default: ``0``)
+            * ``<element_name>.unit`` (``integer``) specification of units (default: ``0``)
             * ``<element_name>.taper`` (``float``, in 1/meters) horizontal taper parameter
                 = 1 / (target horizontal dispersion :math:`D_x` in m)
 
@@ -690,6 +690,20 @@ Numerics and algorithms
 
 * ``algo.space_charge`` (``boolean``, optional, default: ``false``)
     Whether to calculate space charge effects.
+
+* ``algo.poisson_solver`` (``string``, optional, default: ``"multigrid"``)
+    The numerical solver to solve the Poisson equation when calculating space charge effects.
+    Options:
+
+    * ``multigrid``: Poisson's equation is solved using an iterative multigrid (MLMG) solver.
+      See the `AMReX documentation <https://amrex-codes.github.io/amrex/docs_html/LinearSolvers.html#>`__ for details of the MLMG solver.
+
+    * ``fft``: Poisson's equation is solved using an Integrated Green Function method (which requires FFT calculations).
+      See these references for more details `Qiang et al. (2006) <https://doi.org/10.1103/PhysRevSTAB.9.044204>`__ (+ `Erratum <https://doi.org/10.1103/PhysRevSTAB.10.129901>`__).
+      It only works in 3D and it requires the compilation flag ``-DImpactX_FFT=ON``.
+      If mesh refinement is enabled, this solver only works on the coarsest level.
+      On the refined patches, the Poisson equation is solved with the multigrid solver.
+      The boundary conditions are assumed to be open.
 
 * ``algo.mlmg_relative_tolerance`` (``float``, optional, default: ``1.e-7``)
     The relative precision with which the electrostatic space-charge fields should be calculated.

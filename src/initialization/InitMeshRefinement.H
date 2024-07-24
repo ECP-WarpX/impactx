@@ -35,6 +35,9 @@ namespace impactx::initialization
         bool space_charge = false;
         pp_algo.queryAdd("space_charge", space_charge);
 
+        std::string poisson_solver = "multigrid";
+        pp_algo.queryAdd("poisson_solver", poisson_solver);
+
         int max_level = 0;
         pp_amr.query("max_level", max_level);
 
@@ -48,7 +51,7 @@ namespace impactx::initialization
         prob_relative[0] = 3.0;  // top/bottom pad the beam on the lowest level by default by its width
         pp_geometry.queryarr("prob_relative", prob_relative);
 
-        if (prob_relative[0] < 3.0 && space_charge)
+        if (prob_relative[0] < 3.0 && space_charge && poisson_solver == "multigrid")
             ablastr::warn_manager::WMRecordWarning(
                     "ImpactX::read_mr_prob_relative",
                     "Dynamic resizing of the mesh uses a geometry.prob_relative "

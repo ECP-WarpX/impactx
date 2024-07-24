@@ -58,6 +58,7 @@ jobs:
 
         cmake -S . -B build            \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
+          -DImpactX_FFT=ON             \
           -DImpactX_PYTHON=ON          \
           -DMPIEXEC_POSTFLAGS="--use-hwthread-cpus"
         cmake --build build -j 4 --target pip_install

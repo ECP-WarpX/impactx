@@ -163,7 +163,7 @@ Use the following :ref:`cmake commands <building-cmake>` to compile the applicat
 
          cd $HOME/src/impactx
 
-         cmake --fresh -S . -B build_lumi_gpu -DImpactX_COMPUTE=HIP
+         cmake --fresh -S . -B build_lumi_gpu -DImpactX_COMPUTE=HIP -DImpactX_FFT=ON
          cmake --build build_lumi_gpu -j 16
 
       The ImpactX application executables are now in ``$HOME/src/impactx/build_lumi_gpu/bin/``.
@@ -171,7 +171,7 @@ Use the following :ref:`cmake commands <building-cmake>` to compile the applicat
 
       .. code-block:: bash
 
-         cmake --fresh -S . -B build_lumi_gpu_py -DImpactX_COMPUTE=HIP -DImpactX_PYTHON=ON
+         cmake --fresh -S . -B build_lumi_gpu_py -DImpactX_COMPUTE=HIP -DImpactX_FFT=ON -DImpactX_PYTHON=ON
          cmake --build build_lumi_gpu_py -j 16 --target pip_install
 
    .. tab-item:: CPU Nodes
@@ -180,7 +180,7 @@ Use the following :ref:`cmake commands <building-cmake>` to compile the applicat
 
          cd $HOME/src/impactx
 
-         cmake --fresh -S . -B build_lumi_cpu
+         cmake --fresh -S . -B build_lumi_cpu -DImpactX_FFT=ON
          cmake --build build_lumi_cpu -j 16
 
       The ImpactX application executables are now in ``$HOME/src/impactx/build_lumi_cpu/bin/``.
@@ -188,7 +188,7 @@ Use the following :ref:`cmake commands <building-cmake>` to compile the applicat
 
       .. code-block:: bash
 
-         cmake --fresh -S . -B build_lumi_cpu_py -DImpactX_PYTHON=ON
+         cmake --fresh -S . -B build_lumi_cpu_py -DImpactX_FFT=ON -DImpactX_PYTHON=ON
          cmake --build build_lumi_cpu_py -j 16 --target pip_install
 
 Now, you can :ref:`submit LUMI compute jobs <running-cpp-lumi>` for ImpactX :ref:`Python scripts <usage-picmi>` (:ref:`example scripts <usage-examples>`).

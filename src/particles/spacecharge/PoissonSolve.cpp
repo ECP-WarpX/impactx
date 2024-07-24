@@ -53,6 +53,14 @@ namespace impactx::spacecharge
         std::array<amrex::Real, 3> const beta_xyz = {0.0, 0.0, beta_s};
 
         amrex::ParmParse pp_algo("algo");
+        std::string poisson_solver = "multigrid";
+        pp_algo.queryAdd("poisson_solver", poisson_solver);
+        const bool is_solver_igf_on_lev0 = poisson_solver == "fft";
+        if (poisson_solver != "multigrid" && poisson_solver != "fft") {
+            throw std::runtime_error("algo.poisson_solver must be multigrid or fft but is: " + poisson_solver);
+        }
+
+        // MLMG options
         amrex::Real mlmg_relative_tolerance = 1.e-7; // relative TODO: make smaller for SP
         amrex::Real mlmg_absolute_tolerance = 0.0;   // ignored
         pp_algo.queryAdd("mlmg_relative_tolerance", mlmg_relative_tolerance);
@@ -88,7 +96,6 @@ namespace impactx::spacecharge
             sorted_phi.emplace_back(&phi[lev]);
         }
 
-        const bool is_solver_igf_on_lev0 = false;
         const bool do_single_precision_comms = false;
         ablastr::fields::computePhi(
             sorted_rho,

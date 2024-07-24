@@ -213,6 +213,20 @@ void init_ImpactX (py::module& m)
              },
              "Enable or disable space charge calculations (default: enabled)."
         )
+        .def_property("poisson_solver",
+            [](ImpactX & /* ix */) {
+                return detail::get_or_throw<std::string>("algo", "poisson_solver");
+            },
+            [](ImpactX & /* ix */, std::string const poisson_solver) {
+                if (poisson_solver != "multigrid" && poisson_solver != "fft") {
+                    throw std::runtime_error("Poisson solver must be multigrid or fft but is: " + poisson_solver);
+                }
+
+                amrex::ParmParse pp_algo("algo");
+                pp_algo.add("poisson_solver", poisson_solver);
+            },
+            "The numerical solver to solve the Poisson equation when calculating space charge effects. Either multigrid (default) or fft."
+        )
         .def_property("mlmg_relative_tolerance",
               [](ImpactX & /* ix */) {
                   return detail::get_or_throw<bool>("algo", "mlmg_relative_tolerance");

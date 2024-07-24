@@ -50,11 +50,11 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 ns = 1  # number of slices per ds in the element
 period = [
     monitor,
-    elements.ChrQuad(ds=0.1, k=-6.674941, units=1, nslice=ns),
+    elements.ChrQuad(ds=0.1, k=-6.674941, unit=1, nslice=ns),
     elements.ChrDrift(ds=0.3, nslice=ns),
-    elements.ChrQuad(ds=0.2, k=6.674941, units=1, nslice=ns),
+    elements.ChrQuad(ds=0.2, k=6.674941, unit=1, nslice=ns),
     elements.ChrDrift(ds=0.3, nslice=ns),
-    elements.ChrQuad(ds=0.1, k=-6.674941, units=1, nslice=ns),
+    elements.ChrQuad(ds=0.1, k=-6.674941, unit=1, nslice=ns),
     elements.ChrDrift(ds=0.1, nslice=ns),
     elements.ChrAcc(ds=1.8, ez=10871.950994502130424, bz=1.0e-12, nslice=ns),
     elements.ChrDrift(ds=0.1, nslice=ns),
