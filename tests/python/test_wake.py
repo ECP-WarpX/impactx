@@ -1,11 +1,14 @@
+import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
+
 np.set_printoptions(threshold=sys.maxsize)
-#import pdb; pdb.set_trace() - not needed when using breakpoint()
+# import pdb; pdb.set_trace() - not needed when using breakpoint()
 from conftest import basepath
 
 from impactx import ImpactX, amr, wakeconvolution
+
 
 def test_wake(save_png=True):
     """
@@ -61,8 +64,8 @@ def test_wake(save_png=True):
             bin_max = t_max
             bin_size = (bin_max - bin_min) / num_bins
 
-            padding_factor = 1 # Keep set to 1
-            pad_factor = 4 # Change this to change the zero-padding
+            padding_factor = 1  # Keep set to 1
+            pad_factor = 4  # Change this to change the zero-padding
             sigma_t = 1.9975134930563207e-05
 
             # Calculate original length of the convolution result
@@ -121,7 +124,9 @@ def test_wake(save_png=True):
             print("Calculating the CSR wake function")
             wake_function = np.array(
                 [
-                    wakeconvolution.w_l_csr(new_start + (i * s_values_bin_size), R, beam_charge)
+                    wakeconvolution.w_l_csr(
+                        new_start + (i * s_values_bin_size), R, beam_charge
+                    )
                     for i in range(target_length)
                 ],
                 dtype=np.double,
@@ -135,7 +140,7 @@ def test_wake(save_png=True):
             print("These are my wake function results:", wake_function)
             print("My bin size is:", s_values_bin_size)
             print("My padding factor is:", padding_factor)
-            #breakpoint() #Use pdb to debug
+            # breakpoint() #Use pdb to debug
             wakeconvolution.convolve_fft(
                 slopes,
                 wake_function,
@@ -147,15 +152,19 @@ def test_wake(save_png=True):
 
             lower_bound = 2 * s_values[0]
             upper_bound = 2 * s_values[-1]
-            s_values_full_range = np.linspace(lower_bound, upper_bound, 2 * len(s_values) - 1)
+            s_values_full_range = np.linspace(
+                lower_bound, upper_bound, 2 * len(s_values) - 1
+            )
             normalized_s_values = s_values_full_range / sigma_t
 
             # Plot convoluted wakefield
             print("Plotting convoluted wakefield")
-            #breakpoint()
-            plt.plot(normalized_s_values, convoluted_wakefield, label="Convoluted Wakefield")
-            #plt.xlim(left = -5)
-            #plt.xlim(right = 5)
+            # breakpoint()
+            plt.plot(
+                normalized_s_values, convoluted_wakefield, label="Convoluted Wakefield"
+            )
+            # plt.xlim(left = -5)
+            # plt.xlim(right = 5)
             plt.xlabel("Longitudinal Position s/sigma_s")
             plt.ylabel("Wakefield (V C/m)")
             plt.legend()
@@ -164,12 +173,13 @@ def test_wake(save_png=True):
                 plt.savefig("convoluted_wakefield.png")
             else:
                 plt.show()
-            plt.close('all')
+            plt.close("all")
 
     finally:
         # Finalize simulation
         print("Finalizing simulation")
         sim.finalize()
+
 
 if __name__ == "__main__":
     test_wake()
