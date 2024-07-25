@@ -12,8 +12,7 @@ from impactx import ImpactX, amr, wakeconvolution
 # Check MPI is off for this test
 try:
     from mpi4py import MPI
-
-    mpi_enabled = True
+    mpi_enabled = MPI.COMM_WORLD.Get_size() > 1
 except ImportError:
     mpi_enabled = False
 
@@ -57,7 +56,6 @@ def test_wake(save_png=True):
         # Check for CSR elements and perform necessary calculations
         element_has_csr = True
         R = 10.35  # Units [m] TODO: Read in value
-        beam_charge = 1.0e-09  # Units [C] TODO: Read in value
 
         # Enter loop if lattice has bend element
         if element_has_csr:
