@@ -24,8 +24,8 @@ def test_charge_deposition(save_png=True):
 
     sim.n_cell = [24, 32, 40]
     sim.load_inputs_file(
-        basepath + "/../../examples/chicane/input_chicane.in"
-    )  # examples/fodo/input_fodo.in
+        basepath + "/examples/chicane/input_chicane.in"
+    )  # /examples/fodo/input_fodo.in
     sim.slice_step_diagnostics = False
 
     # Future:
