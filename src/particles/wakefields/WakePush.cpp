@@ -7,7 +7,7 @@
 
 namespace impactx::wakepush
 {
-    void WakePush(ImpactXParticleContainer & pc, const std::vector<double>& convoluted_wakefield, amrex::ParticleReal const slice_ds, double bin_size, double bin_min, int padding_factor)
+    void WakePush(ImpactXParticleContainer & pc, std::vector<double>& convoluted_wakefield, amrex::ParticleReal const slice_ds, double bin_size, double bin_min, int padding_factor)
     {
         BL_PROFILE("impactx::wakepush::WakePush");
 
@@ -63,7 +63,7 @@ namespace impactx::wakepush
                     double lower_bound = padding_factor * 2 * bin_min;
                     int idx = static_cast<int>((z - lower_bound) / bin_size); //Find index position along z
 
-                    amrex::ParticleReal F_L = convoluted_wakefield[idx];
+                    amrex::ParticleReal const F_L = convoluted_wakefield[idx];
 
                     //Update longitudinal momentum
                     pz -=  push_consts * slice_ds * F_L;
