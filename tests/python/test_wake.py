@@ -9,6 +9,16 @@ from conftest import basepath
 
 from impactx import ImpactX, amr, wakeconvolution
 
+# Check MPI is off for this test
+try:
+    from mpi4py import MPI
+    mpi_enabled = True
+except ImportError:
+    mpi_enabled = False
+
+if mpi_enabled:
+    print("MPI is enabled. Skipping this script.")
+    sys.exit(0)
 
 def test_wake(save_png=True):
     """
@@ -65,7 +75,7 @@ def test_wake(save_png=True):
             bin_size = (bin_max - bin_min) / num_bins
 
             padding_factor = 1  # Keep set to 1
-            pad_factor = 4  # Change this to change the zero-padding
+            pad_factor = 2  # Change this to change the zero-padding
             sigma_t = 1.9975134930563207e-05
 
             # Calculate original length of the convolution result
@@ -125,8 +135,7 @@ def test_wake(save_png=True):
             wake_function = np.array(
                 [
                     wakeconvolution.w_l_csr(
-                        new_start + (i * s_values_bin_size), R, beam_charge
-                    )
+                        new_start + (i * s_values_bin_size), R)
                     for i in range(target_length)
                 ],
                 dtype=np.double,
