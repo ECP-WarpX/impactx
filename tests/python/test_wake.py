@@ -12,6 +12,7 @@ from impactx import ImpactX, amr, wakeconvolution
 # Check MPI is off for this test
 try:
     from mpi4py import MPI
+
     mpi_enabled = True
 except ImportError:
     mpi_enabled = False
@@ -19,6 +20,7 @@ except ImportError:
 if mpi_enabled:
     print("MPI is enabled. Skipping this script.")
     sys.exit(0)
+
 
 def test_wake(save_png=True):
     """
@@ -134,8 +136,7 @@ def test_wake(save_png=True):
             print("Calculating the CSR wake function")
             wake_function = np.array(
                 [
-                    wakeconvolution.w_l_csr(
-                        new_start + (i * s_values_bin_size), R)
+                    wakeconvolution.w_l_csr(new_start + (i * s_values_bin_size), R)
                     for i in range(target_length)
                 ],
                 dtype=np.double,
