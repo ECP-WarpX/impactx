@@ -46,8 +46,8 @@ namespace impactx::wakepush
                 //Obtain constants for force normalization
                 amrex::ParticleReal const push_consts = 1.0 / ((ablastr::constant::SI::c) * pz_ref_SI);
 
-                //Gather particles and push momentum
-                amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE (int i)
+                //Gather particles and push momentum - Capture convoluted_wakefield by reference for indexing
+                amrex::ParallelFor(np, [=, &convoluted_wakefield] AMREX_GPU_DEVICE (int i)
                 {
                     //Access SoA Real data
                     //amrex::ParticleReal & AMREX_RESTRICT x = part_x[i];
