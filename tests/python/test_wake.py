@@ -12,6 +12,7 @@ from impactx import ImpactX, amr, wakeconvolution
 # Check MPI is off for this test
 try:
     from mpi4py import MPI
+
     mpi_enabled = MPI.COMM_WORLD.Get_size() > 1
 except ImportError:
     mpi_enabled = False
