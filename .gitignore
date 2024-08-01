@@ -58,3 +58,10 @@ cmake-build-*/
 .DS_Store
 .AppleDouble
 .LSOverride
+
+#####################
+# Trame Dashboard (output files are temporary) #
+#####################
+src/python/impactx/dashboard/output_latticeElements_parameters.txt
+src/python/impactx/dashboard/output_distribution_parameters.txt
+src/python/impactx/dashboard/diags/
