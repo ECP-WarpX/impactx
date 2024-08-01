@@ -6,6 +6,21 @@ from impactx import elements
 distribution_parameters_file_path = "output_distribution_parameters.txt"
 latticeElement_parameters_file_path = "output_latticeElements_parameters.txt"
 
+from trame.app import get_server
+import asyncio
+import subprocess
+from trame.widgets import xterm
+
+# -----------------------------------------------------------------------------
+# Trame setup
+# -----------------------------------------------------------------------------
+
+server = get_server(client_type="vue2")
+state, ctrl = server.state, server.controller
+
+# -----------------------------------------------------------------------------
+# Content
+# -----------------------------------------------------------------------------
 
 class analyzeFunctions:
 
@@ -104,3 +119,37 @@ class analyzeFunctions:
             exec(file.read(), safe_env)
 
         return safe_env["distr"]
+
+    # -----------------------------------------------------------------------------
+    # Function to print simulation output in terminal view
+    # -----------------------------------------------------------------------------
+
+    async def outputTerminal(simulation_function_name):
+        ctrl.terminal_println(f"Running {simulation_function_name}...")
+        ctrl.terminal_println(f"npart: {state.npart}\nkin_energy_MeV: {state.kin_energy_MeV}")
+
+        # Define the command to run based on the simulation function name
+        if simulation_function_name == "run_simulation":
+            command = ["python", "-c", "from Analyze.plot_phase_space.phaseSpace import run_simulation; run_simulation()"]
+        elif simulation_function_name == "run_optimize_triplet":
+            command = ["python", "-c", "from Analyze.plot_phase_space.phaseSpace import run_optimize_triplet; run_optimize_triplet()"]
+        else:
+            ctrl.terminal_println(f"Unknown simulation function: {simulation_function_name}")
+            return
+
+        # Run the specified simulation function as a separate process
+        process = await asyncio.create_subprocess_exec(
+            *command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,  # Capture errors to the same stream as output
+        )
+
+        # Read output from the process and print it to the xterm widget
+        while True:
+            output = await process.stdout.readline()
+            if output == b"" and await process.wait() is not None:
+                break
+            if output:
+                ctrl.terminal_println(output.decode().strip())
+
+        ctrl.terminal_println(f"{simulation_function_name} complete.")

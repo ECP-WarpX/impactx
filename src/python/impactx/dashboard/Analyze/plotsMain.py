@@ -5,7 +5,10 @@ from Analyze.plot_over_s.overS import line_plot_1d
 from Analyze.plot_phase_space.phaseSpace import run_simulation
 from Run.optimize_triplet.run_triplet import run_optimize_triplet
 from trame.app import get_server
-from trame.widgets import plotly, vuetify
+from trame.widgets import plotly, vuetify, matplotlib
+
+
+import asyncio
 
 # -----------------------------------------------------------------------------
 # Start server
@@ -127,12 +130,15 @@ def run_simulation_and_store():
     state.plot_options = validPlotOptions(simulationClicked=True)
     if workflow == "DataFrameTest":
         state.simulation_data = run_simulation()
+        # asyncio.create_task(run_simulation("run_simulation"))
         update_plot()
     elif workflow == "Optimize Triplet":
         run_optimize_triplet()
+        # asyncio.create_task(run_simulation("run_optimize_triplet"))
     load_dataTable_data()
 
-
+# async def run_simulation(simulation_function_name):
+#     await analyzeFunctions.outputTerminal(simulation_function_name)
 # -----------------------------------------------------------------------------
 # GUI
 # -----------------------------------------------------------------------------

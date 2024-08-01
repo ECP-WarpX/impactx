@@ -96,7 +96,6 @@ def application():
             with xterm.XTerm(v_if="$route.path == '/Run'") as term:
                 ctrl.clear = term.clear
                 ctrl.terminal_println = term.writeln
-        return term
     return layout
 
 
