@@ -64,4 +64,4 @@ cmake-build-*/
 #####################
 src/python/impactx/dashboard/output_latticeElements_parameters.txt
 src/python/impactx/dashboard/output_distribution_parameters.txt
-src/python/impactx/dashboard/diags/
+src/python/impactx/dashboard/diags*
