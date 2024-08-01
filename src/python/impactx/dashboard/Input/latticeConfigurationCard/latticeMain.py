@@ -102,7 +102,7 @@ def parameter_input_checker_for_lattice(latticeElement):
                     "parameter_default_value"
                 ]
         else:
-            parameter_input[parameter["parameter_name"]] = None
+            parameter_input[parameter["parameter_name"]] = 0
 
     return parameter_input
 
@@ -111,17 +111,15 @@ def save_latticeElements_to_file():
     """
     Writes users input for lattice element parameters into file in simulation code format
     """
-    with open("output_latticeElements_parameters.txt", "w") as file:
-        file.write("latticeElements = [\n")
-        for latticeElement in state.selectedLatticeList:
-            latticeElement_name = latticeElement["name"]
-            parameters = parameter_input_checker_for_lattice(latticeElement)
+    elements_list = []
+    for latticeElement in state.selectedLatticeList:
+        latticeElement_name = latticeElement["name"]
+        parameters = parameter_input_checker_for_lattice(latticeElement)
 
-            param_values = ", ".join(f"{value}" for value in parameters.values())
-            file.write(f"    elements.{latticeElement_name}({param_values}),\n")
-
-        file.write("]\n")
-
+        param_values = ", ".join(f"{value}" for value in parameters.values())
+        elements_list.append(eval(f"elements.{latticeElement_name}({param_values})"))
+        
+    return elements_list
 
 # -----------------------------------------------------------------------------
 # Callbacks

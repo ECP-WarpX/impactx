@@ -3,9 +3,6 @@ import pandas as pd
 from impactx import distribution
 from impactx import elements
 
-distribution_parameters_file_path = "output_distribution_parameters.txt"
-latticeElement_parameters_file_path = "output_latticeElements_parameters.txt"
-
 from trame.app import get_server
 import asyncio
 import subprocess
@@ -84,41 +81,6 @@ class analyzeFunctions:
                     filtered_row[key] = value
             filtered_data.append(filtered_row)
         return filtered_data
-
-    # -----------------------------------------------------------------------------
-    # Helper functions to read lattice elements and distribution parameter list
-    # -----------------------------------------------------------------------------
-
-    @staticmethod
-    def read_latticeElements_file():
-        """
-        Function to help run impactX simulation
-        Returns a list in correct format to read latticeElements.
-        """
-        file_path = latticeElement_parameters_file_path
-        elements_list = []
-        with open(file_path, "r") as file:
-            lines = file.readlines()
-            for line in lines:
-                line = line.strip()
-                if line.startswith("elements."):
-                    element_code = line.replace("elements.", "").rstrip(",")
-                    elements_list.append(eval(f"elements.{element_code}"))
-        return elements_list
-
-    @staticmethod
-    def read_distribution_file():
-        """
-        Function to help run impactX simulation
-        Reads distribution file path line by line.
-        """
-        file_path = distribution_parameters_file_path
-        safe_env = {"distribution": distribution, "distr": None}
-
-        with open(file_path, "r") as file:
-            exec(file.read(), safe_env)
-
-        return safe_env["distr"]
 
     # -----------------------------------------------------------------------------
     # Function to print simulation output in terminal view

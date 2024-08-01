@@ -98,9 +98,9 @@ def parameter_input_checker():
     parameter_input = {}
     for param in state.selectedDistributionParameters:
         if param["parameter_error_message"] == []:
-            parameter_input[param["parameter_name"]] = param["parameter_default_value"]
+            parameter_input[param["parameter_name"]] = float(param["parameter_default_value"])
         else:
-            parameter_input[param["parameter_name"]] = None
+            parameter_input[param["parameter_name"]] = 0.0
 
     return parameter_input
 
@@ -112,12 +112,8 @@ def save_distribution_parameters_to_file():
     distribution_name = state.selectedDistribution
     parameters = parameter_input_checker()
 
-    with open("output_distribution_parameters.txt", "w") as file:
-        file.write(f"distr = distribution.{distribution_name}(\n")
-        for param, value in parameters.items():
-            file.write(f"    {param}={value},\n")
-        file.write(")\n")
-
+    distr = getattr(distribution, distribution_name)(**parameters)
+    return distr
 
 # -----------------------------------------------------------------------------
 # Callbacks
