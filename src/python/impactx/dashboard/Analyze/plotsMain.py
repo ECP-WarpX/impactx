@@ -157,7 +157,7 @@ class AnalyzeSimulation:
                         items=("filtered_data",),
                         header_class="centered-header",
                         dense=True,
-                        height="250px",
+                        height="325px",
                     )
     @staticmethod
     def plot():
