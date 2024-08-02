@@ -11,9 +11,9 @@ import numpy as np
 # -----------------------------------------------------------------------------
 # Trame Code
 # -----------------------------------------------------------------------------
-from Analyze.analyzeFunctions import (
-    analyzeFunctions,  # to load in distribution and lattice inputs
-)
+# from Analyze.analyzeFunctions import (
+#     analyzeFunctions,  # to load in distribution and lattice inputs
+# )
 from scipy.optimize import minimize
 
 import amrex.space3d as amr

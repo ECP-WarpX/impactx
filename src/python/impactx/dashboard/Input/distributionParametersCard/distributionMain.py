@@ -1,5 +1,5 @@
-from Input.distributionParametersCard.distributionFunctions import distributionFunctions
-from Input.generalFunctions import generalFunctions
+from impactx.dashboard.Input.distributionParametersCard.distributionFunctions import distributionFunctions
+from impactx.dashboard.Input.generalFunctions import generalFunctions
 from trame.app import get_server
 from trame.widgets import vuetify
 

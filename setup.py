@@ -282,4 +282,9 @@ setup(
     # new PEP 639 format
     license="BSD-3-Clause-LBNL",
     license_files=["LICENSE"],
+    entry_points={
+        'console_scripts': [
+            'impactx-dashboard=impactx.dashboard.main:main',
+        ],
+    },
 )

@@ -1,5 +1,5 @@
-from Input.generalFunctions import generalFunctions
-from Input.inputParametersCard.inputFunctions import inputFunctions
+from impactx.dashboard.Input.generalFunctions import generalFunctions
+from impactx.dashboard.Input.inputParametersCard.inputFunctions import inputFunctions
 from trame.app import get_server
 from trame.widgets import vuetify
 

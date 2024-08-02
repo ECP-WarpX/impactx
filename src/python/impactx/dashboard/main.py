@@ -1,11 +1,19 @@
-from Analyze.plotsMain import AnalyzeSimulation
-from Input.distributionParametersCard.distributionMain import distributionParameters
-from Input.inputParametersCard.inputMain import inputParameters
-from Input.latticeConfigurationCard.latticeMain import latticeConfiguration
-from Input.trameFunctions import trameFunctions
-from Input.Visualiztion.twiss_phase_space_ellipse.x_px import visualizeTwiss
-from Optimize.optimizeMain import Optimize
-from Toolbar.toolbarMain import toolbars
+# from Analyze.plotsMain import AnalyzeSimulation
+# from Input.distributionParametersCard.distributionMain import distributionParameters
+# from Input.inputParametersCard.inputMain import inputParameters
+# from Input.latticeConfigurationCard.latticeMain import latticeConfiguration
+# from Input.trameFunctions import trameFunctions
+# from Input.Visualiztion.twiss_phase_space_ellipse.x_px import visualizeTwiss
+# from Optimize.optimizeMain import Optimize
+# from Toolbar.toolbarMain import toolbars
+from impactx.dashboard.Analyze.plotsMain import AnalyzeSimulation
+from impactx.dashboard.Input.distributionParametersCard.distributionMain import distributionParameters
+from impactx.dashboard.Input.inputParametersCard.inputMain import inputParameters
+from impactx.dashboard.Input.latticeConfigurationCard.latticeMain import latticeConfiguration
+from impactx.dashboard.Input.trameFunctions import trameFunctions
+from impactx.dashboard.Input.Visualiztion.twiss_phase_space_ellipse.x_px import visualizeTwiss
+from impactx.dashboard.Optimize.optimizeMain import Optimize
+from impactx.dashboard.Toolbar.toolbarMain import toolbars
 from trame.app import get_server
 from trame.ui.router import RouterViewLayout
 from trame.ui.vuetify import SinglePageWithDrawerLayout
@@ -112,8 +120,11 @@ application()
 # Main
 # -----------------------------------------------------------------------------
 
-if __name__ == "__main__":
+def main():
     server.start()
+
+if __name__ == "__main__":
+    main()
 
 """
 from main import JupyterMainApplication
