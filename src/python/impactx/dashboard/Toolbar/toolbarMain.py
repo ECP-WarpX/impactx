@@ -1,5 +1,5 @@
-from impactx.dashboard.Input.trameFunctions import trameFunctions
-from impactx.dashboard.Toolbar.exportTemplate import retrieve_state_content
+from ..Input.trameFunctions import trameFunctions
+from .exportTemplate import retrieve_state_content
 from trame.app import get_server
 from trame.widgets import vuetify, xterm
 

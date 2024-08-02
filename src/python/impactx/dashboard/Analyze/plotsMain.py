@@ -1,9 +1,8 @@
 import os
 
-from impactx.dashboard.Analyze.analyzeFunctions import analyzeFunctions
-from impactx.dashboard.Analyze.plot_over_s.overS import line_plot_1d
-from impactx.dashboard.Analyze.plot_phase_space.phaseSpace import run_simulation
-from impactx.dashboard.Run.optimize_triplet.run_triplet import run_optimize_triplet
+from .analyzeFunctions import analyzeFunctions
+from .plot_over_s.overS import line_plot_1d
+from .plot_phase_space.phaseSpace import run_simulation
 from trame.app import get_server
 from trame.widgets import plotly, vuetify, matplotlib
 

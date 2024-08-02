@@ -14,10 +14,10 @@ state, ctrl = server.state, server.controller
 import importlib
 
 import pytest
-from impactx.dashboard.Analyze.analyzeFunctions import analyzeFunctions
-from impactx.dashboard.Analyze.plot_phase_space.phaseSpaceSettings import adjusted_settings_plot
-from impactx.dashboard.Input.distributionParametersCard.distributionMain import save_distribution_parameters_to_file
-from impactx.dashboard.Input.latticeConfigurationCard.latticeMain import save_latticeElements_to_file
+from ..analyzeFunctions import analyzeFunctions
+from ..plot_phase_space.phaseSpaceSettings import adjusted_settings_plot
+from ...Input.distributionParametersCard.distributionMain import save_distribution_parameters_to_file
+from ...Input.latticeConfigurationCard.latticeMain import save_latticeElements_to_file
 
 from impactx import ImpactX
 
