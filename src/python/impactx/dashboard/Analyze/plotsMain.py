@@ -59,7 +59,7 @@ def load_dataTable_data():
 # Defaults
 # -----------------------------------------------------------------------------
 
-BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 REDUCED_BEAM_DATA = os.path.join(BASE_PATH, "diags", "reduced_beam_characteristics.0.0")
 REF_PARTICLE_DATA = os.path.join(BASE_PATH, "diags", "ref_particle.0.0")
 DEFAULT_HEADERS = ["step", "s", "alpha_x", "alpha_y", "alpha_t"]
