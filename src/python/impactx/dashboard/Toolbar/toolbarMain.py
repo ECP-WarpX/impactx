@@ -23,14 +23,6 @@ state.selectedVisualization = None
 def on_export_click():
     return retrieve_state_content()
 
-
-@state.change("selectedWorkflow")
-def on_selectedWorkflow_change(selectedWorkflow, **kwargs):
-    # print(f"Selected workflow is {selectedWorkflow}")
-    if selectedWorkflow is None:
-        state.isSelectedWorkflow = "Please select a workflow"
-
-
 # -----------------------------------------------------------------------------
 # Common toolbar elements
 # -----------------------------------------------------------------------------
@@ -41,20 +33,6 @@ terminal_button_styles = {
 }
 
 class toolbarElements:
-
-    @staticmethod
-    def select_workflow():
-        vuetify.VCombobox(
-            placeholder="Select Workflow",
-            v_model=("selectedWorkflow",),
-            items=(["DataFrameTest", "Optimize Triplet"],),
-            clearable=True,
-            error_messages=("isSelectedWorkflow",),
-            dense=True,
-            hide_details=True,
-            style="max-width: 175px",
-            classes="mr-2",
-        )
 
     @staticmethod
     def select_visualization():
@@ -164,7 +142,6 @@ class toolbars:
         toolbarElements.start_button(),
         toolbarElements.kill_button(),
         vuetify.VSpacer(),
-        toolbarElements.select_workflow(),
         toolbarElements.run_simulation_button(),
         toolbarElements.export_input_data(),
         toolbarElements.switch_theme(),
@@ -174,7 +151,6 @@ class toolbars:
         vuetify.VSpacer()
         toolbarElements.checkbox_2d()
         toolbarElements.checkbox_3d()
-        toolbarElements.select_workflow()
         toolbarElements.plot_options()
         toolbarElements.run_simulation_button()
         toolbarElements.export_input_data()
@@ -184,7 +160,6 @@ class toolbars:
     def latticeToolbar():
         toolbarElements.file_upload()
         vuetify.VSpacer()
-        toolbarElements.select_workflow()
         toolbarElements.select_visualization()
         toolbarElements.run_simulation_button()
         toolbarElements.export_input_data()

@@ -128,13 +128,9 @@ def on_filtered_data_change(**kwargs):
 def run_simulation_and_store():
     workflow = state.selectedWorkflow
     state.plot_options = validPlotOptions(simulationClicked=True)
-    if workflow == "DataFrameTest":
-        state.simulation_data = run_simulation()
+    state.simulation_data = run_simulation()
         # asyncio.create_task(run_simulation("run_simulation"))
-        update_plot()
-    elif workflow == "Optimize Triplet":
-        run_optimize_triplet()
-        # asyncio.create_task(run_simulation("run_optimize_triplet"))
+    update_plot()
     load_dataTable_data()
 
 # async def run_simulation(simulation_function_name):
