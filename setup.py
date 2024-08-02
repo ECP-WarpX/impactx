@@ -284,7 +284,7 @@ setup(
     license_files=["LICENSE"],
     entry_points={
         'console_scripts': [
-            'impactx-dashboard=impactx.dashboard.main:main',
+            'impactx-dashboard=impactx.dashboard.__main__:main',
         ],
     },
 )
