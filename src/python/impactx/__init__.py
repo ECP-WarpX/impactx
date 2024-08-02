@@ -44,3 +44,6 @@ RefPart.load_file = read_beam  # noqa
 # Pure Python extensions to ImpactX types
 register_ImpactXParIter_extension(cxx)
 register_ImpactXParticleContainer_extension(cxx.ImpactXParticleContainer)
+
+# include dashboard
+from .dashboard import *  # noqa
