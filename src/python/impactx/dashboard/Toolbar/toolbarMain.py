@@ -1,7 +1,8 @@
+from trame.app import get_server
+from trame.widgets import vuetify
+
 from ..Input.trameFunctions import trameFunctions
 from .exportTemplate import retrieve_state_content
-from trame.app import get_server
-from trame.widgets import vuetify, xterm
 
 # -----------------------------------------------------------------------------
 # Trame setup
@@ -23,6 +24,7 @@ state.selectedVisualization = None
 def on_export_click():
     return retrieve_state_content()
 
+
 # -----------------------------------------------------------------------------
 # Common toolbar elements
 # -----------------------------------------------------------------------------
@@ -31,6 +33,7 @@ terminal_button_styles = {
     "color": "white",
     "margin": "0 20px",
 }
+
 
 class toolbarElements:
 

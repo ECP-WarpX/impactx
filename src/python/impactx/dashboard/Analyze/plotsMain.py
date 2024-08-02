@@ -1,13 +1,11 @@
 import os
 
+from trame.app import get_server
+from trame.widgets import plotly, vuetify
+
 from .analyzeFunctions import analyzeFunctions
 from .plot_over_s.overS import line_plot_1d
 from .plot_phase_space.phaseSpace import run_simulation
-from trame.app import get_server
-from trame.widgets import plotly, vuetify, matplotlib
-
-
-import asyncio
 
 # -----------------------------------------------------------------------------
 # Start server
@@ -128,9 +126,10 @@ def run_simulation_and_store():
     workflow = state.selectedWorkflow
     state.plot_options = validPlotOptions(simulationClicked=True)
     state.simulation_data = run_simulation()
-        # asyncio.create_task(run_simulation("run_simulation"))
+    # asyncio.create_task(run_simulation("run_simulation"))
     update_plot()
     load_dataTable_data()
+
 
 # async def run_simulation(simulation_function_name):
 #     await analyzeFunctions.outputTerminal(simulation_function_name)
@@ -160,6 +159,7 @@ class AnalyzeSimulation:
                         dense=True,
                         height="325px",
                     )
+
     @staticmethod
     def plot():
         with vuetify.VContainer(

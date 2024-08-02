@@ -14,12 +14,14 @@ state, ctrl = server.state, server.controller
 import importlib
 
 import pytest
-from ..analyzeFunctions import analyzeFunctions
-from ..plot_phase_space.phaseSpaceSettings import adjusted_settings_plot
-from ...Input.distributionParametersCard.distributionMain import save_distribution_parameters_to_file
-from ...Input.latticeConfigurationCard.latticeMain import save_latticeElements_to_file
 
 from impactx import ImpactX
+
+from ...Input.distributionParametersCard.distributionMain import (
+    save_distribution_parameters_to_file,
+)
+from ...Input.latticeConfigurationCard.latticeMain import save_latticeElements_to_file
+from ..plot_phase_space.phaseSpaceSettings import adjusted_settings_plot
 
 
 @pytest.mark.skipif(

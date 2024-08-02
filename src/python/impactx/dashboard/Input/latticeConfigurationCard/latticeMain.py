@@ -1,8 +1,9 @@
-from ..generalFunctions import generalFunctions
 from trame.app import get_server
 from trame.widgets import vuetify
 
 from impactx import elements
+
+from ..generalFunctions import generalFunctions
 
 # -----------------------------------------------------------------------------
 # Trame setup
@@ -118,8 +119,9 @@ def save_latticeElements_to_file():
 
         param_values = ", ".join(f"{value}" for value in parameters.values())
         elements_list.append(eval(f"elements.{latticeElement_name}({param_values})"))
-        
+
     return elements_list
+
 
 # -----------------------------------------------------------------------------
 # Callbacks

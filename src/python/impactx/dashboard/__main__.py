@@ -1,3 +1,10 @@
+import sys
+
+from trame.app import get_server
+from trame.ui.router import RouterViewLayout
+from trame.ui.vuetify import SinglePageWithDrawerLayout
+from trame.widgets import router, vuetify, xterm
+
 from .Analyze.plotsMain import AnalyzeSimulation
 from .Input.distributionParametersCard.distributionMain import distributionParameters
 from .Input.inputParametersCard.inputMain import inputParameters
@@ -6,12 +13,6 @@ from .Input.trameFunctions import trameFunctions
 from .Input.Visualiztion.twiss_phase_space_ellipse.x_px import visualizeTwiss
 from .Optimize.optimizeMain import Optimize
 from .Toolbar.toolbarMain import toolbars
-from trame.app import get_server
-from trame.ui.router import RouterViewLayout
-from trame.ui.vuetify import SinglePageWithDrawerLayout
-from trame.widgets import router, vuetify, xterm
-
-import sys
 
 # -----------------------------------------------------------------------------
 # Trame setup
@@ -114,9 +115,11 @@ application()
 # Main
 # -----------------------------------------------------------------------------
 
+
 def main():
     server.start()
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -1,9 +1,10 @@
-from .distributionFunctions import distributionFunctions
-from ..generalFunctions import generalFunctions
 from trame.app import get_server
 from trame.widgets import vuetify
 
 from impactx import distribution
+
+from ..generalFunctions import generalFunctions
+from .distributionFunctions import distributionFunctions
 
 # -----------------------------------------------------------------------------
 # Trame setup
@@ -98,7 +99,9 @@ def parameter_input_checker():
     parameter_input = {}
     for param in state.selectedDistributionParameters:
         if param["parameter_error_message"] == []:
-            parameter_input[param["parameter_name"]] = float(param["parameter_default_value"])
+            parameter_input[param["parameter_name"]] = float(
+                param["parameter_default_value"]
+            )
         else:
             parameter_input[param["parameter_name"]] = 0.0
 
@@ -114,6 +117,7 @@ def save_distribution_parameters_to_file():
 
     distr = getattr(distribution, distribution_name)(**parameters)
     return distr
+
 
 # -----------------------------------------------------------------------------
 # Callbacks

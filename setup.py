@@ -283,8 +283,8 @@ setup(
     license="BSD-3-Clause-LBNL",
     license_files=["LICENSE"],
     entry_points={
-        'console_scripts': [
-            'impactx-dashboard=impactx.dashboard.__main__:main',
+        "console_scripts": [
+            "impactx-dashboard=impactx.dashboard.__main__:main",
         ],
     },
 )

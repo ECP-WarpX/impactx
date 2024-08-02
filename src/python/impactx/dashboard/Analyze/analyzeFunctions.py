@@ -1,12 +1,9 @@
-import pandas as pd
-
-from impactx import distribution
-from impactx import elements
-
-from trame.app import get_server
 import asyncio
 import subprocess
-from trame.widgets import xterm
+
+import pandas as pd
+from trame.app import get_server
+
 
 # -----------------------------------------------------------------------------
 # Trame setup
@@ -18,6 +15,7 @@ state, ctrl = server.state, server.controller
 # -----------------------------------------------------------------------------
 # Content
 # -----------------------------------------------------------------------------
+
 
 class analyzeFunctions:
 
@@ -88,15 +86,27 @@ class analyzeFunctions:
 
     async def outputTerminal(simulation_function_name):
         ctrl.terminal_println(f"Running {simulation_function_name}...")
-        ctrl.terminal_println(f"npart: {state.npart}\nkin_energy_MeV: {state.kin_energy_MeV}")
+        ctrl.terminal_println(
+            f"npart: {state.npart}\nkin_energy_MeV: {state.kin_energy_MeV}"
+        )
 
         # Define the command to run based on the simulation function name
         if simulation_function_name == "run_simulation":
-            command = ["python", "-c", "from Analyze.plot_phase_space.phaseSpace import run_simulation; run_simulation()"]
+            command = [
+                "python",
+                "-c",
+                "from Analyze.plot_phase_space.phaseSpace import run_simulation; run_simulation()",
+            ]
         elif simulation_function_name == "run_optimize_triplet":
-            command = ["python", "-c", "from Analyze.plot_phase_space.phaseSpace import run_optimize_triplet; run_optimize_triplet()"]
+            command = [
+                "python",
+                "-c",
+                "from Analyze.plot_phase_space.phaseSpace import run_optimize_triplet; run_optimize_triplet()",
+            ]
         else:
-            ctrl.terminal_println(f"Unknown simulation function: {simulation_function_name}")
+            ctrl.terminal_println(
+                f"Unknown simulation function: {simulation_function_name}"
+            )
             return
 
         # Run the specified simulation function as a separate process

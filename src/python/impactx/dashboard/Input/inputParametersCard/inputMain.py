@@ -1,7 +1,8 @@
-from ..generalFunctions import generalFunctions
-from .inputFunctions import inputFunctions
 from trame.app import get_server
 from trame.widgets import vuetify
+
+from ..generalFunctions import generalFunctions
+from .inputFunctions import inputFunctions
 
 # -----------------------------------------------------------------------------
 # Trame setup
