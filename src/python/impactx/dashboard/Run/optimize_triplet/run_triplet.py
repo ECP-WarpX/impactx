@@ -1,6 +1,9 @@
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
+from ...Input.distributionParametersCard.distributionMain import (
+    save_distribution_parameters_to_file,
+)
 from trame.app import get_server
 
 server = get_server(client_type="vue2")
@@ -148,7 +151,7 @@ def run(parameters: tuple, write_particles=False, write_reduced=False) -> dict:
     # muypy=-0.894427190999916,
     # mutpt=0.0,
     # )
-    distr = analyzeFunctions.read_distribution_file()
+    distr = save_distribution_parameters_to_file
     sim.add_particles(bunch_charge_C, distr, npart)
 
     # design the accelerator lattice

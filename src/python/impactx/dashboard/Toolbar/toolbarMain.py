@@ -11,8 +11,6 @@ from .exportTemplate import retrieve_state_content
 server = get_server(client_type="vue2")
 state, ctrl = server.state, server.controller
 
-state.selectedWorkflow = "Optimize Triplet"
-state.isSelectedWorkflow = None
 state.selectedVisualization = None
 
 # -----------------------------------------------------------------------------
