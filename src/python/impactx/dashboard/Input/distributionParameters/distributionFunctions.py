@@ -1,7 +1,7 @@
 class DistributionFunctions:
 
     @staticmethod
-    def classAndParametersAndDefaultValueAndType_Twiss ():
+    def classAndParametersAndDefaultValueAndType_Twiss():
         file_path = "/mnt/c/Users/parth/Downloads/vsCode/TrameApplication/Input/distributionParametersCard/twissParameters.txt"
 
         with open(file_path, "r") as file:

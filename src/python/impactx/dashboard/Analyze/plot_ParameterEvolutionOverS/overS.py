@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 
 
-def line_plot_1d (selected_headers, filtered_data):
+def line_plot_1d(selected_headers, filtered_data):
     x_axis = selected_headers[1] if len(selected_headers) > 1 else None
     y_axis = selected_headers[2:] if len(selected_headers) > 2 else None
 

@@ -39,7 +39,8 @@ state.nsliceDefaultValue = None
 # Main Functions
 # -----------------------------------------------------------------------------
 
-def add_lattice_element ():
+
+def add_lattice_element():
     selectedLattice = state.selectedLattice
     selectedLatticeParameters = state.listOfLatticeElementParametersAndDefault.get(
         selectedLattice, []
@@ -65,7 +66,7 @@ def add_lattice_element ():
     return selectedLatticeElement
 
 
-def update_latticeElement_parameters (
+def update_latticeElement_parameters(
     index, parameterName, parameterValue, parameterErrorMessage
 ):
     """
@@ -81,12 +82,13 @@ def update_latticeElement_parameters (
     state.dirty("selectedLatticeList")
     save_lattice_elements()
 
+
 # -----------------------------------------------------------------------------
 # Write to file functions
 # -----------------------------------------------------------------------------
 
 
-def parameter_input_checker_for_lattice (latticeElement):
+def parameter_input_checker_for_lattice(latticeElement):
     """
     Helper function to check if user input is valid.
     :return: A dictionary with parameter names as keys and their validated values.
@@ -108,7 +110,8 @@ def parameter_input_checker_for_lattice (latticeElement):
 
     return parameter_input
 
-def save_lattice_elements ():
+
+def save_lattice_elements():
     """
     Writes user input for lattice element parameters parameters in suitable format for simulation code.
     :return: A list in the suitable format.
@@ -124,12 +127,14 @@ def save_lattice_elements ():
 
     return elements_list
 
+
 # -----------------------------------------------------------------------------
 # Callbacks
 # -----------------------------------------------------------------------------
 
+
 @state.change("selectedLatticeList")
-def on_selectedLatticeList_change (selectedLatticeList, **kwargs):
+def on_selectedLatticeList_change(selectedLatticeList, **kwargs):
     if selectedLatticeList == []:
         state.isSelectedLatticeListEmpty = "Please select a lattice element"
         generalFunctions.update_runSimulation_validation_checking()
@@ -138,12 +143,13 @@ def on_selectedLatticeList_change (selectedLatticeList, **kwargs):
 
 
 @state.change("selectedLattice")
-def on_lattice_element_name_change (selectedLattice, **kwargs):
+def on_lattice_element_name_change(selectedLattice, **kwargs):
     return
     # print (f"Lattice Selection Changed to: {selectedLattice}")
 
+
 @ctrl.add("add_latticeElement")
-def on_add_lattice_element_click ():
+def on_add_lattice_element_click():
     selectedLattice = state.selectedLattice
     if selectedLattice:
         add_lattice_element()
@@ -152,8 +158,9 @@ def on_add_lattice_element_click ():
         # print(f"ADD button clicked, added: {selectedLattice}")
         # print(f"Current list of selected lattice elements: {state.selectedLatticeList}")
 
+
 @ctrl.add("updateLatticeElementParameters")
-def on_lattice_element_parameter_change (
+def on_lattice_element_parameter_change(
     index, parameter_name, parameter_value, parameter_type
 ):
     parameter_value, input_type = generalFunctions.determine_input_type(parameter_value)
@@ -166,19 +173,22 @@ def on_lattice_element_parameter_change (
         f"Lattice element {index}, {parameter_name} changed to {parameter_value} (type: {input_type})"
     )
 
+
 @ctrl.add("clear_latticeElements")
-def on_clear_lattice_element_click ():
+def on_clear_lattice_element_click():
     state.selectedLatticeList = []
     save_lattice_elements()
 
+
 @ctrl.add("deleteLatticeElement")
-def on_delete_LatticeElement_click (index):
+def on_delete_LatticeElement_click(index):
     state.selectedLatticeList.pop(index)
     state.dirty("selectedLatticeList")
     save_lattice_elements()
 
+
 @ctrl.add("move_latticeElementIndex_up")
-def on_move_latticeElementIndex_up_click (index):
+def on_move_latticeElementIndex_up_click(index):
     if index > 0:
         state.selectedLatticeList[index], state.selectedLatticeList[index - 1] = (
             state.selectedLatticeList[index - 1],
@@ -187,8 +197,9 @@ def on_move_latticeElementIndex_up_click (index):
         state.dirty("selectedLatticeList")
         save_lattice_elements()
 
+
 @ctrl.add("move_latticeElementIndex_down")
-def on_move_latticeElementIndex_down_click (index):
+def on_move_latticeElementIndex_down_click(index):
     if index < len(state.selectedLatticeList) - 1:
         state.selectedLatticeList[index], state.selectedLatticeList[index + 1] = (
             state.selectedLatticeList[index + 1],
@@ -197,8 +208,9 @@ def on_move_latticeElementIndex_down_click (index):
         state.dirty("selectedLatticeList")
         save_lattice_elements()
 
+
 @ctrl.add("nsliceDefaultChange")
-def update_default_value (parameter_name, new_value):
+def update_default_value(parameter_name, new_value):
     data = generalFunctions.classAndParametersAndDefaultValueAndType(elements)
 
     for key, parameters in data.items():
@@ -208,14 +220,16 @@ def update_default_value (parameter_name, new_value):
 
     state.listOfLatticeElementParametersAndDefault = data
 
+
 # -----------------------------------------------------------------------------
 # ContentSetup
 # -----------------------------------------------------------------------------
 
+
 class LatticeConfiguration:
 
     @staticmethod
-    def card ():
+    def card():
         with vuetify.VDialog(v_model=("showDialog", False), width="1200px"):
             LatticeConfiguration.dialog_lattice_elementList()
 
@@ -336,7 +350,7 @@ class LatticeConfiguration:
                                         )
 
     @staticmethod
-    def dialog_lattice_elementList ():
+    def dialog_lattice_elementList():
         with vuetify.VCard():
             with vuetify.VCardTitle("Elements", classes="text-subtitle-2 pa-3"):
                 vuetify.VSpacer()
@@ -377,7 +391,7 @@ class LatticeConfiguration:
                         )
 
     @staticmethod
-    def dialog_lattice_settings ():
+    def dialog_lattice_settings():
         with vuetify.VCard():
             with vuetify.VTabs(v_model=("tab", "Settings")):
                 vuetify.VTab("Settings")

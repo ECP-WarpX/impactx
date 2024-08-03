@@ -16,7 +16,7 @@ state, ctrl = server.state, server.controller
 class Optimize:
 
     @staticmethod
-    def card ():
+    def card():
         with vuetify.VCard(style="width: 680px; height: 300px"):
             with vuetify.VCardTitle("Optimizer Settings"):
                 vuetify.VSpacer()

@@ -20,7 +20,7 @@ state, ctrl = server.state, server.controller
 
 
 # Call plot_over_s
-def plot_over_s ():
+def plot_over_s():
     fig = line_plot_1d(state.selected_headers, state.filtered_data)
     ctrl.plotly_figure_update(fig)
 
@@ -34,14 +34,14 @@ PLOTS = {
 # -----------------------------------------------------------------------------
 
 
-def validPlotOptions (simulationClicked):
+def validPlotOptions(simulationClicked):
     if simulationClicked:
         return list(PLOTS.keys())
     else:
         return ["Run Simulation To See Options"]
 
 
-def load_dataTable_data ():
+def load_dataTable_data():
     combined_files = analyzeFunctions.combine_files(
         REDUCED_BEAM_DATA, REF_PARTICLE_DATA
     )
@@ -75,7 +75,7 @@ state.all_headers = []
 # -----------------------------------------------------------------------------
 
 
-def update_data_table ():
+def update_data_table():
     """
     Combines reducedBeam and refParticle files
     and updates data table upon column selection by user
@@ -90,7 +90,7 @@ def update_data_table ():
     )
 
 
-def update_plot ():
+def update_plot():
     """
     Performs actions to display correct information,
     based on the plot optin selected by the user
@@ -111,7 +111,7 @@ def update_plot ():
 
 
 @state.change("selected_headers")
-def on_header_selection_change (selected_headers, **kwargs):
+def on_header_selection_change(selected_headers, **kwargs):
     state.filtered_headers = analyzeFunctions.filter_headers(
         state.all_headers, selected_headers
     )
@@ -119,12 +119,12 @@ def on_header_selection_change (selected_headers, **kwargs):
 
 
 @state.change("filtered_data", "active_plot")
-def on_filtered_data_change (**kwargs):
+def on_filtered_data_change(**kwargs):
     update_plot()
 
 
 @ctrl.add("run_simulation")
-def run_simulation_and_store ():
+def run_simulation_and_store():
     workflow = state.selectedWorkflow
     state.plot_options = validPlotOptions(simulationClicked=True)
     state.simulation_data = run_simulation()
@@ -143,7 +143,7 @@ def run_simulation_and_store ():
 class AnalyzeSimulation:
 
     @staticmethod
-    def card ():
+    def card():
         with vuetify.VContainer():
             with vuetify.VCard(v_if=("show_table")):
                 with vuetify.VCol(style="width: 500px;"):
@@ -163,7 +163,7 @@ class AnalyzeSimulation:
                     )
 
     @staticmethod
-    def plot ():
+    def plot():
         with vuetify.VContainer(
             v_if="active_plot === 'Plot Over S'", style="height: 90vh; width: 100vh;"
         ):
