@@ -36,7 +36,7 @@ terminal_button_styles = {
 class ToolbarElements:
 
     @staticmethod
-    def select_visualization():
+    def select_visualization ():
         vuetify.VCombobox(
             placeholder="Select Visualization",
             v_model=("selectedVisualization",),
@@ -48,7 +48,7 @@ class ToolbarElements:
         )
 
     @staticmethod
-    def plot_options():
+    def plot_options ():
         vuetify.VSelect(
             v_model=("active_plot", "1D plots over s"),
             items=("plot_options",),
@@ -60,7 +60,7 @@ class ToolbarElements:
         )
 
     @staticmethod
-    def run_simulation_button():
+    def run_simulation_button ():
         vuetify.VBtn(
             "Run Simulation",
             style="background-color: #00313C; color: white; margin: 0 20px;",
@@ -69,7 +69,7 @@ class ToolbarElements:
         )
 
     @staticmethod
-    def export_input_data():
+    def export_input_data ():
         vuetify.VIcon(
             "mdi-download",
             style="color: #00313C; margin: 0 10px;",
@@ -78,14 +78,14 @@ class ToolbarElements:
         )
 
     @staticmethod
-    def switch_theme():
+    def switch_theme ():
         vuetify.VSwitch(
             v_model="$vuetify.theme.dark",
             hide_details=True,
         )
 
     @staticmethod
-    def file_upload():
+    def file_upload ():
         vuetify.VFileInput(
             # Allows users to upload file, but nothing more than that.
             label="Upload Input File",
@@ -97,20 +97,20 @@ class ToolbarElements:
             style="max-width: 175px;",
         )
 
-    def run_simulation():
+    def run_simulation ():
         ctrl.terminal_println("Running simulation...")
         ctrl.terminal_println("Simulation complete.")
 
     @staticmethod
-    def kill_button():
+    def kill_button ():
         return trameFunctions.create_button("Kill")
 
     @staticmethod
-    def stop_button():
+    def stop_button ():
         return trameFunctions.create_button("Stop")
 
     @staticmethod
-    def start_button():
+    def start_button ():
         vuetify.VBtn(
             "START",
             style=terminal_button_styles,
@@ -119,14 +119,14 @@ class ToolbarElements:
         )
 
     @staticmethod
-    def checkbox_2d():
+    def checkbox_2d ():
         vuetify.VCheckbox(
             label="2D",
             hide_details=True,
         )
 
     @staticmethod
-    def checkbox_3d():
+    def checkbox_3d ():
         vuetify.VCheckbox(label="3D", classes="px-2", hide_details=True)
 
 

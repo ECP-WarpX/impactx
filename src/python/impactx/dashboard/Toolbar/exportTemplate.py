@@ -14,7 +14,7 @@ state, ctrl = server.state, server.controller
 # -----------------------------------------------------------------------------
 
 
-def retrieve_state_content():
+def retrieve_state_content ():
     """
     This function builds the output file based on user inputs
     """
