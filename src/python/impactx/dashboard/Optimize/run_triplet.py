@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
-from ...Input.distributionParameters.distributionMain import (
+from ..Input.distributionParameters.distributionMain import (
     save_distribution_parameters,
 )
 from trame.app import get_server

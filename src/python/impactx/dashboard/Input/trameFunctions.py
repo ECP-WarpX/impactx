@@ -41,15 +41,6 @@ class trameFunctions:
                 vuetify.VListItemTitle(route_title)
 
     @staticmethod
-    def create_section (title, content, expand_section_index):
-        with vuetify.VExpansionPanels(v_model=(expand_section_index,), accordion=True):
-            with vuetify.VExpansionPanel():
-                with vuetify.VExpansionPanelHeader():
-                    vuetify.VCardText(title)
-                with vuetify.VExpansionPanelContent():
-                    vuetify.VCardText(content)
-
-    @staticmethod
     def create_button (label):
         """
         Creates a Vuetify button component with the specified label and styles.

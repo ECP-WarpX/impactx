@@ -15,7 +15,6 @@ state, ctrl = server.state, server.controller
 # Callbacks
 # -----------------------------------------------------------------------------
 
-
 @ctrl.add("on_input_change")
 def validate_and_convert_to_correct_type (
     value, desired_type, state_name, validation_name
@@ -37,7 +36,6 @@ def validate_and_convert_to_correct_type (
                 )
                 print(f"Value of - state.kin_energy_MeV: {state.kin_energy_MeV}")
 
-
 @ctrl.add("kin_energy_unit_change")
 def on_convert_kin_energy_change (new_unit):
     old_unit = state.old_kin_energy_unit
@@ -57,11 +55,9 @@ def on_convert_kin_energy_change (new_unit):
     # print(f"old unit is {old_unit}")
     # print(f"new unit is {new_unit}")
 
-
 # -----------------------------------------------------------------------------
 # Content
 # -----------------------------------------------------------------------------
-
 
 class InputParameters:
 

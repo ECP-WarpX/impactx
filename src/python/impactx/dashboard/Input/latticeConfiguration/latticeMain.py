@@ -31,14 +31,13 @@ state.listOfLatticeElementParametersAndDefault = (
 # Default
 # -----------------------------------------------------------------------------
 
-state.selectedLattice = None  #  Selected lattice is Empty by default
-state.selectedLatticeList = []  # Selected lattice list is Empty by default
+state.selectedLattice = None
+state.selectedLatticeList = []
 state.nsliceDefaultValue = None
 
 # -----------------------------------------------------------------------------
 # Main Functions
 # -----------------------------------------------------------------------------
-
 
 def add_lattice_element ():
     selectedLattice = state.selectedLattice
@@ -72,6 +71,7 @@ def update_latticeElement_parameters (
     """
     Updates parameter value and includes error message if user input is not valid
     """
+
     for param in state.selectedLatticeList[index]["parameters"]:
         if param["parameter_name"] == parameterName:
             param["parameter_default_value"] = parameterValue
@@ -80,7 +80,6 @@ def update_latticeElement_parameters (
     generalFunctions.update_runSimulation_validation_checking()
     state.dirty("selectedLatticeList")
     save_lattice_elements()
-
 
 # -----------------------------------------------------------------------------
 # Write to file functions
@@ -109,7 +108,6 @@ def parameter_input_checker_for_lattice (latticeElement):
 
     return parameter_input
 
-
 def save_lattice_elements ():
     """
     Writes user input for lattice element parameters parameters in suitable format for simulation code.
@@ -126,10 +124,10 @@ def save_lattice_elements ():
 
     return elements_list
 
-
 # -----------------------------------------------------------------------------
 # Callbacks
 # -----------------------------------------------------------------------------
+
 @state.change("selectedLatticeList")
 def on_selectedLatticeList_change (selectedLatticeList, **kwargs):
     if selectedLatticeList == []:
@@ -144,7 +142,6 @@ def on_lattice_element_name_change (selectedLattice, **kwargs):
     return
     # print (f"Lattice Selection Changed to: {selectedLattice}")
 
-
 @ctrl.add("add_latticeElement")
 def on_add_lattice_element_click ():
     selectedLattice = state.selectedLattice
@@ -154,7 +151,6 @@ def on_add_lattice_element_click ():
         state.dirty("selectedLatticeList")
         # print(f"ADD button clicked, added: {selectedLattice}")
         # print(f"Current list of selected lattice elements: {state.selectedLatticeList}")
-
 
 @ctrl.add("updateLatticeElementParameters")
 def on_lattice_element_parameter_change (
@@ -170,19 +166,16 @@ def on_lattice_element_parameter_change (
         f"Lattice element {index}, {parameter_name} changed to {parameter_value} (type: {input_type})"
     )
 
-
 @ctrl.add("clear_latticeElements")
 def on_clear_lattice_element_click ():
     state.selectedLatticeList = []
     save_lattice_elements()
-
 
 @ctrl.add("deleteLatticeElement")
 def on_delete_LatticeElement_click (index):
     state.selectedLatticeList.pop(index)
     state.dirty("selectedLatticeList")
     save_lattice_elements()
-
 
 @ctrl.add("move_latticeElementIndex_up")
 def on_move_latticeElementIndex_up_click (index):
@@ -194,7 +187,6 @@ def on_move_latticeElementIndex_up_click (index):
         state.dirty("selectedLatticeList")
         save_lattice_elements()
 
-
 @ctrl.add("move_latticeElementIndex_down")
 def on_move_latticeElementIndex_down_click (index):
     if index < len(state.selectedLatticeList) - 1:
@@ -204,7 +196,6 @@ def on_move_latticeElementIndex_down_click (index):
         )
         state.dirty("selectedLatticeList")
         save_lattice_elements()
-
 
 @ctrl.add("nsliceDefaultChange")
 def update_default_value (parameter_name, new_value):
@@ -217,11 +208,9 @@ def update_default_value (parameter_name, new_value):
 
     state.listOfLatticeElementParametersAndDefault = data
 
-
 # -----------------------------------------------------------------------------
 # ContentSetup
 # -----------------------------------------------------------------------------
-
 
 class LatticeConfiguration:
 

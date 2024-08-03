@@ -17,21 +17,19 @@ state.selectedVisualization = None
 # Trigger
 # -----------------------------------------------------------------------------
 
-
 @ctrl.trigger("export")
 def on_export_click():
     return retrieve_state_content()
 
-
 # -----------------------------------------------------------------------------
 # Common toolbar elements
 # -----------------------------------------------------------------------------
-terminal_button_styles = {
+
+TERMINAL_BUTTON_STYLES = {
     "background-color": "#2E86C1",
     "color": "white",
     "margin": "0 20px",
 }
-
 
 class ToolbarElements:
 
@@ -129,11 +127,9 @@ class ToolbarElements:
     def checkbox_3d ():
         vuetify.VCheckbox(label="3D", classes="px-2", hide_details=True)
 
-
 # -----------------------------------------------------------------------------
 # Content
 # -----------------------------------------------------------------------------
-
 
 class Toolbars:
 
