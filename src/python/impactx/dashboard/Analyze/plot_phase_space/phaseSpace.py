@@ -13,8 +13,6 @@ server = get_server(client_type="vue2")
 state, ctrl = server.state, server.controller
 import importlib
 
-import pytest
-
 from impactx import ImpactX
 
 from ...Input.distributionParametersCard.distributionMain import (
@@ -23,10 +21,6 @@ from ...Input.distributionParametersCard.distributionMain import (
 from ...Input.latticeConfigurationCard.latticeMain import save_latticeElements_to_file
 from ..plot_phase_space.phaseSpaceSettings import adjusted_settings_plot
 
-
-@pytest.mark.skipif(
-    importlib.util.find_spec("pandas") is None, reason="pandas is not available"
-)
 def run_simulation(save_png=True):
     """
     This tests using ImpactX and Pandas Dataframes
