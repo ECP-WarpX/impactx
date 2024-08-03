@@ -22,7 +22,7 @@ terminal_button_styles = {
 class trameFunctions:
 
     @staticmethod
-    def create_route(route_title, mdi_icon):
+    def create_route (route_title, mdi_icon):
         """
         Creates a route with a specified title and icon.
         :param route_title: The title of the route.
@@ -41,7 +41,7 @@ class trameFunctions:
                 vuetify.VListItemTitle(route_title)
 
     @staticmethod
-    def create_section(title, content, expand_section_index):
+    def create_section (title, content, expand_section_index):
         with vuetify.VExpansionPanels(v_model=(expand_section_index,), accordion=True):
             with vuetify.VExpansionPanel():
                 with vuetify.VExpansionPanelHeader():
@@ -50,7 +50,7 @@ class trameFunctions:
                     vuetify.VCardText(content)
 
     @staticmethod
-    def create_button(label):
+    def create_button (label):
         """
         Creates a Vuetify button component with the specified label and styles.
         :param label: The name of the button.

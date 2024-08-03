@@ -16,9 +16,9 @@ import importlib
 from impactx import ImpactX
 
 from ...Input.distributionParametersCard.distributionMain import (
-    save_distribution_parameters_to_file,
+    save_distribution_parameters,
 )
-from ...Input.latticeConfigurationCard.latticeMain import save_latticeElements_to_file
+from ...Input.latticeConfigurationCard.latticeMain import save_lattice_elements
 from ..plot_phase_space.phaseSpaceSettings import adjusted_settings_plot
 
 def run_simulation(save_png=True):
@@ -54,7 +54,7 @@ def run_simulation(save_png=True):
     #     muypy=0.846574929020762,
     #     mutpt=0.0,
     # )
-    distr = save_distribution_parameters_to_file()
+    distr = save_distribution_parameters()
 
     sim.add_particles(bunch_charge_C, distr, npart)
 
@@ -68,7 +68,7 @@ def run_simulation(save_png=True):
     #     elements.Quad(1.0, -1.0),
     #     elements.Drift(0.25),
     # ]
-    fodo = save_latticeElements_to_file()
+    fodo = save_lattice_elements()
 
     sim.lattice.extend(fodo)
 

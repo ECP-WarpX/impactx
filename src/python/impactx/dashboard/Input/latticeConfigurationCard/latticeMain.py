@@ -79,7 +79,7 @@ def update_latticeElement_parameters (
 
     generalFunctions.update_runSimulation_validation_checking()
     state.dirty("selectedLatticeList")
-    save_latticeElements_to_file()
+    save_lattice_elements()
 
 
 # -----------------------------------------------------------------------------
