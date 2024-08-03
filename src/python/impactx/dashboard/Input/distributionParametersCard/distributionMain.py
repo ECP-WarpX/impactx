@@ -39,8 +39,13 @@ state.selectedDistributionParameters = []
 # Main Functions
 # -----------------------------------------------------------------------------
 
+def populate_distribution_parameters (selectedDistribution):
+    """
+    Populates distribution parameters based on the selected distribution.
+    :param selectedDistribution (str): The name of the selected distribution
+        whos parameters need to be populated.
+    """
 
-def populate_distribution_parameters(selectedDistribution):
     if state.selectedDistributionType == "Twiss":
         selectedDistributionParameters = (
             state.listOfDistributionsAndParametersAndDefault_Twiss.get(
@@ -66,17 +71,21 @@ def populate_distribution_parameters(selectedDistribution):
         for parameter in selectedDistributionParameters
     ]
 
-    save_distribution_parameters_to_file()
+    save_distribution_parameters()
     generalFunctions.update_runSimulation_validation_checking()
     return selectedDistributionParameters
 
-
-def update_distribution_parameters(
+def update_distribution_parameters (
     parameterName, parameterValue, parameterErrorMessage
 ):
     """
-    Updates parameter value and includes error message if user input is not valid
+    Updates the value of a distribution parameter and its error message.
+    
+    :param parameterName (str): The name of the parameter to update.
+    :param parameterValue: The new value for the parameter.
+    :param parameterErrorMessage: The error message related to the parameter's value.
     """
+        
     for param in state.selectedDistributionParameters:
         if param["parameter_name"] == parameterName:
             param["parameter_default_value"] = parameterValue
@@ -84,18 +93,18 @@ def update_distribution_parameters(
 
     generalFunctions.update_runSimulation_validation_checking()
     state.dirty("selectedDistributionParameters")
-    save_distribution_parameters_to_file()
-
+    save_distribution_parameters()
 
 # -----------------------------------------------------------------------------
 # Write to file functions
 # -----------------------------------------------------------------------------
 
+def parameter_input_checker ():
+    """
+    Helper function to check if user input is valid.
+    :return: A dictionary with parameter names as keys and their validated values.
+    """
 
-def parameter_input_checker():
-    """
-    Helper function to check if user input is valid, if yes, then will update with value, if not then set to None.
-    """
     parameter_input = {}
     for param in state.selectedDistributionParameters:
         if param["parameter_error_message"] == []:
@@ -107,35 +116,32 @@ def parameter_input_checker():
 
     return parameter_input
 
+def save_distribution_parameters ():
+    """
+    Writes user input for distribution parameters in suitable format for simulation code.
+    :return: An instance of the selected distribution class, initialized with user-provided parameters.
+    """
 
-def save_distribution_parameters_to_file():
-    """
-    Writes users input for distribution parameters into file in simulation code format
-    """
     distribution_name = state.selectedDistribution
     parameters = parameter_input_checker()
 
     distr = getattr(distribution, distribution_name)(**parameters)
     return distr
 
-
 # -----------------------------------------------------------------------------
 # Callbacks
 # -----------------------------------------------------------------------------
 
-
 @state.change("selectedDistribution")
-def on_distribution_name_change(selectedDistribution, **kwargs):
+def on_distribution_name_change (selectedDistribution, **kwargs):
     populate_distribution_parameters(selectedDistribution)
 
-
 @state.change("selectedDistributionType")
-def on_distribution_type_change(selectedDistributionType, **kwargs):
+def on_distribution_type_change (**kwargs):
     populate_distribution_parameters(state.selectedDistribution)
 
-
 @ctrl.add("updateDistributionParameters")
-def on_distribution_parameter_change(parameter_name, parameter_value, parameter_type):
+def on_distribution_parameter_change (parameter_name, parameter_value, parameter_type):
     parameter_value, input_type = generalFunctions.determine_input_type(parameter_value)
     error_message = generalFunctions.validate_against(parameter_value, parameter_type)
 
@@ -144,16 +150,14 @@ def on_distribution_parameter_change(parameter_name, parameter_value, parameter_
         f"Parameter {parameter_name} was changed to {parameter_value} (type: {input_type})"
     )
 
-
 # -----------------------------------------------------------------------------
 # Content
 # -----------------------------------------------------------------------------
 
-
 class DistributionParameters:
 
     @staticmethod
-    def card():
+    def card ():
         with vuetify.VCard(style="width: 340px; height: 300px"):
             with vuetify.VCardTitle("Distribution Parameters"):
                 vuetify.VSpacer()
