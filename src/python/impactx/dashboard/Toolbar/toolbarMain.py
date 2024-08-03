@@ -111,7 +111,7 @@ class ToolbarElements:
     def start_button ():
         vuetify.VBtn(
             "START",
-            style=terminal_button_styles,
+            style=TERMINAL_BUTTON_STYLES,
             classes="mx-1",
             click=ToolbarElements.run_simulation,
         )

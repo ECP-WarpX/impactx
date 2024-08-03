@@ -125,7 +125,6 @@ def on_filtered_data_change (**kwargs):
 
 @ctrl.add("run_simulation")
 def run_simulation_and_store ():
-    workflow = state.selectedWorkflow
     state.plot_options = validPlotOptions(simulationClicked=True)
     state.simulation_data = run_simulation()
     # asyncio.create_task(run_simulation("run_simulation"))
