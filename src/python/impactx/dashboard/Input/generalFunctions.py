@@ -25,8 +25,10 @@ class generalFunctions:
     @staticmethod
     def documentation(section_name):
         """
-        Function that opens tab to section_name link
+        Opens a tab to the specified section link in the documentation.
+        :param section_name (str): The name of the documentation section to open.
         """
+        
         if section_name == "LatticeElements":
             url = "https://impactx.readthedocs.io/en/latest/usage/python.html#lattice-elements"
         elif section_name == "BeamDistributions":
@@ -47,9 +49,12 @@ class generalFunctions:
 
     @staticmethod
     def determine_input_type(value):
-        """ "
-        Used to help find out the value type
         """
+        Determines the type of the input value.
+        :param value: The input value whose type needs to be determined.
+        :return: A tuple containing the value converted to its determined type and the type itself.
+        """
+
         try:
             return int(value), int
         except ValueError:
@@ -61,10 +66,12 @@ class generalFunctions:
     @staticmethod
     def validate_against(input_value, value_type):
         """
-        Function which returns error message if
-        input value type does not match desired
-        type.
+        Returns an error message if the input value type does not match the desired type.
+        :param input_value: The value to validate.
+        :param value_type: The desired type ('int', 'float', 'str').
+        :return: A list of error messages. An empty list if there are no errors.
         """
+
         if value_type == "int":
             if input_value is None:
                 return ["Must be an integer"]
@@ -98,10 +105,10 @@ class generalFunctions:
     @staticmethod
     def update_runSimulation_validation_checking():
         """
-        Function to check if any input fields are not
-        provided with the correct input type.
-        Updates states as True or False given result.
+        Checks if any input fields are not provided with the correct input type.
+        Updates the state to enable or disable the run simulation button.
         """
+
         error_details = []
 
         # Check for errors in distribution parameters
@@ -144,8 +151,11 @@ class generalFunctions:
     @staticmethod
     def findAllClasses(module_name):
         """
-        Returns list of all classes in given module_name
+        Returns a list of all classes in the given module.
+        :param module_name: The module to inspect.
+        :return: A list of tuples containing class names.
         """
+
         results = []
         for name in dir(module_name):
             attr = getattr(module_name, name)
@@ -156,8 +166,11 @@ class generalFunctions:
     @staticmethod
     def findInitDocstringForClasses(classes):
         """
-        Retrieves the __init__ docstring of given classes
+        Retrieves the __init__ docstring of the given classes.
+        :param classes: A list of typles containing class names.
+        :return: A dictionary with class names as keys and their __init__ docstrings as values.
         """
+
         if not isinstance(classes, (list, tuple)):
             raise TypeError("The 'classes' argument must be a list or tuple.")
 
@@ -173,8 +186,11 @@ class generalFunctions:
     def extractParameters(docstring):
         """
         Parses specific information from docstrings.
-        Aimed to retrieve parameter names/values/types.
+        Aimed to retrieve parameter names, values, and types.
+        :param docstring: The docstring to parse.
+        :return: A list of tuples containing parameter names, default values, and types.
         """
+
         parameters = []
         docstring = re.search(r"\((.*?)\)", docstring).group(
             1
@@ -209,10 +225,10 @@ class generalFunctions:
     @staticmethod
     def classAndParametersAndDefaultValueAndType(module_name):
         """
-        Given module_name, outputs a dictionary.
-        Keys are each class name of the module_name
-        Values are dictionaries of parameter information,
-        such as default name/value/type.
+        Given a module name, outputs a dictionary of class names and their parameters.
+        Keys are class names, and values are lists of parameter information (name, default value, type).
+        :param module_name: The module to inspect.
+        :return: A dictionary with class names as keys and parameter information as values.
         """
 
         classes = generalFunctions.findAllClasses(module_name)
@@ -229,9 +245,11 @@ class generalFunctions:
     @staticmethod
     def selectClasses(module_name):
         """
-        Given module_name, outputs a list
-        of all class names in module_name.
+        Given a module name, outputs a list of all class names in the module.
+        :param module_name: The module to inspect.
+        :return: A list of class names.
         """
+        
         return list(
             generalFunctions.classAndParametersAndDefaultValueAndType(module_name)
         )
@@ -239,9 +257,12 @@ class generalFunctions:
     @staticmethod
     def convert_to_correct_type(value, desired_type):
         """
-        Converts given value to the desired_type.
-        Used for input parameters.
+        Converts the given value to the desired type.
+        :param value: The value to convert.
+        :param desired_type: The type to convert the value to ('int', 'float', 'str').
+        :return: The value converted to the desired type.
         """
+
         if value is None:
             raise ValueError("Cannot convert to desired type")
         if desired_type == "int":

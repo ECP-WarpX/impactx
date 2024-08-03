@@ -23,6 +23,12 @@ class trameFunctions:
 
     @staticmethod
     def create_route(route_title, mdi_icon):
+        """
+        Creates a route with a specified title and icon.
+        :param route_title: The title of the route.
+        :param mdi_icon: The icon to be used for the route.
+        """
+
         state[route_title] = False  # Does not display route by default
 
         to = f"/{route_title}"
@@ -45,6 +51,11 @@ class trameFunctions:
 
     @staticmethod
     def create_button(label):
+        """
+        Creates a Vuetify button component with the specified label and styles.
+        :param label: The name of the button.
+        """
+                
         return vuetify.VBtn(
             label,
             style=terminal_button_styles,

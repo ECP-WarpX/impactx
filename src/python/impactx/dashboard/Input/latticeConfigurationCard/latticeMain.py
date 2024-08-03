@@ -89,8 +89,10 @@ def update_latticeElement_parameters(
 
 def parameter_input_checker_for_lattice(latticeElement):
     """
-    Helper function to check if user input is valid, if yes, then will update with value, if not then set to None.
+    Helper function to check if user input is valid.
+    :return: A dictionary with parameter names as keys and their validated values.
     """
+
     parameter_input = {}
     for parameter in latticeElement["parameters"]:
         if parameter["parameter_error_message"] == []:
@@ -110,8 +112,10 @@ def parameter_input_checker_for_lattice(latticeElement):
 
 def save_latticeElements_to_file():
     """
-    Writes users input for lattice element parameters into file in simulation code format
+    Writes user input for lattice element parameters parameters in suitable format for simulation code.
+    :return: A list in the suitable format.
     """
+    
     elements_list = []
     for latticeElement in state.selectedLatticeList:
         latticeElement_name = latticeElement["name"]
