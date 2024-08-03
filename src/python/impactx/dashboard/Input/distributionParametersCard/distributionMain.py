@@ -4,7 +4,7 @@ from trame.widgets import vuetify
 from impactx import distribution
 
 from ..generalFunctions import generalFunctions
-from .distributionFunctions import distributionFunctions
+from .distributionFunctions import DistributionFunctions
 
 # -----------------------------------------------------------------------------
 # Trame setup
@@ -24,7 +24,7 @@ state.listOfDistributionsAndParametersAndDefault = (
     generalFunctions.classAndParametersAndDefaultValueAndType(DISTRIBUTIONS_MODULE_NAME)
 )
 state.listOfDistributionsAndParametersAndDefault_Twiss = (
-    distributionFunctions.classAndParametersAndDefaultValueAndType_Twiss()
+    DistributionFunctions.classAndParametersAndDefaultValueAndType_Twiss()
 )
 
 # -----------------------------------------------------------------------------
@@ -150,7 +150,7 @@ def on_distribution_parameter_change(parameter_name, parameter_value, parameter_
 # -----------------------------------------------------------------------------
 
 
-class distributionParameters:
+class DistributionParameters:
 
     @staticmethod
     def card():

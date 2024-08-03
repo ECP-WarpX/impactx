@@ -2,7 +2,7 @@ from trame.app import get_server
 from trame.widgets import vuetify
 
 from ..generalFunctions import generalFunctions
-from .inputFunctions import inputFunctions
+from .inputFunctions import InputFunctions
 
 # -----------------------------------------------------------------------------
 # Trame setup
@@ -32,7 +32,7 @@ def validate_and_convert_to_correct_type(
         if getattr(state, state_name) != converted_value:
             setattr(state, state_name, converted_value)
             if state_name == "kin_energy":
-                state.kin_energy_MeV = inputFunctions.value_of_kin_energy_MeV(
+                state.kin_energy_MeV = InputFunctions.value_of_kin_energy_MeV(
                     converted_value, state.kin_energy_unit
                 )
                 print(f"Value of - state.kin_energy_MeV: {state.kin_energy_MeV}")
@@ -42,12 +42,12 @@ def validate_and_convert_to_correct_type(
 def on_convert_kin_energy_change(new_unit):
     old_unit = state.old_kin_energy_unit
     if old_unit != new_unit and float(state.kin_energy) > 0:
-        state.kin_energy = inputFunctions.update_kin_energy_on_display(
+        state.kin_energy = InputFunctions.update_kin_energy_on_display(
             old_unit, new_unit, state.kin_energy
         )
         state.kin_energy_unit = new_unit
         state.old_kin_energy_unit = new_unit
-        state.kin_energy_MeV = inputFunctions.value_of_kin_energy_MeV(
+        state.kin_energy_MeV = InputFunctions.value_of_kin_energy_MeV(
             float(state.kin_energy), new_unit
         )
         # print(f"Value of - state.kin_energy_MeV (back-end value): {state.kin_energy_MeV}")
@@ -63,7 +63,7 @@ def on_convert_kin_energy_change(new_unit):
 # -----------------------------------------------------------------------------
 
 
-class inputParameters:
+class InputParameters:
 
     def __init__(self):
         state.particle_shape = 1

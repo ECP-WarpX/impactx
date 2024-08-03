@@ -39,17 +39,17 @@ state.epsilon_t = 1
 # Update plots on parameter change
 @state.change("alpha_x", "beta_x", "epsilon_x")
 def on_params_change_x(**kwargs):
-    visualizeTwiss.update_plot_x()
+    VisualizeTwiss.update_plot_x()
 
 
 @state.change("alpha_y", "beta_y", "epsilon_y")
 def on_params_change_y(**kwargs):
-    visualizeTwiss.update_plot_y()
+    VisualizeTwiss.update_plot_y()
 
 
 @state.change("alpha_t", "beta_t", "epsilon_t")
 def on_params_change_t(**kwargs):
-    visualizeTwiss.update_plot_t()
+    VisualizeTwiss.update_plot_t()
 
 
 # -----------------------------------------------------------------------------
@@ -57,7 +57,7 @@ def on_params_change_t(**kwargs):
 # -----------------------------------------------------------------------------
 
 
-class visualizeTwiss:
+class VisualizeTwiss:
 
     @staticmethod
     def draw_phase_space_ellipse(
@@ -130,7 +130,7 @@ class visualizeTwiss:
         alpha = state.alpha_x
         beta = state.beta_x
         epsilon = state.epsilon_x
-        fig = visualizeTwiss.draw_phase_space_ellipse(
+        fig = VisualizeTwiss.draw_phase_space_ellipse(
             alpha,
             beta,
             epsilon,
@@ -146,7 +146,7 @@ class visualizeTwiss:
         alpha = state.alpha_y
         beta = state.beta_y
         epsilon = state.epsilon_y
-        fig = visualizeTwiss.draw_phase_space_ellipse(
+        fig = VisualizeTwiss.draw_phase_space_ellipse(
             alpha,
             beta,
             epsilon,
@@ -162,7 +162,7 @@ class visualizeTwiss:
         alpha = state.alpha_t
         beta = state.beta_t
         epsilon = state.epsilon_t
-        fig = visualizeTwiss.draw_phase_space_ellipse(
+        fig = VisualizeTwiss.draw_phase_space_ellipse(
             alpha,
             beta,
             epsilon,

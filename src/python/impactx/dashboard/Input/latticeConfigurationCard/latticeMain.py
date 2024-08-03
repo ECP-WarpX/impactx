@@ -219,15 +219,15 @@ def update_default_value(parameter_name, new_value):
 # -----------------------------------------------------------------------------
 
 
-class latticeConfiguration:
+class LatticeConfiguration:
 
     @staticmethod
     def card():
         with vuetify.VDialog(v_model=("showDialog", False), width="1200px"):
-            latticeConfiguration.dialog_lattice_elementList()
+            LatticeConfiguration.dialog_lattice_elementList()
 
         with vuetify.VDialog(v_model=("showDialog_settings", False), width="500px"):
-            latticeConfiguration.dialog_lattice_settings()
+            LatticeConfiguration.dialog_lattice_settings()
 
         with vuetify.VCard(style="width: 696px;"):
             with vuetify.VCardTitle("Lattice Configuration"):

@@ -1,4 +1,4 @@
-class distributionFunctions:
+class DistributionFunctions:
 
     @staticmethod
     def classAndParametersAndDefaultValueAndType_Twiss():

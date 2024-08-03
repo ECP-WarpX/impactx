@@ -35,7 +35,7 @@ terminal_button_styles = {
 }
 
 
-class toolbarElements:
+class ToolbarElements:
 
     @staticmethod
     def select_visualization():
@@ -117,7 +117,7 @@ class toolbarElements:
             "START",
             style=terminal_button_styles,
             classes="mx-1",
-            click=toolbarElements.run_simulation,
+            click=ToolbarElements.run_simulation,
         )
 
     @staticmethod
@@ -137,33 +137,33 @@ class toolbarElements:
 # -----------------------------------------------------------------------------
 
 
-class toolbars:
+class Toolbars:
 
     @staticmethod
     def runToolbar():
-        toolbarElements.stop_button(),
-        toolbarElements.start_button(),
-        toolbarElements.kill_button(),
+        ToolbarElements.stop_button(),
+        ToolbarElements.start_button(),
+        ToolbarElements.kill_button(),
         vuetify.VSpacer(),
-        toolbarElements.run_simulation_button(),
-        toolbarElements.export_input_data(),
-        toolbarElements.switch_theme(),
+        ToolbarElements.run_simulation_button(),
+        ToolbarElements.export_input_data(),
+        ToolbarElements.switch_theme(),
 
     @staticmethod
     def analyzeToolbar():
         vuetify.VSpacer()
-        toolbarElements.checkbox_2d()
-        toolbarElements.checkbox_3d()
-        toolbarElements.plot_options()
-        toolbarElements.run_simulation_button()
-        toolbarElements.export_input_data()
-        toolbarElements.switch_theme()
+        ToolbarElements.checkbox_2d()
+        ToolbarElements.checkbox_3d()
+        ToolbarElements.plot_options()
+        ToolbarElements.run_simulation_button()
+        ToolbarElements.export_input_data()
+        ToolbarElements.switch_theme()
 
     @staticmethod
     def latticeToolbar():
-        toolbarElements.file_upload()
+        ToolbarElements.file_upload()
         vuetify.VSpacer()
-        toolbarElements.select_visualization()
-        toolbarElements.run_simulation_button()
-        toolbarElements.export_input_data()
-        toolbarElements.switch_theme()
+        ToolbarElements.select_visualization()
+        ToolbarElements.run_simulation_button()
+        ToolbarElements.export_input_data()
+        ToolbarElements.switch_theme()

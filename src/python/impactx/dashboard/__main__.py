@@ -6,13 +6,13 @@ from trame.ui.vuetify import SinglePageWithDrawerLayout
 from trame.widgets import router, vuetify, xterm
 
 from .Analyze.plotsMain import AnalyzeSimulation
-from .Input.distributionParametersCard.distributionMain import distributionParameters
-from .Input.inputParametersCard.inputMain import inputParameters
-from .Input.latticeConfigurationCard.latticeMain import latticeConfiguration
+from .Input.distributionParametersCard.distributionMain import DistributionParameters
+from .Input.inputParametersCard.inputMain import InputParameters
+from .Input.latticeConfigurationCard.latticeMain import LatticeConfiguration
 from .Input.trameFunctions import trameFunctions
-from .Input.Visualiztion.twiss_phase_space_ellipse.x_px import visualizeTwiss
+from .Input.Visualiztion.twiss_phase_space_ellipse.x_px import VisualizeTwiss
 from .Optimize.optimizeMain import Optimize
-from .Toolbar.toolbarMain import toolbars
+from .Toolbar.toolbarMain import Toolbars
 
 # -----------------------------------------------------------------------------
 # Trame setup
@@ -25,7 +25,7 @@ state, ctrl = server.state, server.controller
 # Router Views
 # -----------------------------------------------------------------------------
 
-inputParameters = inputParameters()
+inputParameters = InputParameters()
 
 with RouterViewLayout(server, "/Input"):
     with vuetify.VContainer(fluid=True):
@@ -35,10 +35,10 @@ with RouterViewLayout(server, "/Input"):
                     with vuetify.VCol(cols="auto", classes="pa-2"):
                         inputParameters.card()
                     with vuetify.VCol(cols="auto", classes="pa-2"):
-                        distributionParameters.card()
+                        DistributionParameters.card()
                 with vuetify.VRow(no_gutters=True):
                     with vuetify.VCol(cols="auto", classes="pa-2"):
-                        latticeConfiguration.card()
+                        LatticeConfiguration.card()
             with vuetify.VCol(
                 cols="auto",
                 classes="pa-2",
@@ -46,12 +46,12 @@ with RouterViewLayout(server, "/Input"):
             ):
                 with vuetify.VRow(no_gutters=True):
                     with vuetify.VCol(cols="auto", classes="pa-2"):
-                        visualizeTwiss.card_x()
+                        VisualizeTwiss.card_x()
                     with vuetify.VCol(cols="auto", classes="pa-2"):
-                        visualizeTwiss.card_t()
+                        VisualizeTwiss.card_t()
                 with vuetify.VRow(no_gutters=True):
                     with vuetify.VCol(cols="auto", classes="pa-2"):
-                        visualizeTwiss.card_y()
+                        VisualizeTwiss.card_y()
 
 with RouterViewLayout(server, "/Analyze"):
     with vuetify.VContainer(fluid=True):
@@ -79,11 +79,11 @@ def application():
         layout.title.hide()
         with layout.toolbar:
             with vuetify.Template(v_if="$route.path == '/Input'"):
-                toolbars.latticeToolbar()
+                Toolbars.latticeToolbar()
             with vuetify.Template(v_if="$route.path == '/Analyze'"):
-                toolbars.analyzeToolbar()
+                Toolbars.analyzeToolbar()
             with vuetify.Template(v_if="$route.path == '/Run'"):
-                toolbars.runToolbar()
+                Toolbars.runToolbar()
 
         with layout.drawer as drawer:
             drawer.width = 200
