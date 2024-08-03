@@ -108,13 +108,13 @@ class analyzeFunctions:
             command = [
                 "python",
                 "-c",
-                "from Analyze.plot_phase_space.phaseSpace import run_simulation; run_simulation()",
+                "from Analyze.plot_PhaseSpaceProjections.phaseSpace import run_simulation; run_simulation()",
             ]
         elif simulation_function_name == "run_optimize_triplet":
             command = [
                 "python",
                 "-c",
-                "from Analyze.plot_phase_space.phaseSpace import run_optimize_triplet; run_optimize_triplet()",
+                "from Analyze.plot_PhaseSpaceProjections.phaseSpace import run_optimize_triplet; run_optimize_triplet()",
             ]
         else:
             ctrl.terminal_println(

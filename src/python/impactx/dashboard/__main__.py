@@ -6,9 +6,9 @@ from trame.ui.vuetify import SinglePageWithDrawerLayout
 from trame.widgets import router, vuetify, xterm
 
 from .Analyze.plotsMain import AnalyzeSimulation
-from .Input.distributionParametersCard.distributionMain import DistributionParameters
-from .Input.inputParametersCard.inputMain import InputParameters
-from .Input.latticeConfigurationCard.latticeMain import LatticeConfiguration
+from .Input.distributionParameters.distributionMain import DistributionParameters
+from .Input.inputParameters.inputMain import InputParameters
+from .Input.latticeConfiguration.latticeMain import LatticeConfiguration
 from .Input.trameFunctions import trameFunctions
 from .Input.Visualiztion.twiss_phase_space_ellipse.x_px import VisualizeTwiss
 from .Optimize.optimizeMain import Optimize
