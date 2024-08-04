@@ -1,7 +1,7 @@
 import os
 
 from trame.app import get_server
-from trame.widgets import plotly, vuetify
+from trame.widgets import plotly, vuetify, matplotlib
 
 from .analyzeFunctions import analyzeFunctions
 from .plot_ParameterEvolutionOverS.overS import line_plot_1d
@@ -116,7 +116,7 @@ def update_plot ():
         state.show_table = True
     elif state.active_plot == "Phase Space Plots":
         state.show_table = False
-        # ctrl.matplotlib_figure_update(state.simulation_data)
+        ctrl.matplotlib_figure_update(state.simulation_data)
 
 
 # -----------------------------------------------------------------------------
@@ -195,6 +195,6 @@ class AnalyzeSimulation:
                 display_mode_bar="true", config={"responsive": True}
             )
             ctrl.plotly_figure_update = plotly_figure.update
-        # with vuetify.VLayout(v_if="active_plot === 'Phase Space Plots'"):
-        # matplotlib_figure = matplotlib.Figure(style="position: absolute")
-        # ctrl.matplotlib_figure_update = matplotlib_figure.update
+        with vuetify.VLayout(v_if="active_plot === 'Phase Space Plots'"):
+            matplotlib_figure = matplotlib.Figure(style="position: absolute")
+            ctrl.matplotlib_figure_update = matplotlib_figure.update
