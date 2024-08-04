@@ -11,7 +11,6 @@ from trame.app import get_server
 
 server = get_server(client_type="vue2")
 state, ctrl = server.state, server.controller
-import importlib
 
 from impactx import ImpactX
 
@@ -20,6 +19,7 @@ from ...Input.distributionParameters.distributionMain import (
 )
 from ...Input.latticeConfiguration.latticeMain import save_lattice_elements
 from ..plot_PhaseSpaceProjections.phaseSpaceSettings import adjusted_settings_plot
+
 
 def run_simulation(save_png=True):
     """

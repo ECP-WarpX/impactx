@@ -4,7 +4,6 @@ import subprocess
 import pandas as pd
 from trame.app import get_server
 
-
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
@@ -27,7 +26,7 @@ class analyzeFunctions:
     # -----------------------------------------------------------------------------
 
     @staticmethod
-    def load_data (file_path):
+    def load_data(file_path):
         """
         Reads data from the provided file path.
         :param file_path: The path to the file to be read.
@@ -38,7 +37,7 @@ class analyzeFunctions:
         return df
 
     @staticmethod
-    def convert_to_dict (combined_data):
+    def convert_to_dict(combined_data):
         """
         Converts data to dictionary format
         for Vuetify data table.
@@ -54,7 +53,7 @@ class analyzeFunctions:
         return dictionary, headers
 
     @staticmethod
-    def combine_files (file1_name, file2_name):
+    def combine_files(file1_name, file2_name):
         """
         Merges two files together.
         :param file1_name: The name of the first file.
@@ -67,7 +66,7 @@ class analyzeFunctions:
         return pd.merge(file1, file2, how="outer")
 
     @staticmethod
-    def filter_headers (allHeaders, selected_headers):
+    def filter_headers(allHeaders, selected_headers):
         """
         Retrieves only user-selected headers.
         :param allHeaders: The list of all headers.
@@ -82,7 +81,7 @@ class analyzeFunctions:
         return filtered_headers
 
     @staticmethod
-    def filter_data (allData, selected_headers):
+    def filter_data(allData, selected_headers):
         """
         Retrieves data for user-selected headers.
         :param allData: The list of all data.

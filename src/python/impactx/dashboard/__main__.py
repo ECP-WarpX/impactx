@@ -74,7 +74,7 @@ with RouterViewLayout(server, "/Optimize"):
 # -----------------------------------------------------------------------------
 
 
-def application ():
+def application():
     with SinglePageWithDrawerLayout(server) as layout:
         layout.title.hide()
         with layout.toolbar:

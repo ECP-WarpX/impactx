@@ -1,10 +1,9 @@
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
-from ..Input.distributionParameters.distributionMain import (
-    save_distribution_parameters,
-)
 from trame.app import get_server
+
+from ..Input.distributionParameters.distributionMain import save_distribution_parameters
 
 server = get_server(client_type="vue2")
 state, ctrl = server.state, server.controller
