@@ -195,6 +195,6 @@ class AnalyzeSimulation:
                 display_mode_bar="true", config={"responsive": True}
             )
             ctrl.plotly_figure_update = plotly_figure.update
-        with vuetify.VLayout(v_if="active_plot === 'Phase Space Plots'"):
+        with vuetify.VContainer(fluid=True, v_if="active_plot === 'Phase Space Plots'"):
             matplotlib_figure = matplotlib.Figure(style="position: absolute")
             ctrl.matplotlib_figure_update = matplotlib_figure.update

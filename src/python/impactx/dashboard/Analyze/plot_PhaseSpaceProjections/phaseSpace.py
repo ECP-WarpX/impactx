@@ -18,7 +18,9 @@ from ...Input.distributionParameters.distributionMain import (
     save_distribution_parameters,
 )
 from ...Input.latticeConfiguration.latticeMain import save_lattice_elements
-from ..plot_PhaseSpaceProjections.phaseSpaceSettings import adjusted_settings_plot
+# from ..plot_PhaseSpaceProjections.phaseSpaceSettings import adjusted_settings_plot
+from ..plot_PhaseSpaceProjections.impactXSettings import adjusted_settings_plot
+
 
 
 def run_simulation(save_png=True):
