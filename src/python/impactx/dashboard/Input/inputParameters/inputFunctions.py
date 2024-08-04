@@ -11,7 +11,7 @@ state, ctrl = server.state, server.controller
 # Functions
 # -----------------------------------------------------------------------------
 
-conversion_factors = {
+CONVERSION_FACTORS = {
     "meV": 1.0e-9,
     "eV": 1.0e-6,
     "keV": 1.0e-3,
@@ -38,8 +38,8 @@ class InputFunctions:
             
         state.kin_energy_MeV = (
             kineticEnergyOnDisplayValue
-            * conversion_factors[OldUnit]
-            / conversion_factors["MeV"]
+            * CONVERSION_FACTORS[OldUnit]
+            / CONVERSION_FACTORS["MeV"]
         )
         return state.kin_energy_MeV
 
@@ -57,7 +57,7 @@ class InputFunctions:
             kin_energy_value, old_unit
         )
         kin_energy_value_on_display = (
-            value_in_mev * conversion_factors["MeV"] / conversion_factors[new_unit]
+            value_in_mev * CONVERSION_FACTORS["MeV"] / CONVERSION_FACTORS[new_unit]
         )
 
         return kin_energy_value_on_display

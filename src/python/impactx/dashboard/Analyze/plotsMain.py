@@ -21,6 +21,10 @@ state, ctrl = server.state, server.controller
 
 # Call plot_over_s
 def plot_over_s ():
+    """
+    Generates a plot.
+    """
+
     fig = line_plot_1d(state.selected_headers, state.filtered_data)
     ctrl.plotly_figure_update(fig)
 
@@ -34,7 +38,13 @@ PLOTS = {
 # -----------------------------------------------------------------------------
 
 
-def validPlotOptions (simulationClicked):
+def available_plot_options (simulationClicked):
+    """
+    Displays plot_options for users based on status of simulation.
+    :param simulationClicked (bool): status of simulation status
+    :return: list of plot_options for users
+    """
+
     if simulationClicked:
         return list(PLOTS.keys())
     else:
@@ -42,6 +52,10 @@ def validPlotOptions (simulationClicked):
 
 
 def load_dataTable_data ():
+    """
+    Loads and processes data from combined beam and reference particle files.
+    """
+    
     combined_files = analyzeFunctions.combine_files(
         REDUCED_BEAM_DATA, REF_PARTICLE_DATA
     )
@@ -63,7 +77,7 @@ REF_PARTICLE_DATA = os.path.join(BASE_PATH, "diags", "ref_particle.0.0")
 DEFAULT_HEADERS = ["step", "s", "alpha_x", "alpha_y", "alpha_t"]
 
 state.selected_headers = DEFAULT_HEADERS
-state.plot_options = validPlotOptions(simulationClicked=False)
+state.plot_options = available_plot_options(simulationClicked=False)
 state.show_table = False
 state.active_plot = None
 state.filtered_data = []
@@ -125,7 +139,7 @@ def on_filtered_data_change (**kwargs):
 
 @ctrl.add("run_simulation")
 def run_simulation_and_store ():
-    state.plot_options = validPlotOptions(simulationClicked=True)
+    state.plot_options = available_plot_options(simulationClicked=True)
     state.simulation_data = run_simulation()
     # asyncio.create_task(run_simulation("run_simulation"))
     update_plot()
@@ -141,11 +155,15 @@ def run_simulation_and_store ():
 
 class AnalyzeSimulation:
     """
-    Prepares contents for the 'Analyze' page
+    Prepares contents for the 'Analyze' page.
     """
 
     @staticmethod
     def card ():
+        """
+        Displays any non-plot content for 'Analyze' page.
+        """
+
         with vuetify.VContainer():
             with vuetify.VCard(v_if=("show_table")):
                 with vuetify.VCol(style="width: 500px;"):
@@ -166,6 +184,10 @@ class AnalyzeSimulation:
 
     @staticmethod
     def plot ():
+        """
+        Displays any plot content for 'Analyze' page.
+        """
+
         with vuetify.VContainer(
             v_if="active_plot === 'Plot Over S'", style="height: 90vh; width: 100vh;"
         ):

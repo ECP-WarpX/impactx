@@ -15,13 +15,17 @@ state, ctrl = server.state, server.controller
 
 class Optimize:
     """
-    User-Input section for the Optimize Workflow.
+    User-Input section for the Optimize workflow.
     This is a base implementation without functionality
     thus far. (8/4/24)
     """
 
     @staticmethod
     def card ():
+        """
+        User-Input section for Optimize workflow.
+        """
+
         with vuetify.VCard(style="width: 680px; height: 300px"):
             with vuetify.VCardTitle("Optimizer Settings"):
                 vuetify.VSpacer()

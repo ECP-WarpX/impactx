@@ -19,12 +19,12 @@ state, ctrl = server.state, server.controller
 
 DISTRIBUTIONS_MODULE_NAME = distribution
 
-state.listOfDistributions = generalFunctions.selectClasses(DISTRIBUTIONS_MODULE_NAME)
+state.listOfDistributions = generalFunctions.select_classes(DISTRIBUTIONS_MODULE_NAME)
 state.listOfDistributionsAndParametersAndDefault = (
-    generalFunctions.classAndParametersAndDefaultValueAndType(DISTRIBUTIONS_MODULE_NAME)
+    generalFunctions.class_parameters_with_defaults(DISTRIBUTIONS_MODULE_NAME)
 )
 state.listOfDistributionsAndParametersAndDefault_Twiss = (
-    DistributionFunctions.classAndParametersAndDefaultValueAndType_Twiss()
+    DistributionFunctions.class_parameters_with_defaults_twiss()
 )
 
 # -----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ def populate_distribution_parameters (selectedDistribution):
     ]
 
     save_distribution_parameters()
-    generalFunctions.update_runSimulation_validation_checking()
+    generalFunctions.update_simulation_validation_status()
     return selectedDistributionParameters
 
 def update_distribution_parameters (
@@ -91,7 +91,7 @@ def update_distribution_parameters (
             param["parameter_default_value"] = parameterValue
             param["parameter_error_message"] = parameterErrorMessage
 
-    generalFunctions.update_runSimulation_validation_checking()
+    generalFunctions.update_simulation_validation_status()
     state.dirty("selectedDistributionParameters")
     save_distribution_parameters()
 
@@ -161,6 +161,10 @@ class DistributionParameters:
 
     @staticmethod
     def card ():
+        """
+        Creates UI content for beam distribution.
+        """
+                
         with vuetify.VCard(style="width: 340px; height: 300px"):
             with vuetify.VCardTitle("Distribution Parameters"):
                 vuetify.VSpacer()

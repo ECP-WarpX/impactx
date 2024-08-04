@@ -9,7 +9,7 @@ from .Analyze.plotsMain import AnalyzeSimulation
 from .Input.distributionParameters.distributionMain import DistributionParameters
 from .Input.inputParameters.inputMain import InputParameters
 from .Input.latticeConfiguration.latticeMain import LatticeConfiguration
-from .Input.trameFunctions import trameFunctions
+from .Input.trameFunctions import TrameFunctions
 from .Input.Visualiztion.twiss_phase_space_ellipse.x_px import VisualizeTwiss
 from .Optimize.optimizeMain import Optimize
 from .Toolbar.toolbarMain import Toolbars
@@ -79,20 +79,20 @@ def application ():
         layout.title.hide()
         with layout.toolbar:
             with vuetify.Template(v_if="$route.path == '/Input'"):
-                Toolbars.latticeToolbar()
+                Toolbars.input_toolbar()
             with vuetify.Template(v_if="$route.path == '/Analyze'"):
-                Toolbars.analyzeToolbar()
+                Toolbars.analyze_toolbar()
             with vuetify.Template(v_if="$route.path == '/Run'"):
-                Toolbars.runToolbar()
+                Toolbars.run_toolbar()
 
         with layout.drawer as drawer:
             drawer.width = 200
             with vuetify.VList():
                 vuetify.VSubheader("Simulation")
-            trameFunctions.create_route("Input", "mdi-file-edit")
-            trameFunctions.create_route("Optimize", "mdi-trending-up")
-            trameFunctions.create_route("Run", "mdi-play")
-            trameFunctions.create_route("Analyze", "mdi-chart-box-multiple")
+            TrameFunctions.create_route("Input", "mdi-file-edit")
+            TrameFunctions.create_route("Optimize", "mdi-trending-up")
+            TrameFunctions.create_route("Run", "mdi-play")
+            TrameFunctions.create_route("Analyze", "mdi-chart-box-multiple")
 
         with layout.content:
             router.RouterView()

@@ -33,6 +33,7 @@ class analyzeFunctions:
         :param file_path: The path to the file to be read.
         :return: A DataFrame containing the data from the file.
         """
+        
         df = pd.read_csv(file_path, sep=" ")
         return df
 
@@ -73,6 +74,7 @@ class analyzeFunctions:
         :param selected_headers: The list of headers selected by the user.
         :return: A list of filtered headers based on user selection.
         """
+
         filtered_headers = []
         for selectedHeader in allHeaders:
             if selectedHeader["value"] in selected_headers:
@@ -87,6 +89,7 @@ class analyzeFunctions:
         :param selected_headers: The list of headers selected by the user.
         :return: A list of filtered data based on user selection.
         """
+
         filtered_data = []
         for row in allData:
             filtered_row = {}
@@ -101,6 +104,11 @@ class analyzeFunctions:
     # -----------------------------------------------------------------------------
 
     async def outputTerminal (simulation_function_name):
+        """
+        Function to print out simulation results in
+        terminal view. (Not working as intended, 8/4/24)
+        """
+
         ctrl.terminal_println(f"Running {simulation_function_name}...")
         ctrl.terminal_println(
             f"npart: {state.npart}\nkin_energy_MeV: {state.kin_energy_MeV}"

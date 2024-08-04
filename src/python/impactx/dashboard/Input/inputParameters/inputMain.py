@@ -21,7 +21,7 @@ def validate_and_convert_to_correct_type (
 ):
     validation_result = generalFunctions.validate_against(value, desired_type)
     setattr(state, validation_name, validation_result)
-    generalFunctions.update_runSimulation_validation_checking()
+    generalFunctions.update_simulation_validation_status()
 
     if validation_result == []:
         converted_value = generalFunctions.convert_to_correct_type(value, desired_type)
@@ -80,6 +80,10 @@ class InputParameters:
         print(f"Initial value of - state.kin_energy_MeV: {state.kin_energy_MeV}")
 
     def card (self):
+        """
+        Creates UI content for beam properties.
+        """
+                
         with vuetify.VCard(style="width: 340px; height: 300px"):
             with vuetify.VCardTitle("Input Parameters"):
                 vuetify.VSpacer()

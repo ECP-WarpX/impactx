@@ -3,8 +3,8 @@ from .__main__ import application
 
 class JupyterMainApplication:
     """
-    Functions to return specific components from 
-    Trame Application.
+    Creates specific components from 
+    Trame Application for Jupyter Notebook.
     """
 
     def __init__(self):

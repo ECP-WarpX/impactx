@@ -12,14 +12,18 @@ state, ctrl = server.state, server.controller
 # Code
 # -----------------------------------------------------------------------------
 
-terminal_button_styles = {
+TERMINAL_BUTTON_STYLES = {
     "background-color": "#2E86C1",
     "color": "white",
     "margin": "0 20px",
 }
 
 
-class trameFunctions:
+class TrameFunctions:
+    """
+    Contains functions containing Vuetify
+    components.
+    """
 
     @staticmethod
     def create_route (route_title, mdi_icon):
@@ -49,6 +53,6 @@ class trameFunctions:
                 
         return vuetify.VBtn(
             label,
-            style=terminal_button_styles,
+            style=TERMINAL_BUTTON_STYLES,
             classes="mx-1",
         )

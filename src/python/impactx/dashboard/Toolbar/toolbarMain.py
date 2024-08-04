@@ -1,7 +1,7 @@
 from trame.app import get_server
 from trame.widgets import vuetify
 
-from ..Input.trameFunctions import trameFunctions
+from ..Input.trameFunctions import TrameFunctions
 from .exportTemplate import retrieve_state_content
 
 # -----------------------------------------------------------------------------
@@ -88,8 +88,11 @@ class ToolbarElements:
 
     @staticmethod
     def file_upload ():
+        """
+        Allows users to upload file, but nothing more than that.
+        """
+        
         vuetify.VFileInput(
-            # Allows users to upload file, but nothing more than that.
             label="Upload Input File",
             clearable=True,
             chips=True,
@@ -105,11 +108,11 @@ class ToolbarElements:
 
     @staticmethod
     def kill_button ():
-        return trameFunctions.create_button("Kill")
+        return TrameFunctions.create_button("Kill")
 
     @staticmethod
     def stop_button ():
-        return trameFunctions.create_button("Stop")
+        return TrameFunctions.create_button("Stop")
 
     @staticmethod
     def start_button ():
@@ -122,10 +125,7 @@ class ToolbarElements:
 
     @staticmethod
     def checkbox_2d ():
-        vuetify.VCheckbox(
-            label="2D",
-            hide_details=True,
-        )
+        vuetify.VCheckbox(label="2D", hide_details=True,)
 
     @staticmethod
     def checkbox_3d ():
@@ -141,7 +141,24 @@ class Toolbars:
     """
 
     @staticmethod
-    def runToolbar():
+    def input_toolbar ():
+        """
+        Builds toolbar for the 'Input' page.
+        """
+
+        ToolbarElements.file_upload()
+        vuetify.VSpacer()
+        ToolbarElements.select_visualization()
+        ToolbarElements.run_simulation_button()
+        ToolbarElements.export_input_data()
+        ToolbarElements.switch_theme()
+
+    @staticmethod
+    def run_toolbar ():
+        """
+        Builds toolbar for the 'Run' page.
+        """
+        
         ToolbarElements.stop_button(),
         ToolbarElements.start_button(),
         ToolbarElements.kill_button(),
@@ -151,20 +168,15 @@ class Toolbars:
         ToolbarElements.switch_theme(),
 
     @staticmethod
-    def analyzeToolbar():
+    def analyze_toolbar ():
+        """
+        Builds toolbar for the 'Analyze' page.
+        """
+
         vuetify.VSpacer()
         ToolbarElements.checkbox_2d()
         ToolbarElements.checkbox_3d()
         ToolbarElements.plot_options()
-        ToolbarElements.run_simulation_button()
-        ToolbarElements.export_input_data()
-        ToolbarElements.switch_theme()
-
-    @staticmethod
-    def latticeToolbar():
-        ToolbarElements.file_upload()
-        vuetify.VSpacer()
-        ToolbarElements.select_visualization()
         ToolbarElements.run_simulation_button()
         ToolbarElements.export_input_data()
         ToolbarElements.switch_theme()

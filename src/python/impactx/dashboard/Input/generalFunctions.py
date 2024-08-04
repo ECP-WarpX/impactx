@@ -103,7 +103,7 @@ class generalFunctions:
             return ["Unknown type"]
 
     @staticmethod
-    def update_runSimulation_validation_checking ():
+    def update_simulation_validation_status ():
         """
         Checks if any input fields are not provided with the correct input type.
         Updates the state to enable or disable the run simulation button.
@@ -149,7 +149,7 @@ class generalFunctions:
     # -----------------------------------------------------------------------------
 
     @staticmethod
-    def findAllClasses (module_name):
+    def find_classes (module_name):
         """
         Returns a list of all classes in the given module.
         :param module_name: The module to inspect.
@@ -164,7 +164,7 @@ class generalFunctions:
         return results
 
     @staticmethod
-    def findInitDocstringForClasses (classes):
+    def find_init_docstring_for_classes (classes):
         """
         Retrieves the __init__ docstring of the given classes.
         :param classes: A list of typles containing class names.
@@ -183,7 +183,7 @@ class generalFunctions:
         return docstrings
 
     @staticmethod
-    def extractParameters (docstring):
+    def extract_parameters (docstring):
         """
         Parses specific information from docstrings.
         Aimed to retrieve parameter names, values, and types.
@@ -223,7 +223,7 @@ class generalFunctions:
         return parameters
 
     @staticmethod
-    def classAndParametersAndDefaultValueAndType (module_name):
+    def class_parameters_with_defaults (module_name):
         """
         Given a module name, outputs a dictionary of class names and their parameters.
         Keys are class names, and values are lists of parameter information (name, default value, type).
@@ -231,19 +231,19 @@ class generalFunctions:
         :return: A dictionary with class names as keys and parameter information as values.
         """
 
-        classes = generalFunctions.findAllClasses(module_name)
-        docstrings = generalFunctions.findInitDocstringForClasses(classes)
+        classes = generalFunctions.find_classes(module_name)
+        docstrings = generalFunctions.find_init_docstring_for_classes(classes)
 
         result = {}
 
         for class_name, docstring in docstrings.items():
-            parameters = generalFunctions.extractParameters(docstring)
+            parameters = generalFunctions.extract_parameters(docstring)
             result[class_name] = parameters
 
         return result
 
     @staticmethod
-    def selectClasses (module_name):
+    def select_classes (module_name):
         """
         Given a module name, outputs a list of all class names in the module.
         :param module_name: The module to inspect.
@@ -251,7 +251,7 @@ class generalFunctions:
         """
         
         return list(
-            generalFunctions.classAndParametersAndDefaultValueAndType(module_name)
+            generalFunctions.class_parameters_with_defaults(module_name)
         )
 
     @staticmethod
