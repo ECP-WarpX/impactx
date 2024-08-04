@@ -13,7 +13,7 @@ from .Input.trameFunctions import trameFunctions
 from .Input.Visualiztion.twiss_phase_space_ellipse.x_px import VisualizeTwiss
 from .Optimize.optimizeMain import Optimize
 from .Toolbar.toolbarMain import Toolbars
-
+from .start import main
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
@@ -101,38 +101,10 @@ def application ():
                 ctrl.terminal_println = term.writeln
     return layout
 
-
-class JupyterMainApplication:
-    def __init__(self):
-        self.ui = self.generate_ui()
-
-    def generate_ui(self):
-        return application()
-
-
 application()
 # -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
 
-
-def main():
-    server.start()
-    return 0
-
-
 if __name__ == "__main__":
     sys.exit(main())
-
-"""
-from main import JupyterMainApplication
-
-# Create new application instance
-app = JupyterMainApplication()
-
-# Let's start the server by waiting for its UI to be ready
-await app.ui.ready
-
-# Put the UI into the resulting cell
-app.ui
-"""
