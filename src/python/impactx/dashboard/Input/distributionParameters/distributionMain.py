@@ -155,6 +155,9 @@ def on_distribution_parameter_change (parameter_name, parameter_value, parameter
 # -----------------------------------------------------------------------------
 
 class DistributionParameters:
+    """
+    User-Input section for beam distribution.
+    """
 
     @staticmethod
     def card ():

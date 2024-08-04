@@ -14,6 +14,11 @@ state, ctrl = server.state, server.controller
 
 
 class Optimize:
+    """
+    User-Input section for the Optimize Workflow.
+    This is a base implementation without functionality
+    thus far. (8/4/24)
+    """
 
     @staticmethod
     def card ():

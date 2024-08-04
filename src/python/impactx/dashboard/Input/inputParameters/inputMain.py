@@ -60,6 +60,9 @@ def on_convert_kin_energy_change (new_unit):
 # -----------------------------------------------------------------------------
 
 class InputParameters:
+    """
+    User-Input section for beam properties.
+    """
 
     def __init__ (self):
         state.particle_shape = 1

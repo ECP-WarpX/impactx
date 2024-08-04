@@ -32,6 +32,10 @@ TERMINAL_BUTTON_STYLES = {
 }
 
 class ToolbarElements:
+    """
+    Helper functions to create
+    Vuetify UI elements for toolbar.
+    """
 
     @staticmethod
     def select_visualization ():
@@ -132,6 +136,9 @@ class ToolbarElements:
 # -----------------------------------------------------------------------------
 
 class Toolbars:
+    """
+    Builds section toolbars for various pages.
+    """
 
     @staticmethod
     def runToolbar():

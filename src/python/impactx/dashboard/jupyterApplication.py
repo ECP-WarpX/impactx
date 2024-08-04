@@ -2,6 +2,11 @@ from .__main__ import application
 
 
 class JupyterMainApplication:
+    """
+    Functions to return specific components from 
+    Trame Application.
+    """
+
     def __init__(self):
         self.ui = self.generate_ui()
 

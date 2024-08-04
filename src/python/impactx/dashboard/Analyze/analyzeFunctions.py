@@ -18,7 +18,10 @@ state, ctrl = server.state, server.controller
 
 
 class analyzeFunctions:
-
+    """
+    Helper functions for
+    preparing the contents for the 'Analyze' page
+    """
     # -----------------------------------------------------------------------------
     # Functions for Beam Characteristic and Ref particle data table
     # -----------------------------------------------------------------------------

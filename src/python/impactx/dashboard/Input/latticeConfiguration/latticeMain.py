@@ -213,6 +213,9 @@ def update_default_value (parameter_name, new_value):
 # -----------------------------------------------------------------------------
 
 class LatticeConfiguration:
+    """
+    User-Input section for configuring lattice elements.
+    """
 
     @staticmethod
     def card ():

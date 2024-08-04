@@ -22,6 +22,10 @@ conversion_factors = {
 
 
 class InputFunctions:
+    """
+    Helper functions for the
+    User-Input section for beam properties.
+    """
 
     @staticmethod
     def value_of_kin_energy_MeV (kineticEnergyOnDisplayValue, OldUnit):

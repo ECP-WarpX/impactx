@@ -140,6 +140,9 @@ def run_simulation_and_store ():
 
 
 class AnalyzeSimulation:
+    """
+    Prepares contents for the 'Analyze' page
+    """
 
     @staticmethod
     def card ():

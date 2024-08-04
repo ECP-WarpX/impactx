@@ -1,4 +1,8 @@
 class DistributionFunctions:
+    """
+    Helper functions for
+    User-Input section for beam distribution.
+    """
 
     @staticmethod
     def classAndParametersAndDefaultValueAndType_Twiss ():
