@@ -18,261 +18,144 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
     """
     import matplotlib.pyplot as plt
     import numpy as np
-    from quantiphy import Quantity
+    from scipy.stats import gaussian_kde
 
     # Beam Characteristics
-    rbc = self.reduced_beam_characteristics()
-
+    # rbc = self.reduced_beam_characteristics()
     # update for plot unit system
     m2mm = 1.0e3
     rad2mrad = 1.0e3
 
-    # Data Histogramming
+    # Data Extraction
     df = self.to_df(local=True)
-
-    # calculate local histograms
-    if df is None:
-        xpx = np.zeros(
-            (
-                num_bins,
-                num_bins,
-            )
-        )
-        x_edges = np.linspace(rbc["x_min"] * m2mm, rbc["x_max"] * m2mm, num_bins + 1)
-        px_edges = np.linspace(
-            rbc["px_min"] * rad2mrad, rbc["px_max"] * rad2mrad, num_bins + 1
-        )
-
-        ypy = np.zeros(
-            (
-                num_bins,
-                num_bins,
-            )
-        )
-        y_edges = np.linspace(rbc["y_min"] * m2mm, rbc["y_max"] * m2mm, num_bins + 1)
-        py_edges = np.linspace(
-            rbc["py_min"] * rad2mrad, rbc["py_max"] * rad2mrad, num_bins + 1
-        )
-
-        tpt = np.zeros(
-            (
-                num_bins,
-                num_bins,
-            )
-        )
-        t_edges = np.linspace(rbc["t_min"] * m2mm, rbc["t_max"] * m2mm, num_bins + 1)
-        pt_edges = np.linspace(
-            rbc["pt_min"] * rad2mrad, rbc["pt_max"] * rad2mrad, num_bins + 1
-        )
-    else:
-        # update for plot unit system
-        # TODO: normalize to t/z to um and mc depending on s or t
-        df.position_x = df.position_x.multiply(m2mm)
-        df.position_y = df.position_y.multiply(m2mm)
-        df.position_t = df.position_t.multiply(m2mm)
-
-        df.momentum_x = df.momentum_x.multiply(rad2mrad)
-        df.momentum_y = df.momentum_y.multiply(rad2mrad)
-        df.momentum_t = df.momentum_t.multiply(rad2mrad)
-
-        xpx, x_edges, px_edges = np.histogram2d(
-            df["position_x"],
-            df["momentum_x"],
-            bins=num_bins,
-            range=[
-                [rbc["x_min"] * m2mm, rbc["x_max"] * m2mm],
-                [rbc["px_min"] * rad2mrad, rbc["px_max"] * rad2mrad],
-            ],
-        )
-
-        ypy, y_edges, py_edges = np.histogram2d(
-            df["position_y"],
-            df["momentum_y"],
-            bins=num_bins,
-            range=[
-                [rbc["y_min"] * m2mm, rbc["y_max"] * m2mm],
-                [rbc["py_min"] * rad2mrad, rbc["py_max"] * rad2mrad],
-            ],
-        )
-
-        tpt, t_edges, pt_edges = np.histogram2d(
-            df["position_t"],
-            df["momentum_t"],
-            bins=num_bins,
-            range=[
-                [rbc["t_min"] * m2mm, rbc["t_max"] * m2mm],
-                [rbc["pt_min"] * rad2mrad, rbc["pt_max"] * rad2mrad],
-            ],
-        )
-
-    # MPI reduce
-    #   nothing to do for non-MPI runs
-    from inspect import getmodule
-
-    ix = getmodule(self)
-    if ix.Config.have_mpi:
-        from mpi4py import MPI
-
-        comm = MPI.COMM_WORLD  # TODO: get currently used ImpactX communicator here
-        rank = comm.Get_rank()
-
-        # MPI_Reduce the node-local histogram data
-        combined_data = np.concatenate([xpx, ypy, tpt])
-        summed_data = comm.reduce(
-            combined_data,
-            op=MPI.SUM,
-            root=root_rank,
-        )
-
-        if rank != root_rank:
-            return None
-
-        [xpx, ypy, tpt] = np.split(
-            summed_data,
-            [
-                len(xpx),
-                len(xpx) + len(ypy),
-            ],
-        )
-
-    # histograms per axis
-    x = np.sum(xpx, axis=1)
-    px = np.sum(xpx, axis=0)
-    y = np.sum(ypy, axis=1)
-    py = np.sum(ypy, axis=0)
-    t = np.sum(tpt, axis=1)
-    pt = np.sum(tpt, axis=0)
 
     # Matplotlib canvas: figure and plottable axes areas
     fig, axes = plt.subplots(1, 3, figsize=(16, 4), constrained_layout=True)
     (ax_xpx, ax_ypy, ax_tpt) = axes
 
-    #   projected axes
-    ax_x, ax_px = ax_xpx.twinx(), ax_xpx.twiny()
-    ax_y, ax_py = ax_ypy.twinx(), ax_ypy.twiny()
-    ax_t, ax_pt = ax_tpt.twinx(), ax_tpt.twiny()
+    # Plotting data points if df is not None
+    if df is not None:
+        # update for plot unit system
+        df["position_x"] = df["position_x"].multiply(m2mm)
+        df["position_y"] = df["position_y"].multiply(m2mm)
+        df["position_t"] = df["position_t"].multiply(m2mm)
+        df["momentum_x"] = df["momentum_x"].multiply(rad2mrad)
+        df["momentum_y"] = df["momentum_y"].multiply(rad2mrad)
+        df["momentum_t"] = df["momentum_t"].multiply(rad2mrad)
 
-    # Plotting
-    def plot_2d(hist, r, p, r_edges, p_edges, ax_r, ax_p, ax_rp):
-        hist = np.ma.masked_where(hist == 0, hist)
-        im = ax_rp.imshow(
-            hist.T,
-            origin="lower",
-            aspect="auto",
-            extent=[r_edges[0], r_edges[-1], p_edges[0], p_edges[-1]],
+        def scatter_density_plot(ax, x, y, xlabel, ylabel, title, size=10):
+            xy = np.vstack([x, y])
+            z = gaussian_kde(xy)(xy)
+            scatter = ax.scatter(x, y, c=z, cmap="viridis", alpha=0.5, s=size)
+            ax.set_xlabel(xlabel)
+            ax.set_ylabel(ylabel)
+            ax.set_title(title)
+            return scatter
+
+        scatter_xpx = scatter_density_plot(
+            ax_xpx,
+            df["position_x"],
+            df["momentum_x"],
+            "Δ x [mm]",
+            "Δ p_x [mrad]",
+            "Longitudinal Phase Space",
+            size=20  # Increase the size of the points here
         )
-        cbar = fig.colorbar(im, ax=ax_rp)
+        scatter_ypy = scatter_density_plot(
+            ax_ypy,
+            df["position_y"],
+            df["momentum_y"],
+            "Δ y [mm]",
+            "Δ p_y [mrad]",
+            "Transverse Phase Space (y)",
+            size=20  # Increase the size of the points here
+        )
+        scatter_tpt = scatter_density_plot(
+            ax_tpt,
+            df["position_t"],
+            df["momentum_t"],
+            "Δ ct [mm]",
+            "Delta p_t [p_0 . c]",
+            "Transverse Phase Space (t)",
+            size=20  # Increase the size of the points here
+        )
 
-        r_mids = (r_edges[:-1] + r_edges[1:]) / 2
-        p_mids = (p_edges[:-1] + p_edges[1:]) / 2
-        ax_r.plot(r_mids, r, c="w", lw=0.8, alpha=0.7)
-        ax_r.plot(r_mids, r, c="k", lw=0.5, alpha=0.7)
-        ax_r.fill_between(r_mids, r, facecolor="k", alpha=0.2)
-        ax_p.plot(p, p_mids, c="w", lw=0.8, alpha=0.7)
-        ax_p.plot(p, p_mids, c="k", lw=0.5, alpha=0.7)
-        ax_p.fill_betweenx(p_mids, p, facecolor="k", alpha=0.2)
+        fig.colorbar(scatter_xpx, ax=ax_xpx, label="Particle Density")
+        fig.colorbar(scatter_ypy, ax=ax_ypy, label="Particle Density")
+        fig.colorbar(scatter_tpt, ax=ax_tpt, label="Particle Density")
 
-        return cbar
-
-    cbar_xpx = plot_2d(xpx, x, px, x_edges, px_edges, ax_x, ax_px, ax_xpx)
-    cbar_ypy = plot_2d(ypy, y, py, y_edges, py_edges, ax_y, ax_py, ax_ypy)
-    cbar_tpt = plot_2d(tpt, t, pt, t_edges, pt_edges, ax_t, ax_pt, ax_tpt)
-
-    # Limits
-    def set_limits(r, p, r_edges, p_edges, ax_r, ax_p, ax_rp):
-        pad = 0.1
-        len_r = r_edges[-1] - r_edges[0]
-        len_p = p_edges[-1] - p_edges[0]
-        ax_rp.set_xlim(r_edges[0] - len_r * pad, r_edges[-1] + len_r * pad)
-        ax_rp.set_ylim(p_edges[0] - len_p * pad, p_edges[-1] + len_p * pad)
-
-        # ensure zoom does not change value axis for projections
-        def on_xlims_change(axes):
-            if not axes.xlim_reset_in_progress:
-                pad = 6.0
-                axes.xlim_reset_in_progress = True
-                axes.set_xlim(0, np.max(p) * pad)
-                axes.xlim_reset_in_progress = False
-
-        ax_p.xlim_reset_in_progress = False
-        ax_p.callbacks.connect("xlim_changed", on_xlims_change)
-        on_xlims_change(ax_p)
-
-        def on_ylims_change(axes):
-            if not axes.ylim_reset_in_progress:
-                pad = 6.0
-                axes.ylim_reset_in_progress = True
-                axes.set_ylim(0, np.max(r) * pad)
-                axes.ylim_reset_in_progress = False
-
-        ax_r.ylim_reset_in_progress = False
-        ax_r.callbacks.connect("ylim_changed", on_ylims_change)
-        on_ylims_change(ax_r)
-
-    set_limits(x, px, x_edges, px_edges, ax_x, ax_px, ax_xpx)
-    set_limits(y, py, y_edges, py_edges, ax_y, ax_py, ax_ypy)
-    set_limits(t, pt, t_edges, pt_edges, ax_t, ax_pt, ax_tpt)
+    else:
+        ax_xpx.text(
+            0.5,
+            0.5,
+            "No data available",
+            horizontalalignment="center",
+            verticalalignment="center",
+        )
+        ax_ypy.text(
+            0.5,
+            0.5,
+            "No data available",
+            horizontalalignment="center",
+            verticalalignment="center",
+        )
+        ax_tpt.text(
+            0.5,
+            0.5,
+            "No data available",
+            horizontalalignment="center",
+            verticalalignment="center",
+        )
 
     # Annotations
     fig.canvas.manager.set_window_title("Phase Space")
-    ax_xpx.set_xlabel(r"$\Delta x$ [mm]")
-    ax_xpx.set_ylabel(r"$\Delta p_x$ [mrad]")
-    cbar_xpx.set_label(r"$Q$ [C/bin]")
-    # ax_x.patch.set_alpha(0)
-    ax_x.set_yticks([])
-    ax_px.set_xticks([])
 
-    ax_ypy.set_xlabel(r"$\Delta y$ [mm]")
-    ax_ypy.set_ylabel(r"$\Delta p_y$ [mrad]")
-    cbar_ypy.set_label(r"$Q$ [C/bin]")
-    ax_y.set_yticks([])
-    ax_py.set_xticks([])
+    # # Adding legends
+    # def add_legend(ax, title):
+    #     leg = ax.legend(
+    #         title=title,
+    #         loc="upper right",
+    #         framealpha=0.8,
+    #         handles=[]
+    #     )
+    #     leg._legend_box.sep = 0
 
-    # TODO: update depending on s or t
-    ax_tpt.set_xlabel(r"$\Delta ct$ [mm]")
-    ax_tpt.set_ylabel(r"$\Delta p_t$ [$p_0\cdot c$]")
-    cbar_tpt.set_label(r"$Q$ [C/bin]")
-    ax_t.set_yticks([])
-    ax_pt.set_xticks([])
-
-    leg = ax_xpx.legend(
-        title=r"$\epsilon_{n,x}=$"
-        f"{Quantity(rbc['emittance_x'], 'm'):.3}\n"
-        rf"$\sigma_x=${Quantity(rbc['sig_x'], 'm'):.3}"
-        "\n"
-        rf"$\beta_x=${Quantity(rbc['beta_x'], 'm'):.3}"
-        "\n"
-        rf"$\alpha_x=${rbc['alpha_x']:.3g}",
-        loc="upper right",
-        framealpha=0.8,
-        handles=[],
-    )
-    leg._legend_box.sep = 0
-    leg = ax_ypy.legend(
-        title=r"$\epsilon_{n,y}=$"
-        f"{Quantity(rbc['emittance_y'], 'm'):.3}\n"
-        rf"$\sigma_y=${Quantity(rbc['sig_y'], 'm'):.3}"
-        "\n"
-        rf"$\beta_y=${Quantity(rbc['beta_y'], 'm'):.3}"
-        "\n"
-        rf"$\alpha_y=${rbc['alpha_y']:.3g}",
-        loc="upper right",
-        framealpha=0.8,
-        handles=[],
-    )
-    leg._legend_box.sep = 0
-    leg = ax_tpt.legend(
-        title=r"$\epsilon_{n,t}=$"
-        f"{Quantity(rbc['emittance_t'], 'm'):.3}\n"
-        r"$\sigma_{ct}=$"
-        f"{Quantity(rbc['sig_t'], 'm'):.3}\n"
-        r"$\sigma_{pt}=$"
-        f"{rbc['sig_pt']:.3g}",
-        # TODO: I_peak, t_FWHM, ...
-        loc="upper right",
-        framealpha=0.8,
-        handles=[],
-    )
-    leg._legend_box.sep = 0
+    # add_legend(
+    #     ax_xpx, (
+    #         "ε_n,x = {}\n"
+    #         "σ_x = {}\n"
+    #         "β_x = {}\n"
+    #         "α_x = {:.3g}"
+    #     ).format(
+    #         Quantity(rbc['emittance_x'], 'm').render(prec=3),
+    #         Quantity(rbc['sig_x'], 'm').render(prec=3),
+    #         Quantity(rbc['beta_x'], 'm').render(prec=3),
+    #         rbc['alpha_x']
+    #     )
+    # )
+    # add_legend(
+    #     ax_ypy, (
+    #         "ε_n,y = {}\n"
+    #         "σ_y = {}\n"
+    #         "β_y = {}\n"
+    #         "α_y = {:.3g}"
+    #     ).format(
+    #         Quantity(rbc['emittance_y'], 'm').render(prec=3),
+    #         Quantity(rbc['sig_y'], 'm').render(prec=3),
+    #         Quantity(rbc['beta_y'], 'm').render(prec=3),
+    #         rbc['alpha_y']
+    #     )
+    # )
+    # add_legend(
+    #     ax_tpt, (
+    #         "ε_n,t = {}\n"
+    #         "σ_ct = {}\n"
+    #         "σ_pt = {:.3g}"
+    #     ).format(
+    #         Quantity(rbc['emittance_t'], 'm').render(prec=3),
+    #         Quantity(rbc['sig_t'], 'm').render(prec=3),
+    #         rbc['sig_pt']
+    #     )
+    # )
 
     return fig
