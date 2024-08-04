@@ -11,6 +11,7 @@ state, ctrl = server.state, server.controller
 # Main
 # -----------------------------------------------------------------------------
 
+
 def main():
     """
     Launches Trame application server

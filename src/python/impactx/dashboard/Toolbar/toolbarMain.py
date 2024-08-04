@@ -90,11 +90,11 @@ class ToolbarElements:
         )
 
     @staticmethod
-    def file_upload ():
+    def file_upload():
         """
         Allows users to upload file, but nothing more than that.
         """
-        
+
         vuetify.VFileInput(
             label="Upload Input File",
             clearable=True,
@@ -110,11 +110,11 @@ class ToolbarElements:
         ctrl.terminal_println("Simulation complete.")
 
     @staticmethod
-    def kill_button ():
+    def kill_button():
         return TrameFunctions.create_button("Kill")
 
     @staticmethod
-    def stop_button ():
+    def stop_button():
         return TrameFunctions.create_button("Stop")
 
     @staticmethod
@@ -127,8 +127,11 @@ class ToolbarElements:
         )
 
     @staticmethod
-    def checkbox_2d ():
-        vuetify.VCheckbox(label="2D", hide_details=True,)
+    def checkbox_2d():
+        vuetify.VCheckbox(
+            label="2D",
+            hide_details=True,
+        )
 
     @staticmethod
     def checkbox_3d():
@@ -146,7 +149,7 @@ class Toolbars:
     """
 
     @staticmethod
-    def input_toolbar ():
+    def input_toolbar():
         """
         Builds toolbar for the 'Input' page.
         """
@@ -159,11 +162,11 @@ class Toolbars:
         ToolbarElements.switch_theme()
 
     @staticmethod
-    def run_toolbar ():
+    def run_toolbar():
         """
         Builds toolbar for the 'Run' page.
         """
-        
+
         ToolbarElements.stop_button(),
         ToolbarElements.start_button(),
         ToolbarElements.kill_button(),
@@ -173,7 +176,7 @@ class Toolbars:
         ToolbarElements.switch_theme(),
 
     @staticmethod
-    def analyze_toolbar ():
+    def analyze_toolbar():
         """
         Builds toolbar for the 'Analyze' page.
         """

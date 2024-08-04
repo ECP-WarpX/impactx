@@ -21,6 +21,7 @@ class analyzeFunctions:
     Helper functions for
     preparing the contents for the 'Analyze' page
     """
+
     # -----------------------------------------------------------------------------
     # Functions for Beam Characteristic and Ref particle data table
     # -----------------------------------------------------------------------------
@@ -32,7 +33,7 @@ class analyzeFunctions:
         :param file_path: The path to the file to be read.
         :return: A DataFrame containing the data from the file.
         """
-        
+
         df = pd.read_csv(file_path, sep=" ")
         return df
 
@@ -102,7 +103,7 @@ class analyzeFunctions:
     # Function to print simulation output in terminal view
     # -----------------------------------------------------------------------------
 
-    async def outputTerminal (simulation_function_name):
+    async def outputTerminal(simulation_function_name):
         """
         Function to print out simulation results in
         terminal view. (Not working as intended, 8/4/24)

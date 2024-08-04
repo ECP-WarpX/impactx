@@ -21,7 +21,7 @@ class Optimize:
     """
 
     @staticmethod
-    def card ():
+    def card():
         """
         User-Input section for Optimize workflow.
         """

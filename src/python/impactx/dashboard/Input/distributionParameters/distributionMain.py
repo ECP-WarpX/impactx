@@ -40,7 +40,7 @@ state.selectedDistributionParameters = []
 # -----------------------------------------------------------------------------
 
 
-def populate_distribution_parameters (selectedDistribution):
+def populate_distribution_parameters(selectedDistribution):
     """
     Populates distribution parameters based on the selected distribution.
     :param selectedDistribution (str): The name of the selected distribution
@@ -77,7 +77,7 @@ def populate_distribution_parameters (selectedDistribution):
     return selectedDistributionParameters
 
 
-def update_distribution_parameters (
+def update_distribution_parameters(
     parameterName, parameterValue, parameterErrorMessage
 ):
     """
@@ -103,7 +103,7 @@ def update_distribution_parameters (
 # -----------------------------------------------------------------------------
 
 
-def parameter_input_checker ():
+def parameter_input_checker():
     """
     Helper function to check if user input is valid.
     :return: A dictionary with parameter names as keys and their validated values.
@@ -121,7 +121,7 @@ def parameter_input_checker ():
     return parameter_input
 
 
-def save_distribution_parameters ():
+def save_distribution_parameters():
     """
     Writes user input for distribution parameters in suitable format for simulation code.
     :return: An instance of the selected distribution class, initialized with user-provided parameters.
@@ -140,17 +140,17 @@ def save_distribution_parameters ():
 
 
 @state.change("selectedDistribution")
-def on_distribution_name_change (selectedDistribution, **kwargs):
+def on_distribution_name_change(selectedDistribution, **kwargs):
     populate_distribution_parameters(selectedDistribution)
 
 
 @state.change("selectedDistributionType")
-def on_distribution_type_change (**kwargs):
+def on_distribution_type_change(**kwargs):
     populate_distribution_parameters(state.selectedDistribution)
 
 
 @ctrl.add("updateDistributionParameters")
-def on_distribution_parameter_change (parameter_name, parameter_value, parameter_type):
+def on_distribution_parameter_change(parameter_name, parameter_value, parameter_type):
     parameter_value, input_type = generalFunctions.determine_input_type(parameter_value)
     error_message = generalFunctions.validate_against(parameter_value, parameter_type)
 
@@ -171,11 +171,11 @@ class DistributionParameters:
     """
 
     @staticmethod
-    def card ():
+    def card():
         """
         Creates UI content for beam distribution.
         """
-                
+
         with vuetify.VCard(style="width: 340px; height: 300px"):
             with vuetify.VCardTitle("Distribution Parameters"):
                 vuetify.VSpacer()

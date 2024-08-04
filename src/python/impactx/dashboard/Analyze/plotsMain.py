@@ -20,7 +20,7 @@ state, ctrl = server.state, server.controller
 
 
 # Call plot_over_s
-def plot_over_s ():
+def plot_over_s():
     """
     Generates a plot.
     """
@@ -38,7 +38,7 @@ PLOTS = {
 # -----------------------------------------------------------------------------
 
 
-def available_plot_options (simulationClicked):
+def available_plot_options(simulationClicked):
     """
     Displays plot_options for users based on status of simulation.
     :param simulationClicked (bool): status of simulation status
@@ -51,11 +51,11 @@ def available_plot_options (simulationClicked):
         return ["Run Simulation To See Options"]
 
 
-def load_dataTable_data ():
+def load_dataTable_data():
     """
     Loads and processes data from combined beam and reference particle files.
     """
-    
+
     combined_files = analyzeFunctions.combine_files(
         REDUCED_BEAM_DATA, REF_PARTICLE_DATA
     )
@@ -89,7 +89,7 @@ state.all_headers = []
 # -----------------------------------------------------------------------------
 
 
-def update_data_table ():
+def update_data_table():
     """
     Combines reducedBeam and refParticle files
     and updates data table upon column selection by user
@@ -104,7 +104,7 @@ def update_data_table ():
     )
 
 
-def update_plot ():
+def update_plot():
     """
     Performs actions to display correct information,
     based on the plot optin selected by the user
@@ -125,20 +125,20 @@ def update_plot ():
 
 
 @state.change("selected_headers")
-def on_header_selection_change (selected_headers, **kwargs):
+def on_header_selection_change(selected_headers, **kwargs):
     state.filtered_headers = analyzeFunctions.filter_headers(
         state.all_headers, selected_headers
     )
     state.filtered_data = analyzeFunctions.filter_data(state.all_data, selected_headers)
 
 
-@state.change ("filtered_data", "active_plot")
+@state.change("filtered_data", "active_plot")
 def on_filtered_data_change(**kwargs):
     update_plot()
 
 
 @ctrl.add("run_simulation")
-def run_simulation_and_store ():
+def run_simulation_and_store():
     state.plot_options = available_plot_options(simulationClicked=True)
     state.simulation_data = run_simulation()
     # asyncio.create_task(run_simulation("run_simulation"))
@@ -159,7 +159,7 @@ class AnalyzeSimulation:
     """
 
     @staticmethod
-    def card ():
+    def card():
         """
         Displays any non-plot content for 'Analyze' page.
         """
@@ -183,7 +183,7 @@ class AnalyzeSimulation:
                     )
 
     @staticmethod
-    def plot ():
+    def plot():
         """
         Displays any plot content for 'Analyze' page.
         """
