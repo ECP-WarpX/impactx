@@ -89,7 +89,7 @@ state.all_headers = []
 # -----------------------------------------------------------------------------
 
 
-def update_data_table():
+def update_data_table ():
     """
     Combines reducedBeam and refParticle files
     and updates data table upon column selection by user
@@ -104,7 +104,7 @@ def update_data_table():
     )
 
 
-def update_plot():
+def update_plot ():
     """
     Performs actions to display correct information,
     based on the plot optin selected by the user
@@ -125,14 +125,14 @@ def update_plot():
 
 
 @state.change("selected_headers")
-def on_header_selection_change(selected_headers, **kwargs):
+def on_header_selection_change (selected_headers, **kwargs):
     state.filtered_headers = analyzeFunctions.filter_headers(
         state.all_headers, selected_headers
     )
     state.filtered_data = analyzeFunctions.filter_data(state.all_data, selected_headers)
 
 
-@state.change("filtered_data", "active_plot")
+@state.change ("filtered_data", "active_plot")
 def on_filtered_data_change(**kwargs):
     update_plot()
 

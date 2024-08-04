@@ -23,7 +23,7 @@ ANSI_RESET = "\033[0m"
 class generalFunctions:
 
     @staticmethod
-    def documentation(section_name):
+    def documentation (section_name):
         """
         Opens a tab to the specified section link in the documentation.
         :param section_name (str): The name of the documentation section to open.
@@ -48,7 +48,7 @@ class generalFunctions:
     # -----------------------------------------------------------------------------
 
     @staticmethod
-    def determine_input_type(value):
+    def determine_input_type (value):
         """
         Determines the type of the input value.
         :param value: The input value whose type needs to be determined.
@@ -64,7 +64,7 @@ class generalFunctions:
                 return value, str
 
     @staticmethod
-    def validate_against(input_value, value_type):
+    def validate_against (input_value, value_type):
         """
         Returns an error message if the input value type does not match the desired type.
         :param input_value: The value to validate.

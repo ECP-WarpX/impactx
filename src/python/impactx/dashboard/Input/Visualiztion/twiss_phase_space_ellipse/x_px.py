@@ -38,17 +38,17 @@ state.epsilon_t = 1
 
 # Update plots on parameter change
 @state.change("alpha_x", "beta_x", "epsilon_x")
-def on_params_change_x(**kwargs):
+def on_params_change_x (**kwargs):
     VisualizeTwiss.update_plot_x()
 
 
 @state.change("alpha_y", "beta_y", "epsilon_y")
-def on_params_change_y(**kwargs):
+def on_params_change_y (**kwargs):
     VisualizeTwiss.update_plot_y()
 
 
 @state.change("alpha_t", "beta_t", "epsilon_t")
-def on_params_change_t(**kwargs):
+def on_params_change_t (**kwargs):
     VisualizeTwiss.update_plot_t()
 
 
@@ -126,7 +126,7 @@ class VisualizeTwiss:
         return fig
 
     @staticmethod
-    def update_plot_x(**kwargs):
+    def update_plot_x (**kwargs):
         alpha = state.alpha_x
         beta = state.beta_x
         epsilon = state.epsilon_x
@@ -142,7 +142,7 @@ class VisualizeTwiss:
         plt.close(fig)
 
     @staticmethod
-    def update_plot_y(**kwargs):
+    def update_plot_y (**kwargs):
         alpha = state.alpha_y
         beta = state.beta_y
         epsilon = state.epsilon_y
@@ -158,7 +158,7 @@ class VisualizeTwiss:
         plt.close(fig)
 
     @staticmethod
-    def update_plot_t(**kwargs):
+    def update_plot_t (**kwargs):
         alpha = state.alpha_t
         beta = state.beta_t
         epsilon = state.epsilon_t
@@ -174,7 +174,7 @@ class VisualizeTwiss:
         plt.close(fig)
 
     @staticmethod
-    def card_x():
+    def card_x ():
         with vuetify.VCard(style="width: 340px; height: 300px"):
             with vuetify.VCardText():
                 with vuetify.VRow(classes="pl-1"):
@@ -189,7 +189,7 @@ class VisualizeTwiss:
             ctrl.matplotlib_figure_update_x = matplotlib_figure.update
 
     @staticmethod
-    def card_y():
+    def card_y ():
         with vuetify.VCard(style="width: 340px; height: 300px"):
             with vuetify.VCardText():
                 with vuetify.VRow(classes="pl-1"):
@@ -204,7 +204,7 @@ class VisualizeTwiss:
             ctrl.matplotlib_figure_update_y = matplotlib_figure.update
 
     @staticmethod
-    def card_t():
+    def card_t ():
         with vuetify.VCard(style="width: 340px; height: 300px"):
             with vuetify.VCardText():
                 with vuetify.VRow(classes="pl-1"):

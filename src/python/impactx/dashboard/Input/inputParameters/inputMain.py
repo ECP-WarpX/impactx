@@ -17,7 +17,7 @@ state, ctrl = server.state, server.controller
 
 
 @ctrl.add("on_input_change")
-def validate_and_convert_to_correct_type(
+def validate_and_convert_to_correct_type (
     value, desired_type, state_name, validation_name
 ):
     validation_result = generalFunctions.validate_against(value, desired_type)
@@ -39,7 +39,7 @@ def validate_and_convert_to_correct_type(
 
 
 @ctrl.add("kin_energy_unit_change")
-def on_convert_kin_energy_change(new_unit):
+def on_convert_kin_energy_change (new_unit):
     old_unit = state.old_kin_energy_unit
     if old_unit != new_unit and float(state.kin_energy) > 0:
         state.kin_energy = InputFunctions.update_kin_energy_on_display(
