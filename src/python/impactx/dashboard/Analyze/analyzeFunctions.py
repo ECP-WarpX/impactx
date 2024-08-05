@@ -103,7 +103,7 @@ class AnalyzeFunctions:
     # Function to print simulation output in terminal view
     # -----------------------------------------------------------------------------
     @staticmethod
-    async def outputTerminal (simulation_function_name):
+    async def outputTerminal(simulation_function_name):
         """
         Function to print out simulation results in
         terminal view. (Not working as intended, 8/4/24)

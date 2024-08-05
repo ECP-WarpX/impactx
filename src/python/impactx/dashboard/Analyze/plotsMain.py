@@ -1,7 +1,7 @@
 import os
 
 from trame.app import get_server
-from trame.widgets import plotly, vuetify, matplotlib
+from trame.widgets import matplotlib, plotly, vuetify
 
 from .analyzeFunctions import AnalyzeFunctions
 from .plot_ParameterEvolutionOverS.overS import line_plot_1d
@@ -55,7 +55,7 @@ def load_dataTable_data():
     """
     Loads and processes data from combined beam and reference particle files.
     """
-    
+
     combined_files = AnalyzeFunctions.combine_files(
         REDUCED_BEAM_DATA, REF_PARTICLE_DATA
     )
@@ -125,7 +125,7 @@ def update_plot():
 
 
 @state.change("selected_headers")
-def on_header_selection_change (selected_headers, **kwargs):
+def on_header_selection_change(selected_headers, **kwargs):
     state.filtered_headers = AnalyzeFunctions.filter_headers(
         state.all_headers, selected_headers
     )
@@ -196,6 +196,9 @@ class AnalyzeSimulation:
             )
             ctrl.plotly_figure_update = plotly_figure.update
         with vuetify.VCol(cols=12):  # Adjust the column size as needed
-            with vuetify.VCard(v_if="active_plot === 'Phase Space Plots'", style="height: 37vh; width: 147vh;"):
+            with vuetify.VCard(
+                v_if="active_plot === 'Phase Space Plots'",
+                style="height: 37vh; width: 147vh;",
+            ):
                 matplotlib_figure = matplotlib.Figure(style="position: absolute")
                 ctrl.matplotlib_figure_update = matplotlib_figure.update

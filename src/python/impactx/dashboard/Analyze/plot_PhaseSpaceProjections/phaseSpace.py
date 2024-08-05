@@ -20,6 +20,7 @@ from ...Input.distributionParameters.distributionMain import (
 from ...Input.latticeConfiguration.latticeMain import save_lattice_elements
 from ..plot_PhaseSpaceProjections.phaseSpaceSettings import adjusted_settings_plot
 
+
 def run_simulation(save_png=True):
     """
     This tests using ImpactX and Pandas Dataframes
