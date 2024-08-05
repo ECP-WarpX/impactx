@@ -22,9 +22,9 @@ state.listOfDistributions = generalFunctions.select_classes(DISTRIBUTIONS_MODULE
 state.listOfDistributionsAndParametersAndDefault = (
     generalFunctions.class_parameters_with_defaults(DISTRIBUTIONS_MODULE_NAME)
 )
-state.listOfDistributionsAndParametersAndDefault_Twiss = (
-    DistributionFunctions.class_parameters_with_defaults_twiss()
-)
+# state.listOfDistributionsAndParametersAndDefault_Twiss = (
+#     DistributionFunctions.class_parameters_with_defaults_twiss()
+# )
 
 # -----------------------------------------------------------------------------
 # Default
@@ -46,18 +46,11 @@ def populate_distribution_parameters(selectedDistribution):
         whos parameters need to be populated.
     """
 
-    if state.selectedDistributionType == "Twiss":
-        selectedDistributionParameters = (
-            state.listOfDistributionsAndParametersAndDefault_Twiss.get(
-                selectedDistribution, []
-            )
+    selectedDistributionParameters = (
+        state.listOfDistributionsAndParametersAndDefault.get(
+            selectedDistribution, []
         )
-    else:
-        selectedDistributionParameters = (
-            state.listOfDistributionsAndParametersAndDefault.get(
-                selectedDistribution, []
-            )
-        )
+    )
 
     state.selectedDistributionParameters = [
         {
@@ -200,6 +193,7 @@ class DistributionParameters:
                             items=(["Native", "Twiss"],),
                             # change=(ctrl.kin_energy_unit_change, "[$event]"),
                             dense=True,
+                            disabled=True,
                         )
                 with vuetify.VRow(classes="my-2"):
                     for i in range(3):

@@ -13,7 +13,6 @@
 
 from ...trame_setup import setup_server
 server, state, ctrl = setup_server()
-from mpi4py import MPI
 
 from impactx import ImpactX
 

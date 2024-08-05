@@ -153,7 +153,7 @@ class Toolbars:
 
         # ToolbarElements.file_upload()
         vuetify.VSpacer()
-        ToolbarElements.select_visualization()
+        # ToolbarElements.select_visualization()
         ToolbarElements.run_simulation_button()
         # ToolbarElements.export_input_data()
         # ToolbarElements.switch_theme()
