@@ -21,6 +21,7 @@ class AnalyzeFunctions:
     Helper functions for
     preparing the contents for the 'Analyze' page
     """
+
     # -----------------------------------------------------------------------------
     # Functions for Beam Characteristic and Ref particle data table
     # -----------------------------------------------------------------------------
@@ -32,7 +33,7 @@ class AnalyzeFunctions:
         :param file_path: The path to the file to be read.
         :return: A DataFrame containing the data from the file.
         """
-        
+
         df = pd.read_csv(file_path, sep=" ")
         return df
 

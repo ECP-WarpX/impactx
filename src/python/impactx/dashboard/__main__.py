@@ -12,8 +12,9 @@ from .Input.latticeConfiguration.latticeMain import LatticeConfiguration
 from .Input.trameFunctions import TrameFunctions
 from .Input.Visualiztion.twiss_phase_space_ellipse.x_px import VisualizeTwiss
 from .Optimize.optimizeMain import Optimize
-from .Toolbar.toolbarMain import Toolbars
 from .start import main
+from .Toolbar.toolbarMain import Toolbars
+
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
@@ -100,6 +101,7 @@ def application():
             #     ctrl.clear = term.clear
             #     ctrl.terminal_println = term.writeln
     return layout
+
 
 application()
 # -----------------------------------------------------------------------------

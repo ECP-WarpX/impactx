@@ -22,9 +22,7 @@ state.listOfLatticeElements = generalFunctions.select_classes(
     LATTICE_ELEMENTS_MODULE_NAME
 )
 state.listOfLatticeElementParametersAndDefault = (
-    generalFunctions.class_parameters_with_defaults(
-        LATTICE_ELEMENTS_MODULE_NAME
-    )
+    generalFunctions.class_parameters_with_defaults(LATTICE_ELEMENTS_MODULE_NAME)
 )
 
 # -----------------------------------------------------------------------------
@@ -39,7 +37,8 @@ state.nsliceDefaultValue = None
 # Main Functions
 # -----------------------------------------------------------------------------
 
-def add_lattice_element ():
+
+def add_lattice_element():
     """
     Adds the selected lattice element to the list of selected
     lattice elements along with its default parameters.
@@ -71,7 +70,7 @@ def add_lattice_element ():
     return selectedLatticeElement
 
 
-def update_latticeElement_parameters (
+def update_latticeElement_parameters(
     index, parameterName, parameterValue, parameterErrorMessage
 ):
     """
@@ -93,7 +92,7 @@ def update_latticeElement_parameters (
 # -----------------------------------------------------------------------------
 
 
-def parameter_input_checker_for_lattice (latticeElement):
+def parameter_input_checker_for_lattice(latticeElement):
     """
     Helper function to check if user input is valid.
     :return: A dictionary with parameter names as keys and their validated values.
@@ -116,7 +115,7 @@ def parameter_input_checker_for_lattice (latticeElement):
     return parameter_input
 
 
-def save_lattice_elements ():
+def save_lattice_elements():
     """
     Writes user input for lattice element parameters parameters in suitable format for simulation code.
     :return: A list in the suitable format.
@@ -139,7 +138,7 @@ def save_lattice_elements ():
 
 
 @state.change("selectedLatticeList")
-def on_selectedLatticeList_change (selectedLatticeList, **kwargs):
+def on_selectedLatticeList_change(selectedLatticeList, **kwargs):
     if selectedLatticeList == []:
         state.isSelectedLatticeListEmpty = "Please select a lattice element"
         generalFunctions.update_simulation_validation_status()
@@ -148,13 +147,13 @@ def on_selectedLatticeList_change (selectedLatticeList, **kwargs):
 
 
 @state.change("selectedLattice")
-def on_lattice_element_name_change (selectedLattice, **kwargs):
+def on_lattice_element_name_change(selectedLattice, **kwargs):
     return
     # print (f"Lattice Selection Changed to: {selectedLattice}")
 
 
 @ctrl.add("add_latticeElement")
-def on_add_lattice_element_click ():
+def on_add_lattice_element_click():
     selectedLattice = state.selectedLattice
     if selectedLattice:
         add_lattice_element()
@@ -165,7 +164,7 @@ def on_add_lattice_element_click ():
 
 
 @ctrl.add("updateLatticeElementParameters")
-def on_lattice_element_parameter_change (
+def on_lattice_element_parameter_change(
     index, parameter_name, parameter_value, parameter_type
 ):
     parameter_value, input_type = generalFunctions.determine_input_type(parameter_value)
@@ -180,20 +179,20 @@ def on_lattice_element_parameter_change (
 
 
 @ctrl.add("clear_latticeElements")
-def on_clear_lattice_element_click ():
+def on_clear_lattice_element_click():
     state.selectedLatticeList = []
     save_lattice_elements()
 
 
 @ctrl.add("deleteLatticeElement")
-def on_delete_LatticeElement_click (index):
+def on_delete_LatticeElement_click(index):
     state.selectedLatticeList.pop(index)
     state.dirty("selectedLatticeList")
     save_lattice_elements()
 
 
 @ctrl.add("move_latticeElementIndex_up")
-def on_move_latticeElementIndex_up_click (index):
+def on_move_latticeElementIndex_up_click(index):
     if index > 0:
         state.selectedLatticeList[index], state.selectedLatticeList[index - 1] = (
             state.selectedLatticeList[index - 1],
@@ -204,7 +203,7 @@ def on_move_latticeElementIndex_up_click (index):
 
 
 @ctrl.add("move_latticeElementIndex_down")
-def on_move_latticeElementIndex_down_click (index):
+def on_move_latticeElementIndex_down_click(index):
     if index < len(state.selectedLatticeList) - 1:
         state.selectedLatticeList[index], state.selectedLatticeList[index + 1] = (
             state.selectedLatticeList[index + 1],
@@ -215,7 +214,7 @@ def on_move_latticeElementIndex_down_click (index):
 
 
 @ctrl.add("nsliceDefaultChange")
-def update_default_value (parameter_name, new_value):
+def update_default_value(parameter_name, new_value):
     data = generalFunctions.class_parameters_with_defaults(elements)
 
     for key, parameters in data.items():
@@ -237,7 +236,7 @@ class LatticeConfiguration:
     """
 
     @staticmethod
-    def card ():
+    def card():
         """
         Creates UI content for lattice configuration.
         """
@@ -362,7 +361,7 @@ class LatticeConfiguration:
                                         )
 
     @staticmethod
-    def dialog_lattice_elementList ():
+    def dialog_lattice_elementList():
         """
         Displays the content shown on the dialog
         box for lattice configuration.
@@ -408,12 +407,12 @@ class LatticeConfiguration:
                         )
 
     @staticmethod
-    def dialog_lattice_settings ():
+    def dialog_lattice_settings():
         """
         Creates UI content for lattice configuration
         settings.
         """
-        
+
         with vuetify.VCard():
             with vuetify.VTabs(v_model=("tab", "Settings")):
                 vuetify.VTab("Settings")

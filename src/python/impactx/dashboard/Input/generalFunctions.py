@@ -23,7 +23,7 @@ ANSI_RESET = "\033[0m"
 class generalFunctions:
 
     @staticmethod
-    def documentation (section_name):
+    def documentation(section_name):
         """
         Opens a tab to the specified section link in the documentation.
         :param section_name (str): The name of the documentation section to open.
@@ -48,7 +48,7 @@ class generalFunctions:
     # -----------------------------------------------------------------------------
 
     @staticmethod
-    def determine_input_type (value):
+    def determine_input_type(value):
         """
         Determines the type of the input value.
         :param value: The input value whose type needs to be determined.
@@ -64,7 +64,7 @@ class generalFunctions:
                 return value, str
 
     @staticmethod
-    def validate_against (input_value, value_type):
+    def validate_against(input_value, value_type):
         """
         Returns an error message if the input value type does not match the desired type.
         :param input_value: The value to validate.
@@ -103,7 +103,7 @@ class generalFunctions:
             return ["Unknown type"]
 
     @staticmethod
-    def update_simulation_validation_status ():
+    def update_simulation_validation_status():
         """
         Checks if any input fields are not provided with the correct input type.
         Updates the state to enable or disable the run simulation button.
@@ -149,7 +149,7 @@ class generalFunctions:
     # -----------------------------------------------------------------------------
 
     @staticmethod
-    def find_classes (module_name):
+    def find_classes(module_name):
         """
         Returns a list of all classes in the given module.
         :param module_name: The module to inspect.
@@ -164,7 +164,7 @@ class generalFunctions:
         return results
 
     @staticmethod
-    def find_init_docstring_for_classes (classes):
+    def find_init_docstring_for_classes(classes):
         """
         Retrieves the __init__ docstring of the given classes.
         :param classes: A list of typles containing class names.
@@ -183,7 +183,7 @@ class generalFunctions:
         return docstrings
 
     @staticmethod
-    def extract_parameters (docstring):
+    def extract_parameters(docstring):
         """
         Parses specific information from docstrings.
         Aimed to retrieve parameter names, values, and types.
@@ -223,7 +223,7 @@ class generalFunctions:
         return parameters
 
     @staticmethod
-    def class_parameters_with_defaults (module_name):
+    def class_parameters_with_defaults(module_name):
         """
         Given a module name, outputs a dictionary of class names and their parameters.
         Keys are class names, and values are lists of parameter information (name, default value, type).
@@ -243,16 +243,14 @@ class generalFunctions:
         return result
 
     @staticmethod
-    def select_classes (module_name):
+    def select_classes(module_name):
         """
         Given a module name, outputs a list of all class names in the module.
         :param module_name: The module to inspect.
         :return: A list of class names.
         """
 
-        return list(
-            generalFunctions.class_parameters_with_defaults(module_name)
-        )
+        return list(generalFunctions.class_parameters_with_defaults(module_name))
 
     @staticmethod
     def convert_to_correct_type(value, desired_type):

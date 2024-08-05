@@ -3,7 +3,7 @@ from .__main__ import application
 
 class JupyterMainApplication:
     """
-    Creates specific components from 
+    Creates specific components from
     Trame Application for Jupyter Notebook.
     """
 
@@ -12,6 +12,7 @@ class JupyterMainApplication:
 
     def generate_ui(self):
         return application()
+
 
 """
 from dashboard.jupyterApplication import JupyterMainApplication

@@ -1,9 +1,9 @@
+jupyterlab
+pandas
+plotly
 trame
+trame-matplotlib
+trame-plotly
 trame-router
 trame-vuetify
 trame-xterm
-trame-matplotlib
-trame-plotly
-pandas
-plotly
-jupyterlab
