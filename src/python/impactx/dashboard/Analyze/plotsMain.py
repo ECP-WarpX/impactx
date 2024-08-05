@@ -187,14 +187,28 @@ class AnalyzeSimulation:
         Displays any plot content for 'Analyze' page.
         """
 
+        with vuetify.VContainer(fluid=True):
+            with vuetify.VContainer(v_if="active_plot === 'Phase Space Plots'", fluid=True):
+                with vuetify.VCard(style="height: 50vh; width: 150vh;"):
+                    with vuetify.VTabs(v_model=("active_tab", 0)):
+                        vuetify.VTab("Plot")
+                        vuetify.VTab("Interact")
+                    vuetify.VDivider()
+                    with vuetify.VTabsItems(v_model="active_tab"):
+                        with vuetify.VTabItem():
+                            vuetify.VImg(v_if=("image_data",), src=("image_data",))
+
+                        with vuetify.VTabItem():
+                            with vuetify.VContainer(
+                                style="height: 37vh; width: 147vh;"
+                            ):
+                                matplotlib_figure = matplotlib.Figure(style="position: absolute")
+                                ctrl.matplotlib_figure_update = matplotlib_figure.update
+
         with vuetify.VContainer(
-            v_if="active_plot === 'Plot Over S'", style="height: 90vh; width: 100vh;"
+            v_if="active_plot === 'Plot Over S'", style="height: 90vh; width: 100vh;", fluid=True,
         ):
             plotly_figure = plotly.Figure(
                 display_mode_bar="true", config={"responsive": True}
             )
             ctrl.plotly_figure_update = plotly_figure.update
-        with vuetify.VCol(cols=12):  # Adjust the column size as needed
-            with vuetify.VCard(v_if="active_plot === 'Phase Space Plots'", style="height: 37vh; width: 147vh;"):
-                matplotlib_figure = matplotlib.Figure(style="position: absolute")
-                ctrl.matplotlib_figure_update = matplotlib_figure.update
