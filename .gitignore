@@ -63,3 +63,4 @@ cmake-build-*/
 # Trame Dashboard (output files are temporary) #
 #####################
 src/python/impactx/diags*
+src/python/impactx/*.png
