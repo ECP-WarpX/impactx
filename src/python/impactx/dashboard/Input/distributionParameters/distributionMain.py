@@ -2,14 +2,13 @@ from trame.widgets import vuetify
 
 from impactx import distribution
 
+from ...trame_setup import setup_server
 from ..generalFunctions import generalFunctions
-from .distributionFunctions import DistributionFunctions
 
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
 
-from ...trame_setup import setup_server
 server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------
@@ -47,9 +46,7 @@ def populate_distribution_parameters(selectedDistribution):
     """
 
     selectedDistributionParameters = (
-        state.listOfDistributionsAndParametersAndDefault.get(
-            selectedDistribution, []
-        )
+        state.listOfDistributionsAndParametersAndDefault.get(selectedDistribution, [])
     )
 
     state.selectedDistributionParameters = [

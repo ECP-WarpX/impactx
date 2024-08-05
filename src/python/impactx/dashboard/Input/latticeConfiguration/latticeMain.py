@@ -2,13 +2,13 @@ from trame.widgets import vuetify
 
 from impactx import elements
 
+from ...trame_setup import setup_server
 from ..generalFunctions import generalFunctions
 
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
 
-from ...trame_setup import setup_server
 server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------
@@ -112,7 +112,6 @@ def parameter_input_checker_for_lattice(latticeElement):
             parameter_input[parameter["parameter_name"]] = 0
 
     return parameter_input
-
 
 
 def save_lattice_elements():

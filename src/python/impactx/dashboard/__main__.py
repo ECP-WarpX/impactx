@@ -1,4 +1,5 @@
 import sys
+
 from trame.ui.router import RouterViewLayout
 from trame.ui.vuetify import SinglePageWithDrawerLayout
 from trame.widgets import router, vuetify
@@ -11,12 +12,12 @@ from .Input.trameFunctions import TrameFunctions
 from .Input.Visualiztion.twiss_phase_space_ellipse.x_px import VisualizeTwiss
 from .start import main
 from .Toolbar.toolbarMain import Toolbars
+from .trame_setup import setup_server
 
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
 
-from .trame_setup import setup_server
 server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------

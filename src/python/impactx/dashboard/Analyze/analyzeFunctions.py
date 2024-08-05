@@ -1,13 +1,13 @@
-import asyncio
 import subprocess
 
 import pandas as pd
+
+from ..trame_setup import setup_server
 
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
 
-from ..trame_setup import setup_server
 server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------
@@ -97,8 +97,8 @@ class AnalyzeFunctions:
                     filtered_row[key] = value
             filtered_data.append(filtered_row)
         return filtered_data
-    
-     # -----------------------------------------------------------------------------
+
+    # -----------------------------------------------------------------------------
     # Function to print simulation output in terminal view
     # -----------------------------------------------------------------------------
 
@@ -109,7 +109,7 @@ class AnalyzeFunctions:
         terminal view. (Not working as intended, 8/4/24)
         """
 
-        ctrl.terminal_println(f"Running...")
+        ctrl.terminal_println("Running...")
 
         command = [
             "python",

@@ -1,23 +1,26 @@
 from trame.widgets import vuetify
 
-from ..Input.trameFunctions import TrameFunctions
-from .exportTemplate import retrieve_state_content
 # from ..Analyze.plot_PhaseSpaceProjections.phaseSpace import outputTerminal
 from ..Analyze.analyzeFunctions import AnalyzeFunctions
+from ..Input.trameFunctions import TrameFunctions
+from ..trame_setup import setup_server
+from .exportTemplate import retrieve_state_content
+
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
 
-from ..trame_setup import setup_server
 server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------
 # Trigger
 # -----------------------------------------------------------------------------
 
+
 @ctrl.trigger("export")
 def on_export_click():
     return retrieve_state_content()
+
 
 # -----------------------------------------------------------------------------
 # Common toolbar elements
@@ -107,7 +110,6 @@ class ToolbarElements:
         # ctrl.terminal_println("Running simulation...")
         # ctrl.terminal_println("Simulation complete.")
         AnalyzeFunctions.outputTerminal()
-
 
     @staticmethod
     def kill_button():
