@@ -1,7 +1,7 @@
 import sys
 from trame.ui.router import RouterViewLayout
 from trame.ui.vuetify import SinglePageWithDrawerLayout
-from trame.widgets import router, vuetify
+from trame.widgets import router, vuetify, xterm
 
 from .Analyze.plotsMain import AnalyzeSimulation
 from .Input.distributionParameters.distributionMain import DistributionParameters
