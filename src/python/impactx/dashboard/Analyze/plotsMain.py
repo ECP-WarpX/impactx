@@ -3,7 +3,7 @@ import os
 from trame.app import get_server
 from trame.widgets import plotly, vuetify, matplotlib
 
-from .analyzeFunctions import analyzeFunctions
+from .analyzeFunctions import AnalyzeFunctions
 from .plot_ParameterEvolutionOverS.overS import line_plot_1d
 from .plot_PhaseSpaceProjections.phaseSpace import run_simulation
 
@@ -56,11 +56,11 @@ def load_dataTable_data ():
     Loads and processes data from combined beam and reference particle files.
     """
     
-    combined_files = analyzeFunctions.combine_files(
+    combined_files = AnalyzeFunctions.combine_files(
         REDUCED_BEAM_DATA, REF_PARTICLE_DATA
     )
     combined_files_data_converted_to_dictionary_format = (
-        analyzeFunctions.convert_to_dict(combined_files)
+        AnalyzeFunctions.convert_to_dict(combined_files)
     )
     data, headers = combined_files_data_converted_to_dictionary_format
     state.all_data = data
@@ -96,10 +96,10 @@ def update_data_table ():
     """
 
     load_dataTable_data()
-    state.filtered_data = analyzeFunctions.filter_data(
+    state.filtered_data = AnalyzeFunctions.filter_data(
         state.all_data, state.selected_headers
     )
-    state.filtered_headers = analyzeFunctions.filter_headers(
+    state.filtered_headers = AnalyzeFunctions.filter_headers(
         state.all_headers, state.selected_headers
     )
 
@@ -126,10 +126,10 @@ def update_plot ():
 
 @state.change("selected_headers")
 def on_header_selection_change (selected_headers, **kwargs):
-    state.filtered_headers = analyzeFunctions.filter_headers(
+    state.filtered_headers = AnalyzeFunctions.filter_headers(
         state.all_headers, selected_headers
     )
-    state.filtered_data = analyzeFunctions.filter_data(state.all_data, selected_headers)
+    state.filtered_data = AnalyzeFunctions.filter_data(state.all_data, selected_headers)
 
 
 @state.change ("filtered_data", "active_plot")
@@ -147,7 +147,7 @@ def run_simulation_and_store ():
 
 
 # async def run_simulation(simulation_function_name):
-#     await analyzeFunctions.outputTerminal(simulation_function_name)
+#     await AnalyzeFunctions.outputTerminal(simulation_function_name)
 # -----------------------------------------------------------------------------
 # GUI
 # -----------------------------------------------------------------------------

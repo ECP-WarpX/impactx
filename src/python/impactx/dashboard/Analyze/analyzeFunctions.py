@@ -16,7 +16,7 @@ state, ctrl = server.state, server.controller
 # -----------------------------------------------------------------------------
 
 
-class analyzeFunctions:
+class AnalyzeFunctions:
     """
     Helper functions for
     preparing the contents for the 'Analyze' page
@@ -61,8 +61,8 @@ class analyzeFunctions:
         :return: A DataFrame containing the merged data from the two files.
         """
 
-        file1 = analyzeFunctions.load_data(file1_name)
-        file2 = analyzeFunctions.load_data(file2_name)
+        file1 = AnalyzeFunctions.load_data(file1_name)
+        file2 = AnalyzeFunctions.load_data(file2_name)
         return pd.merge(file1, file2, how="outer")
 
     @staticmethod
@@ -101,7 +101,7 @@ class analyzeFunctions:
     # -----------------------------------------------------------------------------
     # Function to print simulation output in terminal view
     # -----------------------------------------------------------------------------
-
+    @staticmethod
     async def outputTerminal (simulation_function_name):
         """
         Function to print out simulation results in

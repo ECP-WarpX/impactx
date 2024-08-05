@@ -14,7 +14,7 @@ import numpy as np
 # Trame Code
 # -----------------------------------------------------------------------------
 # from Analyze.analyzeFunctions import (
-#     analyzeFunctions,  # to load in distribution and lattice inputs
+#     AnalyzeFunctions,  # to load in distribution and lattice inputs
 # )
 from scipy.optimize import minimize
 
@@ -82,7 +82,7 @@ def build_lattice(parameters: tuple, write_particles: bool) -> list:
         elements.Quad(ds=0.1, k=q1_k, nslice=ns),
         elements.Drift(ds=2.7, nslice=ns),
     ]
-    # line = analyzeFunctions.read_latticeElements_file()
+    # line = AnalyzeFunctions.read_latticeElements_file()
     if write_particles:
         monitor = elements.BeamMonitor("monitor", backend="h5")
         line = [monitor] + line + [monitor]
