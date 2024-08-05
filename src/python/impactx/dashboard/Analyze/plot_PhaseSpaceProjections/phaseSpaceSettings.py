@@ -32,7 +32,7 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
     # Matplotlib canvas: figure and plottable axes areas
     fig, axes = plt.subplots(1, 3, figsize=(12, 3))
     (ax_xpx, ax_ypy, ax_tpt) = axes
-    
+
     # Plotting data points if df is not None
     if df is not None:
         # update for plot unit system

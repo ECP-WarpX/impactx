@@ -1,6 +1,7 @@
 import os
 
-from trame.widgets import plotly, vuetify, matplotlib
+from trame.app import get_server
+from trame.widgets import matplotlib, plotly, vuetify
 
 from .analyzeFunctions import AnalyzeFunctions
 from .plot_ParameterEvolutionOverS.overS import line_plot_1d
@@ -54,7 +55,7 @@ def load_dataTable_data():
     """
     Loads and processes data from combined beam and reference particle files.
     """
-    
+
     combined_files = AnalyzeFunctions.combine_files(
         REDUCED_BEAM_DATA, REF_PARTICLE_DATA
     )
@@ -124,7 +125,7 @@ def update_plot():
 
 
 @state.change("selected_headers")
-def on_header_selection_change (selected_headers, **kwargs):
+def on_header_selection_change(selected_headers, **kwargs):
     state.filtered_headers = AnalyzeFunctions.filter_headers(
         state.all_headers, selected_headers
     )

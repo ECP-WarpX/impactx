@@ -1,7 +1,7 @@
 import sys
 from trame.ui.router import RouterViewLayout
 from trame.ui.vuetify import SinglePageWithDrawerLayout
-from trame.widgets import router, vuetify, xterm
+from trame.widgets import router, vuetify
 
 from .Analyze.plotsMain import AnalyzeSimulation
 from .Input.distributionParameters.distributionMain import DistributionParameters
@@ -9,7 +9,6 @@ from .Input.inputParameters.inputMain import InputParameters
 from .Input.latticeConfiguration.latticeMain import LatticeConfiguration
 from .Input.trameFunctions import TrameFunctions
 from .Input.Visualiztion.twiss_phase_space_ellipse.x_px import VisualizeTwiss
-from .Optimize.optimizeMain import Optimize
 from .start import main
 from .Toolbar.toolbarMain import Toolbars
 
