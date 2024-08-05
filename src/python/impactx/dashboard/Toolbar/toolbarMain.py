@@ -2,7 +2,8 @@ from trame.widgets import vuetify
 
 from ..Input.trameFunctions import TrameFunctions
 from .exportTemplate import retrieve_state_content
-
+# from ..Analyze.plot_PhaseSpaceProjections.phaseSpace import outputTerminal
+from ..Analyze.analyzeFunctions import AnalyzeFunctions
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
@@ -103,8 +104,10 @@ class ToolbarElements:
         )
 
     def run_simulation():
-        ctrl.terminal_println("Running simulation...")
-        ctrl.terminal_println("Simulation complete.")
+        # ctrl.terminal_println("Running simulation...")
+        # ctrl.terminal_println("Simulation complete.")
+        AnalyzeFunctions.outputTerminal()
+
 
     @staticmethod
     def kill_button():

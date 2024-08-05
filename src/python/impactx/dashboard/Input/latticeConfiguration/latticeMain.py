@@ -114,6 +114,7 @@ def parameter_input_checker_for_lattice(latticeElement):
     return parameter_input
 
 
+
 def save_lattice_elements():
     """
     Writes user input for lattice element parameters parameters in suitable format for simulation code.

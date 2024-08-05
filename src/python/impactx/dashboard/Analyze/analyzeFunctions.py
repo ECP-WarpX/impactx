@@ -97,54 +97,41 @@ class AnalyzeFunctions:
                     filtered_row[key] = value
             filtered_data.append(filtered_row)
         return filtered_data
-
-    # -----------------------------------------------------------------------------
+    
+     # -----------------------------------------------------------------------------
     # Function to print simulation output in terminal view
     # -----------------------------------------------------------------------------
+
     @staticmethod
-    async def outputTerminal (simulation_function_name):
+    def outputTerminal():
         """
         Function to print out simulation results in
         terminal view. (Not working as intended, 8/4/24)
         """
 
-        ctrl.terminal_println(f"Running {simulation_function_name}...")
-        ctrl.terminal_println(
-            f"npart: {state.npart}\nkin_energy_MeV: {state.kin_energy_MeV}"
-        )
+        ctrl.terminal_println(f"Running...")
 
-        # Define the command to run based on the simulation function name
-        if simulation_function_name == "run_simulation":
-            command = [
-                "python",
-                "-c",
-                "from Analyze.plot_PhaseSpaceProjections.phaseSpace import run_simulation; run_simulation()",
-            ]
-        elif simulation_function_name == "run_optimize_triplet":
-            command = [
-                "python",
-                "-c",
-                "from Analyze.plot_PhaseSpaceProjections.phaseSpace import run_optimize_triplet; run_optimize_triplet()",
-            ]
-        else:
-            ctrl.terminal_println(
-                f"Unknown simulation function: {simulation_function_name}"
-            )
-            return
+        command = [
+            "python",
+            "-m",
+            "impactx.dashboard.Analyze.plot_PhaseSpaceProjections.phaseSpace",
+            "run_simulation",
+        ]
 
         # Run the specified simulation function as a separate process
-        process = await asyncio.create_subprocess_exec(
-            *command,
+        process = subprocess.Popen(
+            command,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,  # Capture errors to the same stream as output
+            universal_newlines=True,  # Return output as strings instead of bytes
         )
 
         # Read output from the process and print it to the xterm widget
         while True:
-            output = await process.stdout.readline()
-            if output == b"" and await process.wait() is not None:
+            output = process.stdout.readline()
+            if output == "" and process.poll() is not None:
                 break
             if output:
-                ctrl.terminal_println(output.decode().strip())
+                ctrl.terminal_println(output.strip())
 
-        ctrl.terminal_println(f"{simulation_function_name} complete.")
+        ctrl.terminal_println("complete.")

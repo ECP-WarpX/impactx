@@ -81,8 +81,8 @@ def application():
                 Toolbars.input_toolbar()
             with vuetify.Template(v_if="$route.path == '/Analyze'"):
                 Toolbars.analyze_toolbar()
-            # with vuetify.Template(v_if="$route.path == '/Run'"):
-            #     Toolbars.run_toolbar()
+            with vuetify.Template(v_if="$route.path == '/Run'"):
+                Toolbars.run_toolbar()
 
         with layout.drawer as drawer:
             drawer.width = 200
@@ -90,14 +90,14 @@ def application():
                 vuetify.VSubheader("Simulation")
             TrameFunctions.create_route("Input", "mdi-file-edit")
             # TrameFunctions.create_route("Optimize", "mdi-trending-up")
-            # TrameFunctions.create_route("Run", "mdi-play")
+            TrameFunctions.create_route("Run", "mdi-play")
             TrameFunctions.create_route("Analyze", "mdi-chart-box-multiple")
 
         with layout.content:
             router.RouterView()
-            # with xterm.XTerm(v_if="$route.path == '/Run'") as term:
-            #     ctrl.clear = term.clear
-            #     ctrl.terminal_println = term.writeln
+            with xterm.XTerm(v_if="$route.path == '/Run'") as term:
+                ctrl.clear = term.clear
+                ctrl.terminal_println = term.writeln
     return layout
 
 
