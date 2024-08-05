@@ -1,6 +1,4 @@
 import sys
-
-from trame.app import get_server
 from trame.ui.router import RouterViewLayout
 from trame.ui.vuetify import SinglePageWithDrawerLayout
 from trame.widgets import router, vuetify, xterm
@@ -19,8 +17,8 @@ from .Toolbar.toolbarMain import Toolbars
 # Trame setup
 # -----------------------------------------------------------------------------
 
-server = get_server(client_type="vue2")
-state, ctrl = server.state, server.controller
+from .trame_setup import setup_server
+server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------
 # Router Views

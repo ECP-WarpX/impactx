@@ -1,4 +1,3 @@
-from trame.app import get_server
 from trame.widgets import vuetify
 
 from ..generalFunctions import generalFunctions
@@ -8,8 +7,8 @@ from .inputFunctions import InputFunctions
 # Trame setup
 # -----------------------------------------------------------------------------
 
-server = get_server(client_type="vue2")
-state, ctrl = server.state, server.controller
+from ...trame_setup import setup_server
+server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------
 # Callbacks

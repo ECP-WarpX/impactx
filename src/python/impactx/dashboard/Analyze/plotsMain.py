@@ -1,6 +1,5 @@
 import os
 
-from trame.app import get_server
 from trame.widgets import plotly, vuetify, matplotlib
 
 from .analyzeFunctions import AnalyzeFunctions
@@ -8,11 +7,11 @@ from .plot_ParameterEvolutionOverS.overS import line_plot_1d
 from .plot_PhaseSpaceProjections.phaseSpace import run_simulation
 
 # -----------------------------------------------------------------------------
-# Start server
+# Trame setup
 # -----------------------------------------------------------------------------
 
-server = get_server(client_type="vue2")
-state, ctrl = server.state, server.controller
+from ..trame_setup import setup_server
+server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------
 # Plotting

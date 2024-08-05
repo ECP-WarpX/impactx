@@ -7,10 +7,13 @@
 #
 # -*- coding: utf-8 -*-
 
-from trame.app import get_server
+# -----------------------------------------------------------------------------
+# Trame setup
+# -----------------------------------------------------------------------------
 
-server = get_server(client_type="vue2")
-state, ctrl = server.state, server.controller
+from ...trame_setup import setup_server
+server, state, ctrl = setup_server()
+from mpi4py import MPI
 
 from impactx import ImpactX
 

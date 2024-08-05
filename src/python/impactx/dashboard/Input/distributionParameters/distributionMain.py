@@ -1,4 +1,3 @@
-from trame.app import get_server
 from trame.widgets import vuetify
 
 from impactx import distribution
@@ -10,8 +9,8 @@ from .distributionFunctions import DistributionFunctions
 # Trame setup
 # -----------------------------------------------------------------------------
 
-server = get_server(client_type="vue2")
-state, ctrl = server.state, server.controller
+from ...trame_setup import setup_server
+server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------
 # Helpful

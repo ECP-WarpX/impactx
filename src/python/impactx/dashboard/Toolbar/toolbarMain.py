@@ -1,4 +1,3 @@
-from trame.app import get_server
 from trame.widgets import vuetify
 
 from ..Input.trameFunctions import TrameFunctions
@@ -8,24 +7,22 @@ from .exportTemplate import retrieve_state_content
 # Trame setup
 # -----------------------------------------------------------------------------
 
-server = get_server(client_type="vue2")
-state, ctrl = server.state, server.controller
-
-state.selectedVisualization = None
+from ..trame_setup import setup_server
+server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------
 # Trigger
 # -----------------------------------------------------------------------------
 
-
 @ctrl.trigger("export")
 def on_export_click():
     return retrieve_state_content()
 
-
 # -----------------------------------------------------------------------------
 # Common toolbar elements
 # -----------------------------------------------------------------------------
+
+state.selectedVisualization = None
 
 TERMINAL_BUTTON_STYLES = {
     "background-color": "#2E86C1",

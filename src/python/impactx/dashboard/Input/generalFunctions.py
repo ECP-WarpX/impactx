@@ -4,14 +4,12 @@ import re
 import subprocess
 import webbrowser
 
-from trame.app import get_server
-
 # -----------------------------------------------------------------------------
-# Server setup
+# Trame setup
 # -----------------------------------------------------------------------------
 
-server = get_server(client_type="vue2")
-state, ctrl = server.state, server.controller
+from ..trame_setup import setup_server
+server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------
 # Code
