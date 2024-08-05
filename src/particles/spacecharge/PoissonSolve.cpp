@@ -108,6 +108,7 @@ namespace impactx::spacecharge
             pc.GetParGDB()->Geom(),
             pc.GetParGDB()->DistributionMap(),
             pc.GetParGDB()->boxArray(),
+            ablastr::utils::enums::GridType::Collocated,
             poisson_boundary_handler,
             is_solver_igf_on_lev0,
             do_single_precision_comms,
