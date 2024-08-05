@@ -30,9 +30,9 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
     df = self.to_df(local=True)
 
     # Matplotlib canvas: figure and plottable axes areas
-    fig, axes = plt.subplots(1, 3, figsize=(16, 4), constrained_layout=True)
+    fig, axes = plt.subplots(1, 3, figsize=(12, 3))
     (ax_xpx, ax_ypy, ax_tpt) = axes
-
+    
     # Plotting data points if df is not None
     if df is not None:
         # update for plot unit system
@@ -50,6 +50,7 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             ax.set_title(title)
+            ax.axis("equal")
             return scatter
 
         scatter_xpx = scatter_density_plot(
@@ -58,7 +59,7 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
             df["momentum_x"],
             "Δ x [mm]",
             "Δ p_x [mrad]",
-            "Longitudinal Phase Space",
+            "",
         )
         scatter_ypy = scatter_density_plot(
             ax_ypy,
@@ -66,7 +67,7 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
             df["momentum_y"],
             "Δ y [mm]",
             "Δ p_y [mrad]",
-            "Transverse Phase Space (y)",
+            "",
         )
         scatter_tpt = scatter_density_plot(
             ax_tpt,
@@ -74,12 +75,14 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
             df["momentum_t"],
             "Δ ct [mm]",
             "Delta p_t [p_0 . c]",
-            "Transverse Phase Space (t)",
+            "",
         )
 
-        fig.colorbar(scatter_xpx, ax=ax_xpx, label="Particle Density")
-        fig.colorbar(scatter_ypy, ax=ax_ypy, label="Particle Density")
-        fig.colorbar(scatter_tpt, ax=ax_tpt, label="Particle Density")
+        fig.colorbar(scatter_xpx, ax=ax_xpx, fraction=0.046, pad=0.04)
+        fig.colorbar(scatter_ypy, ax=ax_ypy, fraction=0.046, pad=0.04)
+        fig.colorbar(scatter_tpt, ax=ax_tpt, fraction=0.046, pad=0.04)
+
+        fig.tight_layout()
 
     else:
         ax_xpx.text(
@@ -104,55 +107,6 @@ def adjusted_settings_plot(self, num_bins=50, root_rank=0):
             verticalalignment="center",
         )
 
-    # Annotations
     fig.canvas.manager.set_window_title("Phase Space")
-
-    # # Adding legends
-    # def add_legend(ax, title):
-    #     leg = ax.legend(
-    #         title=title,
-    #         loc="upper right",
-    #         framealpha=0.8,
-    #         handles=[]
-    #     )
-    #     leg._legend_box.sep = 0
-
-    # add_legend(
-    #     ax_xpx, (
-    #         "ε_n,x = {}\n"
-    #         "σ_x = {}\n"
-    #         "β_x = {}\n"
-    #         "α_x = {:.3g}"
-    #     ).format(
-    #         Quantity(rbc['emittance_x'], 'm').render(prec=3),
-    #         Quantity(rbc['sig_x'], 'm').render(prec=3),
-    #         Quantity(rbc['beta_x'], 'm').render(prec=3),
-    #         rbc['alpha_x']
-    #     )
-    # )
-    # add_legend(
-    #     ax_ypy, (
-    #         "ε_n,y = {}\n"
-    #         "σ_y = {}\n"
-    #         "β_y = {}\n"
-    #         "α_y = {:.3g}"
-    #     ).format(
-    #         Quantity(rbc['emittance_y'], 'm').render(prec=3),
-    #         Quantity(rbc['sig_y'], 'm').render(prec=3),
-    #         Quantity(rbc['beta_y'], 'm').render(prec=3),
-    #         rbc['alpha_y']
-    #     )
-    # )
-    # add_legend(
-    #     ax_tpt, (
-    #         "ε_n,t = {}\n"
-    #         "σ_ct = {}\n"
-    #         "σ_pt = {:.3g}"
-    #     ).format(
-    #         Quantity(rbc['emittance_t'], 'm').render(prec=3),
-    #         Quantity(rbc['sig_t'], 'm').render(prec=3),
-    #         rbc['sig_pt']
-    #     )
-    # )
 
     return fig

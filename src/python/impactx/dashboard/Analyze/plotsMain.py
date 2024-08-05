@@ -195,6 +195,7 @@ class AnalyzeSimulation:
                 display_mode_bar="true", config={"responsive": True}
             )
             ctrl.plotly_figure_update = plotly_figure.update
-        with vuetify.VContainer(fluid=True, v_if="active_plot === 'Phase Space Plots'"):
-            matplotlib_figure = matplotlib.Figure(style="position: absolute")
-            ctrl.matplotlib_figure_update = matplotlib_figure.update
+        with vuetify.VCol(cols=12):  # Adjust the column size as needed
+            with vuetify.VCard(v_if="active_plot === 'Phase Space Plots'", style="height: 37vh; width: 147vh;"):
+                matplotlib_figure = matplotlib.Figure(style="position: absolute")
+                ctrl.matplotlib_figure_update = matplotlib_figure.update
