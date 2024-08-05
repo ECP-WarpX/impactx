@@ -174,9 +174,9 @@ def on_lattice_element_parameter_change (
     update_latticeElement_parameters(
         index, parameter_name, parameter_value, error_message
     )
-    print(
-        f"Lattice element {index}, {parameter_name} changed to {parameter_value} (type: {input_type})"
-    )
+    # print(
+    #     f"Lattice element {index}, {parameter_name} changed to {parameter_value} (type: {input_type})"
+    # )
 
 
 @ctrl.add("clear_latticeElements")

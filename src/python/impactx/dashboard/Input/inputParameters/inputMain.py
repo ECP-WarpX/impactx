@@ -26,16 +26,16 @@ def validate_and_convert_to_correct_type (
 
     if validation_result == []:
         converted_value = generalFunctions.convert_to_correct_type(value, desired_type)
-        print(
-            f"{state_name} changed to {converted_value} (type: {type(converted_value)})"
-        )
+        # print(
+        #     f"{state_name} changed to {converted_value} (type: {type(converted_value)})"
+        # )
         if getattr(state, state_name) != converted_value:
             setattr(state, state_name, converted_value)
             if state_name == "kin_energy":
                 state.kin_energy_MeV = InputFunctions.value_of_kin_energy_MeV(
                     converted_value, state.kin_energy_unit
                 )
-                print(f"Value of - state.kin_energy_MeV: {state.kin_energy_MeV}")
+                # print(f"Value of - state.kin_energy_MeV: {state.kin_energy_MeV}")
 
 
 @ctrl.add("kin_energy_unit_change")
@@ -81,7 +81,7 @@ class InputParameters:
         state.kin_energy_validation = []
         state.bunch_charge_C_validation = []
 
-        print(f"Initial value of - state.kin_energy_MeV: {state.kin_energy_MeV}")
+        # print(f"Initial value of - state.kin_energy_MeV: {state.kin_energy_MeV}")
 
     def card (self):
         """

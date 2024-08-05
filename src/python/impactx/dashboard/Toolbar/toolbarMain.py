@@ -45,7 +45,7 @@ class ToolbarElements:
         vuetify.VCombobox(
             placeholder="Select Visualization",
             v_model=("selectedVisualization",),
-            items=(["Twiss Phase Space Ellipses", "Lattice Visualization"],),
+            items=(["Twiss Phase Space Ellipses"],),
             clearable=True,
             dense=True,
             hide_details=True,
@@ -151,12 +151,12 @@ class Toolbars:
         Builds toolbar for the 'Input' page.
         """
 
-        ToolbarElements.file_upload()
+        # ToolbarElements.file_upload()
         vuetify.VSpacer()
         ToolbarElements.select_visualization()
         ToolbarElements.run_simulation_button()
-        ToolbarElements.export_input_data()
-        ToolbarElements.switch_theme()
+        # ToolbarElements.export_input_data()
+        # ToolbarElements.switch_theme()
 
     @staticmethod
     def run_toolbar ():
@@ -169,8 +169,8 @@ class Toolbars:
         ToolbarElements.kill_button(),
         vuetify.VSpacer(),
         ToolbarElements.run_simulation_button(),
-        ToolbarElements.export_input_data(),
-        ToolbarElements.switch_theme(),
+        # ToolbarElements.export_input_data(),
+        # ToolbarElements.switch_theme(),
 
     @staticmethod
     def analyze_toolbar ():
@@ -179,9 +179,9 @@ class Toolbars:
         """
 
         vuetify.VSpacer()
-        ToolbarElements.checkbox_2d()
-        ToolbarElements.checkbox_3d()
+        # ToolbarElements.checkbox_2d()
+        # ToolbarElements.checkbox_3d()
         ToolbarElements.plot_options()
         ToolbarElements.run_simulation_button()
-        ToolbarElements.export_input_data()
-        ToolbarElements.switch_theme()
+        # ToolbarElements.export_input_data()
+        # ToolbarElements.switch_theme()

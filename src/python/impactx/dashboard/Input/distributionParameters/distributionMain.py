@@ -155,9 +155,9 @@ def on_distribution_parameter_change (parameter_name, parameter_value, parameter
     error_message = generalFunctions.validate_against(parameter_value, parameter_type)
 
     update_distribution_parameters(parameter_name, parameter_value, error_message)
-    print(
-        f"Parameter {parameter_name} was changed to {parameter_value} (type: {input_type})"
-    )
+    # print(
+    #     f"Parameter {parameter_name} was changed to {parameter_value} (type: {input_type})"
+    # )
 
 
 # -----------------------------------------------------------------------------
