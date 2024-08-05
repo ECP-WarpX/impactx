@@ -1,8 +1,8 @@
 import os
 
-from trame.app import get_server
 from trame.widgets import matplotlib, plotly, vuetify
 
+from ..trame_setup import setup_server
 from .analyzeFunctions import AnalyzeFunctions
 from .plot_ParameterEvolutionOverS.overS import line_plot_1d
 from .plot_PhaseSpaceProjections.phaseSpace import run_simulation
@@ -11,7 +11,6 @@ from .plot_PhaseSpaceProjections.phaseSpace import run_simulation
 # Trame setup
 # -----------------------------------------------------------------------------
 
-from ..trame_setup import setup_server
 server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------
@@ -189,7 +188,9 @@ class AnalyzeSimulation:
         """
 
         with vuetify.VContainer(fluid=True):
-            with vuetify.VContainer(v_if="active_plot === 'Phase Space Plots'", fluid=True):
+            with vuetify.VContainer(
+                v_if="active_plot === 'Phase Space Plots'", fluid=True
+            ):
                 with vuetify.VCard(style="height: 50vh; width: 150vh;"):
                     with vuetify.VTabs(v_model=("active_tab", 0)):
                         vuetify.VTab("Plot")
@@ -203,11 +204,15 @@ class AnalyzeSimulation:
                             with vuetify.VContainer(
                                 style="height: 37vh; width: 147vh;"
                             ):
-                                matplotlib_figure = matplotlib.Figure(style="position: absolute")
+                                matplotlib_figure = matplotlib.Figure(
+                                    style="position: absolute"
+                                )
                                 ctrl.matplotlib_figure_update = matplotlib_figure.update
 
         with vuetify.VContainer(
-            v_if="active_plot === 'Plot Over S'", style="height: 90vh; width: 100vh;", fluid=True,
+            v_if="active_plot === 'Plot Over S'",
+            style="height: 90vh; width: 100vh;",
+            fluid=True,
         ):
             plotly_figure = plotly.Figure(
                 display_mode_bar="true", config={"responsive": True}

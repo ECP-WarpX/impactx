@@ -1,10 +1,11 @@
 from trame.widgets import vuetify
 
+from ..trame_setup import setup_server
+
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
 
-from ..trame_setup import setup_server
 server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------

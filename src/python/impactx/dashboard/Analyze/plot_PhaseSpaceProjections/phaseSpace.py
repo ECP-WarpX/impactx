@@ -12,7 +12,11 @@
 # -----------------------------------------------------------------------------
 
 from ...trame_setup import setup_server
+
 server, state, ctrl = setup_server()
+
+import base64
+import io
 
 from impactx import ImpactX
 
@@ -22,8 +26,7 @@ from ...Input.distributionParameters.distributionMain import (
 from ...Input.latticeConfiguration.latticeMain import save_lattice_elements
 from ..plot_PhaseSpaceProjections.phaseSpaceSettings import adjusted_settings_plot
 
-import io
-import base64
+
 def fig_to_base64(fig):
     """
     Puts png in trame-compatible form
@@ -31,7 +34,7 @@ def fig_to_base64(fig):
     buf = io.BytesIO()
     fig.savefig(buf, format="png")
     buf.seek(0)
-    return base64.b64encode(buf.read()).decode('utf-8')
+    return base64.b64encode(buf.read()).decode("utf-8")
 
 
 def run_simulation(save_png=True):
@@ -108,7 +111,7 @@ def run_simulation(save_png=True):
     # fig = pc.plot_phasespace()
     fig = adjusted_settings_plot(pc)
     fig_original = pc.plot_phasespace()
-            
+
     if fig_original is not None:
         image_base64 = fig_to_base64(fig_original)
         state.image_data = f"data:image/png;base64, {image_base64}"

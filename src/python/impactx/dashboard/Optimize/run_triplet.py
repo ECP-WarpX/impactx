@@ -1,10 +1,10 @@
 from ..Input.distributionParameters.distributionMain import save_distribution_parameters
+from ..trame_setup import setup_server
 
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
 
-from ..trame_setup import setup_server
 server, state, ctrl = setup_server()
 
 import numpy as np

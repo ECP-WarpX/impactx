@@ -4,11 +4,12 @@ import re
 import subprocess
 import webbrowser
 
+from ..trame_setup import setup_server
+
 # -----------------------------------------------------------------------------
 # Trame setup
 # -----------------------------------------------------------------------------
 
-from ..trame_setup import setup_server
 server, state, ctrl = setup_server()
 
 # -----------------------------------------------------------------------------
