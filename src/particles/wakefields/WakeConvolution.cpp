@@ -3,7 +3,7 @@
 #include "initialization/InitDistribution.H"
 
 #ifdef ImpactX_USE_FFT
-#include <fftw3.h> //Fastest Fourier Transform in the West
+#include <ablastr/math/fft/AnyFFT.H>
 #endif
 
 #include <algorithm>
@@ -68,13 +68,14 @@ void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size
     //Add padding factor to control amount of zero-padding
     int n = static_cast<int>(original_n * padding_factor);
 
-    //Allocate memory for FFTW inputs and outputs
-    double *in1 = (double*) fftw_malloc(sizeof(double) * n); //Allocate memory for 'n' real numbers for inputs and complex outputs
-    double *in2 = (double*) fftw_malloc(sizeof(double) * n);
-    fftw_complex *out1 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
-    fftw_complex *out2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
-    fftw_complex *conv_result = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
-    double *out3 = (double*) fftw_malloc(sizeof(double) * n);
+    //Allocate memory for FFT inputs and outputs
+    using ablastr::math::anyfft::Complex;
+    double *in1 = (double*) malloc(sizeof(double) * n); //Allocate memory for 'n' real numbers for inputs and complex outputs
+    double *in2 = (double*) malloc(sizeof(double) * n);
+    Complex *out1 = (Complex*) malloc(sizeof(Complex) * n);
+    Complex *out2 = (Complex*) malloc(sizeof(Complex) * n);
+    Complex *conv_result = (Complex*) malloc(sizeof(Complex) * n);
+    double *out3 = (double*) malloc(sizeof(double) * n);
 
     //Zero-pad the input arrays to be the size of the convolution output length 'n'
     for (int i = 0; i < n; ++i)
@@ -98,13 +99,18 @@ void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size
         }
     }
 
-    //Define Forward FFT
-    fftw_plan p1 = fftw_plan_dft_r2c_1d(n, in1, out1, FFTW_ESTIMATE); // sign = forward or backward; flag = estimate or measure
-    fftw_plan p2 = fftw_plan_dft_r2c_1d(n, in2, out2, FFTW_ESTIMATE);
+    // Define Forward FFT
+    auto p1 = ablastr::math::anyfft::CreatePlan(
+        amrex::IntVect{n}, in1, out1, ablastr::math::anyfft::direction::R2C, 1
+    );
+    auto p2 = ablastr::math::anyfft::CreatePlan(
+        amrex::IntVect{n}, in2, out2, ablastr::math::anyfft::direction::R2C, 1
+    );
 
-    //Perform Forward FFT - Convert inputs into frequency domain
-    fftw_execute(p1); //Gives out1,out2, the FFT-transformed input arrays of in1, in2
-    fftw_execute(p2);
+    // Perform Forward FFT - Convert inputs into frequency domain
+    // Gives out1,out2, the FFT-transformed input arrays of in1, in2
+    ablastr::math::anyfft::Execute(p1);
+    ablastr::math::anyfft::Execute(p2);
 
     //Perform FFT Multiplication - FFT Element-wise multiplication in frequency space
     for (int i = 0; i < n; ++i)
@@ -122,11 +128,13 @@ void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size
         conv_result[i][1] = out1[i][0] * out2[i][1] + out1[i][1] * out2[i][0]; //Imaginary part of convolution
     }
 
-    //Define Backward FFT - Revert from frequency domain to time/space domain
-    fftw_plan p3 = fftw_plan_dft_c2r_1d(n, conv_result, out3, FFTW_ESTIMATE);
+    // Define Backward FFT - Revert from frequency domain to time/space domain
+    auto p3 = ablastr::math::anyfft::CreatePlan(
+        amrex::IntVect{n}, out3, conv_result, ablastr::math::anyfft::direction::C2R, 1
+    );
 
-    //Perform Backward FFT
-    fftw_execute(p3);
+    // Perform Backward FFT
+    ablastr::math::anyfft::Execute(p3);
 
     //Normalize result by the output size and multiply result by bin size
     for (int i = 0; i < n; ++i)
@@ -135,15 +143,15 @@ void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size
     }
 
     //Clean up intermediate declarations
-    fftw_destroy_plan(p1);
-    fftw_destroy_plan(p2);
-    fftw_destroy_plan(p3);
-    fftw_free(in1);
-    fftw_free(in2);
-    fftw_free(out1);
-    fftw_free(out2);
-    fftw_free(out3);
-    fftw_free(conv_result);
+    ablastr::math::anyfft::DestroyPlan(p1);
+    ablastr::math::anyfft::DestroyPlan(p2);
+    ablastr::math::anyfft::DestroyPlan(p3);
+    free(in1);
+    free(in2);
+    free(out1);
+    free(out2);
+    free(out3);
+    free(conv_result);
 #else
     throw std::runtime_error("convolve_fft: To use this function, recompile with ImpactX_FFT=ON.");
 #endif
