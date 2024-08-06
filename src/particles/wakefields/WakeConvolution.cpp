@@ -69,41 +69,38 @@ void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size
     int n = static_cast<int>(original_n * padding_factor);
 
     //Allocate memory for FFTW inputs and outputs
-    fftw_complex *in1 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n); //Allocate memory for 'n' complex numbers for inputs (zero-padded) and outputs
-    fftw_complex *in2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
+    double *in1 = (double*) fftw_malloc(sizeof(double) * n); //Allocate memory for 'n' real numbers for inputs and complex outputs
+    double *in2 = (double*) fftw_malloc(sizeof(double) * n);
     fftw_complex *out1 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
     fftw_complex *out2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
     fftw_complex *conv_result = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n);
+    double *out3 = (double*) fftw_malloc(sizeof(double) * n);
 
     //Zero-pad the input arrays to be the size of the convolution output length 'n'
     for (int i = 0; i < n; ++i)
     {
         if (i < beam_profile_size)
         {
-            in1[i][0] = std::isfinite(beam_profile[i]) ? beam_profile[i] : 0.0; //Print NaN was produced if 0
-            in1[i][1] = 0.0;
+            in1[i] = std::isfinite(beam_profile[i]) ? beam_profile[i] : 0.0; //Print NaN was produced if 0
         }
         else
         {
-            in1[i][0] = 0.0;
-            in1[i][1] = 0.0;
+            in1[i] = 0.0;
         }
 
         if (i < wake_func_size)
         {
-            in2[i][0] = std::isfinite(wake_func[i]) ? wake_func[i] : 0.0; //Print NaN was produced if 0
-            in2[i][1] = 0.0;
+            in2[i] = std::isfinite(wake_func[i]) ? wake_func[i] : 0.0; //Print NaN was produced if 0
         }
         else
         {
-            in2[i][0] = 0.0;
-            in2[i][1] = 0.0;
+            in2[i] = 0.0;
         }
     }
 
     //Define Forward FFT
-    fftw_plan p1 = fftw_plan_dft_1d(n, in1, out1, FFTW_FORWARD, FFTW_ESTIMATE); //sign = forward or backward; flag = estimate or measure
-    fftw_plan p2 = fftw_plan_dft_1d(n, in2, out2, FFTW_FORWARD, FFTW_ESTIMATE);
+    fftw_plan p1 = fftw_plan_dft_r2c_1d(n, in1, out1, FFTW_ESTIMATE); // sign = forward or backward; flag = estimate or measure
+    fftw_plan p2 = fftw_plan_dft_r2c_1d(n, in2, out2, FFTW_ESTIMATE);
 
     //Perform Forward FFT - Convert inputs into frequency domain
     fftw_execute(p1); //Gives out1,out2, the FFT-transformed input arrays of in1, in2
@@ -126,7 +123,7 @@ void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size
     }
 
     //Define Backward FFT - Revert from frequency domain to time/space domain
-    fftw_plan p3 = fftw_plan_dft_1d(n, conv_result, out1, FFTW_BACKWARD, FFTW_ESTIMATE);
+    fftw_plan p3 = fftw_plan_dft_c2r_1d(n, conv_result, out3, FFTW_ESTIMATE);
 
     //Perform Backward FFT
     fftw_execute(p3);
@@ -134,7 +131,7 @@ void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size
     //Normalize result by the output size and multiply result by bin size
     for (int i = 0; i < n; ++i)
     {
-        result[i] = out1[i][0] / n * delta_t;
+        result[i] = out3[i] / n * delta_t;
     }
 
     //Clean up intermediate declarations
@@ -145,6 +142,7 @@ void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size
     fftw_free(in2);
     fftw_free(out1);
     fftw_free(out2);
+    fftw_free(out3);
     fftw_free(conv_result);
 #else
     throw std::runtime_error("convolve_fft: To use this function, recompile with ImpactX_FFT=ON.");
