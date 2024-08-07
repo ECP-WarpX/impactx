@@ -18,7 +18,6 @@
 #include "particles/spacecharge/GatherAndPush.H"
 #include "particles/spacecharge/PoissonSolve.H"
 #include "particles/transformation/CoordinateTransformation.H"
-#include "particles/elements/Sbend.H"
 
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
