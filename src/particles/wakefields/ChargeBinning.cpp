@@ -8,20 +8,24 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "ChargeBinning.H"
-#include "particles/ImpactXParticleContainer.H" //Includes all necessary AMReX headers
+#include "particles/ImpactXParticleContainer.H"
 
 #include <cmath>
-#include <iostream>
 #include <vector>
-#include <algorithm>
 
 using namespace amrex;
 
-//Beam charge distribution function
 
 namespace impactx::particles::wakefields
 {
-    void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, Real* dptr_data, int num_bins, Real bin_min, Real bin_size, bool is_unity_particle_weight)
+    void DepositCharge1D (
+        impactx::ImpactXParticleContainer& myspc,
+        Real* dptr_data,
+        int num_bins,
+        Real bin_min,
+        Real bin_size,
+        bool is_unity_particle_weight
+    )
     {   //Access and change data directly using '&' to pass by reference
 
         //Determine the number of grid levels in the simulation
@@ -64,33 +68,34 @@ namespace impactx::particles::wakefields
                         For w > 1 --> macroparticle > 1 electrons making up a macroparticle
                         */
 
-                        //Calculate bin index based on z-position
+                        // Calculate bin index based on z-position
                         int const bin = int(Math::floor((z - bin_min) / bin_size)); //Round to nearest bin index integer
                         if (bin < 0 || bin >= num_bins) { return; } //Discard if bin index is out of range
 
-                        //Calculate the charge contribution of the macro particle
-                        Real charge_contribution = w * ablastr::constant::SI::q_e;
+                        // Divide charge by bin size to get binned charge density
+                        Real add_value = ablastr::constant::SI::q_e / bin_size;
 
-                        //Divide charge by bin size to get binned charge density
-                        Real charge_density = charge_contribution / bin_size;
-                        Real unity_density = ablastr::constant::SI::q_e / bin_size;
+                        // Calculate the charge contribution of the macro particle
+                        if (!is_unity_particle_weight)
+                        {
+                            add_value *= w;
+                        }
 
-                        //Add to histogram bin
-                        if (is_unity_particle_weight)
-                        {
-                            HostDevice::Atomic::Add(&dptr_data[bin], unity_density);  //Unity weight: Add elementary charge of 1 particle
-                        }
-                        else
-                        {
-                            HostDevice::Atomic::Add(&dptr_data[bin], charge_density);  //Non-unity weight: Add calculated charge from >1 particle
-                        }
+                        // Add to histogram bin
+                        HostDevice::Atomic::Add(&dptr_data[bin], add_value);
                     });
                 }
             }
         }
     }
 
-    void DerivativeCharge1D(amrex::Real* charge_distribution, amrex::Real* slopes, int num_bins, Real bin_size, bool GetNumberDensity)
+    void DerivativeCharge1D (
+        amrex::Real* charge_distribution,
+        amrex::Real* slopes,
+        int num_bins,
+        Real bin_size,
+        bool GetNumberDensity
+    )
     {
 
         for (int i = 0; i < num_bins - 1; ++i)

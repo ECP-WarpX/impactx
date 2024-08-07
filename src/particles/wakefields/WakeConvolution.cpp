@@ -8,114 +8,133 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "WakeConvolution.H"
-#include "particles/ImpactXParticleContainer.H" //Includes all necessary AMReX headers
-#include "initialization/InitDistribution.H"
+#include "particles/ImpactXParticleContainer.H"
 
 #ifdef ImpactX_USE_FFT
 #include <ablastr/math/fft/AnyFFT.H>
 #endif
 
+#include <AMReX_REAL.H>
+
 #include <algorithm>
 #include <cmath>
-#include <iostream>
+#ifndef ImpactX_USE_FFT
 #include <stdexcept>
-#include <vector>
+#endif
 
 namespace impactx::particles::wakefields
 {
-    /*
-    Wake Functions:
+    using namespace amrex;
 
-    Define the longitudinal and transverse resistive wall wake functions,
-    the longitudinal CSR wake function, and their associated functions
-
-    */
-
-    //Step Function
-    amrex::Real unit_step(amrex::Real s)
+    Real unit_step (Real s)
     {
-        return s >= 0 ? 1.0 : 0.0; //If true return 1, else 0
+        using namespace amrex::literals;
+
+        return s >= 0_rt ? 1_rt : 0_rt;
+    }
+    Real alpha (Real s)
+    {
+        using namespace amrex::literals;
+
+        return 1_rt - impactx::particles::wakefields::alpha_1 * std::sqrt(s) - (1_rt - 2_rt * impactx::particles::wakefields::alpha_1) * s;
     }
 
-    //Alpha Function
-    amrex::Real alpha(amrex::Real s)
+    Real w_t_rf (
+        Real s,
+        Real a,
+        Real g,
+        Real L
+    )
     {
-        return 1.0 - impactx::particles::wakefields::alpha_1 * std::sqrt(s) - (1.0 - 2 * impactx::particles::wakefields::alpha_1) * s;
+        using namespace amrex::literals;
+
+        Real s0 = (0.169_rt * std::pow(a, 1.79_rt) * std::pow(g, 0.38_rt)) / std::pow(L, 1.17_rt);
+        Real term = std::sqrt(std::abs(s) / s0) * std::exp(-std::sqrt(std::abs(s) / s0));
+        return (4 * impactx::particles::wakefields::Z0 * ablastr::constant::SI::c * s0 * unit_step(s)) / (Real(M_PI) * std::pow(a, 4)) * term;
     }
 
-    //Resistive Wall Wake Functions
-
-    amrex::Real w_t_rf(amrex::Real s, amrex::Real a, amrex::Real g, amrex::Real L)
+    Real w_l_rf (
+        Real s,
+        Real a,
+        Real g,
+        Real L
+    )
     {
-        amrex::Real s0 = (0.169 * std::pow(a, 1.79) * std::pow(g, 0.38)) / std::pow(L, 1.17);
-        amrex::Real term = std::sqrt(std::abs(s) / s0) * std::exp(-std::sqrt(std::abs(s) / s0));
-        return (4 * impactx::particles::wakefields::Z0 * ablastr::constant::SI::c * s0 * unit_step(s)) / (M_PI * std::pow(a, 4)) * term;
+        using namespace amrex::literals;
+
+        Real s00 = g * std::pow((a / (alpha(g / L) * L)), 2) / 8.0_rt;
+        return (impactx::particles::wakefields::Z0 * ablastr::constant::SI::c * unit_step(s) * std::exp(-std::sqrt(std::abs(s) / s00))) / (Real(M_PI) * std::pow(a, 2));
     }
 
-    amrex::Real w_l_rf(amrex::Real s, amrex::Real a, amrex::Real g, amrex::Real L)
+    Real w_l_csr (
+        Real s,
+        Real R
+    )
     {
-        amrex::Real s00 = g * std::pow((a / (alpha(g / L) * L)), 2) / 8.0;
-        return (impactx::particles::wakefields::Z0 * ablastr::constant::SI::c * unit_step(s) * std::exp(-std::sqrt(std::abs(s) / s00))) / (M_PI * std::pow(a, 2));
+        using namespace amrex::literals;
+
+        Real rc = std::pow(ablastr::constant::SI::q_e, 2) / (4_rt * Real(M_PI) * ablastr::constant::SI::ep0 * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2));
+        Real kappa = (2_rt * rc * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2)) / std::pow(3_rt, 1_rt/3_rt) / std::pow(R, 2_rt/3_rt);
+
+        return - (kappa * unit_step(s)) / std::pow(std::abs(s), 1_rt/3_rt);
     }
 
-    //CSR Wake Function
-
-    amrex::Real w_l_csr(amrex::Real s, amrex::ParticleReal R)
-    {
-        amrex::Real rc = std::pow(ablastr::constant::SI::q_e, 2) / (4 * M_PI * ablastr::constant::SI::ep0 * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2));
-        amrex::Real kappa = (2 * rc * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2)) / std::pow(3, 1.0/3.0) / std::pow(R, 2.0/3.0);
-
-        return - (kappa * unit_step(s)) / std::pow(std::abs(s), 1.0/3.0);
-    }
-
-    //Convolution Function
-
-    void convolve_fft(amrex::Real* beam_profile, amrex::Real* wake_func, int beam_profile_size, int wake_func_size, amrex::Real delta_t, amrex::Real* result, int padding_factor)
+    void convolve_fft (
+        Real const * beam_profile_slope,
+        Real const * wake_func,
+        int beam_profile_size,
+        int wake_func_size,
+        Real delta_t,
+        Real* result,
+        int padding_factor
+    )
     {
     #ifdef ImpactX_USE_FFT
-        //Length of convolution result
-        int original_n = beam_profile_size + wake_func_size - 1; //Output size is n = 2N - 1, where N = size of signals 1,2
+        using namespace amrex::literals;
 
-        //Add padding factor to control amount of zero-padding
+        // Length of convolution result
+        int original_n = beam_profile_size + wake_func_size - 1;  // Output size is n = 2N - 1, where N = size of signals 1,2
+
+        // Add padding factor to control amount of zero-padding
         int n = static_cast<int>(original_n * padding_factor);
 
-        //Allocate memory for FFT inputs and outputs
+        // Allocate memory for FFT inputs and outputs
         using ablastr::math::anyfft::Complex;
-        amrex::Real *in1 = (amrex::Real*) malloc(sizeof(amrex::Real) * n); //Allocate memory for 'n' real numbers for inputs and complex outputs
-        amrex::Real *in2 = (amrex::Real*) malloc(sizeof(amrex::Real) * n);
+        Real *in1 = (Real*) malloc(sizeof(Real) * n);  // Allocate memory for 'n' real numbers for inputs and complex outputs
+        Real *in2 = (Real*) malloc(sizeof(Real) * n);
         Complex *out1 = (Complex*) malloc(sizeof(Complex) * n);
         Complex *out2 = (Complex*) malloc(sizeof(Complex) * n);
         Complex *conv_result = (Complex*) malloc(sizeof(Complex) * n);
-        amrex::Real *out3 = (amrex::Real*) malloc(sizeof(amrex::Real) * n);
+        Real *out3 = (Real*) malloc(sizeof(Real) * n);
 
         //Zero-pad the input arrays to be the size of the convolution output length 'n'
         for (int i = 0; i < n; ++i)
         {
             if (i < beam_profile_size)
             {
-                in1[i] = std::isfinite(beam_profile[i]) ? beam_profile[i] : 0.0; //Print NaN was produced if 0
+                in1[i] = std::isfinite(beam_profile_slope[i]) ? beam_profile_slope[i] : 0_rt;  // Print NaN was produced if 0
             }
             else
             {
-                in1[i] = 0.0;
+                in1[i] = 0_rt;
             }
 
             if (i < wake_func_size)
             {
-                in2[i] = std::isfinite(wake_func[i]) ? wake_func[i] : 0.0; //Print NaN was produced if 0
+                in2[i] = std::isfinite(wake_func[i]) ? wake_func[i] : 0_rt;  // Print NaN was produced if 0
             }
             else
             {
-                in2[i] = 0.0;
+                in2[i] = 0_rt;
             }
         }
 
         // Define Forward FFT
         auto p1 = ablastr::math::anyfft::CreatePlan(
-            amrex::IntVect{n}, in1, out1, ablastr::math::anyfft::direction::R2C, 1
+            IntVect{n}, in1, out1, ablastr::math::anyfft::direction::R2C, 1
         );
         auto p2 = ablastr::math::anyfft::CreatePlan(
-            amrex::IntVect{n}, in2, out2, ablastr::math::anyfft::direction::R2C, 1
+            IntVect{n}, in2, out2, ablastr::math::anyfft::direction::R2C, 1
         );
 
         // Perform Forward FFT - Convert inputs into frequency domain
@@ -141,7 +160,7 @@ namespace impactx::particles::wakefields
 
         // Define Backward FFT - Revert from frequency domain to time/space domain
         auto p3 = ablastr::math::anyfft::CreatePlan(
-            amrex::IntVect{n}, out3, conv_result, ablastr::math::anyfft::direction::C2R, 1
+            IntVect{n}, out3, conv_result, ablastr::math::anyfft::direction::C2R, 1
         );
 
         // Perform Backward FFT

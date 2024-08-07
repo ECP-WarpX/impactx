@@ -10,14 +10,33 @@
 #ifndef WAKEPUSH_H
 #define WAKEPUSH_H
 
-#include <AMReX_REAL.H>
-#include <vector>
 #include "particles/ImpactXParticleContainer.H"
+
+#include <AMReX_REAL.H>
+
+#include <vector>
+
 
 namespace impactx::particles::wakefields
 {
-    //Function to update particle momentum using wake force kick
-    void WakePush(ImpactXParticleContainer & pc, const std::vector<amrex::Real>& convoluted_wakefield, amrex::ParticleReal const slice_ds, amrex::Real bin_size, amrex::Real bin_min, int padding_factor);
-} //namespace impactx::particles::wakefields
+    /** Function to update particle momentum using wake force kick
+     *
+     * @param[inout] pc
+     * @param[in] convoluted_wakefield
+     * @param[in] slice_ds
+     * @param[in] bin_size
+     * @param[in] bin_min
+     * @param[in] padding_factor
+     */
+    void WakePush (
+        ImpactXParticleContainer & pc,
+        std::vector<amrex::Real> const & convoluted_wakefield,
+        amrex::ParticleReal slice_ds,
+        amrex::Real bin_size,
+        amrex::Real bin_min,
+        int padding_factor
+    );
 
-#endif //WAKEPUSH_H
+} // namespace impactx::particles::wakefields
+
+#endif // WAKEPUSH_H
