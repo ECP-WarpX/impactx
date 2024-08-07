@@ -106,11 +106,6 @@ class ToolbarElements:
             style="max-width: 175px;",
         )
 
-    def run_simulation():
-        # ctrl.terminal_println("Running simulation...")
-        # ctrl.terminal_println("Simulation complete.")
-        AnalyzeFunctions.outputTerminal()
-
     @staticmethod
     def kill_button():
         return TrameFunctions.create_button("Kill")

@@ -439,28 +439,3 @@ class LatticeConfiguration:
                                     style="max-width: 75px",
                                     classes="ma-0 pa-0",
                                 )
-                # with vuetify.VTabItem():
-                #     with vuetify.VContainer(
-                #         fluid=True,
-                #         style="background-color: #f5f5f5; padding: 16px; border-radius: 8px;",
-                #     ):
-                #         with vuetify.VRow():
-                #             with vuetify.VCol(cols="3"):
-                #                 vuetify.VTextField(
-                #                     label="Variables",
-                #                     style="max-width: 100px; font-family: 'Courier New', monospace;",
-                #                 )
-                #             with vuetify.VCol(cols="1"):
-                #                 vuetify.VInput(
-                #                     "=",
-                #                     style="max-width: 40px; font-family: 'Courier New', monospace; text-align: center; margin-top: 25px;",
-                #                 )
-                #             with vuetify.VCol(cols="7"):
-                #                 vuetify.VTextField(
-                #                     label="Formula",
-                #                     style="max-width: 300px; font-family: 'Courier New', monospace;",
-                #                 )
-                #             with vuetify.VCol(cols="1"):
-                #                 vuetify.VIcon(
-                #                     "mdi-plus", hide_details=True, classes="ma-0"
-                #                 )

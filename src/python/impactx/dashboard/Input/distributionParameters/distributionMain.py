@@ -21,9 +21,6 @@ state.listOfDistributions = generalFunctions.select_classes(DISTRIBUTIONS_MODULE
 state.listOfDistributionsAndParametersAndDefault = (
     generalFunctions.class_parameters_with_defaults(DISTRIBUTIONS_MODULE_NAME)
 )
-# state.listOfDistributionsAndParametersAndDefault_Twiss = (
-#     DistributionFunctions.class_parameters_with_defaults_twiss()
-# )
 
 # -----------------------------------------------------------------------------
 # Default

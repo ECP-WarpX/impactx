@@ -1,5 +1,3 @@
-import subprocess
-
 import pandas as pd
 
 from ..trame_setup import setup_server
@@ -97,41 +95,3 @@ class AnalyzeFunctions:
                     filtered_row[key] = value
             filtered_data.append(filtered_row)
         return filtered_data
-
-    # -----------------------------------------------------------------------------
-    # Function to print simulation output in terminal view
-    # -----------------------------------------------------------------------------
-
-    @staticmethod
-    def outputTerminal():
-        """
-        Function to print out simulation results in
-        terminal view. (Not working as intended, 8/4/24)
-        """
-
-        ctrl.terminal_println("Running...")
-
-        command = [
-            "python",
-            "-m",
-            "impactx.dashboard.Analyze.plot_PhaseSpaceProjections.phaseSpace",
-            "run_simulation",
-        ]
-
-        # Run the specified simulation function as a separate process
-        process = subprocess.Popen(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,  # Capture errors to the same stream as output
-            universal_newlines=True,  # Return output as strings instead of bytes
-        )
-
-        # Read output from the process and print it to the xterm widget
-        while True:
-            output = process.stdout.readline()
-            if output == "" and process.poll() is not None:
-                break
-            if output:
-                ctrl.terminal_println(output.strip())
-
-        ctrl.terminal_println("complete.")

@@ -233,12 +233,6 @@ class AnalyzeSimulation:
                                 )
                                 ctrl.matplotlib_figure_update = matplotlib_figure.update
 
-        with vuetify.VContainer(
-            v_if="active_plot === 'Plot Over S'",
-            style="height: 90vh; width: 100vh;",
-            fluid=True,
-        ):
-            plotly_figure = plotly.Figure(
-                display_mode_bar="true", config={"responsive": True}
-            )
+        with vuetify.VContainer(v_if="active_plot === 'Plot Over S'", style="height: 50vh; width: 90vh;"):
+            plotly_figure = plotly.Figure(display_mode_bar="true", config={"responsive": True})
             ctrl.plotly_figure_update = plotly_figure.update

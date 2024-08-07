@@ -57,16 +57,8 @@ with RouterViewLayout(server, "/Analyze"):
         with vuetify.VRow(no_gutters=True, classes="fill-height"):
             with vuetify.VCol(cols="auto", classes="pa-2 fill-height"):
                 AnalyzeSimulation.card()
-            with vuetify.VCol(
-                classes="pa-2 d-flex align-center justify-center fill-height"
-            ):
+            with vuetify.VCol(cols="auto", classes="pa-2 fill-height"):
                 AnalyzeSimulation.plot()
-
-# with RouterViewLayout(server, "/Optimize"):
-#     with vuetify.VContainer(fluid=True):
-#         with vuetify.VRow(no_gutters=True, classes="fill-height"):
-#             with vuetify.VCol(cols="auto", classes="pa-2 fill-height"):
-#                 Optimize.card()
 
 # -----------------------------------------------------------------------------
 # GUI
@@ -92,7 +84,6 @@ def application():
             with vuetify.VList():
                 vuetify.VSubheader("Simulation")
             TrameFunctions.create_route("Input", "mdi-file-edit")
-            # TrameFunctions.create_route("Optimize", "mdi-trending-up")
             TrameFunctions.create_route("Run", "mdi-play")
             TrameFunctions.create_route("Analyze", "mdi-chart-box-multiple")
 
