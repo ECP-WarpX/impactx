@@ -18,7 +18,7 @@ namespace impactx::particles::wakefields
 {
     void WakePush(ImpactXParticleContainer & pc, const std::vector<amrex::Real>& convoluted_wakefield, amrex::ParticleReal const slice_ds, amrex::Real bin_size, amrex::Real bin_min, int padding_factor)
     {
-        BL_PROFILE("impactx::wakepush::WakePush");
+        BL_PROFILE("impactx::particles::wakefields::WakePush");
 
         using namespace amrex::literals;
 
