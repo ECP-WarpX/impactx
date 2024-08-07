@@ -10,14 +10,12 @@
 #ifndef CHARGE_BINNING_H
 #define CHARGE_BINNING_H
 
-#include "../ImpactXParticleContainer.H"
-
-using namespace amrex;
+#include "particles/ImpactXParticleContainer.H"
 
 //Function to calculate charge density profile
-void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, Real* dptr_data, int num_bins, Real bin_min, Real bin_size, bool is_unity_particle_weight);
+void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, amrex::Real* dptr_data, int num_bins, amrex::Real bin_min, amrex::Real bin_size, bool is_unity_particle_weight);
 
 //Function to calculate number, charge density slopes
-void DerivativeCharge1D(amrex::Real* charge_distribution, amrex::Real* slopes, int num_bins, Real bin_size, bool GetNumberDensity);
+void DerivativeCharge1D(amrex::Real* charge_distribution, amrex::Real* slopes, int num_bins, amrex::Real bin_size, bool GetNumberDensity);
 
 #endif // CHARGE_BINNING_H

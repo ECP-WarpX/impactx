@@ -12,7 +12,7 @@
 
 #include <AMReX_REAL.H>
 #include <vector>
-#include "../ImpactXParticleContainer.H"
+#include "particles/ImpactXParticleContainer.H"
 
 namespace impactx::particles::wakefields
 {
