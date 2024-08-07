@@ -12,6 +12,7 @@ server, state, ctrl = setup_server()
 # Common toolbar elements
 # -----------------------------------------------------------------------------
 
+
 class ToolbarElements:
     """
     Helper functions to create
@@ -39,6 +40,7 @@ class ToolbarElements:
             disabled=("disableRunSimulationButton", True),
         )
 
+
 # -----------------------------------------------------------------------------
 # Content
 # -----------------------------------------------------------------------------
@@ -57,7 +59,6 @@ class Toolbars:
 
         vuetify.VSpacer(),
         ToolbarElements.run_simulation_button(),
-
 
     @staticmethod
     def analyze_toolbar():

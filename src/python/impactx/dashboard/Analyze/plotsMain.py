@@ -1,7 +1,7 @@
-import os
-import io
 import asyncio
 import contextlib
+import io
+import os
 
 from trame.widgets import matplotlib, plotly, vuetify
 
@@ -59,7 +59,9 @@ def load_dataTable_data():
     """
 
     if not os.path.exists(REDUCED_BEAM_DATA) or not os.path.exists(REF_PARTICLE_DATA):
-        ctrl.terminal_print("Diagnostics files are missing. Please ensure they are in the correct directory.")
+        ctrl.terminal_print(
+            "Diagnostics files are missing. Please ensure they are in the correct directory."
+        )
         return
 
     combined_files = AnalyzeFunctions.combine_files(
@@ -128,13 +130,12 @@ def update_plot():
         ctrl.matplotlib_figure_update(state.simulation_data)
 
 
-
 def run_simulation_impactX():
     buf = io.StringIO()
-    
+
     with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
         state.simulation_data = run_simulation()
-    
+
     buf.seek(0)
     lines = [line.strip() for line in buf]
 
@@ -145,6 +146,7 @@ def run_simulation_impactX():
         ctrl.terminal_print("Simulation complete.")
 
     asyncio.create_task(print_lines())
+
 
 # -----------------------------------------------------------------------------
 # State changes
@@ -170,6 +172,7 @@ def run_simulation_and_store():
     run_simulation_impactX()
     update_plot()
     load_dataTable_data()
+
 
 # -----------------------------------------------------------------------------
 # GUI
@@ -233,6 +236,10 @@ class AnalyzeSimulation:
                                 )
                                 ctrl.matplotlib_figure_update = matplotlib_figure.update
 
-        with vuetify.VContainer(v_if="active_plot === 'Plot Over S'", style="height: 50vh; width: 90vh;"):
-            plotly_figure = plotly.Figure(display_mode_bar="true", config={"responsive": True})
+        with vuetify.VContainer(
+            v_if="active_plot === 'Plot Over S'", style="height: 50vh; width: 90vh;"
+        ):
+            plotly_figure = plotly.Figure(
+                display_mode_bar="true", config={"responsive": True}
+            )
             ctrl.plotly_figure_update = plotly_figure.update

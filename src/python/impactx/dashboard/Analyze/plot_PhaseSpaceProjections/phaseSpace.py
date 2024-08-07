@@ -18,6 +18,7 @@ server, state, ctrl = setup_server()
 import base64
 import io
 
+
 from impactx import ImpactX
 
 from ...Input.distributionParameters.distributionMain import (
@@ -25,7 +26,7 @@ from ...Input.distributionParameters.distributionMain import (
 )
 from ...Input.latticeConfiguration.latticeMain import save_lattice_elements
 from ..plot_PhaseSpaceProjections.phaseSpaceSettings import adjusted_settings_plot
-from mpi4py import MPI
+
 
 def fig_to_base64(fig):
     """
@@ -117,5 +118,5 @@ def run_simulation(save_png=True):
         state.image_data = f"data:image/png;base64, {image_base64}"
 
     sim.finalize()
-    
+
     return fig

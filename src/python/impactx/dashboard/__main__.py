@@ -46,12 +46,14 @@ with RouterViewLayout(server, "/Analyze"):
             with vuetify.VCol(cols="auto", classes="pa-2 fill-height"):
                 AnalyzeSimulation.plot()
 
+
 # -----------------------------------------------------------------------------
 # GUI
 # -----------------------------------------------------------------------------
 def init_terminal():
     with xterm.XTerm(v_if="$route.path == '/Run'") as term:
         ctrl.terminal_print = term.writeln
+
 
 def application():
     init_terminal()
@@ -73,8 +75,9 @@ def application():
 
         with layout.content:
             router.RouterView()
-            init_terminal() 
+            init_terminal()
     return layout
+
 
 application()
 # -----------------------------------------------------------------------------

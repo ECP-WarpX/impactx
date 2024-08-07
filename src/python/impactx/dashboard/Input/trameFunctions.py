@@ -12,6 +12,7 @@ server, state, ctrl = setup_server()
 # Code
 # -----------------------------------------------------------------------------
 
+
 class TrameFunctions:
     """
     Contains functions containing Vuetify

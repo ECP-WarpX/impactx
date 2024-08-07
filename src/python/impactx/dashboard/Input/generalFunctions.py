@@ -136,12 +136,12 @@ class generalFunctions:
             error_details.append("LatticeListIsEmpty")
 
         # Print all collected error messages
-        '''
+        """
         if error_details:
             print("Errors detected in the following parameters:")
             for error in error_details:
                 print(ANSI_RED + error + ANSI_RESET)
-        '''
+        """
         state.disableRunSimulationButton = bool(error_details)
 
     # -----------------------------------------------------------------------------
