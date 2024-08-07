@@ -8,7 +8,7 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "ChargeBinning.H"
-#include "../ImpactXParticleContainer.H" //Includes all necessary AMReX headers
+#include "particles/ImpactXParticleContainer.H"
 
 #include <cmath>
 #include <iostream>
