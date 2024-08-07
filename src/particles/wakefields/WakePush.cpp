@@ -16,7 +16,7 @@
 
 namespace impactx::wakepush
 {
-    void WakePush(ImpactXParticleContainer & pc, const std::vector<double>& convoluted_wakefield, amrex::ParticleReal const slice_ds, double bin_size, double bin_min, int padding_factor)
+    void WakePush(ImpactXParticleContainer & pc, const std::vector<amrex::Real>& convoluted_wakefield, amrex::ParticleReal const slice_ds, amrex::Real bin_size, amrex::Real bin_min, int padding_factor)
     {
         BL_PROFILE("impactx::wakepush::WakePush");
 
@@ -56,7 +56,7 @@ namespace impactx::wakepush
                 amrex::ParticleReal const push_consts = 1.0 / ((ablastr::constant::SI::c) * pz_ref_SI);
 
                 //Gather particles and push momentum
-                const double* wakefield_ptr = convoluted_wakefield.data();
+                const amrex::Real* wakefield_ptr = convoluted_wakefield.data();
                 amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE (int i)
                 {
                     //Access SoA Real data
@@ -69,8 +69,8 @@ namespace impactx::wakepush
                     amrex::ParticleReal & AMREX_RESTRICT pz = part_pz[i];
 
                     //Update longitudinal momentum with the convoluted wakefield force
-                    //double lower_bound = 2 * bin_min - bin_size * (padding_factor * (2 * num_bins - 1) - num_bins);
-                    double lower_bound = padding_factor * 2 * bin_min;
+                    //amrex::Real lower_bound = 2 * bin_min - bin_size * (padding_factor * (2 * num_bins - 1) - num_bins);
+                    amrex::Real lower_bound = padding_factor * 2 * bin_min;
                     int idx = static_cast<int>((z - lower_bound) / bin_size); //Find index position along z
 
                     amrex::ParticleReal const F_L = wakefield_ptr[idx];

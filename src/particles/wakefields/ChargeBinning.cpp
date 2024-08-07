@@ -88,13 +88,13 @@ void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, Real* dptr_data, 
     }
 }
 
-void DerivativeCharge1D(double* charge_distribution, double* slopes, int num_bins, Real bin_size, bool GetNumberDensity)
+void DerivativeCharge1D(amrex::Real* charge_distribution, amrex::Real* slopes, int num_bins, Real bin_size, bool GetNumberDensity)
 {
 
     for (int i = 0; i < num_bins - 1; ++i)
     {
         //Compute the charge density derivative
-        double charge_derivative = (charge_distribution[i + 1] - charge_distribution[i]) / bin_size;
+        amrex::Real charge_derivative = (charge_distribution[i + 1] - charge_distribution[i]) / bin_size;
 
         //If GetNumberDensity = True, convert charge density derivative to number density derivative for CSR convolution
         if (GetNumberDensity)

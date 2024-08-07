@@ -30,45 +30,45 @@ the longitudinal CSR wake function, and their associated functions
 */
 
 //Step Function
-double unit_step(double s)
+amrex::Real unit_step(amrex::Real s)
 {
     return s >= 0 ? 1.0 : 0.0; //If true return 1, else 0
 }
 
 //Alpha Function
-double alpha(double s)
+amrex::Real alpha(amrex::Real s)
 {
     return 1.0 - alpha_1 * std::sqrt(s) - (1.0 - 2 * alpha_1) * s;
 }
 
 //Resistive Wall Wake Functions
 
-double w_t_rf(double s, double a, double g, double L)
+amrex::Real w_t_rf(amrex::Real s, amrex::Real a, amrex::Real g, amrex::Real L)
 {
-    double s0 = (0.169 * std::pow(a, 1.79) * std::pow(g, 0.38)) / std::pow(L, 1.17);
-    double term = std::sqrt(std::abs(s) / s0) * std::exp(-std::sqrt(std::abs(s) / s0));
+    amrex::Real s0 = (0.169 * std::pow(a, 1.79) * std::pow(g, 0.38)) / std::pow(L, 1.17);
+    amrex::Real term = std::sqrt(std::abs(s) / s0) * std::exp(-std::sqrt(std::abs(s) / s0));
     return (4 * Z0 * ablastr::constant::SI::c * s0 * unit_step(s)) / (M_PI * std::pow(a, 4)) * term;
 }
 
-double w_l_rf(double s, double a, double g, double L)
+amrex::Real w_l_rf(amrex::Real s, amrex::Real a, amrex::Real g, amrex::Real L)
 {
-    double s00 = g * std::pow((a / (alpha(g / L) * L)), 2) / 8.0;
+    amrex::Real s00 = g * std::pow((a / (alpha(g / L) * L)), 2) / 8.0;
     return (Z0 * ablastr::constant::SI::c * unit_step(s) * std::exp(-std::sqrt(std::abs(s) / s00))) / (M_PI * std::pow(a, 2));
 }
 
 //CSR Wake Function
 
-double w_l_csr(double s, amrex::ParticleReal R)
+amrex::Real w_l_csr(amrex::Real s, amrex::ParticleReal R)
 {
-    double rc = std::pow(ablastr::constant::SI::q_e, 2) / (4 * M_PI * ablastr::constant::SI::ep0 * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2));
-    double kappa = (2 * rc * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2)) / std::pow(3, 1.0/3.0) / std::pow(R, 2.0/3.0);
+    amrex::Real rc = std::pow(ablastr::constant::SI::q_e, 2) / (4 * M_PI * ablastr::constant::SI::ep0 * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2));
+    amrex::Real kappa = (2 * rc * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2)) / std::pow(3, 1.0/3.0) / std::pow(R, 2.0/3.0);
 
     return - (kappa * unit_step(s)) / std::pow(std::abs(s), 1.0/3.0);
 }
 
 //Convolution Function
 
-void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size, int wake_func_size, double delta_t, double* result, int padding_factor)
+void convolve_fft(amrex::Real* beam_profile, amrex::Real* wake_func, int beam_profile_size, int wake_func_size, amrex::Real delta_t, amrex::Real* result, int padding_factor)
 {
 #ifdef ImpactX_USE_FFT
     //Length of convolution result
@@ -79,12 +79,12 @@ void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size
 
     //Allocate memory for FFT inputs and outputs
     using ablastr::math::anyfft::Complex;
-    double *in1 = (double*) malloc(sizeof(double) * n); //Allocate memory for 'n' real numbers for inputs and complex outputs
-    double *in2 = (double*) malloc(sizeof(double) * n);
+    amrex::Real *in1 = (amrex::Real*) malloc(sizeof(amrex::Real) * n); //Allocate memory for 'n' real numbers for inputs and complex outputs
+    amrex::Real *in2 = (amrex::Real*) malloc(sizeof(amrex::Real) * n);
     Complex *out1 = (Complex*) malloc(sizeof(Complex) * n);
     Complex *out2 = (Complex*) malloc(sizeof(Complex) * n);
     Complex *conv_result = (Complex*) malloc(sizeof(Complex) * n);
-    double *out3 = (double*) malloc(sizeof(double) * n);
+    amrex::Real *out3 = (amrex::Real*) malloc(sizeof(amrex::Real) * n);
 
     //Zero-pad the input arrays to be the size of the convolution output length 'n'
     for (int i = 0; i < n; ++i)

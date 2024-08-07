@@ -218,7 +218,7 @@ namespace impactx {
                     //CSR Wakefield Response
 
                     bool element_has_csr = false; // Updates to true for example with bend element
-                    double R = 0.0; // Updates for bend element rc
+                    amrex::Real R = 0.0; // Updates for bend element rc
 
                     //Define lambda function inside of std::visit
                     std::visit([&R, &element_has_csr](auto &&element)
@@ -271,24 +271,24 @@ namespace impactx {
                         DepositCharge1D(particle_container, dptr_data, num_bins, bin_min, bin_size, is_unity_particle_weight);
 
                         // Call charge density derivative function
-                        std::vector<double> charge_distribution(dptr_data, dptr_data + num_bins);
-                        std::vector<double> slopes(num_bins - 1);
+                        std::vector<amrex::Real> charge_distribution(dptr_data, dptr_data + num_bins);
+                        std::vector<amrex::Real> slopes(num_bins - 1);
                         DerivativeCharge1D(charge_distribution.data(), slopes.data(), num_bins, bin_size, GetNumberDensity); //Use number derivatives for convolution with CSR
 
                         // Call wake function
 
-                        std::vector<double> wake_function(num_bins);
+                        std::vector<amrex::Real> wake_function(num_bins);
                         for (int i = 0; i < num_bins; ++i)
                         {
-                            double s = bin_min + i * bin_size;
+                            amrex::Real s = bin_min + i * bin_size;
                             wake_function[i] = w_l_csr(s, R);
                         }
 
                         // Call convolution function
-                        std::vector<double> convoluted_wakefield(padding_factor * (2 * num_bins - 1));
+                        std::vector<amrex::Real> convoluted_wakefield(padding_factor * (2 * num_bins - 1));
                         convolve_fft(slopes.data(), wake_function.data(), slopes.size(), wake_function.size(), bin_size, convoluted_wakefield.data(), padding_factor);
 
-                        /*Check convolution
+                        //Check convolution
                         std::cout << "Convoluted wakefield: ";
                         std::ofstream outfile("convoluted_wakefield.txt");
                         for (int i = 0; i < convoluted_wakefield.size(); ++i)
@@ -298,7 +298,7 @@ namespace impactx {
                         }
                         std::cout << std::endl;
                         outfile.close();
-                        delete[] dptr_data;*/
+                        delete[] dptr_data;
 
                         // Kick particles with wake
                         impactx::wakepush::WakePush(particle_container, convoluted_wakefield, slice_ds, bin_size, t_min, padding_factor);

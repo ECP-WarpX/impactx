@@ -15,23 +15,23 @@
 
 
 //Constants
-constexpr double Z0 = 377;  //Free space impedance [Ohm]
-constexpr double alpha_1 = 0.4648;
+constexpr amrex::Real Z0 = 377;  //Free space impedance [Ohm]
+constexpr amrex::Real alpha_1 = 0.4648;
 
 //Step Function
-double unit_step(double s);
+amrex::Real unit_step(amrex::Real s);
 
 //Alpha Function
-double alpha(double s);
+amrex::Real alpha(amrex::Real s);
 
 //Resistive Wall Wake Functions
-double w_t_rf(double s, double a, double g, double L);
-double w_l_rf(double s, double a, double g, double L);
+amrex::Real w_t_rf(amrex::Real s, amrex::Real a, amrex::Real g, amrex::Real L);
+amrex::Real w_l_rf(amrex::Real s, amrex::Real a, amrex::Real g, amrex::Real L);
 
 //CSR Wake Function
-double w_l_csr(double s, amrex::ParticleReal R);
+amrex::Real w_l_csr(amrex::Real s, amrex::ParticleReal R);
 
 //Function to perform FFT-based convolution
-void convolve_fft(double* beam_profile, double* wake_func, int beam_profile_size, int wake_func_size, double delta_t, double* result, int padding_factor);
+void convolve_fft(amrex::Real* beam_profile, amrex::Real* wake_func, int beam_profile_size, int wake_func_size, amrex::Real delta_t, amrex::Real* result, int padding_factor);
 
 #endif // WAKE_CONVOLUTION_H
