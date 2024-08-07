@@ -1,4 +1,7 @@
 import os
+import io
+import asyncio
+import contextlib
 
 from trame.widgets import matplotlib, plotly, vuetify
 
@@ -118,6 +121,24 @@ def update_plot():
         ctrl.matplotlib_figure_update(state.simulation_data)
 
 
+
+def run_simulation_impactX():
+    buf = io.StringIO()
+    
+    with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+        state.simulation_data = run_simulation()
+    
+    buf.seek(0)
+    lines = [line.strip() for line in buf]
+
+    # Use $nextTick to ensure the terminal is fully rendered before printing
+    async def print_lines():
+        for line in lines:
+            ctrl.terminal_print(line)
+        ctrl.terminal_print("Simulation complete.")
+
+    asyncio.create_task(print_lines())
+
 # -----------------------------------------------------------------------------
 # State changes
 # -----------------------------------------------------------------------------
@@ -139,14 +160,10 @@ def on_filtered_data_change(**kwargs):
 @ctrl.add("run_simulation")
 def run_simulation_and_store():
     state.plot_options = available_plot_options(simulationClicked=True)
-    state.simulation_data = run_simulation()
-    # asyncio.create_task(run_simulation("run_simulation"))
+    run_simulation_impactX()
     update_plot()
     load_dataTable_data()
 
-
-# async def run_simulation(simulation_function_name):
-#     await AnalyzeFunctions.outputTerminal(simulation_function_name)
 # -----------------------------------------------------------------------------
 # GUI
 # -----------------------------------------------------------------------------
