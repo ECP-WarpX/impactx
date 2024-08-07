@@ -14,7 +14,7 @@
 #include <AMReX_REAL.H>
 #include <AMReX_SPACE.H>
 
-namespace impactx::wakepush
+namespace impactx::particles::wakefields
 {
     void WakePush(ImpactXParticleContainer & pc, const std::vector<amrex::Real>& convoluted_wakefield, amrex::ParticleReal const slice_ds, amrex::Real bin_size, amrex::Real bin_min, int padding_factor)
     {
