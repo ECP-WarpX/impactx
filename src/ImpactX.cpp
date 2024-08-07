@@ -267,12 +267,12 @@ namespace impactx {
                         auto& particle_container = *(amr_data->m_particle_container);
 
                         //Call charge deposition function
-                        DepositCharge1D(particle_container, dptr_data, num_bins, bin_min, bin_size, is_unity_particle_weight);
+                        impactx::particles::wakefields::DepositCharge1D(particle_container, dptr_data, num_bins, bin_min, bin_size, is_unity_particle_weight);
 
                         // Call charge density derivative function
                         std::vector<amrex::Real> charge_distribution(dptr_data, dptr_data + num_bins);
                         std::vector<amrex::Real> slopes(num_bins - 1);
-                        DerivativeCharge1D(charge_distribution.data(), slopes.data(), num_bins, bin_size, GetNumberDensity); //Use number derivatives for convolution with CSR
+                        impactx::particles::wakefields::DerivativeCharge1D(charge_distribution.data(), slopes.data(), num_bins, bin_size, GetNumberDensity); //Use number derivatives for convolution with CSR
 
                         // Call wake function
 
@@ -280,12 +280,12 @@ namespace impactx {
                         for (int i = 0; i < num_bins; ++i)
                         {
                             amrex::Real s = bin_min + i * bin_size;
-                            wake_function[i] = w_l_csr(s, R);
+                            wake_function[i] = impactx::particles::wakefields::w_l_csr(s, R);
                         }
 
                         // Call convolution function
                         std::vector<amrex::Real> convoluted_wakefield(padding_factor * (2 * num_bins - 1));
-                        convolve_fft(slopes.data(), wake_function.data(), slopes.size(), wake_function.size(), bin_size, convoluted_wakefield.data(), padding_factor);
+                        impactx::particles::wakefields::convolve_fft(slopes.data(), wake_function.data(), slopes.size(), wake_function.size(), bin_size, convoluted_wakefield.data(), padding_factor);
 
                         //Check convolution
                         std::cout << "Convoluted wakefield: ";
@@ -300,7 +300,7 @@ namespace impactx {
                         delete[] dptr_data;
 
                         // Kick particles with wake
-                        impactx::wakepush::WakePush(particle_container, convoluted_wakefield, slice_ds, bin_size, t_min, padding_factor);
+                        impactx::particles::wakefields::WakePush(particle_container, convoluted_wakefield, slice_ds, bin_size, t_min, padding_factor);
                     }
 
                     // Space-charge calculation: turn off if there is only 1 particle
