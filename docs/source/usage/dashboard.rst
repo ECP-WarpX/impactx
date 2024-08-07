@@ -3,11 +3,11 @@
 Dashboard
 ==================
 
-This document provides instructions on how to use the `impactx-dashboard`.
+This document provides instructions on how to launch the ``impactx-dashboard``.
 
 Installing Dependencies
 -----------------------
-From the `impactx/src/python/impactx/dashboard` directory, execute:
+To install the necessary dependencies, navigate to the ``impactx/src/python/impactx/dashboard`` directory and execute the following command:
 
 .. code-block:: bash
 
@@ -16,28 +16,54 @@ From the `impactx/src/python/impactx/dashboard` directory, execute:
 Launching the Dashboard
 -----------------------
 
-There are two ways to launch the Dashboard GUI, depending on your use case:
-
-- **Using the CLI Command**: This is the recommended method for most users. It is straightforward and requires minimal setup.
-- **Using the Python Module**: This method is more flexible and is particularly useful for developers who need to make direct
-changes to the dashboard, integrate it with other Python scripts, or run it in a specific environment.
-
-1. **Direct Command Execution**
-   From the base ImpactX directory, execute:
+1. **CLI Command (Recommended for Most Users):**
+   Navigate to the ``impactx`` directory and execute:
 
    .. code-block:: bash
 
       impactx-dashboard
 
-2. **Python Module Execution**
-   From the `impactx/src/python/impactx` directory, execute:
+2. **Python Module (Flexible for Developers):**
+   Navigate to the ``impactx/src/python/impactx/dashboard`` directory and run the module using:
 
    .. code-block:: bash
 
       python -m dashboard
 
-3. **Access the GUI**
+3. **JupyterLab:**
+   Navigate to the ``impactx/src/python/impactx/dashboard`` directory and start JupyterLab using:
 
-   Open a web browser and navigate to `http://localhost:8080` to access the Dashboard GUI.
+   .. code-block:: bash
 
-   #TODO accessing through Jupyter
+      jupyter-lab
+
+   After opening JupyterLab, run the following Python code in a notebook to initialize and display the dashboard:
+
+   .. code-block:: python
+
+      from dashboard.jupyterApplication import JupyterMainApplication
+
+      # Create new application instance
+      app = JupyterMainApplication()
+
+      # Start the server and wait for the UI to be ready
+      await app.ui.ready
+
+      # Display the UI in the JupyterLab notebook
+      app.ui
+
+Navigating the GUI
+------------------
+
+The GUI is designed with a user-friendly interface that includes multiple tabs and menu options:
+
+- **Input Tab**: Allows users to adjust simulation parameters.
+- **Run Tab**: Enables users to initiate simulations and monitor ongoing processes.
+- **Analyze Tab**: Provides tools for users to visualize and analyze their simulation outputs.
+
+.. figure:: dashboard.png
+   :align: center
+   :width: 75%
+   :alt: phase space ellipse
+
+   Input section in the dashboard.
