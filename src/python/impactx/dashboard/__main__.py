@@ -71,9 +71,12 @@ with RouterViewLayout(server, "/Analyze"):
 # -----------------------------------------------------------------------------
 # GUI
 # -----------------------------------------------------------------------------
-
+def init_terminal():
+    with xterm.XTerm(v_if="$route.path == '/Run'") as term:
+        ctrl.terminal_print = term.writeln
 
 def application():
+    init_terminal()
     with SinglePageWithDrawerLayout(server) as layout:
         layout.title.hide()
         with layout.toolbar:
@@ -95,11 +98,8 @@ def application():
 
         with layout.content:
             router.RouterView()
-            with xterm.XTerm(v_if="$route.path == '/Run'") as term:
-                ctrl.clear = term.clear
-                ctrl.terminal_println = term.writeln
+            init_terminal() 
     return layout
-
 
 application()
 # -----------------------------------------------------------------------------
