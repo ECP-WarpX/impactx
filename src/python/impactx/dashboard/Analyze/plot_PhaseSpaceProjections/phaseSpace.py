@@ -18,8 +18,7 @@ server, state, ctrl = setup_server()
 import base64
 import io
 
-
-from impactx import ImpactX, Config
+from impactx import Config, ImpactX
 
 from ...Input.distributionParameters.distributionMain import (
     save_distribution_parameters,
