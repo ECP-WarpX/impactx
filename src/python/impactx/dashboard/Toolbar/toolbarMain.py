@@ -151,31 +151,14 @@ class Toolbars:
     """
 
     @staticmethod
-    def input_toolbar():
-        """
-        Builds toolbar for the 'Input' page.
-        """
-
-        # ToolbarElements.file_upload()
-        vuetify.VSpacer()
-        # ToolbarElements.select_visualization()
-        # ToolbarElements.run_simulation_button()
-        # ToolbarElements.export_input_data()
-        # ToolbarElements.switch_theme()
-
-    @staticmethod
     def run_toolbar():
         """
         Builds toolbar for the 'Run' page.
         """
 
-        # ToolbarElements.stop_button(),
-        # ToolbarElements.start_button(),
-        # ToolbarElements.kill_button(),
         vuetify.VSpacer(),
         ToolbarElements.run_simulation_button(),
-        # ToolbarElements.export_input_data(),
-        # ToolbarElements.switch_theme(),
+
 
     @staticmethod
     def analyze_toolbar():
@@ -184,9 +167,4 @@ class Toolbars:
         """
 
         vuetify.VSpacer()
-        # ToolbarElements.checkbox_2d()
-        # ToolbarElements.checkbox_3d()
         ToolbarElements.plot_options()
-        # ToolbarElements.run_simulation_button()
-        # ToolbarElements.export_input_data()
-        # ToolbarElements.switch_theme()
