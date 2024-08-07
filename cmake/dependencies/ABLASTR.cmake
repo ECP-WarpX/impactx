@@ -53,18 +53,18 @@ macro(find_ablastr)
             "Download & build openPMD-api" FORCE)
     endif()
 
-    # transitive control for FFT/PICSAR superbuild
-    # TODO (future)
-
-    # ABLASTR superbuild
+    # transitive control for ABLASTR superbuild
     if(ImpactX_ablastr_internal OR ImpactX_ablastr_src)
         set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+
+        set(ABLASTR_FFT ${ImpactX_FFT} CACHE BOOL "" FORCE)
 
         set(WarpX_APP OFF CACHE BOOL "" FORCE)
         set(WarpX_LIB OFF CACHE BOOL "" FORCE)
         set(WarpX_QED OFF CACHE BOOL "" FORCE)
-        set(WarpX_DIMS 3 CACHE INTERNAL "" FORCE)
         set(WarpX_COMPUTE ${ImpactX_COMPUTE} CACHE INTERNAL "" FORCE)
+        set(WarpX_DIMS 3 CACHE INTERNAL "" FORCE)
+        set(WarpX_FFT ${ImpactX_FFT} CACHE BOOL "" FORCE)
         set(WarpX_OPENPMD ${ImpactX_OPENPMD} CACHE INTERNAL "" FORCE)
         set(WarpX_PRECISION ${ImpactX_PRECISION} CACHE INTERNAL "" FORCE)
         set(WarpX_MPI ${ImpactX_MPI} CACHE INTERNAL "" FORCE)
@@ -140,7 +140,7 @@ macro(find_ablastr)
     else()
         message(STATUS "Searching for pre-installed ABLASTR ...")
         message(FATAL_ERROR "Not yet supported!")
-        # TODO: MPI control
+        # TODO: MPI & FFT control
         set(COMPONENT_DIM 3D)
         set(COMPONENT_PRECISION ${ImpactX_PRECISION} P${ImpactX_PRECISION})
 
