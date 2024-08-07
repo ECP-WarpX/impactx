@@ -12,10 +12,13 @@
 
 #include "particles/ImpactXParticleContainer.H"
 
-//Function to calculate charge density profile
-void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, amrex::Real* dptr_data, int num_bins, amrex::Real bin_min, amrex::Real bin_size, bool is_unity_particle_weight);
+namespace impactx::particles::wakefields
+{
+    //Function to calculate charge density profile
+    void DepositCharge1D(impactx::ImpactXParticleContainer& myspc, amrex::Real* dptr_data, int num_bins, amrex::Real bin_min, amrex::Real bin_size, bool is_unity_particle_weight);
 
-//Function to calculate number, charge density slopes
-void DerivativeCharge1D(amrex::Real* charge_distribution, amrex::Real* slopes, int num_bins, amrex::Real bin_size, bool GetNumberDensity);
+    //Function to calculate number, charge density slopes
+    void DerivativeCharge1D(amrex::Real* charge_distribution, amrex::Real* slopes, int num_bins, amrex::Real bin_size, bool GetNumberDensity);
+} //namespace impactx::particles::wakefields
 
-#endif // CHARGE_BINNING_H
+#endif //CHARGE_BINNING_H

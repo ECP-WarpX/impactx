@@ -18,6 +18,6 @@ namespace impactx::particles::wakefields
 {
     //Function to update particle momentum using wake force kick
     void WakePush(ImpactXParticleContainer & pc, const std::vector<amrex::Real>& convoluted_wakefield, amrex::ParticleReal const slice_ds, amrex::Real bin_size, amrex::Real bin_min, int padding_factor);
-}
+} //namespace impactx::particles::wakefields
 
-#endif // WAKEPUSH_H
+#endif //WAKEPUSH_H
