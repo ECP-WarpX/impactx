@@ -58,6 +58,10 @@ def load_dataTable_data():
     Loads and processes data from combined beam and reference particle files.
     """
 
+    if not os.path.exists(REDUCED_BEAM_DATA) or not os.path.exists(REF_PARTICLE_DATA):
+        ctrl.terminal_print("Diagnostics files are missing. Please ensure they are in the correct directory.")
+        return
+
     combined_files = AnalyzeFunctions.combine_files(
         REDUCED_BEAM_DATA, REF_PARTICLE_DATA
     )
@@ -73,9 +77,12 @@ def load_dataTable_data():
 # Defaults
 # -----------------------------------------------------------------------------
 
-BASE_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-REDUCED_BEAM_DATA = os.path.join(BASE_PATH, "diags", "reduced_beam_characteristics.0.0")
-REF_PARTICLE_DATA = os.path.join(BASE_PATH, "diags", "ref_particle.0.0")
+CURRENT_DIR = os.getcwd()
+DIAGS_DIR = os.path.join(CURRENT_DIR, "diags")
+
+REDUCED_BEAM_DATA = os.path.join(DIAGS_DIR, "reduced_beam_characteristics.0.0")
+REF_PARTICLE_DATA = os.path.join(DIAGS_DIR, "ref_particle.0.0")
+
 DEFAULT_HEADERS = ["step", "s", "alpha_x", "alpha_y", "alpha_t"]
 
 state.selected_headers = DEFAULT_HEADERS
