@@ -12,13 +12,6 @@ server, state, ctrl = setup_server()
 # Code
 # -----------------------------------------------------------------------------
 
-TERMINAL_BUTTON_STYLES = {
-    "background-color": "#2E86C1",
-    "color": "white",
-    "margin": "0 20px",
-}
-
-
 class TrameFunctions:
     """
     Contains functions containing Vuetify
@@ -43,16 +36,3 @@ class TrameFunctions:
                 vuetify.VIcon(mdi_icon)
             with vuetify.VListItemContent():
                 vuetify.VListItemTitle(route_title)
-
-    @staticmethod
-    def create_button(label):
-        """
-        Creates a Vuetify button component with the specified label and styles.
-        :param label: The name of the button.
-        """
-
-        return vuetify.VBtn(
-            label,
-            style=TERMINAL_BUTTON_STYLES,
-            classes="mx-1",
-        )

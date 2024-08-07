@@ -9,7 +9,6 @@ from .Input.distributionParameters.distributionMain import DistributionParameter
 from .Input.inputParameters.inputMain import InputParameters
 from .Input.latticeConfiguration.latticeMain import LatticeConfiguration
 from .Input.trameFunctions import TrameFunctions
-from .Input.Visualiztion.twiss_phase_space_ellipse.x_px import VisualizeTwiss
 from .start import main
 from .Toolbar.toolbarMain import Toolbars
 from .trame_setup import setup_server
@@ -38,19 +37,6 @@ with RouterViewLayout(server, "/Input"):
                 with vuetify.VRow(no_gutters=True):
                     with vuetify.VCol(cols="auto", classes="pa-2"):
                         LatticeConfiguration.card()
-            with vuetify.VCol(
-                cols="auto",
-                classes="pa-2",
-                v_if="selectedVisualization == 'Twiss Phase Space Ellipses'",
-            ):
-                with vuetify.VRow(no_gutters=True):
-                    with vuetify.VCol(cols="auto", classes="pa-2"):
-                        VisualizeTwiss.card_x()
-                    with vuetify.VCol(cols="auto", classes="pa-2"):
-                        VisualizeTwiss.card_t()
-                with vuetify.VRow(no_gutters=True):
-                    with vuetify.VCol(cols="auto", classes="pa-2"):
-                        VisualizeTwiss.card_y()
 
 with RouterViewLayout(server, "/Analyze"):
     with vuetify.VContainer(fluid=True):
