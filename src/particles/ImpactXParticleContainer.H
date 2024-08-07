@@ -19,7 +19,7 @@
 #include <AMReX_ParIter.H>
 #include <AMReX_Particles.H>
 #include <AMReX_ParticleTile.H>
-#include <AMReX_REAL.H> //added line
+#include <AMReX_REAL.H>
 
 #include <AMReX_IntVect.H>
 #include <AMReX_Vector.H>
