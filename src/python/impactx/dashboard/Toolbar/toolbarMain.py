@@ -159,7 +159,7 @@ class Toolbars:
         # ToolbarElements.file_upload()
         vuetify.VSpacer()
         # ToolbarElements.select_visualization()
-        ToolbarElements.run_simulation_button()
+        # ToolbarElements.run_simulation_button()
         # ToolbarElements.export_input_data()
         # ToolbarElements.switch_theme()
 
@@ -169,9 +169,9 @@ class Toolbars:
         Builds toolbar for the 'Run' page.
         """
 
-        ToolbarElements.stop_button(),
-        ToolbarElements.start_button(),
-        ToolbarElements.kill_button(),
+        # ToolbarElements.stop_button(),
+        # ToolbarElements.start_button(),
+        # ToolbarElements.kill_button(),
         vuetify.VSpacer(),
         ToolbarElements.run_simulation_button(),
         # ToolbarElements.export_input_data(),
@@ -187,6 +187,6 @@ class Toolbars:
         # ToolbarElements.checkbox_2d()
         # ToolbarElements.checkbox_3d()
         ToolbarElements.plot_options()
-        ToolbarElements.run_simulation_button()
+        # ToolbarElements.run_simulation_button()
         # ToolbarElements.export_input_data()
         # ToolbarElements.switch_theme()
