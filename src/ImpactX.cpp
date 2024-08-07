@@ -290,7 +290,7 @@ namespace impactx {
                         //Check convolution
                         std::cout << "Convoluted wakefield: ";
                         std::ofstream outfile("convoluted_wakefield.txt");
-                        for (int i = 0; i < convoluted_wakefield.size(); ++i)
+                        for (int i = 0; i < int(convoluted_wakefield.size()); ++i)
                         {
                             std::cout << convoluted_wakefield[i] << " ";
                             outfile << convoluted_wakefield[i] << std::endl;
