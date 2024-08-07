@@ -72,8 +72,6 @@ def application():
     with SinglePageWithDrawerLayout(server) as layout:
         layout.title.hide()
         with layout.toolbar:
-            with vuetify.Template(v_if="$route.path == '/Input'"):
-                Toolbars.input_toolbar()
             with vuetify.Template(v_if="$route.path == '/Analyze'"):
                 Toolbars.analyze_toolbar()
             with vuetify.Template(v_if="$route.path == '/Run'"):

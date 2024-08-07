@@ -15,7 +15,7 @@ server, state, ctrl = setup_server()
 
 def retrieve_state_content():
     """
-    This function builds the output file based on user inputs
+    This function builds the export file based on user inputs
     """
 
     with open("output_distribution_parameters.txt", "r") as file:
