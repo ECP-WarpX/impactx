@@ -19,7 +19,7 @@ import base64
 import io
 
 
-from impactx import ImpactX
+from impactx import ImpactX, Config
 
 from ...Input.distributionParameters.distributionMain import (
     save_distribution_parameters,
@@ -28,7 +28,7 @@ from ...Input.latticeConfiguration.latticeMain import save_lattice_elements
 from ..plot_PhaseSpaceProjections.phaseSpaceSettings import adjusted_settings_plot
 
 # Call MPI_Init and MPI_Finalize only once:
-if impactx.Config.have_mpi:
+if Config.have_mpi:
     from mpi4py import MPI  # noqa
 
 
