@@ -114,10 +114,10 @@ namespace details
         // set max_grid_size to blocking_factor to fix the number of boxes we generate
         amrex::ParmParse pp_amr("amr");
         bool const has_max_grid_size =
-                pp_amr.countRecords("max_grid_size") > 0 ||
-                pp_amr.countRecords("max_grid_size_x") > 0 ||
-                pp_amr.countRecords("max_grid_size_y") > 0 ||
-                pp_amr.countRecords("max_grid_size_z") > 0;
+                pp_amr.countname("max_grid_size") > 0 ||
+                pp_amr.countname("max_grid_size_x") > 0 ||
+                pp_amr.countname("max_grid_size_y") > 0 ||
+                pp_amr.countname("max_grid_size_z") > 0;
         amrex::Vector<int> const bf_lvl0(amr_info.blocking_factor[0].begin(), amr_info.blocking_factor[0].end());
         auto bf_lvl0_iv = amrex::IntVect(bf_lvl0[0]);
         if (!has_max_grid_size) {
