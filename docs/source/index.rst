@@ -68,6 +68,7 @@ Usage
    usage/examples
    usage/python
    usage/parameters
+   usage/dashboard
    usage/workflows
 
 Data Analysis
