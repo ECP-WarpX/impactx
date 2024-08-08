@@ -1,15 +1,10 @@
-#!/usr/bin/env python3
-#
-# Copyright 2022-2023 The ImpactX Community
-#
-# Authors: Axel Huebl
-# License: BSD-3-Clause-LBNL
-#
-# -*- coding: utf-8 -*-
+"""
+This file is part of ImpactX
 
-# -----------------------------------------------------------------------------
-# Trame setup
-# -----------------------------------------------------------------------------
+Copyright 2024 ImpactX contributors
+Authors: Parthib Roy, Axel Huebl
+License: BSD-3-Clause-LBNL
+"""
 
 from ...trame_setup import setup_server
 

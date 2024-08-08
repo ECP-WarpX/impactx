@@ -1,3 +1,11 @@
+"""
+This file is part of ImpactX
+
+Copyright 2024 ImpactX contributors
+Authors: Parthib Roy, Axel Huebl
+License: BSD-3-Clause-LBNL
+"""
+
 from trame.app import get_server
 
 

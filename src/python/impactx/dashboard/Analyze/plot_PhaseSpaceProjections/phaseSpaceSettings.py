@@ -1,3 +1,12 @@
+"""
+This file is part of ImpactX
+
+Copyright 2024 ImpactX contributors
+Authors: Parthib Roy, Axel Huebl
+License: BSD-3-Clause-LBNL
+"""
+
+
 def adjusted_settings_plot(self, num_bins=50, root_rank=0):
     """
     Plot the longitudinal and transverse phase space projections with matplotlib.
