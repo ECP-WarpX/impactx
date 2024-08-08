@@ -152,7 +152,6 @@ def on_selectedLatticeList_change(selectedLatticeList, **kwargs):
 @state.change("selectedLattice")
 def on_lattice_element_name_change(selectedLattice, **kwargs):
     return
-    # print (f"Lattice Selection Changed to: {selectedLattice}")
 
 
 @ctrl.add("add_latticeElement")
@@ -162,9 +161,6 @@ def on_add_lattice_element_click():
         add_lattice_element()
         save_lattice_elements()
         state.dirty("selectedLatticeList")
-        # print(f"ADD button clicked, added: {selectedLattice}")
-        # print(f"Current list of selected lattice elements: {state.selectedLatticeList}")
-
 
 @ctrl.add("updateLatticeElementParameters")
 def on_lattice_element_parameter_change(
@@ -176,10 +172,6 @@ def on_lattice_element_parameter_change(
     update_latticeElement_parameters(
         index, parameter_name, parameter_value, error_message
     )
-    # print(
-    #     f"Lattice element {index}, {parameter_name} changed to {parameter_value} (type: {input_type})"
-    # )
-
 
 @ctrl.add("clear_latticeElements")
 def on_clear_lattice_element_click():
