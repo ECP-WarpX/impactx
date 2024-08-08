@@ -88,6 +88,7 @@ def update_latticeElement_parameters(
     generalFunctions.update_simulation_validation_status()
     state.dirty("selectedLatticeList")
 
+
 # -----------------------------------------------------------------------------
 # Write to file functions
 # -----------------------------------------------------------------------------
@@ -159,6 +160,7 @@ def on_add_lattice_element_click():
         add_lattice_element()
         state.dirty("selectedLatticeList")
 
+
 @ctrl.add("updateLatticeElementParameters")
 def on_lattice_element_parameter_change(
     index, parameter_name, parameter_value, parameter_type
@@ -169,6 +171,7 @@ def on_lattice_element_parameter_change(
     update_latticeElement_parameters(
         index, parameter_name, parameter_value, error_message
     )
+
 
 @ctrl.add("clear_latticeElements")
 def on_clear_lattice_element_click():
