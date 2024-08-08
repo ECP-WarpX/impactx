@@ -27,10 +27,10 @@ Launching the Dashboard
 
    .. code-block:: python
 
-      from dashboard.jupyterApplication import JupyterMainApplication
+      from impactx.dashboard import JupyterApp
 
       # Create new application instance
-      app = JupyterMainApplication()
+      app = JupyterApp()
 
       # Start the server and wait for the UI to be ready
       await app.ui.ready
