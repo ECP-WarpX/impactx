@@ -1,3 +1,11 @@
+"""
+This file is part of ImpactX
+
+Copyright 2024 ImpactX contributors
+Authors: Parthib Roy, Axel Huebl
+License: BSD-3-Clause-LBNL
+"""
+
 import asyncio
 import contextlib
 import io
@@ -9,10 +17,6 @@ from ..trame_setup import setup_server
 from .analyzeFunctions import AnalyzeFunctions
 from .plot_ParameterEvolutionOverS.overS import line_plot_1d
 from .plot_PhaseSpaceProjections.phaseSpace import run_simulation
-
-# -----------------------------------------------------------------------------
-# Trame setup
-# -----------------------------------------------------------------------------
 
 server, state, ctrl = setup_server()
 
