@@ -14,8 +14,8 @@ def line_plot_1d(selected_headers, filtered_data):
     Generates a 1D line plot using Plotly based on selected headers and filtered data.
     """
 
-    x_axis = selected_headers[1] if len(selected_headers) > 1 else None
-    y_axis = selected_headers[2:] if len(selected_headers) > 2 else None
+    x_axis = selected_headers[0] if len(selected_headers) > 1 else None
+    y_axis = selected_headers[1:] if len(selected_headers) > 2 else None
 
     x = [row[x_axis] for row in filtered_data] if x_axis else []
 

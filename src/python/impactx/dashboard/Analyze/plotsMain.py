@@ -89,7 +89,7 @@ DIAGS_DIR = os.path.join(CURRENT_DIR, "diags")
 REDUCED_BEAM_DATA = os.path.join(DIAGS_DIR, "reduced_beam_characteristics.0.0")
 REF_PARTICLE_DATA = os.path.join(DIAGS_DIR, "ref_particle.0.0")
 
-DEFAULT_HEADERS = ["step", "s", "alpha_x", "alpha_y", "alpha_t"]
+DEFAULT_HEADERS = ["s", "beta_x", "beta_y"]
 
 state.selected_headers = DEFAULT_HEADERS
 state.plot_options = available_plot_options(simulationClicked=False)
