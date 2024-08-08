@@ -44,7 +44,7 @@ def run_simulation():
 
     sim.particle_shape = state.particle_shape
     sim.space_charge = False
-    sim.slice_step_diagnostics = False
+    sim.slice_step_diagnostics = True
     sim.init_grids()
 
     # init particle beam
