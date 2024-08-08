@@ -63,6 +63,13 @@ def load_dataTable_data():
     Loads and processes data from combined beam and reference particle files.
     """
 
+    CURRENT_DIR = os.getcwd()
+    DIAGS_DIR = os.path.join(CURRENT_DIR, "diags")
+
+    base_path = DIAGS_DIR + "/"
+    REDUCED_BEAM_DATA = glob.glob(base_path + "reduced_beam_characteristics.*")[0]
+    REF_PARTICLE_DATA = glob.glob(base_path + "ref_particle.*")[0]
+
     if not os.path.exists(REDUCED_BEAM_DATA) or not os.path.exists(REF_PARTICLE_DATA):
         ctrl.terminal_print(
             "Diagnostics files are missing. Please ensure they are in the correct directory."
@@ -83,14 +90,6 @@ def load_dataTable_data():
 # -----------------------------------------------------------------------------
 # Defaults
 # -----------------------------------------------------------------------------
-
-CURRENT_DIR = os.getcwd()
-DIAGS_DIR = os.path.join(CURRENT_DIR, "diags")
-
-base_path = DIAGS_DIR + "/"
-REDUCED_BEAM_DATA = glob.glob(base_path + "reduced_beam_characteristics.*")[0]
-REF_PARTICLE_DATA = glob.glob(base_path + "ref_particle.*")[0]
-
 
 DEFAULT_HEADERS = ["s", "beta_x", "beta_y"]
 
