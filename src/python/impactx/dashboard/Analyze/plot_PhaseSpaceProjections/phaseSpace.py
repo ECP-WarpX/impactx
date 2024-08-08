@@ -16,9 +16,9 @@ import io
 from impactx import Config, ImpactX
 
 from ...Input.distributionParameters.distributionMain import (
-    save_distribution_parameters,
+    distribution_parameters,
 )
-from ...Input.latticeConfiguration.latticeMain import save_lattice_elements
+from ...Input.latticeConfiguration.latticeMain import lattice_elements
 from ..plot_PhaseSpaceProjections.phaseSpaceSettings import adjusted_settings_plot
 
 # Call MPI_Init and MPI_Finalize only once:
@@ -57,11 +57,10 @@ def run_simulation():
     ref = pc.ref_particle()
     ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_MeV)
 
-    distr = save_distribution_parameters()
-
+    distr = distribution_parameters()
     sim.add_particles(bunch_charge_C, distr, npart)
 
-    fodo = save_lattice_elements()
+    fodo = lattice_elements()
 
     sim.lattice.extend(fodo)
 

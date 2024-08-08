@@ -62,7 +62,6 @@ def populate_distribution_parameters(selectedDistribution):
         for parameter in selectedDistributionParameters
     ]
 
-    save_distribution_parameters()
     generalFunctions.update_simulation_validation_status()
     return selectedDistributionParameters
 
@@ -85,8 +84,6 @@ def update_distribution_parameters(
 
     generalFunctions.update_simulation_validation_status()
     state.dirty("selectedDistributionParameters")
-    save_distribution_parameters()
-
 
 # -----------------------------------------------------------------------------
 # Write to file functions
@@ -111,7 +108,7 @@ def parameter_input_checker():
     return parameter_input
 
 
-def save_distribution_parameters():
+def distribution_parameters():
     """
     Writes user input for distribution parameters in suitable format for simulation code.
     :return: An instance of the selected distribution class, initialized with user-provided parameters.

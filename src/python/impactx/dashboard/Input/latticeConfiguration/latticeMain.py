@@ -87,8 +87,6 @@ def update_latticeElement_parameters(
 
     generalFunctions.update_simulation_validation_status()
     state.dirty("selectedLatticeList")
-    save_lattice_elements()
-
 
 # -----------------------------------------------------------------------------
 # Write to file functions
@@ -118,7 +116,7 @@ def parameter_input_checker_for_lattice(latticeElement):
     return parameter_input
 
 
-def save_lattice_elements():
+def lattice_elements():
     """
     Writes user input for lattice element parameters parameters in suitable format for simulation code.
     :return: A list in the suitable format.
@@ -159,7 +157,6 @@ def on_add_lattice_element_click():
     selectedLattice = state.selectedLattice
     if selectedLattice:
         add_lattice_element()
-        save_lattice_elements()
         state.dirty("selectedLatticeList")
 
 @ctrl.add("updateLatticeElementParameters")
@@ -176,14 +173,12 @@ def on_lattice_element_parameter_change(
 @ctrl.add("clear_latticeElements")
 def on_clear_lattice_element_click():
     state.selectedLatticeList = []
-    save_lattice_elements()
 
 
 @ctrl.add("deleteLatticeElement")
 def on_delete_LatticeElement_click(index):
     state.selectedLatticeList.pop(index)
     state.dirty("selectedLatticeList")
-    save_lattice_elements()
 
 
 @ctrl.add("move_latticeElementIndex_up")
@@ -194,7 +189,6 @@ def on_move_latticeElementIndex_up_click(index):
             state.selectedLatticeList[index],
         )
         state.dirty("selectedLatticeList")
-        save_lattice_elements()
 
 
 @ctrl.add("move_latticeElementIndex_down")
@@ -205,7 +199,6 @@ def on_move_latticeElementIndex_down_click(index):
             state.selectedLatticeList[index],
         )
         state.dirty("selectedLatticeList")
-        save_lattice_elements()
 
 
 @ctrl.add("nsliceDefaultChange")
