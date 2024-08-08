@@ -16,6 +16,7 @@ server, state, ctrl = setup_server()
 # Code
 # -----------------------------------------------------------------------------
 
+
 class generalFunctions:
 
     @staticmethod
@@ -72,9 +73,7 @@ class generalFunctions:
             if input_value is None:
                 return ["Must be an integer"]
             try:
-                value = int(input_value)
-                if value < -10000000000:
-                    return ["Must be positive"]
+                int(input_value)
                 return []
             except ValueError:
                 return ["Must be an integer"]
@@ -83,9 +82,7 @@ class generalFunctions:
             if input_value is None:
                 return ["Must be a float"]
             try:
-                value = float(input_value)
-                if value < -1000000000:
-                    return ["Must be positive"]
+                float(input_value)
                 return []
             except ValueError:
                 return ["Must be a float"]
@@ -94,7 +91,6 @@ class generalFunctions:
             if input_value is None:
                 return ["Must be a string"]
             return []
-
         else:
             return ["Unknown type"]
 

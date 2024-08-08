@@ -33,6 +33,7 @@ def validate_and_convert_to_correct_type(
                     converted_value, state.kin_energy_unit
                 )
 
+
 @ctrl.add("kin_energy_unit_change")
 def on_convert_kin_energy_change(new_unit):
     old_unit = state.old_kin_energy_unit
@@ -45,6 +46,7 @@ def on_convert_kin_energy_change(new_unit):
         state.kin_energy_MeV = InputFunctions.value_of_kin_energy_MeV(
             float(state.kin_energy), new_unit
         )
+
 
 # -----------------------------------------------------------------------------
 # Content
