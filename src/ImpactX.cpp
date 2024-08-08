@@ -34,6 +34,7 @@
 #include "particles/wakefields/ChargeBinning.H"
 #include "particles/wakefields/WakeConvolution.H"
 #include "particles/wakefields/WakePush.H"
+#include "particles/wakefields/CSRBendElement.H"
 
 namespace impactx {
 
@@ -214,36 +215,15 @@ namespace impactx {
                                        << " slice_step=" << slice_step << "\n";
                     }
 
-                    //CSR Wakefield Response
+                    // CSR Wakefield Response
 
                     bool element_has_csr = false; // Updates to true for example with bend element
                     amrex::Real R = 0.0; // Updates for bend element rc
 
-                    //Define lambda function inside of std::visit
-                    std::visit([&R, &element_has_csr](auto &&element)
-                    {
-                        if constexpr (std::is_same_v<std::decay_t<decltype(element)>, Sbend>)
-                        {
-                            R = element.m_rc;
-                            R = std::abs(R);
-                            element_has_csr = true;
-                        }
-                        else if constexpr (std::is_same_v<std::decay_t<decltype(element)>, CFbend>)
-                        {
-                            R = element.m_rc;
-                            R = std::abs(R);
-                            element_has_csr = true;
-                        }
+                    // Call the CSRBendElement function
+                    impactx::particles::wakefields::HandleElementVariant(R, element_has_csr, element_variant);
 
-                        /*else if constexpr (std::is_same_v<std::decay_t<decltype(element)>, ExactSbend>) //Currently internal calculation for m_rc
-                        {
-                            R = element.m_rc;
-                            element_has_csr = true;
-                        }*/
-
-                    }, element_variant);
-
-                    //Enter loop if lattice has bend element
+                    // Enter loop if lattice has bend element
                     if (csr && element_has_csr)
                     {
                         // Measure beam size, extract the min, max of particle positions
