@@ -47,10 +47,10 @@ The ImpactX Dashboard can be run in two modes, as a standalone browser applicati
       app.ui
 
 
-Navigating the GUI
-------------------
+Navigation
+----------
 
-The GUI is designed with a user-friendly interface that includes multiple tabs and menu options:
+The user-friendly interface includes multiple tabs and menu options, intended to be navigated from top to bottom:
 
 - **Input Tab**: Allows to adjust simulation input parameters.
 - **Run Tab**: Enables to run simulations and monitor their progress.
