@@ -85,6 +85,7 @@ def load_dataTable_data():
     data, headers = combined_files_data_converted_to_dictionary_format
     state.all_data = data
     state.all_headers = headers
+    state.headers_without_step_or_s = state.all_headers[2:]
 
 
 # -----------------------------------------------------------------------------
@@ -201,7 +202,7 @@ class AnalyzeSimulation:
                 with vuetify.VCol(style="width: 500px;"):
                     vuetify.VSelect(
                         v_model=("selected_headers",),
-                        items=("all_headers",),
+                        items=("headers_without_step_or_s",),
                         label="Select data to view",
                         multiple=True,
                     )
