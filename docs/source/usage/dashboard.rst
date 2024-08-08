@@ -3,11 +3,19 @@
 Dashboard
 =========
 
-This document provides instructions on how to launch the ImpactX Dashboard, a browser-based interface to ImpactX.
+ImpactX Dashboard is a browser-based interface to ImpactX.
+It provides a graphical interface to a subset of ImpactX functionality.
+
+.. note::
+
+   ImpactX Dashboard is provided as a preview and continues to be developed.
+   Let us know in GitHub `discussions <https://github.com/ECP-WarpX/impactx/discussions>`__ and `issues <https://github.com/ECP-WarpX/impactx/issues>`__ how it works for you and what kind of workflows you would like to run in it.
 
 
 Launching the Dashboard
 -----------------------
+
+The ImpactX Dashboard can be run in two modes, as a standalone browser application or inside a Jupyter notebook.
 
 1. **Standalone browser application:**
    After installation of ImpactX including the Python modules, launch:
