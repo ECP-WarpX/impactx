@@ -15,9 +15,7 @@ import io
 
 from impactx import Config, ImpactX
 
-from ...Input.distributionParameters.distributionMain import (
-    distribution_parameters,
-)
+from ...Input.distributionParameters.distributionMain import distribution_parameters
 from ...Input.latticeConfiguration.latticeMain import lattice_elements
 from ..plot_PhaseSpaceProjections.phaseSpaceSettings import adjusted_settings_plot
 
@@ -57,12 +55,12 @@ def run_simulation():
     ref = pc.ref_particle()
     ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_MeV)
 
-    distr = distribution_parameters()
-    sim.add_particles(bunch_charge_C, distr, npart)
+    distribution = distribution_parameters()
+    sim.add_particles(bunch_charge_C, distribution, npart)
 
-    fodo = lattice_elements()
+    lattice_configuration = lattice_elements()
 
-    sim.lattice.extend(fodo)
+    sim.lattice.extend(lattice_configuration)
 
     # simulate
     sim.evolve()
