@@ -8,6 +8,7 @@ License: BSD-3-Clause-LBNL
 
 import asyncio
 import contextlib
+import glob
 import io
 import os
 
@@ -86,8 +87,10 @@ def load_dataTable_data():
 CURRENT_DIR = os.getcwd()
 DIAGS_DIR = os.path.join(CURRENT_DIR, "diags")
 
-REDUCED_BEAM_DATA = os.path.join(DIAGS_DIR, "reduced_beam_characteristics.0.0")
-REF_PARTICLE_DATA = os.path.join(DIAGS_DIR, "ref_particle.0.0")
+base_path = DIAGS_DIR + "/"
+REDUCED_BEAM_DATA = glob.glob(base_path + "reduced_beam_characteristics.*")[0]
+REF_PARTICLE_DATA = glob.glob(base_path + "ref_particle.*")[0]
+
 
 DEFAULT_HEADERS = ["s", "beta_x", "beta_y"]
 
