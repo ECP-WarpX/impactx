@@ -48,7 +48,7 @@ The GUI is designed with a user-friendly interface that includes multiple tabs a
 - **Run Tab**: Enables to run simulations and monitor their progress.
 - **Analyze Tab**: Provides tools to visualize and analyze simulation results.
 
-.. figure:: https://gist.githubusercontent.com/ax3l/b56aa3c3261f9612e276f3198b34f771/raw/25a9e2709a449fb4fd1c2ffb6c961716e70d8b32/dashboard.png
+.. figure:: https://gist.githubusercontent.com/ax3l/b56aa3c3261f9612e276f3198b34f771/raw/11bfe461a24e1daa7fd2d663c686b0fcc2b6e305/dashboard.png
    :align: center
    :width: 75%
    :alt: phase space ellipse
