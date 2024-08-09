@@ -127,7 +127,7 @@ class InputParameters:
                         vuetify.VSelect(
                             v_model=("kin_energy_unit",),
                             label="Unit",
-                            items=(["meV", "eV", "MeV", "GeV", "TeV"],),
+                            items=(["meV", "eV", "keV", "MeV", "GeV", "TeV"],),
                             change=(ctrl.kin_energy_unit_change, "[$event]"),
                             dense=True,
                         )
