@@ -1,0 +1,8 @@
+pandas>=2.2.0
+plotly>=5.23.0
+trame>=3.6.2
+trame-matplotlib>=2.0.3
+trame-plotly>=3.0.2
+trame-router>=2.2.0
+trame-vuetify>=2.6.2
+trame-xterm>=0.2.1
