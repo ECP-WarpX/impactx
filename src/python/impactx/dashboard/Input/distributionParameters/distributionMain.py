@@ -85,6 +85,7 @@ def update_distribution_parameters(
     generalFunctions.update_simulation_validation_status()
     state.dirty("selectedDistributionParameters")
 
+
 # -----------------------------------------------------------------------------
 # Write to file functions
 # -----------------------------------------------------------------------------
@@ -142,6 +143,7 @@ def on_distribution_parameter_change(parameter_name, parameter_value, parameter_
     error_message = generalFunctions.validate_against(parameter_value, parameter_type)
 
     update_distribution_parameters(parameter_name, parameter_value, error_message)
+
 
 # -----------------------------------------------------------------------------
 # Content
