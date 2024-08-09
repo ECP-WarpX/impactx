@@ -82,6 +82,6 @@ Python Module
 After installing only the ImpactX Python bindings, one can directly run the dashboard modules from the source tree during development, too.
 For this, navigate in the ImpactX source directory to the ``src/python/impactx`` directory and run:
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      python -m dashboard
+   python -m dashboard
