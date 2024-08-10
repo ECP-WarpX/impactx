@@ -40,4 +40,4 @@ class TrameFunctions:
             with vuetify.VListItemIcon():
                 vuetify.VIcon(mdi_icon)
             with vuetify.VListItemContent():
-                vuetify.VListItemTitle(route_title)
+                vuetify.VListItemTitle(route_title, id=f"{route_title}_route")

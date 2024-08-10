@@ -93,6 +93,7 @@ class InputParameters:
                 vuetify.VCombobox(
                     v_model=("particle_shape",),
                     label="Particle Shape",
+                    id="particle_shape",
                     items=([1, 2, 3],),
                     dense=True,
                 )
@@ -101,6 +102,7 @@ class InputParameters:
                         vuetify.VTextField(
                             v_model=("npart",),
                             label="Number of Particles",
+                            id="npart",
                             error_messages=("npart_validation",),
                             change=(
                                 ctrl.on_input_change,
@@ -114,6 +116,7 @@ class InputParameters:
                         vuetify.VTextField(
                             v_model=("kin_energy",),
                             label="Kinetic Energy",
+                            id="kin_energy",
                             error_messages=("kin_energy_validation",),
                             change=(
                                 ctrl.on_input_change,
@@ -127,6 +130,7 @@ class InputParameters:
                         vuetify.VSelect(
                             v_model=("kin_energy_unit",),
                             label="Unit",
+                            id="kin_energy_unit",
                             items=(["meV", "eV", "keV", "MeV", "GeV", "TeV"],),
                             change=(ctrl.kin_energy_unit_change, "[$event]"),
                             dense=True,
@@ -135,6 +139,7 @@ class InputParameters:
                     with vuetify.VCol(cols=8, classes="py-0"):
                         vuetify.VTextField(
                             label="Bunch Charge",
+                            id="bunch_charge_C",
                             v_model=("bunch_charge_C",),
                             error_messages=("bunch_charge_C_validation",),
                             change=(

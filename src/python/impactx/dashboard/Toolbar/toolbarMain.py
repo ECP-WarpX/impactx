@@ -29,6 +29,7 @@ class ToolbarElements:
             v_model=("active_plot", "1D plots over s"),
             items=("plot_options",),
             label="Select plot to view",
+            id="select_plot",
             hide_details=True,
             dense=True,
             style="max-width: 250px",
@@ -39,6 +40,7 @@ class ToolbarElements:
     def run_simulation_button():
         vuetify.VBtn(
             "Run Simulation",
+            id="run_simulation_button",
             style="background-color: #00313C; color: white; margin: 0 20px;",
             click=ctrl.run_simulation,
             disabled=("disableRunSimulationButton", True),

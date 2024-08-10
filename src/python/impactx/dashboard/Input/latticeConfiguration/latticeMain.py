@@ -253,6 +253,7 @@ class LatticeConfiguration:
                     with vuetify.VCol(cols=8):
                         vuetify.VCombobox(
                             label="Select Accelerator Lattice",
+                            id="selected_lattice",
                             v_model=("selectedLattice", None),
                             items=("listOfLatticeElements",),
                             error_messages=("isSelectedLatticeListEmpty",),
@@ -262,6 +263,7 @@ class LatticeConfiguration:
                     with vuetify.VCol(cols="auto"):
                         vuetify.VBtn(
                             "ADD",
+                            id="add_button",
                             color="primary",
                             dense=True,
                             classes="mr-2",
@@ -270,6 +272,7 @@ class LatticeConfiguration:
                     with vuetify.VCol(cols="auto"):
                         vuetify.VBtn(
                             "CLEAR",
+                            id="clear_button",
                             color="secondary",
                             dense=True,
                             classes="mr-2",
@@ -337,6 +340,7 @@ class LatticeConfiguration:
                                     ):
                                         vuetify.VTextField(
                                             label=("parameter.parameter_name",),
+                                            id=("parameter.parameter_name",),
                                             v_model=(
                                                 "parameter.parameter_default_value",
                                             ),

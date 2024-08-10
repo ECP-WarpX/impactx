@@ -175,6 +175,7 @@ class DistributionParameters:
                     with vuetify.VCol(cols=8):
                         vuetify.VCombobox(
                             label="Select Distribution",
+                            id="selected_distribution",
                             v_model=("selectedDistribution",),
                             items=("listOfDistributions",),
                             dense=True,
@@ -182,6 +183,7 @@ class DistributionParameters:
                     with vuetify.VCol(cols=4):
                         vuetify.VSelect(
                             v_model=("selectedDistributionType",),
+                            id="selected_distribution_type",
                             label="Type",
                             items=(["Native", "Twiss"],),
                             # change=(ctrl.kin_energy_unit_change, "[$event]"),
@@ -199,6 +201,7 @@ class DistributionParameters:
                                 ):
                                     vuetify.VTextField(
                                         label=("parameter.parameter_name",),
+                                        id=("parameter.parameter_name",),
                                         v_model=("parameter.parameter_default_value",),
                                         change=(
                                             ctrl.updateDistributionParameters,
