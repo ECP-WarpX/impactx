@@ -282,6 +282,7 @@ class LatticeConfiguration:
                         vuetify.VIcon(
                             "mdi-cog",
                             click="showDialog_settings = true",
+                            id="lattice_settings_icon",
                         )
                 with vuetify.VRow():
                     with vuetify.VCol():
@@ -340,7 +341,7 @@ class LatticeConfiguration:
                                     ):
                                         vuetify.VTextField(
                                             label=("parameter.parameter_name",),
-                                            id=("parameter.parameter_name",),
+                                            id=("parameter.parameter_name + index",),
                                             v_model=(
                                                 "parameter.parameter_default_value",
                                             ),
@@ -424,6 +425,7 @@ class LatticeConfiguration:
                             with vuetify.VCol(no_gutters=True):
                                 vuetify.VTextField(
                                     v_model=("nsliceDefaultValue",),
+                                    id="nslice_default_value",
                                     change=(
                                         ctrl.nsliceDefaultChange,
                                         "['nslice', $event]",
