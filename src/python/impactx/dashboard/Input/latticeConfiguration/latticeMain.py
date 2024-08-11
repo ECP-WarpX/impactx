@@ -165,7 +165,6 @@ def on_add_lattice_element_click():
 def on_lattice_element_parameter_change(
     index, parameter_name, parameter_value, parameter_type
 ):
-    parameter_value, input_type = generalFunctions.determine_input_type(parameter_value)
     error_message = generalFunctions.validate_against(parameter_value, parameter_type)
 
     update_latticeElement_parameters(
