@@ -437,3 +437,13 @@ class LatticeConfiguration:
                                     style="max-width: 75px",
                                     classes="ma-0 pa-0",
                                 )
+            vuetify.VDivider()
+            with vuetify.VCardActions():
+                vuetify.VSpacer()
+                vuetify.VBtn(
+                    "Close",
+                    id="lattice_settings_close",
+                    color="primary",
+                    text=True,
+                    click="showDialog_settings = false",
+                )
