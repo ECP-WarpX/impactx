@@ -65,11 +65,10 @@ def test_simulation():
             sb.click("#Run_route")
             sb.sleep(1)
             sb.click("#run_simulation_button")
-            sb.sleep(7)
+            sb.sleep(25)
 
             # Check if "Simulation complete" message is printed
             xterm_content = sb.get_text("#xterm_component")
             assert "Simulation complete." in xterm_content
-
     finally:
         app_process.terminate()

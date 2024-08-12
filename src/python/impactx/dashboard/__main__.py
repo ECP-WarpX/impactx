@@ -55,7 +55,7 @@ with RouterViewLayout(server, "/Analyze"):
 # GUI
 # -----------------------------------------------------------------------------
 def init_terminal():
-    with xterm.XTerm(v_if="$route.path == '/Run'", id="xterm_component") as term:
+    with xterm.XTerm(v_show="$route.path == '/Run'", id="xterm_component") as term:
         ctrl.terminal_print = term.writeln
 
 
