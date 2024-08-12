@@ -41,6 +41,10 @@ jobs:
         python3 -m pip install -U pip setuptools wheel
         python3 -m pip install -U pip mpi4py pytest pybind11-stubgen pre-commit seleniumbase
 
+    - name: Dashboard Dependencies
+      run: |
+        python3 -m pip install -U trame trame-matplotlib trame-plotly trame-router trame-xterm trame-vuetify
+
     - name: Set Up Cache
       uses: actions/cache@v4
       with:
