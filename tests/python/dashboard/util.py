@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+
 def wait_for_ready(sb, timeout=60):
     for i in range(timeout):
         print(f"wait_for_ready {i}")
@@ -23,6 +24,7 @@ def set_input_value(sb, element_id, value):
 
     sb.update_text(selector, value)
     sb.send_keys(selector, "\n")
+
 
 def start_dashboard():
     """

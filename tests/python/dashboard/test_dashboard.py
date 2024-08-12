@@ -1,12 +1,20 @@
-from seleniumbase import SB
+import importlib
+
 from util import set_input_value, start_dashboard, wait_for_ready
 import time
 
+import pytest
+
+
+@pytest.mark.skipif(
+    importlib.util.find_spec("seleniumbase") is None, reason="seleniumbase is not available"
+)
 def test_simulation():
     """
     This test runs the FODO example on the dashboard and verifies
     that the simulation has ran successfully.
     """
+    from seleniumbase import SB
 
     app_process = start_dashboard()
     time.sleep(10)
