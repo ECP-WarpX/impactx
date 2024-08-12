@@ -57,9 +57,11 @@ jobs:
         $env:HDF5_USE_STATIC_LIBRARIES = "ON"
 
         python3 -m pip install -U pip
-        python3 -m pip install -U build packaging setuptools wheel pytest
+        python3 -m pip install -U build packaging setuptools wheel
         python3 -m pip install -U -r requirements.txt
+        python3 -m pip install -U -r src/python/impactx/dashboard/requirements.txt
         python3 -m pip install -U -r examples/requirements.txt
+        python3 -m pip install -U -r tests/python/requirements.txt
         python3 -m pip install -U openPMD-validator
     - name: Build
       env:
@@ -147,9 +149,11 @@ jobs:
         set "HDF5_USE_STATIC_LIBRARIES=ON"
 
         python3 -m pip install -U pip
-        python3 -m pip install -U build packaging setuptools wheel pytest
+        python3 -m pip install -U build packaging setuptools wheel
         python3 -m pip install -U -r requirements.txt
+        python3 -m pip install -U -r src/python/impactx/dashboard/requirements.txt
         python3 -m pip install -U -r examples/requirements.txt
+        python3 -m pip install -U -r tests/python/requirements.txt
         python3 -m pip install -U openPMD-validator
     - name: Build
       shell: cmd
