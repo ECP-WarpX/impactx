@@ -393,7 +393,9 @@ install(CODE "file(CREATE_LINK
 # pip helpers for the impactx package #########################################
 #
 if(ImpactX_PYTHON)
-    set(PYINSTALLOPTIONS "" CACHE STRING
+    set(PY_PIP_OPTIONS "-v" CACHE STRING
+        "Additional parameters to pass to `pip`")
+    set(PY_PIP_INSTALL_OPTIONS "" CACHE STRING
         "Additional parameters to pass to `pip install`")
 
     # add a prefix to custom targets so we do not collide if used as a subproject
@@ -410,7 +412,7 @@ if(ImpactX_PYTHON)
         ${CMAKE_COMMAND} -E rm -f -r impactx-whl
         COMMAND
             ${CMAKE_COMMAND} -E env PYIMPACTX_LIBDIR=$<TARGET_FILE_DIR:pyImpactX>
-                ${Python_EXECUTABLE} -m pip wheel -v --no-build-isolation --no-deps --wheel-dir=impactx-whl ${ImpactX_SOURCE_DIR}
+                ${Python_EXECUTABLE} -m pip ${PY_PIP_OPTIONS} wheel --no-build-isolation --no-deps --wheel-dir=impactx-whl ${ImpactX_SOURCE_DIR}
         WORKING_DIRECTORY
             ${ImpactX_BINARY_DIR}
         DEPENDS
@@ -424,7 +426,7 @@ if(ImpactX_PYTHON)
         set(pyImpactX_REQUIREMENT_FILE "requirements.txt")
     endif()
     add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_requirements
-        ${Python_EXECUTABLE} -m pip install ${PYINSTALLOPTIONS} -r "${ImpactX_SOURCE_DIR}/${pyImpactX_REQUIREMENT_FILE}"
+        ${Python_EXECUTABLE} -m pip ${PY_PIP_OPTIONS} install ${PY_PIP_INSTALL_OPTIONS} -r "${ImpactX_SOURCE_DIR}/${pyImpactX_REQUIREMENT_FILE}"
         WORKING_DIRECTORY
             ${ImpactX_BINARY_DIR}
     )
@@ -441,7 +443,7 @@ if(ImpactX_PYTHON)
     # because otherwise pip would also force reinstall all dependencies.
     add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_install
         ${CMAKE_COMMAND} -E env IMPACTX_MPI=${ImpactX_MPI}
-            ${Python_EXECUTABLE} -m pip install --force-reinstall --no-index --no-deps ${PYINSTALLOPTIONS} --find-links=impactx-whl impactx
+            ${Python_EXECUTABLE} -m pip ${PY_PIP_OPTIONS} install --force-reinstall --no-index --no-deps ${PY_PIP_INSTALL_OPTIONS} --find-links=impactx-whl impactx
         WORKING_DIRECTORY
             ${ImpactX_BINARY_DIR}
         DEPENDS
@@ -453,7 +455,7 @@ if(ImpactX_PYTHON)
     # this is for package managers only
     add_custom_target(${ImpactX_CUSTOM_TARGET_PREFIX}pip_install_nodeps
         ${CMAKE_COMMAND} -E env IMPACTX_MPI=${ImpactX_MPI}
-            ${Python_EXECUTABLE} -m pip install --force-reinstall --no-index --no-deps ${PYINSTALLOPTIONS} --find-links=impactx-whl impactx
+            ${Python_EXECUTABLE} -m pip ${PY_PIP_OPTIONS} install --force-reinstall --no-index --no-deps ${PY_PIP_INSTALL_OPTIONS} --find-links=impactx-whl impactx
         WORKING_DIRECTORY
             ${ImpactX_BINARY_DIR}
         DEPENDS
