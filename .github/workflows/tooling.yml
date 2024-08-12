@@ -17,6 +17,7 @@ jobs:
     - name: install dependencies
       run: |
         .github/workflows/dependencies/clang-san-openmpi.sh
+        python3 -m pip install --upgrade seleniumbase
 
     - name: CCache Cache
       uses: actions/cache@v4

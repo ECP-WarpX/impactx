@@ -39,7 +39,7 @@ jobs:
       run: |
         .github/workflows/dependencies/gcc-openmpi.sh
         python3 -m pip install -U pip setuptools wheel
-        python3 -m pip install -U pip mpi4py pytest pybind11-stubgen pre-commit
+        python3 -m pip install -U pip mpi4py pytest pybind11-stubgen pre-commit seleniumbase
 
     - name: Set Up Cache
       uses: actions/cache@v4
@@ -83,6 +83,7 @@ jobs:
     - name: Unit tests
       run: |
         mpiexec -np 1 python3 -m pytest tests/python/
+
 
     - uses: stefanzweifel/git-auto-commit-action@v5
       name: Commit Updated Stub Files
