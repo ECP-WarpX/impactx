@@ -38,7 +38,7 @@ jobs:
     - name: Dependencies
       run: |
         .github/workflows/dependencies/gcc-openmpi.sh
-        python3 -m pip install -U pybind11-stubgen
+        python3 -m pip install -U pybind11-stubgen pre-commit
 
     - name: Set Up Cache
       uses: actions/cache@v4
