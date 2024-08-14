@@ -61,8 +61,8 @@ class Toolbars:
         Builds toolbar for the 'Run' page.
         """
 
-        vuetify.VSpacer(),
-        ToolbarElements.run_simulation_button(),
+        (vuetify.VSpacer(),)
+        (ToolbarElements.run_simulation_button(),)
 
     @staticmethod
     def analyze_toolbar():
