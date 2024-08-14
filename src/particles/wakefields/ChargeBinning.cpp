@@ -51,8 +51,6 @@ namespace impactx::particles::wakefields
                     amrex::ParticleReal* const AMREX_RESTRICT d_w = soa.GetRealData(impactx::RealSoA::w).dataPtr();
 
                     //Access particle positions
-                    //amrex::ParticleReal* const AMREX_RESTRICT pos_x = soa.GetRealData(impactx::RealSoA::x).dataPtr();
-                    //amrex::ParticleReal* const AMREX_RESTRICT pos_y = soa.GetRealData(impactx::RealSoA::y).dataPtr();
                     amrex::ParticleReal* const AMREX_RESTRICT pos_z = soa.GetRealData(impactx::RealSoA::z).dataPtr();
 
                     //Parallel loop over particles
@@ -111,6 +109,82 @@ namespace impactx::particles::wakefields
             else
             {
                 slopes[i] = charge_derivative;
+            }
+        }
+    }
+
+    void MeanTransversePosition (
+        impactx::ImpactXParticleContainer& myspc,
+        amrex::Real* mean_x,
+        amrex::Real* mean_y,
+        int num_bins,
+        amrex::Real bin_min,
+        amrex::Real bin_size,
+        bool is_unity_particle_weight
+    )
+    {
+        int const nlevs = std::max(0, myspc.finestLevel() + 1);
+
+        // Declare arrays for sums of positions and weights
+        std::vector<amrex::Real> sum_x(num_bins, 0.0);
+        std::vector<amrex::Real> sum_y(num_bins, 0.0);
+        std::vector<amrex::Real> sum_w(num_bins, 0.0);
+
+        amrex::Real* sum_w_ptr = sum_w.data();
+        amrex::Real* sum_x_ptr = sum_x.data();
+        amrex::Real* sum_y_ptr = sum_y.data();
+
+        for (int lev = 0; lev < nlevs; ++lev)
+        {
+            #ifdef AMREX_USE_OMP
+            #pragma omp parallel if (Gpu::notInLaunchRegion())
+            #endif
+            {
+                for (impactx::ParIterSoA pti(myspc, lev); pti.isValid(); ++pti)
+                {
+                    auto& soa = pti.GetStructOfArrays();
+                    long const np = pti.numParticles();
+
+                    amrex::Real* const AMREX_RESTRICT pos_x = soa.GetRealData(impactx::RealSoA::x).dataPtr();
+                    amrex::Real* const AMREX_RESTRICT pos_y = soa.GetRealData(impactx::RealSoA::y).dataPtr();
+                    amrex::Real* const AMREX_RESTRICT pos_z = soa.GetRealData(impactx::RealSoA::z).dataPtr();
+                    amrex::Real* const AMREX_RESTRICT d_w = soa.GetRealData(impactx::RealSoA::w).dataPtr();
+
+                    ParallelFor(np, [=] AMREX_GPU_DEVICE(int i)
+                    {
+                        amrex::Real w = d_w[i];
+                        amrex::Real x = pos_x[i];
+                        amrex::Real y = pos_y[i];
+                        amrex::Real z = pos_z[i];
+
+                        int const bin = int(Math::floor((z - bin_min) / bin_size));
+                        if (bin < 0 || bin >= num_bins) { return; }
+
+                        amrex::Real weight = is_unity_particle_weight ? 1.0 : w; // Check is macroparticle made up of 1 or more particles
+
+                        sum_w_ptr[bin] += weight; // Deposit the number of particles composing macroparticle
+                        sum_x_ptr[bin] += x * weight; // Deposit x position multiplied by number of particles at this position
+                        sum_y_ptr[bin] += y * weight;
+
+                        //HostDevice::Atomic::Add(&sum_w[bin], weight); // Deposit the number of particles composing macroparticle
+                        //HostDevice::Atomic::Add(&sum_x[bin], x * weight); // Deposit x position multiplied by number of particles at this position
+                        //HostDevice::Atomic::Add(&sum_y[bin], y * weight);
+                    });
+                }
+            }
+        }
+
+        for (int i = 0; i < num_bins; ++i)
+        {
+            if (sum_w[i] > 0) // Ensure number of particles in a bin is >= 1 before taking the mean
+            {
+                mean_x[i] = sum_x_ptr[i] / sum_w_ptr[i];
+                mean_y[i] = sum_y_ptr[i] / sum_w_ptr[i];
+            }
+            else
+            {
+                mean_x[i] = 0.0;
+                mean_y[i] = 0.0;
             }
         }
     }

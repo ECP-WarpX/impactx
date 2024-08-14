@@ -49,6 +49,27 @@ namespace impactx::particles::wakefields
         bool GetNumberDensity = true
     );
 
+    /** Function to calculate the mean transverse positions (x and y) at each bin along s
+     *
+     * @param[in] myspc the particle species to deposit along s
+     * @param[out] mean_x the output array for mean x positions (1D)
+     * @param[out] mean_y the output array for mean y positions (1D)
+     * @param[in] num_bins number of bins in the mean_x and mean_y arrays
+     * @param[in] bin_min lower end of the beam in s
+     * @param[in] bin_size size of the beam in s divided by num_bins
+     * @param[in] is_unity_particle_weight ignore the particle weighting per macro particle,
+     *                                     otherwise treat each particle as one physical particle
+     */
+    void MeanTransversePosition (
+        impactx::ImpactXParticleContainer& myspc,
+        amrex::Real* mean_x,
+        amrex::Real* mean_y,
+        int num_bins,
+        amrex::Real bin_min,
+        amrex::Real bin_size,
+        bool is_unity_particle_weight = false
+    );
+    
 } // namespace impactx::particles::wakefields
 
 #endif // CHARGE_BINNING_H

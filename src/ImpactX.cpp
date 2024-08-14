@@ -32,9 +32,10 @@
 
 #include <vector>
 #include "particles/wakefields/ChargeBinning.H"
+#include "particles/wakefields/CSRBendElement.H"
+#include "particles/wakefields/ExecuteWakefield.H"
 #include "particles/wakefields/WakeConvolution.H"
 #include "particles/wakefields/WakePush.H"
-#include "particles/wakefields/CSRBendElement.H"
 
 namespace impactx {
 
@@ -215,73 +216,11 @@ namespace impactx {
                                        << " slice_step=" << slice_step << "\n";
                     }
 
-                    // CSR Wakefield Response
-
+                    // Wakefield calculation: Call wakefield function to apply wake effects
                     bool element_has_csr = false; // Updates to true for example with bend element
-                    amrex::Real R = 0.0; // Updates for bend element rc
+                    amrex::Real R = 0;// Updates for bend element rc
 
-                    // Call the CSRBendElement function
-                    impactx::particles::wakefields::HandleElementVariant(R, element_has_csr, element_variant);
-
-                    // Enter loop if lattice has bend element
-                    if (csr && element_has_csr)
-                    {
-                        // Measure beam size, extract the min, max of particle positions
-                        auto const [x_min, y_min, t_min, x_max, y_max, t_max] =
-                            amr_data->m_particle_container->MinAndMaxPositions();
-
-                        using amrex::Real;
-
-                        // Set parameters for charge deposition
-                        bool is_unity_particle_weight = false; //Only true if w = 1
-                        bool GetNumberDensity = true;
-
-                        int padding_factor = 1; // Set amount of zero-padding
-                        int num_bins = csr_bins;  // Set resolution
-                        Real bin_min = t_min;
-                        Real bin_max = t_max;
-                        Real bin_size = (bin_max - bin_min) / num_bins;
-
-                        // Allocate memory for the charge profile
-                        Real* dptr_data = new Real[num_bins]();
-                        auto& particle_container = *(amr_data->m_particle_container);
-
-                        //Call charge deposition function
-                        impactx::particles::wakefields::DepositCharge1D(particle_container, dptr_data, num_bins, bin_min, bin_size, is_unity_particle_weight);
-
-                        // Call charge density derivative function
-                        std::vector<amrex::Real> charge_distribution(dptr_data, dptr_data + num_bins);
-                        std::vector<amrex::Real> slopes(num_bins - 1);
-                        impactx::particles::wakefields::DerivativeCharge1D(charge_distribution.data(), slopes.data(), num_bins, bin_size, GetNumberDensity); //Use number derivatives for convolution with CSR
-
-                        // Call wake function
-
-                        std::vector<amrex::Real> wake_function(num_bins);
-                        for (int i = 0; i < num_bins; ++i)
-                        {
-                            amrex::Real s = bin_min + i * bin_size;
-                            wake_function[i] = impactx::particles::wakefields::w_l_csr(s, R);
-                        }
-
-                        // Call convolution function
-                        std::vector<amrex::Real> convoluted_wakefield(padding_factor * (2 * num_bins - 1));
-                        impactx::particles::wakefields::convolve_fft(slopes.data(), wake_function.data(), slopes.size(), wake_function.size(), bin_size, convoluted_wakefield.data(), padding_factor);
-
-                        //Check convolution
-                        std::cout << "Convoluted wakefield: ";
-                        std::ofstream outfile("convoluted_wakefield.txt");
-                        for (int i = 0; i < int(convoluted_wakefield.size()); ++i)
-                        {
-                            std::cout << convoluted_wakefield[i] << " ";
-                            outfile << convoluted_wakefield[i] << std::endl;
-                        }
-                        std::cout << std::endl;
-                        outfile.close();
-                        delete[] dptr_data;
-
-                        // Kick particles with wake
-                        impactx::particles::wakefields::WakePush(particle_container, convoluted_wakefield, slice_ds, bin_size, t_min, padding_factor);
-                    }
+                    particles::wakefields::HandleWakefield(amr_data->m_particle_container.get(), R, element_has_csr, element_variant, csr, csr_bins, slice_ds);
 
                     // Space-charge calculation: turn off if there is only 1 particle
                     if (space_charge &&

@@ -13,39 +13,38 @@
 #include <variant>
 #include <AMReX_REAL.H>
 #include "particles/elements/Sbend.H"
-#include "particles/elements/CFbend.H"
+ #include "particles/elements/CFbend.H"
 
 namespace impactx::particles::wakefields
 {
+
     /** Function to calculate the radius of curvature (R) and check if an element has CSR
      *
      * @param[in,out] R radius of curvature (updated if element has CSR)
      * @param[in,out] element_has_csr boolean flag indicating if the element has CSR (updated if true)
      * @param[in] element the lattice element to check
      */
-    template <typename T>
-    void CSRBendElement(amrex::Real& R, bool& element_has_csr, T& element)
+    template <typename VariantType>
+    void CSRBendElement(amrex::Real& R, bool& element_has_csr, VariantType const& element_variant)
     {
-        if constexpr (std::is_same_v<T, Sbend> || std::is_same_v<T, CFbend>)
+        if (std::holds_alternative<Sbend>(element_variant)) //Check if variant holds a value of type Sbend
         {
+            auto& element = std::get<Sbend>(element_variant); //Retrieves value stored in variant
             R = element.m_rc;
             R = std::abs(R);
             element_has_csr = true;
         }
-    }
-
-    /** Function to handle different element types
-     *
-     * @param[in,out] R radius of curvature (updated if element has CSR)
-     * @param[in,out] element_has_csr boolean flag indicating if the element has CSR (updated if true)
-     * @param[in] element_variant the variant containing different element types to check
-     */
-    template <typename VariantType>
-    void HandleElementVariant(amrex::Real& R, bool& element_has_csr, VariantType& element_variant)
-    {
-        std::visit([&R, &element_has_csr](auto&& element) {
-            CSRBendElement(R, element_has_csr, element);
-        }, element_variant);
+        else if (std::holds_alternative<CFbend>(element_variant))
+        {
+            auto& element = std::get<CFbend>(element_variant); //Check if variant holds a value of type CFbend
+            R = element.m_rc;
+            R = std::abs(R);
+            element_has_csr = true;
+        } 
+        else 
+        {
+            element_has_csr = false;
+        }
     }
 
 } // namespace impactx::particles::wakefields
