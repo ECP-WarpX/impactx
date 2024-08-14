@@ -13,12 +13,15 @@ impactx_pybind
 """
 
 from __future__ import annotations
-from amrex import space3d as amr
-import amrex.space3d.amrex_3d_pybind
-import pybind11_stubgen.typing_ext
+
 import typing
-from . import distribution
-from . import elements
+
+import pybind11_stubgen.typing_ext
+
+import amrex.space3d.amrex_3d_pybind
+from amrex import space3d as amr
+
+from . import distribution, elements
 
 __all__ = [
     "Config",

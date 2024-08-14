@@ -1,5 +1,5 @@
 from __future__ import annotations
-from . import ImpactXParIter
-from . import ImpactXParticleContainer
+
+from . import ImpactXParIter, ImpactXParticleContainer
 
 __all__ = ["ImpactXParIter", "ImpactXParticleContainer"]
