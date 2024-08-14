@@ -46,7 +46,7 @@ namespace impactx::particles::wakefields
         int csr_bins,
         amrex::Real slice_ds)
     {
-        
+
         // Call the CSR bend function
         impactx::particles::wakefields::CSRBendElement(R, element_has_csr, element_variant);
         //impactx::particles::wakefields::HandleElementVariant(R, element_has_csr, element_variant);
@@ -76,7 +76,7 @@ namespace impactx::particles::wakefields
             Real* dptr_data = new Real[num_bins]();
             Real* mean_x = new Real[num_bins]();
             Real* mean_y = new Real[num_bins]();
-            
+
             // Call charge deposition function
             impactx::particles::wakefields::DepositCharge1D(*particle_container, dptr_data, num_bins, bin_min, bin_size, is_unity_particle_weight);
 

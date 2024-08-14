@@ -69,7 +69,7 @@ namespace impactx::particles::wakefields
         amrex::Real bin_size,
         bool is_unity_particle_weight = false
     );
-    
+
 } // namespace impactx::particles::wakefields
 
 #endif // CHARGE_BINNING_H

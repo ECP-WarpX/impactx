@@ -40,8 +40,8 @@ namespace impactx::particles::wakefields
             R = element.m_rc;
             R = std::abs(R);
             element_has_csr = true;
-        } 
-        else 
+        }
+        else
         {
             element_has_csr = false;
         }
