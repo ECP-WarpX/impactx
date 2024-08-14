@@ -3,8 +3,10 @@ Accelerator lattice elements in ImpactX
 """
 
 from __future__ import annotations
-import impactx.impactx_pybind
+
 import typing
+
+import impactx.impactx_pybind
 
 __all__ = [
     "Alignment",
