@@ -38,7 +38,7 @@ void init_refparticle(py::module& m)
         .def_property_readonly("mass_MeV", &RefPart::mass_MeV, "Get reference particle rest mass (MeV/c^2)")
         .def_property_readonly("kin_energy_MeV", &RefPart::kin_energy_MeV, "Get reference particle energy (MeV)")
         .def_property_readonly("rigidity_Tm", &RefPart::rigidity_Tm, "Get reference particle magnetic rigidity Brho (T*m)")
-        .def_property_readonly("qm_qeeV", &RefPart::qm_qeeV, "Get reference particle charge to mass ratio (charge/eV)")
+        .def_property_readonly("qm_ratio_SI", &RefPart::qm_ratio_SI, "Get reference particle charge to mass ratio (C/kg)")
 
         .def("set_charge_qe", &RefPart::set_charge_qe,
              py::return_value_policy::reference_internal,

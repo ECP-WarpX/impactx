@@ -208,11 +208,11 @@ namespace impactx
 
         /** Get reference particle charge to mass ratio
          *
-         * @returns charge to mass ratio (elementary charge/eV)
+         * @returns charge to mass ratio (in SI units of C/kg)
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         amrex::ParticleReal
-        qm_qeeV () const
+        qm_ratio_SI () const
         {
             return charge / mass;
         }

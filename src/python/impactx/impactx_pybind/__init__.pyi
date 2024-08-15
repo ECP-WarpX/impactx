@@ -599,9 +599,9 @@ class RefPart:
     @pz.setter
     def pz(self, arg0: float) -> None: ...
     @property
-    def qm_qeeV(self) -> float:
+    def qm_ratio_SI(self) -> float:
         """
-        Get reference particle charge to mass ratio (charge/eV)
+        Get reference particle charge to mass ratio (C/kg)
         """
     @property
     def rigidity_Tm(self) -> float:
