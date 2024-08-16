@@ -23,7 +23,7 @@ sim.init_grids()
 # normalized transverse rms emittance of 1 um
 kin_energy_MeV = 5.0e3  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
-npart = 100000  # number of macro particles
+npart = 10000  # number of macro particles
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
