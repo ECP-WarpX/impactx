@@ -27,7 +27,6 @@ class MADXParser:
     It expects a single line per element.
 
     """
-
     def __init__(self): ...
     def __str__(self): ...
     def _combine(self, lattice):
@@ -39,7 +38,6 @@ class MADXParser:
         return a list of of element dictionaries
 
         """
-
     def _flatten(self, line):
         """
 
@@ -47,7 +45,6 @@ class MADXParser:
 
 
         """
-
     def _noWhitespace(self, string):
         """
 
@@ -58,7 +55,6 @@ class MADXParser:
 
 
         """
-
     def getBeamline(self): ...
     def getEtot(self): ...
     def getParticle(self): ...

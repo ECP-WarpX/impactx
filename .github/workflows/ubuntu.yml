@@ -9,7 +9,7 @@ concurrency:
 jobs:
   build_gcc:
     name: GCC w/ MPI w/ Python
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: github.event.pull_request.draft == false
     env:
       CMAKE_GENERATOR: Ninja
@@ -78,7 +78,7 @@ jobs:
 
   build_gcc_python:
     name: GCC w/o MPI w/ Python
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: github.event.pull_request.draft == false
     env:
       CMAKE_GENERATOR: Ninja

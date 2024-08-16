@@ -24,7 +24,7 @@ class CopyPreBuild(build):
         # clashes with directories many developers have in their source trees;
         # this can create confusing results with "pip install .", which clones
         # the whole source tree by default
-        self.build_base = "_tmppythonbuild"
+        self.build_base = os.path.join("_tmppythonbuild", "impactx")
 
     def run(self):
         # remove existing build directory
@@ -223,7 +223,7 @@ with open("./requirements.txt") as f:
 setup(
     name="impactx",
     # note PEP-440 syntax: x.y.zaN but x.y.z.devN
-    version="24.07",
+    version="24.08",
     packages=["impactx"],
     # Python sources:
     package_dir={"": "src/python"},
@@ -282,4 +282,9 @@ setup(
     # new PEP 639 format
     license="BSD-3-Clause-LBNL",
     license_files=["LICENSE"],
+    entry_points={
+        "console_scripts": [
+            "impactx-dashboard=impactx.dashboard.__main__:main",
+        ],
+    },
 )

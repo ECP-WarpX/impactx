@@ -1,14 +1,14 @@
 """
 
-            impactx_pybind
-            --------------
-            .. currentmodule:: impactx_pybind
+impactx_pybind
+--------------
+.. currentmodule:: impactx_pybind
 
-            .. autosummary::
-               :toctree: _generate
-               ImpactX
-               distribution
-               elements
+.. autosummary::
+   :toctree: _generate
+   ImpactX
+   distribution
+   elements
 
 """
 
@@ -84,17 +84,15 @@ class ImpactX:
     def add_particles(
         self,
         bunch_charge: float,
-        distr: (
-            distribution.Empty
-            | distribution.Gaussian
-            | distribution.Kurth4D
-            | distribution.Kurth6D
-            | distribution.KVdist
-            | distribution.Thermal
-            | distribution.Triangle
-            | distribution.Semigaussian
-            | distribution.Waterbag
-        ),
+        distr: distribution.Empty
+        | distribution.Gaussian
+        | distribution.Kurth4D
+        | distribution.Kurth6D
+        | distribution.KVdist
+        | distribution.Thermal
+        | distribution.Triangle
+        | distribution.Semigaussian
+        | distribution.Waterbag,
         npart: int,
     ) -> None:
         """
@@ -104,23 +102,19 @@ class ImpactX:
         distribution's extent and then redistribute particles in according
         AMReX grid boxes.
         """
-
     def boxArray(self, lev: int) -> amrex.space3d.amrex_3d_pybind.BoxArray: ...
     def deposit_charge(self) -> None:
         """
         Deposit charge in x,y,z.
         """
-
     def evolve(self) -> None:
         """
         Run the main simulation loop for a number of steps.
         """
-
     def finalize(self) -> None:
         """
         Deallocate all contexts and data.
         """
-
     def init_beam_distribution_from_inputs(self) -> None: ...
     def init_grids(self) -> None:
         """
@@ -128,43 +122,36 @@ class ImpactX:
 
         This must come first, before particle beams and lattice elements are initialized.
         """
-
     def init_lattice_elements_from_inputs(self) -> None: ...
     def load_inputs_file(self, arg0: str) -> None: ...
     def particle_container(self) -> ImpactXParticleContainer:
         """
         Access the beam particle container.
         """
-
     def phi(self, lev: int) -> amrex.space3d.amrex_3d_pybind.MultiFab:
         """
         scalar potential per level
         """
-
     def resize_mesh(self) -> None:
         """
         Resize the mesh :py:attr:`~domain` based on the :py:attr:`~dynamic_size` and related parameters.
         """
-
     def rho(self, lev: int) -> amrex.space3d.amrex_3d_pybind.MultiFab:
         """
         charge density per level
         """
-
     def space_charge_field(
         self, lev: int, comp: str
     ) -> amrex.space3d.amrex_3d_pybind.MultiFab:
         """
         space charge force (vector: x,y,z) per level
         """
-
     @property
     def abort_on_unused_inputs(self) -> int:
         """
         Configure simulation to abort AFTER it has run
         if there are unused parameters in the input.
         """
-
     @abort_on_unused_inputs.setter
     def abort_on_unused_inputs(self, arg1: int) -> None: ...
     @property
@@ -174,7 +161,6 @@ class ImpactX:
         has to abort when a warning is recorded.
         Valid choices are: ['low', 'medium', 'high'].
         """
-
     @abort_on_warning_threshold.setter
     def abort_on_warning_threshold(self, arg1: str) -> None: ...
     @property
@@ -183,7 +169,6 @@ class ImpactX:
         If set to 1, immediately prints every warning message
          as soon as it is generated.
         """
-
     @always_warn_immediately.setter
     def always_warn_immediately(self, arg1: int) -> None: ...
     @property
@@ -191,7 +176,6 @@ class ImpactX:
         """
         AMReX blocking factor for a direction, per MR level.
         """
-
     @blocking_factor_x.setter
     def blocking_factor_x(self, arg1: list[int]) -> None: ...
     @property
@@ -199,7 +183,6 @@ class ImpactX:
         """
         AMReX blocking factor for a direction, per MR level.
         """
-
     @blocking_factor_y.setter
     def blocking_factor_y(self, arg1: list[int]) -> None: ...
     @property
@@ -207,7 +190,6 @@ class ImpactX:
         """
         AMReX blocking factor for a direction, per MR level.
         """
-
     @blocking_factor_z.setter
     def blocking_factor_z(self, arg1: list[int]) -> None: ...
     @property
@@ -216,7 +198,6 @@ class ImpactX:
         The minimum number of digits (default: 6) used for the step
         number appended to the diagnostic file names.
         """
-
     @diag_file_min_digits.setter
     def diag_file_min_digits(self, arg1: int) -> None: ...
     @property
@@ -225,7 +206,6 @@ class ImpactX:
         Enable or disable diagnostics generally (default: enabled).
         Disabling this is mostly used for benchmarking.
         """
-
     @diagnostics.setter
     def diagnostics(self, arg1: bool) -> None: ...
     @property
@@ -233,7 +213,6 @@ class ImpactX:
         """
         The physical extent of the full simulation domain, relative to the reference particle position, in meters.
         """
-
     @domain.setter
     def domain(self, arg1: amrex.space3d.amrex_3d_pybind.RealBox) -> None: ...
     @property
@@ -241,7 +220,6 @@ class ImpactX:
         """
         Use dynamic (``true``) resizing of the field mesh or static sizing (``false``).
         """
-
     @dynamic_size.setter
     def dynamic_size(self, arg1: bool) -> None: ...
     @property
@@ -249,13 +227,11 @@ class ImpactX:
         """
         The currently finest level of mesh-refinement used. This is always less or equal to max_level.
         """
-
     @property
     def lattice(self) -> elements.KnownElementsList:
         """
         Access the accelerator element lattice.
         """
-
     @lattice.setter
     def lattice(self, arg0: elements.KnownElementsList) -> None: ...
     @property
@@ -263,7 +239,6 @@ class ImpactX:
         """
         The maximum mesh-refinement level for the simulation.
         """
-
     @max_level.setter
     def max_level(self, arg1: int) -> None: ...
     @property
@@ -271,7 +246,6 @@ class ImpactX:
         """
         The absolute tolerance with which the space-charge fields should be calculated in units of V/m^2. More specifically, the acceptable residual with which the solution can be considered converged. In general this should be left as the default, but in cases where the simulation state changes very little between steps it can occur that the initial guess for the MLMG solver is so close to the converged value that it fails to improve that solution sufficiently to reach the mlmg_relative_tolerance value.
         """
-
     @mlmg_absolute_tolerance.setter
     def mlmg_absolute_tolerance(self, arg1: float) -> None: ...
     @property
@@ -279,7 +253,6 @@ class ImpactX:
         """
         Maximum number of iterations used for MLMG solver for space-charge fields calculation. In case if MLMG converges but fails to reach the desired self_fields_required_precision, this parameter may be increased.
         """
-
     @mlmg_max_iters.setter
     def mlmg_max_iters(self, arg1: int) -> None: ...
     @property
@@ -287,7 +260,6 @@ class ImpactX:
         """
         The relative precision with which the electrostatic space-charge fields should be calculated. More specifically, the space-charge fields are computed with an iterative Multi-Level Multi-Grid (MLMG) solver. This solver can fail to reach the default precision within a reasonable time.
         """
-
     @mlmg_relative_tolerance.setter
     def mlmg_relative_tolerance(self, arg1: float) -> None: ...
     @property
@@ -295,7 +267,6 @@ class ImpactX:
         """
         The verbosity used for MLMG solver for space-charge fields calculation. Currently MLMG solver looks for verbosity levels from 0-5. A higher number results in more verbose output.
         """
-
     @mlmg_verbosity.setter
     def mlmg_verbosity(self, arg1: int) -> None: ...
     @property
@@ -303,7 +274,6 @@ class ImpactX:
         """
         The number of grid points along each direction on the coarsest level.
         """
-
     @n_cell.setter
     def n_cell(
         self,
@@ -316,7 +286,6 @@ class ImpactX:
 
         See the ``BeamMonitor`` element for backend values.
         """
-
     @particle_lost_diagnostics_backend.setter
     def particle_lost_diagnostics_backend(self, arg1: str) -> None: ...
     @property
@@ -324,7 +293,6 @@ class ImpactX:
         """
         Whether to calculate space charge effects.
         """
-
     @particle_shape.setter
     def particle_shape(self, arg1: int) -> None: ...
     @property
@@ -332,7 +300,6 @@ class ImpactX:
         """
         The number of periods to repeat the lattice.
         """
-
     @periods.setter
     def periods(self, arg1: int) -> None: ...
     @property
@@ -340,7 +307,6 @@ class ImpactX:
         """
         The numerical solver to solve the Poisson equation when calculating space charge effects. Either multigrid (default) or fft.
         """
-
     @poisson_solver.setter
     def poisson_solver(self, arg1: str) -> None: ...
     @property
@@ -348,7 +314,6 @@ class ImpactX:
         """
         The field mesh spans, per direction, multiple times the maximum physical extent of beam particles, as given by this factor.
         """
-
     @prob_relative.setter
     def prob_relative(self, arg1: list[float]) -> None: ...
     @property
@@ -359,7 +324,6 @@ class ImpactX:
         By default, diagnostics is performed at the beginning and end of the simulation.
         Enabling this flag will write diagnostics every step and slice step.
         """
-
     @slice_step_diagnostics.setter
     def slice_step_diagnostics(self, arg1: bool) -> None: ...
     @property
@@ -367,7 +331,6 @@ class ImpactX:
         """
         Enable or disable space charge calculations (default: enabled).
         """
-
     @space_charge.setter
     def space_charge(self, arg1: bool) -> None: ...
     @property
@@ -376,7 +339,6 @@ class ImpactX:
         Controls how much information is printed to the terminal, when running ImpactX.
         ``0`` for silent, higher is more verbose. Default is ``1``.
         """
-
     @verbose.setter
     def verbose(self, arg1: int) -> None: ...
 
@@ -470,21 +432,18 @@ class ImpactXParticleContainer(
         :param qm: charge over mass in 1/eV
         :param bchchg: total charge within a bunch in C
         """
-
     def mean_and_std_positions(self) -> tuple[float, float, float, float, float, float]:
         """
         Compute the mean and std of the particle position in each dimension.
 
         :return: x_mean, x_std, y_mean, y_std, z_mean, z_std
         """
-
     def min_and_max_positions(self) -> tuple[float, float, float, float, float, float]:
         """
         Compute the min and max of the particle position in each dimension.
 
         :return: x_min, y_min, z_min, x_max, y_max, z_max
         """
-
     def plot_phasespace(self, num_bins=50, root_rank=0):
         """
 
@@ -505,41 +464,34 @@ class ImpactXParticleContainer(
         For MPI-parallel ranks, the figure is only created on the root_rank.
 
         """
-
     def redistribute(
         self, arg0: int, arg1: int, arg2: int, arg3: int, arg4: bool
     ) -> None:
         """
         Redistribute particles in the current mesh in x, y, z
         """
-
     def reduced_beam_characteristics(self) -> dict[str, float]:
         """
         Compute reduced beam characteristics like the position and momentum moments of the particle distribution, as well as emittance and Twiss parameters.
         """
-
     def ref_particle(self) -> RefPart:
         """
         Access the reference particle.
         """
-
     def set_ref_particle(self, refpart: RefPart) -> None:
         """
         Set reference particle attributes.
         """
-
     @property
     def RealSoA_names(self) -> list[str]:
         """
         Get the name of each ParticleReal SoA component
         """
-
     @property
     def coord_system(self) -> CoordSystem:
         """
         Get the current coordinate system of particles in this container
         """
-
     @property
     def intSoA_names(self) -> list[str]:
         """
@@ -557,46 +509,38 @@ class RefPart:
         :return: list of ImpactX.KnownElements
 
         """
-
     def __init__(self) -> None:
         """
         This struct stores the reference particle attributes
         stored in ImpactXParticleContainer.
         """
-
     def set_charge_qe(self, charge_qe: float) -> RefPart:
         """
         Set reference particle charge (positive elementary charge)
         """
-
     def set_kin_energy_MeV(self, kin_energy_MeV: float) -> RefPart:
         """
         Set reference particle kinetic energy (MeV)
         """
-
     def set_mass_MeV(self, mass_MeV: float) -> RefPart:
         """
         Set reference particle rest mass (MeV/c^2)
         """
-
     @property
     def beta(self) -> float:
         """
         Get reference particle relativistic beta
         """
-
     @property
     def beta_gamma(self) -> float:
         """
         Get reference particle beta*gamma
         """
-
     @property
     def charge(self) -> float:
         """
         reference charge, in C
         """
-
     @charge.setter
     def charge(self, arg0: float) -> None: ...
     @property
@@ -604,25 +548,21 @@ class RefPart:
         """
         Get reference particle charge (positive elementary charge)
         """
-
     @property
     def gamma(self) -> float:
         """
         Get reference particle relativistic gamma
         """
-
     @property
     def kin_energy_MeV(self) -> float:
         """
         Get reference particle energy (MeV)
         """
-
     @property
     def mass(self) -> float:
         """
         reference rest mass, in kg
         """
-
     @mass.setter
     def mass(self, arg0: float) -> None: ...
     @property
@@ -630,13 +570,11 @@ class RefPart:
         """
         Get reference particle rest mass (MeV/c^2)
         """
-
     @property
     def pt(self) -> float:
         """
         energy deviation, normalized by rest energy
         """
-
     @pt.setter
     def pt(self, arg0: float) -> None: ...
     @property
@@ -644,7 +582,6 @@ class RefPart:
         """
         momentum in x, normalized to proper velocity
         """
-
     @px.setter
     def px(self, arg0: float) -> None: ...
     @property
@@ -652,7 +589,6 @@ class RefPart:
         """
         momentum in y, normalized to proper velocity
         """
-
     @py.setter
     def py(self, arg0: float) -> None: ...
     @property
@@ -660,27 +596,23 @@ class RefPart:
         """
         momentum in z, normalized to proper velocity
         """
-
     @pz.setter
     def pz(self, arg0: float) -> None: ...
     @property
-    def qm_qeeV(self) -> float:
+    def qm_ratio_SI(self) -> float:
         """
-        Get reference particle charge to mass ratio (charge/eV)
+        Get reference particle charge to mass ratio (C/kg)
         """
-
     @property
     def rigidity_Tm(self) -> float:
         """
         Get reference particle magnetic rigidity Brho (T*m)
         """
-
     @property
     def s(self) -> float:
         """
         integrated orbit path length, in meters
         """
-
     @s.setter
     def s(self, arg0: float) -> None: ...
     @property
@@ -688,7 +620,6 @@ class RefPart:
         """
         clock time * c in meters
         """
-
     @t.setter
     def t(self, arg0: float) -> None: ...
     @property
@@ -696,7 +627,6 @@ class RefPart:
         """
         horizontal position x, in meters
         """
-
     @x.setter
     def x(self, arg0: float) -> None: ...
     @property
@@ -704,7 +634,6 @@ class RefPart:
         """
         vertical position y, in meters
         """
-
     @y.setter
     def y(self, arg0: float) -> None: ...
     @property
@@ -712,7 +641,6 @@ class RefPart:
         """
         longitudinal position y, in meters
         """
-
     @z.setter
     def z(self, arg0: float) -> None: ...
 
@@ -725,36 +653,34 @@ def coordinate_transformation(
 
 def push(
     pc: ImpactXParticleContainer,
-    element: (
-        elements.Empty
-        | elements.Aperture
-        | elements.Buncher
-        | elements.CFbend
-        | elements.ChrAcc
-        | elements.ChrDrift
-        | elements.ChrPlasmaLens
-        | elements.ChrQuad
-        | elements.ConstF
-        | elements.BeamMonitor
-        | elements.DipEdge
-        | elements.Drift
-        | elements.ExactDrift
-        | elements.ExactSbend
-        | elements.Kicker
-        | elements.Multipole
-        | elements.NonlinearLens
-        | elements.Programmable
-        | elements.PRot
-        | elements.Quad
-        | elements.RFCavity
-        | elements.Sbend
-        | elements.ShortRF
-        | elements.SoftSolenoid
-        | elements.SoftQuadrupole
-        | elements.Sol
-        | elements.TaperedPL
-        | elements.ThinDipole
-    ),
+    element: elements.Empty
+    | elements.Aperture
+    | elements.Buncher
+    | elements.CFbend
+    | elements.ChrAcc
+    | elements.ChrDrift
+    | elements.ChrPlasmaLens
+    | elements.ChrQuad
+    | elements.ConstF
+    | elements.BeamMonitor
+    | elements.DipEdge
+    | elements.Drift
+    | elements.ExactDrift
+    | elements.ExactSbend
+    | elements.Kicker
+    | elements.Multipole
+    | elements.NonlinearLens
+    | elements.Programmable
+    | elements.PRot
+    | elements.Quad
+    | elements.RFCavity
+    | elements.Sbend
+    | elements.ShortRF
+    | elements.SoftSolenoid
+    | elements.SoftQuadrupole
+    | elements.Sol
+    | elements.TaperedPL
+    | elements.ThinDipole,
     step: int = 0,
 ) -> None:
     """
@@ -765,6 +691,6 @@ __author__: str = (
     "Axel Huebl, Chad Mitchell, Ryan Sandberg, Marco Garten, Ji Qiang, et al."
 )
 __license__: str = "BSD-3-Clause-LBNL"
-__version__: str = "24.07"
+__version__: str = "24.08"
 s: CoordSystem  # value = <CoordSystem.s: 0>
 t: CoordSystem  # value = <CoordSystem.t: 1>
