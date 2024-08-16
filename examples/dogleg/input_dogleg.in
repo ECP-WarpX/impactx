@@ -38,9 +38,6 @@ sbend2.rc = 10.3462283686195526
 drift2.type = drift
 drift2.ds = 0.5
 
-drift3.type = drift
-drift3.ds = 2.0
-
 dipedge1.type = dipedge   # dipole edge focusing
 dipedge1.psi = -0.048345620280243
 dipedge1.rc = -10.3462283686195526
