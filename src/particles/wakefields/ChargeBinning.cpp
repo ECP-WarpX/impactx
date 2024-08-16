@@ -13,36 +13,34 @@
 #include <cmath>
 #include <vector>
 
-using namespace amrex;
-
 
 namespace impactx::particles::wakefields
 {
     void DepositCharge1D (
         impactx::ImpactXParticleContainer& myspc,
-        Real* dptr_data,
+        amrex::Real* dptr_data,
         int num_bins,
-        Real bin_min,
-        Real bin_size,
+        amrex::Real bin_min,
+        amrex::Real bin_size,
         bool is_unity_particle_weight
     )
-    {   //Access and change data directly using '&' to pass by reference
+    {   // Access and change data directly using '&' to pass by reference
 
-        //Determine the number of grid levels in the simulation
+        // Determine the number of grid levels in the simulation
         int const nlevs = std::max(0, myspc.finestLevel() + 1);
 
-        //Loop over each grid level
+        // Loop over each grid level
         for (int lev = 0; lev < nlevs; ++lev)
         {
-            //OpenMP parallelization if enabled
+            // OpenMP parallelization if enabled
             #ifdef AMREX_USE_OMP
-            #pragma omp parallel if (Gpu::notInLaunchRegion())
+            #pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
             #endif
             {
                 //Loop over particles at the current grid level
                 for (impactx::ParIterSoA pti(myspc, lev); pti.isValid(); ++pti)
                 {
-                    auto& soa = pti.GetStructOfArrays(); //Access data directly from StructOfArrays (soa)
+                    auto& soa = pti.GetStructOfArrays();  // Access data directly from StructOfArrays (soa)
 
                     //Number of particles
                     long const np = pti.numParticles();
@@ -54,11 +52,11 @@ namespace impactx::particles::wakefields
                     amrex::ParticleReal* const AMREX_RESTRICT pos_z = soa.GetRealData(impactx::RealSoA::z).dataPtr();
 
                     //Parallel loop over particles
-                    ParallelFor(np, [=] AMREX_GPU_DEVICE(int i)
+                    amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE(int i)
                     {
                         //Access particle z-position directly
-                        ParticleReal z = pos_z[i]; //(Macro)Particle longitudinal position at i
-                        auto const w = (Real)d_w[i]; //(Macro)Particle weight at i
+                        amrex::ParticleReal const z = pos_z[i];  // (Macro)Particle longitudinal position at i
+                        auto const w = amrex::Real(d_w[i]);  // (Macro)Particle weight at i
 
                         /*
                         Weight w is given in [number of electrons]:
@@ -67,11 +65,11 @@ namespace impactx::particles::wakefields
                         */
 
                         // Calculate bin index based on z-position
-                        int const bin = int(Math::floor((z - bin_min) / bin_size)); //Round to nearest bin index integer
-                        if (bin < 0 || bin >= num_bins) { return; } //Discard if bin index is out of range
+                        int const bin = int(amrex::Math::floor((z - bin_min) / bin_size));  // Round to nearest bin index integer
+                        if (bin < 0 || bin >= num_bins) { return; }  // Discard if bin index is out of range
 
                         // Divide charge by bin size to get binned charge density
-                        Real add_value = ablastr::constant::SI::q_e / bin_size;
+                        amrex::Real add_value = ablastr::constant::SI::q_e / bin_size;
 
                         // Calculate the charge contribution of the macro particle
                         if (!is_unity_particle_weight)
@@ -80,7 +78,7 @@ namespace impactx::particles::wakefields
                         }
 
                         // Add to histogram bin
-                        HostDevice::Atomic::Add(&dptr_data[bin], add_value);
+                        amrex::HostDevice::Atomic::Add(&dptr_data[bin], add_value);
                     });
                 }
             }
@@ -88,10 +86,10 @@ namespace impactx::particles::wakefields
     }
 
     void DerivativeCharge1D (
-        amrex::Real* charge_distribution,
+        amrex::Real const* charge_distribution,
         amrex::Real* slopes,
         int num_bins,
-        Real bin_size,
+        amrex::Real bin_size,
         bool GetNumberDensity
     )
     {
@@ -99,7 +97,7 @@ namespace impactx::particles::wakefields
         for (int i = 0; i < num_bins - 1; ++i)
         {
             //Compute the charge density derivative
-            amrex::Real charge_derivative = (charge_distribution[i + 1] - charge_distribution[i]) / bin_size;
+            amrex::Real const charge_derivative = (charge_distribution[i + 1] - charge_distribution[i]) / bin_size;
 
             //If GetNumberDensity = True, convert charge density derivative to number density derivative for CSR convolution
             if (GetNumberDensity)
@@ -123,6 +121,8 @@ namespace impactx::particles::wakefields
         bool is_unity_particle_weight
     )
     {
+        using namespace amrex::literals;
+
         int const nlevs = std::max(0, myspc.finestLevel() + 1);
 
         // Declare arrays for sums of positions and weights
@@ -137,7 +137,7 @@ namespace impactx::particles::wakefields
         for (int lev = 0; lev < nlevs; ++lev)
         {
             #ifdef AMREX_USE_OMP
-            #pragma omp parallel if (Gpu::notInLaunchRegion())
+            #pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
             #endif
             {
                 for (impactx::ParIterSoA pti(myspc, lev); pti.isValid(); ++pti)
@@ -150,17 +150,17 @@ namespace impactx::particles::wakefields
                     amrex::Real* const AMREX_RESTRICT pos_z = soa.GetRealData(impactx::RealSoA::z).dataPtr();
                     amrex::Real* const AMREX_RESTRICT d_w = soa.GetRealData(impactx::RealSoA::w).dataPtr();
 
-                    ParallelFor(np, [=] AMREX_GPU_DEVICE(int i)
+                    amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE(int i)
                     {
-                        amrex::Real w = d_w[i];
-                        amrex::Real x = pos_x[i];
-                        amrex::Real y = pos_y[i];
-                        amrex::Real z = pos_z[i];
+                        amrex::Real const w = d_w[i];
+                        amrex::Real const x = pos_x[i];
+                        amrex::Real const y = pos_y[i];
+                        amrex::Real const z = pos_z[i];
 
-                        int const bin = int(Math::floor((z - bin_min) / bin_size));
+                        int const bin = int(amrex::Math::floor((z - bin_min) / bin_size));
                         if (bin < 0 || bin >= num_bins) { return; }
 
-                        amrex::Real weight = is_unity_particle_weight ? 1.0 : w; // Check is macroparticle made up of 1 or more particles
+                        amrex::Real const weight = is_unity_particle_weight ? 1.0_rt : w; // Check is macroparticle made up of 1 or more particles
 
                         sum_w_ptr[bin] += weight; // Deposit the number of particles composing macroparticle
                         sum_x_ptr[bin] += x * weight; // Deposit x position multiplied by number of particles at this position

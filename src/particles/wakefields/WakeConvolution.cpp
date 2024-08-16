@@ -48,8 +48,8 @@ namespace impactx::particles::wakefields
     {
         using namespace amrex::literals;
 
-        Real s0 = (0.169_rt * std::pow(a, 1.79_rt) * std::pow(g, 0.38_rt)) / std::pow(L, 1.17_rt);
-        Real term = std::sqrt(std::abs(s) / s0) * std::exp(-std::sqrt(std::abs(s) / s0));
+        Real const s0 = (0.169_rt * std::pow(a, 1.79_rt) * std::pow(g, 0.38_rt)) / std::pow(L, 1.17_rt);
+        Real const term = std::sqrt(std::abs(s) / s0) * std::exp(-std::sqrt(std::abs(s) / s0));
         return (4 * impactx::particles::wakefields::Z0 * ablastr::constant::SI::c * s0 * unit_step(s)) / (Real(M_PI) * std::pow(a, 4)) * term;
     }
 
@@ -62,7 +62,7 @@ namespace impactx::particles::wakefields
     {
         using namespace amrex::literals;
 
-        Real s00 = g * std::pow((a / (alpha(g / L) * L)), 2) / 8.0_rt;
+        Real const s00 = g * std::pow((a / (alpha(g / L) * L)), 2) / 8.0_rt;
         return (impactx::particles::wakefields::Z0 * ablastr::constant::SI::c * unit_step(s) * std::exp(-std::sqrt(std::abs(s) / s00))) / (Real(M_PI) * std::pow(a, 2));
     }
 
@@ -73,8 +73,8 @@ namespace impactx::particles::wakefields
     {
         using namespace amrex::literals;
 
-        Real rc = std::pow(ablastr::constant::SI::q_e, 2) / (4_rt * Real(M_PI) * ablastr::constant::SI::ep0 * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2));
-        Real kappa = (2_rt * rc * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2)) / std::pow(3_rt, 1_rt/3_rt) / std::pow(R, 2_rt/3_rt);
+        Real const rc = std::pow(ablastr::constant::SI::q_e, 2) / (4_rt * Real(M_PI) * ablastr::constant::SI::ep0 * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2));
+        Real const kappa = (2_rt * rc * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2)) / std::pow(3_rt, 1_rt/3_rt) / std::pow(R, 2_rt/3_rt);
 
         return - (kappa * unit_step(s)) / std::pow(std::abs(s), 1_rt/3_rt);
     }
@@ -93,10 +93,10 @@ namespace impactx::particles::wakefields
         using namespace amrex::literals;
 
         // Length of convolution result
-        int original_n = beam_profile_size + wake_func_size - 1;  // Output size is n = 2N - 1, where N = size of signals 1,2
+        int const original_n = beam_profile_size + wake_func_size - 1;  // Output size is n = 2N - 1, where N = size of signals 1,2
 
         // Add padding factor to control amount of zero-padding
-        int n = static_cast<int>(original_n * padding_factor);
+        int const n = static_cast<int>(original_n * padding_factor);
 
         // Allocate memory for FFT inputs and outputs
         using ablastr::math::anyfft::Complex;

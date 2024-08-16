@@ -42,7 +42,7 @@ namespace impactx::particles::wakefields
      * @param[in] GetNumberDensity number density if true, otherwise charge density
      */
     void DerivativeCharge1D (
-        amrex::Real* charge_distribution,
+        amrex::Real const * charge_distribution,
         amrex::Real* slopes,
         int num_bins,
         amrex::Real bin_size,
