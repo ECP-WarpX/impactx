@@ -12,7 +12,7 @@ All parameters can be found online.  A 5 GeV electron bunch with normalized tran
 
 The final expected dispersion is 267 mm.
 
-In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must 
+In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must
 agree with nominal values.
 
 In addition, the initial and final values of :math:`\alpha_x`, :math:`\alpha_y`, :math:`\beta_x`, :math:`\beta_y`, :math:`\dispersion_x`, and :math:`\dispersion_px` must
