@@ -10,10 +10,13 @@
 #ifndef IMPACTX_PARTICLES_WAKEFIELDS_CSRBENDELEMENT_H_
 #define IMPACTX_PARTICLES_WAKEFIELDS_CSRBENDELEMENT_H_
 
-#include <variant>
-#include <AMReX_REAL.H>
 #include "particles/elements/Sbend.H"
- #include "particles/elements/CFbend.H"
+#include "particles/elements/CFbend.H"
+
+#include <AMReX_REAL.H>
+
+#include <variant>
+
 
 namespace impactx::particles::wakefields
 {
@@ -22,7 +25,7 @@ namespace impactx::particles::wakefields
      *
      * @param[in,out] R radius of curvature (updated if element has CSR)
      * @param[in,out] element_has_csr boolean flag indicating if the element has CSR (updated if true)
-     * @param[in] element the lattice element to check
+     * @param[in] element_variant the lattice element to check
      */
     template <typename VariantType>
     void CSRBendElement(amrex::Real& R, bool& element_has_csr, VariantType const& element_variant)
