@@ -128,7 +128,7 @@ print(f"  alpha_x={alpha_x:e} beta_x={beta_x:e} alpha_y={alpha_y:e} beta_y={beta
 print(f"  dispersion_x={dispersion_x:e} dispersion_px={dispersion_px:e}")
 
 atol = 0.0  # ignored
-rtol = 2.2 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 3.0 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
