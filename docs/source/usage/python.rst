@@ -354,9 +354,9 @@ Particles
 
       Read-only: Get reference particle :math:`\beta \cdot \gamma`
 
-   .. py:property:: qm_qeeV
+   .. py:property:: qm_ratio_SI
 
-      Read-only: Get reference particle charge to mass ratio (elementary charge/eV)
+      Read-only: Get reference particle charge to mass ratio (C/kg)
 
    .. py:method:: set_charge_qe(charge_qe)
 
