@@ -890,3 +890,19 @@ add_impactx_test(spectrometer.py
     examples/achromatic_spectrometer/analysis_spectrometer.py
     OFF  # no plot script yet
 )
+
+# Dogleg ########################################################
+#
+# w/o space charge
+add_impactx_test(dogleg
+    examples/dogleg/input_dogleg.in
+      ON   # ImpactX MPI-parallel
+    examples/dogleg/analysis_dogleg.py
+    OFF  # no plot script yet
+)
+add_impactx_test(dogleg.py
+    examples/dogleg/run_dogleg.py
+      OFF  # ImpactX MPI-parallel
+    examples/dogleg/analysis_dogleg.py
+    OFF  # no plot script yet
+)
