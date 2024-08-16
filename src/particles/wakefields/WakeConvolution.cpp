@@ -24,117 +24,104 @@
 
 namespace impactx::particles::wakefields
 {
-    using namespace amrex;
-
-    Real unit_step (Real s)
-    {
-        using namespace amrex::literals;
-
-        return s >= 0_rt ? 1_rt : 0_rt;
-    }
-    Real alpha (Real s)
+    amrex::Real alpha (amrex::Real s)
     {
         using namespace amrex::literals;
 
         return 1_rt - impactx::particles::wakefields::alpha_1 * std::sqrt(s) - (1_rt - 2_rt * impactx::particles::wakefields::alpha_1) * s;
     }
 
-    Real w_t_rf (
-        Real s,
-        Real a,
-        Real g,
-        Real L
+    amrex::Real w_t_rf (
+        amrex::Real s,
+        amrex::Real a,
+        amrex::Real g,
+        amrex::Real L
     )
     {
         using namespace amrex::literals;
 
-        Real const s0 = (0.169_rt * std::pow(a, 1.79_rt) * std::pow(g, 0.38_rt)) / std::pow(L, 1.17_rt);
-        Real const term = std::sqrt(std::abs(s) / s0) * std::exp(-std::sqrt(std::abs(s) / s0));
-        return (4 * impactx::particles::wakefields::Z0 * ablastr::constant::SI::c * s0 * unit_step(s)) / (Real(M_PI) * std::pow(a, 4)) * term;
+        amrex::Real const s0 = (0.169_rt * std::pow(a, 1.79_rt) * std::pow(g, 0.38_rt)) / std::pow(L, 1.17_rt);
+        amrex::Real const term = std::sqrt(std::abs(s) / s0) * std::exp(-std::sqrt(std::abs(s) / s0));
+        return (4 * impactx::particles::wakefields::Z0 * ablastr::constant::SI::c * s0 * unit_step(s)) / (amrex::Real(M_PI) * std::pow(a, 4)) * term;
     }
 
-    Real w_l_rf (
-        Real s,
-        Real a,
-        Real g,
-        Real L
+    amrex::Real w_l_rf (
+        amrex::Real s,
+        amrex::Real a,
+        amrex::Real g,
+        amrex::Real L
     )
     {
         using namespace amrex::literals;
 
-        Real const s00 = g * std::pow((a / (alpha(g / L) * L)), 2) / 8.0_rt;
-        return (impactx::particles::wakefields::Z0 * ablastr::constant::SI::c * unit_step(s) * std::exp(-std::sqrt(std::abs(s) / s00))) / (Real(M_PI) * std::pow(a, 2));
-    }
-
-    Real w_l_csr (
-        Real s,
-        Real R
-    )
-    {
-        using namespace amrex::literals;
-
-        Real const rc = std::pow(ablastr::constant::SI::q_e, 2) / (4_rt * Real(M_PI) * ablastr::constant::SI::ep0 * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2));
-        Real const kappa = (2_rt * rc * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2)) / std::pow(3_rt, 1_rt/3_rt) / std::pow(R, 2_rt/3_rt);
-
-        return - (kappa * unit_step(s)) / std::pow(std::abs(s), 1_rt/3_rt);
+        amrex::Real const s00 = g * std::pow((a / (alpha(g / L) * L)), 2) / 8.0_rt;
+        return (impactx::particles::wakefields::Z0 * ablastr::constant::SI::c * unit_step(s) * std::exp(-std::sqrt(std::abs(s) / s00))) / (amrex::Real(M_PI) * std::pow(a, 2));
     }
 
     void convolve_fft (
-        Real const * beam_profile_slope,
-        Real const * wake_func,
-        int beam_profile_size,
-        int wake_func_size,
-        Real delta_t,
-        Real* result,
+        amrex::Gpu::DeviceVector<amrex::Real> const & beam_profile_slope,
+        amrex::Gpu::DeviceVector<amrex::Real> const & wake_func,
+        amrex::Real delta_t,
+        amrex::Gpu::DeviceVector<amrex::Real> & result,
         int padding_factor
     )
     {
     #ifdef ImpactX_USE_FFT
-        using namespace amrex::literals;
+        int const beam_profile_slope_size = beam_profile_slope.size();
+        int const wake_func_size = wake_func.size();
 
         // Length of convolution result
-        int const original_n = beam_profile_size + wake_func_size - 1;  // Output size is n = 2N - 1, where N = size of signals 1,2
+        int const original_n = beam_profile_slope_size + wake_func_size - 1;  // Output size is n = 2N - 1, where N = size of signals 1,2
 
         // Add padding factor to control amount of zero-padding
         int const n = static_cast<int>(original_n * padding_factor);
 
         // Allocate memory for FFT inputs and outputs
         using ablastr::math::anyfft::Complex;
-        Real *in1 = (Real*) malloc(sizeof(Real) * n);  // Allocate memory for 'n' real numbers for inputs and complex outputs
-        Real *in2 = (Real*) malloc(sizeof(Real) * n);
-        Complex *out1 = (Complex*) malloc(sizeof(Complex) * n);
-        Complex *out2 = (Complex*) malloc(sizeof(Complex) * n);
-        Complex *conv_result = (Complex*) malloc(sizeof(Complex) * n);
-        Real *out3 = (Real*) malloc(sizeof(Real) * n);
 
-        //Zero-pad the input arrays to be the size of the convolution output length 'n'
-        for (int i = 0; i < n; ++i)
+        // Allocate memory for 'n' real numbers for inputs and complex outputs
+        amrex::Gpu::DeviceVector<amrex::Real> in1(n);
+        amrex::Gpu::DeviceVector<amrex::Real> in2(n);
+        amrex::Gpu::DeviceVector<Complex> out1(n);
+        amrex::Gpu::DeviceVector<Complex> out2(n);
+        amrex::Gpu::DeviceVector<Complex> conv_result(n);
+        amrex::Gpu::DeviceVector<amrex::Real> out3(n);
+
+        // Zero-pad the input arrays to be the size of the convolution output length 'n'
+        amrex::Real * const dptr_in1 = in1.data();
+        amrex::Real * const dptr_in2 = in2.data();
+        amrex::Real const * const dptr_beam_profile_slope = beam_profile_slope.data();
+        amrex::Real const * const dptr_wake_func = wake_func.data();
+        amrex::ParallelFor(n, [=] AMREX_GPU_DEVICE(int i)
         {
-            if (i < beam_profile_size)
+            if (i < beam_profile_slope_size)
             {
-                in1[i] = std::isfinite(beam_profile_slope[i]) ? beam_profile_slope[i] : 0_rt;  // Print NaN was produced if 0
+                dptr_in1[i] = std::isfinite(dptr_beam_profile_slope[i]) ? dptr_beam_profile_slope[i] : 0;  // Print NaN was produced if 0
             }
             else
             {
-                in1[i] = 0_rt;
+                dptr_in1[i] = 0;
             }
 
             if (i < wake_func_size)
             {
-                in2[i] = std::isfinite(wake_func[i]) ? wake_func[i] : 0_rt;  // Print NaN was produced if 0
+                dptr_in2[i] = std::isfinite(dptr_wake_func[i]) ? dptr_wake_func[i] : 0;  // Print NaN was produced if 0
             }
             else
             {
-                in2[i] = 0_rt;
+                dptr_in2[i] = 0;
             }
-        }
+        });
 
         // Define Forward FFT
+        // TODO: n does not change usually, so we can keep the plans alive over the simulation
+        //       runtime. To do that, we can make this function a functor class.
         auto p1 = ablastr::math::anyfft::CreatePlan(
-            IntVect{n}, in1, out1, ablastr::math::anyfft::direction::R2C, 1
+            amrex::IntVect{n}, in1.data(), out1.data(), ablastr::math::anyfft::direction::R2C, 1
+
         );
         auto p2 = ablastr::math::anyfft::CreatePlan(
-            IntVect{n}, in2, out2, ablastr::math::anyfft::direction::R2C, 1
+            amrex::IntVect{n}, in2.data(), out2.data(), ablastr::math::anyfft::direction::R2C, 1
         );
 
         // Perform Forward FFT - Convert inputs into frequency domain
@@ -142,46 +129,40 @@ namespace impactx::particles::wakefields
         ablastr::math::anyfft::Execute(p1);
         ablastr::math::anyfft::Execute(p2);
 
-        //Perform FFT Multiplication - FFT Element-wise multiplication in frequency space
-        for (int i = 0; i < n; ++i)
+        // Perform FFT Multiplication - FFT Element-wise multiplication in frequency space
+        Complex * const dptr_conv_result = conv_result.data();
+        Complex const * const dptr_out1 = out1.data();
+        Complex const * const dptr_out2 = out2.data();
+        amrex::ParallelFor(n, [=] AMREX_GPU_DEVICE (int i) noexcept
         {
-            /*
-            The multiplication of 2 complex numbers is given by:
-
-            A * B = (a_real + i * a_imag)(b_real + i * b_imag)
-            A * B = (a_real * b_real - a_imag * b_imag) + i * (a_real * b_imag + a_imag * b_real)
-
-            where out[i][0] is the real part and out[i][1] is the imaginary part of out1, out2
-            */
-
-            conv_result[i][0] = out1[i][0] * out2[i][0] - out1[i][1] * out2[i][1]; //Real part of convolution
-            conv_result[i][1] = out1[i][0] * out2[i][1] + out1[i][1] * out2[i][0]; //Imaginary part of convolution
-        }
+            using ablastr::math::anyfft::multiply;
+            multiply(dptr_conv_result[i], dptr_out1[i], dptr_out2[i]);
+        });
 
         // Define Backward FFT - Revert from frequency domain to time/space domain
+        // TODO: n does not change usually, so we can keep the plans alive over the simulation
+        //       runtime. To do that, we can make this function a functor class.
+        amrex::Real * const dptr_out3 = out3.data();
         auto p3 = ablastr::math::anyfft::CreatePlan(
-            IntVect{n}, out3, conv_result, ablastr::math::anyfft::direction::C2R, 1
+            amrex::IntVect{n}, dptr_out3, dptr_conv_result, ablastr::math::anyfft::direction::C2R, 1
         );
 
         // Perform Backward FFT
         ablastr::math::anyfft::Execute(p3);
 
-        //Normalize result by the output size and multiply result by bin size
-        for (int i = 0; i < n; ++i)
+        // Normalize result by the output size and multiply result by bin size
+        amrex::Real * const dptr_result = result.data();
+        amrex::ParallelFor(n, [=] AMREX_GPU_DEVICE (int i) noexcept
         {
-            result[i] = out3[i] / n * delta_t;
-        }
+            dptr_result[i] = dptr_out3[i] / n * delta_t;
+        });
 
-        //Clean up intermediate declarations
+        // Clean up intermediate declarations
+        // TODO: n does not change usually, so we can keep the plans alive over the simulation
+        //       runtime. To do that, we can make this function a functor class.
         ablastr::math::anyfft::DestroyPlan(p1);
         ablastr::math::anyfft::DestroyPlan(p2);
         ablastr::math::anyfft::DestroyPlan(p3);
-        free(in1);
-        free(in2);
-        free(out1);
-        free(out2);
-        free(out3);
-        free(conv_result);
     #else
         throw std::runtime_error("convolve_fft: To use this function, recompile with ImpactX_FFT=ON.");
     #endif

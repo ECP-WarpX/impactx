@@ -22,7 +22,6 @@
 
 namespace impactx::particles::wakefields
 {
-
     /** Function to handle CSR bending process including charge deposition,
      * mean transverse position calculation, wakefield generation, and convolution.
      *
@@ -31,17 +30,19 @@ namespace impactx::particles::wakefields
      * @param[in] csr boolean indicating if CSR effects are included
      * @param[in] csr_bins number of bins (resolution) for CSR calculations
      * @param[in] slice_ds slice spacing along s
+     * @param[in] print_wakefield for debugging: print the wakefield to convoluted_wakefield.txt
      */
     template <typename T_Element>
     void HandleWakefield (
-        impactx::ImpactXParticleContainer* particle_container,
+        impactx::ImpactXParticleContainer& particle_container,
         T_Element const& element_variant,
         bool csr,
         int csr_bins,
-        amrex::Real slice_ds
+        amrex::Real slice_ds,
+        bool print_wakefield = false
     )
     {
-        BL_PROFILE("impactx::particles::wakefields::HandleWakefield");
+        BL_PROFILE("impactx::particles::wakefields::HandleWakefield")
 
         // Call the CSR bend function
         auto const [element_has_csr, R] = impactx::particles::wakefields::CSRBendElement(element_variant);
@@ -51,62 +52,66 @@ namespace impactx::particles::wakefields
         {
             // Measure beam size, extract the min, max of particle positions
             [[maybe_unused]] auto const [x_min, y_min, t_min, x_max, y_max, t_max] =
-                particle_container->MinAndMaxPositions();
-
-            using amrex::Real;
+                particle_container.MinAndMaxPositions();
 
             // Set parameters for charge deposition
-            bool is_unity_particle_weight = false; // Only true if w = 1
-            bool GetNumberDensity = true;
+            bool const is_unity_particle_weight = false; // Only true if w = 1
+            bool const GetNumberDensity = true;
 
-            int padding_factor = 1; // Set amount of zero-padding
-            int num_bins = csr_bins;  // Set resolution
-            Real bin_min = t_min;
-            Real bin_max = t_max;
-            Real bin_size = (bin_max - bin_min) / num_bins;
+            int const padding_factor = 1; // Set amount of zero-padding
+            int const num_bins = csr_bins;  // Set resolution
+            amrex::Real const bin_min = t_min;
+            amrex::Real const bin_max = t_max;
+            amrex::Real const bin_size = (bin_max - bin_min) / num_bins;
 
             // Allocate memory for the charge profile
-            Real* dptr_data = new Real[num_bins]();
-            Real* mean_x = new Real[num_bins]();
-            Real* mean_y = new Real[num_bins]();
+            amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins);
+            amrex::Gpu::DeviceVector<amrex::Real> mean_x(num_bins);
+            amrex::Gpu::DeviceVector<amrex::Real> mean_y(num_bins);
 
             // Call charge deposition function
-            impactx::particles::wakefields::DepositCharge1D(*particle_container, dptr_data, num_bins, bin_min, bin_size, is_unity_particle_weight);
+            impactx::particles::wakefields::DepositCharge1D(particle_container, charge_distribution, bin_min, bin_size, is_unity_particle_weight);
+
+            // FIXME: MPI reduce to rank zero, then the rest on IO processor, then BCast result
 
             // Call the mean transverse position function
-            impactx::particles::wakefields::MeanTransversePosition(*particle_container, mean_x, mean_y, num_bins, bin_min, bin_size, is_unity_particle_weight);
+            impactx::particles::wakefields::MeanTransversePosition(particle_container, mean_x, mean_y, bin_min, bin_size, is_unity_particle_weight);
 
             // Call charge density derivative function
-            std::vector<amrex::Real> charge_distribution(dptr_data, dptr_data + num_bins);
-            std::vector<amrex::Real> slopes(num_bins - 1);
-            impactx::particles::wakefields::DerivativeCharge1D(charge_distribution.data(), slopes.data(), num_bins, bin_size, GetNumberDensity); // Use number derivatives for convolution with CSR
+            amrex::Gpu::DeviceVector<amrex::Real> slopes(num_bins - 1);
+            impactx::particles::wakefields::DerivativeCharge1D(charge_distribution, slopes, bin_size, GetNumberDensity); // Use number derivatives for convolution with CSR
 
             // Call CSR wake function
-            std::vector<amrex::Real> wake_function(num_bins);
-            for (int i = 0; i < num_bins; ++i)
+            amrex::Gpu::DeviceVector<amrex::Real> wake_function(num_bins);
+            amrex::Real * const dptr_wake_function = wake_function.data();
+            auto const dR = R;  // for NVCC capture
+            amrex::ParallelFor(num_bins, [=] AMREX_GPU_DEVICE(int i)
             {
-                amrex::Real s = bin_min + i * bin_size;
-                wake_function[i] = impactx::particles::wakefields::w_l_csr(s, R);
-            }
+                amrex::Real const s = bin_min + i * bin_size;
+                dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR);
+            });
 
             // Call convolution function
-            std::vector<amrex::Real> convoluted_wakefield(padding_factor * (2 * num_bins - 1));
-            impactx::particles::wakefields::convolve_fft(slopes.data(), wake_function.data(), slopes.size(), wake_function.size(), bin_size, convoluted_wakefield.data(), padding_factor);
+            amrex::Gpu::DeviceVector<amrex::Real> convoluted_wakefield(padding_factor * (2 * num_bins - 1));
+            impactx::particles::wakefields::convolve_fft(slopes, wake_function, bin_size, convoluted_wakefield, padding_factor);
+
+            // FIXME: MPI BCast convoluted_wakefield to every MPI rank
 
             // Check convolution output
-            std::cout << "Convoluted wakefield: ";
-            std::ofstream outfile("convoluted_wakefield.txt");
-            for (int i = 0; i < int(convoluted_wakefield.size()); ++i)
+            if (print_wakefield && amrex::ParallelDescriptor::IOProcessor())
             {
-                std::cout << convoluted_wakefield[i] << " ";
-                outfile << convoluted_wakefield[i] << std::endl;
+                std::cout << "Convoluted wakefield: ";
+                std::ofstream outfile("convoluted_wakefield.txt");
+                for (double i : convoluted_wakefield) {
+                    std::cout << i << " ";
+                    outfile << i << std::endl;
+                }
+                std::cout << std::endl;
+                outfile.close();
             }
-            std::cout << std::endl;
-            outfile.close();
-            delete[] dptr_data;
 
             // Call function to kick particles with wake
-            impactx::particles::wakefields::WakePush(*particle_container, convoluted_wakefield, slice_ds, bin_size, t_min, padding_factor);
+            impactx::particles::wakefields::WakePush(particle_container, convoluted_wakefield, slice_ds, bin_size, t_min, padding_factor);
         }
     }
 

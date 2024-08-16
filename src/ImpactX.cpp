@@ -210,7 +210,7 @@ namespace impactx {
                     }
 
                     // Wakefield calculation: call wakefield function to apply wake effects
-                    particles::wakefields::HandleWakefield(amr_data->m_particle_container.get(), element_variant, csr, csr_bins, slice_ds);
+                    particles::wakefields::HandleWakefield(*amr_data->m_particle_container, element_variant, csr, csr_bins, slice_ds);
 
                     // Space-charge calculation: turn off if there is only 1 particle
                     if (space_charge &&

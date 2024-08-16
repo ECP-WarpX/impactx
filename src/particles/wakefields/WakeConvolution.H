@@ -32,7 +32,14 @@ namespace impactx::particles::wakefields
      * @param s value along s [m]
      * @return returns 1 if s>0, else 0
      */
-    amrex::Real unit_step (amrex::Real s);
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+    amrex::Real
+    unit_step (amrex::Real s)
+    {
+        using namespace amrex::literals;
+
+        return s >= 0_rt ? 1_rt : 0_rt;
+    }
 
     /** Alpha Function
      *
@@ -91,28 +98,34 @@ namespace impactx::particles::wakefields
      * @param[in] R band radius [m]
      * @return wake functions in [V*pc/mm]
      */
-    amrex::Real w_l_csr (
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+    amrex::Real
+    w_l_csr (
         amrex::Real s,
         amrex::Real R
-    );
+    )
+    {
+        using namespace amrex::literals;
+
+        amrex::Real const rc = std::pow(ablastr::constant::SI::q_e, 2) / (4_rt * amrex::Real(M_PI) * ablastr::constant::SI::ep0 * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2));
+        amrex::Real const kappa = (2_rt * rc * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2)) / std::pow(3_rt, 1_rt/3_rt) / std::pow(R, 2_rt/3_rt);
+
+        return - (kappa * unit_step(s)) / std::pow(std::abs(s), 1_rt/3_rt);
+    }
 
     /** Perform FFT-based convolution
      *
      * @param[in] beam_profile_slope number density slope along s [1/m]
      * @param[in] wake_func wake functions in along s [V*pc/mm]
-     * @param[in] beam_profile_size number of bins in beam_profile_slope
-     * @param[in] wake_func_size number of bins in wake_func
      * @param[in] delta_t size of a bin in wake_func [m]
      * @param[out] result FFT convolution of beam_profile_slope & wake_func
      * @param[in] padding_factor N times zero-padding of the input arrays' lengths
      */
     void convolve_fft (
-        amrex::Real const * beam_profile_slope,
-        amrex::Real const * wake_func,
-        int beam_profile_size,
-        int wake_func_size,
+        amrex::Gpu::DeviceVector<amrex::Real> const & beam_profile_slope,
+        amrex::Gpu::DeviceVector<amrex::Real> const & wake_func,
         amrex::Real delta_t,
-        amrex::Real* result,
+        amrex::Gpu::DeviceVector<amrex::Real> & result,
         int padding_factor
     );
 

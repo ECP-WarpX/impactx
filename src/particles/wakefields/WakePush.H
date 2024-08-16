@@ -30,7 +30,7 @@ namespace impactx::particles::wakefields
      */
     void WakePush (
         ImpactXParticleContainer & pc,
-        std::vector<amrex::Real> const & convoluted_wakefield,
+        amrex::Gpu::DeviceVector<amrex::Real> const & convoluted_wakefield,
         amrex::ParticleReal slice_ds,
         amrex::Real bin_size,
         amrex::Real bin_min,

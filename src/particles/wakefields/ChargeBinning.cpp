@@ -11,50 +11,48 @@
 #include "particles/ImpactXParticleContainer.H"
 
 #include <cmath>
-#include <vector>
 
 
 namespace impactx::particles::wakefields
 {
     void DepositCharge1D (
         impactx::ImpactXParticleContainer& myspc,
-        amrex::Real* dptr_data,
-        int num_bins,
+        amrex::Gpu::DeviceVector<amrex::Real> & charge_distribution,
         amrex::Real bin_min,
         amrex::Real bin_size,
         bool is_unity_particle_weight
     )
-    {   // Access and change data directly using '&' to pass by reference
-
-        // Determine the number of grid levels in the simulation
-        int const nlevs = std::max(0, myspc.finestLevel() + 1);
+    {
+        int const num_bins = charge_distribution.size();
+        amrex::Real * const dptr_data = charge_distribution.data();
 
         // Loop over each grid level
-        for (int lev = 0; lev < nlevs; ++lev)
+        int const nlevs = myspc.finestLevel();
+        for (int lev = 0; lev <= nlevs; ++lev)
         {
             // OpenMP parallelization if enabled
             #ifdef AMREX_USE_OMP
             #pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
             #endif
             {
-                //Loop over particles at the current grid level
+                // Loop over particles at the current grid level
                 for (impactx::ParIterSoA pti(myspc, lev); pti.isValid(); ++pti)
                 {
                     auto& soa = pti.GetStructOfArrays();  // Access data directly from StructOfArrays (soa)
 
-                    //Number of particles
+                    // Number of particles
                     long const np = pti.numParticles();
 
-                    //Access particle weights and momenta
+                    // Access particle weights and momenta
                     amrex::ParticleReal* const AMREX_RESTRICT d_w = soa.GetRealData(impactx::RealSoA::w).dataPtr();
 
-                    //Access particle positions
+                    // Access particle positions
                     amrex::ParticleReal* const AMREX_RESTRICT pos_z = soa.GetRealData(impactx::RealSoA::z).dataPtr();
 
-                    //Parallel loop over particles
+                    // Parallel loop over particles
                     amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE(int i)
                     {
-                        //Access particle z-position directly
+                        // Access particle z-position directly
                         amrex::ParticleReal const z = pos_z[i];  // (Macro)Particle longitudinal position at i
                         auto const w = amrex::Real(d_w[i]);  // (Macro)Particle weight at i
 
@@ -86,36 +84,37 @@ namespace impactx::particles::wakefields
     }
 
     void DerivativeCharge1D (
-        amrex::Real const* charge_distribution,
-        amrex::Real* slopes,
-        int num_bins,
+        amrex::Gpu::DeviceVector<amrex::Real> const & charge_distribution,
+        amrex::Gpu::DeviceVector<amrex::Real> & slopes,
         amrex::Real bin_size,
         bool GetNumberDensity
     )
     {
+        int const num_bins = charge_distribution.size();
+        amrex::Real const * const dptr_charge_distribution = charge_distribution.data();
+        amrex::Real * const dptr_slopes = slopes.data();
 
-        for (int i = 0; i < num_bins - 1; ++i)
+        amrex::ParallelFor(num_bins - 1, [=] AMREX_GPU_DEVICE(int i)
         {
-            //Compute the charge density derivative
-            amrex::Real const charge_derivative = (charge_distribution[i + 1] - charge_distribution[i]) / bin_size;
+            // Compute the charge density derivative
+            amrex::Real const charge_derivative = (dptr_charge_distribution[i + 1] - dptr_charge_distribution[i]) / bin_size;
 
-            //If GetNumberDensity = True, convert charge density derivative to number density derivative for CSR convolution
+            // If GetNumberDensity = True, convert charge density derivative to number density derivative for CSR convolution
             if (GetNumberDensity)
             {
-                slopes[i] = charge_derivative / ablastr::constant::SI::q_e;
+                dptr_slopes[i] = charge_derivative / ablastr::constant::SI::q_e;
             }
             else
             {
-                slopes[i] = charge_derivative;
+                dptr_slopes[i] = charge_derivative;
             }
-        }
+        });
     }
 
     void MeanTransversePosition (
         impactx::ImpactXParticleContainer& myspc,
-        amrex::Real* mean_x,
-        amrex::Real* mean_y,
-        int num_bins,
+        amrex::Gpu::DeviceVector<amrex::Real> & mean_x,
+        amrex::Gpu::DeviceVector<amrex::Real> & mean_y,
         amrex::Real bin_min,
         amrex::Real bin_size,
         bool is_unity_particle_weight
@@ -123,18 +122,23 @@ namespace impactx::particles::wakefields
     {
         using namespace amrex::literals;
 
-        int const nlevs = std::max(0, myspc.finestLevel() + 1);
+
+
+        int const num_bins = mean_x.size();
+        amrex::Real* dptr_mean_x = mean_x.data();
+        amrex::Real* dptr_mean_y = mean_y.data();
 
         // Declare arrays for sums of positions and weights
-        std::vector<amrex::Real> sum_x(num_bins, 0.0);
-        std::vector<amrex::Real> sum_y(num_bins, 0.0);
-        std::vector<amrex::Real> sum_w(num_bins, 0.0);
+        auto sum_x = amrex::Gpu::DeviceVector<amrex::Real>(num_bins, 0.0_rt);
+        auto sum_y = amrex::Gpu::DeviceVector<amrex::Real>(num_bins, 0.0_rt);
+        auto sum_w = amrex::Gpu::DeviceVector<amrex::Real>(num_bins, 0.0_rt);
 
-        amrex::Real* sum_w_ptr = sum_w.data();
-        amrex::Real* sum_x_ptr = sum_x.data();
-        amrex::Real* sum_y_ptr = sum_y.data();
+        amrex::Real* const sum_w_ptr = sum_w.data();
+        amrex::Real* const sum_x_ptr = sum_x.data();
+        amrex::Real* const sum_y_ptr = sum_y.data();
 
-        for (int lev = 0; lev < nlevs; ++lev)
+        int const nlevs = myspc.finestLevel();
+        for (int lev = 0; lev <= nlevs; ++lev)
         {
             #ifdef AMREX_USE_OMP
             #pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
@@ -160,32 +164,28 @@ namespace impactx::particles::wakefields
                         int const bin = int(amrex::Math::floor((z - bin_min) / bin_size));
                         if (bin < 0 || bin >= num_bins) { return; }
 
-                        amrex::Real const weight = is_unity_particle_weight ? 1.0_rt : w; // Check is macroparticle made up of 1 or more particles
+                        amrex::Real const weight = is_unity_particle_weight ? 1.0_rt : w;  // Check is macroparticle made up of 1 or more particles
 
-                        sum_w_ptr[bin] += weight; // Deposit the number of particles composing macroparticle
-                        sum_x_ptr[bin] += x * weight; // Deposit x position multiplied by number of particles at this position
-                        sum_y_ptr[bin] += y * weight;
-
-                        //HostDevice::Atomic::Add(&sum_w[bin], weight); // Deposit the number of particles composing macroparticle
-                        //HostDevice::Atomic::Add(&sum_x[bin], x * weight); // Deposit x position multiplied by number of particles at this position
-                        //HostDevice::Atomic::Add(&sum_y[bin], y * weight);
+                        amrex::HostDevice::Atomic::Add(&sum_w_ptr[bin], weight);      // Deposit the number of particles composing macroparticle
+                        amrex::HostDevice::Atomic::Add(&sum_x_ptr[bin], x * weight);  // Deposit x position multiplied by number of particles at this position
+                        amrex::HostDevice::Atomic::Add(&sum_y_ptr[bin], y * weight);
                     });
                 }
             }
         }
 
-        for (int i = 0; i < num_bins; ++i)
+        amrex::ParallelFor(num_bins, [=] AMREX_GPU_DEVICE(int i)
         {
-            if (sum_w[i] > 0) // Ensure number of particles in a bin is >= 1 before taking the mean
+            if (sum_w_ptr[i] > 0) // Ensure number of particles in a bin is >= 1 before taking the mean
             {
-                mean_x[i] = sum_x_ptr[i] / sum_w_ptr[i];
-                mean_y[i] = sum_y_ptr[i] / sum_w_ptr[i];
+                dptr_mean_x[i] = sum_x_ptr[i] / sum_w_ptr[i];
+                dptr_mean_y[i] = sum_y_ptr[i] / sum_w_ptr[i];
             }
             else
             {
-                mean_x[i] = 0.0;
-                mean_y[i] = 0.0;
+                dptr_mean_x[i] = 0.0;
+                dptr_mean_y[i] = 0.0;
             }
-        }
+        });
     }
 }
