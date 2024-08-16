@@ -55,7 +55,6 @@ lb = 0.500194828041958  # bend arc length (meters)
 # Drift elements
 dr1 = elements.Drift(ds=5.0058489435, nslice=ns)
 dr2 = elements.Drift(ds=0.5, nslice=ns)
-dr3 = elements.Drift(ds=2.0, nslice=ns)
 
 # Bend elements
 sbend1 = elements.Sbend(ds=lb, rc=-rc, nslice=ns)
