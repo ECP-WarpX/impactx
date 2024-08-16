@@ -7,7 +7,6 @@
  * Authors: Axel Huebl, Chad Mitchell, Ji Qiang
  * License: BSD-3-Clause-LBNL
  */
-
 #include "ImpactX.H"
 #include "initialization/InitAMReX.H"
 
@@ -18,14 +17,15 @@
 #   include <mpi.h>
 #endif
 
+
 int main(int argc, char* argv[])
 {
 #if defined(AMREX_USE_MPI)
     AMREX_ALWAYS_ASSERT(MPI_SUCCESS == MPI_Init(&argc, &argv));
 #endif
 
-    //Although ImpactX' init_grids will call this if not done before, we call
-    //it here so users can pass command line arguments
+    // although ImpactX' init_grids will call this if not done before, we call
+    // it here so users can pass command line arguments
     impactx::initialization::default_init_AMReX(argc, argv);
 
     BL_PROFILE_VAR("main()", pmain);

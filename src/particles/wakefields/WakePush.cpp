@@ -53,13 +53,9 @@ namespace impactx::particles::wakefields
                 // Access data from StructOfArrays (soa)
                 auto& soa_real = pti.GetStructOfArrays().GetRealData();
 
-                // amrex::ParticleReal* const AMREX_RESTRICT part_x = soa_real[RealSoA::x].dataPtr();
-                // amrex::ParticleReal* const AMREX_RESTRICT part_y = soa_real[RealSoA::y].dataPtr();
-                amrex::ParticleReal* const AMREX_RESTRICT part_z = soa_real[RealSoA::z].dataPtr(); //Note: Currently for a fixed t
+                amrex::ParticleReal* const AMREX_RESTRICT part_z = soa_real[RealSoA::z].dataPtr(); // Note: Currently for a fixed t
 
-                // amrex::ParticleReal* const AMREX_RESTRICT part_px = soa_real[RealSoA::px].dataPtr();
-                // amrex::ParticleReal* const AMREX_RESTRICT part_py = soa_real[RealSoA::py].dataPtr();
-                amrex::ParticleReal* const AMREX_RESTRICT part_pz = soa_real[RealSoA::pz].dataPtr(); //Note: Currently for a fixed t
+                amrex::ParticleReal* const AMREX_RESTRICT part_pz = soa_real[RealSoA::pz].dataPtr(); // Note: Currently for a fixed t
 
                 // Obtain constants for force normalization
                 amrex::ParticleReal const push_consts = 1.0 / ((ablastr::constant::SI::c) * pz_ref_SI);
@@ -69,18 +65,13 @@ namespace impactx::particles::wakefields
                 amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE (int i)
                 {
                     // Access SoA Real data
-                    // amrex::ParticleReal & AMREX_RESTRICT x = part_x[i];
-                    // amrex::ParticleReal & AMREX_RESTRICT y = part_y[i];
                     amrex::ParticleReal & AMREX_RESTRICT z = part_z[i];
 
-                    // amrex::ParticleReal & AMREX_RESTRICT px = part_px[i];
-                    // amrex::ParticleReal & AMREX_RESTRICT py = part_py[i];
                     amrex::ParticleReal & AMREX_RESTRICT pz = part_pz[i];
 
                     // Update longitudinal momentum with the convoluted wakefield force
-                    // amrex::Real lower_bound = 2 * bin_min - bin_size * (padding_factor * (2 * num_bins - 1) - num_bins);
                     amrex::Real lower_bound = padding_factor * 2 * bin_min;
-                    int idx = static_cast<int>((z - lower_bound) / bin_size); //Find index position along z
+                    int idx = static_cast<int>((z - lower_bound) / bin_size); // Find index position along z
 
                     amrex::ParticleReal const F_L = wakefield_ptr[idx];
 
@@ -88,10 +79,8 @@ namespace impactx::particles::wakefields
                     pz -=  push_consts * slice_ds * F_L;
 
                     // Other dimensions (x, y) remain unchanged
-                    // px = px;
-                    // py = py;
                 });
             } // End loop over all particle boxes
         } // End mesh-refinement level loop
     }
-}
+} // namespace impactx::particles::wakefields

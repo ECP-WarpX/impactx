@@ -18,6 +18,7 @@
 #include "particles/spacecharge/GatherAndPush.H"
 #include "particles/spacecharge/PoissonSolve.H"
 #include "particles/transformation/CoordinateTransformation.H"
+#include "particles/wakefields/ExecuteWakefield.H"
 
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
@@ -30,15 +31,8 @@
 #include <iostream>
 #include <memory>
 
-#include <vector>
-#include "particles/wakefields/ChargeBinning.H"
-#include "particles/wakefields/CSRBendElement.H"
-#include "particles/wakefields/ExecuteWakefield.H"
-#include "particles/wakefields/WakeConvolution.H"
-#include "particles/wakefields/WakePush.H"
 
 namespace impactx {
-
     ImpactX::ImpactX() {
         // todo: if amr.n_cells is provided, overwrite/redefine AmrCore object
 
@@ -132,7 +126,6 @@ namespace impactx {
 
     void ImpactX::evolve ()
     {
-
         BL_PROFILE("ImpactX::evolve");
 
         validate();
@@ -216,11 +209,8 @@ namespace impactx {
                                        << " slice_step=" << slice_step << "\n";
                     }
 
-                    // Wakefield calculation: Call wakefield function to apply wake effects
-                    bool element_has_csr = false; // Updates to true for example with bend element
-                    amrex::Real R = 0;// Updates for bend element rc
-
-                    particles::wakefields::HandleWakefield(amr_data->m_particle_container.get(), R, element_has_csr, element_variant, csr, csr_bins, slice_ds);
+                    // Wakefield calculation: call wakefield function to apply wake effects
+                    particles::wakefields::HandleWakefield(amr_data->m_particle_container.get(), element_variant, csr, csr_bins, slice_ds);
 
                     // Space-charge calculation: turn off if there is only 1 particle
                     if (space_charge &&

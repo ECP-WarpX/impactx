@@ -19,7 +19,6 @@
 #include <cmath>
 #include <vector>
 
-using namespace amrex;
 
 namespace impactx::particles::wakefields
 {
@@ -28,36 +27,30 @@ namespace impactx::particles::wakefields
      * mean transverse position calculation, wakefield generation, and convolution.
      *
      * @param[in] particle_container the particle species container
-     * @param[in] R radius of curvature of the bend element
-     * @param[in] element_has_csr boolean indicating if the element has CSR
      * @param[in] element_variant variant type of the lattice element
      * @param[in] csr boolean indicating if CSR effects are included
      * @param[in] csr_bins number of bins (resolution) for CSR calculations
      * @param[in] slice_ds slice spacing along s
      */
-
     template <typename T_Element>
-    void HandleWakefield(
+    void HandleWakefield (
         impactx::ImpactXParticleContainer* particle_container,
-        amrex::Real R,
-        bool element_has_csr,
         T_Element const& element_variant,
         bool csr,
         int csr_bins,
-        amrex::Real slice_ds)
+        amrex::Real slice_ds
+    )
     {
+        BL_PROFILE("impactx::particles::wakefields::HandleWakefield");
 
         // Call the CSR bend function
-        impactx::particles::wakefields::CSRBendElement(R, element_has_csr, element_variant);
-        //impactx::particles::wakefields::HandleElementVariant(R, element_has_csr, element_variant);
-
-        std::cout << "My boolean for element has csr is:" << element_has_csr << std::endl;
+        auto const [element_has_csr, R] = impactx::particles::wakefields::CSRBendElement(element_variant);
 
         // Enter loop if lattice has bend element
         if (csr && element_has_csr)
         {
             // Measure beam size, extract the min, max of particle positions
-            auto const [x_min, y_min, t_min, x_max, y_max, t_max] =
+            [[maybe_unused]] auto const [x_min, y_min, t_min, x_max, y_max, t_max] =
                 particle_container->MinAndMaxPositions();
 
             using amrex::Real;

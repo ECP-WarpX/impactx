@@ -77,7 +77,7 @@ You can run the following script to visualize the beam evolution over time:
 .. _examples-chicane-csr:
 
 Chicane with CSR
-==================
+================
 
 Berlin-Zeuthen magnetic bunch compression chicane with CSR:
 https://www.desy.de/csr/

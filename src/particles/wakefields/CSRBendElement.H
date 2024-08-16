@@ -15,39 +15,43 @@
 
 #include <AMReX_REAL.H>
 
+#include <tuple>
 #include <variant>
 
 
 namespace impactx::particles::wakefields
 {
-
     /** Function to calculate the radius of curvature (R) and check if an element has CSR
      *
-     * @param[in,out] R radius of curvature (updated if element has CSR)
-     * @param[in,out] element_has_csr boolean flag indicating if the element has CSR (updated if true)
      * @param[in] element_variant the lattice element to check
+     * @returns boolean flag indicating if the element has CSR, radius of curvature (or zero)
      */
     template <typename VariantType>
-    void CSRBendElement(amrex::Real& R, bool& element_has_csr, VariantType const& element_variant)
+    std::tuple<bool, amrex::Real>
+    CSRBendElement (
+        VariantType const& element_variant
+    )
     {
-        if (std::holds_alternative<Sbend>(element_variant)) //Check if variant holds a value of type Sbend
+        amrex::Real R = 0;
+        bool element_has_csr = false;
+
+        if (std::holds_alternative<Sbend>(element_variant)) // Check if variant holds a value of type Sbend
         {
-            auto& element = std::get<Sbend>(element_variant); //Retrieves value stored in variant
-            R = element.m_rc;
-            R = std::abs(R);
+            auto& element = std::get<Sbend>(element_variant); // Retrieves value stored in variant
+            R = std::abs(element.m_rc);
             element_has_csr = true;
         }
         else if (std::holds_alternative<CFbend>(element_variant))
         {
-            auto& element = std::get<CFbend>(element_variant); //Check if variant holds a value of type CFbend
-            R = element.m_rc;
-            R = std::abs(R);
+            auto& element = std::get<CFbend>(element_variant); // Check if variant holds a value of type CFbend
+            R = std::abs(element.m_rc);
             element_has_csr = true;
         }
         else
         {
             element_has_csr = false;
         }
+        return {element_has_csr, R};
     }
 
 } // namespace impactx::particles::wakefields

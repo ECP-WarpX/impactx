@@ -23,6 +23,4 @@ using namespace impactx;
 
 PYBIND11_MAKE_OPAQUE(std::list<KnownElements>)
 
-//PYBIND11_MAKE_OPAQUE(std::vector<double>)
-
 #endif // IMPACTX_PYIMPACTX_H

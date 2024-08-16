@@ -17,6 +17,7 @@
 
 #include <utility>  // for std::move
 
+
 namespace impactx::initialization
 {
     /** Initialize a single particle's data using the given distribution
