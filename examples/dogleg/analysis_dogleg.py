@@ -7,8 +7,9 @@
 
 import numpy as np
 import openpmd_api as io
-from scipy.stats import moment
 import pandas as pd
+from scipy.stats import moment
+
 
 def get_moments(beam):
     """Calculate standard deviations of beam position & momenta
@@ -32,6 +33,7 @@ def get_moments(beam):
 
     return (sigx, sigy, sigt, emittance_x, emittance_y, emittance_t)
 
+
 def get_twiss(diagnostics):
     """Return Twiss functions from reduced diagnostics
 
@@ -45,8 +47,8 @@ def get_twiss(diagnostics):
     d_px = diagnostics_final["dispersion_px"].values[0]
     alpha_y = diagnostics_final["alpha_y"].values[0]
     beta_y = diagnostics_final["beta_y"].values[0]
-    #d_y = diagnostics_final["dispersion_y"].values[0]
-    #d_py = diagnostics_final["dispersion_py"].values[0]
+    # d_y = diagnostics_final["dispersion_y"].values[0]
+    # d_py = diagnostics_final["dispersion_py"].values[0]
 
     return (alpha_x, beta_x, alpha_y, beta_y, d_x, d_px)
 
@@ -58,7 +60,7 @@ initial = series.iterations[1].particles["beam"].to_df()
 final = series.iterations[last_step].particles["beam"].to_df()
 
 # final reduced beam diagnostics
-diagnostics_final = pd.read_csv("diags/reduced_beam_characteristics_final.0.0",sep=' ')
+diagnostics_final = pd.read_csv("diags/reduced_beam_characteristics_final.0.0", sep=" ")
 
 # compare number of particles
 num_particles = 10000
@@ -119,11 +121,11 @@ assert np.allclose(
 
 print("")
 print("Final Twiss functions:")
-alpha_x, beta_x, alpha_y, beta_y, dispersion_x, dispersion_px = get_twiss(diagnostics_final)
+alpha_x, beta_x, alpha_y, beta_y, dispersion_x, dispersion_px = get_twiss(
+    diagnostics_final
+)
 print(f"  alpha_x={alpha_x:e} beta_x={beta_x:e} alpha_y={alpha_y:e} beta_y={beta_y:e}")
-print(
-    f"  dispersion_x={dispersion_x:e} dispersion_px={dispersion_px:e}"
-)   
+print(f"  dispersion_x={dispersion_x:e} dispersion_px={dispersion_px:e}")
 
 atol = 0.0  # ignored
 rtol = 2.2 * num_particles**-0.5  # from random sampling of a smooth distribution
@@ -132,13 +134,12 @@ print(f"  rtol={rtol} (ignored: atol~={atol})")
 assert np.allclose(
     [alpha_x, beta_x, alpha_y, beta_y, dispersion_x],
     [
-        1.338583e+00,
-        1.437407e+01,
-        -1.347910e+00,
-        4.600362e+00,
+        1.338583e00,
+        1.437407e01,
+        -1.347910e00,
+        4.600362e00,
         -2.666972e-01,
     ],
     rtol=rtol,
     atol=atol,
 )
-
