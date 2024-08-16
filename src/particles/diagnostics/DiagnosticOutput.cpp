@@ -55,6 +55,7 @@ namespace impactx::diagnostics
                              << "emittance_x" << " " << "emittance_y" << " " << "emittance_t" << " "
                              << "alpha_x" << " " << "alpha_y" << " " << "alpha_t" << " "
                              << "beta_x" << " " << "beta_y" << " " << "beta_t" << " "
+                             << "dispersion_x" << " " << "dispersion_px" << " "
                              << "charge_C" << " "
                              << "\n";
             }
@@ -102,6 +103,7 @@ namespace impactx::diagnostics
                          << rbc.at("emittance_x") << " " << rbc.at("emittance_y") << " " << rbc.at("emittance_t") << " "
                          << rbc.at("alpha_x") << " " << rbc.at("alpha_y") << " " << rbc.at("alpha_t") << " "
                          << rbc.at("beta_x") << " " << rbc.at("beta_y") << " " << rbc.at("beta_t") << " "
+                         << rbc.at("dispersion_x") << " " << rbc.at("dispersion_px") << " "
                          << rbc.at("charge_C") << "\n";
         } // if( otype == OutputType::PrintReducedBeamCharacteristics)
 
