@@ -893,20 +893,20 @@ add_impactx_test(spectrometer.py
 
 # Chicane with CSR ###########################################################
 #
-#add_impactx_test(chicane_csr
-#    examples/chicane/input_chicane_csr.in
-#      OFF  # ImpactX MPI-parallel
-#      OFF  # ImpactX Python interface
-#    examples/chicane/analysis_chicane_csr.py
-#    OFF  # no plot script yet
-#)
+add_impactx_test(chicane_csr
+    examples/chicane/input_chicane_csr.in
+      OFF  # ImpactX MPI-parallel
+      OFF  # ImpactX Python interface
+    examples/chicane/analysis_chicane_csr.py
+    OFF  # no plot script yet
+)
 
 # Python: Chicane with CSR #############################################################
 #
-#add_impactx_test(chicane_CSR.py
-#    examples/chicane/run_chicane_csr.py
-#      OFF  # ImpactX MPI-parallel
-#      ON   # ImpactX Python interface
-#    examples/chicane/analysis_chicane_csr.py
-#    OFF  # no plot script yet
-#)
+add_impactx_test(chicane_CSR.py
+    examples/chicane/run_chicane_csr.py
+      OFF  # ImpactX MPI-parallel
+      ON   # ImpactX Python interface
+    examples/chicane/analysis_chicane_csr.py
+    OFF  # no plot script yet
+)
