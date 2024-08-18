@@ -16,7 +16,7 @@ def test_dashboard():
     from seleniumbase import SB
 
     try:
-        with SB() as sb:
+        with SB(headless=True) as sb:
             app_process = start_dashboard()
             wait_for_dashboard_ready(app_process, timeout=60)
 

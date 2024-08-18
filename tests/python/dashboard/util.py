@@ -52,7 +52,7 @@ def start_dashboard():
     working_directory = os.path.normpath(working_directory)
 
     return subprocess.Popen(
-        ["python", "-m", "dashboard"],
+        ["python", "-m", "dashboard", "--server"],
         cwd=working_directory,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
