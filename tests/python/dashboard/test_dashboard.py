@@ -1,12 +1,17 @@
 import importlib
 
-from util import set_input_value, start_dashboard, wait_for_dashboard_ready, wait_for_ready
-
 import pytest
+from util import (
+    set_input_value,
+    start_dashboard,
+    wait_for_dashboard_ready,
+    wait_for_ready,
+)
 
 
 @pytest.mark.skipif(
-    importlib.util.find_spec("seleniumbase") is None, reason="seleniumbase is not available"
+    importlib.util.find_spec("seleniumbase") is None,
+    reason="seleniumbase is not available",
 )
 def test_dashboard():
     """
@@ -72,7 +77,7 @@ def test_dashboard():
             sb.click("#Run_route")
             sb.sleep(1)
             sb.click("#run_simulation_button")
-            sb.sleep(7) # for simulation to finish
+            sb.sleep(7)  # for simulation to finish
 
             # Interact with phase space projection plots
             sb.click("#Analyze_route")

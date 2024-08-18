@@ -29,6 +29,7 @@ def wait_for_dashboard_ready(process, timeout=60):
                 return
     raise Exception("Dashboard did not start correctly.")
 
+
 def set_input_value(sb, element_id, value):
     """
     Function to clear, update, and trigger a change event on an input field by ID.
@@ -56,5 +57,5 @@ def start_dashboard():
         cwd=working_directory,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        universal_newlines=True
+        universal_newlines=True,
     )
