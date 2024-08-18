@@ -1,7 +1,6 @@
 import importlib
 
-from util import set_input_value, start_dashboard, wait_for_ready
-import time
+from util import set_input_value, start_dashboard, wait_for_dashboard_ready, wait_for_ready
 
 import pytest
 
@@ -17,14 +16,15 @@ def test_simulation():
     from seleniumbase import SB
 
     app_process = start_dashboard()
-    time.sleep(10)
+
+    wait_for_dashboard_ready(app_process, timeout=60)
 
     try:
         with SB() as sb:
             url = "http://localhost:8080/index.html#/Input"
             sb.open(url)
 
-            wait_for_ready(sb, 60)
+            wait_for_ready(sb, ".trame__loader", 60)
 
             # Adjust beam properties
             sb.click("#particle_shape")
@@ -73,9 +73,7 @@ def test_simulation():
             sb.click("#Run_route")
             sb.sleep(1)
             sb.click("#run_simulation_button")
-            sb.sleep(7)
-
-            sb.wait_for_element("#select_plot", timeout=10)
+            sb.sleep(7) # for simulation to finish
 
             # Interact with phase space projection plots
             sb.click("#Analyze_route")
