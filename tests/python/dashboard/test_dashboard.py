@@ -8,19 +8,18 @@ import pytest
 @pytest.mark.skipif(
     importlib.util.find_spec("seleniumbase") is None, reason="seleniumbase is not available"
 )
-def test_simulation():
+def test_dashboard():
     """
     This test runs the FODO example on the dashboard and verifies
     that the simulation has ran successfully.
     """
     from seleniumbase import SB
 
-    app_process = start_dashboard()
-
-    wait_for_dashboard_ready(app_process, timeout=60)
-
     try:
         with SB() as sb:
+            app_process = start_dashboard()
+            wait_for_dashboard_ready(app_process, timeout=60)
+
             url = "http://localhost:8080/index.html#/Input"
             sb.open(url)
 

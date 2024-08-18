@@ -4,6 +4,9 @@ import subprocess
 
 def wait_for_ready(sb, element_name, timeout):
     # Code adapted from https://github.com/Kitware/trame-client/blob/master/trame_client/utils/testing.py
+    """
+    Function waits until element_name is present.
+    """
     for i in range(timeout):
         print(f"wait_for_ready {i}")
         if sb.is_element_present(element_name):
