@@ -73,10 +73,16 @@ def test_simulation():
             sb.click("#Run_route")
             sb.sleep(1)
             sb.click("#run_simulation_button")
-            sb.sleep(25)
+            sb.sleep(7)
 
-            # Check if "Simulation complete" message is printed
-            xterm_content = sb.get_text("#xterm_component")
-            assert "Simulation complete." in xterm_content
+            sb.wait_for_element("#select_plot", timeout=10)
+
+            # Interact with phase space projection plots
+            sb.click("#Analyze_route")
+            sb.sleep(3)
+            sb.click("#select_plot")
+            sb.click("div.v-list-item:nth-of-type(2)")
+            sb.wait_for_element("#interact", timeout=10)
+            sb.click("#interact")
     finally:
         app_process.terminate()

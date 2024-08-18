@@ -228,7 +228,7 @@ class AnalyzeSimulation:
                 with vuetify.VCard(style="height: 50vh; width: 150vh;"):
                     with vuetify.VTabs(v_model=("active_tab", 0)):
                         vuetify.VTab("Plot")
-                        vuetify.VTab("Interact")
+                        vuetify.VTab("Interact", id="interact")
                     vuetify.VDivider()
                     with vuetify.VTabsItems(v_model="active_tab"):
                         with vuetify.VTabItem():
