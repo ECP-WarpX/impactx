@@ -3,7 +3,7 @@
 Parameters: Inputs File
 =======================
 
-This documents on how to use ImpactX with an inputs file (``impactx input_file.in``).
+This documents how to use ImpactX with an input file (``impactx input_file.in``).
 
 
 .. _running-cpp-parameters-particle:
