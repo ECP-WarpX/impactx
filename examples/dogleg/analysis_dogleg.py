@@ -34,21 +34,21 @@ def get_moments(beam):
     return (sigx, sigy, sigt, emittance_x, emittance_y, emittance_t)
 
 
-def get_twiss(diagnostics):
-    """Return Twiss functions from reduced diagnostics
+def get_twiss(openpmd_beam):
+    """Return Twiss functions from an openPMD particle species
 
     Returns
     -------
     alpha_x, beta_x, alpha_y, beta_y, dispersion_x, dispersion_px
     """
-    alpha_x = diagnostics_final["alpha_x"].values[0]
-    beta_x = diagnostics_final["beta_x"].values[0]
-    d_x = diagnostics_final["dispersion_x"].values[0]
-    d_px = diagnostics_final["dispersion_px"].values[0]
-    alpha_y = diagnostics_final["alpha_y"].values[0]
-    beta_y = diagnostics_final["beta_y"].values[0]
-    # d_y = diagnostics_final["dispersion_y"].values[0]
-    # d_py = diagnostics_final["dispersion_py"].values[0]
+    alpha_x = openpmd_beam.get_attribute("alpha_x")
+    beta_x = openpmd_beam.get_attribute("beta_x")
+    d_x = openpmd_beam.get_attribute("dispersion_x")
+    d_px = openpmd_beam.get_attribute("dispersion_px")
+    alpha_y = openpmd_beam.get_attribute("alpha_y")
+    beta_y = openpmd_beam.get_attribute("beta_y")
+    # d_y = openpmd_beam.get_attribute("dispersion_y")
+    # d_py = openpmd_beam.get_attribute(["dispersion_py")
 
     return (alpha_x, beta_x, alpha_y, beta_y, d_x, d_px)
 
@@ -57,10 +57,8 @@ def get_twiss(diagnostics):
 series = io.Series("diags/openPMD/monitor.h5", io.Access.read_only)
 last_step = list(series.iterations)[-1]
 initial = series.iterations[1].particles["beam"].to_df()
-final = series.iterations[last_step].particles["beam"].to_df()
-
-# final reduced beam diagnostics
-diagnostics_final = pd.read_csv("diags/reduced_beam_characteristics_final.0.0", sep=" ")
+final_beam = series.iterations[last_step].particles["beam"]
+final = final_beam.to_df()
 
 # compare number of particles
 num_particles = 10000
@@ -122,7 +120,7 @@ assert np.allclose(
 print("")
 print("Final Twiss functions:")
 alpha_x, beta_x, alpha_y, beta_y, dispersion_x, dispersion_px = get_twiss(
-    diagnostics_final
+    final_beam
 )
 print(f"  alpha_x={alpha_x:e} beta_x={beta_x:e} alpha_y={alpha_y:e} beta_y={beta_y:e}")
 print(f"  dispersion_x={dispersion_x:e} dispersion_px={dispersion_px:e}")
