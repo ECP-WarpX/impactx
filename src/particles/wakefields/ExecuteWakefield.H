@@ -72,30 +72,46 @@ namespace impactx::particles::wakefields
             // Call charge deposition function
             impactx::particles::wakefields::DepositCharge1D(particle_container, charge_distribution, bin_min, bin_size, is_unity_particle_weight);
 
-            // FIXME: MPI reduce to rank zero, then the rest on IO processor, then BCast result
+            // Sum up all partial charge histograms to one MPI process to calculate the global wakefield.
+            // Once calculated, we will distribute convoluted_wakefield back to every MPI process.
+            amrex::ParallelReduce::Sum(
+                charge_distribution.data(),
+                charge_distribution.size(),
+                amrex::ParallelDescriptor::IOProcessorNumber(),
+                amrex::ParallelDescriptor::Communicator()
+            );
 
-            // Call the mean transverse position function
-            impactx::particles::wakefields::MeanTransversePosition(particle_container, mean_x, mean_y, bin_min, bin_size, is_unity_particle_weight);
-
-            // Call charge density derivative function
-            amrex::Gpu::DeviceVector<amrex::Real> slopes(num_bins - 1);
-            impactx::particles::wakefields::DerivativeCharge1D(charge_distribution, slopes, bin_size, GetNumberDensity); // Use number derivatives for convolution with CSR
-
-            // Call CSR wake function
-            amrex::Gpu::DeviceVector<amrex::Real> wake_function(num_bins);
-            amrex::Real * const dptr_wake_function = wake_function.data();
-            auto const dR = R;  // for NVCC capture
-            amrex::ParallelFor(num_bins, [=] AMREX_GPU_DEVICE(int i)
-            {
-                amrex::Real const s = bin_min + i * bin_size;
-                dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR);
-            });
-
-            // Call convolution function
             amrex::Gpu::DeviceVector<amrex::Real> convoluted_wakefield(padding_factor * (2 * num_bins - 1));
-            impactx::particles::wakefields::convolve_fft(slopes, wake_function, bin_size, convoluted_wakefield, padding_factor);
+            if (amrex::ParallelDescriptor::IOProcessor()) {
+                // Call the mean transverse position function
+                impactx::particles::wakefields::MeanTransversePosition(particle_container, mean_x, mean_y, bin_min,
+                                                                       bin_size, is_unity_particle_weight);
 
-            // FIXME: MPI BCast convoluted_wakefield to every MPI rank
+                // Call charge density derivative function
+                amrex::Gpu::DeviceVector<amrex::Real> slopes(num_bins - 1);
+                impactx::particles::wakefields::DerivativeCharge1D(charge_distribution, slopes, bin_size,
+                                                                   GetNumberDensity); // Use number derivatives for convolution with CSR
+
+                // Call CSR wake function
+                amrex::Gpu::DeviceVector<amrex::Real> wake_function(num_bins);
+                amrex::Real *const dptr_wake_function = wake_function.data();
+                auto const dR = R;  // for NVCC capture
+                amrex::ParallelFor(num_bins, [=] AMREX_GPU_DEVICE(int i) {
+                    amrex::Real const s = bin_min + i * bin_size;
+                    dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR);
+                });
+
+                // Call convolution function
+                impactx::particles::wakefields::convolve_fft(slopes, wake_function, bin_size, convoluted_wakefield,
+                                                             padding_factor);
+            }
+
+            // Broadcast the global wakefield to every MPI rank
+            amrex::ParallelDescriptor::Bcast(
+                convoluted_wakefield.data(),
+                convoluted_wakefield.size(),
+                amrex::ParallelDescriptor::IOProcessorNumber()
+            );
 
             // Check convolution output
             if (print_wakefield && amrex::ParallelDescriptor::IOProcessor())
