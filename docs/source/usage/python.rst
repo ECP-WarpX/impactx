@@ -5,8 +5,8 @@ Parameters: Python
 
 This documents on how to use ImpactX as a Python script (``python3 run_script.py``).
 
-General
--------
+Collective Effects & Overall Simulation Parameters
+--------------------------------------------------
 
 .. py:class:: impactx.ImpactX
 
@@ -71,15 +71,17 @@ General
       The numerical solver to solve the Poisson equation when calculating space charge effects.
       Either ``"multigrid"`` (default) or ``"fft"``.
 
-      * ``multigrid``: Poisson's equation is solved using an iterative multigrid (MLMG) solver.
-        See the `AMReX documentation <https://amrex-codes.github.io/amrex/docs_html/LinearSolvers.html#>`__ for details of the MLMG solver.
+      Currently, this is a 3D solver.
+      An additional `2D/2.5D solver <https://github.com/ECP-WarpX/impactx/issues/401>`__ will be added in the near future.
 
       * ``fft``: Poisson's equation is solved using an Integrated Green Function method (which requires FFT calculations).
         See these references for more details `Qiang et al. (2006) <https://doi.org/10.1103/PhysRevSTAB.9.044204>`__ (+ `Erratum <https://doi.org/10.1103/PhysRevSTAB.10.129901>`__).
-        It only works in 3D and it requires the compilation flag ``-DImpactX_FFT=ON``.
-        If mesh refinement is enabled, this solver only works on the coarsest level.
-        On the refined patches, the Poisson equation is solved with the multigrid solver.
+        This requires the compilation flag ``-DImpactX_FFT=ON``.
+        If mesh refinement (MR) is enabled, this FFT solver is used only on the coarsest level and a multi-grid solver is used on refined levels.
         The boundary conditions are assumed to be open.
+
+      * ``multigrid``: Poisson's equation is solved using an iterative multigrid (MLMG) solver.
+        See the `AMReX documentation <https://amrex-codes.github.io/amrex/docs_html/LinearSolvers.html#>`__ for details of the MLMG solver.
 
    .. py:property:: mlmg_relative_tolerance
 
@@ -166,7 +168,6 @@ General
 
       The number of periods to repeat the lattice.
 
-
    .. py:property:: abort_on_warning_threshold
 
       (optional) Set to "low", "medium" or "high".
@@ -229,7 +230,7 @@ General
 
       .. warning::
 
-         By default, OpenMP spawns as many threads as there are available virtual cores on a host.
+         By default, OpenMP spawns as many threads as there are available physical CPU cores on a host.
          When MPI and OpenMP support are used at the same time, it can easily happen that one over-subscribes the available physical CPU cores.
          This will lead to a severe slow-down of the simulation.
 
