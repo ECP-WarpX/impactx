@@ -1,7 +1,7 @@
 .. _examples-dogleg:
 
 Dogleg
-=======
+======
 
 This is a 2-bend dogleg lattice obtained by taking the first 1/2 of the Berlin-Zeuthen magnetic bunch compression chicane:
 https://www.desy.de/csr/
