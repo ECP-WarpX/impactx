@@ -7,7 +7,6 @@
 
 import numpy as np
 import openpmd_api as io
-import pandas as pd
 from scipy.stats import moment
 
 
@@ -119,9 +118,7 @@ assert np.allclose(
 
 print("")
 print("Final Twiss functions:")
-alpha_x, beta_x, alpha_y, beta_y, dispersion_x, dispersion_px = get_twiss(
-    final_beam
-)
+alpha_x, beta_x, alpha_y, beta_y, dispersion_x, dispersion_px = get_twiss(final_beam)
 print(f"  alpha_x={alpha_x:e} beta_x={beta_x:e} alpha_y={alpha_y:e} beta_y={beta_y:e}")
 print(f"  dispersion_x={dispersion_x:e} dispersion_px={dispersion_px:e}")
 
