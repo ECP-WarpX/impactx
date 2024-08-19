@@ -3,122 +3,7 @@
 Parameters: Inputs File
 =======================
 
-This documents on how to use ImpactX with an inputs file (``impactx input_file.in``).
-
-.. note::
-   The AMReX parser (see :ref:`running-cpp-parameters-parser`) is used for the right-hand-side of all input parameters that consist of one or more integers or floats, so expressions like ``<species_name>.density_max = "2.+1."`` and/or using user-defined constants are accepted.
-
-.. _running-cpp-parameters-overall:
-
-Overall simulation parameters
------------------------------
-
-* ``max_step`` (``integer``)
-    The number of PIC cycles to perform.
-
-* ``stop_time`` (``float``; in seconds)
-    The maximum physical time of the simulation. Can be provided instead of ``max_step``. If both
-    ``max_step`` and ``stop_time`` are provided, both criteria are used and the simulation stops
-    when the first criterion is hit.
-
-* ``amrex.abort_on_out_of_gpu_memory``  (``0`` or ``1``; default is ``1`` for true)
-    When running on GPUs, memory that does not fit on the device will be automatically swapped to host memory when this option is set to ``0``.
-    This will cause severe performance drops.
-    Note that even with this set to ``1`` ImpactX will not catch all out-of-memory events yet when operating close to maximum device memory.
-    `Please also see the documentation in AMReX <https://amrex-codes.github.io/amrex/docs_html/GPU.html#inputs-parameters>`__.
-
-* ``amrex.the_arena_is_managed``  (``0`` or ``1``; default is ``0`` for false)
-    When running on GPUs, device memory that is accessed from the host will automatically be transferred with managed memory.
-    This is useful for convenience during development, but has sometimes severe performance and memory footprint implications if relied on (and sometimes vendor bugs).
-    For all regular ImpactX operations, we therefore do explicit memory transfers without the need for managed memory and thus changed the AMReX default to false.
-    `Please also see the documentation in AMReX <https://amrex-codes.github.io/amrex/docs_html/GPU.html#inputs-parameters>`__.
-
-* ``amrex.omp_threads``  (``system``, ``nosmt`` or positive integer; default is ``nosmt``)
-    An integer number can be set in lieu of the ``OMP_NUM_THREADS`` environment variable to control the number of OpenMP threads to use for the ``OMP`` compute backend on CPUs.
-    By default, we use the ``nosmt`` option, which overwrites the OpenMP default of spawning one thread per logical CPU core, and instead only spawns a number of threads equal to the number of physical CPU cores on the machine.
-    If set, the environment variable ``OMP_NUM_THREADS`` takes precedence over ``system`` and ``nosmt``, but not over integer numbers set in this option.
-
-* ``amrex.abort_on_unused_inputs`` (``0`` or ``1``; default is ``0`` for false)
-    When set to ``1``, this option causes the simulation to fail *after* its completion if there were unused parameters.
-    It is mainly intended for continuous integration and automated testing to check that all tests and inputs are adapted to API changes.
-
-* ``impactx.always_warn_immediately`` (``0`` or ``1``; default is ``0`` for false)
-    If set to ``1``, ImpactX immediately prints every warning message as soon as it is generated.
-    It is mainly intended for debug purposes, in case a simulation crashes before a global warning report can be printed.
-
-* ``impactx.abort_on_warning_threshold`` (string: ``low``, ``medium`` or ``high``) optional
-    Optional threshold to abort as soon as a warning is raised.
-    If the threshold is set, warning messages with priority greater than or equal to the threshold trigger an immediate abort.
-    It is mainly intended for debug purposes, and is best used with ``impactx.always_warn_immediately=1``.
-    For more information on the warning logger, see `this section <https://warpx.readthedocs.io/en/latest/developers/warning_logger.html>`__ of the WarpX documentation.
-
-* ``impactx.verbose`` (int: ``0`` for silent, higher is more verbose; default is ``1``) optional
-    Controls how much information is printed to the terminal, when running ImpactX.
-
-
-.. _running-cpp-parameters-box:
-
-
-Setting up the field mesh
--------------------------
-
-ImpactX uses an AMReX grid of boxes to organize and parallelize the simulation domain.
-These boxes also contain a field mesh, if space charge calculations are enabled.
-
-* ``amr.n_cell`` (3 integers) optional (default: 1 `blocking_factor <https://amrex-codes.github.io/amrex/docs_html/GridCreation.html>`__ per MPI process)
-    The number of grid points along each direction (on the **coarsest level**)
-
-* ``amr.max_level`` (``integer``, default: ``0``)
-    When using mesh refinement, the number of refinement levels that will be used.
-
-    Use ``0`` in order to disable mesh refinement.
-
-* ``amr.ref_ratio`` (``integer`` per refined level, default: ``2``)
-    When using mesh refinement, this is the refinement ratio per level.
-    With this option, all directions are fined by the same ratio.
-
-* ``amr.ref_ratio_vect`` (3 integers for x,y,z per refined level)
-    When using mesh refinement, this can be used to set the refinement ratio per direction and level, relative to the previous level.
-
-    Example: for three levels, a value of ``2 2 4 8 8 16`` refines the first level by 2-fold in x and y and 4-fold in z compared to the coarsest level (level 0/mother grid); compared to the first level, the second level is refined 8-fold in x and y and 16-fold in z.
-
-.. note::
-
-   Field boundaries for space charge calculation are located at the outer ends of the field mesh.
-   We currently assume `Dirichlet boundary conditions <https://en.wikipedia.org/wiki/Dirichlet_boundary_condition>`__ with zero potential (a mirror charge).
-   Thus, to emulate open boundaries, consider adding enough vacuum padding to the beam.
-   This will be improved in future versions.
-
-.. note::
-
-   Particles that move outside the simulation domain are removed.
-
-* ``geometry.dynamic_size`` (``boolean``) optional (default: ``true`` for dynamic)
-    Use dynamic (``true``) resizing of the field mesh, via ``geometry.prob_relative``, or static sizing (``false``), via ``geometry.prob_lo``/``geometry.prob_hi``.
-
-* ``geometry.prob_relative`` (positive ``float`` array with ``amr.max_level`` entries, unitless) optional (default: ``3.0 1.0 1.0 ...``)
-    By default, we dynamically extract the minimum and maximum of the particle positions in the beam.
-    The field mesh spans, per direction, multiple times the maximum physical extent of beam particles, as given by this factor.
-    The beam minimum and maximum extent are symmetrically padded by the mesh.
-    For instance, ``1.2`` means the mesh will span 10% above and 10% below the beam;
-    ``1.0`` means the beam is exactly covered with the mesh.
-
-* ``geometry.prob_lo`` and ``geometry.prob_hi`` (3 floats, in meters) optional (required if ``geometry.dynamic_size`` is ``false``)
-    The extent of the full simulation domain relative to the reference particle position.
-    This can be used to explicitly size the simulation box and ignore ``geometry.prob_relative``.
-
-    This box is rectangular, and thus its extent is given here by the coordinates of the lower corner (``geometry.prob_lo``) and upper corner (``geometry.prob_hi``).
-    The first axis of the coordinates is x and the last is z.
-
-
-.. _running-cpp-parameters-bc:
-
-Domain Boundary Conditions
---------------------------
-
-.. note::
-
-   TODO :-)
+This documents how to use ImpactX with an input file (``impactx input_file.in``).
 
 
 .. _running-cpp-parameters-particle:
@@ -592,95 +477,62 @@ Lattice Elements
               Note: If ``reverse`` and ``repeat`` both appear, then ``reverse`` is applied before ``repeat``.
 
 
-.. _running-cpp-parameters-parallelization:
+.. _running-cpp-parameters-collective:
 
-Distribution across MPI ranks and parallelization
--------------------------------------------------
+Collective Effects
+------------------
 
-* ``amr.max_grid_size`` (``integer``) optional (default: ``128``)
-    Maximum allowable size of each **subdomain**
-    (expressed in number of grid points, in each direction).
-    Each subdomain has its own ghost cells, and can be handled by a
-    different MPI rank ; several OpenMP threads can work simultaneously on the
-    same subdomain.
+.. _running-cpp-parameters-collective-spacecharge:
 
-    If ``max_grid_size`` is such that the total number of subdomains is
-    **larger** that the number of MPI ranks used, than some MPI ranks
-    will handle several subdomains, thereby providing additional flexibility
-    for **load balancing**.
+Space Charge
+^^^^^^^^^^^^
 
-    When using mesh refinement, this number applies to the subdomains
-    of the coarsest level, but also to any of the finer level.
+Space charge kicks are applied in between slices of thick :ref:`lattice elements <running-cpp-parameters-lattice>`.
+See there ``nslice`` option on lattice elements for slicing.
 
+* ``algo.space_charge`` (``boolean``, optional, default: ``false``)
+    Whether to calculate space charge effects.
 
-.. _running-cpp-parameters-parser:
+ImpactX uses an AMReX grid of boxes to organize and parallelize space charge simulation domain.
+These boxes also contain a field mesh, if space charge calculations are enabled.
 
-Math parser and user-defined constants
---------------------------------------
+* ``amr.n_cell`` (3 integers) optional (default: 1 `blocking_factor <https://amrex-codes.github.io/amrex/docs_html/GridCreation.html>`__ per MPI process)
+    The number of grid points along each direction (on the **coarsest level**)
 
-ImpactX uses AMReX's math parser that reads expressions in the input file.
-It can be used in all input parameters that consist of one or more integers or floats.
-Integer input expecting boolean, 0 or 1, are not parsed.
-Note that when multiple values are expected, the expressions are space delimited.
-For integer input values, the expressions are evaluated as real numbers and the final result rounded to the nearest integer.
-See `this section <https://amrex-codes.github.io/amrex/docs_html/Basics.html#parser>`_ of the AMReX documentation for a complete list of functions supported by the math parser.
+* ``amr.max_level`` (``integer``, default: ``0``)
+    When using mesh refinement, the number of refinement levels that will be used.
 
-ImpactX constants
-^^^^^^^^^^^^^^^^^
+    Use ``0`` in order to disable mesh refinement.
 
-ImpactX will provide a few pre-defined constants, that can be used for any parameter that consists of one or more floats.
+* ``amr.ref_ratio`` (``integer`` per refined level, default: ``2``)
+    When using mesh refinement, this is the refinement ratio per level.
+    With this option, all directions are fined by the same ratio.
+
+* ``amr.ref_ratio_vect`` (3 integers for x,y,z per refined level)
+    When using mesh refinement, this can be used to set the refinement ratio per direction and level, relative to the previous level.
+
+    Example: for three levels, a value of ``2 2 4 8 8 16`` refines the first level by 2-fold in x and y and 4-fold in z compared to the coarsest level (level 0/mother grid); compared to the first level, the second level is refined 8-fold in x and y and 16-fold in z.
 
 .. note::
 
-   Develop, such as:
+   Particles that move outside the simulation domain are removed.
 
-   ======== ===================
-   q_e      elementary charge
-   m_e      electron mass
-   m_p      proton mass
-   m_u      unified atomic mass unit (Dalton)
-   epsilon0 vacuum permittivity
-   mu0      vacuum permeability
-   clight   speed of light
-   pi       math constant pi
-   ======== ===================
+* ``geometry.dynamic_size`` (``boolean``) optional (default: ``true`` for dynamic)
+    Use dynamic (``true``) resizing of the field mesh, via ``geometry.prob_relative``, or static sizing (``false``), via ``geometry.prob_lo``/``geometry.prob_hi``.
 
-   See in WarpX the file ``Source/Utils/WarpXConst.H`` for the values.
+* ``geometry.prob_relative`` (positive ``float`` array with ``amr.max_level`` entries, unitless) optional (default: ``3.0 1.0 1.0 ...``)
+    By default, we dynamically extract the minimum and maximum of the particle positions in the beam.
+    The field mesh spans, per direction, multiple times the maximum physical extent of beam particles, as given by this factor.
+    The beam minimum and maximum extent are symmetrically padded by the mesh.
+    For instance, ``1.2`` means the mesh will span 10% above and 10% below the beam;
+    ``1.0`` means the beam is exactly covered with the mesh.
 
-User-defined constants
-^^^^^^^^^^^^^^^^^^^^^^
+* ``geometry.prob_lo`` and ``geometry.prob_hi`` (3 floats, in meters) optional (required if ``geometry.dynamic_size`` is ``false``)
+    The extent of the full simulation domain relative to the reference particle position.
+    This can be used to explicitly size the simulation box and ignore ``geometry.prob_relative``.
 
-Users can define their own constants in the input file.
-These constants can be used for any parameter that consists of one or more integers or floats.
-User-defined constant names can contain only letters, numbers and the character ``_``.
-The name of each constant has to begin with a letter. The following names are used
-by ImpactX, and cannot be used as user-defined constants: ``x``, ``y``, ``z``, ``X``, ``Y``, ``t``.
-The values of the constants can include the predefined ImpactX constants listed above as well as other user-defined constants.
-For example:
-
-* ``my_constants.a0 = 3.0``
-* ``my_constants.z_plateau = 150.e-6``
-* ``my_constants.n0 = 1.e22``
-* ``my_constants.wp = sqrt(n0*q_e**2/(epsilon0*m_e))``
-
-Coordinates
-^^^^^^^^^^^
-
-Besides, for profiles that depend on spatial coordinates (the plasma momentum distribution or the laser field, see below ``Particle initialization`` and ``Laser initialization``), the parser will interpret some variables as spatial coordinates.
-These are specified in the input parameter, i.e., ``density_function(x,y,z)`` and ``field_function(X,Y,t)``.
-
-The parser reads python-style expressions between double quotes, for instance
-``"a0*x**2 * (1-y*1.e2) * (x>0)"`` is a valid expression where ``a0`` is a
-user-defined constant (see above) and ``x`` and ``y`` are spatial coordinates. The names are case sensitive. The factor
-``(x>0)`` is ``1`` where ``x>0`` and ``0`` where ``x<=0``. It allows the user to
-define functions by intervals.
-Alternatively the expression above can be written as ``if(x>0, a0*x**2 * (1-y*1.e2), 0)``.
-
-
-.. _running-cpp-parameters-numerics:
-
-Numerics and algorithms
------------------------
+    This box is rectangular, and thus its extent is given here by the coordinates of the lower corner (``geometry.prob_lo``) and upper corner (``geometry.prob_hi``).
+    The first axis of the coordinates is x and the last is z.
 
 * ``algo.particle_shape`` (``integer``; ``1``, ``2``, or ``3``)
     The order of the shape factors (splines) for the macro-particles along all spatial directions: `1` for linear, `2` for quadratic, `3` for cubic.
@@ -688,22 +540,26 @@ Numerics and algorithms
     High-order shape factors are computationally more expensive, but may increase the overall accuracy of the results.
     For production runs it is generally safer to use high-order shape factors, such as cubic order.
 
-* ``algo.space_charge`` (``boolean``, optional, default: ``false``)
-    Whether to calculate space charge effects.
-
 * ``algo.poisson_solver`` (``string``, optional, default: ``"multigrid"``)
     The numerical solver to solve the Poisson equation when calculating space charge effects.
-    Options:
+    Currently, this is a 3D solver.
+    An additional `2D/2.5D solver <https://github.com/ECP-WarpX/impactx/issues/401>`__ will be added in the near future.
 
-    * ``multigrid``: Poisson's equation is solved using an iterative multigrid (MLMG) solver.
-      See the `AMReX documentation <https://amrex-codes.github.io/amrex/docs_html/LinearSolvers.html#>`__ for details of the MLMG solver.
+    Options:
 
     * ``fft``: Poisson's equation is solved using an Integrated Green Function method (which requires FFT calculations).
       See these references for more details `Qiang et al. (2006) <https://doi.org/10.1103/PhysRevSTAB.9.044204>`__ (+ `Erratum <https://doi.org/10.1103/PhysRevSTAB.10.129901>`__).
-      It only works in 3D and it requires the compilation flag ``-DImpactX_FFT=ON``.
-      If mesh refinement is enabled, this solver only works on the coarsest level.
-      On the refined patches, the Poisson equation is solved with the multigrid solver.
+      This requires the compilation flag ``-DImpactX_FFT=ON``.
+      If mesh refinement (MR) is enabled, this FFT solver is used only on the coarsest level and a multi-grid solver is used on refined levels.
       The boundary conditions are assumed to be open.
+
+    * ``multigrid``: Poisson's equation is solved using an iterative multigrid (MLMG) solver.
+      See the `AMReX documentation <https://amrex-codes.github.io/amrex/docs_html/LinearSolvers.html#>`__ for details of the MLMG solver.
+      Field boundaries for MLMG space charge calculation are located at the outer ends of the field mesh.
+      For the MLMG solver, we assume `Dirichlet boundary conditions <https://en.wikipedia.org/wiki/Dirichlet_boundary_condition>`__ with zero potential (a mirror charge).
+      Thus, to emulate open boundaries, consider adding enough vacuum padding to the beam.
+
+Multigrid-specific numerical options:
 
 * ``algo.mlmg_relative_tolerance`` (``float``, optional, default: ``1.e-7``)
     The relative precision with which the electrostatic space-charge fields should be calculated.
@@ -727,6 +583,79 @@ Numerics and algorithms
     The verbosity used for MLMG solver for space-charge fields calculation.
     Currently MLMG solver looks for verbosity levels from 0-5.
     A higher number results in more verbose output.
+
+
+.. _running-cpp-parameters-collective-csr:
+
+Coherent Synchrotron Radiation (CSR)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+
+   Coming soon, see `PR #627 <https://github.com/ECP-WarpX/impactx/pull/627>`__.
+
+
+.. _running-cpp-parameters-parser:
+
+Math parser and user-defined constants
+--------------------------------------
+
+The AMReX parser is used for the right-hand-side of all input parameters that consist of one or more integers or floats.
+Thus, expressions like ``beam.alphaY = beam.alphaX`` and/or using user-defined constants or simple math operations are accepted.
+
+Note that when multiple values are expected, the expressions are space delimited.
+For integer input values, the expressions are evaluated as real numbers and the final result rounded to the nearest integer.
+See `this section <https://amrex-codes.github.io/amrex/docs_html/Basics.html#parser>`__ of the AMReX documentation for a complete list of functions supported by the math parser.
+
+
+ImpactX constants
+^^^^^^^^^^^^^^^^^
+
+ImpactX will provide a few pre-defined constants, that can be used for any parameter that consists of one or more floats.
+
+.. note::
+
+   ======== ===================
+   q_e      elementary charge
+   m_e      electron mass
+   m_p      proton mass
+   m_u      unified atomic mass unit (Dalton)
+   epsilon0 vacuum permittivity
+   mu0      vacuum permeability
+   clight   speed of light
+   pi       math constant pi
+   ======== ===================
+
+
+User-defined constants
+^^^^^^^^^^^^^^^^^^^^^^
+
+Users can define their own constants in the input file.
+These constants can be used for any parameter that consists of one or more integers or floats.
+User-defined constant names can contain only letters, numbers and the character ``_``.
+The name of each constant has to begin with a letter. The following names are used
+by ImpactX, and cannot be used as user-defined constants: ``x``, ``y``, ``z``, ``X``, ``Y``, ``t``.
+The values of the constants can include the predefined ImpactX constants listed above as well as other user-defined constants.
+For example:
+
+* ``my_constants.my_alpha = 3.0``
+* ``my_constants.my_beta = 12.e-6``
+* ``my_constants.abc = 1.23e10``
+
+
+Coordinates
+^^^^^^^^^^^
+
+Besides, for profiles that depend on spatial coordinates (the plasma momentum distribution or the laser field, see below ``Particle initialization`` and ``Laser initialization``), the parser will interpret some variables as spatial coordinates.
+These are specified in the input parameter, i.e., ``density_function(x,y,z)`` and ``field_function(X,Y,t)``.
+
+The parser reads python-style expressions between double quotes, for instance
+``"a0*x**2 * (1-y*1.e2) * (x>0)"`` is a valid expression where ``a0`` is a
+user-defined constant (see above) and ``x`` and ``y`` are spatial coordinates. The names are case sensitive. The factor
+``(x>0)`` is ``1`` where ``x>0`` and ``0`` where ``x<=0``. It allows the user to
+define functions by intervals.
+Alternatively the expression above can be written as ``if(x>0, a0*x**2 * (1-y*1.e2), 0)``.
+
 
 .. _running-cpp-parameters-diagnostics:
 
@@ -767,6 +696,7 @@ In-situ visualization
 
    TODO :-)
 
+
 .. _running-cpp-parameters-cp-restart:
 
 Checkpoints and restart
@@ -774,12 +704,14 @@ Checkpoints and restart
 
 .. note::
 
-   ImpactX will support checkpoints/restart via AMReX.
+   Future version of ImpactX will support checkpoints/restart via AMReX.
+   This is not yet implemented.
    The checkpoint capability can be turned with regular diagnostics: ``<diag_name>.format = checkpoint``.
 
    * ``amr.restart`` (`string`)
        Name of the checkpoint file to restart from. Returns an error if the folder does not exist
        or if it is not properly formatted.
+
 
 Intervals parser
 ----------------
@@ -832,3 +764,64 @@ This is essentially the python slicing syntax except that the stop is inclusive
 Note that if a given period is zero or negative, the corresponding slice is disregarded.
 For example, ``something_intervals = -1`` deactivates ``something`` and
 ``something_intervals = ::-1,100:1000:25`` is equivalent to ``something_intervals = 100:1000:25``.
+
+
+.. _running-cpp-parameters-overall:
+
+Overall simulation parameters
+-----------------------------
+
+* ``amrex.abort_on_out_of_gpu_memory``  (``0`` or ``1``; default is ``1`` for true)
+    When running on GPUs, memory that does not fit on the device will be automatically swapped to host memory when this option is set to ``0``.
+    This will cause severe performance drops.
+    Note that even with this set to ``1`` ImpactX will not catch all out-of-memory events yet when operating close to maximum device memory.
+    `Please also see the documentation in AMReX <https://amrex-codes.github.io/amrex/docs_html/GPU.html#inputs-parameters>`__.
+
+* ``amrex.the_arena_is_managed``  (``0`` or ``1``; default is ``0`` for false)
+    When running on GPUs, device memory that is accessed from the host will automatically be transferred with managed memory.
+    This is useful for convenience during development, but has sometimes severe performance and memory footprint implications if relied on (and sometimes vendor bugs).
+    For all regular ImpactX operations, we therefore do explicit memory transfers without the need for managed memory and thus changed the AMReX default to false.
+    `Please also see the documentation in AMReX <https://amrex-codes.github.io/amrex/docs_html/GPU.html#inputs-parameters>`__.
+
+* ``amrex.omp_threads``  (``system``, ``nosmt`` or positive integer; default is ``nosmt``)
+    An integer number can be set in lieu of the ``OMP_NUM_THREADS`` environment variable to control the number of OpenMP threads to use for the ``OMP`` compute backend on CPUs.
+    By default, we use the ``nosmt`` option, which overwrites the OpenMP default of spawning one thread per logical CPU core, and instead only spawns a number of threads equal to the number of physical CPU cores on the machine.
+    If set, the environment variable ``OMP_NUM_THREADS`` takes precedence over ``system`` and ``nosmt``, but not over integer numbers set in this option.
+
+* ``amrex.abort_on_unused_inputs`` (``0`` or ``1``; default is ``0`` for false)
+    When set to ``1``, this option causes the simulation to fail *after* its completion if there were unused parameters.
+    It is mainly intended for continuous integration and automated testing to check that all tests and inputs are adapted to API changes.
+
+* ``impactx.always_warn_immediately`` (``0`` or ``1``; default is ``0`` for false)
+    If set to ``1``, ImpactX immediately prints every warning message as soon as it is generated.
+    It is mainly intended for debug purposes, in case a simulation crashes before a global warning report can be printed.
+
+* ``impactx.abort_on_warning_threshold`` (string: ``low``, ``medium`` or ``high``) optional
+    Optional threshold to abort as soon as a warning is raised.
+    If the threshold is set, warning messages with priority greater than or equal to the threshold trigger an immediate abort.
+    It is mainly intended for debug purposes, and is best used with ``impactx.always_warn_immediately=1``.
+    For more information on the warning logger, see `this section <https://warpx.readthedocs.io/en/latest/developers/warning_logger.html>`__ of the WarpX documentation.
+
+* ``impactx.verbose`` (int: ``0`` for silent, higher is more verbose; default is ``1``) optional
+    Controls how much information is printed to the terminal, when running ImpactX.
+
+
+.. _running-cpp-parameters-parallelization:
+
+Distribution across MPI ranks and parallelization
+-------------------------------------------------
+
+* ``amr.max_grid_size`` (``integer``) optional (default: ``128``)
+    Maximum allowable size of each **subdomain**
+    (expressed in number of grid points, in each direction).
+    Each subdomain has its own ghost cells, and can be handled by a
+    different MPI rank ; several OpenMP threads can work simultaneously on the
+    same subdomain.
+
+    If ``max_grid_size`` is such that the total number of subdomains is
+    **larger** that the number of MPI ranks used, than some MPI ranks
+    will handle several subdomains, thereby providing additional flexibility
+    for **load balancing**.
+
+    When using mesh refinement, this number applies to the subdomains
+    of the coarsest level, but also to any of the finer level.

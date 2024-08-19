@@ -875,7 +875,7 @@ add_impactx_test(initialize_from_array.py
     examples/initialize_from_array/visualize_from_array.py
 )
 
-# Achromatic Spectrometer ########################################################
+# Achromatic Spectrometer ####################################################
 #
 # w/o space charge
 add_impactx_test(spectrometer
@@ -899,12 +899,25 @@ add_impactx_test(chicane_csr
     examples/chicane/analysis_chicane_csr.py
     OFF  # no plot script yet
 )
-
-# Python: Chicane with CSR #############################################################
-#
 add_impactx_test(chicane_CSR.py
     examples/chicane/run_chicane_csr.py
       OFF  # ImpactX MPI-parallel
     examples/chicane/analysis_chicane_csr.py
+    OFF  # no plot script yet
+)
+
+# Dogleg #####################################################################
+#
+# w/o space charge
+add_impactx_test(dogleg
+    examples/dogleg/input_dogleg.in
+      ON   # ImpactX MPI-parallel
+    examples/dogleg/analysis_dogleg.py
+    OFF  # no plot script yet
+)
+add_impactx_test(dogleg.py
+    examples/dogleg/run_dogleg.py
+      OFF  # ImpactX MPI-parallel
+    examples/dogleg/analysis_dogleg.py
     OFF  # no plot script yet
 )
