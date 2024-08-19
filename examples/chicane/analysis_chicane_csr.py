@@ -26,6 +26,11 @@ def get_moments(beam):
     sigpt = moment(beam["momentum_t"], moment=2) ** 0.5
 
     epstrms = beam.cov(ddof=0)
+
+    # Check for valid values before calculating emittance
+    if np.any(np.isnan([sigx, sigpx, sigy, sigpy, sigt, sigpt])) or np.any(np.isnan(epstrms)):
+        raise ValueError("Invalid value detected in standard deviations or covariance matrix.")
+
     emittance_x = (sigx**2 * sigpx**2 - epstrms["position_x"]["momentum_x"] ** 2) ** 0.5
     emittance_y = (sigy**2 * sigpy**2 - epstrms["position_y"]["momentum_y"] ** 2) ** 0.5
     emittance_t = (sigt**2 * sigpt**2 - epstrms["position_t"]["momentum_t"] ** 2) ** 0.5

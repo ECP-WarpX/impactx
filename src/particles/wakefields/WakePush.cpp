@@ -74,7 +74,18 @@ namespace impactx::particles::wakefields
                     amrex::ParticleReal const F_L = wakefield_ptr[idx];
 
                     // Update longitudinal momentum
-                    pz -=  push_consts * slice_ds * F_L;
+
+                    // Check if the force (convolution) values are within a reasonable range
+                    if (std::isfinite(F_L))
+                    {
+                        // Update longitudinal momentum
+                        pz -= push_consts * slice_ds * F_L;
+                    }
+                    else
+                    {
+                        // Handle unexpected values: log warning and skip momentum update
+                        std::cerr << "Warning: Invalid or out-of-range values detected." << std::endl;
+                    }
 
                     // Other dimensions (x, y) remain unchanged
                 });
