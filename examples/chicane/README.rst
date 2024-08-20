@@ -86,7 +86,7 @@ All parameters can be found online.
 A 5 GeV electron bunch with normalized transverse rms emittance of 1 um undergoes longitudinal compression by a factor of 10 in a standard 4-bend chicane.
 The rms pulse length should decrease by the compression factor (10).
 
-An ultrarelativistic model of steady-state CSR in the bending dipoles is included, resulting in a horizontal emittance growth of 19%.
+An ultrarelativistic model of steady-state CSR in the bending dipoles is included, resulting in a horizontal emittance growth of 19%.  Note that this value is smaller than the horizontal emittance growth of 57% that is obtained when transient (bend-entry and -exit) effects are included.
 
 In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
