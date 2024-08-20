@@ -64,8 +64,8 @@ namespace impactx::particles::wakefields
                 amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE (int i)
                 {
                     // Access SoA Real data
-                    amrex::ParticleReal const & AMREX_RESTRICT z = part_z[i];
-                    amrex::ParticleReal & AMREX_RESTRICT pz = part_pz[i];
+                    amrex::ParticleReal const & AMREX_RESTRICT t = part_t[i];
+                    amrex::ParticleReal & AMREX_RESTRICT pt = part_pt[i];
 
                     // Update longitudinal momentum with the convoluted wakefield force
                     amrex::Real const lower_bound = padding_factor * 2 * bin_min;
