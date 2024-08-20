@@ -79,7 +79,7 @@ namespace impactx::particles::wakefields
                     if (std::isfinite(F_L))
                     {
                         // Update longitudinal momentum
-                        pz -= push_consts * slice_ds * F_L;
+                        pt -= push_consts * slice_ds * F_L;
                     }
                     else
                     {
