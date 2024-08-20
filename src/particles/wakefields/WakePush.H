@@ -21,12 +21,12 @@ namespace impactx::particles::wakefields
 {
     /** Function to update particle momentum using wake force kick
      *
-     * @param[inout] pc
-     * @param[in] convoluted_wakefield
-     * @param[in] slice_ds
-     * @param[in] bin_size
-     * @param[in] bin_min
-     * @param[in] padding_factor
+     * @param[inout] pc the particle species container
+     * @param[in] convoluted_wakefield wake functions in [V*pc/mm]
+     * @param[in] slice_ds slice spacing along s
+     * @param[in] bin_size size of the beam in s divided by num_bins
+     * @param[in] bin_min lower end of the beam in s
+     * @param[in] padding_factor N times zero-padding of the input arrays' lengths
      */
     void WakePush (
         ImpactXParticleContainer & pc,
