@@ -69,7 +69,7 @@ namespace impactx::particles::wakefields
 
                     // Update longitudinal momentum with the convoluted wakefield force
                     amrex::Real const lower_bound = padding_factor * 2 * bin_min;
-                    int const idx = static_cast<int>((z - lower_bound) / bin_size); // Find index position along z
+                    int const idx = static_cast<int>((t - lower_bound) / bin_size); // Find index position along t
 
                     amrex::ParticleReal const F_L = wakefield_ptr[idx];
 
