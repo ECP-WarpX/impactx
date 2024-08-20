@@ -595,7 +595,7 @@ E. L. Saldin et al, NIMA 398, p. 373-394 (1997), [DOI:10.1016/S0168-9002(97)0082
 
 * ``algo.csr`` (``boolean``, optional, default: ``false``)
     Whether to calculate CSR effects.
-    CSR calculations involve several steps, including charge deposition, mean transverse position calculation, wakefield generation, and convolution, all of which are handled within the CSR bending process.
+    CSR calculations involve several steps, including charge deposition, wakefield generation, and convolution, all of which are handled within the CSR bending process.
 
 * ``algo.csr_bins`` (``integer`, optional, default: ``150``)
     The number of bins used for the CSR calculations along the longitudinal direction. Increasing the number of bins can lead to more accurate wakefield resolution at the cost of higher computational expense.
