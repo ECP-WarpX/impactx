@@ -593,15 +593,15 @@ Coherent Synchrotron Radiation (CSR)
 CSR effects are included in the simulation for bend lattice elements such as Sbend and CFbend. These effects are critical in accurately modeling the wakefields generated due to the interaction of particles with the radiated field during bending in synchrotron radiation.
 
 * ``algo.csr`` (boolean, optional, default: false)
-Whether to calculate CSR effects.
-CSR calculations involve several steps, including charge deposition, mean transverse position calculation, wakefield generation, and convolution, all of which are handled within the CSR bending process.
+    Whether to calculate CSR effects.
+    CSR calculations involve several steps, including charge deposition, mean transverse position calculation, wakefield generation, and convolution, all of which are handled within the CSR bending process.
 
 * ``algo.csr_bins`` (integer, optional, default: 150)
-The number of bins used for the CSR calculations along the longitudinal direction. Increasing the number of bins can lead to more accurate wakefield resolution at the cost of higher computational expense.
+    The number of bins used for the CSR calculations along the longitudinal direction. Increasing the number of bins can lead to more accurate wakefield resolution at the cost of higher computational expense.
 
 .. note::
 
-CSR effects are only calculated for lattice elements that include bending, such as Sbend and CFbend.
+   CSR effects are only calculated for lattice elements that include bending, such as Sbend and CFbend.
 
 .. note::
 
