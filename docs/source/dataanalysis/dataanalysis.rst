@@ -91,7 +91,7 @@ The code writes out the values in an ASCII file prefixed ``reduced_beam_characte
     Courant-Snyder (Twiss) beta (unit: meter).  Transverse Twiss functions are calculated after removing correlations with particle energy.
 * ``dispersion_x``, ``dispersion_y``
     Horizontal and vertical dispersion (unit: meter)
-* ``dispersion_px``, ``dispersion_py``            
+* ``dispersion_px``, ``dispersion_py``
     Derivative of horizontal and vertical dispersion (unit: dimensionless)
 * ``charge``
     Total beam charge (unit: Coulomb)
