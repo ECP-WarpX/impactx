@@ -78,19 +78,23 @@ The code writes out the values in an ASCII file prefixed ``reduced_beam_characte
 * ``x_mean/min/max``, ``y_mean/min/max``, ``t_mean/min/max``
     Average / minimum / maximum particle displacement with respect to the reference particle in the dimensions of ``x``, ``y`` (transverse coordinates, unit: meter), and ``t`` (normalized time difference :math:`ct`, unit: meter)
 * ``sig_x``, ``sig_y``, ``sig_t``
-    RMS of the average beam particle positions (unit: meter)
+    Standard deviation of the particle positions (speed of light times time delay for ``t``) (unit: meter)
 * ``px_mean/min/max``, ``py_mean/min/max``, ``pt_mean/min/max``
     Average / minimum / maximum particle momentum deviation from the reference particle momentum, divided by the magnitude of the reference particle momentum (unit: dimensionless, radians for transverse momenta)
 * ``sig_px``, ``sig_py``, ``sig_pt``
     Standard deviation of the particle momentum deviations (energy difference for ``pt``) normalized by the magnitude of the reference particle momentum (unit: dimensionless)
 * ``emittance_x``, ``emittance_y``, ``emittance_t``
-    Normalized beam emittance (unit: meter)
+    Normalized rms beam emittance (unit: meter)
 * ``alpha_x``, ``alpha_y``, ``alpha_t``
-    Courant-Snyder (Twiss) alpha (unit: dimensionless)
+    Courant-Snyder (Twiss) alpha (unit: dimensionless).  Transverse Twiss functions are calculated after removing correlations with particle energy.
 * ``beta_x``, ``beta_y``, ``beta_t``
-    Courant-Snyder (Twiss) beta (unit: meter)
+    Courant-Snyder (Twiss) beta (unit: meter).  Transverse Twiss functions are calculated after removing correlations with particle energy.
+* ``dispersion_x``, ``dispersion_y``
+    Horizontal and vertical dispersion (unit: meter)
+* ``dispersion_px``, ``dispersion_py``
+    Derivative of horizontal and vertical dispersion (unit: dimensionless)
 * ``charge``
-    Cumulated beam charge (unit: Coulomb)
+    Total beam charge (unit: Coulomb)
 
 
 .. _dataanalysis-plot:
