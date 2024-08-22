@@ -81,7 +81,7 @@ namespace impactx::particles::wakefields
                 amrex::ParallelDescriptor::Communicator()
             );
 
-            amrex::Gpu::DeviceVector<amrex::Real> convoluted_wakefield(padding_factor * (2 * num_bins - 1), 0.0);
+            amrex::Gpu::DeviceVector<amrex::Real> convoluted_wakefield;
             if (amrex::ParallelDescriptor::IOProcessor()) {
                 // Call the mean transverse position function
                 impactx::particles::wakefields::MeanTransversePosition(particle_container, mean_x, mean_y, bin_min,
@@ -102,8 +102,7 @@ namespace impactx::particles::wakefields
                 });
 
                 // Call convolution function
-                impactx::particles::wakefields::convolve_fft(slopes, wake_function, bin_size, convoluted_wakefield,
-                                                             padding_factor);
+                convoluted_wakefield = impactx::particles::wakefields::convolve_fft(slopes, wake_function, bin_size, padding_factor);
             }
 
             // Broadcast the global wakefield to every MPI rank
@@ -118,7 +117,7 @@ namespace impactx::particles::wakefields
             {
                 std::cout << "Convoluted wakefield: ";
                 std::ofstream outfile("convoluted_wakefield.txt");
-                for (double i : convoluted_wakefield) {
+                for (double const i : convoluted_wakefield) {
                     std::cout << i << " ";
                     outfile << i << std::endl;
                 }

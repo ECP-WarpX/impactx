@@ -31,6 +31,8 @@ namespace impactx::particles::wakefields
 
         using namespace amrex::literals;
 
+        int const cw_size = convoluted_wakefield.size();
+
         // Loop over refinement levels
         int const nLevel = pc.finestLevel();
         for (int lev = 0; lev <= nLevel; ++lev)
@@ -68,8 +70,13 @@ namespace impactx::particles::wakefields
                     amrex::ParticleReal & AMREX_RESTRICT pt = part_pt[i];
 
                     // Update longitudinal momentum with the convoluted wakefield force
-                    amrex::Real const lower_bound = padding_factor * 2 * bin_min;
-                    int const idx = static_cast<int>((t - lower_bound) / bin_size); // Find index position along t
+                    amrex::Real const lower_bound = padding_factor * bin_min;
+                    int const idx = static_cast<int>((t - lower_bound) / bin_size);  // Find index position along t
+
+                    if (idx < 0 || idx >= cw_size)
+                    {
+                        std::cerr << "Warning: Index out of range for wakfield." << std::endl;
+                    }
 
                     amrex::ParticleReal const F_L = wakefield_ptr[idx];
 

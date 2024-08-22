@@ -118,15 +118,15 @@ namespace impactx::particles::wakefields
      * @param[in] beam_profile_slope number density slope along s [1/m]
      * @param[in] wake_func wake functions in along s [V*pc/mm]
      * @param[in] delta_t size of a bin in wake_func [m]
-     * @param[out] result FFT convolution of beam_profile_slope & wake_func
      * @param[in] padding_factor N times zero-padding of the input arrays' lengths
+     * @return FFT convolution of beam_profile_slope & wake_func
      */
-    void convolve_fft (
+    amrex::Gpu::DeviceVector<amrex::Real>
+    convolve_fft (
         amrex::Gpu::DeviceVector<amrex::Real> const & beam_profile_slope,
         amrex::Gpu::DeviceVector<amrex::Real> const & wake_func,
         amrex::Real delta_t,
-        amrex::Gpu::DeviceVector<amrex::Real> & result,
-        int padding_factor
+        int padding_factor = 1
     );
 
 } // namespace impactx::particles::wakefields
