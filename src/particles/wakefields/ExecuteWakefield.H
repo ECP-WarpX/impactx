@@ -65,9 +65,9 @@ namespace impactx::particles::wakefields
             amrex::Real const bin_size = (bin_max - bin_min) / num_bins;
 
             // Allocate memory for the charge profile
-            amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins);
-            amrex::Gpu::DeviceVector<amrex::Real> mean_x(num_bins);
-            amrex::Gpu::DeviceVector<amrex::Real> mean_y(num_bins);
+            amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins, 0.0);
+            amrex::Gpu::DeviceVector<amrex::Real> mean_x(num_bins, 0.0);
+            amrex::Gpu::DeviceVector<amrex::Real> mean_y(num_bins, 0.0);
 
             // Call charge deposition function
             impactx::particles::wakefields::DepositCharge1D(particle_container, charge_distribution, bin_min, bin_size, is_unity_particle_weight);
@@ -81,19 +81,19 @@ namespace impactx::particles::wakefields
                 amrex::ParallelDescriptor::Communicator()
             );
 
-            amrex::Gpu::DeviceVector<amrex::Real> convoluted_wakefield(padding_factor * (2 * num_bins - 1));
+            amrex::Gpu::DeviceVector<amrex::Real> convoluted_wakefield(padding_factor * (2 * num_bins - 1), 0.0);
             if (amrex::ParallelDescriptor::IOProcessor()) {
                 // Call the mean transverse position function
                 impactx::particles::wakefields::MeanTransversePosition(particle_container, mean_x, mean_y, bin_min,
                                                                        bin_size, is_unity_particle_weight);
 
                 // Call charge density derivative function
-                amrex::Gpu::DeviceVector<amrex::Real> slopes(num_bins - 1);
+                amrex::Gpu::DeviceVector<amrex::Real> slopes(num_bins - 1, 0.0);
                 impactx::particles::wakefields::DerivativeCharge1D(charge_distribution, slopes, bin_size,
                                                                    GetNumberDensity); // Use number derivatives for convolution with CSR
 
                 // Call CSR wake function
-                amrex::Gpu::DeviceVector<amrex::Real> wake_function(num_bins);
+                amrex::Gpu::DeviceVector<amrex::Real> wake_function(num_bins, 0.0);
                 amrex::Real *const dptr_wake_function = wake_function.data();
                 auto const dR = R;  // for NVCC capture
                 amrex::ParallelFor(num_bins, [=] AMREX_GPU_DEVICE(int i) {

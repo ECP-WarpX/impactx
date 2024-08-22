@@ -80,12 +80,12 @@ namespace impactx::particles::wakefields
         using ablastr::math::anyfft::Complex;
 
         // Allocate memory for 'n' real numbers for inputs and complex outputs
-        amrex::Gpu::DeviceVector<amrex::Real> in1(n);
-        amrex::Gpu::DeviceVector<amrex::Real> in2(n);
+        amrex::Gpu::DeviceVector<amrex::Real> in1(n, 0.0);
+        amrex::Gpu::DeviceVector<amrex::Real> in2(n, 0.0);
         amrex::Gpu::DeviceVector<Complex> out1(n);
         amrex::Gpu::DeviceVector<Complex> out2(n);
         amrex::Gpu::DeviceVector<Complex> conv_result(n);
-        amrex::Gpu::DeviceVector<amrex::Real> out3(n);
+        amrex::Gpu::DeviceVector<amrex::Real> out3(n, 0.0);
 
         // Zero-pad the input arrays to be the size of the convolution output length 'n'
         amrex::Real * const dptr_in1 = in1.data();
@@ -96,7 +96,7 @@ namespace impactx::particles::wakefields
         {
             if (i < beam_profile_slope_size)
             {
-                dptr_in1[i] = std::isfinite(dptr_beam_profile_slope[i]) ? dptr_beam_profile_slope[i] : 0;  // Print NaN was produced if 0
+                dptr_in1[i] = dptr_beam_profile_slope[i];
             }
             else
             {
@@ -105,7 +105,7 @@ namespace impactx::particles::wakefields
 
             if (i < wake_func_size)
             {
-                dptr_in2[i] = std::isfinite(dptr_wake_func[i]) ? dptr_wake_func[i] : 0;  // Print NaN was produced if 0
+                dptr_in2[i] = dptr_wake_func[i];
             }
             else
             {
