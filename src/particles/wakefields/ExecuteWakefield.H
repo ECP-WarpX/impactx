@@ -62,7 +62,7 @@ namespace impactx::particles::wakefields
             int const num_bins = csr_bins;  // Set resolution
             amrex::Real const bin_min = t_min;
             amrex::Real const bin_max = t_max;
-            amrex::Real const bin_size = (bin_max - bin_min) / num_bins;
+            amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);
 
             // Allocate memory for the charge profile
             amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins, 0.0);

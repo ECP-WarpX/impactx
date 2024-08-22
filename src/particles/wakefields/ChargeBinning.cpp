@@ -31,9 +31,9 @@ namespace impactx::particles::wakefields
         for (int lev = 0; lev <= nlevs; ++lev)
         {
             // OpenMP parallelization if enabled
-            #ifdef AMREX_USE_OMP
-            #pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
-            #endif
+            //ifdef AMREX_USE_OMP
+            //pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
+            //endif
             {
                 // Loop over particles at the current grid level
                 for (impactx::ParIterSoA pti(myspc, lev); pti.isValid(); ++pti)
@@ -140,9 +140,9 @@ namespace impactx::particles::wakefields
         int const nlevs = myspc.finestLevel();
         for (int lev = 0; lev <= nlevs; ++lev)
         {
-            #ifdef AMREX_USE_OMP
-            #pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
-            #endif
+            //ifdef AMREX_USE_OMP
+            //pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
+            //endif
             {
                 for (impactx::ParIterSoA pti(myspc, lev); pti.isValid(); ++pti)
                 {

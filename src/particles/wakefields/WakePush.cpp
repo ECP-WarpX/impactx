@@ -75,7 +75,7 @@ namespace impactx::particles::wakefields
 
                     if (idx < 0 || idx >= cw_size)
                     {
-                        std::cerr << "Warning: Index out of range for wakfield." << std::endl;
+                        std::cerr << "Warning: Index out of range for wakefield: " << idx << std::endl;
                     }
 
                     amrex::ParticleReal const F_L = wakefield_ptr[idx];
