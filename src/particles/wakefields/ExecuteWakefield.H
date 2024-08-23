@@ -58,14 +58,13 @@ namespace impactx::particles::wakefields
             bool const is_unity_particle_weight = false; // Only true if w = 1
             bool const GetNumberDensity = true;
 
-            int const padding_factor = 1; // Set amount of zero-padding
             int const num_bins = csr_bins;  // Set resolution
             amrex::Real const bin_min = t_min;
             amrex::Real const bin_max = t_max;
-            amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);
+            amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);  // number of evaluation points
 
             // Allocate memory for the charge profile
-            amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins, 0.0);
+            amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins + 1, 0.0);
             amrex::Gpu::DeviceVector<amrex::Real> mean_x(num_bins, 0.0);
             amrex::Gpu::DeviceVector<amrex::Real> mean_y(num_bins, 0.0);
 
@@ -88,21 +87,32 @@ namespace impactx::particles::wakefields
                                                                        bin_size, is_unity_particle_weight);
 
                 // Call charge density derivative function
-                amrex::Gpu::DeviceVector<amrex::Real> slopes(num_bins - 1, 0.0);
+                amrex::Gpu::DeviceVector<amrex::Real> slopes(charge_distribution.size() - 1, 0.0);
                 impactx::particles::wakefields::DerivativeCharge1D(charge_distribution, slopes, bin_size,
                                                                    GetNumberDensity); // Use number derivatives for convolution with CSR
 
-                // Call CSR wake function
-                amrex::Gpu::DeviceVector<amrex::Real> wake_function(num_bins, 0.0);
+                // Construct CSR wake function on 2N support
+                amrex::Gpu::DeviceVector<amrex::Real> wake_function(num_bins*2, 0.0);
                 amrex::Real *const dptr_wake_function = wake_function.data();
                 auto const dR = R;  // for NVCC capture
-                amrex::ParallelFor(num_bins, [=] AMREX_GPU_DEVICE(int i) {
-                    amrex::Real const s = bin_min + i * bin_size;
-                    dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR);
+                amrex::ParallelFor(num_bins*2, [=] AMREX_GPU_DEVICE(int i) {
+                    if (i == 0) {
+                        amrex::Real const s = bin_size;
+                        dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR);
+                        // dptr_wake_function[i] = 0.0;  // TODO: which value to use for this divergent point?
+                    }
+                    else if (i < num_bins) {
+                        amrex::Real const s = static_cast<amrex::Real>(i) * bin_size;
+                        dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR);
+                    }
+                    else if (i > num_bins) {
+                        amrex::Real const s = static_cast<amrex::Real>(i - 2*num_bins) * bin_size;
+                        dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR);
+                    }
                 });
 
                 // Call convolution function
-                convoluted_wakefield = impactx::particles::wakefields::convolve_fft(slopes, wake_function, bin_size, padding_factor);
+                convoluted_wakefield = impactx::particles::wakefields::convolve_fft(slopes, wake_function, bin_size);
             }
 
             // Broadcast the global wakefield to every MPI rank
@@ -126,7 +136,7 @@ namespace impactx::particles::wakefields
             }
 
             // Call function to kick particles with wake
-            impactx::particles::wakefields::WakePush(particle_container, convoluted_wakefield, slice_ds, bin_size, t_min, padding_factor);
+            impactx::particles::wakefields::WakePush(particle_container, convoluted_wakefield, slice_ds, bin_size, t_min);
         }
     }
 

@@ -26,15 +26,13 @@ namespace impactx::particles::wakefields
      * @param[in] slice_ds slice spacing along s
      * @param[in] bin_size size of the beam in s divided by num_bins
      * @param[in] bin_min lower end of the beam in s
-     * @param[in] padding_factor N times zero-padding of the input arrays' lengths
      */
     void WakePush (
         ImpactXParticleContainer & pc,
         amrex::Gpu::DeviceVector<amrex::Real> const & convoluted_wakefield,
         amrex::ParticleReal slice_ds,
         amrex::Real bin_size,
-        amrex::Real bin_min,
-        int padding_factor
+        amrex::Real bin_min
     );
 
 } // namespace impactx::particles::wakefields

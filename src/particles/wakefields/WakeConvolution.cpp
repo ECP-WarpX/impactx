@@ -42,7 +42,7 @@ namespace impactx::particles::wakefields
 
         amrex::Real const s0 = (0.169_rt * std::pow(a, 1.79_rt) * std::pow(g, 0.38_rt)) / std::pow(L, 1.17_rt);
         amrex::Real const term = std::sqrt(std::abs(s) / s0) * std::exp(-std::sqrt(std::abs(s) / s0));
-        return (4 * impactx::particles::wakefields::Z0 * ablastr::constant::SI::c * s0 * unit_step(s)) / (amrex::Real(M_PI) * std::pow(a, 4)) * term;
+        return (4_rt * impactx::particles::wakefields::Z0 * ablastr::constant::SI::c * s0 * unit_step(s)) / (amrex::Real(M_PI) * std::pow(a, 4)) * term;
     }
 
     amrex::Real w_l_rf (
@@ -62,48 +62,40 @@ namespace impactx::particles::wakefields
     convolve_fft (
         amrex::Gpu::DeviceVector<amrex::Real> const & beam_profile_slope,
         amrex::Gpu::DeviceVector<amrex::Real> const & wake_func,
-        amrex::Real delta_t,
-        int padding_factor
+        amrex::Real delta_t
     )
     {
-    #ifdef ImpactX_USE_FFT
+#ifdef ImpactX_USE_FFT
         int const beam_profile_slope_size = beam_profile_slope.size();
         int const wake_func_size = wake_func.size();
 
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(beam_profile_slope_size * 2 == wake_func_size, "Signal sizes don't match"); // TODO: exact 2N later on
+
         // Length of convolution result (complex) is N/2+1
         // e.g., https://www.fftw.org/fftw3_doc/One_002dDimensional-DFTs-of-Real-Data.html
-        int const signal_size = padding_factor * std::max(beam_profile_slope_size, wake_func_size);  // zero-pad slope by one element
-        int const complex_size = signal_size / 2 + 1;
+        int const padded_signal_size = wake_func_size;  // zero-pad slope by one element
+        int const complex_size = padded_signal_size / 2 + 1;
 
         // Allocate memory for FFT inputs and outputs
         using ablastr::math::anyfft::Complex;
 
-        // Zero-pad the input (signal) arrays to equal length
-        amrex::Gpu::DeviceVector<amrex::Real> in1(signal_size, 0.0);
-        amrex::Gpu::DeviceVector<amrex::Real> in2(signal_size, 0.0);
+        // Signal padding for periodicity of FFTs:
+        // - slope starts/end on zero, zero-pad the rest
+        // - wake function is copied (constructed well defined)
+        amrex::Gpu::DeviceVector<amrex::Real> in1(padded_signal_size, 0.0);
+        amrex::Gpu::DeviceVector<amrex::Real> in2(padded_signal_size, 0.0);
         amrex::Real * const dptr_in1 = in1.data();
         amrex::Real * const dptr_in2 = in2.data();
         amrex::Real const * const dptr_beam_profile_slope = beam_profile_slope.data();
         amrex::Real const * const dptr_wake_func = wake_func.data();
-        amrex::ParallelFor(signal_size, [=] AMREX_GPU_DEVICE(int i)
+        amrex::ParallelFor(padded_signal_size, [=] AMREX_GPU_DEVICE(int i)
         {
             if (i < beam_profile_slope_size)
             {
                 dptr_in1[i] = dptr_beam_profile_slope[i];
             }
-            else
-            {
-                dptr_in1[i] = 0;
-            }
 
-            if (i < wake_func_size)
-            {
-                dptr_in2[i] = dptr_wake_func[i];
-            }
-            else
-            {
-                dptr_in2[i] = 0;
-            }
+            dptr_in2[i] = dptr_wake_func[i];
         });
 
         // Define Forward FFT
@@ -112,11 +104,10 @@ namespace impactx::particles::wakefields
         // TODO: n does not change usually, so we can keep the plans alive over the simulation
         //       runtime. To do that, we can make this function a functor class.
         auto p1 = ablastr::math::anyfft::CreatePlan(
-            amrex::IntVect{signal_size}, in1.data(), out1.data(), ablastr::math::anyfft::direction::R2C, 1
-
+                amrex::IntVect(padded_signal_size), in1.data(), out1.data(), ablastr::math::anyfft::direction::R2C, 1
         );
         auto p2 = ablastr::math::anyfft::CreatePlan(
-            amrex::IntVect{signal_size}, in2.data(), out2.data(), ablastr::math::anyfft::direction::R2C, 1
+                amrex::IntVect(padded_signal_size), in2.data(), out2.data(), ablastr::math::anyfft::direction::R2C, 1
         );
 
         // Perform Forward FFT - Convert inputs into frequency domain
@@ -136,21 +127,23 @@ namespace impactx::particles::wakefields
         });
 
         // Define Backward FFT - Revert from frequency domain to time/space domain
-        amrex::Gpu::DeviceVector<amrex::Real> result(signal_size, 0.0);
+        amrex::Gpu::DeviceVector<amrex::Real> out3(padded_signal_size, 0.0);
         // TODO: n does not change usually, so we can keep the plans alive over the simulation
         //       runtime. To do that, we can make this function a functor class.
-        amrex::Real * const dptr_result = result.data();
+        amrex::Real * const dptr_out3 = out3.data();
         auto p3 = ablastr::math::anyfft::CreatePlan(
-            amrex::IntVect{signal_size}, dptr_result, dptr_conv_result, ablastr::math::anyfft::direction::C2R, 1
+                amrex::IntVect(padded_signal_size), dptr_out3, dptr_conv_result, ablastr::math::anyfft::direction::C2R, 1
         );
 
         // Perform Backward FFT
         ablastr::math::anyfft::Execute(p3);
 
-        // Normalize result by the output size and multiply result by bin size
-        amrex::ParallelFor(signal_size, [=] AMREX_GPU_DEVICE (int i) noexcept
+        // Crop to first N values, normalize result by the output size and multiply result by bin size
+        amrex::Gpu::DeviceVector<amrex::Real> result(beam_profile_slope_size, 0.0);
+        amrex::Real * const dptr_result = result.data();
+        amrex::ParallelFor(beam_profile_slope_size, [=] AMREX_GPU_DEVICE (int i) noexcept
         {
-            dptr_result[i] = dptr_result[i] / signal_size * delta_t;
+            dptr_result[i] = dptr_out3[i] / padded_signal_size * delta_t;  // TODO: padded_signal_size or beam_profile_slope_size (2N or N)?
         });
 
         // Clean up intermediate declarations
@@ -161,10 +154,10 @@ namespace impactx::particles::wakefields
         ablastr::math::anyfft::DestroyPlan(p3);
 
         return result;
-    #else
+#else
         throw std::runtime_error("convolve_fft: To use this function, recompile with ImpactX_FFT=ON.");
 
         return amrex::Gpu::DeviceVector<amrex::Real>();
-    #endif
+#endif
     }
 }
