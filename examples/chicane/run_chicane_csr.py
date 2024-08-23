@@ -13,6 +13,8 @@ sim = ImpactX()
 # set numerical parameters and IO control
 sim.particle_shape = 2  # B-spline order
 sim.space_charge = False
+sim.csr = True
+sim.csr_bins = 150
 # sim.diagnostics = False  # benchmarking
 sim.slice_step_diagnostics = True
 

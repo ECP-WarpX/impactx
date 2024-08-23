@@ -203,6 +203,26 @@ void init_ImpactX (py::module& m)
             },
             "Whether to calculate space charge effects."
         )
+        .def_property("csr",
+            [](ImpactX & /* ix */) {
+                return detail::get_or_throw<bool>("algo", "csr");
+            },
+            [](ImpactX & /* ix */, bool const enable) {
+                amrex::ParmParse pp_algo("algo");
+                pp_algo.add("csr", enable);
+            },
+            "Enable or disable Coherent Synchrotron Radiation (CSR) calculations (default: disabled)."
+        )
+        .def_property("csr_bins",
+            [](ImpactX & /* ix */) {
+                return detail::get_or_throw<bool>("algo", "csr_bins");
+            },
+            [](ImpactX & /* ix */, int csr_bins) {
+                amrex::ParmParse pp_algo("algo");
+                pp_algo.add("csr_bins", csr_bins);
+            },
+            "Enable or disable Coherent Synchrotron Radiation (CSR) calculations (default: 150)."
+        )
         .def_property("space_charge",
              [](ImpactX & /* ix */) {
                  return detail::get_or_throw<bool>("algo", "space_charge");

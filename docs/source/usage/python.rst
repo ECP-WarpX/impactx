@@ -116,6 +116,16 @@ Collective Effects & Overall Simulation Parameters
       Currently MLMG solver looks for verbosity levels from 0-5.
       A higher number results in more verbose output.
 
+   .. py:property:: csr
+
+      Enable (``True``) or disable (``False``) space charge calculations (default: ``False``).
+
+      Whether to calculate Coherent Synchrotron Radiation (CSR) effects (default: disabled).
+
+   .. py:property:: csr_bins
+
+      Enable or disable Coherent Synchrotron Radiation (CSR) calculations (default: ``150``).
+
    .. py:property:: diagnostics
 
       Enable (``True``) or disable (``False``) diagnostics generally (default: ``True``).

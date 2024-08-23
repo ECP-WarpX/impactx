@@ -895,13 +895,13 @@ add_impactx_test(spectrometer.py
 #
 add_impactx_test(chicane_csr
     examples/chicane/input_chicane_csr.in
-      OFF  # ImpactX MPI-parallel
+    OFF  # ImpactX MPI-parallel
     examples/chicane/analysis_chicane_csr.py
     OFF  # no plot script yet
 )
-add_impactx_test(chicane_CSR.py
+add_impactx_test(chicane_csr.py
     examples/chicane/run_chicane_csr.py
-      OFF  # ImpactX MPI-parallel
+    OFF  # ImpactX MPI-parallel
     examples/chicane/analysis_chicane_csr.py
     OFF  # no plot script yet
 )

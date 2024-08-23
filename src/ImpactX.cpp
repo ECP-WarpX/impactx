@@ -175,7 +175,7 @@ namespace impactx {
         }
 
         bool csr = false;
-        int csr_bins = 100;
+        int csr_bins = 150;
         pp_algo.query("csr", csr);
         pp_algo.query("csr_bins", csr_bins);
         if (verbose > 0) {
