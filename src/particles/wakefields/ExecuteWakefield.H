@@ -39,7 +39,7 @@ namespace impactx::particles::wakefields
         bool csr,
         int csr_bins,
         amrex::Real slice_ds,
-        bool print_wakefield = false
+        bool print_wakefield = true
     )
     {
         BL_PROFILE("impactx::particles::wakefields::HandleWakefield")
@@ -96,18 +96,13 @@ namespace impactx::particles::wakefields
                 amrex::Real *const dptr_wake_function = wake_function.data();
                 auto const dR = R;  // for NVCC capture
                 amrex::ParallelFor(num_bins*2, [=] AMREX_GPU_DEVICE(int i) {
-                    if (i == 0) {
-                        amrex::Real const s = bin_size;
-                        dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR);
-                        // dptr_wake_function[i] = 0.0;  // TODO: which value to use for this divergent point?
-                    }
-                    else if (i < num_bins) {
+                    if (i < num_bins) {
                         amrex::Real const s = static_cast<amrex::Real>(i) * bin_size;
-                        dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR);
+                        dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR, bin_size);
                     }
                     else if (i > num_bins) {
                         amrex::Real const s = static_cast<amrex::Real>(i - 2*num_bins) * bin_size;
-                        dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR);
+                        dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR, bin_size);
                     }
                 });
 

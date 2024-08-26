@@ -102,7 +102,8 @@ namespace impactx::particles::wakefields
     amrex::Real
     w_l_csr (
         amrex::Real s,
-        amrex::Real R
+        amrex::Real R,
+        amrex::Real const bin_size
     )
     {
         using namespace amrex::literals;
@@ -110,7 +111,7 @@ namespace impactx::particles::wakefields
         amrex::Real const rc = std::pow(ablastr::constant::SI::q_e, 2) / (4_rt * amrex::Real(M_PI) * ablastr::constant::SI::ep0 * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2));
         amrex::Real const kappa = (2_rt * rc * ablastr::constant::SI::m_e * std::pow(ablastr::constant::SI::c, 2)) / std::pow(3_rt, 1_rt/3_rt) / std::pow(R, 2_rt/3_rt);
 
-        return - (kappa * unit_step(s)) / std::pow(std::abs(s), 1_rt/3_rt);
+        return -3_rt/2_rt * kappa / bin_size * (unit_step(s + bin_size / 2_rt) * std::pow(std::abs(s + bin_size / 2_rt), 2_rt/3_rt) - unit_step(s - bin_size / 2_rt) * std::pow(std::abs(s - bin_size / 2_rt), 2_rt/3_rt));
     }
 
     /** Perform FFT-based convolution
