@@ -22,6 +22,7 @@
 #include <stdexcept>
 #endif
 
+
 namespace impactx::particles::wakefields
 {
     amrex::Real alpha (amrex::Real s)

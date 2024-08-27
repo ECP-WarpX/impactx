@@ -10,12 +10,14 @@
 #ifndef IMPACTX_PARTICLES_WAKEFIELDS_CSRBENDELEMENT_H_
 #define IMPACTX_PARTICLES_WAKEFIELDS_CSRBENDELEMENT_H_
 
+#include "particles/elements/ExactSbend.H"
 #include "particles/elements/Sbend.H"
 #include "particles/elements/CFbend.H"
 #include "particles/ReferenceParticle.H"
 
 #include <AMReX_REAL.H>
 
+#include <cmath>
 #include <tuple>
 #include <variant>
 

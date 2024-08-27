@@ -12,9 +12,8 @@
 
 #include "particles/ImpactXParticleContainer.H"
 
+#include <AMReX_GpuContainers.H>
 #include <AMReX_REAL.H>
-
-#include <vector>
 
 
 namespace impactx::particles::wakefields

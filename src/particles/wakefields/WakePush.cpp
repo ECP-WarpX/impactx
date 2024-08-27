@@ -44,7 +44,6 @@ namespace impactx::particles::wakefields
 #ifdef AMREX_USE_OMP
 #pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
 #endif
-
             for (ParIt pti(pc, lev); pti.isValid(); ++pti)
             {
                 const int np = pti.numParticles();
