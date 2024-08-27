@@ -604,7 +604,7 @@ Currently, this is the 1D ultrarelativistic steady-state wakefield model (eq. 19
 
 .. note::
 
-   CSR effects are only calculated for lattice elements that include bending, such as ``Sbend`` and ``CFbend``.
+   CSR effects are only calculated for lattice elements that include bending, such as ``Sbend``, ``ExactSbend`` and ``CFbend``.
 
    CSR effects require the compilation flag ``-DImpactX_FFT=ON``.
 

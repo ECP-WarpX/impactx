@@ -12,6 +12,7 @@
 
 #include "particles/elements/Sbend.H"
 #include "particles/elements/CFbend.H"
+#include "particles/ReferenceParticle.H"
 
 #include <AMReX_REAL.H>
 
@@ -24,27 +25,35 @@ namespace impactx::particles::wakefields
     /** Function to calculate the radius of curvature (R) and check if an element has CSR
      *
      * @param[in] element_variant the lattice element to check
+     * @param[in] refpart reference particle
      * @returns boolean flag indicating if the element has CSR, radius of curvature (or zero)
      */
     template <typename VariantType>
     std::tuple<bool, amrex::Real>
     CSRBendElement (
-        VariantType const& element_variant
+        VariantType const& element_variant,
+        RefPart const & refpart
     )
     {
         amrex::Real R = 0;
         bool element_has_csr = false;
 
-        if (std::holds_alternative<Sbend>(element_variant)) // Check if variant holds a value of type Sbend
+        if (std::holds_alternative<Sbend>(element_variant))
         {
-            auto& element = std::get<Sbend>(element_variant); // Retrieves value stored in variant
+            auto& element = std::get<Sbend>(element_variant);
             R = std::abs(element.m_rc);
             element_has_csr = true;
         }
         else if (std::holds_alternative<CFbend>(element_variant))
         {
-            auto& element = std::get<CFbend>(element_variant); // Check if variant holds a value of type CFbend
+            auto& element = std::get<CFbend>(element_variant);
             R = std::abs(element.m_rc);
+            element_has_csr = true;
+        }
+        else if (std::holds_alternative<ExactSbend>(element_variant))
+        {
+            auto& element = std::get<ExactSbend>(element_variant);
+            R = std::abs(element.rc(refpart));
             element_has_csr = true;
         }
 

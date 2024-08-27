@@ -48,7 +48,7 @@ namespace impactx::particles::wakefields
         pp_algo.queryAdd("csr", csr);
 
         // Call the CSR bend function
-        auto const [element_has_csr, R] = impactx::particles::wakefields::CSRBendElement(element_variant);
+        auto const [element_has_csr, R] = impactx::particles::wakefields::CSRBendElement(element_variant, particle_container.GetRefParticle());
 
         // Enter loop if lattice has bend element
         if (csr && element_has_csr)

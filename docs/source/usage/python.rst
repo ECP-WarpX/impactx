@@ -124,7 +124,11 @@ Collective Effects & Overall Simulation Parameters
       Currently, this is the 1D ultrarelativistic steady-state wakefield model (eq. 19 of
       `E. L. Saldin et al, NIMA 398, p. 373-394 (1997), DOI:10.1016/S0168-9002(97)00822-X <https://doi.org/10.1016/S0168-9002(97)00822-X>`__).
 
-      CSR effects require the compilation flag ``-DImpactX_FFT=ON``.
+      .. note::
+
+         CSR effects are only calculated for lattice elements that include bending, such as ``Sbend``, ``ExactSbend`` and ``CFbend``.
+
+         CSR effects require the compilation flag ``-DImpactX_FFT=ON``.
 
    .. py:property:: csr_bins
 
