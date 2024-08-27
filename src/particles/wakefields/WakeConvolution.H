@@ -96,6 +96,7 @@ namespace impactx::particles::wakefields
      *
      * @param[in] s value along s [m]
      * @param[in] R band radius [m]
+     * @param[in] bin_size longitudinal bin size [m]
      * @return wake functions in [V*pc/mm]
      */
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
