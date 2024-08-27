@@ -71,16 +71,19 @@ namespace impactx::particles::wakefields
                     // Update longitudinal momentum with the convoluted wakefield force
                     int const idx = static_cast<int>((t - bin_min) / bin_size);  // Find index position along t
 
+#if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
                     if (idx < 0 || idx >= cw_size)
                     {
                         std::cerr << "Warning: Index out of range for wakefield: " << idx << std::endl;
                     }
+#endif
 
                     amrex::ParticleReal const F_L = wakefield_ptr[idx];
 
                     // Update longitudinal momentum
 
                     // Check if the force (convolution) values are within a reasonable range
+#if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
                     if (std::isfinite(F_L))
                     {
                         // Update longitudinal momentum
@@ -91,6 +94,9 @@ namespace impactx::particles::wakefields
                         // Handle unexpected values: log warning and skip momentum update
                         std::cerr << "Warning: Invalid or out-of-range values detected." << std::endl;
                     }
+#else
+                    pt -= push_consts * slice_ds * F_L;
+#endif
 
                     // Other dimensions (x, y) remain unchanged
                 });
