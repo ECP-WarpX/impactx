@@ -100,29 +100,20 @@ macro(find_ablastr)
             #       or AMReX_DIR or AMReX_MODULE_PATH that we could use for the named path instead
             list(APPEND CMAKE_MODULE_PATH "${FETCHCONTENT_BASE_DIR}/fetchedamrex-src/Tools/CMake")
         else()
+            if(ImpactX_COMPUTE STREQUAL CUDA)
+                enable_language(CUDA)
+                # ABLASTR 21.06+ supports CUDA_ARCHITECTURES
+                #if(CMAKE_VERSION VERSION_LESS 3.20)
+                #    include(ABLASTR_SetupCUDA)
+                #endif()
+            endif()
             FetchContent_Declare(fetchedablastr
                 GIT_REPOSITORY ${ImpactX_ablastr_repo}
                 GIT_TAG        ${ImpactX_ablastr_branch}
                 BUILD_IN_SOURCE 0
             )
-            FetchContent_GetProperties(fetchedablastr)
-
-            if(NOT fetchedablastr_POPULATED)
-                FetchContent_Populate(fetchedablastr)
-                #list(APPEND CMAKE_MODULE_PATH "${fetchedamrex_SOURCE_DIR}/Tools/CMake")
-                if(ImpactX_COMPUTE STREQUAL CUDA)
-                    enable_language(CUDA)
-                    # ABLASTR 21.06+ supports CUDA_ARCHITECTURES
-                    #if(CMAKE_VERSION VERSION_LESS 3.20)
-                    #    include(ABLASTR_SetupCUDA)
-                    #endif()
-                endif()
-                add_subdirectory(${fetchedablastr_SOURCE_DIR} ${fetchedablastr_BINARY_DIR})
-                # TODO: this is a bit hacky, check if we find a variable like
-                #       fetchedamrex_SOURCE_DIR or FETCHCONTENT_SOURCE_DIR_FETCHEDAMREX
-                #       or AMReX_DIR or AMReX_MODULE_PATH that we could use for the named path instead
-                list(APPEND CMAKE_MODULE_PATH "${FETCHCONTENT_BASE_DIR}/fetchedamrex-src/Tools/CMake")
-            endif()
+            FetchContent_MakeAvailable(fetchedablastr)
+            list(APPEND CMAKE_MODULE_PATH "${FETCHCONTENT_BASE_DIR}/fetchedamrex-src/Tools/CMake")
 
             # advanced fetch options
             mark_as_advanced(FETCHCONTENT_BASE_DIR)
