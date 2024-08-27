@@ -893,18 +893,20 @@ add_impactx_test(spectrometer.py
 
 # Chicane with CSR ###########################################################
 #
-add_impactx_test(chicane_csr
-    examples/chicane/input_chicane_csr.in
-    OFF  # ImpactX MPI-parallel
-    examples/chicane/analysis_chicane_csr.py
-    OFF  # no plot script yet
-)
-add_impactx_test(chicane_csr.py
-    examples/chicane/run_chicane_csr.py
-    OFF  # ImpactX MPI-parallel
-    examples/chicane/analysis_chicane_csr.py
-    OFF  # no plot script yet
-)
+if(ImpactX_FFT)
+    add_impactx_test(chicane_csr
+        examples/chicane/input_chicane_csr.in
+        OFF  # ImpactX MPI-parallel
+        examples/chicane/analysis_chicane_csr.py
+        OFF  # no plot script yet
+    )
+    add_impactx_test(chicane_csr.py
+        examples/chicane/run_chicane_csr.py
+        OFF  # ImpactX MPI-parallel
+        examples/chicane/analysis_chicane_csr.py
+        OFF  # no plot script yet
+    )
+endif()
 
 # Dogleg #####################################################################
 #
