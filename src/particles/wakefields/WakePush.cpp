@@ -31,9 +31,9 @@ namespace impactx::particles::wakefields
         using namespace amrex::literals;
 
         #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
-        
+
                 int const cw_size = convoluted_wakefield.size(); // no padding anymore
-        
+
         #endif
 
         // Loop over refinement levels
