@@ -30,7 +30,7 @@ namespace impactx::particles::wakefields
 
         using namespace amrex::literals;
 
-        int const cw_size = convoluted_wakefield.size(); // no padding anymore
+        //int const cw_size = convoluted_wakefield.size(); // no padding anymore
 
         // Loop over refinement levels
         int const nLevel = pc.finestLevel();
