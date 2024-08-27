@@ -30,11 +30,9 @@ namespace impactx::particles::wakefields
 
         using namespace amrex::literals;
 
-        #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
-
-                int const cw_size = convoluted_wakefield.size(); // no padding anymore
-
-        #endif
+#if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
+        int const cw_size = convoluted_wakefield.size(); // no padding anymore
+#endif
 
         // Loop over refinement levels
         int const nLevel = pc.finestLevel();
@@ -82,26 +80,19 @@ namespace impactx::particles::wakefields
                     }
 #endif
 
+                    // Update longitudinal momentum
                     amrex::ParticleReal const F_L = wakefield_ptr[idx];
 
-                    // Update longitudinal momentum
-
-                    // Check if the force (convolution) values are within a reasonable range
 #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
-                    if (std::isfinite(F_L))
-                    {
-                        // Update longitudinal momentum
-                        pt -= push_consts * slice_ds * F_L;
-                    }
-                    else
+                    // Check if the force (convolution) values are within a reasonable range
+                    if (!std::isfinite(F_L))
                     {
                         // Handle unexpected values: log warning and skip momentum update
                         std::cerr << "Warning: Invalid or out-of-range values detected." << std::endl;
                     }
-#else
-                    pt -= push_consts * slice_ds * F_L;
 #endif
 
+                    pt -= push_consts * slice_ds * F_L;
                     // Other dimensions (x, y) remain unchanged
                 });
             } // End loop over all particle boxes

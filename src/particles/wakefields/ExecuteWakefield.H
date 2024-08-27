@@ -17,6 +17,9 @@
 #include "WakePush.H"
 
 #include <cmath>
+#ifndef ImpactX_USE_FFT
+#include <stdexcept>
+#endif
 #include <vector>
 
 
@@ -27,8 +30,6 @@ namespace impactx::particles::wakefields
      *
      * @param[in] particle_container the particle species container
      * @param[in] element_variant variant type of the lattice element
-     * @param[in] csr boolean indicating if CSR effects are included
-     * @param[in] csr_bins number of bins (resolution) for CSR calculations
      * @param[in] slice_ds slice spacing along s
      * @param[in] print_wakefield for debugging: print the wakefield to convoluted_wakefield.txt
      */
@@ -36,13 +37,15 @@ namespace impactx::particles::wakefields
     void HandleWakefield (
         impactx::ImpactXParticleContainer& particle_container,
         T_Element const& element_variant,
-        bool csr,
-        int csr_bins,
         amrex::Real slice_ds,
         bool print_wakefield = true
     )
     {
         BL_PROFILE("impactx::particles::wakefields::HandleWakefield")
+
+        amrex::ParmParse pp_algo("algo");
+        bool csr = false;
+        pp_algo.queryAdd("csr", csr);
 
         // Call the CSR bend function
         auto const [element_has_csr, R] = impactx::particles::wakefields::CSRBendElement(element_variant);
@@ -50,6 +53,13 @@ namespace impactx::particles::wakefields
         // Enter loop if lattice has bend element
         if (csr && element_has_csr)
         {
+#ifndef ImpactX_USE_FFT
+            throw std::runtime_error("algo.csr was requested but ImpactX was not compiled with FFT support. Recompile with ImpactX_FFT=ON.");
+#endif
+
+            int csr_bins = 150;
+            pp_algo.queryAdd("csr_bins", csr_bins);
+
             // Measure beam size, extract the min, max of particle positions
             [[maybe_unused]] auto const [x_min, y_min, t_min, x_max, y_max, t_max] =
                 particle_container.MinAndMaxPositions();

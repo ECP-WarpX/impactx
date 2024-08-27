@@ -175,9 +175,7 @@ namespace impactx {
         }
 
         bool csr = false;
-        int csr_bins = 150;
         pp_algo.query("csr", csr);
-        pp_algo.query("csr_bins", csr_bins);
         if (verbose > 0) {
             amrex::Print() << " CSR effects: " << csr << "\n";
         }
@@ -210,7 +208,7 @@ namespace impactx {
                     }
 
                     // Wakefield calculation: call wakefield function to apply wake effects
-                    particles::wakefields::HandleWakefield(*amr_data->m_particle_container, element_variant, csr, csr_bins, slice_ds);
+                    particles::wakefields::HandleWakefield(*amr_data->m_particle_container, element_variant, slice_ds);
 
                     // Space-charge calculation: turn off if there is only 1 particle
                     if (space_charge &&
