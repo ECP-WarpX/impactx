@@ -30,7 +30,7 @@ namespace impactx::particles::wakefields
         int const nlevs = myspc.finestLevel();
         for (int lev = 0; lev <= nlevs; ++lev)
         {
-            // OpenMP parallelization:
+            // TODO OpenMP parallelization:
             // To enable, charge_distribution needs to be copied and summed between threads.
             {
                 // Loop over particles at the current grid level
@@ -120,8 +120,6 @@ namespace impactx::particles::wakefields
     {
         using namespace amrex::literals;
 
-
-
         int const num_bins = mean_x.size();
         amrex::Real* dptr_mean_x = mean_x.data();
         amrex::Real* dptr_mean_y = mean_y.data();
@@ -138,9 +136,8 @@ namespace impactx::particles::wakefields
         int const nlevs = myspc.finestLevel();
         for (int lev = 0; lev <= nlevs; ++lev)
         {
-            //ifdef AMREX_USE_OMP
-            //pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
-            //endif
+            // TODO OpenMP parallelization:
+            // To enable, sum_x_ptr, sum_x_ptr, sum_y_ptr need to be copied and summed between threads.
             {
                 for (impactx::ParIterSoA pti(myspc, lev); pti.isValid(); ++pti)
                 {
