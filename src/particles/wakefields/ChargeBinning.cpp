@@ -30,8 +30,11 @@ namespace impactx::particles::wakefields
         int const nlevs = myspc.finestLevel();
         for (int lev = 0; lev <= nlevs; ++lev)
         {
-            // TODO OpenMP parallelization:
-            // To enable, charge_distribution needs to be copied and summed between threads.
+            // TODO We could make this more efficient on CPU, see:
+            // https://github.com/ECP-WarpX/WarpX/pull/5161/files#r1735068373
+#ifdef AMREX_USE_OMP
+#pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
+#endif
             {
                 // Loop over particles at the current grid level
                 for (impactx::ParIterSoA pti(myspc, lev); pti.isValid(); ++pti)
@@ -136,8 +139,11 @@ namespace impactx::particles::wakefields
         int const nlevs = myspc.finestLevel();
         for (int lev = 0; lev <= nlevs; ++lev)
         {
-            // TODO OpenMP parallelization:
-            // To enable, sum_x_ptr, sum_x_ptr, sum_y_ptr need to be copied and summed between threads.
+            // TODO We could make this more efficient on CPU, see:
+            // https://github.com/ECP-WarpX/WarpX/pull/5161/files#r1735068373
+#ifdef AMREX_USE_OMP
+#pragma omp parallel if (amrex::Gpu::notInLaunchRegion())
+#endif
             {
                 for (impactx::ParIterSoA pti(myspc, lev); pti.isValid(); ++pti)
                 {
