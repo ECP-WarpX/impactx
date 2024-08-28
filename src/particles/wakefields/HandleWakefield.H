@@ -38,7 +38,7 @@ namespace impactx::particles::wakefields
         impactx::ImpactXParticleContainer& particle_container,
         T_Element const& element_variant,
         amrex::Real slice_ds,
-        bool print_wakefield = true
+        bool print_wakefield = false
     )
     {
         BL_PROFILE("impactx::particles::wakefields::HandleWakefield")

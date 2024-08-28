@@ -221,7 +221,7 @@ void init_ImpactX (py::module& m)
                 amrex::ParmParse pp_algo("algo");
                 pp_algo.add("csr_bins", csr_bins);
             },
-            "Enable or disable Coherent Synchrotron Radiation (CSR) calculations (default: 150)."
+            "Number of longitudinal bins used for CSR calculations (default: 150)."
         )
         .def_property("space_charge",
              [](ImpactX & /* ix */) {
