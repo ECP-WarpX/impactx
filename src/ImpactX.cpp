@@ -18,7 +18,7 @@
 #include "particles/spacecharge/GatherAndPush.H"
 #include "particles/spacecharge/PoissonSolve.H"
 #include "particles/transformation/CoordinateTransformation.H"
-#include "particles/wakefields/ExecuteWakefield.H"
+#include "particles/wakefields/HandleWakefield.H"
 
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
