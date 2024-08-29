@@ -31,7 +31,7 @@ namespace impactx::particles::wakefields
      * @param[in] particle_container the particle species container
      * @param[in] element_variant variant type of the lattice element
      * @param[in] slice_ds slice spacing along s
-     * @param[in] print_wakefield for debugging: print the wakefield to convoluted_wakefield.txt
+     * @param[in] print_wakefield for debugging: print the wakefield to convolved_wakefield.txt
      */
     template <typename T_Element>
     void HandleWakefield (
@@ -82,7 +82,7 @@ namespace impactx::particles::wakefields
             impactx::particles::wakefields::DepositCharge1D(particle_container, charge_distribution, bin_min, bin_size, is_unity_particle_weight);
 
             // Sum up all partial charge histograms to one MPI process to calculate the global wakefield.
-            // Once calculated, we will distribute convoluted_wakefield back to every MPI process.
+            // Once calculated, we will distribute convolved_wakefield back to every MPI process.
             amrex::ParallelReduce::Sum(
                 charge_distribution.data(),
                 charge_distribution.size(),
@@ -90,7 +90,7 @@ namespace impactx::particles::wakefields
                 amrex::ParallelDescriptor::Communicator()
             );
 
-            amrex::Gpu::DeviceVector<amrex::Real> convoluted_wakefield;
+            amrex::Gpu::DeviceVector<amrex::Real> convolved_wakefield;
             if (amrex::ParallelDescriptor::IOProcessor()) {
                 // Call the mean transverse position function
                 impactx::particles::wakefields::MeanTransversePosition(particle_container, mean_x, mean_y, bin_min,
@@ -117,22 +117,22 @@ namespace impactx::particles::wakefields
                 });
 
                 // Call convolution function
-                convoluted_wakefield = impactx::particles::wakefields::convolve_fft(slopes, wake_function, bin_size);
+                convolved_wakefield = impactx::particles::wakefields::convolve_fft(slopes, wake_function, bin_size);
             }
 
             // Broadcast the global wakefield to every MPI rank
             amrex::ParallelDescriptor::Bcast(
-                convoluted_wakefield.data(),
-                convoluted_wakefield.size(),
+                convolved_wakefield.data(),
+                convolved_wakefield.size(),
                 amrex::ParallelDescriptor::IOProcessorNumber()
             );
 
             // Check convolution output
             if (print_wakefield && amrex::ParallelDescriptor::IOProcessor())
             {
-                std::cout << "Convoluted wakefield: ";
-                std::ofstream outfile("convoluted_wakefield.txt");
-                for (double const i : convoluted_wakefield) {
+                std::cout << "Convolved wakefield: ";
+                std::ofstream outfile("convolved_wakefield.txt");
+                for (double const i : convolved_wakefield) {
                     std::cout << i << " ";
                     outfile << i << std::endl;
                 }
@@ -141,7 +141,7 @@ namespace impactx::particles::wakefields
             }
 
             // Call function to kick particles with wake
-            impactx::particles::wakefields::WakePush(particle_container, convoluted_wakefield, slice_ds, bin_size, t_min);
+            impactx::particles::wakefields::WakePush(particle_container, convolved_wakefield, slice_ds, bin_size, t_min);
         }
     }
 

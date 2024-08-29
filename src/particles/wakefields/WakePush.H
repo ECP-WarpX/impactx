@@ -21,14 +21,14 @@ namespace impactx::particles::wakefields
     /** Function to update particle momentum using wake force kick
      *
      * @param[inout] pc the particle species container
-     * @param[in] convoluted_wakefield wake functions in [V*pc/mm]
+     * @param[in] convolved_wakefield wake functions in [V*pc/mm]
      * @param[in] slice_ds slice spacing along s
      * @param[in] bin_size size of the beam in s divided by num_bins
      * @param[in] bin_min lower end of the beam in s
      */
     void WakePush (
         ImpactXParticleContainer & pc,
-        amrex::Gpu::DeviceVector<amrex::Real> const & convoluted_wakefield,
+        amrex::Gpu::DeviceVector<amrex::Real> const & convolved_wakefield,
         amrex::ParticleReal slice_ds,
         amrex::Real bin_size,
         amrex::Real bin_min

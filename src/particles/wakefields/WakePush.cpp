@@ -20,7 +20,7 @@ namespace impactx::particles::wakefields
 {
     void WakePush (
         ImpactXParticleContainer & pc,
-        amrex::Gpu::DeviceVector<amrex::Real> const & convoluted_wakefield,
+        amrex::Gpu::DeviceVector<amrex::Real> const & convolved_wakefield,
         amrex::ParticleReal slice_ds,
         amrex::Real bin_size,
         amrex::Real bin_min
@@ -31,7 +31,7 @@ namespace impactx::particles::wakefields
         using namespace amrex::literals;
 
 #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
-        int const cw_size = convoluted_wakefield.size(); // no padding anymore
+        int const cw_size = convolved_wakefield.size(); // no padding anymore
 #endif
 
         // Loop over refinement levels
@@ -62,14 +62,14 @@ namespace impactx::particles::wakefields
                 amrex::ParticleReal const push_consts = 1.0 / ((ablastr::constant::SI::c) * pz_ref_SI);
 
                 // Gather particles and push momentum
-                const amrex::Real* wakefield_ptr = convoluted_wakefield.data();
+                const amrex::Real* wakefield_ptr = convolved_wakefield.data();
                 amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE (int i)
                 {
                     // Access SoA Real data
                     amrex::ParticleReal const & AMREX_RESTRICT t = part_t[i];
                     amrex::ParticleReal & AMREX_RESTRICT pt = part_pt[i];
 
-                    // Update longitudinal momentum with the convoluted wakefield force
+                    // Update longitudinal momentum with the convolved wakefield force
                     int const idx = static_cast<int>((t - bin_min) / bin_size);  // Find index position along t
 
 #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
