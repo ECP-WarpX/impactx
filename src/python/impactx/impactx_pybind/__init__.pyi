@@ -21,7 +21,7 @@ import pybind11_stubgen.typing_ext
 import amrex.space3d.amrex_3d_pybind
 from amrex import space3d as amr
 
-from . import distribution, elements
+from . import distribution, elements, wakeconvolution
 
 __all__ = [
     "Config",
@@ -38,6 +38,7 @@ __all__ = [
     "push",
     "s",
     "t",
+    "wakeconvolution",
 ]
 
 class Config:
@@ -192,6 +193,20 @@ class ImpactX:
         """
     @blocking_factor_z.setter
     def blocking_factor_z(self, arg1: list[int]) -> None: ...
+    @property
+    def csr(self) -> bool:
+        """
+        Enable or disable Coherent Synchrotron Radiation (CSR) calculations (default: disabled).
+        """
+    @csr.setter
+    def csr(self, arg1: bool) -> None: ...
+    @property
+    def csr_bins(self) -> bool:
+        """
+        Number of longitudinal bins used for CSR calculations (default: 150).
+        """
+    @csr_bins.setter
+    def csr_bins(self, arg1: int) -> None: ...
     @property
     def diag_file_min_digits(self) -> int:
         """

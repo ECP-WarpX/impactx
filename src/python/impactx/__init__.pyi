@@ -33,6 +33,7 @@ from impactx.impactx_pybind import (
     distribution,
     elements,
     push,
+    wakeconvolution,
 )
 from impactx.madx_to_impactx import read_beam, read_lattice
 
@@ -63,6 +64,7 @@ __all__ = [
     "register_ImpactXParticleContainer_extension",
     "s",
     "t",
+    "wakeconvolution",
 ]
 __author__: str = (
     "Axel Huebl, Chad Mitchell, Ryan Sandberg, Marco Garten, Ji Qiang, et al."
