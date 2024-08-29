@@ -62,6 +62,7 @@ class ToolbarElements:
             classes="mt-4",
         )
 
+
 class Toolbars:
     """
     Builds section toolbars for various pages.
@@ -73,7 +74,7 @@ class Toolbars:
         Builds toolbar for the 'Input' page.
         """
 
-        ToolbarElements.dashboard_info(),
+        (ToolbarElements.dashboard_info(),)
 
     @staticmethod
     def run_toolbar():
@@ -81,9 +82,9 @@ class Toolbars:
         Builds toolbar for the 'Run' page.
         """
 
-      ToolbarElements.dashboard_info(),
-      vuetify.VSpacer(),
-      ToolbarElements.run_simulation_button(),
+        (ToolbarElements.dashboard_info(),)
+        (vuetify.VSpacer(),)
+        (ToolbarElements.run_simulation_button(),)
 
     @staticmethod
     def analyze_toolbar():
@@ -91,6 +92,6 @@ class Toolbars:
         Builds toolbar for the 'Analyze' page.
         """
 
-        ToolbarElements.dashboard_info(),
+        (ToolbarElements.dashboard_info(),)
         vuetify.VSpacer()
         ToolbarElements.plot_options()
