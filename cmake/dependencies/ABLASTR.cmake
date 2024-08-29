@@ -89,10 +89,6 @@ macro(find_ablastr)
             #list(APPEND CMAKE_MODULE_PATH "${WarpX_amrex_src}/Tools/CMake")
             if(ImpactX_COMPUTE STREQUAL CUDA)
                 enable_language(CUDA)
-                # AMReX 21.06+ supports CUDA_ARCHITECTURES
-                #if(CMAKE_VERSION VERSION_LESS 3.20)
-                #    include(AMReX_SetupCUDA)
-                #endif()
             endif()
             add_subdirectory(${ImpactX_ablastr_src} _deps/localablastr-build/)
             # TODO: this is a bit hacky, check if we find a variable like
@@ -102,10 +98,6 @@ macro(find_ablastr)
         else()
             if(ImpactX_COMPUTE STREQUAL CUDA)
                 enable_language(CUDA)
-                # ABLASTR 21.06+ supports CUDA_ARCHITECTURES
-                #if(CMAKE_VERSION VERSION_LESS 3.20)
-                #    include(ABLASTR_SetupCUDA)
-                #endif()
             endif()
             FetchContent_Declare(fetchedablastr
                 GIT_REPOSITORY ${ImpactX_ablastr_repo}
