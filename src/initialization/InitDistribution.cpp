@@ -106,7 +106,7 @@ namespace impactx
         }, distr);
 
         amr_data->m_particle_container->AddNParticles(x, y, t, px, py, pt,
-                                                      ref.qm_qeeV(),
+                                                      ref.qm_ratio_SI(),
                                             bunch_charge * rel_part_this_proc);
 
         bool space_charge = false;

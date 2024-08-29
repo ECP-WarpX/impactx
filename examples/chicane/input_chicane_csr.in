@@ -1,0 +1,76 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.kin_energy = 5.0e3
+beam.charge = 1.0e-9
+beam.particle = electron
+beam.distribution = gaussian
+beam.lambdaX = 2.2951017632e-5
+beam.lambdaY = 1.3084093142e-5
+beam.lambdaT = 5.5555553e-8
+beam.lambdaPx = 1.598353425e-6
+beam.lambdaPy = 2.803697378e-6
+beam.lambdaPt = 2.000000000e-6
+beam.muxpx = 0.933345606203060
+beam.muypy = 0.933345606203060
+beam.mutpt = 0.999999961419755
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor sbend1 dipedge1 drift1 dipedge2 sbend2 drift2      \
+                   sbend2 dipedge2 drift1 dipedge1 sbend1 drift3 monitor
+lattice.nslice = 25
+
+#lattice.elements = sbend1
+#lattice.nslice = 1
+
+sbend1.type = sbend
+sbend1.ds = 0.500194828041958       # projected length 0.5 m, angle 2.77 deg
+sbend1.rc = -10.3462283686195526
+
+drift1.type = drift
+drift1.ds = 5.0058489435  # projected length 5 m
+
+sbend2.type = sbend
+sbend2.ds = 0.500194828041958       # projected length 0.5 m, angle 2.77 deg
+sbend2.rc = 10.3462283686195526
+
+drift2.type = drift
+drift2.ds = 1.0
+
+drift3.type = drift
+drift3.ds = 2.0
+
+dipedge1.type = dipedge   # dipole edge focusing
+dipedge1.psi = -0.048345620280243
+dipedge1.rc = -10.3462283686195526
+dipedge1.g = 0.0
+dipedge1.K2 = 0.0
+
+dipedge2.type = dipedge
+dipedge2.psi = 0.048345620280243
+dipedge2.rc = 10.3462283686195526
+dipedge2.g = 0.0
+dipedge2.K2 = 0.0
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+algo.csr = true
+algo.csr_bins = 150
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = true

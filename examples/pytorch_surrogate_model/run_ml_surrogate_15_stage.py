@@ -170,7 +170,6 @@ class LPASurrogateStage(elements.Programmable):
         self.ds = surrogate_length
 
     def surrogate_push(self, pc, step):
-
         ref_part = pc.ref_particle()
         ref_z_i = ref_part.z
         ref_z_i_LPA = ref_z_i - self.stage_start

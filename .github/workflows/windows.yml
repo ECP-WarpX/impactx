@@ -31,6 +31,10 @@ jobs:
           ccache-windows-winmsvc-
     - name: Download Dependencies
       run: |
+        Invoke-WebRequest http://fftw.org/fftw-3.3.10.tar.gz -OutFile fftw-3.3.10.tar.gz
+        7z.exe x -r fftw-3.3.10.tar.gz
+        7z.exe x -r fftw-3.3.10.tar
+
         Invoke-WebRequest https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.tar.gz -OutFile hdf5-1_12_2.tar.gz
         7z.exe x -r hdf5-1_12_2.tar.gz
         7z.exe x -r hdf5-1_12_2.tar
@@ -40,6 +44,15 @@ jobs:
         # https://github.com/actions/runner-images/issues/10004
         CXXFLAGS: "/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR"
       run: |
+        cmake -S fftw-3.3.10 -B build_fftw       `
+              -DBUILD_SHARED_LIBS=OFF            `
+              -DBUILD_TESTS=OFF                  `
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo  `
+              -DDISABLE_FORTRAN=ON
+        if(!$?) { Exit $LASTEXITCODE }
+        cmake --build build_fftw --config RelWithDebInfo --target install --parallel 4
+        if(!$?) { Exit $LASTEXITCODE }
+
         cmake -S hdf5-hdf5-1_12_2 -B build_hdf5  `
               -DCMAKE_BUILD_TYPE=RelWithDebInfo  `
               -DBUILD_SHARED_LIBS=OFF            `
@@ -57,15 +70,19 @@ jobs:
         $env:HDF5_USE_STATIC_LIBRARIES = "ON"
 
         python3 -m pip install -U pip
-        python3 -m pip install -U build packaging setuptools wheel pytest
+        python3 -m pip install -U build packaging setuptools wheel
         python3 -m pip install -U -r requirements.txt
+        python3 -m pip install -U -r src/python/impactx/dashboard/requirements.txt
         python3 -m pip install -U -r examples/requirements.txt
+        python3 -m pip install -U -r tests/python/requirements.txt
         python3 -m pip install -U openPMD-validator
     - name: Build
       env:
         # Work-around for windows-latest GH runner issue, see
         # https://github.com/actions/runner-images/issues/10004
         CXXFLAGS: "/D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR"
+        # FFTW3 install prefix path
+        FFTW3_DIR: "C:/Program Files (x86)/fftw/"
       run: |
         $env:HDF5_DIR = "C:/Program Files/HDF_Group/HDF5/1.12.2/cmake/"
         cmake -S . -B build               `
@@ -74,6 +91,7 @@ jobs:
               -DCMAKE_VERBOSE_MAKEFILE=ON    `
               -DHDF5_USE_STATIC_LIBRARIES=ON `
               -DImpactX_COMPUTE=NOACC     `
+              -DImpactX_FFT=ON            `
               -DImpactX_MPI=OFF           `
               -DImpactX_PYTHON=ON         `
               -DopenPMD_USE_HDF5=ON       `
@@ -119,6 +137,10 @@ jobs:
     - uses: seanmiddleditch/gha-setup-ninja@master
     - name: Download Dependencies
       run: |
+        Invoke-WebRequest http://fftw.org/fftw-3.3.10.tar.gz -OutFile fftw-3.3.10.tar.gz
+        7z.exe x -r fftw-3.3.10.tar.gz
+        7z.exe x -r fftw-3.3.10.tar
+
         Invoke-WebRequest https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_2.tar.gz -OutFile hdf5-1_12_2.tar.gz
         7z.exe x -r hdf5-1_12_2.tar.gz
         7z.exe x -r hdf5-1_12_2.tar
@@ -126,6 +148,17 @@ jobs:
       shell: cmd
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
+
+        cmake -S fftw-3.3.10                    ^
+              -B build_fftw                     ^
+              -G "Ninja"                        ^
+              -DBUILD_TESTS=OFF                 ^
+              -DBUILD_SHARED_LIBS=OFF           ^
+              -DCMAKE_BUILD_TYPE=Release        ^
+              -DDISABLE_FORTRAN=ON
+        if errorlevel 1 exit 1
+        cmake --build build_fftw --config Release --target install --parallel 4
+        if errorlevel 1 exit 1
 
         cmake -S hdf5-hdf5-1_12_2 -B build_hdf5 ^
             -G "Ninja"                          ^
@@ -147,12 +180,17 @@ jobs:
         set "HDF5_USE_STATIC_LIBRARIES=ON"
 
         python3 -m pip install -U pip
-        python3 -m pip install -U build packaging setuptools wheel pytest
+        python3 -m pip install -U build packaging setuptools wheel
         python3 -m pip install -U -r requirements.txt
+        python3 -m pip install -U -r src/python/impactx/dashboard/requirements.txt
         python3 -m pip install -U -r examples/requirements.txt
+        python3 -m pip install -U -r tests/python/requirements.txt
         python3 -m pip install -U openPMD-validator
     - name: Build
       shell: cmd
+      env:
+        # FFTW3 install prefix path
+        FFTW3_DIR: "C:/Program Files (x86)/fftw/"
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
 
@@ -166,6 +204,7 @@ jobs:
               -DCMAKE_VERBOSE_MAKEFILE=ON    ^
               -DHDF5_USE_STATIC_LIBRARIES=ON ^
               -DImpactX_COMPUTE=OMP          ^
+              -DImpactX_FFT=ON               ^
               -DImpactX_MPI=OFF              ^
               -DImpactX_PYTHON=ON            ^
               -DopenPMD_USE_HDF5=ON          ^

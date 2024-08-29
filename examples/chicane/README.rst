@@ -3,16 +3,16 @@
 Chicane
 =======
 
-Berlin-Zeuthen magnetic bunch compression chicane:
-https://www.desy.de/csr/
+This is the Berlin-Zeuthen magnetic bunch compression chicane, which is a standardized community benchmark.
 
-All parameters can be found online.
+`All parameters can be found online <https://www.desy.de/csr/>`__.
 A 5 GeV electron bunch with normalized transverse rms emittance of 1 um undergoes longitudinal compression by a factor of 10 in a standard 4-bend chicane.
 
 The emittances should be preserved, and the rms pulse length should decrease by the compression factor (10).
 
 In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
+We also have :ref:`a variation of this test that includes CSR effects in the bending magnets <examples-chicane-csr>`.
 
 Run
 ---

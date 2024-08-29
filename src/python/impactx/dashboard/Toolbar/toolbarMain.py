@@ -81,9 +81,9 @@ class Toolbars:
         Builds toolbar for the 'Run' page.
         """
 
-        ToolbarElements.dashboard_info(),
-        vuetify.VSpacer(),
-        ToolbarElements.run_simulation_button(),
+      ToolbarElements.dashboard_info(),
+      vuetify.VSpacer(),
+      ToolbarElements.run_simulation_button(),
 
     @staticmethod
     def analyze_toolbar():
