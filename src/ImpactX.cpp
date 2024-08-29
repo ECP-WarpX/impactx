@@ -9,6 +9,7 @@
  */
 #include "ImpactX.H"
 #include "initialization/InitAmrCore.H"
+#include "initialization/InitDistribution.H"
 #include "particles/CollectLost.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
@@ -17,6 +18,7 @@
 #include "particles/spacecharge/GatherAndPush.H"
 #include "particles/spacecharge/PoissonSolve.H"
 #include "particles/transformation/CoordinateTransformation.H"
+#include "particles/wakefields/HandleWakefield.H"
 
 #include <AMReX.H>
 #include <AMReX_AmrParGDB.H>
@@ -172,6 +174,12 @@ namespace impactx {
             amrex::Print() << " Space Charge effects: " << space_charge << "\n";
         }
 
+        bool csr = false;
+        pp_algo.query("csr", csr);
+        if (verbose > 0) {
+            amrex::Print() << " CSR effects: " << csr << "\n";
+        }
+
         // periods through the lattice
         int periods = 1;
         amrex::ParmParse("lattice").queryAdd("periods", periods);
@@ -198,6 +206,9 @@ namespace impactx {
                         amrex::Print() << " ++++ Starting global_step=" << global_step
                                        << " slice_step=" << slice_step << "\n";
                     }
+
+                    // Wakefield calculation: call wakefield function to apply wake effects
+                    particles::wakefields::HandleWakefield(*amr_data->m_particle_container, element_variant, slice_ds);
 
                     // Space-charge calculation: turn off if there is only 1 particle
                     if (space_charge &&

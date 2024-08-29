@@ -7,7 +7,6 @@
 #
 # -*- coding: utf-8 -*-
 
-
 import math
 
 import matplotlib.pyplot as plt

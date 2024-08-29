@@ -116,6 +116,24 @@ Collective Effects & Overall Simulation Parameters
       Currently MLMG solver looks for verbosity levels from 0-5.
       A higher number results in more verbose output.
 
+   .. py:property:: csr
+
+      Enable (``True``) or disable (``False``) space charge calculations (default: ``False``).
+
+      Whether to calculate Coherent Synchrotron Radiation (CSR) effects (default: disabled).
+      Currently, this is the 1D ultrarelativistic steady-state wakefield model (eq. 19 of
+      `E. L. Saldin et al, NIMA 398, p. 373-394 (1997), DOI:10.1016/S0168-9002(97)00822-X <https://doi.org/10.1016/S0168-9002(97)00822-X>`__).
+
+      .. note::
+
+         CSR effects are only calculated for lattice elements that include bending, such as ``Sbend``, ``ExactSbend`` and ``CFbend``.
+
+         CSR effects require the compilation flag ``-DImpactX_FFT=ON``.
+
+   .. py:property:: csr_bins
+
+      Enable or disable Coherent Synchrotron Radiation (CSR) calculations (default: ``150``).
+
    .. py:property:: diagnostics
 
       Enable (``True``) or disable (``False``) diagnostics generally (default: ``True``).

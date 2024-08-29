@@ -71,6 +71,15 @@ namespace impactx
         {
         }
 
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        amrex::ParticleReal
+        rc (RefPart const & refpart) const
+        {
+            using namespace amrex::literals; // for _rt and _prt
+
+            return m_B != 0_prt ? refpart.rigidity_Tm() / m_B : m_ds / m_phi;
+        }
+
         /** Push all particles */
         using BeamOptic::operator();
 
@@ -114,7 +123,7 @@ namespace impactx
             amrex::ParticleReal const bet = refpart.beta();
 
             // reference particle's orbital radius
-            amrex::ParticleReal const rc = (m_B != 0_prt) ? refpart.rigidity_Tm() / m_B : m_ds / m_phi;
+            amrex::ParticleReal const rc = this->rc(refpart);
 
             // intialize output values of momenta
             amrex::ParticleReal pxout = px;

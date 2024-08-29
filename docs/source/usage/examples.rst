@@ -34,9 +34,11 @@ Single Particle Dynamics
    examples/fodo_programmable/README.rst
    examples/dogleg/README.rst
 
+Collective Effects
+------------------
 
 Space Charge
-------------
+""""""""""""
 
 .. toctree::
    :maxdepth: 1
@@ -45,6 +47,14 @@ Space Charge
    examples/cfchannel/README.rst
    examples/kurth/README.rst
    examples/epac2004_benchmarks/README.rst
+
+Coherent Synchrotron Radiation (CSR)
+""""""""""""""""""""""""""""""""""""
+
+.. toctree::
+   :maxdepth: 1
+
+   examples/chicane/README_csr.rst
 
 
 Beam Distributions
