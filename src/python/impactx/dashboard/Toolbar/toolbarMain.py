@@ -12,6 +12,8 @@ from ..trame_setup import setup_server
 
 server, state, ctrl = setup_server()
 
+state.show_dashboard_alert = True
+
 # -----------------------------------------------------------------------------
 # Common toolbar elements
 # -----------------------------------------------------------------------------
@@ -44,10 +46,21 @@ class ToolbarElements:
             disabled=("disableRunSimulationButton", True),
         )
 
+    @staticmethod
+    def dashboard_info():
+        """
+        Creates an alert box with dashboard information.
+        """
 
-# -----------------------------------------------------------------------------
-# Content
-# -----------------------------------------------------------------------------
+        vuetify.VAlert(
+            "ImpactX Dashboard is provided as a preview and continues to be developed. "
+            "Thus, it may not yet include all the features available in ImpactX.",
+            type="info",
+            dense=True,
+            dismissible=True,
+            v_model=("show_dashboard_alert", True),
+            classes="mt-4",
+        )
 
 
 class Toolbars:
@@ -56,11 +69,20 @@ class Toolbars:
     """
 
     @staticmethod
+    def input_toolbar():
+        """
+        Builds toolbar for the 'Input' page.
+        """
+
+        (ToolbarElements.dashboard_info(),)
+
+    @staticmethod
     def run_toolbar():
         """
         Builds toolbar for the 'Run' page.
         """
 
+        (ToolbarElements.dashboard_info(),)
         (vuetify.VSpacer(),)
         (ToolbarElements.run_simulation_button(),)
 
@@ -70,5 +92,6 @@ class Toolbars:
         Builds toolbar for the 'Analyze' page.
         """
 
+        (ToolbarElements.dashboard_info(),)
         vuetify.VSpacer()
         ToolbarElements.plot_options()
