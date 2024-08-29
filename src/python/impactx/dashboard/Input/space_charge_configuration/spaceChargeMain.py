@@ -41,7 +41,6 @@ def on_nCell_value_change(n_cell_x, n_cell_y, n_cell_z, **kwargs):
 
 
 class SpaceChargeConfiguration:
-
     @staticmethod
     def card():
         """
