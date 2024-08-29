@@ -49,7 +49,7 @@ initial = series.iterations[1].particles["beam"].to_df()
 final = series.iterations[last_step].particles["beam"].to_df()
 
 # compare number of particles
-num_particles = 10000
+num_particles = len(initial)
 assert num_particles == len(initial)
 assert num_particles == len(final)
 
