@@ -40,8 +40,12 @@ def run_simulation():
     """
     sim = ImpactX()
 
+    # space charge selections
+    sim.n_cell = state.n_cell
     sim.particle_shape = state.particle_shape
-    sim.space_charge = False
+    sim.space_charge = state.space_charge
+    sim.dynamic_size = state.dynamic_size
+
     sim.slice_step_diagnostics = True
     sim.init_grids()
 

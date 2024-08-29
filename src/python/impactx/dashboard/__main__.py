@@ -16,6 +16,7 @@ from .Analyze.plotsMain import AnalyzeSimulation
 from .Input.distributionParameters.distributionMain import DistributionParameters
 from .Input.inputParameters.inputMain import InputParameters
 from .Input.latticeConfiguration.latticeMain import LatticeConfiguration
+from .Input.space_charge_configuration.spaceChargeMain import SpaceChargeConfiguration
 from .Input.trameFunctions import TrameFunctions
 from .start import main
 from .Toolbar.toolbarMain import Toolbars
@@ -38,6 +39,8 @@ with RouterViewLayout(server, "/Input"):
                         inputParameters.card()
                     with vuetify.VCol(cols="auto", classes="pa-2"):
                         DistributionParameters.card()
+                    with vuetify.VCol(cols="auto", classes="pa-2"):
+                        SpaceChargeConfiguration.card()
                 with vuetify.VRow(no_gutters=True):
                     with vuetify.VCol(cols="auto", classes="pa-2"):
                         LatticeConfiguration.card()
