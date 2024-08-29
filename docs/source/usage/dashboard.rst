@@ -8,7 +8,7 @@ It provides a graphical interface to a subset of ImpactX functionality.
 
 .. note::
 
-   ImpactX Dashboard is provided as a preview and continues to be developed.
+   ImpactX Dashboard is provided as a preview and continues to be developed.  As a result, it may not yet include all the features available in ImpactX.
    Let us know in GitHub `discussions <https://github.com/ECP-WarpX/impactx/discussions>`__ and `issues <https://github.com/ECP-WarpX/impactx/issues>`__ how it works for you and what kind of workflows you would like to run in it.
 
 
