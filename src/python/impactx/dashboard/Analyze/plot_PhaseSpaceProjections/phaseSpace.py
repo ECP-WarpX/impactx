@@ -47,6 +47,7 @@ def run_simulation():
     sim.poisson_solver = state.poisson_solver
     sim.space_charge = state.space_charge
     sim.dynamic_size = state.dynamic_size
+    sim.prob_relative = state.prob_relative
 
     sim.slice_step_diagnostics = True
     sim.init_grids()

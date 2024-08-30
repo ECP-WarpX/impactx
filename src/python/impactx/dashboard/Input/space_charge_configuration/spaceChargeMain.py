@@ -28,9 +28,9 @@ def on_max_level_change(max_level, **kwargs):
         }
         for i in range(num_levels)
     ]
+    state.prob_relative = [0.0] * num_levels
+    print(f"Reset prob_relative: {state.prob_relative}")
 
-
-# Updated function to handle float values
 @state.change("n_cell_x", "n_cell_y", "n_cell_z")
 def on_nCell_value_change(n_cell_x, n_cell_y, n_cell_z, **kwargs):
     state.n_cell = [
@@ -39,6 +39,13 @@ def on_nCell_value_change(n_cell_x, n_cell_y, n_cell_z, **kwargs):
         int(n_cell_z) if n_cell_z else 0.0,
     ]
 
+@ctrl.add("updateArray")
+def updateArray(index, value):
+    index = int(index)
+    if index < len(state.prob_relative):
+        state.prob_relative[index] = float(value) if value else 0.0
+        state.level_fields[index]["value"] = str(state.prob_relative[index])
+        print(f"Updated prob_relative: {state.prob_relative}")
 
 class SpaceChargeConfiguration:
     @staticmethod
@@ -99,10 +106,13 @@ class SpaceChargeConfiguration:
                         )
                 with vuetify.VRow(classes="my-0"):
                     with vuetify.VCol(
-                        v_for=("field in level_fields",), cols="auto", classes="py-0"
+                        v_for=("(field, index) in level_fields",), cols="auto", classes="py-0"
                     ):
                         vuetify.VTextField(
                             label=("field.label",),
+                            v_model=("field.value",),
+                            input=(ctrl.updateArray, "[index, $event]"),
                             dense=True,
                             style="width: 125px;",
+                            type="number",
                         )
