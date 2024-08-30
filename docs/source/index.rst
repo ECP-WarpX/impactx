@@ -3,23 +3,32 @@
 ImpactX
 -------
 
-ImpactX is an s-based beam dynamics code including space charge effects.
-This is the next generation of the `IMPACT-Z <https://github.com/impact-lbl/IMPACT-Z>`__ code.
+ImpactX provides high-performance modeling of beam dynamics in particle accelerators with collective effects.
 
-Please contact us with any questions on it or if you like to contribute to its development.
+This is the next generation of the `IMPACT-Z <https://github.com/impact-lbl/IMPACT-Z>`__ code.
+ImpactX runs on modern GPUs or CPUs alike, provides user-friendly interfaces suitable for AI/ML workflows, has many :ref:`benchmarks <usage-examples>` to ensure its correctness, and an extensive documentation.
+
+As a beam dynamics code, ImpactX uses the reference trajectory :math:`s` as the independent variable of motion to achieve large speedups.
+See our :ref:`theory chapter <theory-concepts>` for details on our models, assumptions and concepts.
+
+ImpactX is part of the `Beam, Plasma & Accelerator Simulation Toolkit (BLAST) <https://blast.lbl.gov>`__.
+If you are looking for a general particle-in-cell code (with time as the independent variable) on GPUs and CPUs, take a look at `WarpX <https://warpx.readthedocs.io>`__.
+If you are looking for a specialized code for efficient *plasma wakefield* modeling on GPUs and CPUs, take a look at the quasi-static code `HiPACE++ <https://hipace.readthedocs.io>`__.
+
 
 .. _contact:
 
 Contact us
 ^^^^^^^^^^
 
-If you are starting using ImpactX, or if you have a user question, please pop in our `discussions page <https://github.com/ECP-WarpX/impactx/discussions>`__ and get in touch with the community.
+We organize support as an open community, helping each other.
 
-The `ImpactX GitHub repo <https://github.com/ECP-WarpX/impactx>`__ is the main communication platform.
+The `ImpactX GitHub repository <https://github.com/ECP-WarpX/impactx>`__ is our open communication platform.
 Have a look at the action icons on the top right of the web page: feel free to watch the repo if you want to receive updates, or to star the repo to support the project.
 For bug reports or to request new features, you can also open a new `issue <https://github.com/ECP-WarpX/impactx/issues>`__.
 
-We also have a `discussion page <https://github.com/ECP-WarpX/impactx/discussions>`__ on which you can find already answered questions, add new questions, get help with installation procedures, discuss ideas or share comments.
+If you are starting to use ImpactX and have questions not answered by this documentation, have a look on our `discussion page <https://github.com/ECP-WarpX/impactx/discussions>`__.
+There, you can find already answered questions, add your own, get help with installation procedures, help others and share ideas.
 
 .. raw:: html
 
