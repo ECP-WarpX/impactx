@@ -4,20 +4,32 @@ from ...trame_setup import setup_server
 
 server, state, ctrl = setup_server()
 
+# -----------------------------------------------------------------------------
+# Default
+# -----------------------------------------------------------------------------
+
 state.dynamic_size = False
 state.max_level = 3
 state.level_fields = []
 state.n_cell = [0.0, 0.0, 0.0]
+state.prob_relative = []
+state.particle_shape = 2
+state.poisson_solver = "multigrid"
+state.n_cell_x = ""
+state.n_cell_y = ""
+state.n_cell_z = ""
 
+# -----------------------------------------------------------------------------
+# Decorators
+# -----------------------------------------------------------------------------
 
 @state.change("space_charge")
 def on_space_charge_change(space_charge, **kwargs):
     state.dynamic_size = space_charge
 
-
 @state.change("max_level")
 def on_max_level_change(max_level, **kwargs):
-    num_levels = int(max_level) + 1
+    num_prob_relative_fields = int(max_level) + 1
 
     state.level_fields = [
         {
@@ -26,9 +38,9 @@ def on_max_level_change(max_level, **kwargs):
             "type": "number",
             "error_message": "",
         }
-        for i in range(num_levels)
+        for i in range(num_prob_relative_fields)
     ]
-    state.prob_relative = [0.0] * num_levels
+    state.prob_relative = [0.0] * num_prob_relative_fields
     print(f"Reset prob_relative: {state.prob_relative}")
 
 @state.change("n_cell_x", "n_cell_y", "n_cell_z")
@@ -39,13 +51,19 @@ def on_nCell_value_change(n_cell_x, n_cell_y, n_cell_z, **kwargs):
         int(n_cell_z) if n_cell_z else 0.0,
     ]
 
-@ctrl.add("updateArray")
-def updateArray(index, value):
+@ctrl.add("update_max_level_array")
+def on_update_max_level_array_call(index, value):
     index = int(index)
     if index < len(state.prob_relative):
         state.prob_relative[index] = float(value) if value else 0.0
         state.level_fields[index]["value"] = str(state.prob_relative[index])
         print(f"Updated prob_relative: {state.prob_relative}")
+
+
+# -----------------------------------------------------------------------------
+# UI
+# -----------------------------------------------------------------------------
+
 
 class SpaceChargeConfiguration:
     @staticmethod
@@ -61,15 +79,15 @@ class SpaceChargeConfiguration:
                 with vuetify.VRow(classes="my-0"):
                     with vuetify.VCol(cols=6, classes="py-0"):
                         vuetify.VCombobox(
-                            v_model=("particle_shape",),
                             label="Particle Shape",
+                            v_model=("particle_shape",),
                             items=([1, 2, 3],),
                             dense=True,
                         )
                     with vuetify.VCol(cols=6, classes="py-0"):
                         vuetify.VCombobox(
                             label="Poisson Solver",
-                            v_model=("poisson_solver", "multigrid"),
+                            v_model=("poisson_solver",),
                             items=(["multigrid", "fft"],),
                             dense=True,
                             hide_details=True,
@@ -78,29 +96,29 @@ class SpaceChargeConfiguration:
                     with vuetify.VCol(cols=4, classes="py-0"):
                         vuetify.VTextField(
                             label="nCell_X",
-                            v_model=("n_cell_x", ""),
+                            v_model=("n_cell_x",),
                             type="number",
                             dense=True,
                         )
                     with vuetify.VCol(cols=4, classes="py-0"):
                         vuetify.VTextField(
                             label="nCell_Y",
-                            v_model=("n_cell_y", ""),
+                            v_model=("n_cell_y",),
                             type="number",
                             dense=True,
                         )
                     with vuetify.VCol(cols=4, classes="py-0"):
                         vuetify.VTextField(
                             label="nCell_Z",
-                            v_model=("n_cell_z", ""),
+                            v_model=("n_cell_z",),
                             type="number",
                             dense=True,
                         )
                 with vuetify.VRow(classes="my-0"):
                     with vuetify.VCol(cols=4, classes="py-0"):
                         vuetify.VSelect(
-                            v_model=("max_level",),
                             label="Max Level",
+                            v_model=("max_level",),
                             items=([0, 1, 2, 3, 4],),
                             dense=True,
                         )
@@ -111,7 +129,7 @@ class SpaceChargeConfiguration:
                         vuetify.VTextField(
                             label=("field.label",),
                             v_model=("field.value",),
-                            input=(ctrl.updateArray, "[index, $event]"),
+                            input=(ctrl.update_max_level_array, "[index, $event]"),
                             dense=True,
                             style="width: 125px;",
                             type="number",
