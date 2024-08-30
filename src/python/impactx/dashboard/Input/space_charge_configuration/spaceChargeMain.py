@@ -66,7 +66,6 @@ def on_poisson_solver_change(poisson_solver, **kwargs):
 def on_space_charge_change(space_charge, **kwargs):
     state.dynamic_size = space_charge
 
-
 @state.change("max_level")
 def on_max_level_change(max_level, **kwargs):
     populate_prob_relative_fields(max_level)
@@ -109,13 +108,19 @@ def on_update_prob_relative_call(index, value):
 # UI
 # -----------------------------------------------------------------------------
 
-@ctrl.add("updateArray")
-def updateArray(index, value):
+@ctrl.add("update_max_level_array")
+def on_update_max_level_array_call(index, value):
     index = int(index)
     if index < len(state.prob_relative):
         state.prob_relative[index] = float(value) if value else 0.0
         state.level_fields[index]["value"] = str(state.prob_relative[index])
         print(f"Updated prob_relative: {state.prob_relative}")
+
+
+# -----------------------------------------------------------------------------
+# UI
+# -----------------------------------------------------------------------------
+
 
 class SpaceChargeConfiguration:
     @staticmethod
