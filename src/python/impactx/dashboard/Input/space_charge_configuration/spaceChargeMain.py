@@ -109,6 +109,13 @@ def on_update_prob_relative_call(index, value):
 # UI
 # -----------------------------------------------------------------------------
 
+@ctrl.add("updateArray")
+def updateArray(index, value):
+    index = int(index)
+    if index < len(state.prob_relative):
+        state.prob_relative[index] = float(value) if value else 0.0
+        state.level_fields[index]["value"] = str(state.prob_relative[index])
+        print(f"Updated prob_relative: {state.prob_relative}")
 
 class SpaceChargeConfiguration:
     @staticmethod
