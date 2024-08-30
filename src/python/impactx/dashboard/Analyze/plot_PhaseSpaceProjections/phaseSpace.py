@@ -41,8 +41,10 @@ def run_simulation():
     sim = ImpactX()
 
     # space charge selections
+    sim.max_level = state.max_level
     sim.n_cell = state.n_cell
     sim.particle_shape = state.particle_shape
+    sim.poisson_solver = state.poisson_solver
     sim.space_charge = state.space_charge
     sim.dynamic_size = state.dynamic_size
 

@@ -62,8 +62,8 @@ class SpaceChargeConfiguration:
                     with vuetify.VCol(cols=6, classes="py-0"):
                         vuetify.VCombobox(
                             label="Poisson Solver",
-                            v_model=("poisson_solver", "Multigrid"),
-                            items=(["Multigrid", "FFT"],),
+                            v_model=("poisson_solver", "multigrid"),
+                            items=(["multigrid", "fft"],),
                             dense=True,
                             hide_details=True,
                         )
