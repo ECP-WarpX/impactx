@@ -35,7 +35,7 @@ class generalFunctions:
             url = "https://impactx.readthedocs.io/en/latest/usage/python.html#initial-beam-distributions"
         elif section_name == "pythonParameters":
             url = "https://impactx.readthedocs.io/en/latest/usage/python.html#general"
-        elif section_name == "SpaceChargeConfiguration":
+        elif section_name == "space_charge_documentation":
             url = "https://impactx.readthedocs.io/en/latest/usage/parameters.html#space-charge"
         elif section_name == "CSR":
             url = "https://impactx.readthedocs.io/en/latest/usage/parameters.html#coherent-synchrotron-radiation-csr"

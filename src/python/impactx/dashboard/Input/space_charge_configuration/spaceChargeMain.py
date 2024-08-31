@@ -83,25 +83,18 @@ class SpaceChargeConfiguration:
         """
 
         with vuetify.VCard(v_show="space_charge", style="width: 340px;"):
-            with vuetify.VCardTitle("Space Charge Configuration"):
+            with vuetify.VCardTitle("Space Charge"):
                 vuetify.VSpacer()
                 vuetify.VIcon(
                     "mdi-information",
                     classes="ml-2",
-                    click=lambda: generalFunctions.documentation("SpaceChargeConfiguration"),
+                    click=lambda: generalFunctions.documentation("space_charge_documentation"),
                     style="color: #00313C;",
                 )
             vuetify.VDivider()
             with vuetify.VCardText():
                 with vuetify.VRow(classes="my-0"):
-                    with vuetify.VCol(cols=6, classes="py-0"):
-                        vuetify.VCombobox(
-                            label="Particle Shape",
-                            v_model=("particle_shape",),
-                            items=([1, 2, 3],),
-                            dense=True,
-                        )
-                    with vuetify.VCol(cols=6, classes="py-0"):
+                    with vuetify.VCol(cols=5, classes="py-0"):
                         vuetify.VCombobox(
                             label="Poisson Solver",
                             v_model=("poisson_solver",),
@@ -109,45 +102,60 @@ class SpaceChargeConfiguration:
                             dense=True,
                             hide_details=True,
                         )
-                with vuetify.VRow(classes="my-0"):
                     with vuetify.VCol(cols=4, classes="py-0"):
-                        vuetify.VTextField(
-                            label="nCell_X",
-                            v_model=("n_cell_x",),
-                            type="number",
+                        vuetify.VCombobox(
+                            label="Particle Shape",
+                            v_model=("particle_shape",),
+                            items=([1, 2, 3],),
                             dense=True,
                         )
-                    with vuetify.VCol(cols=4, classes="py-0"):
-                        vuetify.VTextField(
-                            label="nCell_Y",
-                            v_model=("n_cell_y",),
-                            type="number",
-                            dense=True,
-                        )
-                    with vuetify.VCol(cols=4, classes="py-0"):
-                        vuetify.VTextField(
-                            label="nCell_Z",
-                            v_model=("n_cell_z",),
-                            type="number",
-                            dense=True,
-                        )
-                with vuetify.VRow(classes="my-0"):
-                    with vuetify.VCol(cols=4, classes="py-0"):
+                    with vuetify.VCol(cols=3, classes="py-0"):
                         vuetify.VSelect(
                             label="Max Level",
                             v_model=("max_level",),
                             items=([0, 1, 2, 3, 4],),
                             dense=True,
                         )
+                with vuetify.VCol(classes="pa-0"):
+                    vuetify.VListItemSubtitle(
+                        "nCell",
+                        classes="font-weight-bold black--text",
+                    )
+                with vuetify.VRow(classes="my-0"):
+                    with vuetify.VCol(cols=3, classes="py-0"):
+                        vuetify.VTextField(
+                            placeholder="x",
+                            v_model=("n_cell_x",),
+                            type="number",
+                            dense=True,
+                        )
+                    with vuetify.VCol(cols=3, classes="py-0"):
+                        vuetify.VTextField(
+                            placeholder="y",
+                            v_model=("n_cell_y",),
+                            type="number",
+                            dense=True,
+                        )
+                    with vuetify.VCol(cols=3, classes="py-0"):
+                        vuetify.VTextField(
+                            placeholder="z",
+                            v_model=("n_cell_z",),
+                            type="number",
+                            dense=True,
+                        )
+                with vuetify.VCol(classes="pa-0"):
+                    vuetify.VListItemSubtitle(
+                        "prob_relative",
+                        classes="font-weight-bold black--text",
+                    )
                 with vuetify.VRow(classes="my-0"):
                     with vuetify.VCol(
-                        v_for=("(field, index) in prob_relative_fields",), cols="auto", classes="py-0"
+                        v_for=("(field, index) in prob_relative_fields",), classes="py-0"
                     ):
                         vuetify.VTextField(
-                            label=("field.label",),
+                            placeholder=("val."),
                             v_model=("field.value",),
                             input=(ctrl.update_prob_relative, "[index, $event]"),
                             dense=True,
-                            style="width: 125px;",
                             type="number",
                         )
