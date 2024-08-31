@@ -108,12 +108,12 @@ def on_update_prob_relative_call(index, value):
 # UI
 # -----------------------------------------------------------------------------
 
-@ctrl.add("update_max_level_array")
-def on_update_max_level_array_call(index, value):
+@ctrl.add("update_prob_relative")
+def on_update_prob_relative_call(index, value):
     index = int(index)
     if index < len(state.prob_relative):
         state.prob_relative[index] = float(value) if value else 0.0
-        state.level_fields[index]["value"] = str(state.prob_relative[index])
+        state.prob_relative_fields[index]["value"] = str(state.prob_relative[index])
         print(f"Updated prob_relative: {state.prob_relative}")
 
 
