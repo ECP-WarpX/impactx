@@ -1,5 +1,6 @@
 from trame.widgets import vuetify
 
+from ..generalFunctions import generalFunctions
 from ...trame_setup import setup_server
 
 server, state, ctrl = setup_server()
@@ -82,7 +83,14 @@ class SpaceChargeConfiguration:
         """
 
         with vuetify.VCard(v_show="space_charge", style="width: 340px;"):
-            vuetify.VCardTitle("Space Charge Configuration")
+            with vuetify.VCardTitle("Space Charge Configuration"):
+                vuetify.VSpacer()
+                vuetify.VIcon(
+                    "mdi-information",
+                    classes="ml-2",
+                    click=lambda: generalFunctions.documentation("SpaceChargeConfiguration"),
+                    style="color: #00313C;",
+                )
             vuetify.VDivider()
             with vuetify.VCardText():
                 with vuetify.VRow(classes="my-0"):

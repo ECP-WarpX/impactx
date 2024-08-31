@@ -35,6 +35,8 @@ class generalFunctions:
             url = "https://impactx.readthedocs.io/en/latest/usage/python.html#initial-beam-distributions"
         elif section_name == "pythonParameters":
             url = "https://impactx.readthedocs.io/en/latest/usage/python.html#general"
+        elif section_name == "SpaceChargeConfiguration":
+            url = "https://impactx.readthedocs.io/en/latest/usage/parameters.html#space-charge"
         else:
             raise ValueError(f"Invalid section name: {section_name}")
 
