@@ -1,5 +1,6 @@
 from trame.widgets import vuetify
 
+from ...trame_setup import setup_server
 from ..generalFunctions import generalFunctions
 from .spaceChargeFunctions import SpaceChargeFunctions
 from ...trame_setup import setup_server
@@ -68,6 +69,7 @@ def on_poisson_solver_change(poisson_solver, **kwargs):
 def on_space_charge_change(space_charge, **kwargs):
     state.dynamic_size = space_charge
 
+
 @state.change("max_level")
 def on_max_level_change(max_level, **kwargs):
     populate_prob_relative_fields(max_level)
@@ -86,6 +88,7 @@ def on_nCell_value_change(n_cell_x, n_cell_y, n_cell_z, **kwargs):
     ]
 
     state.dirty("n_cell")
+
 
 
 @ctrl.add("update_prob_relative")
