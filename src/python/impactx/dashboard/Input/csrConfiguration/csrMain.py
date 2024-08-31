@@ -33,7 +33,7 @@ class csrConfiguration:
                     with vuetify.VCol():
                         vuetify.VTextField(
                             label="CSR Bins",
-                            v_model=("CSR_bins",150),
+                            v_model=("csr_bins", 150),
                             type="number",
                             dense=True,
                         )

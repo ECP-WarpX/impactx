@@ -49,6 +49,11 @@ def run_simulation():
     sim.dynamic_size = state.dynamic_size
     sim.prob_relative = state.prob_relative
 
+    # csr
+    sim.csr = state.csr
+    if state.csr:
+        sim.csr_bins = state.csr_bins
+
     sim.slice_step_diagnostics = True
     sim.init_grids()
 
