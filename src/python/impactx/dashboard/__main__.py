@@ -49,6 +49,9 @@ with RouterViewLayout(server, "/Input"):
                         SpaceChargeConfiguration.card()
                 with vuetify.VRow(no_gutters=True):
                     with vuetify.VCol(cols="auto", classes="pa-2"):
+                        DistributionParameters.card()
+                with vuetify.VRow(no_gutters=True):
+                    with vuetify.VCol(cols="auto", classes="pa-2"):
                         LatticeConfiguration.card()
 
 with RouterViewLayout(server, "/Analyze"):
