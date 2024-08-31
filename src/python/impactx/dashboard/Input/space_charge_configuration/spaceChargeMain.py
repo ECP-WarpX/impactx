@@ -21,15 +21,10 @@ state.n_cell_y = ""
 state.n_cell_z = ""
 
 # -----------------------------------------------------------------------------
-# Decorators
+# Helper functions
 # -----------------------------------------------------------------------------
 
-@state.change("space_charge")
-def on_space_charge_change(space_charge, **kwargs):
-    state.dynamic_size = space_charge
-
-@state.change("max_level")
-def on_max_level_change(max_level, **kwargs):
+def populate_prob_relative_fields(max_level):
     num_prob_relative_fields = int(max_level) + 1
 
     state.prob_relative_fields = [
@@ -44,8 +39,21 @@ def on_max_level_change(max_level, **kwargs):
     state.prob_relative = [0.0] * num_prob_relative_fields
     print(f"Reset prob_relative: {state.prob_relative}")
 
+# -----------------------------------------------------------------------------
+# Decorators
+# -----------------------------------------------------------------------------
+
+@state.change("space_charge")
+def on_space_charge_change(space_charge, **kwargs):
+    state.dynamic_size = space_charge
+
+@state.change("max_level")
+def on_max_level_change(max_level, **kwargs):
+    populate_prob_relative_fields(max_level)
+
 @state.change("n_cell_x", "n_cell_y", "n_cell_z")
 def on_nCell_value_change(n_cell_x, n_cell_y, n_cell_z, **kwargs):
+    # modify into an array of ints
     state.n_cell = [
         int(n_cell_x) if n_cell_x else 0.0,
         int(n_cell_y) if n_cell_y else 0.0,
