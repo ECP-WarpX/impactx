@@ -1,7 +1,7 @@
 from trame.widgets import vuetify
 
-from ..generalFunctions import generalFunctions
 from ...trame_setup import setup_server
+from ..generalFunctions import generalFunctions
 
 server, state, ctrl = setup_server()
 
@@ -11,7 +11,6 @@ server, state, ctrl = setup_server()
 
 
 class csrConfiguration:
-
     @staticmethod
     def card():
         """
