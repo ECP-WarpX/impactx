@@ -15,22 +15,22 @@ class csrConfiguration:
     @staticmethod
     def card():
         """
-        Creates UI content for CSR configuration
+        Creates UI content for CSR.
         """
 
-        with vuetify.VCard(v_show="CSR"):
-            with vuetify.VCardTitle("CSR Configuration"):
+        with vuetify.VCard(v_show="CSR", style="width: 170px;"):
+            with vuetify.VCardTitle("CSR"):
                 vuetify.VSpacer()
                 vuetify.VIcon(
                     "mdi-information",
                     classes="ml-2",
-                    click=lambda: generalFunctions.documentation("csrConfiguration"),
+                    click=lambda: generalFunctions.documentation("CSR"),
                     style="color: #00313C;",
                 )
             vuetify.VDivider()
             with vuetify.VCardText():
-                with vuetify.VRow(classes="my-0"):
-                    with vuetify.VCol(cols=12):
+                with vuetify.VRow(classes="py-2"):
+                    with vuetify.VCol():
                         vuetify.VTextField(
                             label="CSR Bins",
                             v_model=("CSR_bins",150),
