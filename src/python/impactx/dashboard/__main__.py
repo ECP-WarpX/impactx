@@ -38,9 +38,10 @@ with RouterViewLayout(server, "/Input"):
                     with vuetify.VCol(cols="auto", classes="pa-2"):
                         inputParameters.card()
                     with vuetify.VCol(cols="auto", classes="pa-2"):
-                        DistributionParameters.card()
-                    with vuetify.VCol(cols="auto", classes="pa-2"):
                         SpaceChargeConfiguration.card()
+                with vuetify.VRow(no_gutters=True):
+                    with vuetify.VCol(cols="auto", classes="pa-2"):
+                        DistributionParameters.card()
                 with vuetify.VRow(no_gutters=True):
                     with vuetify.VCol(cols="auto", classes="pa-2"):
                         LatticeConfiguration.card()
