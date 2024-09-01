@@ -120,7 +120,9 @@ def on_update_prob_relative_call(index, value):
     index = int(index)
 
     # Validate the updated value
-    error_message = SpaceChargeFunctions.validate_prob_relative_fields(index, prob_relative_value)
+    error_message = SpaceChargeFunctions.validate_prob_relative_fields(
+        index, prob_relative_value
+    )
 
     if index < len(state.prob_relative):
         state.prob_relative[index] = prob_relative_value if value else 0.0
@@ -128,9 +130,11 @@ def on_update_prob_relative_call(index, value):
         state.prob_relative_fields[index]["error_message"] = error_message
         state.dirty("prob_relative_fields")
 
+
 # -----------------------------------------------------------------------------
 # UI
 # -----------------------------------------------------------------------------
+
 
 class SpaceChargeConfiguration:
     @staticmethod
