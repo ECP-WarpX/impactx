@@ -1,6 +1,7 @@
 from trame.widgets import vuetify
 
 from ..generalFunctions import generalFunctions
+from .spaceChargeFunctions import SpaceChargeFunctions
 from ...trame_setup import setup_server
 from ..generalFunctions import generalFunctions
 from .spaceChargeFunctions import SpaceChargeFunctions
@@ -111,17 +112,22 @@ def on_update_prob_relative_call(index, value):
 
 @ctrl.add("update_prob_relative")
 def on_update_prob_relative_call(index, value):
-    index = int(index)
-    if index < len(state.prob_relative):
-        state.prob_relative[index] = float(value) if value else 0.0
-        state.prob_relative_fields[index]["value"] = str(state.prob_relative[index])
-        print(f"Updated prob_relative: {state.prob_relative}")
+    prob_relative_value, input_type = generalFunctions.determine_input_type(value)
 
+    index = int(index)
+
+    # Validate the updated value
+    error_message = SpaceChargeFunctions.validate_prob_relative_fields(index, prob_relative_value)
+
+    if index < len(state.prob_relative):
+        state.prob_relative[index] = prob_relative_value if value else 0.0
+        print(f"Updated prob_relative: {state.prob_relative}")
+        state.prob_relative_fields[index]["error_message"] = error_message
+        state.dirty("prob_relative_fields")
 
 # -----------------------------------------------------------------------------
 # UI
 # -----------------------------------------------------------------------------
-
 
 class SpaceChargeConfiguration:
     @staticmethod
