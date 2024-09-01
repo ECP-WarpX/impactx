@@ -51,17 +51,17 @@ def on_poisson_solver_change(poisson_solver, **kwargs):
 
     for i, field in enumerate(state.prob_relative_fields):
         prob_relative_value = state.prob_relative[i]
-        error_message = SpaceChargeFunctions.validate_prob_relative_fields(i, prob_relative_value)
+        error_message = SpaceChargeFunctions.validate_prob_relative_fields(
+            i, prob_relative_value
+        )
 
-        updated_field = {
-            "value": field["value"],
-            "error_message": error_message
-        }
+        updated_field = {"value": field["value"], "error_message": error_message}
 
         updated_prob_relative_fields.append(updated_field)
 
     state.prob_relative_fields = updated_prob_relative_fields
     state.dirty("prob_relative_fields")
+
 
 @state.change("space_charge")
 def on_space_charge_change(space_charge, **kwargs):
@@ -95,7 +95,9 @@ def on_update_prob_relative_call(index, value):
     index = int(index)
 
     # Validate the updated value
-    error_message = SpaceChargeFunctions.validate_prob_relative_fields(index, prob_relative_value)
+    error_message = SpaceChargeFunctions.validate_prob_relative_fields(
+        index, prob_relative_value
+    )
 
     if index < len(state.prob_relative):
         state.prob_relative[index] = prob_relative_value if value else 0.0
@@ -103,9 +105,11 @@ def on_update_prob_relative_call(index, value):
         state.prob_relative_fields[index]["error_message"] = error_message
         state.dirty("prob_relative_fields")
 
+
 # -----------------------------------------------------------------------------
 # UI
 # -----------------------------------------------------------------------------
+
 
 class SpaceChargeConfiguration:
     @staticmethod
@@ -120,7 +124,9 @@ class SpaceChargeConfiguration:
                 vuetify.VIcon(
                     "mdi-information",
                     classes="ml-2",
-                    click=lambda: generalFunctions.documentation("space_charge_documentation"),
+                    click=lambda: generalFunctions.documentation(
+                        "space_charge_documentation"
+                    ),
                     style="color: #00313C;",
                 )
             vuetify.VDivider()
@@ -185,7 +191,8 @@ class SpaceChargeConfiguration:
                     )
                 with vuetify.VRow(classes="my-0"):
                     with vuetify.VCol(
-                        v_for=("(field, index) in prob_relative_fields",), classes="py-0"
+                        v_for=("(field, index) in prob_relative_fields",),
+                        classes="py-0",
                     ):
                         vuetify.VTextField(
                             placeholder=("val."),
