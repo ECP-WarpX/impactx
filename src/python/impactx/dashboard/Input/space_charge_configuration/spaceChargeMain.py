@@ -121,7 +121,7 @@ class SpaceChargeConfiguration:
             with vuetify.VCardText():
                 with vuetify.VRow(classes="my-0"):
                     with vuetify.VCol(cols=5, classes="py-0"):
-                        vuetify.VCombobox(
+                        vuetify.VSelect(
                             label="Poisson Solver",
                             v_model=("poisson_solver",),
                             items=(["multigrid", "fft"],),
@@ -129,7 +129,7 @@ class SpaceChargeConfiguration:
                             hide_details=True,
                         )
                     with vuetify.VCol(cols=4, classes="py-0"):
-                        vuetify.VCombobox(
+                        vuetify.VSelect(
                             label="Particle Shape",
                             v_model=("particle_shape",),
                             items=([1, 2, 3],),

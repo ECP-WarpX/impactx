@@ -41,19 +41,21 @@ def run_simulation():
     sim = ImpactX()
 
     # space charge selections
-    sim.max_level = state.max_level
-    sim.n_cell = state.n_cell
-    sim.particle_shape = state.particle_shape
-    sim.poisson_solver = state.poisson_solver
-    sim.space_charge = state.space_charge
-    sim.dynamic_size = state.dynamic_size
-    sim.prob_relative = state.prob_relative
+    if state.space_charge:
+        sim.max_level = state.max_level
+        sim.n_cell = state.n_cell
+        sim.particle_shape = state.particle_shape
+        sim.poisson_solver = state.poisson_solver
+        sim.space_charge = state.space_charge
+        sim.dynamic_size = state.dynamic_size
+        sim.prob_relative = state.prob_relative
 
     # csr
-    sim.csr = state.csr
     if state.csr:
+        sim.csr = state.csr
         sim.csr_bins = state.csr_bins
 
+    sim.particle_shape = state.particle_shape
     sim.slice_step_diagnostics = True
     sim.init_grids()
 
