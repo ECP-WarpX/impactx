@@ -3,7 +3,6 @@ from trame.widgets import vuetify
 from ...trame_setup import setup_server
 from ..generalFunctions import generalFunctions
 from .spaceChargeFunctions import SpaceChargeFunctions
-from ...trame_setup import setup_server
 
 server, state, ctrl = setup_server()
 
@@ -12,11 +11,11 @@ server, state, ctrl = setup_server()
 # -----------------------------------------------------------------------------
 
 state.dynamic_size = False
-state.max_level = 3
+state.max_level = 0
 state.n_cell = [0.0, 0.0, 0.0]
 state.prob_relative = []
 state.particle_shape = 2
-state.poisson_solver = "multigrid"
+state.poisson_solver = "fft"
 
 state.prob_relative_fields = []
 state.n_cell_x = ""
