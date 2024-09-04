@@ -8,7 +8,10 @@ ImpactX provides high-performance modeling of beam dynamics in particle accelera
 This is the next generation of the `IMPACT-Z <https://github.com/impact-lbl/IMPACT-Z>`__ code.
 ImpactX runs on modern GPUs or CPUs alike, provides user-friendly interfaces suitable for AI/ML workflows, has many :ref:`benchmarks <usage-examples>` to ensure its correctness, and an extensive documentation.
 
-As a beam dynamics code, ImpactX uses the reference trajectory :math:`s` as the independent variable of motion to achieve large speedups.
+As a beam dynamics code, ImpactX uses the reference trajectory path length :math:`s` as the independent variable of motion to achieve large speedups.
+The code includes the effects of externally applied fields from magnets and accelerating cavities as well as the effect of self-fields (space charge fields, CSR, wakefields, ...).
+All particle tracking models are symplectic, and space charge is included by solving the Poisson equation in the beam rest frame.
+The code may be used to model the dynamics of beams in both linear and ring accelerators.
 See our :ref:`theory chapter <theory-concepts>` for details on our models, assumptions and concepts.
 
 ImpactX is part of the `Beam, Plasma & Accelerator Simulation Toolkit (BLAST) <https://blast.lbl.gov>`__.
