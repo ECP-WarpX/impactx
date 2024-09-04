@@ -3,7 +3,7 @@
 ImpactX
 -------
 
-ImpactX provides high-performance modeling of beam dynamics in particle accelerators with collective effects.
+ImpactX enables high-performance modeling of beam dynamics in particle accelerators with collective effects.
 
 This is the next generation of the `IMPACT-Z <https://github.com/impact-lbl/IMPACT-Z>`__ code.
 ImpactX runs on modern GPUs or CPUs alike, provides user-friendly interfaces suitable for AI/ML workflows, has many :ref:`benchmarks <usage-examples>` to ensure its correctness, and an extensive documentation.
@@ -15,8 +15,7 @@ The code may be used to model the dynamics of beams in both linear and ring acce
 See our :ref:`theory chapter <theory-concepts>` for details on our models, assumptions and concepts.
 
 ImpactX is part of the `Beam, Plasma & Accelerator Simulation Toolkit (BLAST) <https://blast.lbl.gov>`__.
-If you are looking for a general particle-in-cell code (with time as the independent variable) on GPUs and CPUs, take a look at `WarpX <https://warpx.readthedocs.io>`__.
-If you are looking for a specialized code for efficient *plasma wakefield* modeling on GPUs and CPUs, take a look at the quasi-static code `HiPACE++ <https://hipace.readthedocs.io>`__.
+Please see this page for more information to select the code most appropriate for your application.
 
 
 .. _contact:
