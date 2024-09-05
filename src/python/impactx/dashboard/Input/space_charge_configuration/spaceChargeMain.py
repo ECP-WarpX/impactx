@@ -12,7 +12,7 @@ server, state, ctrl = setup_server()
 
 state.dynamic_size = False
 state.max_level = 0
-state.n_cell = [0.0, 0.0, 0.0]
+state.n_cell = [32.0, 32.0, 32.0]
 state.prob_relative = []
 state.particle_shape = 2
 state.poisson_solver = "fft"

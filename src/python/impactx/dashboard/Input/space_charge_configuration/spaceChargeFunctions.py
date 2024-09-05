@@ -8,6 +8,7 @@ server, state, ctrl = setup_server()
 
 
 class SpaceChargeFunctions:
+    @staticmethod
     def validate_prob_relative_fields(index, prob_relative_value):
         """
         This function checks specific validation requirements

@@ -28,18 +28,16 @@ class generalFunctions:
         Opens a tab to the specified section link in the documentation.
         :param section_name (str): The name of the documentation section to open.
         """
+        url_dict = {
+            "LatticeElements": "https://impactx.readthedocs.io/en/latest/usage/python.html#lattice-elements",
+            "BeamDistributions": "https://impactx.readthedocs.io/en/latest/usage/python.html#initial-beam-distributions",
+            "pythonParameters": "https://impactx.readthedocs.io/en/latest/usage/python.html#general",
+            "space_charge_documentation": "https://impactx.readthedocs.io/en/latest/usage/parameters.html#space-charge",
+            "CSR": "https://impactx.readthedocs.io/en/latest/usage/parameters.html#coherent-synchrotron-radiation-csr",
+        }
 
-        if section_name == "LatticeElements":
-            url = "https://impactx.readthedocs.io/en/latest/usage/python.html#lattice-elements"
-        elif section_name == "BeamDistributions":
-            url = "https://impactx.readthedocs.io/en/latest/usage/python.html#initial-beam-distributions"
-        elif section_name == "pythonParameters":
-            url = "https://impactx.readthedocs.io/en/latest/usage/python.html#general"
-        elif section_name == "space_charge_documentation":
-            url = "https://impactx.readthedocs.io/en/latest/usage/parameters.html#space-charge"
-        elif section_name == "CSR":
-            url = "https://impactx.readthedocs.io/en/latest/usage/parameters.html#coherent-synchrotron-radiation-csr"
-        else:
+        url = url_dict.get(section_name)
+        if url is None:
             raise ValueError(f"Invalid section name: {section_name}")
 
         if "WSL_DISTRO_NAME" in os.environ:
