@@ -40,8 +40,6 @@ def test_wake(save_png=True):
             bin_min = t_min
             bin_max = t_max
             bin_size = (bin_max - bin_min) / (num_bins - 1)
-            print("t_min, t_max, sigma_t = ")
-            print(t_min, t_max, sigma_t)
 
             # Create charge_distribution and slopes as PODVector_real_std
             charge_distribution = PODVector_real_std(num_bins + 1)
@@ -70,10 +68,6 @@ def test_wake(save_png=True):
                 bin_min, bin_max, len(charge_distribution_np)
             )
             plt.figure()
-            print("Length density s values = ")
-            print(len(charge_distribution_np))
-            print("Length density values = ")
-            print(len(charge_distribution_np))
             plt.plot(charge_distribution_s_values, charge_distribution_np)
             plt.xlabel("Longitudinal Position s (m)")
             plt.ylabel("Charge density")
