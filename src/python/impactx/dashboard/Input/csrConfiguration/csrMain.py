@@ -28,8 +28,8 @@ class csrConfiguration:
                 )
             vuetify.VDivider()
             with vuetify.VCardText():
-                with vuetify.VRow(classes="py-2"):
-                    with vuetify.VCol():
+                with vuetify.VRow(classes="my-0"):
+                    with vuetify.VCol(classes="py-0"):
                         vuetify.VTextField(
                             label="CSR Bins",
                             v_model=("csr_bins", 150),

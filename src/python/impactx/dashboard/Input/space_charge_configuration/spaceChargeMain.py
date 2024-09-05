@@ -117,7 +117,7 @@ class SpaceChargeConfiguration:
         Creates UI content for space charge configuration
         """
 
-        with vuetify.VCard(v_show="space_charge", style="width: 340px;"):
+        with vuetify.VCard(v_show="space_charge", style="width: 340px; height: 300px"):
             with vuetify.VCardTitle("Space Charge"):
                 vuetify.VSpacer()
                 vuetify.VIcon(
@@ -166,6 +166,7 @@ class SpaceChargeConfiguration:
                             error_messages=("error_message_x",),
                             type="number",
                             dense=True,
+                            style="margin-top: -5px",
                         )
                     with vuetify.VCol(cols=3, classes="py-0"):
                         vuetify.VTextField(
@@ -174,6 +175,7 @@ class SpaceChargeConfiguration:
                             error_messages=("error_message_y",),
                             type="number",
                             dense=True,
+                            style="margin-top: -5px",
                         )
                     with vuetify.VCol(cols=3, classes="py-0"):
                         vuetify.VTextField(
@@ -182,6 +184,7 @@ class SpaceChargeConfiguration:
                             error_messages=("error_message_z",),
                             type="number",
                             dense=True,
+                            style="margin-top: -5px",
                         )
                 with vuetify.VCol(classes="pa-0"):
                     vuetify.VListItemSubtitle(
@@ -198,6 +201,7 @@ class SpaceChargeConfiguration:
                             v_model=("field.value",),
                             input=(ctrl.update_prob_relative, "[index, $event]"),
                             error_messages=("field.error_message",),
-                            dense=True,
                             type="number",
+                            dense=True,
+                            style="margin-top: -5px",
                         )
