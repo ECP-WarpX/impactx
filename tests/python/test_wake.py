@@ -1,11 +1,14 @@
 import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 np.set_printoptions(threshold=sys.maxsize)
 from conftest import basepath
-from impactx import ImpactX, amr, wakeconvolution
+
 from amrex.space3d import PODVector_real_std  # Import amrex array
+from impactx import ImpactX, amr, wakeconvolution
+
 
 def test_wake(save_png=True):
     amr.initialize([])
@@ -38,7 +41,7 @@ def test_wake(save_png=True):
             bin_max = t_max
             bin_size = (bin_max - bin_min) / (num_bins - 1)
             print("t_min, t_max, sigma_t = ")
-            print(t_min,t_max,sigma_t)
+            print(t_min, t_max, sigma_t)
 
             # Create charge_distribution and slopes as PODVector_real_std
             charge_distribution = PODVector_real_std(num_bins + 1)
@@ -63,7 +66,9 @@ def test_wake(save_png=True):
 
             # Convert charge distribution to numpy array and plot it
             charge_distribution_np = charge_distribution.to_numpy()
-            charge_distribution_s_values = np.linspace(bin_min, bin_max, len(charge_distribution_np))
+            charge_distribution_s_values = np.linspace(
+                bin_min, bin_max, len(charge_distribution_np)
+            )
             plt.figure()
             print("Length density s values = ")
             print(len(charge_distribution_np))
@@ -82,7 +87,7 @@ def test_wake(save_png=True):
             slopes_np = slopes.to_numpy()
             slopes_s_values = np.linspace(bin_min, bin_max, len(slopes_np))
             plt.figure()
-            plt.plot(slopes_s_values, slopes_np)  
+            plt.plot(slopes_s_values, slopes_np)
             plt.xlabel("Longitudinal Position s (m)")
             plt.ylabel("Slopes")
             plt.title("Slopes vs Longitudinal Position")
@@ -95,14 +100,13 @@ def test_wake(save_png=True):
             wake_function = PODVector_real_std(2 * len(slopes))
             wake_s_values = np.linspace(bin_min, bin_max, 2 * len(slopes))
             for i in range(len(wake_function)):
-                if (i < num_bins):
-                   s = (i * bin_size)
+                if i < num_bins:
+                    s = i * bin_size
                 else:
-                   s = (i-2*num_bins)*bin_size
+                    s = (i - 2 * num_bins) * bin_size
                 wake_s_values[i] = s
                 wake_function[i] = wakeconvolution.w_l_csr(s, R, bin_size)
 
-            
             # Convert wake_function to numpy array and plot it
             wake_function_np = wake_function.to_numpy()
             plt.figure()
@@ -117,9 +121,7 @@ def test_wake(save_png=True):
 
             # Call convolve_fft with the correct types and capture the output
             convolved_wakefield = wakeconvolution.convolve_fft(
-                slopes,
-                wake_function,
-                bin_size
+                slopes, wake_function, bin_size
             )
 
             # Convert the result to numpy array
@@ -140,6 +142,7 @@ def test_wake(save_png=True):
             plt.close("all")
     finally:
         sim.finalize()
+
 
 if __name__ == "__main__":
     test_wake()
