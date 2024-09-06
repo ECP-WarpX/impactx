@@ -3,9 +3,6 @@ from trame.widgets import vuetify
 from ...trame_setup import setup_server
 from ..generalFunctions import generalFunctions
 from .spaceChargeFunctions import SpaceChargeFunctions
-from ...trame_setup import setup_server
-from ..generalFunctions import generalFunctions
-from .spaceChargeFunctions import SpaceChargeFunctions
 
 server, state, ctrl = setup_server()
 
@@ -90,7 +87,6 @@ def on_nCell_value_change(n_cell_x, n_cell_y, n_cell_z, **kwargs):
     state.dirty("n_cell")
 
 
-
 @ctrl.add("update_prob_relative")
 def on_update_prob_relative_call(index, value):
     prob_relative_value, input_type = generalFunctions.determine_input_type(value)
@@ -112,6 +108,7 @@ def on_update_prob_relative_call(index, value):
 # -----------------------------------------------------------------------------
 # UI
 # -----------------------------------------------------------------------------
+
 
 @ctrl.add("update_prob_relative")
 def on_update_prob_relative_call(index, value):
