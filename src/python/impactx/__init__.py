@@ -18,13 +18,13 @@ if os.name == "nt":
 
 # import core bindings to C++
 from . import impactx_pybind as cxx
+from .distribution_input_helpers import twiss
 from .extensions.ImpactXParIter import register_ImpactXParIter_extension
 from .extensions.ImpactXParticleContainer import (
     register_ImpactXParticleContainer_extension,
 )
 from .impactx_pybind import *  # noqa
 from .madx_to_impactx import read_beam, read_lattice  # noqa
-from .distribution_input_helpers import twiss
 
 __version__ = cxx.__version__
 __doc__ = cxx.__doc__

@@ -10,9 +10,16 @@ import numpy as np
 
 
 def twiss(
-        beta_x: np.float64, beta_y: np.float64, beta_t: np.float64,
-        emitt_x: np.float64, emitt_y: np.float64, emitt_t: np.float64,
-        alpha_x: np.float64=0.0, alpha_y: np.float64=0.0, alpha_t: np.float64=0.0):
+    beta_x: np.float64,
+    beta_y: np.float64,
+    beta_t: np.float64,
+    emitt_x: np.float64,
+    emitt_y: np.float64,
+    emitt_t: np.float64,
+    alpha_x: np.float64 = 0.0,
+    alpha_y: np.float64 = 0.0,
+    alpha_t: np.float64 = 0.0,
+):
     """
     Helper function to convert Courant-Snyder / Twiss input into phase space ellipse input.
 
@@ -28,10 +35,14 @@ def twiss(
     :return: A dictionary containing calculated phase space input: 'lambdaX', 'lambdaY', 'lambdaT', 'lambdaPx', 'lambdaPy', 'lambdaPt', 'muxpx', 'muypy', 'mutpt'.
     """
     if beta_x <= 0.0 or beta_y <= 0.0 or beta_t <= 0.0:
-        raise ValueError("Input Error: The beta function values need to be non-zero positive values in all dimensions.")
+        raise ValueError(
+            "Input Error: The beta function values need to be non-zero positive values in all dimensions."
+        )
 
     if emitt_x <= 0.0 or emitt_y <= 0.0 or emitt_t <= 0.0:
-        raise ValueError("Input Error: Emittance values need to be non-zero positive values in all dimensions.")
+        raise ValueError(
+            "Input Error: Emittance values need to be non-zero positive values in all dimensions."
+        )
 
     betas = [beta_x, beta_y, beta_t]
     alphas = [alpha_x, alpha_y, alpha_t]
@@ -43,15 +54,13 @@ def twiss(
     gamma_x, gamma_y, gamma_t = gammas
 
     return {
-        'lambdaX': np.sqrt(emitt_x / gamma_x),
-        'lambdaY': np.sqrt(emitt_y / gamma_y),
-        'lambdaT': np.sqrt(emitt_t / gamma_t),
-
-        'lambdaPx': np.sqrt(emitt_x / beta_x),
-        'lambdaPy': np.sqrt(emitt_y / beta_y),
-        'lambdaPt': np.sqrt(emitt_t / beta_t),
-
-        'muxpx': alpha_x / np.sqrt(beta_x * gamma_x),
-        'muypy': alpha_y / np.sqrt(beta_y * gamma_y),
-        'mutpt': alpha_t / np.sqrt(beta_t * gamma_t),
+        "lambdaX": np.sqrt(emitt_x / gamma_x),
+        "lambdaY": np.sqrt(emitt_y / gamma_y),
+        "lambdaT": np.sqrt(emitt_t / gamma_t),
+        "lambdaPx": np.sqrt(emitt_x / beta_x),
+        "lambdaPy": np.sqrt(emitt_y / beta_y),
+        "lambdaPt": np.sqrt(emitt_t / beta_t),
+        "muxpx": alpha_x / np.sqrt(beta_x * gamma_x),
+        "muypy": alpha_y / np.sqrt(beta_y * gamma_y),
+        "mutpt": alpha_t / np.sqrt(beta_t * gamma_t),
     }
