@@ -24,6 +24,7 @@ from .extensions.ImpactXParticleContainer import (
 )
 from .impactx_pybind import *  # noqa
 from .madx_to_impactx import read_beam, read_lattice  # noqa
+from .distribution_input_helpers import twiss
 
 __version__ = cxx.__version__
 __doc__ = cxx.__doc__

@@ -179,6 +179,15 @@ add_impactx_test(FODO.py
     examples/fodo/plot_fodo.py
 )
 
+# Python: FODO Cell w/ Twiss input ############################################
+#
+add_impactx_test(FODO.Twiss.py
+        examples/fodo/run_fodo_twiss.py
+        OFF  # ImpactX MPI-parallel
+        examples/fodo/analysis_fodo.py
+        examples/fodo/plot_fodo.py
+)
+
 # Python: FODO Cell w/ programmed element for the Drifts ######################
 #
 add_impactx_test(FODO.programmable.py
