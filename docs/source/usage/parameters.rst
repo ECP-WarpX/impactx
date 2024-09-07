@@ -43,8 +43,8 @@ Initial Beam Distributions
         * ``beam.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``beam.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
-    * Courant-Snyder / Twiss parameters.
-      To enable input via CS / Twiss parameters, add the suffix ``_from_cs`` or ``from_twiss`` to the name of the distribution.
+    * Courant-Snyder (Twiss) parameters.
+      To enable input via Courant-Snyder (Twiss) parameters, add the suffix ``from_twiss`` to the name of the distribution.
       Use the following parameters to characterize it:
 
         * ``beam.alphaX`` (``float``, dimensionless, default: ``0``) CS / Twiss :math:`\alpha` for X
@@ -59,21 +59,21 @@ Initial Beam Distributions
 
     The following distributions are available:
 
-    * ``waterbag`` or ``waterbag_from_cs``/``waterbag_from_twiss`` for initial Waterbag distribution.
+    * ``waterbag`` or ``waterbag_from_twiss`` for initial Waterbag distribution.
 
-    * ``kurth6d`` or ``kurth6d_from_cs``/``kurth6d_from_twiss`` for initial 6D Kurth distribution.
+    * ``kurth6d`` or ``kurth6d_from_twiss`` for initial 6D Kurth distribution.
 
-    * ``gaussian`` or ``gaussian_from_cs``/``gaussian_from_twiss`` for initial 6D Gaussian (normal) distribution.
+    * ``gaussian`` or ``gaussian_from_twiss`` for initial 6D Gaussian (normal) distribution.
 
-    * ``kvdist`` or ``kvdist_from_cs``/``kvdist_from_twiss`` for initial K-V distribution in the transverse plane.
+    * ``kvdist`` or ``kvdist_from_twiss`` for initial K-V distribution in the transverse plane.
       The distribution is uniform in t and Gaussian in pt.
 
-    * ``kurth4d`` or ``kurth4d_from_cs``/``kurth4d_from_twiss`` for initial 4D Kurth distribution in the transverse plane.
+    * ``kurth4d`` or ``kurth4d_from_twiss`` for initial 4D Kurth distribution in the transverse plane.
       The distribution is uniform in t and Gaussian in pt.
 
-    * ``semigaussian`` or ``semigaussian_from_cs``/``semigaussian_from_twiss`` for initial Semi-Gaussian distribution.  The distribution is uniform within a cylinder in (x,y,z) and Gaussian in momenta (px,py,pt).
+    * ``semigaussian`` or ``semigaussian_from_twiss`` for initial Semi-Gaussian distribution.  The distribution is uniform within a cylinder in (x,y,z) and Gaussian in momenta (px,py,pt).
 
-    * ``triangle`` or ``triangle_from_cs``/``triangle_from_twiss`` a triangle distribution for laser-plasma acceleration related applications.
+    * ``triangle`` or ``triangle_from_twiss`` a triangle distribution for laser-plasma acceleration related applications.
       A ramped, triangular current profile with a Gaussian energy spread (possibly correlated).
       The transverse distribution is a 4D waterbag.
 
