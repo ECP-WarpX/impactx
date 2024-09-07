@@ -40,7 +40,7 @@ distr = distribution.Gaussian(
         emitt_t=2e-06,
         alpha_x=-1.5905003499999992,
         alpha_y=1.5905003499999992,
-        alpha_t=0.0
+        alpha_t=0.0,
     )
 )
 sim.add_particles(bunch_charge_C, distr, npart)
