@@ -401,6 +401,18 @@ Initial Beam Distributions
 
 This module provides particle beam distributions that can be used to initialize particle beams in an :py:class:`impactx.ParticleContainer`.
 
+.. note::
+
+    For additional information, consult the documentation on :ref:`theory-collective-beam-distribution-input`.
+    For **all** except the ``thermal`` distribution we allow input in two forms:
+
+    1. Phase space ellipse axis intersections (ImpactX native)
+    2. Courant-Snyder (Twiss) parameters
+
+For the input from Twiss parameters in Python, please use the helper function ``twiss``:
+
+.. autofunction:: impactx.twiss
+
 .. py:class:: impactx.distribution.Gaussian(lambdax, lambday, lambdat, lambdapx, lambdapy, lambdapt, muxpx=0.0, muypy=0.0, mutpt=0.0)
 
    A 6D Gaussian distribution.
