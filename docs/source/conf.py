@@ -23,6 +23,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import shutil
 import subprocess
 import sys
 import urllib.request
@@ -211,3 +212,26 @@ subprocess.call(
     "cp impactx-doxygen-web.tag.xml source/_static/doxyhtml/",
     shell=True,
 )
+
+# Copy .pyi interface files and make them available as .py files
+# path to .pyi files w/o having them installed
+src_path = "../../src/python/impactx"
+dst_path = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "_static/pyapi/impactx"
+)
+if os.path.exists(dst_path) and os.path.isdir(dst_path):
+    shutil.rmtree(dst_path)
+shutil.copytree(src_path, dst_path)
+
+for subdir, _dirs, files in os.walk(dst_path):
+    for f in files:
+        if f.find(".pyi") > 0:
+            dir_path = os.path.relpath(subdir, dst_path)
+            old_path = os.path.join(dir_path, f)
+            new_path = old_path.replace(".pyi", ".py")
+            os.replace(
+                os.path.join(dst_path, old_path), os.path.join(dst_path, new_path)
+            )
+
+# insert into PYTHONPATH
+sys.path.insert(0, os.path.join(dst_path, ".."))
