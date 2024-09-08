@@ -18,6 +18,7 @@ if os.name == "nt":
 
 # import core bindings to C++
 from . import impactx_pybind as cxx
+from .distribution_input_helpers import twiss  # noqa
 from .extensions.ImpactXParIter import register_ImpactXParIter_extension
 from .extensions.ImpactXParticleContainer import (
     register_ImpactXParticleContainer_extension,
