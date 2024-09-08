@@ -17,6 +17,7 @@ from __future__ import annotations
 import os as os
 
 from amrex import space3d as amr
+from impactx.distribution_input_helpers import twiss
 from impactx.extensions.ImpactXParIter import register_ImpactXParIter_extension
 from impactx.extensions.ImpactXParticleContainer import (
     register_ImpactXParticleContainer_extension,
@@ -37,7 +38,13 @@ from impactx.impactx_pybind import (
 )
 from impactx.madx_to_impactx import read_beam, read_lattice
 
-from . import MADXParser, extensions, impactx_pybind, madx_to_impactx
+from . import (
+    MADXParser,
+    distribution_input_helpers,
+    extensions,
+    impactx_pybind,
+    madx_to_impactx,
+)
 
 __all__ = [
     "Config",
@@ -52,6 +59,7 @@ __all__ = [
     "coordinate_transformation",
     "cxx",
     "distribution",
+    "distribution_input_helpers",
     "elements",
     "extensions",
     "impactx_pybind",
@@ -64,6 +72,7 @@ __all__ = [
     "register_ImpactXParticleContainer_extension",
     "s",
     "t",
+    "twiss",
     "wakeconvolution",
 ]
 __author__: str = (
