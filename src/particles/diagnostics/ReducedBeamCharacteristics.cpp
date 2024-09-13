@@ -152,7 +152,7 @@ namespace impactx::diagnostics
          * https://stackoverflow.com/questions/55136414/constexpr-variable-captured-inside-lambda-loses-its-constexpr-ness
          */
         // number of reduction operations in second concurrent batch
-        static constexpr std::size_t num_red_ops_2 = 14;
+        static constexpr std::size_t num_red_ops_2 = 22;
         // prepare reduction operations for calculation of mean square and correlation values
         amrex::TypeMultiplier<amrex::ReduceOps, amrex::ReduceOpSum[num_red_ops_2]> reduce_ops_2;
         using ReducedDataT2 = amrex::TypeMultiplier<amrex::ReduceData, amrex::ParticleReal[num_red_ops_2]>;
@@ -183,12 +183,20 @@ namespace impactx::diagnostics
                 const amrex::ParticleReal p_xpx = (p_x-x_mean)*(p_px-px_mean)*p_w;
                 const amrex::ParticleReal p_ypy = (p_y-y_mean)*(p_py-py_mean)*p_w;
                 const amrex::ParticleReal p_tpt = (p_t-t_mean)*(p_pt-pt_mean)*p_w;
-                // prepare correlations for dispersion
+                // prepare correlations for dispersion (4 required)
                 const amrex::ParticleReal p_xpt = (p_x-x_mean)*(p_pt-pt_mean)*p_w;
                 const amrex::ParticleReal p_pxpt = (p_px-px_mean)*(p_pt-pt_mean)*p_w;
                 const amrex::ParticleReal p_ypt = (p_y-y_mean)*(p_pt-pt_mean)*p_w;
                 const amrex::ParticleReal p_pypt = (p_py-py_mean)*(p_pt-pt_mean)*p_w;
-
+                // prepare additional cross-plane correlations (8 required)
+                const amrex::ParticleReal p_xy = (p_x-x_mean)*(p_y-y_mean)*p_w;
+                const amrex::ParticleReal p_xpy = (p_x-x_mean)*(p_py-py_mean)*p_w;   
+                const amrex::ParticleReal p_xt = (p_x-x_mean)*(p_t-t_mean)*p_w;
+                const amrex::ParticleReal p_pxy = (p_px-px_mean)*(p_y-y_mean)*p_w;
+                const amrex::ParticleReal p_pxpy = (p_px-px_mean)*(p_py-py_mean)*p_w;
+                const amrex::ParticleReal p_pxt = (p_px-px_mean)*(p_t-t_mean)*p_w;
+                const amrex::ParticleReal p_yt = (p_y-y_mean)*(p_t-t_mean)*p_w;
+                const amrex::ParticleReal p_pyt = (p_py-py_mean)*(p_t-t_mean)*p_w;
 
                 const amrex::ParticleReal p_charge = q_C*p_w;
 
@@ -196,6 +204,7 @@ namespace impactx::diagnostics
                         p_px_ms, p_py_ms, p_pt_ms,
                         p_xpx, p_ypy, p_tpt,
                         p_xpt, p_pxpt, p_ypt, p_pypt,
+                        p_xy, p_xpy, p_xt, p_pxy, p_pxpy, p_pxt, p_yt, p_pyt,
                         p_charge};
             },
                 reduce_ops_2
@@ -208,6 +217,7 @@ namespace impactx::diagnostics
          * px_ms, py_ms, pt_ms,
          * xpx, ypy, tpt,
          * p_xpt, p_pxpt, p_ypt, p_pypt,
+         * p_xy, p_xpy, p_xt, p_pxy, p_pxpy, p_pxt, p_yt, p_pyt,
          * charge
          */
         amrex::constexpr_for<0, num_red_ops_2> ([&](auto i) {
@@ -249,7 +259,15 @@ namespace impactx::diagnostics
         amrex::ParticleReal const pxpt   = values_per_rank_2nd.at(10) /= w_sum;
         amrex::ParticleReal const ypt    = values_per_rank_2nd.at(11) /= w_sum;
         amrex::ParticleReal const pypt   = values_per_rank_2nd.at(12) /= w_sum;
-        amrex::ParticleReal const charge = values_per_rank_2nd.at(13);
+        amrex::ParticleReal const xy     = values_per_rank_2nd.at(13) /= w_sum;
+        amrex::ParticleReal const xpy    = values_per_rank_2nd.at(14) /= w_sum;
+        amrex::ParticleReal const xt     = values_per_rank_2nd.at(15) /= w_sum;
+        amrex::ParticleReal const pxy    = values_per_rank_2nd.at(16) /= w_sum;
+        amrex::ParticleReal const pxpy   = values_per_rank_2nd.at(17) /= w_sum;
+        amrex::ParticleReal const pxt    = values_per_rank_2nd.at(18) /= w_sum;
+        amrex::ParticleReal const yt     = values_per_rank_2nd.at(19) /= w_sum;
+        amrex::ParticleReal const pyt    = values_per_rank_2nd.at(20) /= w_sum;
+        amrex::ParticleReal const charge = values_per_rank_2nd.at(21);
         // standard deviations of positions
         amrex::ParticleReal const sig_x = std::sqrt(x_ms);
         amrex::ParticleReal const sig_y = std::sqrt(y_ms);
@@ -283,6 +301,55 @@ namespace impactx::diagnostics
         amrex::ParticleReal const alpha_x = - xpx_d / emittance_xd;
         amrex::ParticleReal const alpha_y = - ypy_d / emittance_yd;
         amrex::ParticleReal const alpha_t = - tpt / emittance_t;
+
+        // Calculate eigenemittances (optional)
+        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> Sigma;
+        amrex::ParticleReal emittance_1 = emittance_x;
+        amrex::ParticleReal emittance_2 = emittance_y;
+        amrex::ParticleReal emittance_3 = emittance_t;
+        bool compute_eigenemittances = true;
+        if (compute_eigenemittances) {
+           Sigma(1,1) = x_ms;
+           Sigma(1,2) = xpx;
+           Sigma(1,3) = xy;
+           Sigma(1,4) = xpy;
+           Sigma(1,5) = xt;
+           Sigma(1,6) = xpt;
+           Sigma(2,1) = xpx;
+           Sigma(2,2) = px_ms;
+           Sigma(2,3) = pxy;
+           Sigma(2,4) = pxpy;
+           Sigma(2,5) = pxt;
+           Sigma(2,6) = pxpt;
+           Sigma(3,1) = xy;
+           Sigma(3,2) = pxy;
+           Sigma(3,3) = y_ms;
+           Sigma(3,4) = ypy;
+           Sigma(3,5) = yt;
+           Sigma(3,6) = ypt;
+           Sigma(4,1) = xpy;
+           Sigma(4,2) = pxpy;
+           Sigma(4,3) = ypy;
+           Sigma(4,4) = py_ms;
+           Sigma(4,5) = pyt;
+           Sigma(4,6) = pypt;
+           Sigma(5,1) = xt;
+           Sigma(5,2) = pxt;
+           Sigma(5,3) = yt;
+           Sigma(5,4) = pyt;
+           Sigma(5,5) = t_ms;
+           Sigma(5,6) = tpt;
+           Sigma(6,1) = xpt;
+           Sigma(6,2) = pxpt;
+           Sigma(6,3) = ypt;
+           Sigma(6,4) = pypt;
+           Sigma(6,5) = tpt;
+           Sigma(6,6) = pt_ms;
+           std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> emittances = Eigenemittances(Sigma);
+           emittance_1 = std::get<0>(emittances);
+           emittance_2 = std::get<1>(emittances);
+           emittance_3 = std::get<2>(emittances);
+        }
 
         std::unordered_map<std::string, amrex::ParticleReal> data;
         data["x_mean"] = x_mean;
@@ -323,11 +390,14 @@ namespace impactx::diagnostics
         data["dispersion_y"] = dispersion_y;
         data["dispersion_py"] = dispersion_py;
         data["charge_C"] = charge;
+        data["emittance_1"] = emittance_1;
+        data["emittance_2"] = emittance_2;
+        data["emittance_3"] = emittance_3;
 
         // The following lines are added temporarily, for the sole
         // purpose of benchmarking the eigenemittance output for
         // a given beam covariance matrix Sigma.
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> Sigma;
+        //amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> Sigma;
         for (int i = 1; i < 7; i++) {
             for (int j = 1; j < 7; j++) {
                 Sigma(i,j) = 0.0;
