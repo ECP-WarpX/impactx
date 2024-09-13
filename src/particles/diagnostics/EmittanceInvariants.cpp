@@ -27,8 +27,8 @@ namespace impactx::diagnostics
      *  under any linear symplectic transport map, and are used in the
      *  calculation of the three eigenemittances.
      *
-     * @param[in] Sigma symmetric 6x6 covariance matrix
-     * @returns tuple containing invarants I2, I4, and I6
+     * input - Sigma symmetric 6x6 covariance matrix
+     * returns - tuple containing invarants I2, I4, and I6
      */
     std::tuple<
             amrex::ParticleReal,
@@ -89,8 +89,8 @@ namespace impactx::diagnostics
      *  the projected normalized rms emittances in the limit of
      *  uncoupled transport.
      *
-     * @param[in] Sigma symmetric 6x6 covariance matrix
-     * @returns tuple containing eigenemittances e1, e2, and e3
+     * input - Sigma symmetric 6x6 covariance matrix
+     * returns - tuple containing eigenemittances e1, e2, and e3
      */
     std::tuple<
             amrex::ParticleReal,
