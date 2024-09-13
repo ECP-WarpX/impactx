@@ -44,24 +44,35 @@ namespace impactx::diagnostics
         using ablastr::constant::math::pi;
 
         std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> roots;
+        amrex::ParticleReal x1 = 0.0_prt;
+        amrex::ParticleReal x2 = 0.0_prt;
+        amrex::ParticleReal x3 = 0.0_prt;
 
         amrex::ParticleReal Q = (3.0_prt*a*c - pow(b,2))/(9.0_prt * pow(a,2));
         amrex::ParticleReal R = (9.0_prt*a*b*c - 27_prt*pow(a,2)*d - 2.0_prt*pow(b,3))/(54.0_prt*pow(a,3));
         amrex::ParticleReal discriminant = pow(Q,3) + pow(R,2);
 
-        amrex::ParticleReal theta = 0.0_prt;
-
         // Discriminant should be < 0.  Otherwise, keep theta at default and throw an error.
-        if(discriminant > 0.0_prt){
-           std::cout << "Polynomial in CubicRoots has one or more complex roots." << "\n";
-        } else {
-           theta = acos(R/sqrt(-pow(Q,3)));
-        }
+        amrex::ParticleReal tol = 1.0e-12;  //allow for roundoff error
+        if(discriminant > tol){
 
-        //Three real roots in trigonometric form.
-        amrex::ParticleReal x1 = 2.0_prt*sqrt(-Q)*cos(theta/3.0_prt) - b/(3.0_prt*a);
-        amrex::ParticleReal x2 = 2.0_prt*sqrt(-Q)*cos(theta/3.0_prt + 2.0_prt*pi/3.0_prt) - b/(3.0_prt*a);
-        amrex::ParticleReal x3 = 2.0_prt*sqrt(-Q)*cos(theta/3.0_prt + 4.0_prt*pi/3.0_prt) - b/(3.0_prt*a);
+           std::cout << "Polynomial in CubicRoots has one or more complex roots." << "\n";
+
+        } else if (Q == 0.0_prt){  // Special case of a triple root
+
+           x1 = - b/(3.0_prt*a);
+           x2 = - b/(3.0_prt*a);
+           x3 = - b/(3.0_prt*a);
+
+        } else {
+
+           //Three real roots in trigonometric form.
+           amrex::ParticleReal theta = acos(R/sqrt(-pow(Q,3)));
+           x1 = 2.0_prt*sqrt(-Q)*cos(theta/3.0_prt) - b/(3.0_prt*a);
+           x2 = 2.0_prt*sqrt(-Q)*cos(theta/3.0_prt + 2.0_prt*pi/3.0_prt) - b/(3.0_prt*a);
+           x3 = 2.0_prt*sqrt(-Q)*cos(theta/3.0_prt + 4.0_prt*pi/3.0_prt) - b/(3.0_prt*a);
+
+        }
 
         std::cout << "Discriminant, Q, R " << discriminant << " " << Q << " " << R << "\n";
         std::cout << "Return x1, x2, x3 " << x1 << " " << x2 << " " << x3 << "\n";
