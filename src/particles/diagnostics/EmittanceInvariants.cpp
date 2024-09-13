@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
-#include <AMReX_GpuComplex.H>           
+#include <AMReX_GpuComplex.H>
 #include <cmath>
 #include <vector>
 #include <tuple>
@@ -22,7 +22,7 @@ namespace impactx::diagnostics
 {
 
     /** This function returns the three independent kinetic invariants
-     *  denoted I2, I4, and I6 as constructed from the 6x6 
+     *  denoted I2, I4, and I6 as constructed from the 6x6
      *  beam covariance matrix.  These three quantities are invariant
      *  under any linear symplectic transport map, and are used in the
      *  calculation of the three eigenemittances.
@@ -51,8 +51,8 @@ namespace impactx::diagnostics
         amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> S4;
         amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> S6;
 
-        // Construct the matrix S1 = Sigma*J.  This is a 
-        // permutation of the columns of Sigma with 
+        // Construct the matrix S1 = Sigma*J.  This is a
+        // permutation of the columns of Sigma with
         // a change of sign.
         for (int i = 1; i < 7; i++) {
             for (int j = 1; j < 7; j++) {
@@ -69,7 +69,7 @@ namespace impactx::diagnostics
         S2 = impactx::diagnostics::MultiplyMat(S1,S1);
         S4 = impactx::diagnostics::MultiplyMat(S2,S2);
         S6 = impactx::diagnostics::MultiplyMat(S2,S4);
-        
+
         // Define the three kinematic invariants (should be nonnegative).
         I2 = -impactx::diagnostics::TraceMat(S2)/2.0_prt;
         I4 = +impactx::diagnostics::TraceMat(S4)/2.0_prt;
@@ -130,6 +130,6 @@ namespace impactx::diagnostics
         emittances = std::make_tuple(e1,e2,e3);
         return emittances;
     }
-        
+
 
 } // namespace impactx::diagnostics

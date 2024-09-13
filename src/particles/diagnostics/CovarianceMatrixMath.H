@@ -52,7 +52,7 @@ namespace impactx::diagnostics
         amrex::ParticleReal theta = 0.0_prt;
 
         // Discriminant should be < 0.  Otherwise, keep theta at default and throw an error.
-        if(discriminant > 0.0_prt){ 
+        if(discriminant > 0.0_prt){
            std::cout << "Polynomial in CubicRoots has one or more complex roots." << "\n";
         } else {
            theta = acos(R/sqrt(-pow(Q,3)));
@@ -66,13 +66,13 @@ namespace impactx::diagnostics
         std::cout << "Discriminant, Q, R " << discriminant << " " << Q << " " << R << "\n";
         std::cout << "Return x1, x2, x3 " << x1 << " " << x2 << " " << x3 << "\n";
 
-        roots = std::make_tuple(x1,x2,x3);        
+        roots = std::make_tuple(x1,x2,x3);
         return roots;
     }
 
 
     /** Function to take the trace of a square 6x6 matrix.
-     *  
+     *
      * @param[in] matrix A
      * @returns the trace of A
      */
@@ -81,11 +81,11 @@ namespace impactx::diagnostics
         amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> A
     )
     {
-        int const dim = 6;              
+        int const dim = 6;
         amrex::ParticleReal trA = 0.0;
 
         for (int i = 1; i < dim+1; i++) {
-            trA += A(i,i);         
+            trA += A(i,i);
         }
         return trA;
     }
@@ -115,9 +115,9 @@ namespace impactx::diagnostics
                 }
 
             }
-             
+
         }
-        return C;   
+        return C;
     }
 
 
