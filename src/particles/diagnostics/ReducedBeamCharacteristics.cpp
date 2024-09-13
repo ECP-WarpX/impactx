@@ -190,7 +190,7 @@ namespace impactx::diagnostics
                 const amrex::ParticleReal p_pypt = (p_py-py_mean)*(p_pt-pt_mean)*p_w;
                 // prepare additional cross-plane correlations (8 required)
                 const amrex::ParticleReal p_xy = (p_x-x_mean)*(p_y-y_mean)*p_w;
-                const amrex::ParticleReal p_xpy = (p_x-x_mean)*(p_py-py_mean)*p_w;   
+                const amrex::ParticleReal p_xpy = (p_x-x_mean)*(p_py-py_mean)*p_w;
                 const amrex::ParticleReal p_xt = (p_x-x_mean)*(p_t-t_mean)*p_w;
                 const amrex::ParticleReal p_pxy = (p_px-px_mean)*(p_y-y_mean)*p_w;
                 const amrex::ParticleReal p_pxpy = (p_px-px_mean)*(p_py-py_mean)*p_w;
