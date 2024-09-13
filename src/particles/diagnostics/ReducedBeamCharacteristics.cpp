@@ -12,6 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/ReferenceParticle.H"
+#include "EmittanceInvariants.H"
 
 #include <AMReX_BLProfiler.H>           // for TinyProfiler
 #include <AMReX_GpuQualifiers.H>        // for AMREX_GPU_DEVICE
@@ -322,6 +323,39 @@ namespace impactx::diagnostics
         data["dispersion_y"] = dispersion_y;
         data["dispersion_py"] = dispersion_py;
         data["charge_C"] = charge;
+
+        // The following lines are added temporarily, for the sole
+        // purpose of benchmarking the eigenemittance output for
+        // a given beam covariance matrix Sigma.
+        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> Sigma;
+        for (int i = 1; i < 7; i++) {
+            for (int j = 1; j < 7; j++) {
+                Sigma(i,j) = 0.0;
+            }
+        }
+        for (int i = 1; i<7; i++) {
+            Sigma(i,i) = 1.0;
+        }
+        Sigma(1,1) = 3.0;
+        Sigma(1,2) = 2.0;
+        Sigma(2,1) = 2.0;
+        Sigma(2,2) = 3.0;
+
+        Sigma(3,3) = 1.0;
+        Sigma(3,4) = 0.5;
+        Sigma(4,3) = 0.5;
+        Sigma(4,4) = 1.0;
+
+        Sigma(5,5) = 4.0;
+        Sigma(5,6) = 1.0;
+        Sigma(6,5) = 1.0;
+        Sigma(6,6) = 4.0;
+
+        Sigma(1,6) = 1.0;
+        Sigma(6,1) = 1.0;
+
+        std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> emittances = Eigenemittances(Sigma);
+        std::cout << "Emittances = " << std::get<0>(emittances) << " " << std::get<1>(emittances) << " " << std::get<2>(emittances);
 
         return data;
     }
