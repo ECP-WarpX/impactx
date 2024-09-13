@@ -23,10 +23,10 @@ namespace impactx::diagnostics
      *  This implementation expects three real roots, which is verified
      *  by checking the sign of the discriminant.
      *
-     * @param[in] coefficient a
-     * @param[in] coefficient b
-     * @param[in] coefficient c
-     * @param[in] coefficient d
+     * @param[in] a coefficient of cubic term
+     * @param[in] b coefficient of quadratic term
+     * @param[in] c coefficient of linear term
+     * @param[in] d coefficient of constant term
      * @returns tuple of three real roots
      */
     std::tuple<
@@ -73,7 +73,7 @@ namespace impactx::diagnostics
 
     /** Function to take the trace of a square 6x6 matrix.
      *
-     * @param[in] matrix A
+     * @param[in] A a square matrix
      * @returns the trace of A
      */
     amrex::ParticleReal
@@ -93,9 +93,9 @@ namespace impactx::diagnostics
 
     /** Function to multiply two square matrices of dimension 6.
      *
-     * @param[in] matrix A
-     * @param[in] matrix B
-     * @returns matrix C = AB
+     * @param[in] A a square matrix
+     * @param[in] B square matrix
+     * @returns the matrix C = AB
      */
     amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6>
     MultiplyMat (
@@ -119,38 +119,6 @@ namespace impactx::diagnostics
         }
         return C;
     }
-
-
-    void TestMult ()
-    {
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> A;
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> B;
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> C;
-
-        for (int i = 1; i < 7; i++) {
-            for (int j = 1; j < 7; j++) {
-                A(i,j) = 0;
-                B(i,j) = 0;
-                C(i,j) = 0;
-            }
-        }
-        for (int i = 1; i < 7; i++) {
-            A(i,i) = 1.0;
-            B(i,i) = 1.0;
-        }
-        A(2,3) = -0.3;
-        B(4,5) = 0.5;
-        C = MultiplyMat(A,B);
-        std::cout << "Matrix multiplication gives " << "\n";
-        for (int i = 1; i < 7; i++) {
-            for (int j = 1; j < 7; j++) {
-                std::cout << i << " " << j << " " << C(i,j) << "\n";
-            }
-        }
-
-
-    }
-
 
 
 } // namespace impactx::diagnostics
