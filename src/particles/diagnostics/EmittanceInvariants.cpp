@@ -75,7 +75,7 @@ namespace impactx::diagnostics
         I4 = +impactx::diagnostics::TraceMat(S4)/2.0_prt;
         I6 = -impactx::diagnostics::TraceMat(S6)/2.0_prt;
 
-        std::cout << "Return I2, I4, I6 " << I2 << " " << I4 << " " << I6 << "\n";
+        //std::cout << "Return I2, I4, I6 " << I2 << " " << I4 << " " << I6 << "\n";
 
         invariants = std::make_tuple(I2,I4,I6);
         return invariants;
@@ -119,7 +119,7 @@ namespace impactx::diagnostics
         amrex::ParticleReal d = -pow(I2,3)/6.0_prt + I2*I4/2.0_prt - I6/3.0_prt;
 
         // Return the cubic coefficients
-        std::cout << "Return a,b,c,d " << a << " " << b << " " << c << " " << d << "\n";
+        //std::cout << "Return a,b,c,d " << a << " " << b << " " << c << " " << d << "\n";
 
         // Solve for the roots to obtain the eigenemittances.
         roots = CubicRoots(a,b,c,d);

@@ -425,7 +425,7 @@ namespace impactx::diagnostics
         Sigma(6,1) = 1.0;
 
         std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> emittances = Eigenemittances(Sigma);
-        std::cout << "Emittances = " << std::get<0>(emittances) << " " << std::get<1>(emittances) << " " << std::get<2>(emittances);
+        //std::cout << "Emittances = " << std::get<0>(emittances) << " " << std::get<1>(emittances) << " " << std::get<2>(emittances);
 
         return data;
     }
