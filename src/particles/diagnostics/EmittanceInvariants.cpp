@@ -129,7 +129,7 @@ namespace impactx::diagnostics
 
         // Caution: The order of e1,e2,e3 should be consistent with the
         // order ex,ey,et in the limit of uncoupled transport.  The
-        // ordering remains to be carefully checked (TODO).  
+        // ordering remains to be carefully checked (TODO).
         emittances = std::make_tuple(e1,e2,e3);
         return emittances;
     }
