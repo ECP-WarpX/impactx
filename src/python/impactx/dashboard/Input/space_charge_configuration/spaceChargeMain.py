@@ -110,29 +110,6 @@ def on_update_prob_relative_call(index, value):
 # -----------------------------------------------------------------------------
 
 
-@ctrl.add("update_prob_relative")
-def on_update_prob_relative_call(index, value):
-    prob_relative_value, input_type = generalFunctions.determine_input_type(value)
-
-    index = int(index)
-
-    # Validate the updated value
-    error_message = SpaceChargeFunctions.validate_prob_relative_fields(
-        index, prob_relative_value
-    )
-
-    if index < len(state.prob_relative):
-        state.prob_relative[index] = prob_relative_value if value else 0.0
-        print(f"Updated prob_relative: {state.prob_relative}")
-        state.prob_relative_fields[index]["error_message"] = error_message
-        state.dirty("prob_relative_fields")
-
-
-# -----------------------------------------------------------------------------
-# UI
-# -----------------------------------------------------------------------------
-
-
 class SpaceChargeConfiguration:
     @staticmethod
     def card():
@@ -212,7 +189,7 @@ class SpaceChargeConfiguration:
                 with vuetify.VCol(classes="pa-0"):
                     vuetify.VListItemSubtitle(
                         "prob_relative",
-                        classes="font-weight-bold black--text",
+                        classes="font-weight-bold black--text mt-1",
                     )
                 with vuetify.VRow(classes="my-0"):
                     with vuetify.VCol(
