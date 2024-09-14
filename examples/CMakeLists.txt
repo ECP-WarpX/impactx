@@ -964,13 +964,13 @@ add_impactx_test(dogleg.py
 #
 # w/o space charge
 add_impactx_test(coupled-optics
-    examples/dogleg/input_coupled_optics.in
+    examples/coupled_optics/input_coupled_optics.in
       ON   # ImpactX MPI-parallel
     examples/dogleg/analysis_coupled_optics.py
     OFF  # no plot script yet
 )
 add_impactx_test(coupled-optics.py
-    examples/dogleg/run_coupled_optics.py
+    examples/coupled_optics/run_coupled_optics.py
       OFF  # ImpactX MPI-parallel
     examples/dogleg/analysis_coupled_optics.py
     OFF  # no plot script yet
