@@ -115,12 +115,16 @@ assert np.allclose(
 print("")
 print("Initial eigenemittances:")
 emittance_1i, emittance_2i, emittance_3i = get_eigenemittances(initial_beam)
-print(f"  emittance_1={emittance_1i:e} emittance_2={emittance_2i:e} emittance_3={emittance_3i:e}")
+print(
+    f"  emittance_1={emittance_1i:e} emittance_2={emittance_2i:e} emittance_3={emittance_3i:e}"
+)
 
 print("")
 print("Final eigenemittances:")
 emittance_1f, emittance_2f, emittance_3f = get_eigenemittances(final_beam)
-print(f"  emittance_1={emittance_1f:e} emittance_2={emittance_2f:e} emittance_3={emittance_3f:e}")
+print(
+    f"  emittance_1={emittance_1f:e} emittance_2={emittance_2f:e} emittance_3={emittance_3f:e}"
+)
 
 atol = 0.0  # ignored
 rtol = 3.5 * num_particles**-0.5  # from random sampling of a smooth distribution
