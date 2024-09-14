@@ -34,6 +34,9 @@ namespace impactx::diagnostics
         RefPart const ref_part = pc.GetRefParticle();
         // reference particle charge in C
         amrex::ParticleReal const q_C = ref_part.charge;
+        // reference particle relativistic beta*gamma
+        amrex::ParticleReal const bg = ref_part.beta_gamma();
+        amrex::ParticleReal const bg2 = bg*bg;
 
         // preparing access to particle data: SoA
         using PType = typename ImpactXParticleContainer::SuperParticleType;
@@ -304,47 +307,49 @@ namespace impactx::diagnostics
 
         // Calculate eigenemittances (optional)
         amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> Sigma;
-        amrex::ParticleReal emittance_1 = emittance_x;
-        amrex::ParticleReal emittance_2 = emittance_y;
-        amrex::ParticleReal emittance_3 = emittance_t;
+        amrex::ParticleReal emittance_1 = emittance_x * bg;
+        amrex::ParticleReal emittance_2 = emittance_y * bg;
+        amrex::ParticleReal emittance_3 = emittance_t * bg;
         bool compute_eigenemittances = true;
         if (compute_eigenemittances) {
+           // Store the covariance matrix in dynamical variables:
            Sigma(1,1) = x_ms;
-           Sigma(1,2) = xpx;
+           Sigma(1,2) = xpx * bg;
            Sigma(1,3) = xy;
-           Sigma(1,4) = xpy;
+           Sigma(1,4) = xpy * bg;
            Sigma(1,5) = xt;
-           Sigma(1,6) = xpt;
-           Sigma(2,1) = xpx;
-           Sigma(2,2) = px_ms;
-           Sigma(2,3) = pxy;
-           Sigma(2,4) = pxpy;
-           Sigma(2,5) = pxt;
-           Sigma(2,6) = pxpt;
+           Sigma(1,6) = xpt * bg;
+           Sigma(2,1) = xpx * bg;
+           Sigma(2,2) = px_ms * bg2;
+           Sigma(2,3) = pxy * bg;
+           Sigma(2,4) = pxpy * bg2;
+           Sigma(2,5) = pxt * bg;
+           Sigma(2,6) = pxpt * bg2;
            Sigma(3,1) = xy;
-           Sigma(3,2) = pxy;
+           Sigma(3,2) = pxy * bg;
            Sigma(3,3) = y_ms;
-           Sigma(3,4) = ypy;
+           Sigma(3,4) = ypy * bg;
            Sigma(3,5) = yt;
-           Sigma(3,6) = ypt;
-           Sigma(4,1) = xpy;
-           Sigma(4,2) = pxpy;
-           Sigma(4,3) = ypy;
-           Sigma(4,4) = py_ms;
-           Sigma(4,5) = pyt;
-           Sigma(4,6) = pypt;
+           Sigma(3,6) = ypt * bg;
+           Sigma(4,1) = xpy * bg;
+           Sigma(4,2) = pxpy * bg2;
+           Sigma(4,3) = ypy * bg;
+           Sigma(4,4) = py_ms * bg2;
+           Sigma(4,5) = pyt * bg;
+           Sigma(4,6) = pypt * bg2;
            Sigma(5,1) = xt;
-           Sigma(5,2) = pxt;
+           Sigma(5,2) = pxt * bg;
            Sigma(5,3) = yt;
-           Sigma(5,4) = pyt;
+           Sigma(5,4) = pyt * bg;
            Sigma(5,5) = t_ms;
-           Sigma(5,6) = tpt;
-           Sigma(6,1) = xpt;
-           Sigma(6,2) = pxpt;
-           Sigma(6,3) = ypt;
-           Sigma(6,4) = pypt;
-           Sigma(6,5) = tpt;
-           Sigma(6,6) = pt_ms;
+           Sigma(5,6) = tpt * bg;
+           Sigma(6,1) = xpt * bg;
+           Sigma(6,2) = pxpt * bg2;
+           Sigma(6,3) = ypt * bg;
+           Sigma(6,4) = pypt * bg2;
+           Sigma(6,5) = tpt * bg;
+           Sigma(6,6) = pt_ms * bg2;
+           // Calculate eigenemittances
            std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> emittances = Eigenemittances(Sigma);
            emittance_1 = std::get<0>(emittances);
            emittance_2 = std::get<1>(emittances);
@@ -393,39 +398,6 @@ namespace impactx::diagnostics
         data["emittance_1"] = emittance_1;
         data["emittance_2"] = emittance_2;
         data["emittance_3"] = emittance_3;
-
-        // The following lines are added temporarily, for the sole
-        // purpose of benchmarking the eigenemittance output for
-        // a given beam covariance matrix Sigma.
-        //amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> Sigma;
-        for (int i = 1; i < 7; i++) {
-            for (int j = 1; j < 7; j++) {
-                Sigma(i,j) = 0.0;
-            }
-        }
-        for (int i = 1; i<7; i++) {
-            Sigma(i,i) = 1.0;
-        }
-        Sigma(1,1) = 3.0;
-        Sigma(1,2) = 2.0;
-        Sigma(2,1) = 2.0;
-        Sigma(2,2) = 3.0;
-
-        Sigma(3,3) = 1.0;
-        Sigma(3,4) = 0.5;
-        Sigma(4,3) = 0.5;
-        Sigma(4,4) = 1.0;
-
-        Sigma(5,5) = 4.0;
-        Sigma(5,6) = 1.0;
-        Sigma(6,5) = 1.0;
-        Sigma(6,6) = 4.0;
-
-        Sigma(1,6) = 1.0;
-        Sigma(6,1) = 1.0;
-
-        //std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> emittances = Eigenemittances(Sigma);
-        //std::cout << "Emittances = " << std::get<0>(emittances) << " " << std::get<1>(emittances) << " " << std::get<2>(emittances);
 
         return data;
     }
