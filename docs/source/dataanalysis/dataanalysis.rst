@@ -93,6 +93,8 @@ The code writes out the values in an ASCII file prefixed ``reduced_beam_characte
     Horizontal and vertical dispersion (unit: meter)
 * ``dispersion_px``, ``dispersion_py``
     Derivative of horizontal and vertical dispersion (unit: dimensionless)
+* ``emittance_1``, ``emittance_2``, ``emittance_3``
+    Normalized rms beam eigenemittances (aka mode emittances) (unit: meter)
 * ``charge``
     Total beam charge (unit: Coulomb)
 

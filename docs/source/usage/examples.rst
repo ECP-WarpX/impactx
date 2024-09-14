@@ -33,6 +33,8 @@ Single Particle Dynamics
    examples/achromatic_spectrometer/README.rst
    examples/fodo_programmable/README.rst
    examples/dogleg/README.rst
+   examples/coupled_optics/README.rst
+
 
 Collective Effects
 ------------------
