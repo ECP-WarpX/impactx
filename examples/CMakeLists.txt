@@ -975,4 +975,3 @@ add_impactx_test(coupled-optics.py
     examples/dogleg/analysis_coupled_optics.py
     OFF  # no plot script yet
 )
-
