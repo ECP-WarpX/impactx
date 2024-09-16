@@ -111,7 +111,11 @@ namespace impactx::diagnostics
         amrex::ParticleReal I4 = std::get<1>(invariants);
         amrex::ParticleReal I6 = std::get<2>(invariants);
 
-        // Construct the coefficients of the cubic polynomial
+        // Construct the coefficients of the cubic polynomial.
+        // This expression for the characteristic polynomial can be found in:
+        // V. Balandin, W. Decking, and N. Golubeva, "Relations Between Projected
+        // Emittances and Eigenemittances," in IPAC2018, Shanghai, China, 2013,
+        // doi:10.48550/arXiv.1305.1532.
         amrex::ParticleReal a = 1.0_prt;
         amrex::ParticleReal b = -I2;
         amrex::ParticleReal c = (pow(I2,2)-I4)/2.0_prt;
