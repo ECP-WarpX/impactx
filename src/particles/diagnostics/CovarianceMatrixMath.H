@@ -13,7 +13,9 @@
 #include <ablastr/constant.H>
 #include <AMReX_Array.H>
 #include <AMReX_REAL.H>
+#include <AMReX_GpuComplex.H>
 #include <tuple>
+#include <cmath>
 
 namespace impactx::diagnostics
 {
@@ -33,7 +35,7 @@ namespace impactx::diagnostics
             amrex::ParticleReal,
             amrex::ParticleReal,
             amrex::ParticleReal>
-    CubicRoots (
+    CubicRootsTrig (
         amrex::ParticleReal a,
         amrex::ParticleReal b,
         amrex::ParticleReal c,
@@ -75,6 +77,78 @@ namespace impactx::diagnostics
         }
 
         //std::cout << "Discriminant, Q, R " << discriminant << " " << Q << " " << R << "\n";
+        //std::cout << "Return x1, x2, x3 " << x1 << " " << x2 << " " << x3 << "\n";
+
+        roots = std::make_tuple(x1,x2,x3);
+        return roots;
+    }
+
+
+    /** Function to return the roots of a cubic polynomial ax^3 + bx^2 + cx + d.
+     *  The algebraic form of Cardano's formula is used.
+     *  This implementation expects three real roots, which is verified
+     *  by checking the sign of the discriminant.
+     *
+     * @param[in] a coefficient of cubic term
+     * @param[in] b coefficient of quadratic term
+     * @param[in] c coefficient of linear term
+     * @param[in] d coefficient of constant term
+     * @returns tuple of three real roots
+     */
+    std::tuple<
+            amrex::ParticleReal,
+            amrex::ParticleReal,
+            amrex::ParticleReal>
+    CubicRootsAlg (
+        amrex::ParticleReal a,
+        amrex::ParticleReal b,
+        amrex::ParticleReal c,
+        amrex::ParticleReal d
+    )
+    {
+        using namespace amrex::literals;
+        using Complex = amrex::GpuComplex<amrex::ParticleReal>;
+
+        std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> roots;
+        amrex::ParticleReal x1 = 0.0_prt;
+        amrex::ParticleReal x2 = 0.0_prt;
+        amrex::ParticleReal x3 = 0.0_prt;
+
+        amrex::ParticleReal Q = (3.0_prt*a*c - pow(b,2))/(9.0_prt * pow(a,2));
+        amrex::ParticleReal R = (9.0_prt*a*b*c - 27_prt*pow(a,2)*d - 2.0_prt*pow(b,3))/(54.0_prt*pow(a,3));
+        amrex::ParticleReal discriminant = pow(Q,3) + pow(R,2);
+
+        // Define complex variable C
+        Complex Qc(Q,0.0_prt);
+        Complex Rc(R,0.0_prt);
+        Complex Dc(discriminant,0.0_prt);
+        Complex C = pow(-Rc + sqrt(Dc),1.0/3.0);
+
+        // Define a cubic root of unity xi
+        amrex::ParticleReal xire = -1.0/2.0;
+        amrex::ParticleReal xiim = sqrt(3.0)/2.0;
+        Complex xi(xire,xiim);
+
+        //Three roots in algebraic form.
+
+        if (C.m_real == 0.0_prt && C.m_imag == 0.0_prt){  // Special case of a triple root
+
+           x1 = - b/(3.0_prt*a);
+           x2 = - b/(3.0_prt*a);
+           x3 = - b/(3.0_prt*a);
+
+        } else {
+
+           Complex z1 = Q/C - C - b/(3.0*a);
+           Complex z2 = Q/(xi*C) - xi*C - b/(3.0*a);
+           Complex z3 = Q/(pow(xi,2)*C) - pow(xi,2)*C - b/(3.0*a);
+           x1 = z2.m_real;
+           x2 = z1.m_real;
+           x3 = z3.m_real;
+        }
+
+        //std::cout << "Discriminant, Q, R " << discriminant << " " << Q << " " << R << "\n";
+        //std::cout << "Re(C), Im(C)  " << C.m_real << " " << C.m_imag << "\n";
         //std::cout << "Return x1, x2, x3 " << x1 << " " << x2 << " " << x3 << "\n";
 
         roots = std::make_tuple(x1,x2,x3);

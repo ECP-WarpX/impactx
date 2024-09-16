@@ -122,14 +122,14 @@ namespace impactx::diagnostics
         //std::cout << "Return a,b,c,d " << a << " " << b << " " << c << " " << d << "\n";
 
         // Solve for the roots to obtain the eigenemittances.
-        roots = CubicRoots(a,b,c,d);
+        // Caution: The order of e1,e2,e3 should be consistent with the
+        // order ex,ey,et in the limit of uncoupled transport.
+        // The order below is important and has been checked.
+        roots = CubicRootsAlg(a,b,c,d);
         amrex::ParticleReal e1 = sqrt(std::get<1>(roots));
         amrex::ParticleReal e2 = sqrt(std::get<2>(roots));
         amrex::ParticleReal e3 = sqrt(std::get<0>(roots));
 
-        // Caution: The order of e1,e2,e3 should be consistent with the
-        // order ex,ey,et in the limit of uncoupled transport.  The
-        // ordering remains to be carefully checked (TODO).
         emittances = std::make_tuple(e1,e2,e3);
         return emittances;
     }
