@@ -139,12 +139,12 @@ namespace impactx::diagnostics
 
         } else {
 
-           Complex z1 = Q/C - C - b/(3.0*a);
-           Complex z2 = Q/(xi*C) - xi*C - b/(3.0*a);
-           Complex z3 = Q/(pow(xi,2)*C) - pow(xi,2)*C - b/(3.0*a);
-           x1 = z2.m_real;
-           x2 = z1.m_real;
-           x3 = z3.m_real;
+           Complex z1 = Qc/C - C;
+           Complex z2 = Qc/(xi*C) - xi*C;
+           Complex z3 = Qc/(pow(xi,2)*C) - pow(xi,2)*C;
+           x1 = z2.m_real - b/(3.0*a);
+           x2 = z1.m_real - b/(3.0*a);
+           x3 = z3.m_real - b/(3.0*a);
         }
 
         //std::cout << "Discriminant, Q, R " << discriminant << " " << Q << " " << R << "\n";
