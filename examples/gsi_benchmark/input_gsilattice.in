@@ -1,0 +1,125 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 10000
+beam.units = static
+beam.energy = 11.4
+beam.charge = 1.0e-9
+beam.particle = proton
+beam.distribution = gaussian
+beam.sigmaX = 5.0e-3  #checked
+beam.sigmaY = 5.0e-3  #checked
+beam.sigmaT = 261.198218975890164  #checked
+beam.sigmaPx = 1.257e-3  #to verify
+beam.sigmaPy = 0.93e-3   #to verify
+beam.sigmaPt = 3.8620094883e-5  #checked
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.periods = 5
+lattice.elements = monitor rf cell sextupole chain rf
+
+# lines
+cell.type = line
+cell.elements = dr1 rb dr2 rb dr3 qs1f dr4 qs2d dr5 qs3t dr6
+
+rb.type = line
+rb.elements = e1 sbend1 e2
+
+chain.type = line
+chain.elements = cell
+chain.repeat = 11
+
+
+# thick element splitting for space charge
+lattice.nslice = 10
+
+
+# Drift elements:
+
+dr1.type = drift
+dr1.ds = 0.6450000
+
+dr2.type = drift
+dr2.ds = 0.9700000
+
+dr3.type = drift
+dr3.ds = 6.8390117
+
+dr4.type = drift
+dr4.ds = 0.6000000
+
+dr5.type = drift
+dr5.ds = 0.7098000
+
+dr6.type = drift
+dr6.ds = 0.4998000
+
+
+# Bend elements:
+sbend1.type = sbend
+sbend1.ds = 2.6179938779914944
+sbend1.rc = 10.0
+
+e1.type = dipedge
+e1.psi = 0.127409035395586
+e1.rc = 10.0
+e1.g = 0.07
+e1.K2 = 0.5
+
+e2.type = dipedge
+e2.psi = 0.127409035395586
+e2.rc = 10.0
+e2.g = 0.07
+e2.K2 = 0.5
+
+
+# Quad elements:
+qs1f.type = quad
+qs1f.ds = 1.0400000
+qs1f.k = 0.311872401
+
+qs2d.type = quad
+qs2d.ds = 1.0400000
+qs2d.k = -0.496504354
+
+qs3t.type = quad
+qs3t.ds = 0.4804000
+qs3t.k = 0.62221964
+
+
+# Sextupole element:
+sextupole.type = multipole
+sextupole.multipole = 3
+sextupole.k_normal = 0.2
+sextupole.k_skew = 0.0
+
+
+# Short RF element for bunching:
+rf.type = shortrf
+rf.V = 2.3184782e-8
+rf.freq = 1.0e4
+rf.phase = -90.0
+
+
+# Beam Monitor: Diagnostics
+monitor.type = beam_monitor
+monitor.backend = h5
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = true
