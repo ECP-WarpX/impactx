@@ -75,7 +75,6 @@ namespace impactx::diagnostics
         I4 = +impactx::diagnostics::TraceMat(S4)/2.0_prt;
         I6 = -impactx::diagnostics::TraceMat(S6)/2.0_prt;
 
-        //std::cout << "Return I2, I4, I6 " << I2 << " " << I4 << " " << I6 << "\n";
 
         invariants = std::make_tuple(I2,I4,I6);
         return invariants;

@@ -76,8 +76,6 @@ namespace impactx::diagnostics
 
         }
 
-        //std::cout << "Discriminant, Q, R " << discriminant << " " << Q << " " << R << "\n";
-        //std::cout << "Return x1, x2, x3 " << x1 << " " << x2 << " " << x3 << "\n";
 
         roots = std::make_tuple(x1,x2,x3);
         return roots;
@@ -147,9 +145,6 @@ namespace impactx::diagnostics
            x3 = z3.m_real - b/(3.0*a);
         }
 
-        //std::cout << "Discriminant, Q, R " << discriminant << " " << Q << " " << R << "\n";
-        //std::cout << "Re(C), Im(C)  " << C.m_real << " " << C.m_imag << "\n";
-        //std::cout << "Return x1, x2, x3 " << x1 << " " << x2 << " " << x3 << "\n";
 
         roots = std::make_tuple(x1,x2,x3);
         return roots;
