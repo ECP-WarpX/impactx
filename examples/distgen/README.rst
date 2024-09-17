@@ -100,13 +100,13 @@ For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with `
 
    .. tab-item:: Python: Script
 
-       .. literalinclude:: run_kvdist_from_twiss.py
+       .. literalinclude:: run_kvdist_twiss.py
           :language: python3
           :caption: You can copy this file from ``examples/distgen/run_kvdist_twiss.py``.
 
    .. tab-item:: Executable: Input File
 
-       .. literalinclude:: input_kvdist_from_twiss.in
+       .. literalinclude:: input_kvdist_twiss.in
           :language: ini
           :caption: You can copy this file from ``examples/distgen/input_kvdist_twiss.in``.
 
