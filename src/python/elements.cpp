@@ -730,10 +730,10 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Multipole);
 
-    py::class_<Empty, elements::Thin> py_None(me, "Empty");
-    py_None
+    py::class_<Empty, elements::Thin> py_Empty(me, "Empty");
+    py_Empty
         .def("__repr__",
-             [](Empty const & /* none */) {
+             [](Empty const & /* empty */) {
                  return std::string("<impactx.elements.Empty>");
              }
         )
@@ -741,7 +741,20 @@ void init_elements(py::module& m)
              "This element does nothing."
         )
     ;
-    register_beamoptics_push(py_None);
+    register_beamoptics_push(py_Empty);
+
+    py::class_<Marker, elements::Thin> py_Marker(me, "Marker");
+    py_Marker
+            .def("__repr__",
+                 [](Marker const & /* marker */) {
+                     return std::string("<impactx.elements.Marker>");
+                 }
+            )
+            .def(py::init<>(),
+                 "This element does nothing."
+            )
+            ;
+    register_beamoptics_push(py_Marker);
 
     py::class_<NonlinearLens, elements::Thin, elements::Alignment> py_NonlinearLens(me, "NonlinearLens");
     py_NonlinearLens
