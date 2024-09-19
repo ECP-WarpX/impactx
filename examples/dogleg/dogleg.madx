@@ -1,0 +1,20 @@
+beam, particle=electron, energy=5.0;
+
+! drift elements
+D1: drift, L=5.0058489435;
+D2: drift, L=0.1;
+
+! dipole elements
+SB1: sbend, L=0.500194828041958, angle=-0.04834492753623188, e1=0.000, e2=0.000, k1=0.00;
+SB2: sbend, L=0.500194828041958, angle=0.04834492753623188, e1=0.000, e2=0.000, k1=0.00;
+
+! dipole edge elements
+DIPE1: dipedge, H=-0.096653578905433, e1=-0.048345620280243, fint=0.000, hgap=0.000, tilt=0.00;
+DIPE2: dipedge, H=0.096653578905433, e1=0.048345620280243, fint=0.000, hgap=0.000, tilt=0.00;
+
+dogleg:     Line=(SB1,DIPE1,D1,DIPE2,SB2,(5*D2));
+
+! Twiss output
+use, sequence = dogleg;
+select,flag=twiss,range=#S/#E,column=s,alfx,betx,alfy,bety,dx,dpx;
+twiss,betx=40.0,bety=13.0,alfx=2.6,alfy=2.6,file=optics;

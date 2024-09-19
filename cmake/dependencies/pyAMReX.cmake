@@ -47,12 +47,7 @@ function(find_pyamrex)
                 GIT_TAG        ${ImpactX_pyamrex_branch}
                 BUILD_IN_SOURCE 0
             )
-            FetchContent_GetProperties(fetchedpyamrex)
-
-            if(NOT fetchedpyamrex_POPULATED)
-                FetchContent_Populate(fetchedpyamrex)
-                add_subdirectory(${fetchedpyamrex_SOURCE_DIR} ${fetchedpyamrex_BINARY_DIR})
-            endif()
+            FetchContent_MakeAvailable(fetchedpyamrex)
 
             # advanced fetch options
             mark_as_advanced(FETCHCONTENT_BASE_DIR)
@@ -64,7 +59,7 @@ function(find_pyamrex)
         endif()
     elseif(NOT ImpactX_pyamrex_internal)
         # TODO: MPI control
-        find_package(pyAMReX 24.08 CONFIG REQUIRED)
+        find_package(pyAMReX 24.09 CONFIG REQUIRED)
         message(STATUS "pyAMReX: Found version '${pyAMReX_VERSION}'")
     endif()
 endfunction()
@@ -79,7 +74,7 @@ option(ImpactX_pyamrex_internal "Download & build pyAMReX" ON)
 set(ImpactX_pyamrex_repo "https://github.com/AMReX-Codes/pyamrex.git"
     CACHE STRING
     "Repository URI to pull and build pyamrex from if(ImpactX_pyamrex_internal)")
-set(ImpactX_pyamrex_branch "24.08"
+set(ImpactX_pyamrex_branch "24.09"
     CACHE STRING
     "Repository branch for ImpactX_pyamrex_repo if(ImpactX_pyamrex_internal)")
 

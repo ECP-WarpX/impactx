@@ -179,6 +179,15 @@ add_impactx_test(FODO.py
     examples/fodo/plot_fodo.py
 )
 
+# Python: FODO Cell w/ Twiss input ############################################
+#
+add_impactx_test(FODO.Twiss.py
+        examples/fodo/run_fodo_twiss.py
+        OFF  # ImpactX MPI-parallel
+        examples/fodo/analysis_fodo.py
+        examples/fodo/plot_fodo.py
+)
+
 # Python: FODO Cell w/ programmed element for the Drifts ######################
 #
 add_impactx_test(FODO.programmable.py
@@ -292,28 +301,37 @@ add_impactx_test(cfchannel.py
     OFF  # no plot script yet
 )
 
-# 6D Gaussian Distribution Test ###############################################
+# 6D Gaussian Distribution from Twiss Test ####################################
 #
-add_impactx_test(gaussian
-    examples/distgen/input_gaussian.in
+add_impactx_test(gaussian_twiss
+    examples/distgen/input_gaussian_twiss.in
       OFF  # ImpactX MPI-parallel
     examples/distgen/analysis_gaussian.py
     OFF  # no plot script yet
 )
 
-# K-V Distribution Test #######################################################
+# Python: 6D Gaussian Distribution  w/ Twiss input ############################
 #
-add_impactx_test(kvdist
-    examples/distgen/input_kvdist.in
-      OFF  # ImpactX MPI-parallel
-    examples/distgen/analysis_kvdist.py
-    OFF  # no plot script yet
+add_impactx_test(gaussian_twiss.py
+        examples/distgen/run_gaussian_twiss.py
+        OFF  # ImpactX MPI-parallel
+        examples/distgen/analysis_gaussian.py
+        OFF  # no plot script yet
 )
 
 # K-V Distribution from Twiss Test ############################################
 #
-add_impactx_test(kvdist_from_twiss
+add_impactx_test(kvdist_twiss
         examples/distgen/input_kvdist_twiss.in
+        OFF  # ImpactX MPI-parallel
+        examples/distgen/analysis_kvdist.py
+        OFF  # no plot script yet
+)
+
+# Python: 6D Gaussian Distribution  w/ Twiss input ############################
+#
+add_impactx_test(kvdist_twiss.py
+        examples/distgen/run_kvdist_twiss.py
         OFF  # ImpactX MPI-parallel
         examples/distgen/analysis_kvdist.py
         OFF  # no plot script yet
@@ -346,6 +364,15 @@ add_impactx_test(kurth4d
     OFF  # no plot script yet
 )
 
+# Python: 4D Kurth Distribution Test ##########################################
+#
+add_impactx_test(kurth4d.py
+        examples/distgen/run_kurth4d.py
+        OFF  # ImpactX MPI-parallel
+        examples/distgen/analysis_kurth4d.py
+        OFF  # no plot script yet
+)
+
 # Semi-Gaussian Distribution Test #############################################
 #
 add_impactx_test(semigaussian
@@ -353,6 +380,15 @@ add_impactx_test(semigaussian
       OFF  # ImpactX MPI-parallel
     examples/distgen/analysis_semigaussian.py
     OFF  # no plot script yet
+)
+
+# Python: 6D Gaussian Distribution  w/ Twiss input ############################
+#
+add_impactx_test(semigaussian.py
+        examples/distgen/run_semigaussian.py
+        OFF  # ImpactX MPI-parallel
+        examples/distgen/analysis_semigaussian.py
+        OFF  # no plot script yet
 )
 
 # Chain of Multipoles Test ####################################################
@@ -875,7 +911,7 @@ add_impactx_test(initialize_from_array.py
     examples/initialize_from_array/visualize_from_array.py
 )
 
-# Achromatic Spectrometer ########################################################
+# Achromatic Spectrometer ####################################################
 #
 # w/o space charge
 add_impactx_test(spectrometer
@@ -888,5 +924,38 @@ add_impactx_test(spectrometer.py
     examples/achromatic_spectrometer/run_spectrometer.py
       OFF  # ImpactX MPI-parallel
     examples/achromatic_spectrometer/analysis_spectrometer.py
+    OFF  # no plot script yet
+)
+
+# Chicane with CSR ###########################################################
+#
+if(ImpactX_FFT)
+    add_impactx_test(chicane_csr
+        examples/chicane/input_chicane_csr.in
+        OFF  # ImpactX MPI-parallel
+        examples/chicane/analysis_chicane_csr.py
+        OFF  # no plot script yet
+    )
+    add_impactx_test(chicane_csr.py
+        examples/chicane/run_chicane_csr.py
+        OFF  # ImpactX MPI-parallel
+        examples/chicane/analysis_chicane_csr.py
+        OFF  # no plot script yet
+    )
+endif()
+
+# Dogleg #####################################################################
+#
+# w/o space charge
+add_impactx_test(dogleg
+    examples/dogleg/input_dogleg.in
+      ON   # ImpactX MPI-parallel
+    examples/dogleg/analysis_dogleg.py
+    OFF  # no plot script yet
+)
+add_impactx_test(dogleg.py
+    examples/dogleg/run_dogleg.py
+      OFF  # ImpactX MPI-parallel
+    examples/dogleg/analysis_dogleg.py
     OFF  # no plot script yet
 )

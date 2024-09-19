@@ -106,7 +106,7 @@ namespace impactx
         }, distr);
 
         amr_data->m_particle_container->AddNParticles(x, y, t, px, py, pt,
-                                                      ref.qm_qeeV(),
+                                                      ref.qm_ratio_SI(),
                                             bunch_charge * rel_part_this_proc);
 
         bool space_charge = false;
@@ -266,18 +266,13 @@ namespace impactx
         pp_dist.get("distribution", distribution_type);
 
         std::string base_dist_type = distribution_type;
-        // Position of the underscore for splitting off the suffix in case the distribution name either ends in "_from_twiss" or "_from_cs"
+        // Position of the underscore for splitting off the suffix in case the distribution name either ends in "_from_twiss"
         std::size_t str_pos_from_twiss = distribution_type.rfind("_from_twiss");
-        std::size_t str_pos_from_cs = distribution_type.rfind("_from_cs");
         bool initialize_from_twiss = false;
 
         if (str_pos_from_twiss != std::string::npos) { // "_from_twiss" is found
             // Calculate suffix and base type, consider length of "_from_twiss" = 12
             base_dist_type = distribution_type.substr(0, str_pos_from_twiss);
-            initialize_from_twiss = true;
-        } else if (str_pos_from_cs != std::string::npos) { // "_from_cs" is found
-            // Calculate suffix and base type, consider length of "_from_cs" = 8
-            base_dist_type = distribution_type.substr(0, str_pos_from_cs);
             initialize_from_twiss = true;
         }
 

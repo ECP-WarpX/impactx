@@ -66,6 +66,8 @@ def application():
         with layout.toolbar:
             with vuetify.Template(v_if="$route.path == '/Analyze'"):
                 Toolbars.analyze_toolbar()
+            with vuetify.Template(v_if="$route.path == '/Input'"):
+                Toolbars.input_toolbar()
             with vuetify.Template(v_if="$route.path == '/Run'"):
                 Toolbars.run_toolbar()
 

@@ -26,6 +26,7 @@ void init_ImpactX(py::module&);
 void init_impactxparticlecontainer(py::module&);
 void init_refparticle(py::module&);
 void init_transformation(py::module&);
+void init_wakeconvolution(py::module& m);
 
 PYBIND11_MODULE(impactx_pybind, m) {
     // make sure AMReX types are known
@@ -49,6 +50,7 @@ PYBIND11_MODULE(impactx_pybind, m) {
     init_impactxparticlecontainer(m);
     init_elements(m);
     init_transformation(m);
+    init_wakeconvolution(m);
     init_ImpactX(m);
 
     // expose our amrex module

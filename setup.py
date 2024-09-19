@@ -24,7 +24,7 @@ class CopyPreBuild(build):
         # clashes with directories many developers have in their source trees;
         # this can create confusing results with "pip install .", which clones
         # the whole source tree by default
-        self.build_base = "_tmppythonbuild"
+        self.build_base = os.path.join("_tmppythonbuild", "impactx")
 
     def run(self):
         # remove existing build directory
@@ -56,14 +56,14 @@ class CMakeBuild(build_ext):
             out = subprocess.check_output(["cmake", "--version"])
         except OSError:
             raise RuntimeError(
-                "CMake 3.20.0+ must be installed to build the following "
+                "CMake 3.24.0+ must be installed to build the following "
                 + "extensions: "
                 + ", ".join(e.name for e in self.extensions)
             )
 
         cmake_version = parse(re.search(r"version\s*([\d.]+)", out.decode()).group(1))
-        if cmake_version < parse("3.20.0"):
-            raise RuntimeError("CMake >= 3.20.0 is required")
+        if cmake_version < parse("3.24.0"):
+            raise RuntimeError("CMake >= 3.24.0 is required")
 
         for ext in self.extensions:
             self.build_extension(ext)
@@ -223,7 +223,7 @@ with open("./requirements.txt") as f:
 setup(
     name="impactx",
     # note PEP-440 syntax: x.y.zaN but x.y.z.devN
-    version="24.08",
+    version="24.09",
     packages=["impactx"],
     # Python sources:
     package_dir={"": "src/python"},

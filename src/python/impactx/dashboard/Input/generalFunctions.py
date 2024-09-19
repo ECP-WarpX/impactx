@@ -22,7 +22,6 @@ server, state, ctrl = setup_server()
 
 
 class generalFunctions:
-
     @staticmethod
     def documentation(section_name):
         """
