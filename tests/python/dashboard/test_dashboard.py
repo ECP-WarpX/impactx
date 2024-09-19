@@ -20,6 +20,8 @@ def test_dashboard():
     """
     from seleniumbase import SB
 
+    app_process = None
+
     try:
         with SB(headless=True) as sb:
             app_process = start_dashboard()
@@ -87,4 +89,5 @@ def test_dashboard():
             sb.wait_for_element("#interact", timeout=10)
             sb.click("#interact")
     finally:
-        app_process.terminate()
+        if app_process is not None:
+            app_process.terminate()
