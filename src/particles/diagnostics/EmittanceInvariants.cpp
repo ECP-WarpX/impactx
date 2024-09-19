@@ -114,7 +114,7 @@ namespace impactx::diagnostics
         // Construct the coefficients of the cubic polynomial.
         // This expression for the characteristic polynomial can be found in:
         // V. Balandin, W. Decking, and N. Golubeva, "Relations Between Projected
-        // Emittances and Eigenemittances," in IPAC2018, Shanghai, China, 2013,
+        // Emittances and Eigenemittances," in IPAC2013, Shanghai, China, 2013,
         // doi:10.48550/arXiv.1305.1532.
         amrex::ParticleReal a = 1.0_prt;
         amrex::ParticleReal b = -I2;
@@ -129,9 +129,9 @@ namespace impactx::diagnostics
         // order ex,ey,et in the limit of uncoupled transport.
         // The order below is important and has been checked.
         roots = CubicRootsTrig(a,b,c,d);
-        amrex::ParticleReal e1 = sqrt(std::get<1>(roots));
-        amrex::ParticleReal e2 = sqrt(std::get<2>(roots));
-        amrex::ParticleReal e3 = sqrt(std::get<0>(roots));
+        amrex::ParticleReal e1 = sqrt(abs(std::get<1>(roots)));
+        amrex::ParticleReal e2 = sqrt(abs(std::get<2>(roots)));
+        amrex::ParticleReal e3 = sqrt(abs(std::get<0>(roots)));
 
         emittances = std::make_tuple(e1,e2,e3);
         return emittances;
