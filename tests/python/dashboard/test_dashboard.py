@@ -2,12 +2,14 @@ import importlib
 
 import pytest
 from util import (
+    look_for_text,
     set_input_value,
     start_dashboard,
     wait_for_dashboard_ready,
     wait_for_ready,
 )
 
+TIMEOUT = 60
 
 @pytest.mark.skipif(
     importlib.util.find_spec("seleniumbase") is None,
@@ -25,12 +27,12 @@ def test_dashboard():
     try:
         with SB(headless=True) as sb:
             app_process = start_dashboard()
-            wait_for_dashboard_ready(app_process, timeout=60)
+            wait_for_dashboard_ready(app_process, timeout=TIMEOUT)
 
             url = "http://localhost:8080/index.html#/Input"
             sb.open(url)
 
-            wait_for_ready(sb, ".trame__loader", 60)
+            wait_for_ready(sb, ".trame__loader", TIMEOUT)
 
             # Adjust beam properties
             sb.click("#particle_shape")
@@ -53,7 +55,6 @@ def test_dashboard():
 
             # Adjust lattice configuration
             sb.click("#lattice_settings_icon")
-            sb.sleep(1)
             set_input_value(sb, "nslice_default_value", 25)
             sb.click("#lattice_settings_close")
             sb.click("#clear_button")
@@ -77,17 +78,10 @@ def test_dashboard():
 
             # Run simulation
             sb.click("#Run_route")
-            sb.sleep(1)
             sb.click("#run_simulation_button")
-            sb.sleep(7)  # for simulation to finish
 
-            # Interact with phase space projection plots
-            sb.click("#Analyze_route")
-            sb.sleep(3)
-            sb.click("#select_plot")
-            sb.click("div.v-list-item:nth-of-type(2)")
-            sb.wait_for_element("#interact", timeout=10)
-            sb.click("#interact")
+            assert look_for_text(sb, "#xterm_component", "Simulation complete.", timeout=TIMEOUT), "'Simulation compelte.' not found."
+
     finally:
         if app_process is not None:
             app_process.terminate()

@@ -1,12 +1,12 @@
 import os
 import subprocess
 import sys
+from selenium.common.exceptions import ElementNotInteractableException, JavascriptException
+import time
 
-
-def wait_for_ready(sb, element_name, timeout):
-    # Code adapted from https://github.com/Kitware/trame-client/blob/master/trame_client/utils/testing.py
+def wait_for_ready(sb, element_name, timeout=10):
     """
-    Function waits until element_name is present.
+    Waits until the specified element is present in the DOM.
     """
     for i in range(timeout):
         print(f"wait_for_ready {i}")
@@ -31,19 +31,40 @@ def wait_for_dashboard_ready(process, timeout=60):
     raise Exception("Dashboard did not start correctly.")
 
 
-def set_input_value(sb, element_id, value):
+def set_input_value(sb, element_id, value, timeout=60):
     """
     Function to clear, update, and trigger a change event on an input field by ID.
+    Waits until the element is interactable before performing actions.
     """
+
     selector = f"#{element_id}"
-    sb.clear(selector)
+    end_time = time.time() + timeout
 
-    if not isinstance(value, str):
-        value = str(value)
+    while True:
+        try:
+            sb.clear(selector)
+            sb.update_text(selector, value)
+            sb.send_keys(selector, "\n")
+            break
+        except (ElementNotInteractableException, JavascriptException):
+            if time.time() > end_time:
+                raise Exception(f"Element {selector} not interactable after {timeout} seconds.")
 
-    sb.update_text(selector, value)
-    sb.send_keys(selector, "\n")
+def look_for_text(sb, element_id, text_to_look_for, timeout):
+    """
+    Function which repeatedly checks for specific text every second until it appears or the timeout is reached.
+    """
 
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        try:
+            if sb.is_text_visible(text_to_look_for, element_id):
+                return True
+        except Exception as e:
+            print(f"Error checking for text: {e}")
+        time.sleep(1)
+
+    return False
 
 def start_dashboard():
     """
