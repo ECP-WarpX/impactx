@@ -129,9 +129,9 @@ namespace impactx::diagnostics
         // order ex,ey,et in the limit of uncoupled transport.
         // The order below is important and has been checked.
         roots = CubicRootsTrig(a,b,c,d);
-        amrex::ParticleReal e1 = sqrt(abs(std::get<1>(roots)));
-        amrex::ParticleReal e2 = sqrt(abs(std::get<2>(roots)));
-        amrex::ParticleReal e3 = sqrt(abs(std::get<0>(roots)));
+        amrex::ParticleReal e1 = sqrt(amrex::abs(std::get<1>(roots)));
+        amrex::ParticleReal e2 = sqrt(amrex::abs(std::get<2>(roots)));
+        amrex::ParticleReal e3 = sqrt(amrex::abs(std::get<0>(roots)));
 
         emittances = std::make_tuple(e1,e2,e3);
         return emittances;
