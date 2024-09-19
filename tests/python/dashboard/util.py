@@ -1,8 +1,13 @@
 import os
 import subprocess
 import sys
-from selenium.common.exceptions import ElementNotInteractableException, JavascriptException
 import time
+
+from selenium.common.exceptions import (
+    ElementNotInteractableException,
+    JavascriptException,
+)
+
 
 def wait_for_ready(sb, element_name, timeout=10):
     """
@@ -48,7 +53,10 @@ def set_input_value(sb, element_id, value, timeout=60):
             break
         except (ElementNotInteractableException, JavascriptException):
             if time.time() > end_time:
-                raise Exception(f"Element {selector} not interactable after {timeout} seconds.")
+                raise Exception(
+                    f"Element {selector} not interactable after {timeout} seconds."
+                )
+
 
 def look_for_text(sb, element_id, text_to_look_for, timeout):
     """
@@ -65,6 +73,7 @@ def look_for_text(sb, element_id, text_to_look_for, timeout):
         time.sleep(1)
 
     return False
+
 
 def start_dashboard():
     """

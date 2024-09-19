@@ -11,6 +11,7 @@ from util import (
 
 TIMEOUT = 60
 
+
 @pytest.mark.skipif(
     importlib.util.find_spec("seleniumbase") is None,
     reason="seleniumbase is not available",
@@ -80,7 +81,9 @@ def test_dashboard():
             sb.click("#Run_route")
             sb.click("#run_simulation_button")
 
-            assert look_for_text(sb, "#xterm_component", "Simulation complete.", timeout=TIMEOUT), "'Simulation compelte.' not found."
+            assert look_for_text(
+                sb, "#xterm_component", "Simulation complete.", timeout=TIMEOUT
+            ), "'Simulation compelte.' not found."
 
     finally:
         if app_process is not None:
