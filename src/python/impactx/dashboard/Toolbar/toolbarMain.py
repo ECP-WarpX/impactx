@@ -46,6 +46,17 @@ class ToolbarElements:
             disabled=("disableRunSimulationButton", True),
         )
 
+    @staticmethod
+    def show_simulation_complete():
+        vuetify.VAlert(
+                "Simulation Complete",
+                v_model=("simulation_complete", False),
+                id="simulation_complete",
+                type="success",
+                dense=True,
+                classes="mt-4",
+            )
+
 
 # -----------------------------------------------------------------------------
 # Content
@@ -64,6 +75,7 @@ class Toolbars:
         """
 
         vuetify.VSpacer(),
+        ToolbarElements.show_simulation_complete(),
         ToolbarElements.run_simulation_button(),
 
     @staticmethod

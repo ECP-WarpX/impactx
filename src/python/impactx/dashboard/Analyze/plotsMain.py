@@ -152,6 +152,7 @@ def run_simulation_impactX():
             ctrl.terminal_print(line)
         ctrl.terminal_print("Simulation complete.")
 
+
     asyncio.create_task(print_lines())
 
 
@@ -175,6 +176,7 @@ def on_filtered_data_change(**kwargs):
 
 @ctrl.add("run_simulation")
 def run_simulation_and_store():
+    state.simulation_complete = True,
     state.plot_options = available_plot_options(simulationClicked=True)
     run_simulation_impactX()
     update_plot()

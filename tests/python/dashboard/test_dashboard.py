@@ -2,7 +2,7 @@ import importlib
 
 import pytest
 from util import (
-    look_for_text,
+    check_until_visible,
     set_input_value,
     start_dashboard,
     wait_for_dashboard_ready,
@@ -81,9 +81,7 @@ def test_dashboard():
             sb.click("#Run_route")
             sb.click("#run_simulation_button")
 
-            assert look_for_text(
-                sb, "#xterm_component", "Simulation complete.", timeout=TIMEOUT
-            ), "'Simulation compelte.' not found."
+            assert check_until_visible(sb, "#simulation_complete"), "Simulation did not complete successfully."
 
     finally:
         if app_process is not None:

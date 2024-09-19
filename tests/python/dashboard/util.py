@@ -58,20 +58,16 @@ def set_input_value(sb, element_id, value, timeout=60):
                 )
 
 
-def look_for_text(sb, element_id, text_to_look_for, timeout):
+def check_until_visible(sb, selector, timeout=10, interval=1):
     """
-    Function which repeatedly checks for specific text every second until it appears or the timeout is reached.
+    Function which retries checking if an element is visible.
     """
 
-    start_time = time.time()
-    while time.time() - start_time < timeout:
-        try:
-            if sb.is_text_visible(text_to_look_for, element_id):
-                return True
-        except Exception as e:
-            print(f"Error checking for text: {e}")
-        time.sleep(1)
-
+    end_time = time.time() + timeout
+    while time.time() < end_time:
+        if sb.is_element_visible(selector):
+            return True
+        time.sleep(interval)
     return False
 
 
