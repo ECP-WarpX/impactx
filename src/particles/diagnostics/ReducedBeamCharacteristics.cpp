@@ -262,10 +262,10 @@ namespace impactx::diagnostics
         amrex::ParticleReal const emittance_y = std::sqrt(y_ms*py_ms-ypy*ypy);
         amrex::ParticleReal const emittance_t = std::sqrt(t_ms*pt_ms-tpt*tpt);
         // Dispersion and dispersive beam moments
-        amrex::ParticleReal const dispersion_x = - xpt / pt_ms;
-        amrex::ParticleReal const dispersion_px = - pxpt / pt_ms;
-        amrex::ParticleReal const dispersion_y = - ypt / pt_ms;
-        amrex::ParticleReal const dispersion_py = - pypt / pt_ms;
+        amrex::ParticleReal const dispersion_x = ((pt_ms > 0.0) ? (- xpt / pt_ms) : 0.0);
+        amrex::ParticleReal const dispersion_px = ((pt_ms > 0.0) ? (- pxpt / pt_ms) : 0.0);
+        amrex::ParticleReal const dispersion_y = ((pt_ms > 0.0) ? (- ypt / pt_ms) : 0.0);
+        amrex::ParticleReal const dispersion_py = ((pt_ms > 0.0) ? (- pypt / pt_ms) : 0.0);
         amrex::ParticleReal const x_msd = x_ms - pt_ms*dispersion_x*dispersion_x;
         amrex::ParticleReal const px_msd = px_ms - pt_ms*dispersion_px*dispersion_px;
         amrex::ParticleReal const xpx_d = xpx - pt_ms*dispersion_x*dispersion_px;
