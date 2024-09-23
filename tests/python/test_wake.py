@@ -6,16 +6,16 @@ import numpy as np
 np.set_printoptions(threshold=sys.maxsize)
 from conftest import basepath
 
+import impactx
 from amrex.space3d import PODVector_real_std  # Import amrex array
-from impactx import ImpactX, amr, wakeconvolution
+from impactx import ImpactX, wakeconvolution
 
 
 def test_wake(save_png=True):
-    amr.initialize([])
     try:
         sim = ImpactX()
         sim.n_cell = [16, 24, 32]
-        sim.load_inputs_file(basepath + "/../../examples/chicane/input_chicane_csr.in")
+        sim.load_inputs_file(basepath + "/examples/chicane/input_chicane_csr.in")
         sim.slice_step_diagnostics = False
 
         sim.init_grids()
@@ -139,4 +139,8 @@ def test_wake(save_png=True):
 
 
 if __name__ == "__main__":
+    # Call MPI_Init and MPI_Finalize only once:
+    if impactx.Config.have_mpi:
+        from mpi4py import MPI  # noqa
+
     test_wake()
