@@ -54,6 +54,9 @@ namespace impactx {
             // this one last
             amr_data.reset();
 
+            if (amrex::Initialized())
+                amrex::Finalize();
+
             // only finalize once
             m_grids_initialized = false;
         }

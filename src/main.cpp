@@ -29,16 +29,15 @@ int main(int argc, char* argv[])
     impactx::initialization::default_init_AMReX(argc, argv);
 
     {
-        BL_PROFILE("main()");
+        BL_PROFILE_VAR("main()", pmain);
         impactx::ImpactX impactX;
         impactX.init_grids();
         impactX.initBeamDistributionFromInputs();
         impactX.initLatticeElementsFromInputs();
         impactX.evolve();
+        BL_PROFILE_VAR_STOP(pmain);
         impactX.finalize();
     }
-
-    amrex::Finalize();
 
 #if defined(AMREX_USE_MPI)
     AMREX_ALWAYS_ASSERT(MPI_SUCCESS == MPI_Finalize());
