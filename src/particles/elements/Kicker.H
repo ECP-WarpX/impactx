@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,7 +26,8 @@
 namespace impactx
 {
     struct Kicker
-    : public elements::BeamOptic<Kicker>,
+    : public elements::Named,
+      public elements::BeamOptic<Kicker>,
       public elements::Thin,
       public elements::Alignment,
       public elements::NoFinalize
@@ -42,6 +44,7 @@ namespace impactx
         /** A thin transverse kicker element, inducing a transverse
          *  momentum displacement from the reference orbit.
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param xkick Strength of horizontal kick
          * @param ykick Strength of vertical kick
          * @param unit units of xkick and ykick
@@ -50,6 +53,7 @@ namespace impactx
          * @param rotation_degree rotation error in the transverse plane [degrees]
          */
         Kicker (
+            std::optional<std::string> name,
             amrex::ParticleReal xkick,
             amrex::ParticleReal ykick,
             UnitSystem unit,
@@ -57,7 +61,8 @@ namespace impactx
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0
         )
-        : Alignment(dx, dy, rotation_degree),
+        : Named(name),
+          Alignment(dx, dy, rotation_degree),
           m_xkick(xkick), m_ykick(ykick), m_unit(unit)
         {
         }

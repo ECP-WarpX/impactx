@@ -14,6 +14,7 @@
 #include "particles/integrators/Integrators.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
+#include "mixin/named.H"
 #include "mixin/thick.H"
 
 #include <ablastr/constant.H>
@@ -116,7 +117,8 @@ namespace SoftSolenoidData
 } // namespace SoftSolenoidData
 
     struct SoftSolenoid
-    : public elements::BeamOptic<SoftSolenoid>,
+    : public elements::Named,
+      public elements::BeamOptic<SoftSolenoid>,
       public elements::Thick,
       public elements::Alignment
     {
@@ -125,6 +127,7 @@ namespace SoftSolenoidData
 
         /** A soft-edge solenoid
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m
          * @param bscale Scaling factor for on-axis longitudinal magnetic field in 1/m (MAD-X convention)
          *           = (Bz in T) / (rigidity in T-m)
@@ -142,6 +145,7 @@ namespace SoftSolenoidData
          * @param nslice number of slices used for the application of space charge
          */
         SoftSolenoid (
+            std::optional<std::string> name,
             amrex::ParticleReal ds,
             amrex::ParticleReal bscale,
             std::vector<amrex::ParticleReal> cos_coef,
@@ -153,7 +157,8 @@ namespace SoftSolenoidData
             int mapsteps = 1,
             int nslice = 1
         )
-          : Thick(ds, nslice),
+          : Named(name),
+            Thick(ds, nslice),
             Alignment(dx, dy, rotation_degree),
             m_bscale(bscale), m_unit(unit), m_mapsteps(mapsteps), m_id(SoftSolenoidData::next_id)
        {

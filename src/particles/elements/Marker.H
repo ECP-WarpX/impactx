@@ -12,6 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -21,15 +22,19 @@
 namespace impactx
 {
     struct Marker
-    : public elements::Thin,
+    : public elements::Named,
+      public elements::Thin,
       public elements::NoFinalize
     {
-        static constexpr auto name = "Marker";
+        static constexpr auto type = "Marker";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** This element does nothing.
+         *
+         * @param name a user defined and not necessarily unique name of the element
          */
-        Marker ()
+        Marker (std::optional<std::string> name)
+        : Named(name)
         {
         }
 

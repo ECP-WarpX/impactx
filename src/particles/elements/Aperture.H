@@ -15,6 +15,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,7 +26,8 @@
 namespace impactx
 {
     struct Aperture
-    : public elements::BeamOptic<Aperture>,
+    : public elements::Named,
+      public elements::BeamOptic<Aperture>,
       public elements::Thin,
       public elements::Alignment,
       public elements::NoFinalize
@@ -33,15 +35,20 @@ namespace impactx
         static constexpr auto type = "Aperture";
         using PType = ImpactXParticleContainer::ParticleType;
 
+        // TODO: make AMREX_ENUM and simplify @see shape_name implementation with it
         enum Shape
         {
             rectangular,
             elliptical
         };
 
+        static std::string
+        shape_name (Shape const & shape);
+
         /** A thin collimator element that applies a transverse aperture boundary.
          *  Particles outside the boundary are considered lost.
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param shape aperture shape
          * @param xmax maximum value of horizontal coordinate (m)
          * @param ymax maximum value of vertical coordinate (m)
@@ -50,6 +57,7 @@ namespace impactx
          * @param rotation_degree rotation error in the transverse plane [degrees]
          */
         Aperture (
+            std::optional<std::string> name,
             amrex::ParticleReal xmax,
             amrex::ParticleReal ymax,
             Shape shape,
@@ -57,7 +65,8 @@ namespace impactx
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0
         )
-        : Alignment(dx, dy, rotation_degree),
+        : Named(name),
+          Alignment(dx, dy, rotation_degree),
           m_shape(shape), m_xmax(xmax), m_ymax(ymax)
         {
         }

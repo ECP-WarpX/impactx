@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -26,7 +27,8 @@
 namespace impactx
 {
     struct Sol
-    : public elements::BeamOptic<Sol>,
+    : public elements::Named,
+      public elements::BeamOptic<Sol>,
       public elements::Thick,
       public elements::Alignment,
       public elements::NoFinalize
@@ -36,6 +38,7 @@ namespace impactx
 
         /** An ideal hard-edge Solenoid magnet
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m.
          * @param ks Solenoid strength in m^(-1) (MADX convention)
          *           = (magnetic field Bz in T) / (rigidity in T-m)
@@ -45,6 +48,7 @@ namespace impactx
          * @param nslice number of slices used for the application of space charge
          */
         Sol (
+            std::optional<std::string> name,
             amrex::ParticleReal ds,
             amrex::ParticleReal ks,
             amrex::ParticleReal dx = 0,
@@ -52,7 +56,8 @@ namespace impactx
             amrex::ParticleReal rotation_degree = 0,
             int nslice = 1
         )
-        : Thick(ds, nslice),
+        : Named(name),
+          Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
           m_ks(ks)
         {

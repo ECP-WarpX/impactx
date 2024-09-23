@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -26,7 +27,8 @@
 namespace impactx
 {
     struct ChrQuad
-    : public elements::BeamOptic<ChrQuad>,
+    : public elements::Named,
+      public elements::BeamOptic<ChrQuad>,
       public elements::Thick,
       public elements::Alignment,
       public elements::NoFinalize
@@ -39,6 +41,7 @@ namespace impactx
          * The Hamiltonian is expanded through second order in the
          * transverse variables (x,px,y,py), with the exact pt dependence retained.
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m.
          * @param k  Quadrupole strength in m^(-2) (MADX convention)
          *           = (gradient in T/m) / (rigidity in T-m)
@@ -54,6 +57,7 @@ namespace impactx
          * @param nslice number of slices used for the application of space charge
          */
         ChrQuad (
+            std::optional<std::string> name,
             amrex::ParticleReal ds,
             amrex::ParticleReal k,
             int unit,
@@ -62,7 +66,8 @@ namespace impactx
             amrex::ParticleReal rotation_degree = 0,
             int nslice = 1
         )
-        : Thick(ds, nslice),
+        : Named(name),
+          Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
           m_k(k), m_unit(unit)
         {

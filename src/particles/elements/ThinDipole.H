@@ -14,15 +14,18 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
 
+
 namespace impactx
 {
     struct ThinDipole
-    : public elements::BeamOptic<ThinDipole>,
+    : public elements::Named,
+      public elements::BeamOptic<ThinDipole>,
       public elements::Thin,
       public elements::Alignment,
       public elements::NoFinalize
@@ -39,6 +42,7 @@ namespace impactx
          * for Tracking," CERN/SL/95-12 (AP), 1995.  It is intended to replicate
          * the thin-lens dipole model in MAD-X.
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param theta - the total bending angle (degrees)
          * @param rc - the curvature radius (m)
          * @param dx horizontal translation error in m
@@ -46,13 +50,15 @@ namespace impactx
          * @param rotation_degree rotation error in the transverse plane [degrees]
          */
         ThinDipole (
+            std::optional<std::string> name,
             amrex::ParticleReal theta,
             amrex::ParticleReal rc,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0
         )
-        : Alignment(dx, dy, rotation_degree),
+        : Named(name),
+          Alignment(dx, dy, rotation_degree),
           m_theta(theta * degree2rad),
           m_rc(rc)
         {

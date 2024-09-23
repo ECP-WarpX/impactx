@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,7 +26,8 @@
 namespace impactx
 {
     struct ConstF
-    : public elements::BeamOptic<ConstF>,
+    : public elements::Named,
+      public elements::BeamOptic<ConstF>,
       public elements::Thick,
       public elements::Alignment,
       public elements::NoFinalize
@@ -35,6 +37,7 @@ namespace impactx
 
         /** A linear Constant Focusing element
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m.
          * @param kx Focusing strength for x in 1/m.
          * @param ky Focusing strength for y in 1/m.
@@ -45,6 +48,7 @@ namespace impactx
          * @param nslice number of slices used for the application of space charge
          */
         ConstF (
+            std::optional<std::string> name,
             amrex::ParticleReal ds,
             amrex::ParticleReal kx,
             amrex::ParticleReal ky,
@@ -54,7 +58,8 @@ namespace impactx
             amrex::ParticleReal rotation_degree = 0,
             int nslice = 1
         )
-        : Thick(ds, nslice),
+        : Named(name),
+          Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
           m_kx(kx), m_ky(ky), m_kt(kt)
         {

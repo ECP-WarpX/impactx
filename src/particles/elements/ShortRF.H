@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,7 +26,8 @@
 namespace impactx
 {
     struct ShortRF
-    : public elements::BeamOptic<ShortRF>,
+    : public elements::Named,
+      public elements::BeamOptic<ShortRF>,
       public elements::Thin,
       public elements::Alignment,
       public elements::NoFinalize
@@ -35,6 +37,7 @@ namespace impactx
 
         /** A short RF cavity element
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param V Normalized RF voltage V = maximum energy gain/(m*c^2)
          * @param freq RF frequency in Hz
          * @param phase RF synchronous phase of the reference particle in deg
@@ -46,6 +49,7 @@ namespace impactx
          * @param rotation_degree rotation error in the transverse plane [degrees]
          */
         ShortRF (
+            std::optional<std::string> name,
             amrex::ParticleReal V,
             amrex::ParticleReal freq,
             amrex::ParticleReal phase,
@@ -53,7 +57,8 @@ namespace impactx
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0
         )
-        : Alignment(dx, dy, rotation_degree),
+        : Named(name),
+          Alignment(dx, dy, rotation_degree),
           m_V(V), m_freq(freq), m_phase(phase)
         {
         }

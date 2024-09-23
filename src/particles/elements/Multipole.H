@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,7 +26,8 @@
 namespace impactx
 {
     struct Multipole
-    : public elements::BeamOptic<Multipole>,
+    : public elements::Named,
+      public elements::BeamOptic<Multipole>,
       public elements::Thin,
       public elements::Alignment,
       public elements::NoFinalize
@@ -35,6 +37,7 @@ namespace impactx
 
         /** A general thin multipole element
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param multipole index m (m=1 dipole, m=2 quadrupole, m=3 sextupole etc.)
          * @param K_normal Integrated normal multipole coefficient (1/meter^m)
          * @param K_skew Integrated skew multipole coefficient (1/meter^m)
@@ -43,6 +46,7 @@ namespace impactx
          * @param rotation_degree rotation error in the transverse plane [degrees]
          */
         Multipole (
+            std::optional<std::string> name,
             int multipole,
             amrex::ParticleReal K_normal,
             amrex::ParticleReal K_skew,
@@ -50,7 +54,8 @@ namespace impactx
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0
         )
-        : Alignment(dx, dy, rotation_degree),
+        : Named(name),
+          Alignment(dx, dy, rotation_degree),
           m_multipole(multipole), m_Kn(K_normal), m_Ks(K_skew)
         {
             // compute factorial of multipole index

@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,7 +26,8 @@
 namespace impactx
 {
     struct TaperedPL
-    : public elements::BeamOptic<TaperedPL>,
+    : public elements::Named,
+      public elements::BeamOptic<TaperedPL>,
       public elements::Thin,
       public elements::Alignment,
       public elements::NoFinalize
@@ -35,6 +37,7 @@ namespace impactx
 
         /** A short segment of a nonlinear plasma lens with a transverse taper.
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param k  integrated plasma lens (linear) focusing strength in m^(-1)
          *           = (length in m) * (azimuthal field gradient in T/m) / (rigidity in T-m)
          *        OR integrated azimuthal magnetic field gradient in T (k > 0)
@@ -48,6 +51,7 @@ namespace impactx
          * @param rotation_degree rotation error in the transverse plane [degrees]
          */
         TaperedPL (
+            std::optional<std::string> name,
             amrex::ParticleReal k,
             amrex::ParticleReal taper,
             int unit,
@@ -55,7 +59,8 @@ namespace impactx
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0
         )
-        : Alignment(dx, dy, rotation_degree),
+        : Named(name),
+          Alignment(dx, dy, rotation_degree),
           m_k(k), m_taper(taper), m_unit(unit)
         {
         }

@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,7 +26,8 @@
 namespace impactx
 {
     struct Drift
-    : public elements::BeamOptic<Drift>,
+    : public elements::Named,
+      public elements::BeamOptic<Drift>,
       public elements::Thick,
       public elements::Alignment,
       public elements::NoFinalize
@@ -35,6 +37,7 @@ namespace impactx
 
         /** A drift
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
@@ -42,13 +45,15 @@ namespace impactx
          * @param nslice number of slices used for the application of space charge
          */
         Drift (
+            std::optional<std::string> name,
             amrex::ParticleReal ds,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
             int nslice = 1
         )
-        : Thick(ds, nslice),
+        : Named(name),
+          Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree)
         {
         }

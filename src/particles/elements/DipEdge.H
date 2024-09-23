@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,7 +26,8 @@
 namespace impactx
 {
     struct DipEdge
-    : public elements::BeamOptic<DipEdge>,
+    : public elements::Named,
+      public elements::BeamOptic<DipEdge>,
       public elements::Thin,
       public elements::Alignment,
       public elements::NoFinalize
@@ -42,6 +44,7 @@ namespace impactx
          *   K. L. Brown, SLAC Report No. 75 (1982).
          *   K. Hwang and S. Y. Lee, PRAB 18, 122401 (2015).
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param psi Pole face angle in rad.
          * @param rc Radius of curvature in m.
          * @param g Gap parameter in m.
@@ -51,6 +54,7 @@ namespace impactx
          * @param rotation_degree rotation error in the transverse plane [degrees]
          */
         DipEdge (
+            std::optional<std::string> name,
             amrex::ParticleReal psi,
             amrex::ParticleReal rc,
             amrex::ParticleReal g,
@@ -59,7 +63,8 @@ namespace impactx
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0
         )
-        : Alignment(dx, dy, rotation_degree),
+        : Named(name),
+          Alignment(dx, dy, rotation_degree),
           m_psi(psi), m_rc(rc), m_g(g), m_K2(K2)
         {
         }

@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,7 +26,8 @@
 namespace impactx
 {
     struct ChrAcc
-    : public elements::BeamOptic<ChrAcc>,
+    : public elements::Named,
+      public elements::BeamOptic<ChrAcc>,
       public elements::Thick,
       public elements::Alignment,
       public elements::NoFinalize
@@ -38,6 +40,7 @@ namespace impactx
          * The Hamiltonian is expanded through second order in the
          * transverse variables (x,px,y,py), with the exact pt dependence retained.
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m.
          * @param ez electric field strength in m^(-1)
          *           = (charge * electric field Ez in V/m) / (m*c^2)
@@ -49,6 +52,7 @@ namespace impactx
          * @param nslice number of slices used for the application of space charge
          */
         ChrAcc (
+            std::optional<std::string> name,
             amrex::ParticleReal ds,
             amrex::ParticleReal ez,
             amrex::ParticleReal bz,
@@ -57,7 +61,8 @@ namespace impactx
             amrex::ParticleReal rotation_degree = 0,
             int nslice = 1
         )
-        : Thick(ds, nslice),
+        : Named(name),
+          Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
           m_ez(ez), m_bz(bz)
         {

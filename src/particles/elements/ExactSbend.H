@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -27,7 +28,8 @@
 namespace impactx
 {
     struct ExactSbend
-    : public elements::BeamOptic<ExactSbend>,
+    : public elements::Named,
+      public elements::BeamOptic<ExactSbend>,
       public elements::Thick,
       public elements::Alignment,
       public elements::NoFinalize
@@ -46,6 +48,7 @@ namespace impactx
          *  The model consists of a uniform bending field B_y with a hard edge.
          *  Pole faces are normal to the entry and exit velocity of the reference particle.
          *
+         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m.
          * @param phi Segment bend angle in degrees.
          * @param B Magnetic field strength in T.
@@ -57,6 +60,7 @@ namespace impactx
          * @param nslice number of slices used for the application of space charge
          */
         ExactSbend (
+            std::optional<std::string> name,
             amrex::ParticleReal ds,
             amrex::ParticleReal phi,
             amrex::ParticleReal B,
@@ -65,7 +69,8 @@ namespace impactx
             amrex::ParticleReal rotation_degree = 0,
             int nslice = 1
         )
-        : Thick(ds, nslice),
+        : Named(name),
+          Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
           m_phi(phi * degree2rad), m_B(B)
         {
