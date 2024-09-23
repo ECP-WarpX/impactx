@@ -31,7 +31,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "CFbend";
+        static constexpr auto type = "CFbend";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** An combined-function bend, consisting of an ideal sector bend with

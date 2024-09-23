@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "ConstF";
+        static constexpr auto type = "ConstF";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A linear Constant Focusing element

@@ -31,7 +31,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "Sol";
+        static constexpr auto type = "Sol";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** An ideal hard-edge Solenoid magnet

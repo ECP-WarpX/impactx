@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "Kicker";
+        static constexpr auto type = "Kicker";
         using PType = ImpactXParticleContainer::ParticleType;
 
         enum UnitSystem

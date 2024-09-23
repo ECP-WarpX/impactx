@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "ChrAcc";
+        static constexpr auto type = "ChrAcc";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** Acceleration in a uniform field Ez, with a uniform solenoidal field Bz.

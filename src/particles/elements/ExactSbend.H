@@ -32,7 +32,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "ExactSbend";
+        static constexpr auto type = "ExactSbend";
         static constexpr amrex::ParticleReal degree2rad = ablastr::constant::math::pi / 180.0;
         using PType = ImpactXParticleContainer::ParticleType;
 

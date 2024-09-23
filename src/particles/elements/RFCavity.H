@@ -106,7 +106,7 @@ namespace RFCavityData
       public elements::Thick,
       public elements::Alignment
     {
-        static constexpr auto name = "RFCavity";
+        static constexpr auto type = "RFCavity";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** An RF cavity

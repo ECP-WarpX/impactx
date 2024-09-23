@@ -120,7 +120,7 @@ namespace SoftSolenoidData
       public elements::Thick,
       public elements::Alignment
     {
-        static constexpr auto name = "SoftSolenoid";
+        static constexpr auto type = "SoftSolenoid";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A soft-edge solenoid

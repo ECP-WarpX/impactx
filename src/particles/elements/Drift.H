@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "Drift";
+        static constexpr auto type = "Drift";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A drift

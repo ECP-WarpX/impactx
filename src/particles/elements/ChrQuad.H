@@ -31,7 +31,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "ChrQuad";
+        static constexpr auto type = "ChrQuad";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A Quadrupole magnet with chromatic focusing

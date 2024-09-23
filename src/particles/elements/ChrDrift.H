@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "ChrDrift";
+        static constexpr auto type = "ChrDrift";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A drift with chromatic effects included

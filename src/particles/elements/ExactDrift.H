@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "ExactDrift";
+        static constexpr auto type = "ExactDrift";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A drift using the exact nonlinear transfer map

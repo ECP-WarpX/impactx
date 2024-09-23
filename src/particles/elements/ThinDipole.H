@@ -27,7 +27,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "ThinDipole";
+        static constexpr auto type = "ThinDipole";
         using PType = ImpactXParticleContainer::ParticleType;
 
         static constexpr amrex::ParticleReal degree2rad = ablastr::constant::math::pi / 180.0;
