@@ -28,8 +28,8 @@ int main(int argc, char* argv[])
     // it here so users can pass command line arguments
     impactx::initialization::default_init_AMReX(argc, argv);
 
-    BL_PROFILE_VAR("main()", pmain);
     {
+        BL_PROFILE("main()");
         impactx::ImpactX impactX;
         impactX.init_grids();
         impactX.initBeamDistributionFromInputs();
@@ -37,7 +37,8 @@ int main(int argc, char* argv[])
         impactX.evolve();
         impactX.finalize();
     }
-    BL_PROFILE_VAR_STOP(pmain);
+
+    amrex::Finalize();
 
 #if defined(AMREX_USE_MPI)
     AMREX_ALWAYS_ASSERT(MPI_SUCCESS == MPI_Finalize());
