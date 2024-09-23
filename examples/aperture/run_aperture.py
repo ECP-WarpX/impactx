@@ -54,8 +54,10 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 sim.lattice.extend(
     [
         monitor,
-        elements.Drift(0.123),
-        elements.Aperture(xmax=1.0e-3, ymax=1.5e-3, shape="rectangular"),
+        elements.Drift(name="drift", ds=0.123),
+        elements.Aperture(
+            name="collimator", xmax=1.0e-3, ymax=1.5e-3, shape="rectangular"
+        ),
         monitor,
     ]
 )

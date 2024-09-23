@@ -51,7 +51,7 @@ ns = 25  # number of slices per ds in the element
 
 bend = [
     monitor,
-    elements.CFbend(ds=0.5, rc=7.613657587094493, k=-7.057403, nslice=ns),
+    elements.CFbend(name=None, ds=0.5, rc=7.613657587094493, k=-7.057403, nslice=ns),
     monitor,
 ]
 

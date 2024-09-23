@@ -112,11 +112,11 @@ def test_impactx_nofile():
 
     # init accelerator lattice
     fodo = [
-        elements.Drift(0.25),
-        elements.Quad(1.0, 1.0),
-        elements.Drift(0.5),
-        elements.Quad(1.0, -1.0),
-        elements.Drift(0.25),
+        elements.Drift("d1", 0.25),
+        elements.Quad("q1", 1.0, 1.0),
+        elements.Drift("d2", 0.5),
+        elements.Quad("q2", 1.0, -1.0),
+        elements.Drift("d3", 0.25),
     ]
     #  assign a fodo segment
     # sim.lattice = fodo
@@ -127,7 +127,7 @@ def test_impactx_nofile():
 
     # add 2 more drifts
     for i in range(4):
-        sim.lattice.append(elements.Drift(0.25))
+        sim.lattice.append(elements.Drift(name="d" + str(4 + i), ds=0.25))
 
     print(sim.lattice)
     print(len(sim.lattice))
@@ -158,7 +158,7 @@ def test_impactx_noparticles():
     #   particle bunch: init intentionally missing
 
     # init accelerator lattice
-    sim.lattice.append(elements.Drift(0.5))
+    sim.lattice.append(elements.Drift(name=None, ds=0.5))
 
     with pytest.raises(
         RuntimeError, match="No particles found. Cannot run evolve without a beam."
@@ -225,7 +225,7 @@ def test_impactx_resting_refparticle():
     ):
         sim.add_particles(bunch_charge=0.0, distr=gaussian, npart=10)
 
-    sim.lattice.append(elements.Drift(0.25))
+    sim.lattice.append(elements.Drift(name=None, ds=0.25))
 
     with pytest.raises(
         RuntimeError,

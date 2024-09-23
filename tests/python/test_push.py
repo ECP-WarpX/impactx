@@ -48,19 +48,19 @@ def test_element_push():
 
     # init accelerator lattice
     fodo = [
-        elements.Drift(0.25),
+        elements.Drift(name="drift1", ds=0.25),
     ]
     sim.lattice.extend(fodo)
 
     sim.evolve()
 
-    # Push manually through a few elements
-    elements.Quad(1.0, 1.0).push(pc)
-    elements.Drift(0.5).push(pc)
-    elements.Quad(1.0, -1.0).push(pc)
+    # Push manually through a few (unnamed) elements
+    elements.Quad(None, ds=1.0, k=1.0).push(pc)
+    elements.Drift(None, ds=0.5).push(pc)
+    elements.Quad(None, ds=1.0, k=-1.0).push(pc)
 
     # alternative formulation
-    push(pc, elements.Drift(0.25))
+    push(pc, elements.Drift(None, ds=0.25))
 
     # finalize simulation
     sim.finalize()

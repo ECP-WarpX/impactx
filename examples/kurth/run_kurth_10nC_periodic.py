@@ -47,8 +47,8 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 
 # design the accelerator lattice
 nslice = 20  # use 30 for increased precision
-constf1 = elements.ConstF(ds=2.0, kx=0.7, ky=0.7, kt=0.7, nslice=nslice)
-drift1 = elements.Drift(ds=1.0, nslice=nslice)
+constf1 = elements.ConstF(name="constf1", ds=2.0, kx=0.7, ky=0.7, kt=0.7, nslice=nslice)
+drift1 = elements.Drift(name="drift1", ds=1.0, nslice=nslice)
 sim.lattice.extend([monitor, drift1, constf1, drift1, monitor])
 
 # run simulation

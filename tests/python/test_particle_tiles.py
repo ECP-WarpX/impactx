@@ -50,11 +50,11 @@ def test_particle_tiles():
 
     # init accelerator lattice
     fodo = [
-        elements.Drift(0.25),
-        elements.Quad(1.0, 1.0),
-        elements.Drift(0.5),
-        elements.Quad(1.0, -1.0),
-        elements.Drift(0.25),
+        elements.Drift("d1", 0.25),
+        elements.Quad("q1", 1.0, 1.0),
+        elements.Drift("d2", 0.5),
+        elements.Quad("q2", 1.0, -1.0),
+        elements.Drift("d3", 0.25),
     ]
     sim.lattice.extend(fodo)
 

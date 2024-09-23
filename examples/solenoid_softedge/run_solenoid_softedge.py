@@ -43,6 +43,7 @@ sim.add_particles(bunch_charge_C, distr, npart)
 
 # design the accelerator lattice
 sol = elements.SoftSolenoid(
+    name="sol1",
     ds=6.0,
     bscale=1.233482899483985,
     cos_coefficients=[

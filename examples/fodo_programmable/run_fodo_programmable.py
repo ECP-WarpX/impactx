@@ -112,7 +112,7 @@ def my_ref_drift(pge, refpart):
     refpart.s = s + slice_ds
 
 
-pge1 = elements.Programmable()
+pge1 = elements.Programmable("d1")
 pge1.nslice = ns
 pge1.beam_particles = lambda pti, refpart: my_drift(pge1, pti, refpart)
 pge1.ref_particle = lambda refpart: my_ref_drift(pge1, refpart)
@@ -121,7 +121,7 @@ pge1.threadsafe = True  # allow OpenMP threading for speed
 
 # attention: assignment is a reference for pge2 = pge1
 
-pge2 = elements.Programmable()
+pge2 = elements.Programmable("d2")
 pge2.nslice = ns
 pge2.beam_particles = lambda pti, refpart: my_drift(pge2, pti, refpart)
 pge2.ref_particle = lambda refpart: my_ref_drift(pge2, refpart)
@@ -134,15 +134,15 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 # design the accelerator lattice
 fodo = [
     monitor,
-    pge1,  # equivalent to elements.Drift(ds=0.25, nslice=ns)
+    pge1,  # equivalent to elements.Drift("d1", ds=0.25, nslice=ns)
     monitor,
-    elements.Quad(ds=1.0, k=1.0, nslice=ns),
+    elements.Quad("q1", ds=1.0, k=1.0, nslice=ns),
     monitor,
-    pge2,  # equivalent to elements.Drift(ds=0.5, nslice=ns)
+    pge2,  # equivalent to elements.Drift("d2", ds=0.5, nslice=ns)
     monitor,
-    elements.Quad(ds=1.0, k=-1.0, nslice=ns),
+    elements.Quad("q2", ds=1.0, k=-1.0, nslice=ns),
     monitor,
-    pge1,  # equivalent to elements.Drift(ds=0.25, nslice=ns)
+    pge1,  # equivalent to elements.Drift("d1", ds=0.25, nslice=ns)
     monitor,
 ]
 # assign a fodo segment

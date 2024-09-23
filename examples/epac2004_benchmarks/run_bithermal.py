@@ -52,6 +52,7 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 sim.lattice.append(monitor)
 
 constf = elements.ConstF(
+    name="constf",
     ds=10.0,
     kx=6.283185307179586,
     ky=6.283185307179586,
