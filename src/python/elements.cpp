@@ -9,6 +9,8 @@
 #include <particles/elements/All.H>
 #include <AMReX.H>
 
+#include <optional>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -62,6 +64,73 @@ namespace
             "Push first the reference particle, then all other particles."
         );
     }
+
+    /** Helper to format {key, value} pairs
+     *
+     * Expected outcome is ", key=value" with key as a string and appropriate formatting for value.
+     *
+     * @tparam T value type
+     * @param arg a key-value pair
+     * @return a string of the form ", key=value"
+     */
+    template<typename T>
+    std::string
+    format_extra (std::pair<char const *, T> const & arg)
+    {
+        if constexpr (std::is_floating_point_v<T>)
+        {
+            // float
+            // TODO: format as scientific number
+            return std::string(", ")
+                .append(arg.first)
+                .append("=")
+                .append(std::to_string(arg.second));
+        }
+        else if constexpr (std::is_integral_v<T>)
+        {
+            // int
+            return std::string(", ")
+                .append(arg.first)
+                .append("=")
+                .append(std::to_string(arg.second));
+        } else
+        {
+            // already a string
+            return std::string(", ")
+                .append(arg.first)
+                .append("=")
+                .append(arg.second);
+        }
+    }
+
+    /** Helper to build a __repr__ for an Element
+     *
+     * @tparam T_Element type for the C++ element type
+     * @tparam ExtraArgs type for pairs of name, value to add
+     * @param el the current element
+     * @param args pars of name, value to add
+     * @return a string suitable for Python's __repr__
+     */
+    template<typename T_Element, typename... ExtraArgs>
+    std::string element_name (T_Element const & el, std::pair<char const *, ExtraArgs> const &... args)
+    {
+        // Fixed element type name, e.g., "SBend"
+        std::string const type = T_Element::type;
+
+        // User-provided element name, e.g., "name=bend1"
+        std::string const name = el.has_name() ? ", name=" + el.name() : "";
+
+        // Noteworthy element parameters, e.g., "ds=2.3, key=value, ..."
+        std::string extra_args;
+        ((extra_args.append(format_extra(args))), ...);
+
+        // combine it all together
+        return "<impactx.elements." +
+               type +
+               name +
+               extra_args +
+               ">";
+    }
 }
 
 void init_elements(py::module& m)
@@ -72,6 +141,11 @@ void init_elements(py::module& m)
     );
 
     // mixin classes
+
+    py::class_<elements::Named>(me, "Named")
+        .def_property_readonly("name", &elements::Named::name)
+        .def_property_readonly("has_name", &elements::Named::has_name)
+    ;
 
     py::class_<elements::Thick>(me, "Thick")
         .def(py::init<
@@ -194,14 +268,18 @@ void init_elements(py::module& m)
 
     // beam optics
 
-    py::class_<Aperture, elements::Thin, elements::Alignment> py_Aperture(me, "Aperture");
+    py::class_<Aperture, elements::Named, elements::Thin, elements::Alignment> py_Aperture(me, "Aperture");
     py_Aperture
         .def("__repr__",
-             [](Aperture const & /* ap */) {
-                 return std::string("<impactx.elements.Aperture>");
+             [](Aperture const & ap) {
+                 return element_name(
+                    ap,
+                    std::make_pair("shape", ap.shape_name(ap.m_shape))
+                );
              }
         )
         .def(py::init([](
+                 std::optional<std::string> name,
                  amrex::ParticleReal xmax,
                  amrex::ParticleReal ymax,
                  std::string const & shape,
@@ -216,8 +294,9 @@ void init_elements(py::module& m)
                  Aperture::Shape const s = shape == "rectangular" ?
                      Aperture::Shape::rectangular :
                      Aperture::Shape::elliptical;
-                 return new Aperture(xmax, ymax, s, dx, dy, rotation_degree);
+                 return new Aperture(name, xmax, ymax, s, dx, dy, rotation_degree);
              }),
+             py::arg("name"),
              py::arg("xmax"),
              py::arg("ymax"),
              py::arg("shape") = "rectangular",
@@ -229,15 +308,7 @@ void init_elements(py::module& m)
         .def_property("shape",
             [](Aperture & ap)
             {
-                switch (ap.m_shape)
-                {
-                    case Aperture::Shape::rectangular :  // default
-                        return "rectangular";
-                    case Aperture::Shape::elliptical :
-                        return "elliptical";
-                    default:
-                        throw std::runtime_error("Unknown shape");
-                }
+                return ap.shape_name(ap.m_shape);
             },
             [](Aperture & ap, std::string const & shape)
             {
@@ -263,23 +334,25 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Aperture);
 
-    py::class_<ChrDrift, elements::Thick, elements::Alignment> py_ChrDrift(me, "ChrDrift");
+    py::class_<ChrDrift, elements::Named, elements::Thick, elements::Alignment> py_ChrDrift(me, "ChrDrift");
     py_ChrDrift
         .def("__repr__",
              [](ChrDrift const & chr_drift) {
-                 std::string r = "<impactx.elements.ChrDrift (ds=";
-                 r.append(std::to_string(chr_drift.ds()))
-                         .append(")>");
-                 return r;
+                 return element_name(
+                     chr_drift,
+                     std::make_pair("ds", chr_drift.ds())
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
@@ -294,15 +367,15 @@ void init_elements(py::module& m)
     py_ChrQuad
         .def("__repr__",
              [](ChrQuad const & chr_quad) {
-                 std::string r = "<impactx.elements.ChrQuad (ds=";
-                 r.append(std::to_string(chr_quad.ds()))
-                  .append(", k=")
-                  .append(std::to_string(chr_quad.m_k))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     chr_quad,
+                     std::make_pair("ds", chr_quad.ds()),
+                     std::make_pair("k", chr_quad.m_k)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 int,
@@ -311,6 +384,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("k"),
              py::arg("unit") = 0,
@@ -337,15 +411,15 @@ void init_elements(py::module& m)
     py_ChrPlasmaLens
         .def("__repr__",
              [](ChrPlasmaLens const & chr_pl_lens) {
-                 std::string r = "<impactx.elements.ChrPlasmaLens (ds=";
-                 r.append(std::to_string(chr_pl_lens.ds()))
-                  .append(", k=")
-                  .append(std::to_string(chr_pl_lens.m_k))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     chr_pl_lens,
+                     std::make_pair("ds", chr_pl_lens.ds()),
+                     std::make_pair("k", chr_pl_lens.m_k)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 int,
@@ -354,6 +428,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("k"),
              py::arg("unit") = 0,
@@ -380,17 +455,16 @@ void init_elements(py::module& m)
     py_ChrAcc
         .def("__repr__",
              [](ChrAcc const & chr_acc) {
-                 std::string r = "<impactx.elements.ChrAcc (ds=";
-                 r.append(std::to_string(chr_acc.ds()))
-                  .append(", ez=")
-                  .append(std::to_string(chr_acc.m_ez))
-                  .append(", bz=")
-                  .append(std::to_string(chr_acc.m_bz))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     chr_acc,
+                     std::make_pair("ds", chr_acc.ds()),
+                     std::make_pair("ez", chr_acc.m_ez),
+                     std::make_pair("bz", chr_acc.m_bz)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -399,6 +473,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("ez"),
              py::arg("bz"),
@@ -425,19 +500,17 @@ void init_elements(py::module& m)
     py_ConstF
         .def("__repr__",
              [](ConstF const & constf) {
-                 std::string r = "<impactx.elements.ConstF (ds=";
-                 r.append(std::to_string(constf.ds()))
-                  .append(", kx=")
-                  .append(std::to_string(constf.m_kx))
-                  .append(", ky=")
-                  .append(std::to_string(constf.m_ky))
-                  .append(", kt=")
-                  .append(std::to_string(constf.m_kt))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     constf,
+                     std::make_pair("ds", constf.ds()),
+                     std::make_pair("kx", constf.m_kx),
+                     std::make_pair("ky", constf.m_ky),
+                     std::make_pair("kt", constf.m_kt)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -447,6 +520,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("kx"),
              py::arg("ky"),
@@ -479,19 +553,17 @@ void init_elements(py::module& m)
     py_DipEdge
         .def("__repr__",
              [](DipEdge const & dip_edge) {
-                 std::string r = "<impactx.elements.DipEdge (psi=";
-                 r.append(std::to_string(dip_edge.m_psi))
-                  .append(", rc=")
-                  .append(std::to_string(dip_edge.m_rc))
-                  .append(", g=")
-                  .append(std::to_string(dip_edge.m_g))
-                  .append(", K2=")
-                  .append(std::to_string(dip_edge.m_K2))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     dip_edge,
+                     std::make_pair("psi", dip_edge.m_psi),
+                     std::make_pair("rc", dip_edge.m_rc),
+                     std::make_pair("g", dip_edge.m_g),
+                     std::make_pair("K2", dip_edge.m_K2)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -500,6 +572,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal
              >(),
+             py::arg("name"),
              py::arg("psi"),
              py::arg("rc"),
              py::arg("g"),
@@ -536,19 +609,21 @@ void init_elements(py::module& m)
     py_Drift
         .def("__repr__",
              [](Drift const & drift) {
-                 std::string r = "<impactx.elements.Drift (ds=";
-                 r.append(std::to_string(drift.ds()))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     drift,
+                     std::make_pair("ds", drift.ds())
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
@@ -563,19 +638,21 @@ void init_elements(py::module& m)
     py_ExactDrift
         .def("__repr__",
              [](ExactDrift const & exact_drift) {
-                 std::string r = "<impactx.elements.ExactDrift (ds=";
-                 r.append(std::to_string(exact_drift.ds()))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     exact_drift,
+                     std::make_pair("ds", exact_drift.ds())
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
@@ -590,17 +667,16 @@ void init_elements(py::module& m)
     py_ExactSbend
         .def("__repr__",
              [](ExactSbend const & exact_sbend) {
-                 std::string r = "<impactx.elements.ExactSbend (ds=";
-                 r.append(std::to_string(exact_sbend.ds()))
-                  .append(", phi=")
-                  .append(std::to_string(exact_sbend.m_phi))
-                  .append(", B=")
-                  .append(std::to_string(exact_sbend.m_B))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     exact_sbend,
+                     std::make_pair("ds", exact_sbend.ds()),
+                     std::make_pair("phi", exact_sbend.m_phi),
+                     std::make_pair("B", exact_sbend.m_B)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -609,6 +685,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("phi"),
              py::arg("B") = 0.0,
@@ -635,15 +712,15 @@ void init_elements(py::module& m)
     py_Kicker
         .def("__repr__",
              [](Kicker const & kicker) {
-                 std::string r = "<impactx.elements.Kicker (xkick=";
-                 r.append(std::to_string(kicker.m_xkick))
-                  .append(", ykick=")
-                  .append(std::to_string(kicker.m_ykick))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     kicker,
+                     std::make_pair("xkick", kicker.m_xkick),
+                     std::make_pair("ykick", kicker.m_ykick)
+                 );
              }
         )
         .def(py::init([](
+                std::optional<std::string> name,
                 amrex::ParticleReal xkick,
                 amrex::ParticleReal ykick,
                 std::string const & unit,
@@ -658,8 +735,9 @@ void init_elements(py::module& m)
                  Kicker::UnitSystem const u = unit == "dimensionless" ?
                                             Kicker::UnitSystem::dimensionless :
                                             Kicker::UnitSystem::Tm;
-                 return new Kicker(xkick, ykick, u, dx, dy, rotation_degree);
+                 return new Kicker(name, xkick, ykick, u, dx, dy, rotation_degree);
              }),
+             py::arg("name"),
              py::arg("xkick"),
              py::arg("ykick"),
              py::arg("unit") = "dimensionless",
@@ -686,17 +764,17 @@ void init_elements(py::module& m)
     py_Multipole
         .def("__repr__",
              [](Multipole const & multipole) {
-                 std::string r = "<impactx.elements.Multipole (multipole=";
-                 r.append(std::to_string(multipole.m_multipole))
-                  .append(", K_normal=")
-                  .append(std::to_string(multipole.m_Kn))
-                  .append(", K_skew=")
-                  .append(std::to_string(multipole.m_Ks))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     multipole,
+                     std::make_pair("multipole", multipole.m_multipole),
+                     std::make_pair("mfactorial", multipole.m_mfactorial),
+                     std::make_pair("K_normal", multipole.m_Kn),
+                     std::make_pair("K_skew", multipole.m_Ks)
+                 );
              }
         )
         .def(py::init<
+                 std::optional<std::string>,
                 int,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -704,6 +782,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal
              >(),
+             py::arg("name"),
              py::arg("multipole"),
              py::arg("K_normal"),
              py::arg("K_skew"),
@@ -746,11 +825,11 @@ void init_elements(py::module& m)
     py::class_<Marker, elements::Thin> py_Marker(me, "Marker");
     py_Marker
             .def("__repr__",
-                 [](Marker const & /* marker */) {
-                     return std::string("<impactx.elements.Marker>");
+                 [](Marker const & marker) {
+                     return element_name(marker);
                  }
             )
-            .def(py::init<>(),
+            .def(py::init<std::optional<std::string>>(),
                  "This element does nothing."
             )
             ;
@@ -760,21 +839,22 @@ void init_elements(py::module& m)
     py_NonlinearLens
         .def("__repr__",
              [](NonlinearLens const & nl) {
-                 std::string r = "<impactx.elements.NonlinearLens (knll=";
-                 r.append(std::to_string(nl.m_knll))
-                  .append(", cnll=")
-                  .append(std::to_string(nl.m_cnll))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     nl,
+                     std::make_pair("knll", nl.m_knll),
+                     std::make_pair("cnll", nl.m_cnll)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal
              >(),
+             py::arg("name"),
              py::arg("knll"),
              py::arg("cnll"),
              py::arg("dx") = 0,
@@ -798,17 +878,20 @@ void init_elements(py::module& m)
     py::class_<Programmable>(me, "Programmable", py::dynamic_attr())
         .def("__repr__",
              [](Programmable const & prg) {
-                 std::string r = "<impactx.elements.Programmable (ds=";
-                 r.append(std::to_string(prg.ds()))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     prg,
+                     std::make_pair("ds", prg.ds())
+                 );
              }
         )
         .def(py::init<
+                 std::optional<std::string>,
                  amrex::ParticleReal,
                  int
              >(),
-             py::arg("ds") = 0.0, py::arg("nslice") = 1,
+             py::arg("name"),
+             py::arg("ds") = 0.0,
+             py::arg("nslice") = 1,
              "A programmable beam optics element."
         )
         .def_property("nslice",
@@ -851,15 +934,15 @@ void init_elements(py::module& m)
     py_Quad
         .def("__repr__",
              [](Quad const & quad) {
-                 std::string r = "<impactx.elements.Quad (ds=";
-                 r.append(std::to_string(quad.ds()))
-                  .append(", k=")
-                  .append(std::to_string(quad.m_k))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     quad,
+                     std::make_pair("ds", quad.ds()),
+                     std::make_pair("k", quad.m_k)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -867,6 +950,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("k"),
              py::arg("dx") = 0,
@@ -887,19 +971,17 @@ void init_elements(py::module& m)
     py_RFCavity
         .def("__repr__",
              [](RFCavity const & rfc) {
-                 std::string r = "<impactx.elements.RFCavity (ds=";
-                 r.append(std::to_string(rfc.ds()))
-                  .append(", escale=")
-                  .append(std::to_string(rfc.m_escale))
-                  .append(", freq=")
-                  .append(std::to_string(rfc.m_freq))
-                  .append(", phase=")
-                  .append(std::to_string(rfc.m_phase))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     rfc,
+                     std::make_pair("ds", rfc.ds()),
+                     std::make_pair("escale", rfc.m_escale),
+                     std::make_pair("freq", rfc.m_freq),
+                     std::make_pair("phase", rfc.m_phase)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -912,6 +994,7 @@ void init_elements(py::module& m)
                 int,
                 int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("escale"),
              py::arg("freq"),
@@ -954,15 +1037,15 @@ void init_elements(py::module& m)
     py_Sbend
         .def("__repr__",
              [](Sbend const & sbend) {
-                 std::string r = "<impactx.elements.Sbend (ds=";
-                 r.append(std::to_string(sbend.ds()))
-                  .append(", rc=")
-                  .append(std::to_string(sbend.m_rc))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     sbend,
+                     std::make_pair("ds", sbend.ds()),
+                     std::make_pair("rc", sbend.m_rc)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -970,6 +1053,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("rc"),
              py::arg("dx") = 0,
@@ -990,17 +1074,16 @@ void init_elements(py::module& m)
     py_CFbend
         .def("__repr__",
              [](CFbend const & cfbend) {
-                 std::string r = "<impactx.elements.CFbend (ds=";
-                 r.append(std::to_string(cfbend.ds()))
-                  .append(", rc=")
-                  .append(std::to_string(cfbend.m_rc))
-                  .append(", k=")
-                  .append(std::to_string(cfbend.m_k))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     cfbend,
+                     std::make_pair("ds", cfbend.ds()),
+                     std::make_pair("rc", cfbend.m_rc),
+                     std::make_pair("k", cfbend.m_k)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -1009,6 +1092,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("rc"),
              py::arg("k"),
@@ -1035,21 +1119,22 @@ void init_elements(py::module& m)
     py_Buncher
         .def("__repr__",
              [](Buncher const & buncher) {
-                 std::string r = "<impactx.elements.Buncher (V=";
-                 r.append(std::to_string(buncher.m_V))
-                  .append(", k=")
-                  .append(std::to_string(buncher.m_k))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     buncher,
+                     std::make_pair("V", buncher.m_V),
+                     std::make_pair("k", buncher.m_k)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal
              >(),
+             py::arg("name"),
              py::arg("V"),
              py::arg("k"),
              py::arg("dx") = 0,
@@ -1074,17 +1159,16 @@ void init_elements(py::module& m)
     py_ShortRF
         .def("__repr__",
              [](ShortRF const & short_rf) {
-                 std::string r = "<impactx.elements.ShortRF (V=";
-                 r.append(std::to_string(short_rf.m_V))
-                  .append(", freq=")
-                  .append(std::to_string(short_rf.m_freq))
-                  .append(", phase=")
-                  .append(std::to_string(short_rf.m_phase))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     short_rf,
+                     std::make_pair("V", short_rf.m_V),
+                     std::make_pair("freq", short_rf.m_freq),
+                     std::make_pair("phase", short_rf.m_phase)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -1092,6 +1176,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal
              >(),
+             py::arg("name"),
              py::arg("V"),
              py::arg("freq"),
              py::arg("phase") = -90.0,
@@ -1122,15 +1207,15 @@ void init_elements(py::module& m)
     py_SoftSolenoid
         .def("__repr__",
              [](SoftSolenoid const & soft_sol) {
-                 std::string r = "<impactx.elements.SoftSolenoid (ds=";
-                 r.append(std::to_string(soft_sol.ds()))
-                  .append(", bscale=")
-                  .append(std::to_string(soft_sol.m_bscale))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     soft_sol,
+                     std::make_pair("ds", soft_sol.ds()),
+                     std::make_pair("bscale", soft_sol.m_bscale)
+                 );
              }
         )
         .def(py::init<
+                 std::optional<std::string>,
                  amrex::ParticleReal,
                  amrex::ParticleReal,
                  std::vector<amrex::ParticleReal>,
@@ -1142,6 +1227,7 @@ void init_elements(py::module& m)
                  int,
                  int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("bscale"),
              py::arg("cos_coefficients"),
@@ -1177,16 +1263,16 @@ void init_elements(py::module& m)
     py::class_<Sol, elements::Thick, elements::Alignment> py_Sol(me, "Sol");
     py_Sol
         .def("__repr__",
-             [](Sol const & soft_sol) {
-                 std::string r = "<impactx.elements.Sol (ds=";
-                 r.append(std::to_string(soft_sol.ds()))
-                  .append(", ks=")
-                  .append(std::to_string(soft_sol.m_ks))
-                  .append(")>");
-                 return r;
+             [](Sol const & sol) {
+                 return element_name(
+                     sol,
+                     std::make_pair("ds", sol.ds()),
+                     std::make_pair("ks", sol.m_ks)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -1194,6 +1280,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("ks"),
              py::arg("dx") = 0,
@@ -1214,18 +1301,19 @@ void init_elements(py::module& m)
     py_PRot
         .def("__repr__",
              [](PRot const & prot) {
-                 std::string r = "<impactx.elements.PRot (phi_in=";
-                 r.append(std::to_string(prot.m_phi_in))
-                  .append(", phi_out=")
-                  .append(std::to_string(prot.m_phi_out))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     prot,
+                     std::make_pair("phi_in", prot.m_phi_in),
+                     std::make_pair("phi_out", prot.m_phi_out)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal
              >(),
+             py::arg("name"),
              py::arg("phi_in"),
              py::arg("phi_out"),
              "An exact pole-face rotation in the x-z plane. Both angles are in degrees."
@@ -1247,15 +1335,15 @@ void init_elements(py::module& m)
     py_SoftQuadrupole
         .def("__repr__",
              [](SoftQuadrupole const & soft_quad) {
-                 std::string r = "<impactx.elements.SoftQuadrupole (ds=";
-                 r.append(std::to_string(soft_quad.ds()))
-                  .append(", gscale=")
-                  .append(std::to_string(soft_quad.m_gscale))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     soft_quad,
+                     std::make_pair("ds", soft_quad.ds()),
+                     std::make_pair("gscale", soft_quad.m_gscale)
+                 );
              }
         )
         .def(py::init<
+                 std::optional<std::string>,
                  amrex::ParticleReal,
                  amrex::ParticleReal,
                  std::vector<amrex::ParticleReal>,
@@ -1266,6 +1354,7 @@ void init_elements(py::module& m)
                  int,
                  int
              >(),
+             py::arg("name"),
              py::arg("ds"),
              py::arg("gscale"),
              py::arg("cos_coefficients"),
@@ -1296,21 +1385,22 @@ void init_elements(py::module& m)
     py_ThinDipole
         .def("__repr__",
              [](ThinDipole const & thin_dp) {
-                 std::string r = "<impactx.elements.ThinDipole (theta=";
-                 r.append(std::to_string(thin_dp.m_theta))
-                  .append(", rc=")
-                  .append(std::to_string(thin_dp.m_rc))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     thin_dp,
+                     std::make_pair("theta", thin_dp.m_theta),
+                     std::make_pair("rc", thin_dp.m_rc)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal
              >(),
+             py::arg("name"),
              py::arg("theta"),
              py::arg("rc"),
              py::arg("dx") = 0,
@@ -1335,16 +1425,15 @@ void init_elements(py::module& m)
     py_TaperedPL
         .def("__repr__",
              [](TaperedPL const & taperedpl) {
-                 std::string r = "<impactx.elements.TaperedPL (taperedpl=";
-                 r.append(std::to_string(taperedpl.m_k))
-                  .append(", k=")
-                  .append(std::to_string(taperedpl.m_taper))
-                  .append(", taper=")
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     taperedpl,
+                     std::make_pair("k", taperedpl.m_k),
+                     std::make_pair("taper", taperedpl.m_taper)
+                 );
              }
         )
         .def(py::init<
+                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 int,
@@ -1352,6 +1441,7 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal
              >(),
+             py::arg("name"),
              py::arg("k"),
              py::arg("taper"),
              py::arg("unit") = 0,
