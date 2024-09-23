@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "ShortRF";
+        static constexpr auto type = "ShortRF";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A short RF cavity element

@@ -31,7 +31,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "Sbend";
+        static constexpr auto type = "Sbend";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** An ideal sector bend

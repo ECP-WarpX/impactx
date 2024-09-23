@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "Quad";
+        static constexpr auto type = "Quad";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A Quadrupole magnet

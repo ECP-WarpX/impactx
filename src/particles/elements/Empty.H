@@ -24,7 +24,7 @@ namespace impactx
     : public elements::Thin,
       public elements::NoFinalize
     {
-        static constexpr auto name = "None";
+        static constexpr auto type = "None";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** This element does nothing.

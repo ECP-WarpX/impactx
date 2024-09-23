@@ -31,7 +31,7 @@ namespace impactx
       public elements::Thin,
       public elements::NoFinalize
     {
-        static constexpr auto name = "PRot";
+        static constexpr auto type = "PRot";
         using PType = ImpactXParticleContainer::ParticleType;
 
         static constexpr amrex::ParticleReal degree2rad = ablastr::constant::math::pi / 180.0;

@@ -115,7 +115,7 @@ namespace SoftQuadrupoleData
       public elements::Thick,
       public elements::Alignment
     {
-        static constexpr auto name = "SoftQuadrupole";
+        static constexpr auto type = "SoftQuadrupole";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A soft-edge quadrupole

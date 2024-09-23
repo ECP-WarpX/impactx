@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "NonlinearLens";
+        static constexpr auto type = "NonlinearLens";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** Single short segment of the nonlinear magnetic insert element

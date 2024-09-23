@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "Multipole";
+        static constexpr auto type = "Multipole";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A general thin multipole element

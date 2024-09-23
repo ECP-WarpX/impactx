@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "TaperedPL";
+        static constexpr auto type = "TaperedPL";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A short segment of a nonlinear plasma lens with a transverse taper.

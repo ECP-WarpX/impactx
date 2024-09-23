@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "Buncher";
+        static constexpr auto type = "Buncher";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A short RF cavity element at zero crossing for bunching

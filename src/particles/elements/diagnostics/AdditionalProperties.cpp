@@ -53,7 +53,7 @@ namespace impactx::diagnostics
         NonlinearLensInvariants const nonlinear_lens_invariants(alpha, beta, tn, cn);
 
         // profile time spent here
-        std::string profile_name = "impactx::Push::" + std::string(BeamMonitor::name) + "::add_optional_properties";
+        std::string profile_name = "impactx::Push::" + std::string(BeamMonitor::type) + "::add_optional_properties";
         BL_PROFILE(profile_name);
 
         // add runtime properties for H and I

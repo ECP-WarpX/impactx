@@ -53,7 +53,7 @@ To simplify the logic, we use so-called `mixin classes <https://en.wikipedia.org
    :language: cpp
    :dedent: 4
    :start-at: struct Drift
-   :end-at: static constexpr auto name = "Drift";
+   :end-at: static constexpr auto type = "Drift";
 
 After this brief boilerplate, our beamline elements implement three simple parts:
 

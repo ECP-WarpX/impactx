@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "DipEdge";
+        static constexpr auto type = "DipEdge";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** Edge focusing associated with bend entry or exit

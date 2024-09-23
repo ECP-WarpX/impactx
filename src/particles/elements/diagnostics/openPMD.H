@@ -65,7 +65,7 @@ namespace detail
     struct BeamMonitor
     : public elements::Thin
     {
-        static constexpr auto name = "BeamMonitor";
+        static constexpr auto type = "BeamMonitor";
         using PType = typename ImpactXParticleContainer::ParticleType;
         using PinnedContainer = typename ImpactXParticleContainer::ContainerLike<amrex::PinnedArenaAllocator>;
 

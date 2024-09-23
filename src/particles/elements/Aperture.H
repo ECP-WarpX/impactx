@@ -30,7 +30,7 @@ namespace impactx
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "Aperture";
+        static constexpr auto type = "Aperture";
         using PType = ImpactXParticleContainer::ParticleType;
 
         enum Shape
