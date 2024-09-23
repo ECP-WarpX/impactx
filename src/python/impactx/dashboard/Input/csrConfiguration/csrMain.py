@@ -30,6 +30,14 @@ class csrConfiguration:
             with vuetify.VCardText():
                 with vuetify.VRow(classes="my-0"):
                     with vuetify.VCol(classes="py-0"):
+                        vuetify.VSelect(
+                            label="Particle Shape",
+                            v_model=("particle_shape",),
+                            items=([1, 2, 3],),
+                            dense=True,
+                        )
+                with vuetify.VRow(classes="my-0"):
+                    with vuetify.VCol(classes="py-0"):
                         vuetify.VTextField(
                             label="CSR Bins",
                             v_model=("csr_bins", 150),
