@@ -23,10 +23,14 @@ namespace impactx
      * @param[inout] pc container of the particles to push
      * @param[inout] element_variant a single element to push the particles through
      * @param[in] step global step for diagnostics
+     * @param[in] cycle for periodic lattices, this is the cycle or turn
      */
-    void Push (ImpactXParticleContainer & pc,
-               KnownElements & element_variant,
-               int step);
+    void Push (
+        ImpactXParticleContainer & pc,
+        KnownElements & element_variant,
+        int step,
+        int cycle
+    );
 
 } // namespace impactx
 

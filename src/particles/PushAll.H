@@ -26,6 +26,7 @@ namespace impactx
      * @param[in,out] pc particle container to push
      * @param[in,out] element the beamline element
      * @param[in] step global step for diagnostics
+     * @param[in] cycle for periodic lattices, this is the cycle or turn
      * @param[in] omp_parallel allow threading via OpenMP for the particle iterator loop (note: if OMP backend is active)
      */
     template<typename T_Element>
@@ -33,6 +34,7 @@ namespace impactx
             ImpactXParticleContainer & pc,
             T_Element & element,
             [[maybe_unused]] int step,
+            [[maybe_unused]] int cycle,
             [[maybe_unused]] bool omp_parallel = true
     )
     {

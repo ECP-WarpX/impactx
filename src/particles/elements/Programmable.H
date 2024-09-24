@@ -46,10 +46,12 @@ namespace impactx
          *
          * @param[in,out] pc particle container to push
          * @param[in] step global step for diagnostics
+         * @param[in] cycle for periodic lattices, this is the cycle or turn
          */
         void operator() (
             ImpactXParticleContainer & pc,
-            int step
+            int step,
+            int cycle
         ) const;
 
         /** Push all particles relative to the reference particle */
@@ -103,7 +105,7 @@ namespace impactx
          */
         bool m_threadsafe = false;
 
-        std::function<void(ImpactXParticleContainer *, int)> m_push; //! hook for push of whole container
+        std::function<void(ImpactXParticleContainer *, int, int)> m_push; //! hook for push of whole container (pc, step, cycle)
         std::function<void(ImpactXParticleContainer::iterator *, RefPart &)> m_beam_particles; //! hook for beam particles
         std::function<void(RefPart &)> m_ref_particle; //! hook for reference particle
         std::function<void()> m_finalize; //! hook for finalize cleanup

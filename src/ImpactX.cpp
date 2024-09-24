@@ -137,7 +137,7 @@ namespace impactx {
 
         // a global step for diagnostics including space charge slice steps in elements
         //   before we start the evolve loop, we are in "step 0" (initial state)
-        int global_step = 0;
+        int step = 0;
 
         // check typos in inputs after step 1
         bool early_params_checked = false;
@@ -158,7 +158,7 @@ namespace impactx {
             diagnostics::DiagnosticOutput(*amr_data->m_particle_container,
                                           diagnostics::OutputType::PrintRefParticle,
                                           "diags/ref_particle",
-                                          global_step);
+                                          step);
 
             // print the initial values of reduced beam characteristics
             diagnostics::DiagnosticOutput(*amr_data->m_particle_container,
@@ -201,9 +201,9 @@ namespace impactx {
                 // sub-steps for space charge within the element
                 for (int slice_step = 0; slice_step < nslice; ++slice_step) {
                     BL_PROFILE("ImpactX::evolve::slice_step");
-                    global_step++;
+                    step++;
                     if (verbose > 0) {
-                        amrex::Print() << " ++++ Starting global_step=" << global_step
+                        amrex::Print() << " ++++ Starting step=" << step
                                        << " slice_step=" << slice_step << "\n";
                     }
 
@@ -263,7 +263,7 @@ namespace impactx {
                     // assuming that the distribution did not change
 
                     // push all particles with external maps
-                    Push(*amr_data->m_particle_container, element_variant, global_step);
+                    Push(*amr_data->m_particle_container, element_variant, step, cycle);
 
                     // move "lost" particles to another particle container
                     collect_lost_particles(*amr_data->m_particle_container);
@@ -282,14 +282,14 @@ namespace impactx {
                         diagnostics::DiagnosticOutput(*amr_data->m_particle_container,
                                                       diagnostics::OutputType::PrintRefParticle,
                                                       "diags/ref_particle",
-                                                      global_step,
+                                                      step,
                                                       true);
 
                         // print slice step reduced beam characteristics to file
                         diagnostics::DiagnosticOutput(*amr_data->m_particle_container,
                                                       diagnostics::OutputType::PrintReducedBeamCharacteristics,
                                                       "diags/reduced_beam_characteristics",
-                                                      global_step,
+                                                      step,
                                                       true);
 
                     }
@@ -308,13 +308,13 @@ namespace impactx {
             diagnostics::DiagnosticOutput(*amr_data->m_particle_container,
                                           diagnostics::OutputType::PrintRefParticle,
                                           "diags/ref_particle_final",
-                                          global_step);
+                                          step);
 
             // print the final values of the reduced beam characteristics
             diagnostics::DiagnosticOutput(*amr_data->m_particle_container,
                                           diagnostics::OutputType::PrintReducedBeamCharacteristics,
                                           "diags/reduced_beam_characteristics_final",
-                                          global_step);
+                                          step);
 
             // output particles lost in apertures
             if (amr_data->m_particles_lost->TotalNumberOfParticles() > 0)
@@ -323,7 +323,7 @@ namespace impactx {
                 pp_diag.queryAdd("backend", openpmd_backend);
 
                 diagnostics::BeamMonitor output_lost("particles_lost", openpmd_backend, "g");
-                output_lost(*amr_data->m_particles_lost, 0);
+                output_lost(*amr_data->m_particles_lost, 0, 0);
                 output_lost.finalize();
             }
         }

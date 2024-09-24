@@ -147,10 +147,16 @@ namespace detail
     template<typename T_Element>
     struct BeamOptic
     {
-        /** Push first the reference particle, then all other particles */
+        /** Push first the reference particle, then all other particles
+         *
+         * @param[inout] pc container of the particles to push
+         * @param[in] step global step for diagnostics
+         * @param[in] cycle for periodic lattices, this is the cycle or turn
+         */
         void operator() (
             ImpactXParticleContainer & pc,
-            int step
+            int step,
+            int cycle
         )
         {
             static_assert(
@@ -159,7 +165,7 @@ namespace detail
             );
 
             T_Element& element = *static_cast<T_Element*>(this);
-            push_all(pc, element, step);
+            push_all(pc, element, step, cycle);
         }
 
         /** This pushes the particles on a particle iterator tile or box.
