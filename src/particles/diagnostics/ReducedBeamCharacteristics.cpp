@@ -311,7 +311,7 @@ namespace impactx::diagnostics
         amrex::ParticleReal emittance_2 = emittance_y * bg;
         amrex::ParticleReal emittance_3 = emittance_t * bg;
 
-        // Parse the diagnostic parameters 
+        // Parse the diagnostic parameters
         amrex::ParmParse pp_diag("diag");
         bool compute_eigenemittances = false;
         pp_diag.queryAdd("eigenemittances", compute_eigenemittances);
