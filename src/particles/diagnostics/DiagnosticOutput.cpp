@@ -57,6 +57,7 @@ namespace impactx::diagnostics
                              << "beta_x" << " " << "beta_y" << " " << "beta_t" << " "
                              << "dispersion_x" << " " << "dispersion_px" << " "
                              << "dispersion_y" << " " << "dispersion_py" << " "
+                             << "emittance_1" << " " << "emittance_2" << " " << "emittance_3" << " "
                              << "charge_C" << " "
                              << "\n";
             }
