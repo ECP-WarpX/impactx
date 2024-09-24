@@ -107,6 +107,7 @@ namespace impactx::diagnostics
                          << rbc.at("beta_x") << " " << rbc.at("beta_y") << " " << rbc.at("beta_t") << " "
                          << rbc.at("dispersion_x") << " " << rbc.at("dispersion_px") << " "
                          << rbc.at("dispersion_y") << " " << rbc.at("dispersion_py") << " "
+                         << rbc.at("emittance_1") << " " << rbc.at("emittance_2") << " " << rbc.at("emittance_3") << " "
                          << rbc.at("charge_C") << "\n";
         } // if( otype == OutputType::PrintReducedBeamCharacteristics)
 
