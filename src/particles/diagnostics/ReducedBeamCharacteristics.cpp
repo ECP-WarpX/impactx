@@ -310,7 +310,12 @@ namespace impactx::diagnostics
         amrex::ParticleReal emittance_1 = emittance_x * bg;
         amrex::ParticleReal emittance_2 = emittance_y * bg;
         amrex::ParticleReal emittance_3 = emittance_t * bg;
-        bool compute_eigenemittances = true;
+
+        // Parse the diagnostic parameters 
+        amrex::ParmParse pp_diag("diag");
+        bool compute_eigenemittances = false;
+        pp_diag.queryAdd("eigenemittances", compute_eigenemittances);
+
         if (compute_eigenemittances) {
            // Store the covariance matrix in dynamical variables:
            Sigma(1,1) = x_ms;

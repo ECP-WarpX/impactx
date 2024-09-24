@@ -15,6 +15,7 @@ sim.particle_shape = 2  # B-spline order
 sim.space_charge = False
 # sim.diagnostics = False  # benchmarking
 sim.slice_step_diagnostics = True
+sim.eigenemittances = True
 
 # domain decomposition & space charge mesh
 sim.init_grids()
