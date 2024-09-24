@@ -10,6 +10,7 @@
 #include "initialization/InitDistribution.H"
 
 #include "ImpactX.H"
+#include "particles/CovarianceMatrix.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/distribution/All.H"
 
@@ -31,6 +32,48 @@
 
 namespace impactx
 {
+
+    /** Ignore the shape of a distribution and use the 2nd moments to create a covariance matrix
+     */
+    CovarianceMatrix
+    create_covariance_matrix (
+        distribution::KnownDistributions const & distr
+    )
+    {
+        // zero out the 6x6 matrix
+        CovarianceMatrix cv;
+        for (int i=1; i<=6; ++i) {
+            for (int j = 1; j <= 6; ++j) {
+                cv(i, j) = 0.0;
+            }
+        }
+
+        // initialize from 2nd order beam moments
+        std::visit([&](auto&& distribution) {
+            // quick hack
+            using Distribution = std::remove_cv_t< std::remove_reference_t< decltype(distribution)> >;
+            if constexpr (std::is_same<Distribution, distribution::Empty>::value ||
+                          std::is_same<Distribution, distribution::Thermal>::value)
+            {
+                throw std::runtime_error("Empty and Thermal type cannot create Covariance matrices!");
+            } else {
+                amrex::ParticleReal lambdaX = distribution.m_lambdaX;
+                amrex::ParticleReal lambdaY = distribution.m_lambdaY;
+                amrex::ParticleReal lambdaT = distribution.m_lambdaT;
+                amrex::ParticleReal lambdaPx;
+                amrex::ParticleReal lambdaPy;
+                amrex::ParticleReal lambdaPt;
+                amrex::ParticleReal muxpx;
+                amrex::ParticleReal muypy;
+                amrex::ParticleReal mutpt;
+
+                // convert to co-variance matrix
+                // TODO
+            }
+        }, distr);
+
+        return cv;
+    }
 
     void
     ImpactX::add_particles (
@@ -95,7 +138,7 @@ namespace impactx
             amrex::ParticleReal * const AMREX_RESTRICT py_ptr = py.data();
             amrex::ParticleReal * const AMREX_RESTRICT pt_ptr = pt.data();
 
-            using Distribution = std::remove_reference_t< std::remove_cv_t<decltype(distribution)> >;
+            using Distribution = std::remove_reference_t< std::remove_cv_t<decltype(distribution)> >; // TODO: switch order ov remove_ ...?
             initialization::InitSingleParticleData<Distribution> const init_single_particle_data(
                 distribution, x_ptr, y_ptr, t_ptr, px_ptr, py_ptr, pt_ptr);
             amrex::ParallelForRNG(npart_this_proc, init_single_particle_data);
