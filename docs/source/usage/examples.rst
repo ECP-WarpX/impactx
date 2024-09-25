@@ -70,6 +70,16 @@ Beam Distributions
 
    examples/distgen/README
 
+
+Channels & Rings
+----------------
+
+.. toctree::
+   :maxdepth: 1
+
+   examples/fodo_channel/README.rst
+
+
 Lattice Design & Optimization
 -----------------------------
 

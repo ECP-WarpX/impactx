@@ -219,6 +219,23 @@ add_impactx_test(FODO.py.MPI
     examples/fodo/plot_fodo.py
 )
 
+# FODO Channel ################################################################
+#
+add_impactx_test(FODO_channel
+        examples/fodo_channel/input_fodo.in
+        OFF  # ImpactX MPI-parallel
+        examples/fodo_channel/analysis_fodo.py
+        examples/fodo_channel/plot_fodo.py
+)
+add_impactx_test(FODO_channel.py
+        examples/fodo_channel/run_fodo.py
+        OFF  # ImpactX MPI-parallel
+        examples/fodo_channel/analysis_fodo.py
+        examples/fodo_channel/plot_fodo.py
+)
+label_impactx_test(FODO_channel slow)
+label_impactx_test(FODO_channel.py slow)
+
 # Chicane #####################################################################
 #
 add_impactx_test(chicane
