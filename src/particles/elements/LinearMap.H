@@ -35,7 +35,10 @@ namespace impactx
         static constexpr auto type = "LinearMap";
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** A thin element that applies ...
+        /** A thin element that applies a user-provided linear transport map R
+         *  to the 6-vector of phase space coordinates (x,px,y,py,t,pt).  
+         *  Thus  x_final = R(1,1)*x + R(1,2)*px + R(1,3)*y + ..., 
+         *       px_final = R(2,1)*x + R(2,2)*px + R(2,3)*y + ..., etc.
          *
          * @param R user-provided transport map
          * @param dx horizontal translation error in m
@@ -60,8 +63,8 @@ namespace impactx
         /** Push all particles */
         using BeamOptic::operator();
 
-        /** This is a ... functor, so that a variable of this type can be used like a
-         *  function.
+        /** This is a LinearMap functor, so that a variable of this type can be used like a
+         *  LinearMap function.
          *
          * @param x particle position in x
          * @param y particle position in y
@@ -89,7 +92,32 @@ namespace impactx
             // shift due to alignment errors of the element
             shift_in(x, y, px, py);
 
-            // ... TODO ...
+            // input and output phase space vectors
+            amrex::Array1D<amrex::ParticleReal,1,6> vectorin;
+            amrex::Array1D<amrex::ParticleReal,1,6> vectorout;  
+            vectorin(1) = x;
+            vectorin(2) = px;
+            vectorin(3) = y;
+            vectorin(4) = py;
+            vectorin(5) = t;   
+            vectorin(6) = pt;
+        
+            for (int i=1; i<=6; ++i) {
+      
+                vectorout(i) = 0.0;
+                for (int j = 1; j <= 6; ++j) {
+                    vectorout(i) += m_transport_map(i, j) * vectorin(j);
+                }
+          
+            }
+
+            // assign updated values
+            x = vectorout(1);
+            px = vectorout(2);
+            y = vectorout(3);
+            py = vectorout(4);
+            t = vectorout(5);
+            pt = vectorout(6);
 
             // undo shift due to alignment errors of the element
             shift_out(x, y, px, py);
@@ -97,6 +125,9 @@ namespace impactx
 
         /** This pushes the reference particle. */
         using Thin::operator();
+
+        LinearTransport::Map6x6 m_transport_map;  // 6x6 transport map
+
     };
 
 } // namespace impactx
