@@ -117,7 +117,7 @@ class SpaceChargeConfiguration:
         Creates UI content for space charge configuration
         """
 
-        with vuetify.VCard(v_show="space_charge", style="width: 340px; height: 300px"):
+        with vuetify.VCard(v_show="space_charge", style="width: 340px;"):
             with vuetify.VCardTitle("Space Charge"):
                 vuetify.VSpacer()
                 vuetify.VIcon(
@@ -159,7 +159,7 @@ class SpaceChargeConfiguration:
                         classes="font-weight-bold black--text",
                     )
                 with vuetify.VRow(classes="my-0"):
-                    with vuetify.VCol(cols=3, classes="py-0"):
+                    with vuetify.VCol(cols=4, classes="py-0"):
                         vuetify.VTextField(
                             placeholder="x",
                             v_model=("n_cell_x",),
@@ -168,7 +168,7 @@ class SpaceChargeConfiguration:
                             dense=True,
                             style="margin-top: -5px",
                         )
-                    with vuetify.VCol(cols=3, classes="py-0"):
+                    with vuetify.VCol(cols=4, classes="py-0"):
                         vuetify.VTextField(
                             placeholder="y",
                             v_model=("n_cell_y",),
@@ -177,11 +177,44 @@ class SpaceChargeConfiguration:
                             dense=True,
                             style="margin-top: -5px",
                         )
-                    with vuetify.VCol(cols=3, classes="py-0"):
+                    with vuetify.VCol(cols=4, classes="py-0"):
                         vuetify.VTextField(
                             placeholder="z",
                             v_model=("n_cell_z",),
                             error_messages=("error_message_z",),
+                            type="number",
+                            dense=True,
+                            style="margin-top: -5px",
+                        )
+                with vuetify.VCol(classes="pa-0"):
+                    vuetify.VListItemSubtitle(
+                        "Blocking Factor",
+                        classes="font-weight-bold black--text mt-1",
+                    )
+                with vuetify.VRow(classes="my-0"):
+                    with vuetify.VCol(cols=4, classes="py-0"):
+                        vuetify.VTextField(
+                            placeholder="x",
+                            v_model=("blocking_factor_x",),
+                            error_messages=("error_message_bx",),
+                            type="number",
+                            dense=True,
+                            style="margin-top: -5px",
+                        )
+                    with vuetify.VCol(cols=4, classes="py-0"):
+                        vuetify.VTextField(
+                            placeholder="y",
+                            v_model=("blocking_factor_y",),
+                            error_messages=("error_message_by",),
+                            type="number",
+                            dense=True,
+                            style="margin-top: -5px",
+                        )
+                    with vuetify.VCol(cols=4, classes="py-0"):
+                        vuetify.VTextField(
+                            placeholder="z",
+                            v_model=("blocking_factor_z",),
+                            error_messages=("error_message_bz",),
                             type="number",
                             dense=True,
                             style="margin-top: -5px",
