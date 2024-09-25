@@ -22,6 +22,10 @@ state.n_cell_x = 32.0
 state.n_cell_y = 32.0
 state.n_cell_z = 32.0
 
+state.blocking_factor_x = 32.0
+state.blocking_factor_y = 32.0
+state.blocking_factor_z = 32.0
+
 # -----------------------------------------------------------------------------
 # Helper functions
 # -----------------------------------------------------------------------------
