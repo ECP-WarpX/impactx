@@ -438,7 +438,7 @@ namespace detail
         } else if (element_type == "linear_map")
         {
             auto a = detail::query_alignment(pp_element);
-            
+
             elements::LinearTransport::Map6x6 transport_map;
             for (int i=1; i<=6; ++i) {
                 for (int j=1; j<=6; ++j) {
