@@ -12,6 +12,7 @@
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
 #include <AMReX_GpuComplex.H>
+#include <AMReX_BLProfiler.H>
 
 #include <cmath>
 #include <stdexcept>
