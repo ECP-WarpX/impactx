@@ -12,10 +12,11 @@
 
 #include "particles/ImpactXParticleContainer.H"
 
+#include <AMReX_Array.H>
 #include <AMReX_REAL.H>
 
 #include <string>
-#include <unordered_map>
+
 
 
 namespace impactx::diagnostics

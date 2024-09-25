@@ -1,7 +1,7 @@
 .. _examples-coupled-optics:
 
-Coupled optics
-================
+Coupled Optics
+==============
 
 This is a lattice illustrating fully coupled 6D transport.  It is obtained from the example "dogleg" by adding a solenoid after the first bending dipole.
 The solenoid is identical to that found in the example "solenoid".

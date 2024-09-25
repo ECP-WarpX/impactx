@@ -11,11 +11,14 @@
 #define COVARIANCE_MATRIX_MATH_H
 
 #include <ablastr/constant.H>
+
 #include <AMReX_Array.H>
 #include <AMReX_REAL.H>
 #include <AMReX_GpuComplex.H>
-#include <tuple>
+
 #include <cmath>
+#include <tuple>
+
 
 namespace impactx::diagnostics
 {

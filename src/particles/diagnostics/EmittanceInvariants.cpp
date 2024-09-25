@@ -9,13 +9,14 @@
  */
 #include "CovarianceMatrixMath.H"
 
-#include <stdexcept>
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
 #include <AMReX_GpuComplex.H>
+
 #include <cmath>
-#include <vector>
+#include <stdexcept>
 #include <tuple>
+#include <vector>
 
 
 namespace impactx::diagnostics
@@ -56,7 +57,7 @@ namespace impactx::diagnostics
         // a change of sign.
         for (int i = 1; i < 7; i++) {
             for (int j = 1; j < 7; j++) {
-                if (j % 2) {
+                if (j % 2 == 1) {
                    S1(i,j) = -Sigma(i,j+1); // if j is odd
                 }
                 else {
@@ -99,6 +100,8 @@ namespace impactx::diagnostics
         amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> Sigma
     )
     {
+        BL_PROFILE("impactx::diagnostics::Eigenemittances");
+
         using namespace amrex::literals;
 
         std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> invariants;
