@@ -437,11 +437,8 @@ namespace detail
             }
         } else if (element_type == "linear_map")
         {
-            // Parse the lattice elements for the sub-lattice in the line
-            amrex::ParmParse pp_sub_lattice(element_name);
-
             auto a = detail::query_alignment(pp_element);
-
+            
             elements::LinearTransport::Map6x6 transport_map;
             for (int i=1; i<=6; ++i) {
                 for (int j=1; j<=6; ++j) {
@@ -452,6 +449,7 @@ namespace detail
                     transport_map(i, j) = R_ij;
                 }
             }
+            std::cout << "Caution: A user-provided linear map is used.  Transport may not be symplectic." << "\n";
 
             m_lattice.emplace_back(LinearMap(transport_map, a["dx"], a["dy"], a["rotation_degree"]) );
         } else {
