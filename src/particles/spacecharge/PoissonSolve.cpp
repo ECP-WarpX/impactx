@@ -71,7 +71,31 @@ namespace impactx::spacecharge
         pp_algo.queryAdd("mlmg_max_iters", mlmg_max_iters);
         pp_algo.queryAdd("mlmg_verbosity", mlmg_verbosity);
 
-        struct PoissonBoundaryHandler {
+        // empty implementation, no EB support yet in ImpactX
+        struct PhiCalculatorEB
+        {
+            AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+            amrex::Real operator() (const amrex::Real, const amrex::Real) const noexcept {
+                return 0.0;
+            }
+
+            AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+            amrex::Real operator() (const amrex::Real, const amrex::Real, const amrex::Real) const noexcept {
+                return 0.0;
+            }
+        };
+
+        struct PoissonBoundaryHandler
+        {
+            // empty implementation, no EB support yet in ImpactX
+            [[nodiscard]] PhiCalculatorEB
+            getPhiEB (amrex::Real) const noexcept
+            {
+                return PhiCalculatorEB();
+            }
+
+            amrex::ParserExecutor<1> potential_eb_t;
+
             amrex::Array<amrex::LinOpBCType, AMREX_SPACEDIM> const lobc = {
                 amrex::LinOpBCType::Dirichlet,
                 amrex::LinOpBCType::Dirichlet,
@@ -85,6 +109,7 @@ namespace impactx::spacecharge
             //bool bcs_set = false;
             //std::array<bool, AMREX_SPACEDIM * 2> dirichlet_flag;
             //bool has_non_periodic = false;
+            bool phi_EB_only_t = false;
         } poisson_boundary_handler;
 
         // create a vector to our fields, sorted by level
@@ -97,6 +122,7 @@ namespace impactx::spacecharge
         }
 
         const bool do_single_precision_comms = false;
+        const bool eb_enabled = false;
         ablastr::fields::computePhi(
             sorted_rho,
             sorted_phi,
@@ -111,6 +137,7 @@ namespace impactx::spacecharge
             ablastr::utils::enums::GridType::Collocated,
             poisson_boundary_handler,
             is_solver_igf_on_lev0,
+            eb_enabled,
             do_single_precision_comms,
             rel_ref_ratio
             /*
