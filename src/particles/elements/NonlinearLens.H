@@ -42,20 +42,20 @@ namespace impactx
          *  S. Nagaitsev, PRSTAB 13, 084002 (2010), Sect. V.A.  This
          *  element appears in MAD-X as type NLLENS.
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param knll integrated strength of the nonlinear lens (m)
          * @param cnll distance of singularities from the origin (m)
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         NonlinearLens (
-            std::optional<std::string> name,
             amrex::ParticleReal knll,
             amrex::ParticleReal cnll,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
         : Named(name),
           Alignment(dx, dy, rotation_degree),

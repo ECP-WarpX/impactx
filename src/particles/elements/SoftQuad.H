@@ -122,7 +122,6 @@ namespace SoftQuadrupoleData
 
         /** A soft-edge quadrupole
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m
          * @param gscale Scaling factor for on-axis field gradient Bz in 1/m^2
          * @param cos_coef cosine coefficients in Fourier expansion of on-axis magnetic field Bz
@@ -133,9 +132,9 @@ namespace SoftQuadrupoleData
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         SoftQuadrupole (
-            std::optional<std::string> name,
             amrex::ParticleReal ds,
             amrex::ParticleReal gscale,
             std::vector<amrex::ParticleReal> cos_coef,
@@ -144,7 +143,8 @@ namespace SoftQuadrupoleData
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
             int mapsteps = 1,
-            int nslice = 1
+            int nslice = 1,
+            std::optional<std::string> name = std::nullopt
         )
           : Named(name),
             Thick(ds, nslice),

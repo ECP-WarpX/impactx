@@ -49,9 +49,7 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 ns = 1  # number of slices per ds in the element
 lattice = [
     monitor,
-    elements.Quad(
-        name=None, ds=1.0, k=0.25, dx=0.003, dy=0.0, rotation=30.0, nslice=ns
-    ),
+    elements.Quad(ds=1.0, k=0.25, dx=0.003, dy=0.0, rotation=30.0, nslice=ns),
     monitor,
 ]
 sim.lattice.extend(lattice)

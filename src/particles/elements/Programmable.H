@@ -30,14 +30,14 @@ namespace impactx
 
         /** This element can be programmed
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         Programmable (
-            std::optional<std::string> name,
             amrex::ParticleReal ds=0.0,
-            int nslice=1
+            int nslice=1,
+            std::optional<std::string> name = std::nullopt
         )
           : Named(name), m_ds(ds), m_nslice(nslice)
         {}

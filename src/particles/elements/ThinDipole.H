@@ -42,20 +42,20 @@ namespace impactx
          * for Tracking," CERN/SL/95-12 (AP), 1995.  It is intended to replicate
          * the thin-lens dipole model in MAD-X.
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param theta - the total bending angle (degrees)
          * @param rc - the curvature radius (m)
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         ThinDipole (
-            std::optional<std::string> name,
             amrex::ParticleReal theta,
             amrex::ParticleReal rc,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
         : Named(name),
           Alignment(dx, dy, rotation_degree),

@@ -37,7 +37,6 @@ namespace impactx
 
         /** A linear Constant Focusing element
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m.
          * @param kx Focusing strength for x in 1/m.
          * @param ky Focusing strength for y in 1/m.
@@ -46,9 +45,9 @@ namespace impactx
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         ConstF (
-            std::optional<std::string> name,
             amrex::ParticleReal ds,
             amrex::ParticleReal kx,
             amrex::ParticleReal ky,
@@ -56,7 +55,8 @@ namespace impactx
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
-            int nslice = 1
+            int nslice = 1,
+            std::optional<std::string> name = std::nullopt
         )
         : Named(name),
           Thick(ds, nslice),

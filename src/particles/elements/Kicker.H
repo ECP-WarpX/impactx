@@ -44,22 +44,22 @@ namespace impactx
         /** A thin transverse kicker element, inducing a transverse
          *  momentum displacement from the reference orbit.
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param xkick Strength of horizontal kick
          * @param ykick Strength of vertical kick
          * @param unit units of xkick and ykick
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         Kicker (
-            std::optional<std::string> name,
             amrex::ParticleReal xkick,
             amrex::ParticleReal ykick,
             UnitSystem unit,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
         : Named(name),
           Alignment(dx, dy, rotation_degree),

@@ -37,22 +37,22 @@ namespace impactx
 
         /** A general thin multipole element
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param multipole index m (m=1 dipole, m=2 quadrupole, m=3 sextupole etc.)
          * @param K_normal Integrated normal multipole coefficient (1/meter^m)
          * @param K_skew Integrated skew multipole coefficient (1/meter^m)
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         Multipole (
-            std::optional<std::string> name,
             int multipole,
             amrex::ParticleReal K_normal,
             amrex::ParticleReal K_skew,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
         : Named(name),
           Alignment(dx, dy, rotation_degree),

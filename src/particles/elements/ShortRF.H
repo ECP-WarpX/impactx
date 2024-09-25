@@ -37,7 +37,6 @@ namespace impactx
 
         /** A short RF cavity element
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param V Normalized RF voltage V = maximum energy gain/(m*c^2)
          * @param freq RF frequency in Hz
          * @param phase RF synchronous phase of the reference particle in deg
@@ -47,15 +46,16 @@ namespace impactx
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         ShortRF (
-            std::optional<std::string> name,
             amrex::ParticleReal V,
             amrex::ParticleReal freq,
             amrex::ParticleReal phase,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
         : Named(name),
           Alignment(dx, dy, rotation_degree),

@@ -37,20 +37,20 @@ namespace impactx
 
         /** A short RF cavity element at zero crossing for bunching
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param V Normalized RF voltage drop V = Emax*L/(c*Brho)
          * @param k Wavenumber of RF in 1/m
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         Buncher (
-            std::optional<std::string> name,
             amrex::ParticleReal V,
             amrex::ParticleReal k,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
         : Named(name),
           Alignment(dx, dy, rotation_degree),

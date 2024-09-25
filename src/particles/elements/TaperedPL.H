@@ -37,7 +37,6 @@ namespace impactx
 
         /** A short segment of a nonlinear plasma lens with a transverse taper.
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param k  integrated plasma lens (linear) focusing strength in m^(-1)
          *           = (length in m) * (azimuthal field gradient in T/m) / (rigidity in T-m)
          *        OR integrated azimuthal magnetic field gradient in T (k > 0)
@@ -49,15 +48,16 @@ namespace impactx
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         TaperedPL (
-            std::optional<std::string> name,
             amrex::ParticleReal k,
             amrex::ParticleReal taper,
             int unit,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
         : Named(name),
           Alignment(dx, dy, rotation_degree),

@@ -38,22 +38,22 @@ namespace impactx
 
         /** An ideal sector bend
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m.
          * @param rc Radius of curvature in m.
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         Sbend (
-            std::optional<std::string> name,
             amrex::ParticleReal ds,
             amrex::ParticleReal rc,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
-            int nslice = 1
+            int nslice = 1,
+            std::optional<std::string> name = std::nullopt
         )
         : Named(name),
           Thick(ds, nslice),

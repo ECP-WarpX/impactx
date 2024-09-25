@@ -43,14 +43,14 @@ namespace impactx
          *  to a frame in which the reference orbit has angle phi_out
          *  with the z-axis.  The net rotation angle is phi_out - phi_in.
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param phi_in Initial angle of reference trajectory w/r/t z (degrees)
          * @param phi_out Final angle of reference trajectory w/r/t/ z (degrees)
+         * @param name a user defined and not necessarily unique name of the element
          */
         PRot (
-            std::optional<std::string> name,
             amrex::ParticleReal phi_in,
-            amrex::ParticleReal phi_out
+            amrex::ParticleReal phi_out,
+            std::optional<std::string> name = std::nullopt
         )
         : Named(name),
           m_phi_in(phi_in * degree2rad),

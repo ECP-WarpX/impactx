@@ -279,13 +279,13 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init([](
-                 std::optional<std::string> name,
                  amrex::ParticleReal xmax,
                  amrex::ParticleReal ymax,
                  std::string const & shape,
                  amrex::ParticleReal dx,
                  amrex::ParticleReal dy,
-                 amrex::ParticleReal rotation_degree
+                 amrex::ParticleReal rotation_degree,
+                 std::optional<std::string> name
              )
              {
                  if (shape != "rectangular" && shape != "elliptical")
@@ -294,15 +294,15 @@ void init_elements(py::module& m)
                  Aperture::Shape const s = shape == "rectangular" ?
                      Aperture::Shape::rectangular :
                      Aperture::Shape::elliptical;
-                 return new Aperture(name, xmax, ymax, s, dx, dy, rotation_degree);
+                 return new Aperture(xmax, ymax, s, dx, dy, rotation_degree, name);
              }),
-             py::arg("name"),
              py::arg("xmax"),
              py::arg("ymax"),
              py::arg("shape") = "rectangular",
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "A short collimator element applying a transverse aperture boundary."
         )
         .def_property("shape",
@@ -345,19 +345,19 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A Drift with chromatic effects included."
         )
     ;
@@ -375,16 +375,15 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 int,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("k"),
              py::arg("unit") = 0,
@@ -392,6 +391,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A Quadrupole magnet with chromatic effects included."
         )
         .def_property("k",
@@ -419,16 +419,15 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 int,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("k"),
              py::arg("unit") = 0,
@@ -436,6 +435,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "An active Plasma Lens with chromatic effects included."
         )
         .def_property("k",
@@ -464,16 +464,15 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("ez"),
              py::arg("bz"),
@@ -481,6 +480,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A region of Uniform Acceleration, with chromatic effects included."
         )
         .def_property("ez",
@@ -510,7 +510,6 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -518,9 +517,9 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("kx"),
              py::arg("ky"),
@@ -529,6 +528,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A linear Constant Focusing element."
         )
         .def_property("kx",
@@ -563,16 +563,15 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("psi"),
              py::arg("rc"),
              py::arg("g"),
@@ -580,6 +579,7 @@ void init_elements(py::module& m)
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "Edge focusing associated with bend entry or exit."
         )
         .def_property("psi",
@@ -616,19 +616,19 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A drift."
         )
     ;
@@ -645,19 +645,19 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A Drift using the exact nonlinear map."
         )
     ;
@@ -676,16 +676,15 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("phi"),
              py::arg("B") = 0.0,
@@ -693,6 +692,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "An ideal sector bend using the exact nonlinear map.  When B = 0, the reference bending radius is defined by r0 = length / (angle in rad), corresponding to a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B."
         )
         .def_property("phi",
@@ -720,13 +720,13 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init([](
-                std::optional<std::string> name,
                 amrex::ParticleReal xkick,
                 amrex::ParticleReal ykick,
                 std::string const & unit,
                 amrex::ParticleReal dx,
                 amrex::ParticleReal dy,
-                amrex::ParticleReal rotation_degree
+                amrex::ParticleReal rotation_degree,
+                std::optional<std::string> name
              )
              {
                  if (unit != "dimensionless" && unit != "T-m")
@@ -735,15 +735,15 @@ void init_elements(py::module& m)
                  Kicker::UnitSystem const u = unit == "dimensionless" ?
                                             Kicker::UnitSystem::dimensionless :
                                             Kicker::UnitSystem::Tm;
-                 return new Kicker(name, xkick, ykick, u, dx, dy, rotation_degree);
+                 return new Kicker(xkick, ykick, u, dx, dy, rotation_degree, name);
              }),
-             py::arg("name"),
-             py::arg("xkick"),
+                          py::arg("xkick"),
              py::arg("ykick"),
              py::arg("unit") = "dimensionless",
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              R"(A thin transverse kicker element. Kicks are for unit "dimensionless" or in "T-m".)"
         )
         .def_property("xkick",
@@ -774,21 +774,21 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                 std::optional<std::string>,
                 int,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("multipole"),
              py::arg("K_normal"),
              py::arg("K_skew"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "A general thin multipole element."
         )
         .def_property("multipole",
@@ -847,19 +847,19 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("knll"),
              py::arg("cnll"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "Single short segment of the nonlinear magnetic insert element."
         )
         .def_property("knll",
@@ -885,13 +885,13 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                 std::optional<std::string>,
                  amrex::ParticleReal,
-                 int
+                 int,
+                 std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds") = 0.0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A programmable beam optics element."
         )
         .def_property("nslice",
@@ -942,21 +942,21 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("k"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A Quadrupole magnet."
         )
         .def_property("k",
@@ -981,7 +981,6 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -992,9 +991,9 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 int,
-                int
+                int,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("escale"),
              py::arg("freq"),
@@ -1006,6 +1005,7 @@ void init_elements(py::module& m)
              py::arg("rotation") = 0,
              py::arg("mapsteps") = 1,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "An RF cavity."
         )
         .def_property("escale",
@@ -1045,21 +1045,21 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("rc"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "An ideal sector bend."
         )
         .def_property("rc",
@@ -1083,16 +1083,15 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("rc"),
              py::arg("k"),
@@ -1100,6 +1099,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "An ideal combined function bend (sector bend with quadrupole component)."
         )
         .def_property("rc",
@@ -1127,19 +1127,19 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("V"),
              py::arg("k"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "A short linear RF cavity element at zero-crossing for bunching."
         )
         .def_property("V",
@@ -1168,21 +1168,21 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("V"),
              py::arg("freq"),
              py::arg("phase") = -90.0,
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "A short RF cavity element."
         )
         .def_property("V",
@@ -1215,7 +1215,6 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                 std::optional<std::string>,
                  amrex::ParticleReal,
                  amrex::ParticleReal,
                  std::vector<amrex::ParticleReal>,
@@ -1225,9 +1224,9 @@ void init_elements(py::module& m)
                  amrex::ParticleReal,
                  amrex::ParticleReal,
                  int,
-                 int
+                 int,
+                 std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("bscale"),
              py::arg("cos_coefficients"),
@@ -1238,6 +1237,7 @@ void init_elements(py::module& m)
              py::arg("rotation") = 0,
              py::arg("mapsteps") = 1,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A soft-edge solenoid."
         )
         .def_property("bscale",
@@ -1272,21 +1272,21 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("ks"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "An ideal hard-edge Solenoid magnet."
         )
         .def_property("ks",
@@ -1309,13 +1309,13 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("phi_in"),
              py::arg("phi_out"),
+             py::arg("name") = py::none(),
              "An exact pole-face rotation in the x-z plane. Both angles are in degrees."
         )
         .def_property("phi_in",
@@ -1343,7 +1343,6 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                 std::optional<std::string>,
                  amrex::ParticleReal,
                  amrex::ParticleReal,
                  std::vector<amrex::ParticleReal>,
@@ -1352,9 +1351,9 @@ void init_elements(py::module& m)
                  amrex::ParticleReal,
                  amrex::ParticleReal,
                  int,
-                 int
+                 int,
+                 std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("ds"),
              py::arg("gscale"),
              py::arg("cos_coefficients"),
@@ -1364,6 +1363,7 @@ void init_elements(py::module& m)
              py::arg("rotation") = 0,
              py::arg("mapsteps") = 1,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A soft-edge quadrupole."
         )
         .def_property("gscale",
@@ -1393,19 +1393,19 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("theta"),
              py::arg("rc"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "A thin kick model of a dipole bend."
         )
         .def_property("theta",
@@ -1433,21 +1433,21 @@ void init_elements(py::module& m)
              }
         )
         .def(py::init<
-                std::optional<std::string>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 int,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
-             py::arg("name"),
              py::arg("k"),
              py::arg("taper"),
              py::arg("unit") = 0,
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              R"doc(A thin nonlinear plasma lens with transverse (horizontal) taper
 
              .. math::

@@ -37,7 +37,6 @@ namespace impactx
 
         /** A Quadrupole magnet
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m.
          * @param k  Quadrupole strength in m^(-2) (MADX convention)
          *           = (gradient in T/m) / (rigidity in T-m)
@@ -47,15 +46,16 @@ namespace impactx
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         Quad (
-            std::optional<std::string> name,
             amrex::ParticleReal ds,
             amrex::ParticleReal k,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
-            int nslice = 1
+            int nslice = 1,
+            std::optional<std::string> name = std::nullopt
         )
         : Named(name),
           Thick(ds, nslice),

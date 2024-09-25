@@ -127,7 +127,6 @@ namespace SoftSolenoidData
 
         /** A soft-edge solenoid
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m
          * @param bscale Scaling factor for on-axis longitudinal magnetic field in 1/m (MAD-X convention)
          *           = (Bz in T) / (rigidity in T-m)
@@ -143,9 +142,9 @@ namespace SoftSolenoidData
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         SoftSolenoid (
-            std::optional<std::string> name,
             amrex::ParticleReal ds,
             amrex::ParticleReal bscale,
             std::vector<amrex::ParticleReal> cos_coef,
@@ -155,7 +154,8 @@ namespace SoftSolenoidData
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
             int mapsteps = 1,
-            int nslice = 1
+            int nslice = 1,
+            std::optional<std::string> name = std::nullopt
         )
           : Named(name),
             Thick(ds, nslice),

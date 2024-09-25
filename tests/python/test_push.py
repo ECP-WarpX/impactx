@@ -55,12 +55,12 @@ def test_element_push():
     sim.evolve()
 
     # Push manually through a few (unnamed) elements
-    elements.Quad(None, ds=1.0, k=1.0).push(pc)
-    elements.Drift(None, ds=0.5).push(pc)
-    elements.Quad(None, ds=1.0, k=-1.0).push(pc)
+    elements.Quad(ds=1.0, k=1.0).push(pc)
+    elements.Drift(ds=0.5).push(pc)
+    elements.Quad(ds=1.0, k=-1.0).push(pc)
 
     # alternative formulation
-    push(pc, elements.Drift(None, ds=0.25))
+    push(pc, elements.Drift(ds=0.25))
 
     # finalize simulation
     sim.finalize()

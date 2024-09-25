@@ -48,22 +48,22 @@ namespace impactx
         /** A thin collimator element that applies a transverse aperture boundary.
          *  Particles outside the boundary are considered lost.
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param shape aperture shape
          * @param xmax maximum value of horizontal coordinate (m)
          * @param ymax maximum value of vertical coordinate (m)
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         Aperture (
-            std::optional<std::string> name,
             amrex::ParticleReal xmax,
             amrex::ParticleReal ymax,
             Shape shape,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
         : Named(name),
           Alignment(dx, dy, rotation_degree),

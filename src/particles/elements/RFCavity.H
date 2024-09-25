@@ -113,7 +113,6 @@ namespace RFCavityData
 
         /** An RF cavity
          *
-         * @param name a user defined and not necessarily unique name of the element
          * @param ds Segment length in m
          * @param escale Scaling factor for on-axis RF electric field in 1/m
          * @param freq RF frequency in Hz
@@ -126,9 +125,9 @@ namespace RFCavityData
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         RFCavity (
-            std::optional<std::string> name,
             amrex::ParticleReal ds,
             amrex::ParticleReal escale,
             amrex::ParticleReal freq,
@@ -139,7 +138,8 @@ namespace RFCavityData
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
             int mapsteps = 1,
-            int nslice = 1
+            int nslice = 1,
+            std::optional<std::string> name = std::nullopt
         )
           : Named(name),
             Thick(ds, nslice),
