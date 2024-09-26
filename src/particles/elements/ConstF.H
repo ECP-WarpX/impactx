@@ -92,7 +92,7 @@ namespace impactx
 
             // access reference particle values to find beta*gamma^2
             amrex::ParticleReal const pt_ref = refpart.pt;
-            amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
+            amrex::ParticleReal const betgam2 = std::pow(pt_ref, 2) - 1.0_prt;
 
             // intialize output values
             amrex::ParticleReal xout = x;
@@ -106,14 +106,14 @@ namespace impactx
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // advance position and momentum
-            xout = cos(m_kx*slice_ds)*x + sin(m_kx*slice_ds)/m_kx*px;
-            pxout = -m_kx*sin(m_kx*slice_ds)*x + cos(m_kx*slice_ds)*px;
+            xout = std::cos(m_kx*slice_ds)*x + std::sin(m_kx*slice_ds)/m_kx*px;
+            pxout = -m_kx * std::sin(m_kx*slice_ds)*x + std::cos(m_kx*slice_ds)*px;
 
-            yout = cos(m_ky*slice_ds)*y + sin(m_ky*slice_ds)/m_ky*py;
-            pyout = -m_ky*sin(m_ky*slice_ds)*y + cos(m_ky*slice_ds)*py;
+            yout = std::cos(m_ky*slice_ds)*y + std::sin(m_ky*slice_ds)/m_ky*py;
+            pyout = -m_ky * std::sin(m_ky*slice_ds)*y + std::cos(m_ky*slice_ds)*py;
 
-            tout = cos(m_kt*slice_ds)*t + sin(m_kt*slice_ds)/(betgam2*m_kt)*pt;
-            ptout = -(m_kt*betgam2)*sin(m_kt*slice_ds)*t + cos(m_kt*slice_ds)*pt;
+            tout = std::cos(m_kt*slice_ds)*t + std::sin(m_kt*slice_ds)/(betgam2*m_kt)*pt;
+            ptout = -(m_kt*betgam2) * std::sin(m_kt*slice_ds)*t + std::cos(m_kt*slice_ds)*pt;
 
             // assign updated values
             x = xout;
@@ -151,7 +151,7 @@ namespace impactx
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // assign intermediate parameter
-            amrex::ParticleReal const step = slice_ds / sqrt(pow(pt, 2)-1.0_prt);
+            amrex::ParticleReal const step = slice_ds /std::sqrt(std::pow(pt, 2)-1.0_prt);
 
             // advance position and momentum (straight element)
             refpart.x = x + step*px;

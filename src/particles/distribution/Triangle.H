@@ -99,29 +99,29 @@ namespace impactx::distribution
             // Sample the t coordinate for a ramped triangular profile (unit
             // variance):
             u0 = amrex::Random(engine);
-            t = sqrt(2_prt)*(2_prt-3_prt*sqrt(u0));
+            t = std::sqrt(2_prt)*(2_prt-3_prt*std::sqrt(u0));
 
             // Generate five standard normal random variables using Box-Muller:
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            g1 = ln1*cos(2_prt*pi*u2);
-            g2 = ln1*sin(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            g1 = ln1 * std::cos(2_prt*pi*u2);
+            g2 = ln1 * std::sin(2_prt*pi*u2);
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            g3 = ln1*cos(2_prt*pi*u2);
-            g4 = ln1*sin(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            g3 = ln1 * std::cos(2_prt*pi*u2);
+            g4 = ln1 * std::sin(2_prt*pi*u2);
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            g5 = ln1*cos(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            g5 = ln1 * std::cos(2_prt*pi*u2);
 
             // Use one of these normal random variables for pt:
             pt = g5;
 
             // Normalize the rest to produce uniform samples on the unit sphere:
-            norm = sqrt(g1*g1+g2*g2+g3*g3+g4*g4);
+            norm = std::sqrt(g1*g1+g2*g2+g3*g3+g4*g4);
             g1 /= norm;
             g2 /= norm;
             g3 /= norm;
@@ -130,24 +130,24 @@ namespace impactx::distribution
             // Scale to produce uniform samples in a 4D ball (unit variance):
             d = 4_prt;  // unit ball dimension
             u1 = amrex::Random(engine);   // uniform sample
-            u2 = sqrt(d+2_prt)*pow(u1,1_prt/d);
+            u2 = std::sqrt(d+2_prt) * std::pow(u1,1_prt/d);
             x = g1*u2;
             y = g2*u2;
             px = g3*u2;
             py = g4*u2;
 
             // Transform to produce the desired second moments/correlations:
-            root = sqrt(1.0_prt-m_muxpx*m_muxpx);
+            root = std::sqrt(1.0_prt-m_muxpx*m_muxpx);
             a1 = m_lambdaX * x / root;
             a2 = m_lambdaPx * (-m_muxpx * x / root + px);
             x = a1;
             px = a2;
-            root = sqrt(1.0_prt-m_muypy*m_muypy);
+            root = std::sqrt(1.0_prt-m_muypy*m_muypy);
             a1 = m_lambdaY * y / root;
             a2 = m_lambdaPy * (-m_muypy * y / root + py);
             y = a1;
             py = a2;
-            root = sqrt(1.0_prt-m_mutpt*m_mutpt);
+            root = std::sqrt(1.0_prt-m_mutpt*m_mutpt);
             a1 = m_lambdaT * t / root;
             a2 = m_lambdaPt * (-m_mutpt * t / root + pt);
             t = a1;

@@ -102,13 +102,13 @@ namespace impactx
             switch (m_shape)
             {
                 case Shape::rectangular :  // default
-                  if (pow(u,2)>1 || pow(v,2) > 1_prt) {
+                  if (std::pow(u,2)>1 || std::pow(v,2) > 1_prt) {
                       amrex::ParticleIDWrapper{idcpu}.make_invalid();
                   }
                   break;
 
                case Shape::elliptical :
-                  if (pow(u,2)+pow(v,2) > 1_prt) {
+                  if (std::pow(u,2) + std::pow(v,2) > 1_prt) {
                       amrex::ParticleIDWrapper{idcpu}.make_invalid();
                   }
                   break;

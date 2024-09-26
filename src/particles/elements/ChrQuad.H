@@ -118,12 +118,12 @@ namespace impactx
 
             // compute particle momentum deviation delta + 1
             amrex::ParticleReal delta1;
-            delta1 = sqrt(1_prt - 2_prt*pt/bet + pow(pt,2));
+            delta1 = std::sqrt(1_prt - 2_prt*pt/bet + std::pow(pt,2));
             amrex::ParticleReal const delta = delta1 - 1_prt;
 
             // compute phase advance per unit length in s (in rad/m)
             // chromatic dependence on delta is included
-            amrex::ParticleReal const omega = sqrt(std::abs(g)/delta1);
+            amrex::ParticleReal const omega = std::sqrt(std::abs(g)/delta1);
 
             // intialize output values of momenta
             amrex::ParticleReal pxout = px;
@@ -138,23 +138,23 @@ namespace impactx
 
             if(g > 0.0) {
                // advance transverse position and momentum (focusing quad)
-               x = cos(omega*slice_ds) * xout +
-                                   sin(omega*slice_ds)/(omega*delta1)*px;
-               pxout = -omega * delta1 * sin(omega*slice_ds) * xout + cos(omega * slice_ds) * px;
+               x = std::cos(omega*slice_ds) * xout +
+                                  std::sin(omega*slice_ds)/(omega*delta1)*px;
+               pxout = -omega * delta1 *std::sin(omega*slice_ds) * xout + std::cos(omega * slice_ds) * px;
 
-               y = cosh(omega*slice_ds) * yout +
-                                   sinh(omega*slice_ds)/(omega*delta1)*py;
-               pyout = omega * delta1 * sinh(omega*slice_ds) * yout + cosh(omega * slice_ds) * py;
+               y = std::cosh(omega*slice_ds) * yout +
+                                   std::sinh(omega*slice_ds)/(omega*delta1)*py;
+               pyout = omega * delta1 * std::sinh(omega*slice_ds) * yout + std::cosh(omega * slice_ds) * py;
 
             } else {
                // advance transverse position and momentum (defocusing quad)
-               x = cosh(omega*slice_ds) * xout +
-                                   sinh(omega*slice_ds)/(omega*delta1)*px;
-               pxout = omega * delta1 * sinh(omega*slice_ds) * xout + cosh(omega * slice_ds) * px;
+               x = std::cosh(omega*slice_ds) * xout +
+                                   std::sinh(omega*slice_ds)/(omega*delta1)*px;
+               pxout = omega * delta1 * std::sinh(omega*slice_ds) * xout + std::cosh(omega * slice_ds) * px;
 
-               y = cos(omega*slice_ds) * yout +
-                                   sin(omega*slice_ds)/(omega*delta1)*py;
-               pyout = -omega * delta1 * sin(omega*slice_ds) * yout + cos(omega * slice_ds) * py;
+               y = std::cos(omega*slice_ds) * yout +
+                                  std::sin(omega*slice_ds)/(omega*delta1)*py;
+               pyout = -omega * delta1 *std::sin(omega*slice_ds) * yout + std::cos(omega * slice_ds) * py;
 
                q1 = yout;
                q2 = xout;
@@ -169,13 +169,13 @@ namespace impactx
             amrex::ParticleReal const t0 = tout - term * slice_ds / delta1;
 
             amrex::ParticleReal const w = omega*delta1;
-            amrex::ParticleReal const term1 = -(pow(p2,2)+pow(q2,2)*pow(w,2))*sinh(2_prt*slice_ds*omega);
-            amrex::ParticleReal const term2 = -(pow(p1,2)-pow(q1,2)*pow(w,2))*sin(2_prt*slice_ds*omega);
-            amrex::ParticleReal const term3 = -2_prt*q2*p2*w*cosh(2_prt*slice_ds*omega);
-            amrex::ParticleReal const term4 = -2_prt*q1*p1*w*cos(2_prt*slice_ds*omega);
+            amrex::ParticleReal const term1 = -(std::pow(p2,2) + std::pow(q2,2) * std::pow(w,2))*std::sinh(2_prt*slice_ds*omega);
+            amrex::ParticleReal const term2 = -(std::pow(p1,2)-pow(q1,2) * std::pow(w,2)) * std::sin(2_prt*slice_ds*omega);
+            amrex::ParticleReal const term3 = -2_prt*q2*p2*w*std::cosh(2_prt*slice_ds*omega);
+            amrex::ParticleReal const term4 = -2_prt*q1*p1*w * std::cos(2_prt*slice_ds*omega);
             amrex::ParticleReal const term5 = 2_prt*omega*(q1*p1*delta1 + q2*p2*delta1
-                                        -(pow(p1,2)+pow(p2,2))*slice_ds - (pow(q1,2)-pow(q2,2))*pow(w,2)*slice_ds);
-            t = t0 + (-1_prt+bet*pt)/(8_prt*bet*pow(delta1,3)*omega)
+                                        -(std::pow(p1,2) + std::pow(p2,2))*slice_ds - (std::pow(q1,2)-pow(q2,2)) * std::pow(w,2)*slice_ds);
+            t = t0 + (-1_prt+bet*pt)/(8_prt*bet * std::pow(delta1,3)*omega)
                      *(term1+term2+term3+term4+term5);
 
             // ptout = pt;
@@ -213,7 +213,7 @@ namespace impactx
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // assign intermediate parameter
-            amrex::ParticleReal const step = slice_ds / sqrt(pow(pt,2)-1.0_prt);
+            amrex::ParticleReal const step = slice_ds /std::sqrt(std::pow(pt,2)-1.0_prt);
 
             // advance position and momentum (straight element)
             refpart.x = x + step*px;

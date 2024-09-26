@@ -97,7 +97,7 @@ namespace impactx
 
             // access reference particle values to find beta*gamma^2
             amrex::ParticleReal const pt_ref = refpart.pt;
-            amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
+            amrex::ParticleReal const betgam2 = std::pow(pt_ref, 2) - 1.0_prt;
 
             // advance position and momentum (drift)
             xout = x + slice_ds * px;
@@ -143,7 +143,7 @@ namespace impactx
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // assign intermediate parameter
-            amrex::ParticleReal const step = slice_ds / sqrt(pow(pt,2)-1.0_prt);
+            amrex::ParticleReal const step = slice_ds /std::sqrt(std::pow(pt,2)-1.0_prt);
 
             // advance position and momentum (drift)
             refpart.x = x + step*px;

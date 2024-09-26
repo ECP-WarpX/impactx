@@ -95,7 +95,7 @@ namespace impactx
 
             // access reference particle values to find (beta*gamma)^2
             //amrex::ParticleReal const pt_ref = refpart.pt;
-            //amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
+            //amrex::ParticleReal const betgam2 = std::pow(pt_ref, 2) - 1.0_prt;
 
             // intialize output values
             amrex::ParticleReal xout = x;
@@ -117,12 +117,12 @@ namespace impactx
             croot = amrex::sqrt(croot);
 
             // compute carcsin = arcsin(zeta)
-            Complex carcsin = im1*zeta + croot;
-            carcsin = -im1*amrex::log(carcsin);
+            Complex carcsin = im1 * zeta + croot;
+            carcsin = -im1 * amrex::log(carcsin);
 
             // compute complex function F'(zeta)
-            Complex dF = zeta/amrex::pow(croot, 2);
-            dF = dF + carcsin/amrex::pow(croot,3);
+            Complex dF = zeta / amrex::pow(croot, 2);
+            dF = dF + carcsin / amrex::pow(croot, 3);
 
             // compute momentum kick
             amrex::ParticleReal const kick = -m_knll/m_cnll;

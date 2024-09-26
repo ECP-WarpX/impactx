@@ -66,7 +66,7 @@ namespace impactx
             using namespace amrex::literals;
 
             amrex::ParticleReal const ref_gamma = -pt;
-            amrex::ParticleReal const ref_beta = sqrt(1.0_prt - 1.0_prt/pow(ref_gamma,2));
+            amrex::ParticleReal const ref_beta = std::sqrt(1.0_prt - 1.0_prt/pow(ref_gamma,2));
             return ref_beta;
         }
 
@@ -81,7 +81,7 @@ namespace impactx
             using namespace amrex::literals;
 
             amrex::ParticleReal const ref_gamma = -pt;
-            amrex::ParticleReal const ref_betagamma = sqrt(pow(ref_gamma, 2) - 1.0_prt);
+            amrex::ParticleReal const ref_betagamma = std::sqrt(std::pow(ref_gamma, 2) - 1.0_prt);
             return ref_betagamma;
         }
 
@@ -118,7 +118,7 @@ namespace impactx
             if (pt != 0.0_prt)
             {
                 pt = -kin_energy_MeV() / massE - 1.0_prt;
-                pz = sqrt(pow(pt, 2) - 1.0_prt);
+                pz = std::sqrt(std::pow(pt, 2) - 1.0_prt);
             }
 
             return *this;
@@ -155,7 +155,7 @@ namespace impactx
             px = 0.0;
             py = 0.0;
             pt = -kin_energy / mass_MeV() - 1.0_prt;
-            pz = sqrt(pow(pt, 2) - 1.0_prt);
+            pz = std::sqrt(std::pow(pt, 2) - 1.0_prt);
 
             return *this;
         }
@@ -171,7 +171,7 @@ namespace impactx
             using namespace amrex::literals;
 
             amrex::ParticleReal const ref_gamma = -pt;
-            amrex::ParticleReal const ref_betagamma = sqrt(pow(ref_gamma, 2) - 1.0_prt);
+            amrex::ParticleReal const ref_betagamma = std::sqrt(std::pow(ref_gamma, 2) - 1.0_prt);
             //amrex::ParticleReal const ref_rigidity = mass*ref_betagamma*(ablastr::constant::SI::c)/charge; //fails due to "charge"
             amrex::ParticleReal const ref_rigidity = mass*ref_betagamma*(ablastr::constant::SI::c)/(ablastr::constant::SI::q_e);
             return ref_rigidity;

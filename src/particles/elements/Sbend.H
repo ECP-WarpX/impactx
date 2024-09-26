@@ -103,8 +103,8 @@ namespace impactx
 
             // access reference particle values to find beta*gamma^2
             amrex::ParticleReal const pt_ref = refpart.pt;
-            amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
-            amrex::ParticleReal const bet = sqrt(betgam2/(1.0_prt + betgam2));
+            amrex::ParticleReal const betgam2 = std::pow(pt_ref, 2) - 1.0_prt;
+            amrex::ParticleReal const bet = std::sqrt(betgam2/(1.0_prt + betgam2));
 
             // calculate expensive terms once
             amrex::ParticleReal const theta = slice_ds/m_rc;
@@ -162,7 +162,7 @@ namespace impactx
 
             // assign intermediate parameter
             amrex::ParticleReal const theta = slice_ds/m_rc;
-            amrex::ParticleReal const B = sqrt(pow(pt,2)-1.0_prt)/m_rc;
+            amrex::ParticleReal const B = std::sqrt(std::pow(pt,2)-1.0_prt)/m_rc;
 
             // calculate expensive terms once
             auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);

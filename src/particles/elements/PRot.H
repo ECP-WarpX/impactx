@@ -97,8 +97,8 @@ namespace impactx
             auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);
             auto const [sin_phi_in, cos_phi_in] = amrex::Math::sincos(m_phi_in);
 
-            amrex::ParticleReal const pz = sqrt(1.0_prt - 2.0_prt*pt/beta
-               + pow(pt,2) - pow(py,2) - pow(px + sin_phi_in,2));
+            amrex::ParticleReal const pz = std::sqrt(1.0_prt - 2.0_prt*pt/beta
+               + std::pow(pt,2) - std::pow(py,2) - std::pow(px + sin_phi_in,2));
             amrex::ParticleReal const pzf = pz*cos_theta - (px + sin_phi_in)*sin_theta;
 
             // advance position and momentum

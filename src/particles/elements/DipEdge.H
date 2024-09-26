@@ -96,13 +96,13 @@ namespace impactx
             shift_in(x, y, px, py);
 
             // edge focusing matrix elements (zero gap)
-            amrex::ParticleReal const R21 = tan(m_psi)/m_rc;
+            amrex::ParticleReal const R21 = std::tan(m_psi)/m_rc;
             amrex::ParticleReal R43 = -R21;
             amrex::ParticleReal vf = 0;
 
             // first-order effect of nonzero gap
-            vf = (1.0_prt + pow(sin(m_psi),2))/(pow(cos(m_psi),3));
-            vf *= m_g * m_K2/(pow(m_rc,2));
+            vf = (1.0_prt + std::pow(sin(m_psi),2))/(std::pow(cos(m_psi),3));
+            vf *= m_g * m_K2/(std::pow(m_rc,2));
             R43 += vf;
 
             // apply edge focusing

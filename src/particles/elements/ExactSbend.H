@@ -131,8 +131,8 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // assign intermediate quantities
-            amrex::ParticleReal const pperp = sqrt(pow(pt,2)-2.0_prt/bet*pt-pow(py,2)+1.0_prt);
-            amrex::ParticleReal const pzi = sqrt(pow(pperp,2)-pow(px,2));
+            amrex::ParticleReal const pperp = std::sqrt(std::pow(pt,2)-2.0_prt/bet*pt-pow(py,2)+1.0_prt);
+            amrex::ParticleReal const pzi = std::sqrt(std::pow(pperp,2) - std::pow(px,2));
             amrex::ParticleReal const rho = rc + xout;
             auto const [sin_phi, cos_phi] = amrex::Math::sincos(slice_phi);
 
@@ -142,8 +142,8 @@ namespace impactx
             ptout = pt;
 
             // angle of momentum rotation
-            amrex::ParticleReal const pzf = sqrt(pow(pperp,2)-pow(pxout,2));
-            amrex::ParticleReal const theta = slice_phi + asin(px/pperp) - asin(pxout/pperp);
+            amrex::ParticleReal const pzf = std::sqrt(std::pow(pperp,2)-pow(pxout,2));
+            amrex::ParticleReal const theta = slice_phi + std::asin(px/pperp) - std::asin(pxout/pperp);
 
             // update position coordinates
             x = -rc + rho*cos_phi + rc*(pzf + px*sin_phi - pzi*cos_phi);
