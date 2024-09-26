@@ -71,4 +71,4 @@ You can run the following script to visualize the beam evolution over time:
 .. figure:: https://gist.githubusercontent.com/ax3l/8ae7dcb9e07c361e002fa56d6b16cb16/raw/cc952670bb946cd7a62282bc7aa3f03f3d5faa16/fodo_channel.png
    :alt: preserved emittance in the FODO channel.
 
-   FODO transversal emittance evolution (preserved)
+   FODO transverse emittance evolution (preserved)

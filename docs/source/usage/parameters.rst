@@ -452,7 +452,7 @@ Lattice Elements
             * ``<element_name>.cycle_intervals`` (``int``, default value: ``1``)
 
                 For periodic lattice, only output every N cycles (turns).
-                By default, diagnostics is performed every cycle.
+                By default, diagnostics are returned every cycle.
 
             * ``<element_name>.nonlinear_lens_invariants`` (``boolean``, default value: ``false``)
 
