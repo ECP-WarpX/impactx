@@ -72,7 +72,7 @@ namespace impactx::diagnostics
         } else {
 
            //Three real roots in trigonometric form.
-           amrex::ParticleReal theta = acos(R/sqrt(-pow(Q,3)));
+           amrex::ParticleReal theta = std::acos(R/::sqrt(-::pow(Q,3)));
            x1 = 2.0_prt*std::sqrt(-Q)*std::cos(theta/3.0_prt) - b/(3.0_prt*a);
            x2 = 2.0_prt*std::sqrt(-Q)*std::cos(theta/3.0_prt + 2.0_prt*pi/3.0_prt) - b/(3.0_prt*a);
            x3 = 2.0_prt*std::sqrt(-Q)*std::cos(theta/3.0_prt + 4.0_prt*pi/3.0_prt) - b/(3.0_prt*a);
