@@ -53,9 +53,9 @@ namespace impactx::diagnostics
         amrex::ParticleReal x2 = 0.0_prt;
         amrex::ParticleReal x3 = 0.0_prt;
 
-        amrex::ParticleReal Q = (3.0_prt*a*c - pow(b,2))/(9.0_prt * pow(a,2));
-        amrex::ParticleReal R = (9.0_prt*a*b*c - 27_prt*pow(a,2)*d - 2.0_prt*pow(b,3))/(54.0_prt*pow(a,3));
-        amrex::ParticleReal discriminant = pow(Q,3) + pow(R,2);
+        amrex::ParticleReal Q = (3.0_prt*a*c - std::pow(b,2))/(9.0_prt * std::pow(a,2));
+        amrex::ParticleReal R = (9.0_prt*a*b*c - 27_prt*std::pow(a,2)*d - 2.0_prt*std::pow(b,3))/(54.0_prt*std::pow(a,3));
+        amrex::ParticleReal discriminant = std::pow(Q,3) + std::pow(R,2);
 
         // Discriminant should be < 0.  Otherwise, keep theta at default and throw an error.
         amrex::ParticleReal tol = 1.0e-12;  //allow for roundoff error
@@ -73,9 +73,9 @@ namespace impactx::diagnostics
 
            //Three real roots in trigonometric form.
            amrex::ParticleReal theta = acos(R/sqrt(-pow(Q,3)));
-           x1 = 2.0_prt*sqrt(-Q)*cos(theta/3.0_prt) - b/(3.0_prt*a);
-           x2 = 2.0_prt*sqrt(-Q)*cos(theta/3.0_prt + 2.0_prt*pi/3.0_prt) - b/(3.0_prt*a);
-           x3 = 2.0_prt*sqrt(-Q)*cos(theta/3.0_prt + 4.0_prt*pi/3.0_prt) - b/(3.0_prt*a);
+           x1 = 2.0_prt*std::sqrt(-Q)*std::cos(theta/3.0_prt) - b/(3.0_prt*a);
+           x2 = 2.0_prt*std::sqrt(-Q)*std::cos(theta/3.0_prt + 2.0_prt*pi/3.0_prt) - b/(3.0_prt*a);
+           x3 = 2.0_prt*std::sqrt(-Q)*std::cos(theta/3.0_prt + 4.0_prt*pi/3.0_prt) - b/(3.0_prt*a);
 
         }
 
@@ -115,19 +115,19 @@ namespace impactx::diagnostics
         amrex::ParticleReal x2 = 0.0_prt;
         amrex::ParticleReal x3 = 0.0_prt;
 
-        amrex::ParticleReal Q = (3.0_prt*a*c - pow(b,2))/(9.0_prt * pow(a,2));
-        amrex::ParticleReal R = (9.0_prt*a*b*c - 27_prt*pow(a,2)*d - 2.0_prt*pow(b,3))/(54.0_prt*pow(a,3));
-        amrex::ParticleReal discriminant = pow(Q,3) + pow(R,2);
+        amrex::ParticleReal Q = (3.0_prt*a*c - std::pow(b,2))/(9.0_prt * std::pow(a,2));
+        amrex::ParticleReal R = (9.0_prt*a*b*c - 27_prt*std::pow(a,2)*d - 2.0_prt*std::pow(b,3))/(54.0_prt*std::pow(a,3));
+        amrex::ParticleReal discriminant = std::pow(Q,3) + std::pow(R,2);
 
         // Define complex variable C
         Complex Qc(Q,0.0_prt);
         Complex Rc(R,0.0_prt);
         Complex Dc(discriminant,0.0_prt);
-        Complex C = pow(-Rc + sqrt(Dc),1.0/3.0);
+        Complex C = std::pow(-Rc + std::sqrt(Dc),1.0/3.0);
 
         // Define a cubic root of unity xi
         amrex::ParticleReal xire = -1.0/2.0;
-        amrex::ParticleReal xiim = sqrt(3.0)/2.0;
+        amrex::ParticleReal xiim = std::sqrt(3.0)/2.0;
         Complex xi(xire,xiim);
 
         //Three roots in algebraic form.
@@ -142,7 +142,7 @@ namespace impactx::diagnostics
 
            Complex z1 = Qc/C - C;
            Complex z2 = Qc/(xi*C) - xi*C;
-           Complex z3 = Qc/(pow(xi,2)*C) - pow(xi,2)*C;
+           Complex z3 = Qc/(std::pow(xi,2)*C) - std::pow(xi,2)*C;
            x1 = z2.m_real - b/(3.0*a);
            x2 = z1.m_real - b/(3.0*a);
            x3 = z3.m_real - b/(3.0*a);
