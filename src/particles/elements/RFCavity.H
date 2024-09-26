@@ -282,7 +282,7 @@ namespace RFCavityData
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // compute intial value of beta*gamma
-            amrex::ParticleReal const bgi = sqrt(pow(pt, 2) - 1.0_prt);
+            amrex::ParticleReal const bgi = std::sqrt(std::pow(pt, 2) - 1.0_prt);
 
             // call integrator to advance (t,pt)
             amrex::ParticleReal const zin = s - sedge;
@@ -298,7 +298,7 @@ namespace RFCavityData
             refpart.z = z + slice_ds*pz/bgi;
 
             // compute final value of beta*gamma
-            amrex::ParticleReal const bgf = sqrt(pow(ptf, 2) - 1.0_prt);
+            amrex::ParticleReal const bgf = std::sqrt(std::pow(ptf, 2) - 1.0_prt);
 
             // advance momentum (px,py,pz)
             refpart.px = px*bgf/bgi;
@@ -367,14 +367,14 @@ namespace RFCavityData
                efieldint = z*efield;
                for (int j=1; j < m_ncoef; ++j)
                {
-                 efield = efield + cos_data[j]*cos(j*2*pi*z/zlen) +
-                     sin_data[j]*sin(j*2*pi*z/zlen);
-                 efieldp = efieldp-j*2*pi*cos_data[j]*sin(j*2*pi*z/zlen)/zlen +
-                      j*2*pi*sin_data[j]*cos(j*2*pi*z/zlen)/zlen;
-                 efieldpp = efieldpp- pow(j*2*pi*cos_data[j]/zlen,2) *cos(j*2*pi*z/zlen) -
-                      pow(j*2*pi*sin_data[j]/zlen,2) *sin(j*2*pi*z/zlen);
-                 efieldint = efieldint + zlen*cos_data[j]*sin(j*2*pi*z/zlen)/(j*2*pi) -
-                      zlen*sin_data[j]*cos(j*2*pi*z/zlen)/(j*2*pi);
+                 efield = efield + cos_data[j] * std::cos(j*2*pi*z/zlen) +
+                     sin_data[j] * std::sin(j*2*pi*z/zlen);
+                 efieldp = efieldp-j*2*pi*cos_data[j] * std::sin(j*2*pi*z/zlen)/zlen +
+                      j*2*pi*sin_data[j] * std::cos(j*2*pi*z/zlen)/zlen;
+                 efieldpp = efieldpp- std::pow(j*2*pi*cos_data[j]/zlen,2)  * std::cos(j*2*pi*z/zlen) -
+                     std::pow(j*2*pi*sin_data[j]/zlen,2)  * std::sin(j*2*pi*z/zlen);
+                 efieldint = efieldint + zlen*cos_data[j] * std::sin(j*2*pi*z/zlen)/(j*2*pi) -
+                      zlen*sin_data[j] * std::cos(j*2*pi*z/zlen)/(j*2*pi);
                }
             }
             else  // endpoint of the RF, outsize zlen
@@ -382,7 +382,7 @@ namespace RFCavityData
                efieldint = std::copysign(z, z)*zmid*0.5_prt*cos_data[0];;
                for (int j=1; j < m_ncoef; ++j)
                {
-                 efieldint = efieldint - zlen*sin_data[j]*cos(j*pi)/(j*2*pi);
+                 efieldint = efieldint - zlen*sin_data[j] * std::cos(j*pi)/(j*2*pi);
                }
             }
             return std::make_tuple(efield, efieldp, efieldint);
@@ -408,7 +408,7 @@ namespace RFCavityData
             amrex::ParticleReal const pt = refpart.pt;
 
             if (pt < -1.0_prt) {
-                refpart.t = t + tau/sqrt(1.0_prt - pow(pt, -2));
+                refpart.t = t + tau/std::sqrt(1.0_prt - std::pow(pt, -2));
                 refpart.pt = pt;
             }
             else {
@@ -459,17 +459,17 @@ namespace RFCavityData
             // push the linear map equations
             amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
             amrex::ParticleReal const s = tau/refpart.beta_gamma();
-            amrex::ParticleReal const L = E0*ezp*sin(k*t+phi)/(2.0_prt*k);
+            amrex::ParticleReal const L = E0*ezp * std::sin(k*t+phi)/(2.0_prt*k);
 
             refpart.map(1,1) = (1.0_prt-s*L)*R(1,1) + s*R(2,1);
             refpart.map(1,2) = (1.0_prt-s*L)*R(1,2) + s*R(2,2);
-            refpart.map(2,1) = -s*pow(L,2)*R(1,1) + (1.0_prt+s*L)*R(2,1);
-            refpart.map(2,2) = -s*pow(L,2)*R(1,2) + (1.0_prt+s*L)*R(2,2);
+            refpart.map(2,1) = -s * std::pow(L,2)*R(1,1) + (1.0_prt+s*L)*R(2,1);
+            refpart.map(2,2) = -s * std::pow(L,2)*R(1,2) + (1.0_prt+s*L)*R(2,2);
 
             refpart.map(3,3) = (1.0_prt-s*L)*R(3,3) + s*R(4,3);
             refpart.map(3,4) = (1.0_prt-s*L)*R(3,4) + s*R(4,4);
-            refpart.map(4,3) = -s*pow(L,2)*R(3,3) + (1.0_prt+s*L)*R(4,3);
-            refpart.map(4,4) = -s*pow(L,2)*R(3,4) + (1.0_prt+s*L)*R(4,4);
+            refpart.map(4,3) = -s * std::pow(L,2)*R(3,3) + (1.0_prt+s*L)*R(4,3);
+            refpart.map(4,4) = -s * std::pow(L,2)*R(3,4) + (1.0_prt+s*L)*R(4,4);
         }
 
         /** This pushes the reference particle and the linear map matrix
@@ -506,12 +506,12 @@ namespace RFCavityData
             amrex::ignore_unused(ezf);
 
             refpart.t = t;
-            refpart.pt = pt - E0*(ezintf-ezint)*cos(k*t+phi);
+            refpart.pt = pt - E0*(ezintf-ezint) * std::cos(k*t+phi);
 
             // push the linear map equations
             amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
-            amrex::ParticleReal const M = E0*(ezintf-ezint)*k*sin(k*t+phi);
-            amrex::ParticleReal const L = E0*(ezpf-ezp)*sin(k*t+phi)/(2.0_prt*k)+M/2.0_prt;
+            amrex::ParticleReal const M = E0*(ezintf-ezint)*k * std::sin(k*t+phi);
+            amrex::ParticleReal const L = E0*(ezpf-ezp) * std::sin(k*t+phi)/(2.0_prt*k)+M/2.0_prt;
 
             refpart.map(2,1) = L*R(1,1) + R(2,1);
             refpart.map(2,2) = L*R(1,2) + R(2,2);

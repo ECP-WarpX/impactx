@@ -102,9 +102,9 @@ namespace impactx::distribution
             v = amrex::Random(engine);
             phi = amrex::Random(engine);
             phi = 2_prt*pi*phi;
-            r = sqrt(v);
-            x = r*cos(phi);
-            y = r*sin(phi);
+            r = std::sqrt(v);
+            x = r * std::cos(phi);
+            y = r * std::sin(phi);
 
             // Random samples used to define Lz:
             u = amrex::Random(engine);
@@ -113,25 +113,25 @@ namespace impactx::distribution
             // Random samples used to define pr:
             alpha = amrex::Random(engine);
             alpha = pi*alpha;
-            pmax = 1.0_prt - pow((Lz/r),2) - pow(r,2) + pow(Lz,2);
-            pmax = sqrt(pmax);
-            pr = pmax*cos(alpha);
+            pmax = 1.0_prt - std::pow((Lz/r),2) - std::pow(r,2) + std::pow(Lz,2);
+            pmax = std::sqrt(pmax);
+            pr = pmax * std::cos(alpha);
             pphi = Lz/r;
 
             // Transformations used to obtain (px,py):
-            px = pr*cos(phi)-pphi*sin(phi);
-            py = pr*sin(phi)+pphi*cos(phi);
+            px = pr * std::cos(phi)-pphi * std::sin(phi);
+            py = pr * std::sin(phi)+pphi * std::cos(phi);
 
             // Sample and transform to define (t,pt):
             t = amrex::Random(engine);
             t = 2.0_prt*(t-0.5_prt);
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            pt = ln1*cos(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            pt = ln1 * std::cos(2_prt*pi*u2);
 
             // Scale to produce the identity covariance matrix:
-            amrex::ParticleReal const c = sqrt(3.0_prt);
+            amrex::ParticleReal const c = std::sqrt(3.0_prt);
             x = 2_prt*x;
             y = 2_prt*y;
             t = c*t;
@@ -140,17 +140,17 @@ namespace impactx::distribution
             // pt = pt;
 
             // Transform to produce the desired second moments/correlations:
-            root = sqrt(1.0_prt-m_muxpx*m_muxpx);
+            root = std::sqrt(1.0_prt-m_muxpx*m_muxpx);
             a1 = m_lambdaX * x / root;
             a2 = m_lambdaPx * (-m_muxpx * x / root + px);
             x = a1;
             px = a2;
-            root = sqrt(1.0_prt-m_muypy*m_muypy);
+            root = std::sqrt(1.0_prt-m_muypy*m_muypy);
             a1 = m_lambdaY * y / root;
             a2 = m_lambdaPy * (-m_muypy * y / root + py);
             y = a1;
             py = a2;
-            root = sqrt(1.0_prt-m_mutpt*m_mutpt);
+            root = std::sqrt(1.0_prt-m_mutpt*m_mutpt);
             a1 = m_lambdaT * t / root;
             a2 = m_lambdaPt * (-m_mutpt * t / root + pt);
             t = a1;

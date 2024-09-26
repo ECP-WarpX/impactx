@@ -103,8 +103,8 @@ namespace impactx
             amrex::ParticleReal const betgam = refpart.beta_gamma();
 
             // compute the radical in the denominator (= pz):
-            amrex::ParticleReal const pzden = sqrt(pow(pt-1_prt/bet,2) -
-                                1_prt/pow(betgam,2) - pow(px,2) - pow(py,2));
+            amrex::ParticleReal const pzden = std::sqrt(std::pow(pt-1_prt/bet,2) -
+                                1_prt/pow(betgam,2) - std::pow(px,2) - std::pow(py,2));
 
             // advance position and momentum (exact drift)
             x = xout + slice_ds * px / pzden;
@@ -147,7 +147,7 @@ namespace impactx
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // assign intermediate parameter
-            amrex::ParticleReal const step = slice_ds / sqrt(pow(pt,2)-1.0_prt);
+            amrex::ParticleReal const step = slice_ds /std::sqrt(std::pow(pt,2)-1.0_prt);
 
             // advance position and momentum (drift)
             refpart.x = x + step*px;

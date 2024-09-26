@@ -97,7 +97,7 @@ namespace distribution
             amrex::ParticleReal q_e = refpart.charge_qe();
 
             // Set space charge intensity
-            m_Cintensity = q_e*bunch_charge/(pow(bg,2)*Erest*ablastr::constant::SI::ep0);
+            m_Cintensity = q_e*bunch_charge/(std::pow(bg,2)*Erest*ablastr::constant::SI::ep0);
 
             // Set minimum and maximum radius
             amrex::ParticleReal r_scale = matched_scale_radius();
@@ -106,8 +106,8 @@ namespace distribution
             // amrex::PrintToFile("equilibrium_params.out") << r_scale << " " << data.Cintensity << "\n";
 
             // Scale the parameters p1 and p2
-            amrex::ParticleReal rt2pi = sqrt(2.0_prt*pi);
-            amrex::ParticleReal p_scale = pow(r_scale*rt2pi,-3);
+            amrex::ParticleReal rt2pi = std::sqrt(2.0_prt*pi);
+            amrex::ParticleReal p_scale = std::pow(r_scale*rt2pi,-3);
             m_p1 = m_p1*p_scale;
             m_p2 = m_p2*p_scale;
 
@@ -161,8 +161,8 @@ namespace distribution
 
             amrex::ParticleReal k = m_k;
             amrex::ParticleReal kT = (1.0_prt - m_w) * m_T1 + m_w * m_T2;
-            amrex::ParticleReal a = m_Cintensity/(4.0_prt*pi*5.0_prt*sqrt(5.0_prt));
-            amrex::ParticleReal rscale = sqrt(kT + pow(a*k,2.0/3.0))/k;
+            amrex::ParticleReal a = m_Cintensity/(4.0_prt*pi*5.0_prt*std::sqrt(5.0_prt));
+            amrex::ParticleReal rscale = std::sqrt(kT + std::pow(a*k,2.0/3.0))/k;
 
             return rscale;
         }
@@ -252,17 +252,17 @@ namespace distribution
 
             // Define intermediate quantities
             amrex::ParticleReal potential = 0.0_prt;
-            potential = pow(k*r,2.0)/2.0_prt + c1*phi1 + c2*phi2;
-            amrex::ParticleReal Pdensity1 = m_p1*exp(-potential/T1);
-            amrex::ParticleReal Pdensity2 = m_p2*exp(-potential/T2);
+            potential = std::pow(k*r,2.0)/2.0_prt + c1*phi1 + c2*phi2;
+            amrex::ParticleReal Pdensity1 = m_p1 * std::exp(-potential/T1);
+            amrex::ParticleReal Pdensity2 = m_p2 * std::exp(-potential/T2);
             // amrex::ParticleReal Pdensity_tot = (1.0_prt-w)*Pdensity1 + w*Pdensity2;
             // amrex::PrintToFile("Pdensity.out") << reval << " " << Pdensity_tot << "\n";
 
             // Apply map to update f1 and f2:
             m_phi1 = phi1;
             m_phi2 = phi2;
-            m_f1 = f1 + tau*4.0_prt*pi*pow(r,2.0)*Pdensity1;
-            m_f2 = f2 + tau*4.0_prt*pi*pow(r,2.0)*Pdensity2;
+            m_f1 = f1 + tau*4.0_prt*pi * std::pow(r,2.0)*Pdensity1;
+            m_f2 = f2 + tau*4.0_prt*pi * std::pow(r,2.0)*Pdensity2;
             reval = r;
         }
     };
@@ -371,28 +371,28 @@ namespace distribution
             // Generate six standard normal random variables using Box-Muller:
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            g1 = ln1*cos(2_prt*pi*u2);
-            g2 = ln1*sin(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            g1 = ln1 * std::cos(2_prt*pi*u2);
+            g2 = ln1 * std::sin(2_prt*pi*u2);
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            g3 = ln1*cos(2_prt*pi*u2);
-            g4 = ln1*sin(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            g3 = ln1 * std::cos(2_prt*pi*u2);
+            g4 = ln1 * std::sin(2_prt*pi*u2);
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            g5 = ln1*cos(2_prt*pi*u2);
-            g6 = ln1*sin(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            g5 = ln1 * std::cos(2_prt*pi*u2);
+            g6 = ln1 * std::sin(2_prt*pi*u2);
 
             // Scale the last three variables to produce the momenta:
             amrex::ParticleReal kT = (uhalo > m_w) ? m_T1 : m_T2;  // select core or halo value
-            px = sqrt(kT)*g4;
-            py = sqrt(kT)*g5;
-            pz = sqrt(kT)*g6;
+            px = std::sqrt(kT)*g4;
+            py = std::sqrt(kT)*g5;
+            pz = std::sqrt(kT)*g6;
 
             // Normalize the first three variables to produce uniform samples on the unit 3-sphere:
-            norm = sqrt(g1*g1+g2*g2+g3*g3);
+            norm = std::sqrt(g1*g1+g2*g2+g3*g3);
             g1 /= norm;
             g2 /= norm;
             g3 /= norm;

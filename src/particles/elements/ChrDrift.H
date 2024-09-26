@@ -106,7 +106,7 @@ namespace impactx
 
             // compute particle momentum deviation delta + 1
             amrex::ParticleReal delta1;
-            delta1 = sqrt(1_prt - 2_prt*pt/bet + pow(pt,2));
+            delta1 = std::sqrt(1_prt - 2_prt*pt/bet + std::pow(pt,2));
 
             // advance transverse position and momentum (drift)
             x = xout + slice_ds * px / delta1;
@@ -115,12 +115,12 @@ namespace impactx
             // pyout = py;
 
             // the corresponding symplectic update to t
-            amrex::ParticleReal term = 2_prt*pow(pt,2)+pow(px,2)+pow(py,2);
-            term = 2_prt - 4_prt*bet*pt + pow(bet,2)*term;
-            term = -2_prt + pow(gam,2)*term;
+            amrex::ParticleReal term = 2_prt * std::pow(pt,2) + std::pow(px,2) + std::pow(py,2);
+            term = 2_prt - 4_prt*bet*pt + std::pow(bet,2)*term;
+            term = -2_prt + std::pow(gam,2)*term;
             term = (-1_prt+bet*pt)*term;
-            term = term/(2_prt*pow(bet,3)*pow(gam,2));
-            t = tout - slice_ds * (1_prt / bet + term / pow(delta1, 3));
+            term = term/(2_prt * std::pow(bet,3) * std::pow(gam,2));
+            t = tout - slice_ds * (1_prt / bet + term /std::pow(delta1, 3));
             // ptout = pt;
 
             // assign updated momenta
@@ -156,7 +156,7 @@ namespace impactx
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // assign intermediate parameter
-            amrex::ParticleReal const step = slice_ds / sqrt(pow(pt,2)-1.0_prt);
+            amrex::ParticleReal const step = slice_ds /std::sqrt(std::pow(pt,2)-1.0_prt);
 
             // advance position and momentum (drift)
             refpart.x = x + step*px;

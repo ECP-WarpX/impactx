@@ -104,7 +104,7 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // compute the function expressing dp/p in terms of pt (labeled f in Ripken etc.)
-            amrex::ParticleReal f = -1.0_prt + sqrt(1.0_prt - 2.0_prt*pt/beta_ref + pow(pt,2));
+            amrex::ParticleReal f = -1.0_prt + std::sqrt(1.0_prt - 2.0_prt*pt/beta_ref + std::pow(pt,2));
             amrex::ParticleReal fprime = (1.0_prt - beta_ref*pt)/(beta_ref*(1.0_prt + f));
 
             // compute the effective (equivalent) arc length and curvature
@@ -113,7 +113,7 @@ namespace impactx
 
             // advance position and momentum
             x = xout;
-            pxout = px - pow(kx,2) * ds * xout + kx * ds * f; //eq (3.2b)
+            pxout = px - std::pow(kx,2) * ds * xout + kx * ds * f; //eq (3.2b)
 
             y = yout;
             pyout = py;
