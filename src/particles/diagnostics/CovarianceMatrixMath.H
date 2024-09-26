@@ -123,7 +123,7 @@ namespace impactx::diagnostics
         Complex Qc(Q,0.0_prt);
         Complex Rc(R,0.0_prt);
         Complex Dc(discriminant,0.0_prt);
-        Complex C = std::pow(-Rc + std::sqrt(Dc),1.0/3.0);
+        Complex C = pow(-Rc + sqrt(Dc),1.0/3.0);
 
         // Define a cubic root of unity xi
         amrex::ParticleReal xire = -1.0/2.0;
@@ -142,7 +142,7 @@ namespace impactx::diagnostics
 
            Complex z1 = Qc/C - C;
            Complex z2 = Qc/(xi*C) - xi*C;
-           Complex z3 = Qc/(std::pow(xi,2)*C) - std::pow(xi,2)*C;
+           Complex z3 = Qc/(pow(xi,2)*C) - pow(xi,2)*C;
            x1 = z2.m_real - b/(3.0*a);
            x2 = z1.m_real - b/(3.0*a);
            x3 = z3.m_real - b/(3.0*a);
