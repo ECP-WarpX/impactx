@@ -48,13 +48,15 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 # design the accelerator lattice)
 ns = 1  # number of slices per ds in the element
 segment = [
-    elements.Drift(ds=0.003926990816987, nslice=ns),
-    elements.ThinDipole(theta=0.45, rc=1.0),
-    elements.Drift(ds=0.003926990816987, nslice=ns),
+    elements.Drift(name="drift1", ds=0.003926990816987, nslice=ns),
+    elements.ThinDipole(name="kick", theta=0.45, rc=1.0),
+    elements.Drift(name="drift2", ds=0.003926990816987, nslice=ns),
 ]
 bend = 200 * segment
 
-inverse_bend = elements.ExactSbend(ds=-1.570796326794897, phi=-90.0)
+inverse_bend = elements.ExactSbend(
+    name="inverse_bend", ds=-1.570796326794897, phi=-90.0
+)
 
 sim.lattice.append(monitor)
 sim.lattice.extend(bend)

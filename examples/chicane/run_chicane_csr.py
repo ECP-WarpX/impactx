@@ -55,17 +55,17 @@ psi = 0.048345620280243  # pole face rotation angle (radians)
 lb = 0.500194828041958  # bend arc length (meters)
 
 # Drift elements
-dr1 = elements.Drift(ds=5.0058489435, nslice=ns)
-dr2 = elements.Drift(ds=1.0, nslice=ns)
-dr3 = elements.Drift(ds=2.0, nslice=ns)
+dr1 = elements.Drift(name="dr1", ds=5.0058489435, nslice=ns)
+dr2 = elements.Drift(name="dr2", ds=1.0, nslice=ns)
+dr3 = elements.Drift(name="dr3", ds=2.0, nslice=ns)
 
 # Bend elements
-sbend1 = elements.Sbend(ds=lb, rc=-rc, nslice=ns)
-sbend2 = elements.Sbend(ds=lb, rc=rc, nslice=ns)
+sbend1 = elements.Sbend(name="sbend1", ds=lb, rc=-rc, nslice=ns)
+sbend2 = elements.Sbend(name="sbend2", ds=lb, rc=rc, nslice=ns)
 
 # Dipole Edge Focusing elements
-dipedge1 = elements.DipEdge(psi=-psi, rc=-rc, g=0.0, K2=0.0)
-dipedge2 = elements.DipEdge(psi=psi, rc=rc, g=0.0, K2=0.0)
+dipedge1 = elements.DipEdge(name="dipedge1", psi=-psi, rc=-rc, g=0.0, K2=0.0)
+dipedge2 = elements.DipEdge(name="dipedge2", psi=psi, rc=rc, g=0.0, K2=0.0)
 
 lattice_half = [sbend1, dipedge1, dr1, dipedge2, sbend2]
 # assign a segment with the first half of the lattice

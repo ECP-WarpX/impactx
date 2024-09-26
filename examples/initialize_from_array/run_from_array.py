@@ -98,7 +98,7 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 sim.lattice.extend(
     [
         monitor,
-        elements.Drift(ds=0.01),
+        elements.Drift(name="drift", ds=0.01),
         monitor,
     ]
 )

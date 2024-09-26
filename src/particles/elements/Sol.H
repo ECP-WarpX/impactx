@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -26,7 +27,8 @@
 namespace impactx
 {
     struct Sol
-    : public elements::BeamOptic<Sol>,
+    : public elements::Named,
+      public elements::BeamOptic<Sol>,
       public elements::Thick,
       public elements::Alignment,
       public elements::NoFinalize
@@ -43,6 +45,7 @@ namespace impactx
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         Sol (
             amrex::ParticleReal ds,
@@ -50,9 +53,11 @@ namespace impactx
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
-            int nslice = 1
+            int nslice = 1,
+            std::optional<std::string> name = std::nullopt
         )
-        : Thick(ds, nslice),
+        : Named(name),
+          Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
           m_ks(ks)
         {

@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,7 +26,8 @@
 namespace impactx
 {
     struct NonlinearLens
-    : public elements::BeamOptic<NonlinearLens>,
+    : public elements::Named,
+      public elements::BeamOptic<NonlinearLens>,
       public elements::Thin,
       public elements::Alignment,
       public elements::NoFinalize
@@ -45,15 +47,18 @@ namespace impactx
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         NonlinearLens (
             amrex::ParticleReal knll,
             amrex::ParticleReal cnll,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
-        : Alignment(dx, dy, rotation_degree),
+        : Named(name),
+          Alignment(dx, dy, rotation_degree),
           m_knll(knll), m_cnll(cnll)
         {
         }

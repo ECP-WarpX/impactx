@@ -7,8 +7,8 @@
  * Authors: Axel Huebl
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_ELEMENT_EMPTY_H
-#define IMPACTX_ELEMENT_EMPTY_H
+#ifndef IMPACTX_ELEMENT_MARKER_H
+#define IMPACTX_ELEMENT_MARKER_H
 
 #include "particles/ImpactXParticleContainer.H"
 #include "mixin/thin.H"
@@ -21,16 +21,20 @@
 
 namespace impactx
 {
-    struct Empty
-    : public elements::Thin,
+    struct Marker
+    : public elements::Named,
+      public elements::Thin,
       public elements::NoFinalize
     {
-        static constexpr auto type = "None";
+        static constexpr auto type = "Marker";
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** This element does nothing.
+        /** This named element does nothing.
+         *
+         * @param name a user defined and not necessarily unique name of the element
          */
-        Empty ()
+        Marker (std::string name)
+        : Named(name)
         {
         }
 
@@ -82,4 +86,4 @@ namespace impactx
 
 } // namespace impactx
 
-#endif // IMPACTX_ELEMENT_EMPTY_H
+#endif // IMPACTX_ELEMENT_MARKER_H

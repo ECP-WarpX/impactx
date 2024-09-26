@@ -14,6 +14,7 @@
 #include "particles/integrators/Integrators.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
+#include "mixin/named.H"
 #include "mixin/thick.H"
 
 #include <ablastr/constant.H>
@@ -102,7 +103,8 @@ namespace RFCavityData
 } // namespace RFCavityData
 
     struct RFCavity
-    : public elements::BeamOptic<RFCavity>,
+    : public elements::Named,
+      public elements::BeamOptic<RFCavity>,
       public elements::Thick,
       public elements::Alignment
     {
@@ -123,6 +125,7 @@ namespace RFCavityData
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         RFCavity (
             amrex::ParticleReal ds,
@@ -135,9 +138,11 @@ namespace RFCavityData
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
             int mapsteps = 1,
-            int nslice = 1
+            int nslice = 1,
+            std::optional<std::string> name = std::nullopt
         )
-          : Thick(ds, nslice),
+          : Named(name),
+            Thick(ds, nslice),
             Alignment(dx, dy, rotation_degree),
             m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps)
         {

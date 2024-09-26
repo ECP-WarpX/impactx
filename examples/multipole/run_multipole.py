@@ -46,9 +46,11 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 # design the accelerator lattice
 multipole = [
     monitor,
-    elements.Multipole(multipole=2, K_normal=3.0, K_skew=0.0),
-    elements.Multipole(multipole=3, K_normal=100.0, K_skew=-50.0),
-    elements.Multipole(multipole=4, K_normal=65.0, K_skew=6.0),
+    elements.Multipole(name="thin_quadrupole", multipole=2, K_normal=3.0, K_skew=0.0),
+    elements.Multipole(
+        name="thin_sextupole", multipole=3, K_normal=100.0, K_skew=-50.0
+    ),
+    elements.Multipole(name="thin_octupole", multipole=4, K_normal=65.0, K_skew=6.0),
     monitor,
 ]
 # assign a fodo segment

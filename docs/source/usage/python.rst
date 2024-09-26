@@ -496,7 +496,7 @@ This module provides elements for the accelerator lattice.
       :param madx_file: file name to MAD-X file with beamline elements
       :param nslice: number of slices used for the application of space charge
 
-.. py:class:: impactx.elements.CFbend(ds, rc, k, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.CFbend(ds, rc, k, dx=0, dy=0, rotation=0, nslice=1, name=None)
 
    A combined function bending magnet.  This is an ideal Sbend with a normal quadrupole field component.
 
@@ -510,8 +510,9 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.ConstF(ds, kx, ky, kt, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.ConstF(ds, kx, ky, kt, dx=0, dy=0, rotation=0, nslice=1, name=None)
 
    A linear Constant Focusing element.
 
@@ -523,6 +524,7 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
    .. py:property:: kx
 
@@ -536,7 +538,7 @@ This module provides elements for the accelerator lattice.
 
       focusing t strength in 1/m
 
-.. py:class:: impactx.elements.DipEdge(psi, rc, g, K2, dx=0, dy=0, rotation=0)
+.. py:class:: impactx.elements.DipEdge(psi, rc, g, K2, dx=0, dy=0, rotation=0, name=None)
 
    Edge focusing associated with bend entry or exit
 
@@ -555,15 +557,17 @@ This module provides elements for the accelerator lattice.
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.Drift(ds, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.Drift(ds, dx=0, dy=0, rotation=0, nslice=1, name=None)
 
    A drift.
 
    :param ds: Segment length in m
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.ChrDrift(ds, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.ChrDrift(ds, dx=0, dy=0, rotation=0, nslice=1, name=None)
 
    A drift with chromatic effects included.  The Hamiltonian is expanded
    through second order in the transverse variables (x,px,y,py), with the exact pt
@@ -574,8 +578,9 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.ExactDrift(ds, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.ExactDrift(ds, dx=0, dy=0, rotation=0, nslice=1, name=None)
 
    A drift using the exact nonlinear transfer map.
 
@@ -584,16 +589,18 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.Kicker(xkick, ykick, unit="dimensionless", dx=0, dy=0, rotation=0)
+.. py:class:: impactx.elements.Kicker(xkick, ykick, unit="dimensionless", dx=0, dy=0, rotation=0, name=None)
 
    A thin transverse kicker.
 
    :param xkick: horizontal kick strength (dimensionless OR T-m)
    :param ykick: vertical kick strength (dimensionless OR T-m)
    :param unit: specification of units (``"dimensionless"`` in units of the magnetic rigidity of the reference particle or ``"T-m"``)
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.Multipole(multipole, K_normal, K_skew, dx=0, dy=0, rotation=0)
+.. py:class:: impactx.elements.Multipole(multipole, K_normal, K_skew, dx=0, dy=0, rotation=0, name=None)
 
    A general thin multipole element.
 
@@ -603,12 +610,13 @@ This module provides elements for the accelerator lattice.
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
+   :param name: an optional name for the element
 
 .. py::class:: impactx.elements.Empty
 
    This element does nothing.
 
-.. py:class:: impactx.elements.NonlinearLens(knll, cnll, dx=0, dy=0, rotation=0)
+.. py:class:: impactx.elements.NonlinearLens(knll, cnll, dx=0, dy=0, rotation=0, name=None)
 
    Single short segment of the nonlinear magnetic insert element.
 
@@ -622,6 +630,7 @@ This module provides elements for the accelerator lattice.
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
+   :param name: an optional name for the element
 
 .. py:class:: impactx.elements.BeamMonitor(name, backend="default", encoding="g")
 
@@ -667,7 +676,7 @@ This module provides elements for the accelerator lattice.
 
       Scale factor (in meters^(1/2)) of the IOTA nonlinear magnetic insert element used for computing H and I.
 
-.. py:class:: impactx.elements.Programmable
+.. py:class:: impactx.elements.Programmable(ds=0.0, nslice=1, name=None)
 
    A programmable beam optics element.
 
@@ -675,6 +684,7 @@ This module provides elements for the accelerator lattice.
 
    :param ds: Segment length in m.
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
    .. py:property:: push
 
@@ -707,7 +717,7 @@ This module provides elements for the accelerator lattice.
          This function is called for the reference particle as it passes through the element.
          The reference particle is updated *before* the beam particles are pushed.
 
-.. py:class:: impactx.elements.Quad(ds, k, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.Quad(ds, k, dx=0, dy=0, rotation=0, nslice=1, name=None)
 
    A Quadrupole magnet.
 
@@ -720,8 +730,9 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.ChrQuad(ds, k, unit=0, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.ChrQuad(ds, k, unit=0, dx=0, dy=0, rotation=0, nslice=1, name=None)
 
    A Quadrupole magnet, with chromatic effects included.  The Hamiltonian is expanded
    through second order in the transverse variables (x,px,y,py), with the exact pt
@@ -738,6 +749,7 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
    .. py:property:: k
 
@@ -747,7 +759,7 @@ This module provides elements for the accelerator lattice.
 
       unit specification for quad strength
 
-.. py:class:: impactx.elements.ChrPlasmaLens(ds, k, unit=0, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.ChrPlasmaLens(ds, k, unit=0, dx=0, dy=0, rotation=0, nslice=1, name=None)
 
    An active cylindrically symmetric plasma lens, with chromatic effects included.
    The Hamiltonian is expanded through second order in the transverse variables
@@ -762,6 +774,7 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
    .. py:property:: k
 
@@ -771,7 +784,7 @@ This module provides elements for the accelerator lattice.
 
       unit specification for plasma lens focusing strength
 
-.. py:class:: impactx.elements.ChrAcc(ds, ez, bz, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.ChrAcc(ds, ez, bz, dx=0, dy=0, rotation=0, nslice=1, name=None)
 
    Acceleration in a uniform field Ez, with a uniform solenoidal field Bz.
 
@@ -787,6 +800,7 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
    .. py:property:: ez
 
@@ -796,7 +810,7 @@ This module provides elements for the accelerator lattice.
 
       magnetic field strength in 1/m
 
-.. py:class:: impactx.elements.RFCavity(ds, escale, freq, phase, cos_coefficients, sin_coefficients, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1)
+.. py:class:: impactx.elements.RFCavity(ds, escale, freq, phase, cos_coefficients, sin_coefficients, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1, name=None)
 
    A radiofrequency cavity.
 
@@ -813,8 +827,9 @@ This module provides elements for the accelerator lattice.
    :param rotation: rotation error in the transverse plane [degrees]
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.Sbend(ds, rc, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.Sbend(ds, rc, dx=0, dy=0, rotation=0, nslice=1, name=None)
 
    An ideal sector bend.
 
@@ -824,8 +839,9 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.ExactSbend(ds, phi, B=0.0, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.ExactSbend(ds, phi, B=0.0, dx=0, dy=0, rotation=0, nslice=1, name=None)
 
    An ideal sector bend using the exact nonlinear map.  The model consists of a uniform bending field B_y with a hard edge.  Pole faces are
    normal to the entry and exit velocity of the reference particle.
@@ -842,6 +858,7 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
 .. py:class:: impactx.elements.Buncher(V, k, dx=0, dy=0, rotation=0)
 
@@ -853,7 +870,7 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
 
-.. py:class:: impactx.elements.ShortRF(V, freq, phase=-90.0, dx=0, dy=0, rotation=0)
+.. py:class:: impactx.elements.ShortRF(V, freq, phase=-90.0, dx=0, dy=0, rotation=0, name=None)
 
    A short RF cavity element (MAD-X model).
 
@@ -863,8 +880,9 @@ This module provides elements for the accelerator lattice.
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.SoftSolenoid(ds, bscale, cos_coefficients, sin_coefficients, unit=0, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1)
+.. py:class:: impactx.elements.SoftSolenoid(ds, bscale, cos_coefficients, sin_coefficients, unit=0, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1, name=None)
 
    A soft-edge solenoid.
 
@@ -882,8 +900,9 @@ This module provides elements for the accelerator lattice.
    :param rotation: rotation error in the transverse plane [degrees]
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.Sol(ds, ks, dx=0, dy=0, rotation=0, nslice=1)
+.. py:class:: impactx.elements.Sol(ds, ks, dx=0, dy=0, rotation=0, nslice=1, name=None)
 
    An ideal hard-edge Solenoid magnet.
 
@@ -893,15 +912,17 @@ This module provides elements for the accelerator lattice.
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.PRot(phi_in, phi_out)
+.. py:class:: impactx.elements.PRot(phi_in, phi_out, name=None)
 
    Exact map for a pole-face rotation in the x-z plane.
 
    :param phi_in: angle of the reference particle with respect to the longitudinal (z) axis in the original frame in degrees
    :param phi_out: angle of the reference particle with respect to the longitudinal (z) axis in the rotated frame in degrees
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.Aperture(xmax, ymax, shape="rectangular", dx=0, dy=0, rotation=0)
+.. py:class:: impactx.elements.Aperture(xmax, ymax, shape="rectangular", dx=0, dy=0, rotation=0, name=None)
 
    A thin collimator element, applying a transverse aperture boundary.
 
@@ -911,6 +932,7 @@ This module provides elements for the accelerator lattice.
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
+   :param name: an optional name for the element
 
    .. py:property:: shape
 
@@ -924,7 +946,7 @@ This module provides elements for the accelerator lattice.
 
       maximum vertical coordinate
 
-.. py:class:: impactx.elements.SoftQuadrupole(ds, gscale, cos_coefficients, sin_coefficients, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1)
+.. py:class:: impactx.elements.SoftQuadrupole(ds, gscale, cos_coefficients, sin_coefficients, dx=0, dy=0, rotation=0, mapsteps=1, nslice=1, name=None)
 
    A soft-edge quadrupole.
 
@@ -939,8 +961,9 @@ This module provides elements for the accelerator lattice.
    :param rotation: rotation error in the transverse plane [degrees]
    :param mapsteps: number of integration steps per slice used for map and reference particle push in applied fields
    :param nslice: number of slices used for the application of space charge
+   :param name: an optional name for the element
 
-.. py:class:: impactx.elements.ThinDipole(theta, rc, dx=0, dy=0, rotation=0)
+.. py:class:: impactx.elements.ThinDipole(theta, rc, dx=0, dy=0, rotation=0, name=None)
 
    A general thin dipole element.
 
@@ -949,12 +972,13 @@ This module provides elements for the accelerator lattice.
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
+   :param name: an optional name for the element
 
    Reference:
 
    * G. Ripken and F. Schmidt, Thin-Lens Formalism for Tracking, CERN/SL/95-12 (AP), 1995.
 
-.. py:class:: impactx.elements.TaperedPL(k, taper, unit=0, dx=0, dy=0, rotation=0)
+.. py:class:: impactx.elements.TaperedPL(k, taper, unit=0, dx=0, dy=0, rotation=0, name=None)
 
    A thin nonlinear plasma lens with transverse (horizontal) taper
 
@@ -974,6 +998,7 @@ This module provides elements for the accelerator lattice.
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m
    :param rotation: rotation error in the transverse plane [degrees]
+   :param name: an optional name for the element
 
    .. py:property:: k
 

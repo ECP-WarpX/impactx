@@ -13,6 +13,7 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <ablastr/constant.H>
@@ -27,7 +28,8 @@
 namespace impactx
 {
     struct PRot
-    : public elements::BeamOptic<PRot>,
+    : public elements::Named,
+      public elements::BeamOptic<PRot>,
       public elements::Thin,
       public elements::NoFinalize
     {
@@ -43,12 +45,16 @@ namespace impactx
          *
          * @param phi_in Initial angle of reference trajectory w/r/t z (degrees)
          * @param phi_out Final angle of reference trajectory w/r/t/ z (degrees)
+         * @param name a user defined and not necessarily unique name of the element
          */
         PRot (
             amrex::ParticleReal phi_in,
-            amrex::ParticleReal phi_out
+            amrex::ParticleReal phi_out,
+            std::optional<std::string> name = std::nullopt
         )
-        : m_phi_in(phi_in * degree2rad), m_phi_out(phi_out * degree2rad)
+        : Named(name),
+          m_phi_in(phi_in * degree2rad),
+          m_phi_out(phi_out * degree2rad)
         {
         }
 

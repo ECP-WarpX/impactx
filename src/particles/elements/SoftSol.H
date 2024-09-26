@@ -14,6 +14,7 @@
 #include "particles/integrators/Integrators.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
+#include "mixin/named.H"
 #include "mixin/thick.H"
 
 #include <ablastr/constant.H>
@@ -116,7 +117,8 @@ namespace SoftSolenoidData
 } // namespace SoftSolenoidData
 
     struct SoftSolenoid
-    : public elements::BeamOptic<SoftSolenoid>,
+    : public elements::Named,
+      public elements::BeamOptic<SoftSolenoid>,
       public elements::Thick,
       public elements::Alignment
     {
@@ -140,6 +142,7 @@ namespace SoftSolenoidData
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         SoftSolenoid (
             amrex::ParticleReal ds,
@@ -151,9 +154,11 @@ namespace SoftSolenoidData
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
             int mapsteps = 1,
-            int nslice = 1
+            int nslice = 1,
+            std::optional<std::string> name = std::nullopt
         )
-          : Thick(ds, nslice),
+          : Named(name),
+            Thick(ds, nslice),
             Alignment(dx, dy, rotation_degree),
             m_bscale(bscale), m_unit(unit), m_mapsteps(mapsteps), m_id(SoftSolenoidData::next_id)
        {

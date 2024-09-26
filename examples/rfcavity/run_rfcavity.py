@@ -47,10 +47,11 @@ sim.add_particles(bunch_charge_C, distr, npart)
 # design the accelerator lattice
 
 #   Drift elements
-dr1 = elements.Drift(ds=0.4, nslice=1)
-dr2 = elements.Drift(ds=0.032997, nslice=1)
+dr1 = elements.Drift(name="dr1", ds=0.4, nslice=1)
+dr2 = elements.Drift(name="dr2", ds=0.032997, nslice=1)
 #   RF cavity element
 rf = elements.RFCavity(
+    name="rf",
     ds=1.31879807,
     escale=62.0,
     freq=1.3e9,

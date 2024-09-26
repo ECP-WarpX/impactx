@@ -50,7 +50,7 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 # design the accelerator lattice)
 constf = [
     monitor,
-    elements.ConstF(ds=2.0, kx=1.0, ky=1.0, kt=1.0e-4),
+    elements.ConstF(name="constf1", ds=2.0, kx=1.0, ky=1.0, kt=1.0e-4),
     monitor,
 ]
 
