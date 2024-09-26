@@ -363,7 +363,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ChrDrift);
 
-    py::class_<ChrQuad, elements::Thick, elements::Alignment> py_ChrQuad(me, "ChrQuad");
+    py::class_<ChrQuad, elements::Named, elements::Thick, elements::Alignment> py_ChrQuad(me, "ChrQuad");
     py_ChrQuad
         .def("__repr__",
              [](ChrQuad const & chr_quad) {
@@ -407,7 +407,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ChrQuad);
 
-    py::class_<ChrPlasmaLens, elements::Thick, elements::Alignment> py_ChrPlasmaLens(me, "ChrPlasmaLens");
+    py::class_<ChrPlasmaLens, elements::Named, elements::Thick, elements::Alignment> py_ChrPlasmaLens(me, "ChrPlasmaLens");
     py_ChrPlasmaLens
         .def("__repr__",
              [](ChrPlasmaLens const & chr_pl_lens) {
@@ -451,7 +451,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ChrPlasmaLens);
 
-    py::class_<ChrAcc, elements::Thick, elements::Alignment> py_ChrAcc(me, "ChrAcc");
+    py::class_<ChrAcc, elements::Named, elements::Thick, elements::Alignment> py_ChrAcc(me, "ChrAcc");
     py_ChrAcc
         .def("__repr__",
              [](ChrAcc const & chr_acc) {
@@ -496,7 +496,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ChrAcc);
 
-    py::class_<ConstF, elements::Thick, elements::Alignment> py_ConstF(me, "ConstF");
+    py::class_<ConstF, elements::Named, elements::Thick, elements::Alignment> py_ConstF(me, "ConstF");
     py_ConstF
         .def("__repr__",
              [](ConstF const & constf) {
@@ -549,7 +549,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ConstF);
 
-    py::class_<DipEdge, elements::Thin, elements::Alignment> py_DipEdge(me, "DipEdge");
+    py::class_<DipEdge, elements::Named, elements::Thin, elements::Alignment> py_DipEdge(me, "DipEdge");
     py_DipEdge
         .def("__repr__",
              [](DipEdge const & dip_edge) {
@@ -605,7 +605,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_DipEdge);
 
-    py::class_<Drift, elements::Thick, elements::Alignment> py_Drift(me, "Drift");
+    py::class_<Drift, elements::Named, elements::Thick, elements::Alignment> py_Drift(me, "Drift");
     py_Drift
         .def("__repr__",
              [](Drift const & drift) {
@@ -634,7 +634,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Drift);
 
-    py::class_<ExactDrift, elements::Thick, elements::Alignment> py_ExactDrift(me, "ExactDrift");
+    py::class_<ExactDrift, elements::Named, elements::Thick, elements::Alignment> py_ExactDrift(me, "ExactDrift");
     py_ExactDrift
         .def("__repr__",
              [](ExactDrift const & exact_drift) {
@@ -663,7 +663,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ExactDrift);
 
-    py::class_<ExactSbend, elements::Thick, elements::Alignment> py_ExactSbend(me, "ExactSbend");
+    py::class_<ExactSbend, elements::Named, elements::Thick, elements::Alignment> py_ExactSbend(me, "ExactSbend");
     py_ExactSbend
         .def("__repr__",
              [](ExactSbend const & exact_sbend) {
@@ -708,7 +708,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ExactSbend);
 
-    py::class_<Kicker, elements::Thin, elements::Alignment> py_Kicker(me, "Kicker");
+    py::class_<Kicker, elements::Named, elements::Thin, elements::Alignment> py_Kicker(me, "Kicker");
     py_Kicker
         .def("__repr__",
              [](Kicker const & kicker) {
@@ -760,7 +760,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Kicker);
 
-    py::class_<Multipole, elements::Thin, elements::Alignment> py_Multipole(me, "Multipole");
+    py::class_<Multipole, elements::Named, elements::Thin, elements::Alignment> py_Multipole(me, "Multipole");
     py_Multipole
         .def("__repr__",
              [](Multipole const & multipole) {
@@ -822,7 +822,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Empty);
 
-    py::class_<Marker, elements::Thin> py_Marker(me, "Marker");
+    py::class_<Marker, elements::Named, elements::Thin> py_Marker(me, "Marker");
     py_Marker
             .def("__repr__",
                  [](Marker const & marker) {
@@ -835,7 +835,7 @@ void init_elements(py::module& m)
             ;
     register_beamoptics_push(py_Marker);
 
-    py::class_<NonlinearLens, elements::Thin, elements::Alignment> py_NonlinearLens(me, "NonlinearLens");
+    py::class_<NonlinearLens, elements::Named, elements::Thin, elements::Alignment> py_NonlinearLens(me, "NonlinearLens");
     py_NonlinearLens
         .def("__repr__",
              [](NonlinearLens const & nl) {
@@ -875,7 +875,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_NonlinearLens);
 
-    py::class_<Programmable>(me, "Programmable", py::dynamic_attr())
+    py::class_<Programmable, elements::Named>(me, "Programmable", py::dynamic_attr())
         .def("__repr__",
              [](Programmable const & prg) {
                  return element_name(
@@ -930,7 +930,7 @@ void init_elements(py::module& m)
         )
     ;
 
-    py::class_<Quad, elements::Thick, elements::Alignment> py_Quad(me, "Quad");
+    py::class_<Quad, elements::Named, elements::Thick, elements::Alignment> py_Quad(me, "Quad");
     py_Quad
         .def("__repr__",
              [](Quad const & quad) {
@@ -967,7 +967,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Quad);
 
-    py::class_<RFCavity, elements::Thick, elements::Alignment> py_RFCavity(me, "RFCavity");
+    py::class_<RFCavity, elements::Named, elements::Thick, elements::Alignment> py_RFCavity(me, "RFCavity");
     py_RFCavity
         .def("__repr__",
              [](RFCavity const & rfc) {
@@ -1033,7 +1033,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_RFCavity);
 
-    py::class_<Sbend, elements::Thick, elements::Alignment> py_Sbend(me, "Sbend");
+    py::class_<Sbend, elements::Named, elements::Thick, elements::Alignment> py_Sbend(me, "Sbend");
     py_Sbend
         .def("__repr__",
              [](Sbend const & sbend) {
@@ -1070,7 +1070,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Sbend);
 
-    py::class_<CFbend, elements::Thick, elements::Alignment> py_CFbend(me, "CFbend");
+    py::class_<CFbend, elements::Named, elements::Thick, elements::Alignment> py_CFbend(me, "CFbend");
     py_CFbend
         .def("__repr__",
              [](CFbend const & cfbend) {
@@ -1115,7 +1115,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_CFbend);
 
-    py::class_<Buncher, elements::Thin, elements::Alignment> py_Buncher(me, "Buncher");
+    py::class_<Buncher, elements::Named, elements::Thin, elements::Alignment> py_Buncher(me, "Buncher");
     py_Buncher
         .def("__repr__",
              [](Buncher const & buncher) {
@@ -1155,7 +1155,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Buncher);
 
-    py::class_<ShortRF, elements::Thin, elements::Alignment> py_ShortRF(me, "ShortRF");
+    py::class_<ShortRF, elements::Named, elements::Thin, elements::Alignment> py_ShortRF(me, "ShortRF");
     py_ShortRF
         .def("__repr__",
              [](ShortRF const & short_rf) {
@@ -1203,7 +1203,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ShortRF);
 
-    py::class_<SoftSolenoid, elements::Thick, elements::Alignment> py_SoftSolenoid(me, "SoftSolenoid");
+    py::class_<SoftSolenoid, elements::Named, elements::Thick, elements::Alignment> py_SoftSolenoid(me, "SoftSolenoid");
     py_SoftSolenoid
         .def("__repr__",
              [](SoftSolenoid const & soft_sol) {
@@ -1260,7 +1260,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_SoftSolenoid);
 
-    py::class_<Sol, elements::Thick, elements::Alignment> py_Sol(me, "Sol");
+    py::class_<Sol, elements::Named, elements::Thick, elements::Alignment> py_Sol(me, "Sol");
     py_Sol
         .def("__repr__",
              [](Sol const & sol) {
@@ -1297,7 +1297,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Sol);
 
-    py::class_<PRot, elements::Thin> py_PRot(me, "PRot");
+    py::class_<PRot, elements::Named, elements::Thin> py_PRot(me, "PRot");
     py_PRot
         .def("__repr__",
              [](PRot const & prot) {
@@ -1331,7 +1331,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_PRot);
 
-    py::class_<SoftQuadrupole, elements::Thick, elements::Alignment> py_SoftQuadrupole(me, "SoftQuadrupole");
+    py::class_<SoftQuadrupole, elements::Named, elements::Thick, elements::Alignment> py_SoftQuadrupole(me, "SoftQuadrupole");
     py_SoftQuadrupole
         .def("__repr__",
              [](SoftQuadrupole const & soft_quad) {
@@ -1381,7 +1381,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_SoftQuadrupole);
 
-    py::class_<ThinDipole, elements::Thin, elements::Alignment> py_ThinDipole(me, "ThinDipole");
+    py::class_<ThinDipole, elements::Named, elements::Thin, elements::Alignment> py_ThinDipole(me, "ThinDipole");
     py_ThinDipole
         .def("__repr__",
              [](ThinDipole const & thin_dp) {
@@ -1421,7 +1421,7 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ThinDipole);
 
-    py::class_<TaperedPL, elements::Thin, elements::Alignment> py_TaperedPL(me, "TaperedPL");
+    py::class_<TaperedPL, elements::Named, elements::Thin, elements::Alignment> py_TaperedPL(me, "TaperedPL");
     py_TaperedPL
         .def("__repr__",
              [](TaperedPL const & taperedpl) {
