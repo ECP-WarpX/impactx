@@ -42,7 +42,41 @@ def populate_prob_relative_fields(max_level):
         for i in range(num_prob_relative_fields)
     ]
     state.prob_relative = [0.0] * num_prob_relative_fields
-    print(f"Reset prob_relative: {state.prob_relative}")
+
+
+def update_state_values_and_errors(category, kwargs):
+    directions = ["x", "y", "z"]
+
+    for state_name, value in kwargs.items():
+        if any(state_name == f"{category}_{dir}" for dir in directions):
+            direction = state_name.split("_")[-1]
+            error_message_name = f"error_message_{category}_{direction}"
+
+            # update error message for blocking_factor_{direction}
+            updated_blocking_factor_error_message = generalFunctions.validate_against(
+                value, "int"
+            )
+            updated_n_cell_error_message = SpaceChargeFunctions.validate_n_cell_field(
+                direction
+            )
+
+            # update error message for n_cell_{direction}
+            setattr(state, error_message_name, updated_blocking_factor_error_message)
+            setattr(
+                state, f"error_message_n_cell_{direction}", updated_n_cell_error_message
+            )
+
+            if not updated_blocking_factor_error_message:
+                setattr(state, state_name, int(value))  # convert to int if not an error
+
+    updated_attribute = [
+        getattr(state, f"{category}_{direction}", 0) for direction in directions
+    ]
+
+    if category == "blocking_factor":
+        state.blocking_factor = updated_attribute
+    elif category == "n_cell":
+        state.n_cell = updated_attribute
 
 
 # -----------------------------------------------------------------------------
@@ -76,19 +110,14 @@ def on_max_level_change(max_level, **kwargs):
     populate_prob_relative_fields(max_level)
 
 
+@state.change("blocking_factor_x", "blocking_factor_y", "blocking_factor_z")
+def on_blocking_factor_change(**kwargs):
+    update_state_values_and_errors("blocking_factor", kwargs)
+
+
 @state.change("n_cell_x", "n_cell_y", "n_cell_z")
-def on_nCell_value_change(n_cell_x, n_cell_y, n_cell_z, **kwargs):
-    state.error_message_x = generalFunctions.validate_against(n_cell_x, "int")
-    state.error_message_y = generalFunctions.validate_against(n_cell_y, "int")
-    state.error_message_z = generalFunctions.validate_against(n_cell_z, "int")
-
-    state.n_cell = [
-        int(n_cell_x) if not state.error_message_x else 0,
-        int(n_cell_y) if not state.error_message_y else 0,
-        int(n_cell_z) if not state.error_message_z else 0,
-    ]
-
-    state.dirty("n_cell")
+def on_n_cell_change(**kwargs):
+    update_state_values_and_errors("n_cell", kwargs)
 
 
 @ctrl.add("update_prob_relative")
@@ -163,66 +192,34 @@ class SpaceChargeConfiguration:
                         classes="font-weight-bold black--text",
                     )
                 with vuetify.VRow(classes="my-0"):
-                    with vuetify.VCol(cols=4, classes="py-0"):
-                        vuetify.VTextField(
-                            placeholder="x",
-                            v_model=("n_cell_x",),
-                            error_messages=("error_message_x",),
-                            type="number",
-                            dense=True,
-                            style="margin-top: -5px",
-                        )
-                    with vuetify.VCol(cols=4, classes="py-0"):
-                        vuetify.VTextField(
-                            placeholder="y",
-                            v_model=("n_cell_y",),
-                            error_messages=("error_message_y",),
-                            type="number",
-                            dense=True,
-                            style="margin-top: -5px",
-                        )
-                    with vuetify.VCol(cols=4, classes="py-0"):
-                        vuetify.VTextField(
-                            placeholder="z",
-                            v_model=("n_cell_z",),
-                            error_messages=("error_message_z",),
-                            type="number",
-                            dense=True,
-                            style="margin-top: -5px",
-                        )
+                    for direction in ["x", "y", "z"]:
+                        with vuetify.VCol(cols=4, classes="py-0"):
+                            vuetify.VTextField(
+                                placeholder=direction,
+                                v_model=(f"n_cell_{direction}",),
+                                error_messages=(f"error_message_n_cell_{direction}",),
+                                type="number",
+                                dense=True,
+                                style="margin-top: -5px",
+                            )
                 with vuetify.VCol(classes="pa-0"):
                     vuetify.VListItemSubtitle(
                         "Blocking Factor",
                         classes="font-weight-bold black--text mt-1",
                     )
                 with vuetify.VRow(classes="my-0"):
-                    with vuetify.VCol(cols=4, classes="py-0"):
-                        vuetify.VTextField(
-                            placeholder="x",
-                            v_model=("blocking_factor_x",),
-                            error_messages=("error_message_bx",),
-                            type="number",
-                            dense=True,
-                            style="margin-top: -5px",
-                        )
-                    with vuetify.VCol(cols=4, classes="py-0"):
-                        vuetify.VTextField(
-                            placeholder="y",
-                            v_model=("blocking_factor_y",),
-                            error_messages=("error_message_by",),
-                            type="number",
-                            dense=True,
-                            style="margin-top: -5px",
-                        )
-                    with vuetify.VCol(cols=4, classes="py-0"):
-                        vuetify.VTextField(
-                            placeholder="z",
-                            v_model=("blocking_factor_z",),
-                            error_messages=("error_message_bz",),
-                            type="number",
-                            dense=True,
-                            style="margin-top: -5px",
-                        )
+                    for direction in ["x", "y", "z"]:
+                        with vuetify.VCol(cols=4, classes="py-0"):
+                            vuetify.VTextField(
+                                placeholder=direction,
+                                v_model=(f"blocking_factor_{direction}",),
+                                error_messages=(
+                                    f"error_message_blocking_factor_{direction}",
+                                ),
+                                type="number",
+                                dense=True,
+                                style="margin-top: -5px",
+                            )
                 with vuetify.VCol(classes="pa-0"):
                     vuetify.VListItemSubtitle(
                         "prob_relative",

@@ -35,3 +35,19 @@ class SpaceChargeFunctions:
             error_message = "Must be a float."
 
         return error_message
+
+    def validate_n_cell_field(direction):
+        """
+        Validates that n_cell_value is a multiple of blocking_factor_value.
+        """
+
+        n_cell_value = int(getattr(state, f"n_cell_{direction}", 0))
+        blocking_factor_value = int(getattr(state, f"blocking_factor_{direction}", 0))
+
+        if blocking_factor_value == 0:
+            return f"Blocking factor for {direction} cannot be zero."
+
+        if n_cell_value % blocking_factor_value != 0:
+            return f"n_cell_value for {direction} is not a multiple of blocking_factor_value."
+
+        return ""
