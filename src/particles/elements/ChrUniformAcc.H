@@ -152,8 +152,8 @@ namespace impactx
             x = std::cos(theta)*xout + std::sin(theta)*yout;
             pxout = std::cos(theta)*px + std::sin(theta)*py;
 
-            y = -sin(theta)*xout + std::cos(theta)*yout;
-            pyout = -sin(theta)*px + std::cos(theta)*py;
+            y = -std::sin(theta)*xout + std::cos(theta)*yout;
+            pyout = -std::sin(theta)*px + std::cos(theta)*py;
 
             t = tout;
             ptout = pt;

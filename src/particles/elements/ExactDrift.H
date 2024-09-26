@@ -104,7 +104,7 @@ namespace impactx
 
             // compute the radical in the denominator (= pz):
             amrex::ParticleReal const pzden = std::sqrt(std::pow(pt-1_prt/bet,2) -
-                                1_prt/pow(betgam,2) - std::pow(px,2) - std::pow(py,2));
+                                1_prt / std::pow(betgam,2) - std::pow(px,2) - std::pow(py,2));
 
             // advance position and momentum (exact drift)
             x = xout + slice_ds * px / pzden;
