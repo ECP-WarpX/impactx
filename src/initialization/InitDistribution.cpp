@@ -60,15 +60,32 @@ namespace impactx
                 amrex::ParticleReal lambdaX = distribution.m_lambdaX;
                 amrex::ParticleReal lambdaY = distribution.m_lambdaY;
                 amrex::ParticleReal lambdaT = distribution.m_lambdaT;
-                amrex::ParticleReal lambdaPx;
-                amrex::ParticleReal lambdaPy;
-                amrex::ParticleReal lambdaPt;
-                amrex::ParticleReal muxpx;
-                amrex::ParticleReal muypy;
-                amrex::ParticleReal mutpt;
+                amrex::ParticleReal lambdaPx = distribution.m_lambdaPx;
+                amrex::ParticleReal lambdaPy = distribution.m_lambdaPy;
+                amrex::ParticleReal lambdaPt = distribution.m_lambdaPt;
+                amrex::ParticleReal muxpx = distribution.m_muxpx;
+                amrex::ParticleReal muypy = distribution.m_muypy;
+                amrex::ParticleReal mutpt = distribution.m_mutpt;
 
-                // convert to co-variance matrix
-                // TODO
+                // use distribution inputs to populate a 6x6 covariance matrix
+                amrex::ParticleReal denom_x = 1.0 - muxpx*muxpx;
+                cv(1,1) = lambdaX*lambdaX / denom_x;
+                cv(1,2) = -lambdaX*lambdaPx*muxpx / denom_x;
+                cv(2,1) = cv(1,2);
+                cv(2,2) = lambdaPx*lambdaPx / denom_x;
+
+                amrex::ParticleReal denom_y = 1.0 - muypy*muypy;
+                cv(3,3) = lambdaY*lambdaY / denom_y;
+                cv(3,4) = -lambdaY*lambdaPy*muypy / denom_y;
+                cv(4,3) = cv(3,4);
+                cv(4,4) = lambdaPy*lambdaPy / denom_y;
+
+                amrex::ParticleReal denom_t = 1.0 - mutpt*mutpt;
+                cv(5,5) = lambdaT*lambdaT / denom_t;
+                cv(5,6) = -lambdaT*lambdaPt*mutpt / denom_t;
+                cv(6,5) = cv(5,6);
+                cv(6,6) = lambdaPt*lambdaPt / denom_t;
+
             }
         }, distr);
 
