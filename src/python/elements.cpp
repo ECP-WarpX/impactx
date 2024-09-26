@@ -829,8 +829,8 @@ void init_elements(py::module& m)
                      return element_name(marker);
                  }
             )
-            .def(py::init<std::optional<std::string>>(),
-                 "This element does nothing."
+            .def(py::init<std::string>(),
+                 "This named element does nothing."
             )
             ;
     register_beamoptics_push(py_Marker);

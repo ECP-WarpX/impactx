@@ -29,11 +29,11 @@ namespace impactx
         static constexpr auto type = "Marker";
         using PType = ImpactXParticleContainer::ParticleType;
 
-        /** This element does nothing.
+        /** This named element does nothing.
          *
          * @param name a user defined and not necessarily unique name of the element
          */
-        Marker (std::optional<std::string> name)
+        Marker (std::string name)
         : Named(name)
         {
         }
