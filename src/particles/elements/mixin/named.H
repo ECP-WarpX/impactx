@@ -27,6 +27,28 @@ namespace impactx::elements
      */
     struct Named
     {
+        /** Overwrite the name of the element
+         *
+         * @param new_name set a new name on the element
+         */
+        AMREX_GPU_HOST
+        void set_name (
+            std::string const & new_name
+        )
+        {
+            // free old name
+            if (m_name != nullptr) {
+                delete[] m_name;
+                m_name = nullptr;
+            }
+
+            // set new name
+            if (new_name.size() > 0) {
+                m_name = new char[new_name.size() + 1];
+                std::strcpy(m_name, new_name.c_str());
+            }
+        }
+
         /** A user-named element
          *
          * @param name a user defined and not necessarily unique name of the element
@@ -37,8 +59,7 @@ namespace impactx::elements
         )
         {
             if (name.has_value()) {
-                m_name = new char[name->size() + 1];
-                std::strcpy(m_name, name->c_str());
+                set_name(*name);
             }
         }
 
@@ -116,6 +137,7 @@ namespace impactx::elements
             return m_name != nullptr;
         }
 
+    private:
         // Implementation note:
         // This is used as a mixin class in elements that are copied to GPU. GPU compilers copy
         // a whole element by its sizeof(T).

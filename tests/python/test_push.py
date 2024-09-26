@@ -47,8 +47,14 @@ def test_element_push():
     assert pc.total_number_of_particles() == npart
 
     # init accelerator lattice
+    drift = elements.Drift(name="drift1", ds=0.25)
+    assert drift.name == "drift1"
+    # changed my mind on the name
+    drift.name = "mydrift"
+    assert drift.name == "mydrift"
+
     fodo = [
-        elements.Drift(name="drift1", ds=0.25),
+        drift,
     ]
     sim.lattice.extend(fodo)
 

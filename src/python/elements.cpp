@@ -143,7 +143,11 @@ void init_elements(py::module& m)
     // mixin classes
 
     py::class_<elements::Named>(me, "Named")
-        .def_property_readonly("name", &elements::Named::name)
+        .def_property("name",
+            [](elements::Named & nm) { return nm.name(); },
+            [](elements::Named & nm, std::string new_name) { nm.set_name(new_name); },
+            "segment length in m"
+        )
         .def_property_readonly("has_name", &elements::Named::has_name)
     ;
 
