@@ -92,19 +92,7 @@ def update_state_values_and_errors(category, kwargs):
 # -----------------------------------------------------------------------------
 @state.change("poisson_solver")
 def on_poisson_solver_change(poisson_solver, **kwargs):
-    updated_prob_relative_fields = []
-
-    for i, field in enumerate(state.prob_relative_fields):
-        prob_relative_value = state.prob_relative[i]
-        error_message = SpaceChargeFunctions.validate_prob_relative_fields(
-            i, prob_relative_value
-        )
-
-        updated_field = {"value": field["value"], "error_message": error_message}
-
-        updated_prob_relative_fields.append(updated_field)
-
-    state.prob_relative_fields = updated_prob_relative_fields
+    populate_prob_relative_fields(state.max_level)
     state.dirty("prob_relative_fields")
 
 
@@ -130,20 +118,33 @@ def on_n_cell_change(**kwargs):
 
 @ctrl.add("update_prob_relative")
 def on_update_prob_relative_call(index, value):
-    prob_relative_value, input_type = generalFunctions.determine_input_type(value)
-
     index = int(index)
+
+    try:
+        prob_relative_value = float(value)
+        state.prob_relative[index] = prob_relative_value
+    except ValueError:
+        prob_relative_value = 0.0
+        state.prob_relative[index] = prob_relative_value
 
     # Validate the updated value
     error_message = SpaceChargeFunctions.validate_prob_relative_fields(
         index, prob_relative_value
     )
 
-    if index < len(state.prob_relative):
-        state.prob_relative[index] = prob_relative_value if value else 0.0
-        print(f"Updated prob_relative: {state.prob_relative}")
-        state.prob_relative_fields[index]["error_message"] = error_message
-        state.dirty("prob_relative_fields")
+    state.prob_relative_fields[index]["value"] = value
+    state.prob_relative_fields[index]["error_message"] = error_message
+
+    # Validate next index if it exists
+    if index + 1 < len(state.prob_relative):
+        next_value = state.prob_relative[index + 1]
+
+        next_error_message = SpaceChargeFunctions.validate_prob_relative_fields(
+            index + 1, next_value
+        )
+        state.prob_relative_fields[index + 1]["error_message"] = next_error_message
+
+    state.dirty("prob_relative_fields")
 
 
 # -----------------------------------------------------------------------------
