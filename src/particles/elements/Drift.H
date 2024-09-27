@@ -167,8 +167,7 @@ namespace impactx
         transport_map(RefPart & AMREX_RESTRICT refpart) {
             
             using namespace amrex::literals; // for _rt and _prt
-
-            amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> R;
+            elements::LinearTransport::Map6x6 R = {};
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
