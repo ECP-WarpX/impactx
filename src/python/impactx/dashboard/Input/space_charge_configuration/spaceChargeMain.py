@@ -18,13 +18,13 @@ state.particle_shape = 2
 state.poisson_solver = "fft"
 
 state.prob_relative_fields = []
-state.n_cell_x = 32.0
-state.n_cell_y = 32.0
-state.n_cell_z = 32.0
+state.n_cell_x = 32
+state.n_cell_y = 32
+state.n_cell_z = 32
 
-state.blocking_factor_x = 32.0
-state.blocking_factor_y = 32.0
-state.blocking_factor_z = 32.0
+state.blocking_factor_x = 32
+state.blocking_factor_y = 32
+state.blocking_factor_z = 32
 
 # -----------------------------------------------------------------------------
 # Helper functions
@@ -34,14 +34,22 @@ state.blocking_factor_z = 32.0
 def populate_prob_relative_fields(max_level):
     num_prob_relative_fields = int(max_level) + 1
 
+    if state.poisson_solver == "fft":
+        state.prob_relative = [1.1] + [0.0] * (num_prob_relative_fields - 1)
+    elif state.poisson_solver == "multigrid":
+        state.prob_relative = [3.1] + [0.0] * (num_prob_relative_fields - 1)
+    else:
+        state.prob_relative = [0.0] * num_prob_relative_fields
+
     state.prob_relative_fields = [
         {
-            "value": "",
-            "error_message": SpaceChargeFunctions.validate_prob_relative_fields(i, ""),
+            "value": state.prob_relative[i],
+            "error_message": SpaceChargeFunctions.validate_prob_relative_fields(
+                i, state.prob_relative[i]
+            ),
         }
         for i in range(num_prob_relative_fields)
     ]
-    state.prob_relative = [0.0] * num_prob_relative_fields
 
 
 def update_state_values_and_errors(category, kwargs):
