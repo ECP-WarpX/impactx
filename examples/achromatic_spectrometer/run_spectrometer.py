@@ -58,17 +58,17 @@ dk = 1.0 / (focal_length * num_lenses)
 
 # drifts appearing the drift-kick sequence
 ds_half = ds / 2.0
-dr = elements.Drift(ds=ds_half, nslice=ns)
+dr = elements.Drift(name="dr", ds=ds_half, nslice=ns)
 
 # define the lens segments
 thick_lens = []
 for _ in range(0, num_lenses):
-    pl = elements.TaperedPL(k=dk, taper=dtaper, unit=0)
+    pl = elements.TaperedPL(name="pl", k=dk, taper=dtaper, unit=0)
     segment = [dr, pl, dr]
     thick_lens.extend(segment)
 
-bend = elements.ExactSbend(ds=1.0, phi=10.0, B=0.0, nslice=ns)
-drift = elements.Drift(ds=1.0, nslice=ns)
+bend = elements.ExactSbend(name="bend", ds=1.0, phi=10.0, B=0.0, nslice=ns)
+drift = elements.Drift(name="drift", ds=1.0, nslice=ns)
 
 # specify the lattice sequence
 sim.lattice.append(monitor)

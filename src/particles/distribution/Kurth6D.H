@@ -104,40 +104,40 @@ namespace impactx::distribution
             v = amrex::Random(engine);
             costheta = amrex::Random(engine);
             costheta = 2_prt*(costheta-0.5_prt);
-            sintheta = sqrt(1_prt-pow(costheta,2));
+            sintheta = std::sqrt(1_prt-pow(costheta,2));
             phi = amrex::Random(engine);
             phi = 2_prt*pi*phi;
 
             // Transformations for (x,y,t):
-            r = pow(v,1_prt/3_prt);
-            x = r*sintheta*cos(phi);
-            y = r*sintheta*sin(phi);
+            r = std::pow(v,1_prt/3_prt);
+            x = r*sintheta * std::cos(phi);
+            y = r*sintheta * std::sin(phi);
             t = r*costheta;
 
             // Random samples used to define L:
             L = amrex::Random(engine);
-            L = r*sqrt(L);
+            L = r*std::sqrt(L);
 
             // Random samples used to define pr:
             alpha = amrex::Random(engine);
             alpha = pi*alpha;
-            pmax = 1_prt - pow(L/r,2) - pow(r,2) + pow(L,2);
-            pmax = sqrt(pmax);
-            pr = pmax*cos(alpha);
+            pmax = 1_prt - std::pow(L/r,2) - std::pow(r,2) + std::pow(L,2);
+            pmax = std::sqrt(pmax);
+            pr = pmax * std::cos(alpha);
 
             // Random samples used to define ptangent:
             beta = amrex::Random(engine);
             beta = 2_prt*pi*beta;
-            p1 = L/r*cos(beta);  // This is phi component
-            p2 = L/r*sin(beta);  // This is theta component
+            p1 = L/r * std::cos(beta);  // This is phi component
+            p2 = L/r * std::sin(beta);  // This is theta component
 
             // Transformation from spherical to Cartesian coord.:
-            px = pr*sintheta*cos(phi) + p2*costheta*cos(phi) - p1*sin(phi);
-            py = pr*sintheta*sin(phi) + p2*costheta*sin(phi) + p1*cos(phi);
+            px = pr*sintheta * std::cos(phi) + p2*costheta * std::cos(phi) - p1 * std::sin(phi);
+            py = pr*sintheta * std::sin(phi) + p2*costheta * std::sin(phi) + p1 * std::cos(phi);
             pt = pr*costheta - p2*sintheta;
 
             // Scale to produce the identity covariance matrix:
-            amrex::ParticleReal const c = sqrt(5.0_prt);
+            amrex::ParticleReal const c = std::sqrt(5.0_prt);
             x = c*x;
             y = c*y;
             t = c*t;
@@ -146,17 +146,17 @@ namespace impactx::distribution
             pt = c*pt;
 
             // Transform to produce the desired second moments/correlations:
-            root = sqrt(1.0_prt-m_muxpx*m_muxpx);
+            root = std::sqrt(1.0_prt-m_muxpx*m_muxpx);
             a1 = m_lambdaX * x / root;
             a2 = m_lambdaPx * (-m_muxpx * x / root + px);
             x = a1;
             px = a2;
-            root = sqrt(1.0_prt-m_muypy*m_muypy);
+            root = std::sqrt(1.0_prt-m_muypy*m_muypy);
             a1 = m_lambdaY * y / root;
             a2 = m_lambdaPy * (-m_muypy * y / root + py);
             y = a1;
             py = a2;
-            root = sqrt(1.0_prt-m_mutpt*m_mutpt);
+            root = std::sqrt(1.0_prt-m_mutpt*m_mutpt);
             a1 = m_lambdaT * t / root;
             a2 = m_lambdaPt * (-m_mutpt * t / root + pt);
             t = a1;

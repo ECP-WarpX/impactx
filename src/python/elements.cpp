@@ -9,6 +9,8 @@
 #include <particles/elements/All.H>
 #include <AMReX.H>
 
+#include <optional>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -62,6 +64,73 @@ namespace
             "Push first the reference particle, then all other particles."
         );
     }
+
+    /** Helper to format {key, value} pairs
+     *
+     * Expected outcome is ", key=value" with key as a string and appropriate formatting for value.
+     *
+     * @tparam T value type
+     * @param arg a key-value pair
+     * @return a string of the form ", key=value"
+     */
+    template<typename T>
+    std::string
+    format_extra (std::pair<char const *, T> const & arg)
+    {
+        if constexpr (std::is_floating_point_v<T>)
+        {
+            // float
+            // TODO: format as scientific number
+            return std::string(", ")
+                .append(arg.first)
+                .append("=")
+                .append(std::to_string(arg.second));
+        }
+        else if constexpr (std::is_integral_v<T>)
+        {
+            // int
+            return std::string(", ")
+                .append(arg.first)
+                .append("=")
+                .append(std::to_string(arg.second));
+        } else
+        {
+            // already a string
+            return std::string(", ")
+                .append(arg.first)
+                .append("=")
+                .append(arg.second);
+        }
+    }
+
+    /** Helper to build a __repr__ for an Element
+     *
+     * @tparam T_Element type for the C++ element type
+     * @tparam ExtraArgs type for pairs of name, value to add
+     * @param el the current element
+     * @param args pars of name, value to add
+     * @return a string suitable for Python's __repr__
+     */
+    template<typename T_Element, typename... ExtraArgs>
+    std::string element_name (T_Element const & el, std::pair<char const *, ExtraArgs> const &... args)
+    {
+        // Fixed element type name, e.g., "SBend"
+        std::string const type = T_Element::type;
+
+        // User-provided element name, e.g., "name=bend1"
+        std::string const name = el.has_name() ? ", name=" + el.name() : "";
+
+        // Noteworthy element parameters, e.g., "ds=2.3, key=value, ..."
+        std::string extra_args;
+        ((extra_args.append(format_extra(args))), ...);
+
+        // combine it all together
+        return "<impactx.elements." +
+               type +
+               name +
+               extra_args +
+               ">";
+    }
 }
 
 void init_elements(py::module& m)
@@ -72,6 +141,15 @@ void init_elements(py::module& m)
     );
 
     // mixin classes
+
+    py::class_<elements::Named>(me, "Named")
+        .def_property("name",
+            [](elements::Named & nm) { return nm.name(); },
+            [](elements::Named & nm, std::string new_name) { nm.set_name(new_name); },
+            "segment length in m"
+        )
+        .def_property_readonly("has_name", &elements::Named::has_name)
+    ;
 
     py::class_<elements::Thick>(me, "Thick")
         .def(py::init<
@@ -194,11 +272,14 @@ void init_elements(py::module& m)
 
     // beam optics
 
-    py::class_<Aperture, elements::Thin, elements::Alignment> py_Aperture(me, "Aperture");
+    py::class_<Aperture, elements::Named, elements::Thin, elements::Alignment> py_Aperture(me, "Aperture");
     py_Aperture
         .def("__repr__",
-             [](Aperture const & /* ap */) {
-                 return std::string("<impactx.elements.Aperture>");
+             [](Aperture const & ap) {
+                 return element_name(
+                    ap,
+                    std::make_pair("shape", ap.shape_name(ap.m_shape))
+                );
              }
         )
         .def(py::init([](
@@ -207,7 +288,8 @@ void init_elements(py::module& m)
                  std::string const & shape,
                  amrex::ParticleReal dx,
                  amrex::ParticleReal dy,
-                 amrex::ParticleReal rotation_degree
+                 amrex::ParticleReal rotation_degree,
+                 std::optional<std::string> name
              )
              {
                  if (shape != "rectangular" && shape != "elliptical")
@@ -216,7 +298,7 @@ void init_elements(py::module& m)
                  Aperture::Shape const s = shape == "rectangular" ?
                      Aperture::Shape::rectangular :
                      Aperture::Shape::elliptical;
-                 return new Aperture(xmax, ymax, s, dx, dy, rotation_degree);
+                 return new Aperture(xmax, ymax, s, dx, dy, rotation_degree, name);
              }),
              py::arg("xmax"),
              py::arg("ymax"),
@@ -224,20 +306,13 @@ void init_elements(py::module& m)
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "A short collimator element applying a transverse aperture boundary."
         )
         .def_property("shape",
             [](Aperture & ap)
             {
-                switch (ap.m_shape)
-                {
-                    case Aperture::Shape::rectangular :  // default
-                        return "rectangular";
-                    case Aperture::Shape::elliptical :
-                        return "elliptical";
-                    default:
-                        throw std::runtime_error("Unknown shape");
-                }
+                return ap.shape_name(ap.m_shape);
             },
             [](Aperture & ap, std::string const & shape)
             {
@@ -263,14 +338,14 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Aperture);
 
-    py::class_<ChrDrift, elements::Thick, elements::Alignment> py_ChrDrift(me, "ChrDrift");
+    py::class_<ChrDrift, elements::Named, elements::Thick, elements::Alignment> py_ChrDrift(me, "ChrDrift");
     py_ChrDrift
         .def("__repr__",
              [](ChrDrift const & chr_drift) {
-                 std::string r = "<impactx.elements.ChrDrift (ds=";
-                 r.append(std::to_string(chr_drift.ds()))
-                         .append(")>");
-                 return r;
+                 return element_name(
+                     chr_drift,
+                     std::make_pair("ds", chr_drift.ds())
+                 );
              }
         )
         .def(py::init<
@@ -278,28 +353,29 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A Drift with chromatic effects included."
         )
     ;
     register_beamoptics_push(py_ChrDrift);
 
-    py::class_<ChrQuad, elements::Thick, elements::Alignment> py_ChrQuad(me, "ChrQuad");
+    py::class_<ChrQuad, elements::Named, elements::Thick, elements::Alignment> py_ChrQuad(me, "ChrQuad");
     py_ChrQuad
         .def("__repr__",
              [](ChrQuad const & chr_quad) {
-                 std::string r = "<impactx.elements.ChrQuad (ds=";
-                 r.append(std::to_string(chr_quad.ds()))
-                  .append(", k=")
-                  .append(std::to_string(chr_quad.m_k))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     chr_quad,
+                     std::make_pair("ds", chr_quad.ds()),
+                     std::make_pair("k", chr_quad.m_k)
+                 );
              }
         )
         .def(py::init<
@@ -309,7 +385,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("k"),
@@ -318,6 +395,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A Quadrupole magnet with chromatic effects included."
         )
         .def_property("k",
@@ -333,16 +411,15 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ChrQuad);
 
-    py::class_<ChrPlasmaLens, elements::Thick, elements::Alignment> py_ChrPlasmaLens(me, "ChrPlasmaLens");
+    py::class_<ChrPlasmaLens, elements::Named, elements::Thick, elements::Alignment> py_ChrPlasmaLens(me, "ChrPlasmaLens");
     py_ChrPlasmaLens
         .def("__repr__",
              [](ChrPlasmaLens const & chr_pl_lens) {
-                 std::string r = "<impactx.elements.ChrPlasmaLens (ds=";
-                 r.append(std::to_string(chr_pl_lens.ds()))
-                  .append(", k=")
-                  .append(std::to_string(chr_pl_lens.m_k))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     chr_pl_lens,
+                     std::make_pair("ds", chr_pl_lens.ds()),
+                     std::make_pair("k", chr_pl_lens.m_k)
+                 );
              }
         )
         .def(py::init<
@@ -352,7 +429,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("k"),
@@ -361,6 +439,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "An active Plasma Lens with chromatic effects included."
         )
         .def_property("k",
@@ -376,18 +455,16 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ChrPlasmaLens);
 
-    py::class_<ChrAcc, elements::Thick, elements::Alignment> py_ChrAcc(me, "ChrAcc");
+    py::class_<ChrAcc, elements::Named, elements::Thick, elements::Alignment> py_ChrAcc(me, "ChrAcc");
     py_ChrAcc
         .def("__repr__",
              [](ChrAcc const & chr_acc) {
-                 std::string r = "<impactx.elements.ChrAcc (ds=";
-                 r.append(std::to_string(chr_acc.ds()))
-                  .append(", ez=")
-                  .append(std::to_string(chr_acc.m_ez))
-                  .append(", bz=")
-                  .append(std::to_string(chr_acc.m_bz))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     chr_acc,
+                     std::make_pair("ds", chr_acc.ds()),
+                     std::make_pair("ez", chr_acc.m_ez),
+                     std::make_pair("bz", chr_acc.m_bz)
+                 );
              }
         )
         .def(py::init<
@@ -397,7 +474,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("ez"),
@@ -406,6 +484,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A region of Uniform Acceleration, with chromatic effects included."
         )
         .def_property("ez",
@@ -421,20 +500,17 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ChrAcc);
 
-    py::class_<ConstF, elements::Thick, elements::Alignment> py_ConstF(me, "ConstF");
+    py::class_<ConstF, elements::Named, elements::Thick, elements::Alignment> py_ConstF(me, "ConstF");
     py_ConstF
         .def("__repr__",
              [](ConstF const & constf) {
-                 std::string r = "<impactx.elements.ConstF (ds=";
-                 r.append(std::to_string(constf.ds()))
-                  .append(", kx=")
-                  .append(std::to_string(constf.m_kx))
-                  .append(", ky=")
-                  .append(std::to_string(constf.m_ky))
-                  .append(", kt=")
-                  .append(std::to_string(constf.m_kt))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     constf,
+                     std::make_pair("ds", constf.ds()),
+                     std::make_pair("kx", constf.m_kx),
+                     std::make_pair("ky", constf.m_ky),
+                     std::make_pair("kt", constf.m_kt)
+                 );
              }
         )
         .def(py::init<
@@ -445,7 +521,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("kx"),
@@ -455,6 +532,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A linear Constant Focusing element."
         )
         .def_property("kx",
@@ -475,20 +553,17 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ConstF);
 
-    py::class_<DipEdge, elements::Thin, elements::Alignment> py_DipEdge(me, "DipEdge");
+    py::class_<DipEdge, elements::Named, elements::Thin, elements::Alignment> py_DipEdge(me, "DipEdge");
     py_DipEdge
         .def("__repr__",
              [](DipEdge const & dip_edge) {
-                 std::string r = "<impactx.elements.DipEdge (psi=";
-                 r.append(std::to_string(dip_edge.m_psi))
-                  .append(", rc=")
-                  .append(std::to_string(dip_edge.m_rc))
-                  .append(", g=")
-                  .append(std::to_string(dip_edge.m_g))
-                  .append(", K2=")
-                  .append(std::to_string(dip_edge.m_K2))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     dip_edge,
+                     std::make_pair("psi", dip_edge.m_psi),
+                     std::make_pair("rc", dip_edge.m_rc),
+                     std::make_pair("g", dip_edge.m_g),
+                     std::make_pair("K2", dip_edge.m_K2)
+                 );
              }
         )
         .def(py::init<
@@ -498,7 +573,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
              py::arg("psi"),
              py::arg("rc"),
@@ -507,6 +583,7 @@ void init_elements(py::module& m)
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "Edge focusing associated with bend entry or exit."
         )
         .def_property("psi",
@@ -532,14 +609,14 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_DipEdge);
 
-    py::class_<Drift, elements::Thick, elements::Alignment> py_Drift(me, "Drift");
+    py::class_<Drift, elements::Named, elements::Thick, elements::Alignment> py_Drift(me, "Drift");
     py_Drift
         .def("__repr__",
              [](Drift const & drift) {
-                 std::string r = "<impactx.elements.Drift (ds=";
-                 r.append(std::to_string(drift.ds()))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     drift,
+                     std::make_pair("ds", drift.ds())
+                 );
              }
         )
         .def(py::init<
@@ -547,26 +624,28 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A drift."
         )
     ;
     register_beamoptics_push(py_Drift);
 
-    py::class_<ExactDrift, elements::Thick, elements::Alignment> py_ExactDrift(me, "ExactDrift");
+    py::class_<ExactDrift, elements::Named, elements::Thick, elements::Alignment> py_ExactDrift(me, "ExactDrift");
     py_ExactDrift
         .def("__repr__",
              [](ExactDrift const & exact_drift) {
-                 std::string r = "<impactx.elements.ExactDrift (ds=";
-                 r.append(std::to_string(exact_drift.ds()))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     exact_drift,
+                     std::make_pair("ds", exact_drift.ds())
+                 );
              }
         )
         .def(py::init<
@@ -574,30 +653,30 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A Drift using the exact nonlinear map."
         )
     ;
     register_beamoptics_push(py_ExactDrift);
 
-    py::class_<ExactSbend, elements::Thick, elements::Alignment> py_ExactSbend(me, "ExactSbend");
+    py::class_<ExactSbend, elements::Named, elements::Thick, elements::Alignment> py_ExactSbend(me, "ExactSbend");
     py_ExactSbend
         .def("__repr__",
              [](ExactSbend const & exact_sbend) {
-                 std::string r = "<impactx.elements.ExactSbend (ds=";
-                 r.append(std::to_string(exact_sbend.ds()))
-                  .append(", phi=")
-                  .append(std::to_string(exact_sbend.m_phi))
-                  .append(", B=")
-                  .append(std::to_string(exact_sbend.m_B))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     exact_sbend,
+                     std::make_pair("ds", exact_sbend.ds()),
+                     std::make_pair("phi", exact_sbend.m_phi),
+                     std::make_pair("B", exact_sbend.m_B)
+                 );
              }
         )
         .def(py::init<
@@ -607,7 +686,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("phi"),
@@ -616,6 +696,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "An ideal sector bend using the exact nonlinear map.  When B = 0, the reference bending radius is defined by r0 = length / (angle in rad), corresponding to a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B."
         )
         .def_property("phi",
@@ -631,16 +712,15 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ExactSbend);
 
-    py::class_<Kicker, elements::Thin, elements::Alignment> py_Kicker(me, "Kicker");
+    py::class_<Kicker, elements::Named, elements::Thin, elements::Alignment> py_Kicker(me, "Kicker");
     py_Kicker
         .def("__repr__",
              [](Kicker const & kicker) {
-                 std::string r = "<impactx.elements.Kicker (xkick=";
-                 r.append(std::to_string(kicker.m_xkick))
-                  .append(", ykick=")
-                  .append(std::to_string(kicker.m_ykick))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     kicker,
+                     std::make_pair("xkick", kicker.m_xkick),
+                     std::make_pair("ykick", kicker.m_ykick)
+                 );
              }
         )
         .def(py::init([](
@@ -649,7 +729,8 @@ void init_elements(py::module& m)
                 std::string const & unit,
                 amrex::ParticleReal dx,
                 amrex::ParticleReal dy,
-                amrex::ParticleReal rotation_degree
+                amrex::ParticleReal rotation_degree,
+                std::optional<std::string> name
              )
              {
                  if (unit != "dimensionless" && unit != "T-m")
@@ -658,14 +739,15 @@ void init_elements(py::module& m)
                  Kicker::UnitSystem const u = unit == "dimensionless" ?
                                             Kicker::UnitSystem::dimensionless :
                                             Kicker::UnitSystem::Tm;
-                 return new Kicker(xkick, ykick, u, dx, dy, rotation_degree);
+                 return new Kicker(xkick, ykick, u, dx, dy, rotation_degree, name);
              }),
-             py::arg("xkick"),
+                          py::arg("xkick"),
              py::arg("ykick"),
              py::arg("unit") = "dimensionless",
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              R"(A thin transverse kicker element. Kicks are for unit "dimensionless" or in "T-m".)"
         )
         .def_property("xkick",
@@ -682,18 +764,17 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Kicker);
 
-    py::class_<Multipole, elements::Thin, elements::Alignment> py_Multipole(me, "Multipole");
+    py::class_<Multipole, elements::Named, elements::Thin, elements::Alignment> py_Multipole(me, "Multipole");
     py_Multipole
         .def("__repr__",
              [](Multipole const & multipole) {
-                 std::string r = "<impactx.elements.Multipole (multipole=";
-                 r.append(std::to_string(multipole.m_multipole))
-                  .append(", K_normal=")
-                  .append(std::to_string(multipole.m_Kn))
-                  .append(", K_skew=")
-                  .append(std::to_string(multipole.m_Ks))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     multipole,
+                     std::make_pair("multipole", multipole.m_multipole),
+                     std::make_pair("mfactorial", multipole.m_mfactorial),
+                     std::make_pair("K_normal", multipole.m_Kn),
+                     std::make_pair("K_skew", multipole.m_Ks)
+                 );
              }
         )
         .def(py::init<
@@ -702,7 +783,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
              py::arg("multipole"),
              py::arg("K_normal"),
@@ -710,6 +792,7 @@ void init_elements(py::module& m)
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "A general thin multipole element."
         )
         .def_property("multipole",
@@ -730,10 +813,10 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Multipole);
 
-    py::class_<Empty, elements::Thin> py_None(me, "Empty");
-    py_None
+    py::class_<Empty, elements::Thin> py_Empty(me, "Empty");
+    py_Empty
         .def("__repr__",
-             [](Empty const & /* none */) {
+             [](Empty const & /* empty */) {
                  return std::string("<impactx.elements.Empty>");
              }
         )
@@ -741,18 +824,30 @@ void init_elements(py::module& m)
              "This element does nothing."
         )
     ;
-    register_beamoptics_push(py_None);
+    register_beamoptics_push(py_Empty);
 
-    py::class_<NonlinearLens, elements::Thin, elements::Alignment> py_NonlinearLens(me, "NonlinearLens");
+    py::class_<Marker, elements::Named, elements::Thin> py_Marker(me, "Marker");
+    py_Marker
+            .def("__repr__",
+                 [](Marker const & marker) {
+                     return element_name(marker);
+                 }
+            )
+            .def(py::init<std::string>(),
+                 "This named element does nothing."
+            )
+            ;
+    register_beamoptics_push(py_Marker);
+
+    py::class_<NonlinearLens, elements::Named, elements::Thin, elements::Alignment> py_NonlinearLens(me, "NonlinearLens");
     py_NonlinearLens
         .def("__repr__",
              [](NonlinearLens const & nl) {
-                 std::string r = "<impactx.elements.NonlinearLens (knll=";
-                 r.append(std::to_string(nl.m_knll))
-                  .append(", cnll=")
-                  .append(std::to_string(nl.m_cnll))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     nl,
+                     std::make_pair("knll", nl.m_knll),
+                     std::make_pair("cnll", nl.m_cnll)
+                 );
              }
         )
         .def(py::init<
@@ -760,13 +855,15 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
              py::arg("knll"),
              py::arg("cnll"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "Single short segment of the nonlinear magnetic insert element."
         )
         .def_property("knll",
@@ -782,20 +879,23 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_NonlinearLens);
 
-    py::class_<Programmable>(me, "Programmable", py::dynamic_attr())
+    py::class_<Programmable, elements::Named>(me, "Programmable", py::dynamic_attr())
         .def("__repr__",
              [](Programmable const & prg) {
-                 std::string r = "<impactx.elements.Programmable (ds=";
-                 r.append(std::to_string(prg.ds()))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     prg,
+                     std::make_pair("ds", prg.ds())
+                 );
              }
         )
         .def(py::init<
                  amrex::ParticleReal,
-                 int
+                 int,
+                 std::optional<std::string>
              >(),
-             py::arg("ds") = 0.0, py::arg("nslice") = 1,
+             py::arg("ds") = 0.0,
+             py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A programmable beam optics element."
         )
         .def_property("nslice",
@@ -834,16 +934,15 @@ void init_elements(py::module& m)
         )
     ;
 
-    py::class_<Quad, elements::Thick, elements::Alignment> py_Quad(me, "Quad");
+    py::class_<Quad, elements::Named, elements::Thick, elements::Alignment> py_Quad(me, "Quad");
     py_Quad
         .def("__repr__",
              [](Quad const & quad) {
-                 std::string r = "<impactx.elements.Quad (ds=";
-                 r.append(std::to_string(quad.ds()))
-                  .append(", k=")
-                  .append(std::to_string(quad.m_k))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     quad,
+                     std::make_pair("ds", quad.ds()),
+                     std::make_pair("k", quad.m_k)
+                 );
              }
         )
         .def(py::init<
@@ -852,7 +951,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("k"),
@@ -860,6 +960,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A Quadrupole magnet."
         )
         .def_property("k",
@@ -870,20 +971,17 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Quad);
 
-    py::class_<RFCavity, elements::Thick, elements::Alignment> py_RFCavity(me, "RFCavity");
+    py::class_<RFCavity, elements::Named, elements::Thick, elements::Alignment> py_RFCavity(me, "RFCavity");
     py_RFCavity
         .def("__repr__",
              [](RFCavity const & rfc) {
-                 std::string r = "<impactx.elements.RFCavity (ds=";
-                 r.append(std::to_string(rfc.ds()))
-                  .append(", escale=")
-                  .append(std::to_string(rfc.m_escale))
-                  .append(", freq=")
-                  .append(std::to_string(rfc.m_freq))
-                  .append(", phase=")
-                  .append(std::to_string(rfc.m_phase))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     rfc,
+                     std::make_pair("ds", rfc.ds()),
+                     std::make_pair("escale", rfc.m_escale),
+                     std::make_pair("freq", rfc.m_freq),
+                     std::make_pair("phase", rfc.m_phase)
+                 );
              }
         )
         .def(py::init<
@@ -897,7 +995,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 int,
-                int
+                int,
+                std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("escale"),
@@ -910,6 +1009,7 @@ void init_elements(py::module& m)
              py::arg("rotation") = 0,
              py::arg("mapsteps") = 1,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "An RF cavity."
         )
         .def_property("escale",
@@ -937,16 +1037,15 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_RFCavity);
 
-    py::class_<Sbend, elements::Thick, elements::Alignment> py_Sbend(me, "Sbend");
+    py::class_<Sbend, elements::Named, elements::Thick, elements::Alignment> py_Sbend(me, "Sbend");
     py_Sbend
         .def("__repr__",
              [](Sbend const & sbend) {
-                 std::string r = "<impactx.elements.Sbend (ds=";
-                 r.append(std::to_string(sbend.ds()))
-                  .append(", rc=")
-                  .append(std::to_string(sbend.m_rc))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     sbend,
+                     std::make_pair("ds", sbend.ds()),
+                     std::make_pair("rc", sbend.m_rc)
+                 );
              }
         )
         .def(py::init<
@@ -955,7 +1054,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("rc"),
@@ -963,6 +1063,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "An ideal sector bend."
         )
         .def_property("rc",
@@ -973,18 +1074,16 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Sbend);
 
-    py::class_<CFbend, elements::Thick, elements::Alignment> py_CFbend(me, "CFbend");
+    py::class_<CFbend, elements::Named, elements::Thick, elements::Alignment> py_CFbend(me, "CFbend");
     py_CFbend
         .def("__repr__",
              [](CFbend const & cfbend) {
-                 std::string r = "<impactx.elements.CFbend (ds=";
-                 r.append(std::to_string(cfbend.ds()))
-                  .append(", rc=")
-                  .append(std::to_string(cfbend.m_rc))
-                  .append(", k=")
-                  .append(std::to_string(cfbend.m_k))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     cfbend,
+                     std::make_pair("ds", cfbend.ds()),
+                     std::make_pair("rc", cfbend.m_rc),
+                     std::make_pair("k", cfbend.m_k)
+                 );
              }
         )
         .def(py::init<
@@ -994,7 +1093,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("rc"),
@@ -1003,6 +1103,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "An ideal combined function bend (sector bend with quadrupole component)."
         )
         .def_property("rc",
@@ -1018,16 +1119,15 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_CFbend);
 
-    py::class_<Buncher, elements::Thin, elements::Alignment> py_Buncher(me, "Buncher");
+    py::class_<Buncher, elements::Named, elements::Thin, elements::Alignment> py_Buncher(me, "Buncher");
     py_Buncher
         .def("__repr__",
              [](Buncher const & buncher) {
-                 std::string r = "<impactx.elements.Buncher (V=";
-                 r.append(std::to_string(buncher.m_V))
-                  .append(", k=")
-                  .append(std::to_string(buncher.m_k))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     buncher,
+                     std::make_pair("V", buncher.m_V),
+                     std::make_pair("k", buncher.m_k)
+                 );
              }
         )
         .def(py::init<
@@ -1035,13 +1135,15 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
              py::arg("V"),
              py::arg("k"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "A short linear RF cavity element at zero-crossing for bunching."
         )
         .def_property("V",
@@ -1057,18 +1159,16 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Buncher);
 
-    py::class_<ShortRF, elements::Thin, elements::Alignment> py_ShortRF(me, "ShortRF");
+    py::class_<ShortRF, elements::Named, elements::Thin, elements::Alignment> py_ShortRF(me, "ShortRF");
     py_ShortRF
         .def("__repr__",
              [](ShortRF const & short_rf) {
-                 std::string r = "<impactx.elements.ShortRF (V=";
-                 r.append(std::to_string(short_rf.m_V))
-                  .append(", freq=")
-                  .append(std::to_string(short_rf.m_freq))
-                  .append(", phase=")
-                  .append(std::to_string(short_rf.m_phase))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     short_rf,
+                     std::make_pair("V", short_rf.m_V),
+                     std::make_pair("freq", short_rf.m_freq),
+                     std::make_pair("phase", short_rf.m_phase)
+                 );
              }
         )
         .def(py::init<
@@ -1077,7 +1177,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
              py::arg("V"),
              py::arg("freq"),
@@ -1085,6 +1186,7 @@ void init_elements(py::module& m)
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "A short RF cavity element."
         )
         .def_property("V",
@@ -1105,16 +1207,15 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ShortRF);
 
-    py::class_<SoftSolenoid, elements::Thick, elements::Alignment> py_SoftSolenoid(me, "SoftSolenoid");
+    py::class_<SoftSolenoid, elements::Named, elements::Thick, elements::Alignment> py_SoftSolenoid(me, "SoftSolenoid");
     py_SoftSolenoid
         .def("__repr__",
              [](SoftSolenoid const & soft_sol) {
-                 std::string r = "<impactx.elements.SoftSolenoid (ds=";
-                 r.append(std::to_string(soft_sol.ds()))
-                  .append(", bscale=")
-                  .append(std::to_string(soft_sol.m_bscale))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     soft_sol,
+                     std::make_pair("ds", soft_sol.ds()),
+                     std::make_pair("bscale", soft_sol.m_bscale)
+                 );
              }
         )
         .def(py::init<
@@ -1127,7 +1228,8 @@ void init_elements(py::module& m)
                  amrex::ParticleReal,
                  amrex::ParticleReal,
                  int,
-                 int
+                 int,
+                 std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("bscale"),
@@ -1139,6 +1241,7 @@ void init_elements(py::module& m)
              py::arg("rotation") = 0,
              py::arg("mapsteps") = 1,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A soft-edge solenoid."
         )
         .def_property("bscale",
@@ -1161,16 +1264,15 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_SoftSolenoid);
 
-    py::class_<Sol, elements::Thick, elements::Alignment> py_Sol(me, "Sol");
+    py::class_<Sol, elements::Named, elements::Thick, elements::Alignment> py_Sol(me, "Sol");
     py_Sol
         .def("__repr__",
-             [](Sol const & soft_sol) {
-                 std::string r = "<impactx.elements.Sol (ds=";
-                 r.append(std::to_string(soft_sol.ds()))
-                  .append(", ks=")
-                  .append(std::to_string(soft_sol.m_ks))
-                  .append(")>");
-                 return r;
+             [](Sol const & sol) {
+                 return element_name(
+                     sol,
+                     std::make_pair("ds", sol.ds()),
+                     std::make_pair("ks", sol.m_ks)
+                 );
              }
         )
         .def(py::init<
@@ -1179,7 +1281,8 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                int
+                int,
+                std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("ks"),
@@ -1187,6 +1290,7 @@ void init_elements(py::module& m)
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "An ideal hard-edge Solenoid magnet."
         )
         .def_property("ks",
@@ -1197,24 +1301,25 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_Sol);
 
-    py::class_<PRot, elements::Thin> py_PRot(me, "PRot");
+    py::class_<PRot, elements::Named, elements::Thin> py_PRot(me, "PRot");
     py_PRot
         .def("__repr__",
              [](PRot const & prot) {
-                 std::string r = "<impactx.elements.PRot (phi_in=";
-                 r.append(std::to_string(prot.m_phi_in))
-                  .append(", phi_out=")
-                  .append(std::to_string(prot.m_phi_out))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     prot,
+                     std::make_pair("phi_in", prot.m_phi_in),
+                     std::make_pair("phi_out", prot.m_phi_out)
+                 );
              }
         )
         .def(py::init<
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
              py::arg("phi_in"),
              py::arg("phi_out"),
+             py::arg("name") = py::none(),
              "An exact pole-face rotation in the x-z plane. Both angles are in degrees."
         )
         .def_property("phi_in",
@@ -1230,16 +1335,15 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_PRot);
 
-    py::class_<SoftQuadrupole, elements::Thick, elements::Alignment> py_SoftQuadrupole(me, "SoftQuadrupole");
+    py::class_<SoftQuadrupole, elements::Named, elements::Thick, elements::Alignment> py_SoftQuadrupole(me, "SoftQuadrupole");
     py_SoftQuadrupole
         .def("__repr__",
              [](SoftQuadrupole const & soft_quad) {
-                 std::string r = "<impactx.elements.SoftQuadrupole (ds=";
-                 r.append(std::to_string(soft_quad.ds()))
-                  .append(", gscale=")
-                  .append(std::to_string(soft_quad.m_gscale))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     soft_quad,
+                     std::make_pair("ds", soft_quad.ds()),
+                     std::make_pair("gscale", soft_quad.m_gscale)
+                 );
              }
         )
         .def(py::init<
@@ -1251,7 +1355,8 @@ void init_elements(py::module& m)
                  amrex::ParticleReal,
                  amrex::ParticleReal,
                  int,
-                 int
+                 int,
+                 std::optional<std::string>
              >(),
              py::arg("ds"),
              py::arg("gscale"),
@@ -1262,6 +1367,7 @@ void init_elements(py::module& m)
              py::arg("rotation") = 0,
              py::arg("mapsteps") = 1,
              py::arg("nslice") = 1,
+             py::arg("name") = py::none(),
              "A soft-edge quadrupole."
         )
         .def_property("gscale",
@@ -1279,16 +1385,15 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_SoftQuadrupole);
 
-    py::class_<ThinDipole, elements::Thin, elements::Alignment> py_ThinDipole(me, "ThinDipole");
+    py::class_<ThinDipole, elements::Named, elements::Thin, elements::Alignment> py_ThinDipole(me, "ThinDipole");
     py_ThinDipole
         .def("__repr__",
              [](ThinDipole const & thin_dp) {
-                 std::string r = "<impactx.elements.ThinDipole (theta=";
-                 r.append(std::to_string(thin_dp.m_theta))
-                  .append(", rc=")
-                  .append(std::to_string(thin_dp.m_rc))
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     thin_dp,
+                     std::make_pair("theta", thin_dp.m_theta),
+                     std::make_pair("rc", thin_dp.m_rc)
+                 );
              }
         )
         .def(py::init<
@@ -1296,13 +1401,15 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
              py::arg("theta"),
              py::arg("rc"),
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              "A thin kick model of a dipole bend."
         )
         .def_property("theta",
@@ -1318,17 +1425,15 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_ThinDipole);
 
-    py::class_<TaperedPL, elements::Thin, elements::Alignment> py_TaperedPL(me, "TaperedPL");
+    py::class_<TaperedPL, elements::Named, elements::Thin, elements::Alignment> py_TaperedPL(me, "TaperedPL");
     py_TaperedPL
         .def("__repr__",
              [](TaperedPL const & taperedpl) {
-                 std::string r = "<impactx.elements.TaperedPL (taperedpl=";
-                 r.append(std::to_string(taperedpl.m_k))
-                  .append(", k=")
-                  .append(std::to_string(taperedpl.m_taper))
-                  .append(", taper=")
-                  .append(")>");
-                 return r;
+                 return element_name(
+                     taperedpl,
+                     std::make_pair("k", taperedpl.m_k),
+                     std::make_pair("taper", taperedpl.m_taper)
+                 );
              }
         )
         .def(py::init<
@@ -1337,7 +1442,8 @@ void init_elements(py::module& m)
                 int,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
-                amrex::ParticleReal
+                amrex::ParticleReal,
+                std::optional<std::string>
              >(),
              py::arg("k"),
              py::arg("taper"),
@@ -1345,6 +1451,7 @@ void init_elements(py::module& m)
              py::arg("dx") = 0,
              py::arg("dy") = 0,
              py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
              R"doc(A thin nonlinear plasma lens with transverse (horizontal) taper
 
              .. math::

@@ -48,9 +48,9 @@ monitor.tn = 0.4
 monitor.cn = 0.01
 
 # design the accelerator lattice
-constEnd = elements.ConstF(ds=0.05, kx=1.0, ky=1.0, kt=1.0e-12)
-nllens = elements.NonlinearLens(knll=4.0e-6, cnll=0.01)
-const = elements.ConstF(ds=0.1, kx=1.0, ky=1.0, kt=1.0e-12)
+constEnd = elements.ConstF(name="constEnd", ds=0.05, kx=1.0, ky=1.0, kt=1.0e-12)
+nllens = elements.NonlinearLens(name="nllens", knll=4.0e-6, cnll=0.01)
+const = elements.ConstF(name="const", ds=0.1, kx=1.0, ky=1.0, kt=1.0e-12)
 
 num_lenses = 18
 nllens_lattice = (

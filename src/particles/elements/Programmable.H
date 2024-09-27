@@ -10,8 +10,9 @@
 #ifndef IMPACTX_ELEMENTS_PROGRAMMABLE_H
 #define IMPACTX_ELEMENTS_PROGRAMMABLE_H
 
-#include "mixin/thick.H"
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/named.H"
+#include "mixin/thick.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
@@ -22,14 +23,23 @@
 namespace impactx
 {
     struct Programmable
+    : public elements::Named
     {
         static constexpr auto type = "Programmable";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** This element can be programmed
+         *
+         * @param ds Segment length in m
+         * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
-        Programmable (amrex::ParticleReal ds=0.0, int nslice=1)
-            : m_ds(ds), m_nslice(nslice)
+        Programmable (
+            amrex::ParticleReal ds=0.0,
+            int nslice=1,
+            std::optional<std::string> name = std::nullopt
+        )
+          : Named(name), m_ds(ds), m_nslice(nslice)
         {}
 
         /** Push all particles relative to the reference particle

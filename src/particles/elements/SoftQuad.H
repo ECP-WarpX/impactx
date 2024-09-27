@@ -14,6 +14,7 @@
 #include "particles/integrators/Integrators.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
+#include "mixin/named.H"
 #include "mixin/thick.H"
 
 #include <ablastr/constant.H>
@@ -111,7 +112,8 @@ namespace SoftQuadrupoleData
 } // namespace SoftQuadrupoleData
 
     struct SoftQuadrupole
-    : public elements::BeamOptic<SoftQuadrupole>,
+    : public elements::Named,
+      public elements::BeamOptic<SoftQuadrupole>,
       public elements::Thick,
       public elements::Alignment
     {
@@ -130,6 +132,7 @@ namespace SoftQuadrupoleData
          * @param mapsteps number of integration steps per slice used for
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         SoftQuadrupole (
             amrex::ParticleReal ds,
@@ -140,9 +143,11 @@ namespace SoftQuadrupoleData
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
             int mapsteps = 1,
-            int nslice = 1
+            int nslice = 1,
+            std::optional<std::string> name = std::nullopt
         )
-          : Thick(ds, nslice),
+          : Named(name),
+            Thick(ds, nslice),
             Alignment(dx, dy, rotation_degree),
             m_gscale(gscale), m_mapsteps(mapsteps), m_id(SoftQuadrupoleData::next_id)
         {
@@ -285,7 +290,7 @@ namespace SoftQuadrupoleData
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // compute intial value of beta*gamma
-            amrex::ParticleReal const bgi = sqrt(pow(pt, 2) - 1.0_prt);
+            amrex::ParticleReal const bgi = std::sqrt(std::pow(pt, 2) - 1.0_prt);
 
             // call integrator to advance (t,pt)
             amrex::ParticleReal const zin = s - sedge;
@@ -312,7 +317,7 @@ namespace SoftQuadrupoleData
             refpart.z = z + slice_ds*pz/bgi;
 
             // compute final value of beta*gamma
-            amrex::ParticleReal const bgf = sqrt(pow(ptf, 2) - 1.0_prt);
+            amrex::ParticleReal const bgf = std::sqrt(std::pow(ptf, 2) - 1.0_prt);
 
             // advance momentum (px,py,pz)
             refpart.px = px*bgf/bgi;
@@ -362,12 +367,12 @@ namespace SoftQuadrupoleData
                bfieldint = z*bfield;
                for (int j=1; j < m_ncoef; ++j)
                {
-                 bfield = bfield + cos_data[j] * cos(j * 2 * pi * z / zlen) +
-                         sin_data[j] * sin(j * 2 * pi * z / zlen);
-                 bfieldp = bfieldp - j * 2 * pi * cos_data[j] * sin(j * 2 * pi * z / zlen) / zlen +
-                           j * 2 * pi * sin_data[j] * cos(j * 2 * pi * z / zlen) / zlen;
-                 bfieldint = bfieldint + zlen * cos_data[j] * sin(j * 2 * pi * z / zlen) / (j * 2 * pi) -
-                             zlen * sin_data[j] * cos(j * 2 * pi * z / zlen) / (j * 2 * pi);
+                 bfield = bfield + cos_data[j] *std::cos(j * 2 * pi * z / zlen) +
+                         sin_data[j] *std::sin(j * 2 * pi * z / zlen);
+                 bfieldp = bfieldp - j * 2 * pi * cos_data[j] *std::sin(j * 2 * pi * z / zlen) / zlen +
+                           j * 2 * pi * sin_data[j] *std::cos(j * 2 * pi * z / zlen) / zlen;
+                 bfieldint = bfieldint + zlen * cos_data[j] *std::sin(j * 2 * pi * z / zlen) / (j * 2 * pi) -
+                             zlen * sin_data[j] *std::cos(j * 2 * pi * z / zlen) / (j * 2 * pi);
                }
             }
             return std::make_tuple(bfield, bfieldp, bfieldint);
@@ -394,7 +399,7 @@ namespace SoftQuadrupoleData
             amrex::ParticleReal const z = zeval;
 
             if (pt < -1.0_prt) {
-                refpart.t = t + tau/sqrt(1.0_prt - pow(pt, -2));
+                refpart.t = t + tau/std::sqrt(1.0_prt - std::pow(pt, -2));
                 refpart.pt = pt;
             }
             else {

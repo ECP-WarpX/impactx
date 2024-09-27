@@ -46,9 +46,9 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 # design the accelerator lattice
 rotated_drift = [
     monitor,
-    elements.PRot(phi_in=0.0, phi_out=-5.0),
-    elements.Drift(ds=2.0, nslice=1),
-    elements.PRot(phi_in=-5.0, phi_out=0.0),
+    elements.PRot(name="rotation1", phi_in=0.0, phi_out=-5.0),
+    elements.Drift(name="drift1", ds=2.0, nslice=1),
+    elements.PRot(name="rotation2", phi_in=-5.0, phi_out=0.0),
     monitor,
 ]
 # assign a lattice segment

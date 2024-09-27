@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,7 +26,8 @@
 namespace impactx
 {
     struct ChrDrift
-    : public elements::BeamOptic<ChrDrift>,
+    : public elements::Named,
+      public elements::BeamOptic<ChrDrift>,
       public elements::Thick,
       public elements::Alignment,
       public elements::NoFinalize
@@ -43,15 +45,18 @@ namespace impactx
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         ChrDrift (
             amrex::ParticleReal ds,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
-            int nslice = 1
+            int nslice = 1,
+            std::optional<std::string> name = std::nullopt
         )
-        : Thick(ds, nslice),
+        : Named(name),
+          Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree)
         {
         }
@@ -106,7 +111,7 @@ namespace impactx
 
             // compute particle momentum deviation delta + 1
             amrex::ParticleReal delta1;
-            delta1 = sqrt(1_prt - 2_prt*pt/bet + pow(pt,2));
+            delta1 = std::sqrt(1_prt - 2_prt*pt/bet + std::pow(pt,2));
 
             // advance transverse position and momentum (drift)
             x = xout + slice_ds * px / delta1;
@@ -115,12 +120,12 @@ namespace impactx
             // pyout = py;
 
             // the corresponding symplectic update to t
-            amrex::ParticleReal term = 2_prt*pow(pt,2)+pow(px,2)+pow(py,2);
-            term = 2_prt - 4_prt*bet*pt + pow(bet,2)*term;
-            term = -2_prt + pow(gam,2)*term;
+            amrex::ParticleReal term = 2_prt * std::pow(pt,2) + std::pow(px,2) + std::pow(py,2);
+            term = 2_prt - 4_prt*bet*pt + std::pow(bet,2)*term;
+            term = -2_prt + std::pow(gam,2)*term;
             term = (-1_prt+bet*pt)*term;
-            term = term/(2_prt*pow(bet,3)*pow(gam,2));
-            t = tout - slice_ds * (1_prt / bet + term / pow(delta1, 3));
+            term = term/(2_prt * std::pow(bet,3) * std::pow(gam,2));
+            t = tout - slice_ds * (1_prt / bet + term /std::pow(delta1, 3));
             // ptout = pt;
 
             // assign updated momenta
@@ -156,7 +161,7 @@ namespace impactx
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // assign intermediate parameter
-            amrex::ParticleReal const step = slice_ds / sqrt(pow(pt,2)-1.0_prt);
+            amrex::ParticleReal const step = slice_ds /std::sqrt(std::pow(pt,2)-1.0_prt);
 
             // advance position and momentum (drift)
             refpart.x = x + step*px;

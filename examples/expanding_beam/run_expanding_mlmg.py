@@ -54,7 +54,7 @@ sim.add_particles(bunch_charge_C, distr, npart)
 monitor = elements.BeamMonitor("monitor", backend="h5")
 
 # design the accelerator lattice
-sim.lattice.extend([monitor, elements.Drift(ds=6.0, nslice=40), monitor])
+sim.lattice.extend([monitor, elements.Drift(name="d1", ds=6.0, nslice=40), monitor])
 
 # run simulation
 sim.evolve()

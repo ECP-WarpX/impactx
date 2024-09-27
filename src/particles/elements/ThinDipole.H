@@ -14,15 +14,18 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
 
+
 namespace impactx
 {
     struct ThinDipole
-    : public elements::BeamOptic<ThinDipole>,
+    : public elements::Named,
+      public elements::BeamOptic<ThinDipole>,
       public elements::Thin,
       public elements::Alignment,
       public elements::NoFinalize
@@ -44,15 +47,18 @@ namespace impactx
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         ThinDipole (
             amrex::ParticleReal theta,
             amrex::ParticleReal rc,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
-        : Alignment(dx, dy, rotation_degree),
+        : Named(name),
+          Alignment(dx, dy, rotation_degree),
           m_theta(theta * degree2rad),
           m_rc(rc)
         {
@@ -104,7 +110,7 @@ namespace impactx
             amrex::ParticleReal ptout = pt;
 
             // compute the function expressing dp/p in terms of pt (labeled f in Ripken etc.)
-            amrex::ParticleReal f = -1.0_prt + sqrt(1.0_prt - 2.0_prt*pt/beta_ref + pow(pt,2));
+            amrex::ParticleReal f = -1.0_prt + std::sqrt(1.0_prt - 2.0_prt*pt/beta_ref + std::pow(pt,2));
             amrex::ParticleReal fprime = (1.0_prt - beta_ref*pt)/(beta_ref*(1.0_prt + f));
 
             // compute the effective (equivalent) arc length and curvature
@@ -113,7 +119,7 @@ namespace impactx
 
             // advance position and momentum
             x = xout;
-            pxout = px - pow(kx,2) * ds * xout + kx * ds * f; //eq (3.2b)
+            pxout = px - std::pow(kx,2) * ds * xout + kx * ds * f; //eq (3.2b)
 
             y = yout;
             pyout = py;
