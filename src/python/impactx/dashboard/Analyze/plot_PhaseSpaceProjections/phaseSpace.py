@@ -49,6 +49,9 @@ def run_simulation():
         sim.space_charge = state.space_charge
         sim.dynamic_size = state.dynamic_size
         sim.prob_relative = state.prob_relative
+        sim.blocking_factor_x = [state.blocking_factor_x]
+        sim.blocking_factor_y = [state.blocking_factor_y]
+        sim.blocking_factor_z = [state.blocking_factor_z]
 
     # csr
     if state.csr:
