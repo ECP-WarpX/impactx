@@ -70,6 +70,8 @@ class InputParameters:
         state.bunch_charge_C = 1.0e-9
         state.kin_energy_unit = "MeV"
         state.old_kin_energy_unit = "MeV"
+        state.charge_qe = -1.0
+        state.mass_MeV = 0.510998950
 
         state.npart_validation = []
         state.kin_energy_validation = []
@@ -80,7 +82,7 @@ class InputParameters:
         Creates UI content for beam properties.
         """
 
-        with vuetify.VCard(style="width: 340px; height: 300px"):
+        with vuetify.VCard(style="width: 340px; height: 350px"):
             with vuetify.VCardTitle("Input Parameters"):
                 vuetify.VSpacer()
                 vuetify.VIcon(
@@ -96,6 +98,24 @@ class InputParameters:
                     items=([1, 2, 3],),
                     dense=True,
                 )
+
+                with vuetify.VRow(classes="my-2"):
+                    with vuetify.VCol(cols=6, classes="py-0"):
+                        vuetify.VTextField(
+                            label="Ref. Particle Charge",
+                            v_model=("charge_qe",),
+                            suffix="qe",
+                            type="number",
+                            dense=True,
+                        )
+                    with vuetify.VCol(cols=6, classes="py-0"):
+                        vuetify.VTextField(
+                            label="Ref. Particle Mass",
+                            v_model=("mass_MeV",),
+                            suffix="MeV",
+                            type="number",
+                            dense=True,
+                        )
                 with vuetify.VRow(classes="my-0"):
                     with vuetify.VCol(cols=12, classes="py-0"):
                         vuetify.VTextField(
