@@ -26,6 +26,16 @@ state.blocking_factor_x = 32
 state.blocking_factor_y = 32
 state.blocking_factor_z = 32
 
+state.mlmg_relative_tolerance = 1.0e-7
+state.mlmg_absolute_tolerance = 0.0
+state.mlmg_max_iters = 100
+state.mlmg_verbosity = 1
+
+state.error_message_mlmg_relative_tolerance = ""
+state.error_message_mlmg_absolute_tolerance = ""
+state.error_message_mlmg_max_iters = ""
+state.error_message_mlmg_verbosity = ""
+
 # -----------------------------------------------------------------------------
 # Helper functions
 # -----------------------------------------------------------------------------
@@ -159,9 +169,19 @@ class SpaceChargeConfiguration:
         Creates UI content for space charge configuration
         """
 
+        with vuetify.VDialog(v_model=("showSpaceChargeDialog", False), width="500px"):
+            SpaceChargeConfiguration.dialog_space_charge_settings()
+
         with vuetify.VCard(v_show="space_charge", style="width: 340px;"):
             with vuetify.VCardTitle("Space Charge"):
                 vuetify.VSpacer()
+                vuetify.VIcon(
+                    "mdi-cog",
+                    classes="ml-2",
+                    v_if="poisson_solver == 'multigrid'",
+                    click="showSpaceChargeDialog = true",
+                    style="cursor: pointer;",
+                )
                 vuetify.VIcon(
                     "mdi-information",
                     classes="ml-2",
@@ -248,3 +268,61 @@ class SpaceChargeConfiguration:
                             dense=True,
                             style="margin-top: -5px",
                         )
+
+    @staticmethod
+    def dialog_space_charge_settings():
+        """
+        Creates UI content for space charge configuration
+        settings.
+        """
+        with vuetify.VCard():
+            with vuetify.VTabs(
+                v_model=("space_charge_tab", "Advanced Multigrid Settings")
+            ):
+                vuetify.VTab("Settings")
+            vuetify.VDivider()
+            with vuetify.VTabsItems(v_model="space_charge_tab"):
+                with vuetify.VTabItem():
+                    with vuetify.VContainer(fluid=True):
+                        with vuetify.VRow(
+                            classes="my-2", v_if="poisson_solver == 'multigrid'"
+                        ):
+                            with vuetify.VCol(cols=6, classes="py-0"):
+                                vuetify.VTextField(
+                                    label="MLMG Relative Tolerance",
+                                    v_model=("mlmg_relative_tolerance",),
+                                    error_messages=(
+                                        "error_message_mlmg_relative_tolerance",
+                                    ),
+                                    type="number",
+                                    dense=True,
+                                )
+                            with vuetify.VCol(cols=6, classes="py-0"):
+                                vuetify.VTextField(
+                                    label="MLMG Absolute Tolerance",
+                                    v_model=("mlmg_absolute_tolerance",),
+                                    error_messages=(
+                                        "error_message_mlmg_absolute_tolerance",
+                                    ),
+                                    type="number",
+                                    dense=True,
+                                )
+                        with vuetify.VRow(
+                            classes="my-0", v_if="poisson_solver == 'multigrid'"
+                        ):
+                            with vuetify.VCol(cols=6, classes="py-0"):
+                                vuetify.VTextField(
+                                    label="MLMG Max Iterations",
+                                    v_model=("mlmg_max_iters",),
+                                    error_messages=("error_message_mlmg_max_iters",),
+                                    type="number",
+                                    dense=True,
+                                )
+                            with vuetify.VCol(cols=6, classes="py-0"):
+                                vuetify.VTextField(
+                                    label="MLMG Verbosity",
+                                    v_model=("mlmg_verbosity",),
+                                    error_messages=("error_message_mlmg_verbosity",),
+                                    type="number",
+                                    dense=True,
+                                )
