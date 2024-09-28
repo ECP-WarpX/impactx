@@ -9,10 +9,21 @@ License: BSD-3-Clause-LBNL
 from trame.widgets import vuetify
 
 from ..trame_setup import setup_server
+from .exportTemplate import input_file
 
 server, state, ctrl = setup_server()
 
 state.show_dashboard_alert = True
+
+# -----------------------------------------------------------------------------
+# Triggers
+# -----------------------------------------------------------------------------
+
+
+@ctrl.trigger("export")
+def on_export_click():
+    return input_file()
+
 
 # -----------------------------------------------------------------------------
 # Common toolbar elements
@@ -24,6 +35,15 @@ class ToolbarElements:
     Helper functions to create
     Vuetify UI elements for toolbar.
     """
+
+    @staticmethod
+    def export_input_data():
+        vuetify.VIcon(
+            "mdi-download",
+            style="color: #00313C;",
+            click="utils.download('impactx_simulation.py', trigger('export'), 'text/plain')",
+            disabled=("disableRunSimulationButton", True),
+        )
 
     @staticmethod
     def plot_options():
@@ -75,6 +95,8 @@ class Toolbars:
         """
 
         (ToolbarElements.dashboard_info(),)
+        vuetify.VSpacer()
+        ToolbarElements.export_input_data()
 
     @staticmethod
     def run_toolbar():
