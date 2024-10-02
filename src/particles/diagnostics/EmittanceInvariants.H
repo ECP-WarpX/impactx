@@ -39,9 +39,10 @@ namespace impactx::diagnostics
      * @returns tuple containing invariants I2, I4, and I6
      */
     std::tuple<
-            amrex::ParticleReal,
-            amrex::ParticleReal,
-            amrex::ParticleReal>
+        amrex::ParticleReal,
+        amrex::ParticleReal,
+        amrex::ParticleReal
+    >
     KineticInvariants (
         amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & Sigma
     );

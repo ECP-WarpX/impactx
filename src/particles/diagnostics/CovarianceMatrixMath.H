@@ -35,9 +35,10 @@ namespace impactx::diagnostics
      * @returns tuple of three real roots
      */
     std::tuple<
-            amrex::ParticleReal,
-            amrex::ParticleReal,
-            amrex::ParticleReal>
+        amrex::ParticleReal,
+        amrex::ParticleReal,
+        amrex::ParticleReal
+    >
     CubicRootsTrig (
         amrex::ParticleReal a,
         amrex::ParticleReal b,
@@ -48,7 +49,7 @@ namespace impactx::diagnostics
         using namespace amrex::literals;
         using ablastr::constant::math::pi;
 
-        std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> roots;
+        std::tuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal> roots;
         amrex::ParticleReal x1 = 0.0_prt;
         amrex::ParticleReal x2 = 0.0_prt;
         amrex::ParticleReal x3 = 0.0_prt;
@@ -59,11 +60,11 @@ namespace impactx::diagnostics
 
         // Discriminant should be < 0.  Otherwise, keep theta at default and throw an error.
         amrex::ParticleReal tol = 1.0e-12;  //allow for roundoff error
-        if(discriminant > tol){
+        if (discriminant > tol) {
 
            std::cout << "Polynomial in CubicRoots has one or more complex roots." << "\n";
 
-        } else if (Q == 0.0_prt){  // Special case of a triple root
+        } else if (Q == 0.0_prt) {  // Special case of a triple root
 
            x1 = - b/(3.0_prt*a);
            x2 = - b/(3.0_prt*a);
@@ -78,7 +79,6 @@ namespace impactx::diagnostics
            x3 = 2.0_prt*std::sqrt(-Q)*std::cos(theta/3.0_prt + 4.0_prt*pi/3.0_prt) - b/(3.0_prt*a);
 
         }
-
 
         roots = std::make_tuple(x1,x2,x3);
         return roots;
@@ -97,9 +97,10 @@ namespace impactx::diagnostics
      * @returns tuple of three real roots
      */
     std::tuple<
-            amrex::ParticleReal,
-            amrex::ParticleReal,
-            amrex::ParticleReal>
+        amrex::ParticleReal,
+        amrex::ParticleReal,
+        amrex::ParticleReal
+    >
     CubicRootsAlg (
         amrex::ParticleReal a,
         amrex::ParticleReal b,
@@ -110,7 +111,7 @@ namespace impactx::diagnostics
         using namespace amrex::literals;
         using Complex = amrex::GpuComplex<amrex::ParticleReal>;
 
-        std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> roots;
+        std::tuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal> roots;
         amrex::ParticleReal x1 = 0.0_prt;
         amrex::ParticleReal x2 = 0.0_prt;
         amrex::ParticleReal x3 = 0.0_prt;
@@ -132,7 +133,7 @@ namespace impactx::diagnostics
 
         //Three roots in algebraic form.
 
-        if (C.m_real == 0.0_prt && C.m_imag == 0.0_prt){  // Special case of a triple root
+        if (C.m_real == 0.0_prt && C.m_imag == 0.0_prt) {  // Special case of a triple root
 
            x1 = - b/(3.0_prt*a);
            x2 = - b/(3.0_prt*a);
@@ -147,7 +148,6 @@ namespace impactx::diagnostics
            x2 = z1.m_real - b/(3.0*a);
            x3 = z3.m_real - b/(3.0*a);
         }
-
 
         roots = std::make_tuple(x1,x2,x3);
         return roots;

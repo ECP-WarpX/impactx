@@ -33,9 +33,10 @@ namespace impactx::diagnostics
      * returns - tuple containing invarants I2, I4, and I6
      */
     std::tuple<
-            amrex::ParticleReal,
-            amrex::ParticleReal,
-            amrex::ParticleReal>
+        amrex::ParticleReal,
+        amrex::ParticleReal,
+        amrex::ParticleReal
+    >
     KineticInvariants (
         amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & Sigma
     )
@@ -105,9 +106,9 @@ namespace impactx::diagnostics
 
         using namespace amrex::literals;
 
-        std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> invariants;
-        std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> roots;
-        std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> emittances;
+        std::tuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal> invariants;
+        std::tuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal> roots;
+        std::tuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal> emittances;
 
         // Get the invariants I2, I4, and I6 from the covariance matrix.
         invariants = KineticInvariants(Sigma);
