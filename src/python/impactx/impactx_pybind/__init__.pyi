@@ -683,6 +683,7 @@ def push(
     | elements.ExactDrift
     | elements.ExactSbend
     | elements.Kicker
+    | elements.Marker
     | elements.Multipole
     | elements.NonlinearLens
     | elements.Programmable
@@ -706,6 +707,6 @@ __author__: str = (
     "Axel Huebl, Chad Mitchell, Ryan Sandberg, Marco Garten, Ji Qiang, et al."
 )
 __license__: str = "BSD-3-Clause-LBNL"
-__version__: str = "24.08"
+__version__: str = "24.09"
 s: CoordSystem  # value = <CoordSystem.s: 0>
 t: CoordSystem  # value = <CoordSystem.t: 1>

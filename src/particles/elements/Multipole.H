@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,12 +26,13 @@
 namespace impactx
 {
     struct Multipole
-    : public elements::BeamOptic<Multipole>,
+    : public elements::Named,
+      public elements::BeamOptic<Multipole>,
       public elements::Thin,
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "Multipole";
+        static constexpr auto type = "Multipole";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A general thin multipole element
@@ -41,6 +43,7 @@ namespace impactx
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         Multipole (
             int multipole,
@@ -48,9 +51,11 @@ namespace impactx
             amrex::ParticleReal K_skew,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
-        : Alignment(dx, dy, rotation_degree),
+        : Named(name),
+          Alignment(dx, dy, rotation_degree),
           m_multipole(multipole), m_Kn(K_normal), m_Ks(K_skew)
         {
             // compute factorial of multipole index
@@ -98,7 +103,7 @@ namespace impactx
 
             // access reference particle values to find (beta*gamma)^2
             //amrex::ParticleReal const pt_ref = refpart.pt;
-            //amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
+            //amrex::ParticleReal const betgam2 = std::pow(pt_ref, 2) - 1.0_prt;
 
             // intialize output values
             amrex::ParticleReal xout = x;

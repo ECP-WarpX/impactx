@@ -66,22 +66,27 @@ def lattice(parsed_beamline, nslice=1):
         # print(d)
         if d["type"] in [k.casefold() for k in list(madx_to_impactx_dict.keys())]:
             if d["type"] == "drift":
-                impactx_beamline.append(elements.Drift(ds=d["l"], nslice=nslice))
+                impactx_beamline.append(
+                    elements.Drift(name=d["name"], ds=d["l"], nslice=nslice)
+                )
             elif d["type"] == "quadrupole":
                 impactx_beamline.append(
-                    elements.Quad(ds=d["l"], k=d["k1"], nslice=nslice)
+                    elements.Quad(name=d["name"], ds=d["l"], k=d["k1"], nslice=nslice)
                 )
             elif d["type"] == "sbend":
                 impactx_beamline.append(
-                    elements.Sbend(ds=d["l"], rc=d["l"] / d["angle"], nslice=nslice)
+                    elements.Sbend(
+                        name=d["name"], ds=d["l"], rc=d["l"] / d["angle"], nslice=nslice
+                    )
                 )
             elif d["type"] == "solenoid":
                 impactx_beamline.append(
-                    elements.Sol(ds=d["l"], ks=d["ks"], nslice=nslice)
+                    elements.Sol(name=d["name"], ds=d["l"], ks=d["ks"], nslice=nslice)
                 )
             elif d["type"] == "dipedge":
                 impactx_beamline.append(
                     elements.DipEdge(
+                        name=d["name"],
                         psi=d["e1"],
                         rc=1.0 / d["h"],
                         # MAD-X is using half the gap height
@@ -92,14 +97,21 @@ def lattice(parsed_beamline, nslice=1):
             elif d["type"] == "kicker":
                 impactx_beamline.append(
                     elements.Kicker(
+                        name=d["name"],
                         xkick=d["hkick"],
                         ykick=d["vkick"],
                     )
                 )
             elif d["type"] == "monitor":
                 if d["l"] > 0:
-                    impactx_beamline.append(elements.Drift(ds=d["l"], nslice=nslice))
-                impactx_beamline.append(elements.BeamMonitor("monitor", backend="h5"))
+                    impactx_beamline.append(
+                        elements.Drift(
+                            name=d["name"] + "_drift", ds=d["l"], nslice=nslice
+                        )
+                    )
+                impactx_beamline.append(
+                    elements.BeamMonitor(name="monitor", backend="h5")
+                )  # TODO: use name=d["name"] ?
         else:
             raise NotImplementedError(
                 "The beamline element named ",

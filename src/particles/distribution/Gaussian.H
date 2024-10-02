@@ -100,34 +100,34 @@ namespace impactx::distribution
 
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            x = ln1*cos(2_prt*pi*u2);
-            px = ln1*sin(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            x = ln1 * std::cos(2_prt*pi*u2);
+            px = ln1 * std::sin(2_prt*pi*u2);
 
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            y = ln1*cos(2_prt*pi*u2);
-            py = ln1*sin(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            y = ln1 * std::cos(2_prt*pi*u2);
+            py = ln1 * std::sin(2_prt*pi*u2);
 
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            t = ln1*cos(2_prt*pi*u2);
-            pt = ln1*sin(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            t = ln1 * std::cos(2_prt*pi*u2);
+            pt = ln1 * std::sin(2_prt*pi*u2);
 
             // Transform to produce the desired second moments/correlations:
-            root = sqrt(1.0_prt-m_muxpx*m_muxpx);
+            root = std::sqrt(1.0_prt-m_muxpx*m_muxpx);
             a1 = m_lambdaX * x / root;
             a2 = m_lambdaPx * (-m_muxpx * x / root + px);
             x = a1;
             px = a2;
-            root = sqrt(1.0_prt-m_muypy*m_muypy);
+            root = std::sqrt(1.0_prt-m_muypy*m_muypy);
             a1 = m_lambdaY * y / root;
             a2 = m_lambdaPy * (-m_muypy * y / root + py);
             y = a1;
             py = a2;
-            root = sqrt(1.0_prt-m_mutpt*m_mutpt);
+            root = std::sqrt(1.0_prt-m_mutpt*m_mutpt);
             a1 = m_lambdaT * t / root;
             a2 = m_lambdaPt * (-m_mutpt * t / root + pt);
             t = a1;

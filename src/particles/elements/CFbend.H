@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -26,12 +27,13 @@
 namespace impactx
 {
     struct CFbend
-    : public elements::BeamOptic<CFbend>,
+    : public elements::Named,
+      public elements::BeamOptic<CFbend>,
       public elements::Thick,
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "CFbend";
+        static constexpr auto type = "CFbend";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** An combined-function bend, consisting of an ideal sector bend with
@@ -47,6 +49,7 @@ namespace impactx
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         CFbend (
             amrex::ParticleReal ds,
@@ -55,9 +58,11 @@ namespace impactx
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
-            int nslice = 1
+            int nslice = 1,
+            std::optional<std::string> name = std::nullopt
         )
-        : Thick(ds, nslice),
+        : Named(name),
+          Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
           m_rc(rc), m_k(k)
         {
@@ -109,18 +114,18 @@ namespace impactx
 
             // access reference particle values to find beta*gamma^2
             amrex::ParticleReal const pt_ref = refpart.pt;
-            amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
-            amrex::ParticleReal const bet = sqrt(betgam2/(1.0_prt + betgam2));
+            amrex::ParticleReal const betgam2 = std::pow(pt_ref, 2) - 1.0_prt;
+            amrex::ParticleReal const bet = std::sqrt(betgam2/(1.0_prt + betgam2));
 
             // update horizontal and longitudinal phase space variables
-            amrex::ParticleReal const gx = m_k + pow(m_rc,-2);
-            amrex::ParticleReal const omegax = sqrt(std::abs(gx));
+            amrex::ParticleReal const gx = m_k + std::pow(m_rc,-2);
+            amrex::ParticleReal const omegax = std::sqrt(std::abs(gx));
 
             if(gx > 0.0) {
                 // calculate expensive terms once
                 auto const [sinx, cosx] = amrex::Math::sincos(omegax * slice_ds);
                 amrex::ParticleReal const r56 = slice_ds/betgam2
-                    + (sinx - omegax*slice_ds)/(gx*omegax*pow(bet,2)*pow(m_rc,2));
+                    + (sinx - omegax*slice_ds)/(gx*omegax * std::pow(bet,2) * std::pow(m_rc,2));
 
                 // advance position and momentum (focusing)
                 x = cosx*xout + sinx/omegax*px - (1.0_prt - cosx)/(gx*bet*m_rc)*pt;
@@ -131,10 +136,10 @@ namespace impactx
                 ptout = pt;
             } else {
                 // calculate expensive terms once
-                amrex::ParticleReal const sinhx = sinh(omegax * slice_ds);
-                amrex::ParticleReal const coshx = cosh(omegax * slice_ds);
+                amrex::ParticleReal const sinhx = std::sinh(omegax * slice_ds);
+                amrex::ParticleReal const coshx = std::cosh(omegax * slice_ds);
                 amrex::ParticleReal const r56 = slice_ds/betgam2
-                    + (sinhx - omegax*slice_ds)/(gx*omegax*pow(bet,2)*pow(m_rc,2));
+                    + (sinhx - omegax*slice_ds)/(gx*omegax * std::pow(bet,2) * std::pow(m_rc,2));
 
                 // advance position and momentum (defocusing)
                 x = coshx*xout + sinhx/omegax*px - (1.0_prt - coshx)/(gx*bet*m_rc)*pt;
@@ -147,7 +152,7 @@ namespace impactx
 
             // update vertical phase space variables
             amrex::ParticleReal const gy = -m_k;
-            amrex::ParticleReal const omegay = sqrt(std::abs(gy));
+            amrex::ParticleReal const omegay = std::sqrt(std::abs(gy));
 
             if(gy > 0.0) {
                 // calculate expensive terms once
@@ -159,8 +164,8 @@ namespace impactx
 
             } else {
                 // calculate expensive terms once
-                amrex::ParticleReal const sinhy = sinh(omegay * slice_ds);
-                amrex::ParticleReal const coshy = cosh(omegay * slice_ds);
+                amrex::ParticleReal const sinhy = std::sinh(omegay * slice_ds);
+                amrex::ParticleReal const coshy = std::cosh(omegay * slice_ds);
 
                 // advance position and momentum (defocusing)
                 y = coshy*yout + sinhy/omegay*py;
@@ -201,7 +206,7 @@ namespace impactx
 
             // assign intermediate parameter
             amrex::ParticleReal const theta = slice_ds/m_rc;
-            amrex::ParticleReal const B = sqrt(pow(pt,2)-1.0_prt)/m_rc;
+            amrex::ParticleReal const B = std::sqrt(std::pow(pt,2)-1.0_prt)/m_rc;
 
             // calculate expensive terms once
             auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);

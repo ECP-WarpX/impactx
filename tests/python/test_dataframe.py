@@ -57,11 +57,11 @@ def test_df_pandas(save_png=True):
 
     # init accelerator lattice
     fodo = [
-        elements.Drift(0.25),
-        elements.Quad(1.0, 1.0),
-        elements.Drift(0.5),
-        elements.Quad(1.0, -1.0),
-        elements.Drift(0.25),
+        elements.Drift(name="d1", ds=0.25),
+        elements.Quad(name="q1", ds=1.0, k=1.0),
+        elements.Drift(name="d2", ds=0.5),
+        elements.Quad(name="q2", ds=1.0, k=-1.0),
+        elements.Drift(name="d3", ds=0.25),
     ]
     sim.lattice.extend(fodo)
 

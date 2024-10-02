@@ -47,12 +47,12 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 # design the accelerator lattice
 sim.lattice.append(monitor)
 #   Quad elements
-quad1 = elements.Quad(ds=0.15, k=2.5)
-quad2 = elements.Quad(ds=0.3, k=-2.5)
+quad1 = elements.Quad(name="quad1", ds=0.15, k=2.5)
+quad2 = elements.Quad(name="quad2", ds=0.3, k=-2.5)
 #   Drift element
-drift1 = elements.Drift(ds=1.0)
+drift1 = elements.Drift(name="drift1", ds=1.0)
 #   Short RF cavity element
-shortrf1 = elements.Buncher(V=0.01, k=15.0)
+shortrf1 = elements.Buncher(name="shortrf1", V=0.01, k=15.0)
 
 lattice_no_drifts = [quad1, shortrf1, quad2, shortrf1, quad1]
 #   set first lattice element

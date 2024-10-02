@@ -137,7 +137,7 @@ namespace impactx::integrators
 
         // initialize numerical integration parameters
         amrex::ParticleReal const dz = (zout-zin)/nsteps;
-        amrex::ParticleReal const alpha = 1.0_prt - pow(2.0_prt,1.0/3.0);
+        amrex::ParticleReal const alpha = 1.0_prt - std::pow(2.0_prt,1.0/3.0);
         amrex::ParticleReal const tau2 = dz/(1.0_prt + alpha);
         amrex::ParticleReal const tau1 = tau2/2.0_prt;
         amrex::ParticleReal const tau3 = alpha*tau1;

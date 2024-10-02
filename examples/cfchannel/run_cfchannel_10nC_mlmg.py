@@ -52,7 +52,7 @@ nslice = 50  # use 1e5 for increased precision
 sim.lattice.extend(
     [
         monitor,
-        elements.ConstF(ds=2.0, kx=1.0, ky=1.0, kt=1.0, nslice=nslice),
+        elements.ConstF(name="constf1", ds=2.0, kx=1.0, ky=1.0, kt=1.0, nslice=nslice),
         monitor,
     ]
 )

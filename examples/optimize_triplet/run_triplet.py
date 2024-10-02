@@ -43,13 +43,13 @@ def build_lattice(parameters: tuple, write_particles: bool) -> list:
 
     # enforce a mirror symmetry of the triplet
     line = [
-        elements.Drift(ds=2.7, nslice=ns),
-        elements.Quad(ds=0.1, k=q1_k, nslice=ns),
-        elements.Drift(ds=1.4, nslice=ns),
-        elements.Quad(ds=0.2, k=q2_k, nslice=ns),
-        elements.Drift(ds=1.4, nslice=ns),
-        elements.Quad(ds=0.1, k=q1_k, nslice=ns),
-        elements.Drift(ds=2.7, nslice=ns),
+        elements.Drift(name="drift1", ds=2.7, nslice=ns),
+        elements.Quad(name="quad1", ds=0.1, k=q1_k, nslice=ns),
+        elements.Drift(name="drift2", ds=1.4, nslice=ns),
+        elements.Quad(name="quad2", ds=0.2, k=q2_k, nslice=ns),
+        elements.Drift(name="drift3", ds=1.4, nslice=ns),
+        elements.Quad(name="quad1", ds=0.1, k=q1_k, nslice=ns),
+        elements.Drift(name="drift4", ds=2.7, nslice=ns),
     ]
 
     if write_particles:

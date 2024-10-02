@@ -62,7 +62,7 @@ namespace impactx::transformation
                     amrex::ParticleReal *const AMREX_RESTRICT part_pz = soa_real[RealSoA::pz].dataPtr();
 
                     // Design value of pz/mc = beta*gamma
-                    amrex::ParticleReal const pzd = sqrt(pow(pd, 2) - 1.0);
+                    amrex::ParticleReal const pzd = std::sqrt(std::pow(pd, 2) - 1.0);
 
                     ToFixedS const to_s(pzd);
                     amrex::ParallelFor(np, [=] AMREX_GPU_DEVICE(long i) {

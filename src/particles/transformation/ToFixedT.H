@@ -62,9 +62,9 @@ namespace impactx::transformation
             constexpr amrex::ParticleReal tol = 1.0e-8_prt;
 
             // compute value of reference pzd = beta*gamma
-            amrex::ParticleReal const argd = -1.0_prt + pow(m_ptd, 2);
+            amrex::ParticleReal const argd = -1.0_prt + std::pow(m_ptd, 2);
             // AMREX_ASSERT_WITH_MESSAGE(argd > 0.0_prt, "invalid pzd arg (<=0)");
-            amrex::ParticleReal const pzdf = argd > 0.0_prt ? sqrt(argd) : tol;
+            amrex::ParticleReal const pzdf = argd > 0.0_prt ? std::sqrt(argd) : tol;
 
             // transform momenta to dynamic units (eg, so that momenta are
             // normalized by mc):
@@ -73,9 +73,9 @@ namespace impactx::transformation
             pt = pt * pzdf;
 
             // compute value of particle pz = beta*gamma
-            amrex::ParticleReal const arg = -1.0_prt + pow(m_ptd+pt, 2) - pow(px, 2) - pow(py, 2);
+            amrex::ParticleReal const arg = -1.0_prt + std::pow(m_ptd+pt, 2) - std::pow(px, 2) - std::pow(py, 2);
             // AMREX_ASSERT_WITH_MESSAGE(arg > 0.0_prt, "invalid pz arg (<=0)");
-            amrex::ParticleReal const pzf = arg > 0.0_prt ? sqrt(arg) : tol;
+            amrex::ParticleReal const pzf = arg > 0.0_prt ? std::sqrt(arg) : tol;
 
             // transform position and momentum (from fixed s to fixed t)
             x = x + px*t/(m_ptd+pt);

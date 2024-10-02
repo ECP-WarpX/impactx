@@ -23,6 +23,7 @@
 #include "ExactDrift.H"
 #include "ExactSbend.H"
 #include "Kicker.H"
+#include "Marker.H"
 #include "Multipole.H"
 #include "Empty.H"
 #include "NonlinearLens.H"
@@ -60,6 +61,7 @@ namespace impactx
         ExactDrift,
         ExactSbend,
         Kicker,
+        Marker,
         Multipole,
         NonlinearLens,
         Programmable,

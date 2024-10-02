@@ -315,7 +315,7 @@ namespace detail
     )
     {
 #ifdef ImpactX_USE_OPENPMD
-        std::string profile_name = "impactx::Push::" + std::string(BeamMonitor::name);
+        std::string profile_name = "impactx::Push::" + std::string(BeamMonitor::type);
         BL_PROFILE(profile_name);
 
         // preparing to access reference particle data: RefPart
