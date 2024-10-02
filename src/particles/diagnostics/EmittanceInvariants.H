@@ -43,7 +43,7 @@ namespace impactx::diagnostics
             amrex::ParticleReal,
             amrex::ParticleReal>
     KineticInvariants (
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> Sigma
+        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & Sigma
     );
 
     /** Returns the three eigenemittances
@@ -68,7 +68,7 @@ namespace impactx::diagnostics
             amrex::ParticleReal,
             amrex::ParticleReal>
     Eigenemittances (
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> Sigma
+        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & Sigma
     );
 
 } // namespace impactx::diagnostics

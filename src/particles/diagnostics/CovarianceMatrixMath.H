@@ -161,7 +161,7 @@ namespace impactx::diagnostics
      */
     amrex::ParticleReal
     TraceMat (
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> A
+        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & A
     )
     {
         int const dim = 6;
@@ -182,8 +182,8 @@ namespace impactx::diagnostics
      */
     amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6>
     MultiplyMat (
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> A,
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> B
+        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & A,
+        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & B
     )
     {
         amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> C;
