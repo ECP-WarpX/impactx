@@ -6,3 +6,4 @@ trame-plotly>=3.0.2
 trame-router>=2.2.0
 trame-vuetify>=2.6.2
 trame-xterm>=0.2.1
+wurlitzer>=3.1.1

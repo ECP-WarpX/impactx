@@ -7,12 +7,12 @@ License: BSD-3-Clause-LBNL
 """
 
 import asyncio
-import contextlib
 import glob
 import io
 import os
 
 from trame.widgets import matplotlib, plotly, vuetify
+from wurlitzer import pipes
 
 from ..trame_setup import setup_server
 from .analyzeFunctions import AnalyzeFunctions
@@ -140,11 +140,11 @@ def update_plot():
 def run_simulation_impactX():
     buf = io.StringIO()
 
-    with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+    with pipes(stdout=buf, stderr=buf):
         state.simulation_data = run_simulation()
 
     buf.seek(0)
-    lines = [line.strip() for line in buf]
+    lines = [line.strip() for line in buf.getvalue().splitlines()]
 
     # Use $nextTick to ensure the terminal is fully rendered before printing
     async def print_lines():
