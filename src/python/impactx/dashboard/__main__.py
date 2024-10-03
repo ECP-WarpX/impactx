@@ -13,9 +13,11 @@ from trame.ui.vuetify import SinglePageWithDrawerLayout
 from trame.widgets import router, vuetify, xterm
 
 from .Analyze.plotsMain import AnalyzeSimulation
+from .Input.csrConfiguration.csrMain import csrConfiguration
 from .Input.distributionParameters.distributionMain import DistributionParameters
 from .Input.inputParameters.inputMain import InputParameters
 from .Input.latticeConfiguration.latticeMain import LatticeConfiguration
+from .Input.space_charge_configuration.spaceChargeMain import SpaceChargeConfiguration
 from .Input.trameFunctions import TrameFunctions
 from .start import main
 from .Toolbar.toolbarMain import Toolbars
@@ -36,6 +38,11 @@ with RouterViewLayout(server, "/Input"):
                 with vuetify.VRow(no_gutters=True):
                     with vuetify.VCol(cols="auto", classes="pa-2"):
                         inputParameters.card()
+                    with vuetify.VCol(cols="auto", classes="pa-2"):
+                        SpaceChargeConfiguration.card()
+                    with vuetify.VCol(cols="auto", classes="pa-2"):
+                        csrConfiguration.card()
+                with vuetify.VRow(no_gutters=True):
                     with vuetify.VCol(cols="auto", classes="pa-2"):
                         DistributionParameters.card()
                 with vuetify.VRow(no_gutters=True):

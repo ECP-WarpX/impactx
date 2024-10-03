@@ -96,12 +96,21 @@ class InputParameters:
                 )
             vuetify.VDivider()
             with vuetify.VCardText():
-                vuetify.VCombobox(
-                    v_model=("particle_shape",),
-                    label="Particle Shape",
-                    items=([1, 2, 3],),
-                    dense=True,
-                )
+                with vuetify.VRow(classes="py-2"):
+                    with vuetify.VCol(cols=6, classes="py-0"):
+                        vuetify.VCheckbox(
+                            label="Space Charge",
+                            v_model=("space_charge", False),
+                            dense=True,
+                            classes="mt-0",
+                        )
+                    with vuetify.VCol(cols=6, classes="py-0"):
+                        vuetify.VCheckbox(
+                            label="CSR",
+                            v_model=("CSR", False),
+                            dense=True,
+                            classes="mt-0",
+                        )
                 with vuetify.VRow(classes="my-2"):
                     with vuetify.VCol(cols=6, classes="py-0"):
                         vuetify.VTextField(
