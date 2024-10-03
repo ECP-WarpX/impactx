@@ -139,7 +139,7 @@ class InputParameters:
                             ),
                         )
                 with vuetify.VRow(classes="my-0"):
-                    with vuetify.VCol(cols=12, classes="pb-0"):
+                    with vuetify.VCol(cols=12, classes="py-0"):
                         vuetify.VTextField(
                             v_model=("npart",),
                             label="Number of Particles",
