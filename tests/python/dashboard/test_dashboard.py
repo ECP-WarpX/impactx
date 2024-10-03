@@ -81,7 +81,9 @@ def test_dashboard():
             sb.click("#Run_route")
             sb.click("#run_simulation_button")
 
-            assert check_until_visible(sb, "#simulation_complete"), "Simulation did not complete successfully."
+            assert check_until_visible(
+                sb, "#simulation_complete"
+            ), "Simulation did not complete successfully."
 
     finally:
         if app_process is not None:
