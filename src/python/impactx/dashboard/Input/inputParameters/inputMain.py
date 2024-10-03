@@ -72,7 +72,7 @@ class InputParameters:
         state.bunch_charge_C = 1.0e-9
         state.kin_energy_unit = "MeV"
         state.old_kin_energy_unit = "MeV"
-        state.charge_qe = -1.0
+        state.charge_qe = -1
         state.mass_MeV = 0.510998950
 
         state.npart_validation = []

@@ -143,6 +143,11 @@ class generalFunctions:
             error_details.append(f"Kinetic Energy: {state.kin_energy_validation}")
         if state.bunch_charge_C_validation:
             error_details.append(f"Bunch Charge: {state.bunch_charge_C_validation}")
+        if state.charge_qe_validation:
+            error_details.append(f"Ref. Particle Charge: {state.charge_qe_validation}")
+        if state.mass_MeV_validation:
+            error_details.append(f"Ref. Particle Mass: {state.mass_MeV}")
+
         if state.selectedLatticeList == []:
             error_details.append("LatticeListIsEmpty")
 
