@@ -71,12 +71,26 @@ def check_until_visible(sb, selector, timeout=10, interval=1):
     return False
 
 
+def find_repo_root():
+    """
+    Finds the root directory of the repository by looking for a .git directory.
+    """
+    current_dir = os.path.abspath(os.path.dirname(__file__))
+    while True:
+        if os.path.isdir(os.path.join(current_dir, ".git")):
+            return current_dir
+        parent_dir = os.path.dirname(current_dir)
+        if parent_dir == current_dir:
+            raise Exception("Repository root not found.")
+        current_dir = parent_dir
+
+
 def start_dashboard():
     """
     Function which starts up impactx-dashboard server.
     """
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    working_directory = os.path.join(script_dir, "../../../src/python/impactx")
+    repo_root = find_repo_root()
+    working_directory = os.path.join(repo_root, "src", "python", "impactx", "dashboard")
     working_directory = os.path.normpath(working_directory)
 
     return subprocess.Popen(
