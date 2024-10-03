@@ -21,9 +21,11 @@ server, state, ctrl = setup_server()
 
 @ctrl.add("on_input_change")
 def validate_and_convert_to_correct_type(
-    value, desired_type, state_name, validation_name
+    value, desired_type, state_name, validation_name, conditions=None
 ):
-    validation_result = generalFunctions.validate_against(value, desired_type)
+    validation_result = generalFunctions.validate_against(
+        value, desired_type, conditions
+    )
     setattr(state, validation_name, validation_result)
     generalFunctions.update_simulation_validation_status()
 
@@ -76,6 +78,8 @@ class InputParameters:
         state.npart_validation = []
         state.kin_energy_validation = []
         state.bunch_charge_C_validation = []
+        state.mass_MeV_validation = []
+        state.charge_qe_validation = []
 
     def card(self):
         """
@@ -98,7 +102,6 @@ class InputParameters:
                     items=([1, 2, 3],),
                     dense=True,
                 )
-
                 with vuetify.VRow(classes="my-2"):
                     with vuetify.VCol(cols=6, classes="py-0"):
                         vuetify.VTextField(
@@ -107,6 +110,11 @@ class InputParameters:
                             suffix="qe",
                             type="number",
                             dense=True,
+                            error_messages=("charge_qe_validation",),
+                            change=(
+                                ctrl.on_input_change,
+                                "[$event, 'int','charge_qe','charge_qe_validation', ['non_zero']]",
+                            ),
                         )
                     with vuetify.VCol(cols=6, classes="py-0"):
                         vuetify.VTextField(
@@ -115,6 +123,11 @@ class InputParameters:
                             suffix="MeV",
                             type="number",
                             dense=True,
+                            error_messages=("mass_MeV_validation",),
+                            change=(
+                                ctrl.on_input_change,
+                                "[$event, 'float','mass_MeV','mass_MeV_validation', ['positive']]",
+                            ),
                         )
                 with vuetify.VRow(classes="my-0"):
                     with vuetify.VCol(cols=12, classes="py-0"):
