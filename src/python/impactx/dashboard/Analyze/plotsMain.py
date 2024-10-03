@@ -14,10 +14,10 @@ import os
 from trame.widgets import matplotlib, plotly, vuetify
 from wurlitzer import pipes
 
+from ..simulation import run_simulation
 from ..trame_setup import setup_server
 from .analyzeFunctions import AnalyzeFunctions
 from .plot_ParameterEvolutionOverS.overS import line_plot_1d
-from .plot_PhaseSpaceProjections.phaseSpace import run_simulation
 
 server, state, ctrl = setup_server()
 
