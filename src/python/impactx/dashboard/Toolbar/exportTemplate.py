@@ -74,7 +74,7 @@ npart = {state.npart}
 
 # Reference particle
 ref = sim.particle_container().ref_particle()
-ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_MeV)
+ref.set_charge_qe({state.charge_qe}).set_mass_MeV({state.mass_MeV}).set_kin_energy_MeV(kin_energy_MeV)
 
 {build_distribution_list()}
 sim.add_particles(bunch_charge_C, distr, npart)

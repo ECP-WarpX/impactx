@@ -62,20 +62,6 @@ void init_ImpactX (py::module& m)
 
         .def("load_inputs_file",
             [](ImpactX const & /* ix */, std::string const & filename) {
-#if defined(AMREX_DEBUG) || defined(DEBUG)
-                // note: only in debug, since this is costly for the file
-                // system for highly parallel simulations with MPI
-                // possible improvement:
-                // - rank 0 tests file & broadcasts existence/failure
-                bool inputs_file_exists = false;
-                if (FILE *fp = fopen(filename.c_str(), "r")) {
-                    fclose(fp);
-                    inputs_file_exists = true;
-                }
-                AMREX_ALWAYS_ASSERT_WITH_MESSAGE(inputs_file_exists,
-                    "load_inputs_file: file does not exist: " + filename);
-#endif
-
                 amrex::ParmParse::addfile(filename);
             })
 

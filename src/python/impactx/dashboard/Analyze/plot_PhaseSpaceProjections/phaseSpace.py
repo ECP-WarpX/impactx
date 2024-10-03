@@ -70,7 +70,9 @@ def run_simulation():
     #   reference particle
     pc = sim.particle_container()
     ref = pc.ref_particle()
-    ref.set_charge_qe(-1.0).set_mass_MeV(0.510998950).set_kin_energy_MeV(kin_energy_MeV)
+    ref.set_charge_qe(state.charge_qe).set_mass_MeV(state.mass_MeV).set_kin_energy_MeV(
+        kin_energy_MeV
+    )
 
     distribution = distribution_parameters()
     sim.add_particles(bunch_charge_C, distribution, npart)
