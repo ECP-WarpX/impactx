@@ -154,8 +154,8 @@ namespace detail
 #endif // ImpactX_USE_OPENPMD
     }
 
-    BeamMonitor::BeamMonitor (std::string series_name, std::string backend, std::string encoding, int cycle_intervals) :
-        m_series_name(std::move(series_name)), m_OpenPMDFileType(std::move(backend)), m_cycle_intervals(cycle_intervals)
+    BeamMonitor::BeamMonitor (std::string series_name, std::string backend, std::string encoding, int period_sample_intervals) :
+        m_series_name(std::move(series_name)), m_OpenPMDFileType(std::move(backend)), m_period_sample_intervals(period_sample_intervals)
     {
 #ifdef ImpactX_USE_OPENPMD
         // pick first available backend if default is chosen
@@ -181,7 +181,7 @@ namespace detail
 
         amrex::ParmParse pp_diag("diag");
         // turn filter
-        pp_diag.queryAdd("cycle_intervals", m_cycle_intervals);
+        pp_diag.queryAdd("period_sample_intervals", m_period_sample_intervals);
         // legacy options from other diagnostics
         pp_diag.queryAdd("file_min_digits", m_file_min_digits);
 
@@ -318,7 +318,7 @@ namespace detail
     )
     {
         // filter out this turn?
-        if (cycle % m_cycle_intervals != 0)
+        if (cycle % m_period_sample_intervals != 0)
             return;
 
 #ifdef ImpactX_USE_OPENPMD

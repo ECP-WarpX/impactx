@@ -17,7 +17,7 @@ We use a 2 GeV electron beam with initial unnormalized rms emittance of 2 nm.
 The second moments of the particle distribution after the FODO cell should coincide with the second moments of the particle distribution before the FODO cell, to within the level expected due to noise due to statistical sampling.
 
 In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
-This test also demonstrates the ``cycle_intervals`` capability of our beam monitor diagnostics, only creating output every 10th FODO cell
+This test also demonstrates the ``period_sample_intervals`` capability of our beam monitor diagnostics, only creating output every 10th FODO cell
 
 
 Run

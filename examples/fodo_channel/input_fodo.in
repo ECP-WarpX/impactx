@@ -26,7 +26,7 @@ lattice.nslice = 5
 lattice.periods = 101  # FODO channel of 101 periods
 
 monitor.type = beam_monitor
-monitor.cycle_intervals = 10
+monitor.period_sample_intervals = 10
 monitor.backend = h5
 
 drift1.type = drift

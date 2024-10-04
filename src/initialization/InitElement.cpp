@@ -395,8 +395,8 @@ namespace detail
             pp_element.queryAdd("backend", openpmd_backend);
             std::string openpmd_encoding{"g"};
             pp_element.queryAdd("encoding", openpmd_encoding);
-            int cycle_intervals = 1;
-            pp_element.queryAdd("cycle_intervals", cycle_intervals);
+            int period_sample_intervals = 1;
+            pp_element.queryAdd("period_sample_intervals", period_sample_intervals);
 
             // optional: add and calculate additional particle properties
             // property: nonlinear lens invariants
@@ -414,7 +414,7 @@ namespace detail
                 pp_element.queryAdd("cn", cn);
             }
 
-            m_lattice.emplace_back(diagnostics::BeamMonitor(openpmd_name, openpmd_backend, openpmd_encoding, cycle_intervals));
+            m_lattice.emplace_back(diagnostics::BeamMonitor(openpmd_name, openpmd_backend, openpmd_encoding, period_sample_intervals));
         } else if (element_type == "line")
         {
             // Parse the lattice elements for the sub-lattice in the line

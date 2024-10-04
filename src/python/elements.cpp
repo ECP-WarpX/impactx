@@ -218,7 +218,7 @@ void init_elements(py::module& m)
              py::arg("name"),
              py::arg("backend") = "default",
              py::arg("encoding") = "g",
-             py::arg("cycle_intervals") = 1,
+             py::arg("period_sample_intervals") = 1,
              "This element writes the particle beam out to openPMD data."
         )
         .def_property_readonly("name",

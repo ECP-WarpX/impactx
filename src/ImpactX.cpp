@@ -181,10 +181,10 @@ namespace impactx {
         }
 
         // periods through the lattice
-        int periods = 1;
-        amrex::ParmParse("lattice").queryAdd("periods", periods);
+        int num_periods = 1;
+        amrex::ParmParse("lattice").queryAdd("periods", num_periods);
 
-        for (int cycle=0; cycle < periods; ++cycle) {
+        for (int period=0; period < num_periods; ++period) {
             // loop over all beamline elements
             for (auto &element_variant: m_lattice) {
                 // update element edge of the reference particle
@@ -263,7 +263,7 @@ namespace impactx {
                     // assuming that the distribution did not change
 
                     // push all particles with external maps
-                    Push(*amr_data->m_particle_container, element_variant, step, cycle);
+                    Push(*amr_data->m_particle_container, element_variant, step, period);
 
                     // move "lost" particles to another particle container
                     collect_lost_particles(*amr_data->m_particle_container);

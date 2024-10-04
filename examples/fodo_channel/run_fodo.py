@@ -46,7 +46,7 @@ distr = distribution.Waterbag(
 sim.add_particles(bunch_charge_C, distr, npart)
 
 # add beam diagnostics
-monitor = elements.BeamMonitor("monitor", backend="h5", cycle_intervals=10)
+monitor = elements.BeamMonitor("monitor", backend="h5", period_sample_intervals=10)
 
 # design the accelerator lattice)
 ns = 5  # number of slices per ds in the element
