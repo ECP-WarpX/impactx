@@ -151,12 +151,12 @@ namespace detail
          *
          * @param[inout] pc container of the particles to push
          * @param[in] step global step for diagnostics
-         * @param[in] cycle for periodic lattices, this is the cycle or turn
+         * @param[in] period for periodic lattices, this is the current period (turn or cycle)
          */
         void operator() (
             ImpactXParticleContainer & pc,
             int step,
-            int cycle
+            int period
         )
         {
             static_assert(
@@ -165,7 +165,7 @@ namespace detail
             );
 
             T_Element& element = *static_cast<T_Element*>(this);
-            push_all(pc, element, step, cycle);
+            push_all(pc, element, step, period);
         }
 
         /** This pushes the particles on a particle iterator tile or box.

@@ -314,11 +314,11 @@ namespace detail
     BeamMonitor::operator() (
         ImpactXParticleContainer & pc,
         int step,
-        int cycle
+        int period
     )
     {
         // filter out this turn?
-        if (cycle % m_period_sample_intervals != 0)
+        if (period % m_period_sample_intervals != 0)
             return;
 
 #ifdef ImpactX_USE_OPENPMD

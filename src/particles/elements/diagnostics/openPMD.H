@@ -109,12 +109,12 @@ namespace detail
          *
          * @param[in,out] pc particle container to push
          * @param[in] step global step for diagnostics
-         * @param[in] cycle for periodic lattices, this is the cycle or turn
+         * @param[in] period for periodic lattices, this is the current period (turn or cycle)
          */
         void operator() (
             ImpactXParticleContainer & pc,
             int step,
-            int cycle
+            int period
         );
 
         /** Write a tile of particles
@@ -159,7 +159,7 @@ namespace detail
 
         int m_file_min_digits = 6; //! minimum number of digits to iteration number in file name
 
-        int m_period_sample_intervals = 1; //! only output every N cycles (turns) of periodic lattices
+        int m_period_sample_intervals = 1; //! only output every Nth period (turn or cycle) of periodic lattices
 
         /** This rank's offset in the MPI-global particle array, by level
          *

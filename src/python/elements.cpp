@@ -57,10 +57,10 @@ namespace
         using Element = typename T_PyClass::type;  // py::class<T, options...>
 
         cl.def("push",
-            [](Element & el, ImpactXParticleContainer & pc, int step, int cycle) {
-                el(pc, step, cycle);
+            [](Element & el, ImpactXParticleContainer & pc, int step, int period) {
+                el(pc, step, period);
             },
-            py::arg("pc"), py::arg("step")=0, py::arg("cycle")=0,
+            py::arg("pc"), py::arg("step")=0, py::arg("period")=0,
             "Push first the reference particle, then all other particles."
         );
     }
@@ -917,7 +917,7 @@ void init_elements(py::module& m)
               [](Programmable & p,
                  std::function<void(ImpactXParticleContainer *, int, int)> new_hook
               ) { p.m_push = std::move(new_hook); },
-              "hook for push of whole container (pc, step, cycle)"
+              "hook for push of whole container (pc, step, period)"
         )
         .def_property("beam_particles",
               [](Programmable & p) { return p.m_beam_particles; },
@@ -1483,7 +1483,7 @@ void init_elements(py::module& m)
 
     // freestanding push function
     m.def("push", &Push,
-        py::arg("pc"), py::arg("element"), py::arg("step")=0, py::arg("cycle")=0,
+        py::arg("pc"), py::arg("element"), py::arg("step")=0, py::arg("period")=0,
         "Push particles through an element"
     );
 

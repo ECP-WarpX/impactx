@@ -38,7 +38,7 @@ namespace impactx
         void operator() (
             ImpactXParticleContainer & /* pc */,
             int /* step */,
-            int /* cycle */
+            int /* period */
         ) {
             // nothing to do
         }

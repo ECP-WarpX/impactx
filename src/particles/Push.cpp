@@ -20,16 +20,16 @@ namespace impactx
         ImpactXParticleContainer & pc,
         KnownElements & element_variant,
         int step,
-        int cycle
+        int period
     )
     {
         // here we just access the element by its respective type
-        std::visit([&pc, step, cycle](auto&& element)
+        std::visit([&pc, step, period](auto&& element)
         {
             BL_PROFILE("impactx::Push");
 
             // push reference particle & all particles
-            element(pc, step, cycle);
+            element(pc, step, period);
         }, element_variant);
     }
 
