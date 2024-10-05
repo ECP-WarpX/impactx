@@ -305,19 +305,22 @@ namespace impactx::diagnostics
         amrex::ParticleReal const alpha_y = - ypy_d / emittance_yd;
         amrex::ParticleReal const alpha_t = - tpt / emittance_t;
 
-        // Calculate eigenemittances (optional)
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> Sigma;
-        amrex::ParticleReal emittance_1 = emittance_x * bg;
-        amrex::ParticleReal emittance_2 = emittance_y * bg;
-        amrex::ParticleReal emittance_3 = emittance_t * bg;
+        // Calculate normalized emittances
+        amrex::ParticleReal emittance_xn = emittance_x * bg;
+        amrex::ParticleReal emittance_yn = emittance_y * bg;
+        amrex::ParticleReal emittance_tn = emittance_t * bg;
 
-        // Parse the diagnostic parameters
+        // Determine whether to calculate eigenemittances, and initialize
         amrex::ParmParse pp_diag("diag");
         bool compute_eigenemittances = false;
         pp_diag.queryAdd("eigenemittances", compute_eigenemittances);
+        amrex::ParticleReal emittance_1 = emittance_xn;
+        amrex::ParticleReal emittance_2 = emittance_yn;
+        amrex::ParticleReal emittance_3 = emittance_tn;
 
         if (compute_eigenemittances) {
            // Store the covariance matrix in dynamical variables:
+           amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> Sigma;
            Sigma(1,1) = x_ms;
            Sigma(1,2) = xpx * bg;
            Sigma(1,3) = xy;
@@ -400,9 +403,14 @@ namespace impactx::diagnostics
         data["dispersion_y"] = dispersion_y;
         data["dispersion_py"] = dispersion_py;
         data["charge_C"] = charge;
-        data["emittance_1"] = emittance_1;
-        data["emittance_2"] = emittance_2;
-        data["emittance_3"] = emittance_3;
+        data["emittance_xn"] = emittance_xn;
+        data["emittance_yn"] = emittance_yn;
+        data["emittance_tn"] = emittance_tn;
+        if (compute_eigenemittances) {
+           data["emittance_1"] = emittance_1;
+           data["emittance_2"] = emittance_2;
+           data["emittance_3"] = emittance_3;
+        }
 
         return data;
     }

@@ -43,7 +43,14 @@ namespace impactx::diagnostics
             if (otype == OutputType::PrintRefParticle) {
                 file_handler << "step s beta gamma beta_gamma x y z t px py pz pt\n";
             } else if (otype == OutputType::PrintReducedBeamCharacteristics) {
-                file_handler << "step" << " " << "s" << " "
+
+                // determine whether to output eigenemittances
+                amrex::ParmParse pp_diag("diag");
+                bool compute_eigenemittances = false;
+                pp_diag.queryAdd("eigenemittances", compute_eigenemittances);
+
+                if (compute_eigenemittances) {
+                   file_handler << "step" << " " << "s" << " "
                              << "x_mean" << " " << "x_min" << " " << "x_max" << " "
                              << "y_mean" << " " << "y_min" << " " << "y_max" << " "
                              << "t_mean" << " " << "t_min" << " " << "t_max" << " "
@@ -57,9 +64,29 @@ namespace impactx::diagnostics
                              << "beta_x" << " " << "beta_y" << " " << "beta_t" << " "
                              << "dispersion_x" << " " << "dispersion_px" << " "
                              << "dispersion_y" << " " << "dispersion_py" << " "
+                             << "emittance_xn" << " " << "emittance_yn" << " " << "emittance_tn" << " "
                              << "emittance_1" << " " << "emittance_2" << " " << "emittance_3" << " "
                              << "charge_C" << " "
                              << "\n";
+                } else {
+                   file_handler << "step" << " " << "s" << " "
+                             << "x_mean" << " " << "x_min" << " " << "x_max" << " "
+                             << "y_mean" << " " << "y_min" << " " << "y_max" << " "
+                             << "t_mean" << " " << "t_min" << " " << "t_max" << " "
+                             << "sig_x" << " " << "sig_y" << " " << "sig_t" << " " 
+                             << "px_mean" << " " << "px_min" << " " << "px_max" << " "
+                             << "py_mean" << " " << "py_min" << " " << "py_max" << " "
+                             << "pt_mean" << " " << "pt_min" << " " << "pt_max" << " "
+                             << "sig_px" << " " << "sig_py" << " " << "sig_pt" << " " 
+                             << "emittance_x" << " " << "emittance_y" << " " << "emittance_t" << " "
+                             << "alpha_x" << " " << "alpha_y" << " " << "alpha_t" << " "
+                             << "beta_x" << " " << "beta_y" << " " << "beta_t" << " "   
+                             << "dispersion_x" << " " << "dispersion_px" << " "
+                             << "dispersion_y" << " " << "dispersion_py" << " "
+                             << "emittance_xn" << " " << "emittance_yn" << " " << "emittance_tn" << " "
+                             << "charge_C" << " "
+                             << "\n";
+                }
             }
         }
 
@@ -93,7 +120,13 @@ namespace impactx::diagnostics
 
             amrex::ParticleReal const s = pc.GetRefParticle().s;
 
-            file_handler << step << " " << s << " "
+            // determine whether to output eigenemittances
+            amrex::ParmParse pp_diag("diag");
+            bool compute_eigenemittances = false;
+            pp_diag.queryAdd("eigenemittances", compute_eigenemittances);
+
+            if (compute_eigenemittances) {
+               file_handler << step << " " << s << " "
                          << rbc.at("x_mean") << " " << rbc.at("x_min") << " " << rbc.at("x_max") << " "
                          << rbc.at("y_mean") << " " << rbc.at("y_min") << " " << rbc.at("y_max") << " "
                          << rbc.at("t_mean") << " " << rbc.at("t_min") << " " << rbc.at("t_max") << " "
@@ -107,8 +140,27 @@ namespace impactx::diagnostics
                          << rbc.at("beta_x") << " " << rbc.at("beta_y") << " " << rbc.at("beta_t") << " "
                          << rbc.at("dispersion_x") << " " << rbc.at("dispersion_px") << " "
                          << rbc.at("dispersion_y") << " " << rbc.at("dispersion_py") << " "
+                         << rbc.at("emittance_xn") << " " << rbc.at("emittance_yn") << " " << rbc.at("emittance_tn") << " "
                          << rbc.at("emittance_1") << " " << rbc.at("emittance_2") << " " << rbc.at("emittance_3") << " "
                          << rbc.at("charge_C") << "\n";
+            } else {
+               file_handler << step << " " << s << " "
+                         << rbc.at("x_mean") << " " << rbc.at("x_min") << " " << rbc.at("x_max") << " "
+                         << rbc.at("y_mean") << " " << rbc.at("y_min") << " " << rbc.at("y_max") << " "
+                         << rbc.at("t_mean") << " " << rbc.at("t_min") << " " << rbc.at("t_max") << " "
+                         << rbc.at("sig_x") << " " << rbc.at("sig_y") << " " << rbc.at("sig_t") << " " 
+                         << rbc.at("px_mean") << " " << rbc.at("px_min") << " " << rbc.at("px_max") << " "
+                         << rbc.at("py_mean") << " " << rbc.at("py_min") << " " << rbc.at("py_max") << " "
+                         << rbc.at("pt_mean") << " " << rbc.at("pt_min") << " " << rbc.at("pt_max") << " "
+                         << rbc.at("sig_px") << " " << rbc.at("sig_py") << " " << rbc.at("sig_pt") << " " 
+                         << rbc.at("emittance_x") << " " << rbc.at("emittance_y") << " " << rbc.at("emittance_t") << " "
+                         << rbc.at("alpha_x") << " " << rbc.at("alpha_y") << " " << rbc.at("alpha_t") << " "
+                         << rbc.at("beta_x") << " " << rbc.at("beta_y") << " " << rbc.at("beta_t") << " "   
+                         << rbc.at("dispersion_x") << " " << rbc.at("dispersion_px") << " "
+                         << rbc.at("dispersion_y") << " " << rbc.at("dispersion_py") << " "
+                         << rbc.at("emittance_xn") << " " << rbc.at("emittance_yn") << " " << rbc.at("emittance_tn") << " "
+                         << rbc.at("charge_C") << "\n";
+            }
         } // if( otype == OutputType::PrintReducedBeamCharacteristics)
 
         // TODO: add as an option to the monitor element
