@@ -11,6 +11,7 @@
 #define COVARIANCE_MATRIX_MATH_H
 
 #include <ablastr/constant.H>
+#include <ablastr/warn_manager/WarnManager.H>
 
 #include <AMReX_Array.H>
 #include <AMReX_REAL.H>
@@ -61,6 +62,15 @@ namespace impactx::diagnostics
         // Discriminant should be < 0.  Otherwise, keep theta at default and throw an error.
         amrex::ParticleReal tol = 1.0e-12;  //allow for roundoff error
         if (discriminant > tol) {
+
+            ablastr::warn_manager::WMRecordWarning(
+                    "Impactx::diagnostics::CubicRootsTrig",
+                    "Polynomial appearing in CubicRootsTrig has one or more complex "
+                    "(non-real) roots.  Only the real part is returned.  This "
+                    "suggests a loss of numerical precision in computation of the "
+                    "eigenemittances.  Treat eigenemittance values with caution.",
+                    ablastr::warn_manager::WarnPriority::medium
+            );
 
            std::cout << "Polynomial in CubicRoots has one or more complex roots." << "\n";
 
