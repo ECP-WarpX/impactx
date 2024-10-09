@@ -698,6 +698,7 @@ def push(
     | elements.TaperedPL
     | elements.ThinDipole,
     step: int = 0,
+    period: int = 0,
 ) -> None:
     """
     Push particles through an element
