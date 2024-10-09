@@ -151,7 +151,7 @@ namespace impactx
                                    std::sinh(omega*slice_ds)/(omega*delta1)*py;
                pyout = omega * delta1 * std::sinh(omega*slice_ds) * yout + std::cosh(omega * slice_ds) * py;
 
-            } else {
+            } else if (g < 0.0) {
                // advance transverse position and momentum (defocusing quad)
                x = std::cosh(omega*slice_ds) * xout +
                                    std::sinh(omega*slice_ds)/(omega*delta1)*px;
@@ -165,25 +165,44 @@ namespace impactx
                q2 = xout;
                p1 = py;
                p2 = px;
+            } else {
+               // advance transverse position and momentum (zero focusing strength = drift)
+               x = xout + slice_ds * px / delta1;
+               // pxout = px;
+               y = yout + slice_ds * py / delta1;
+               // pyout = py;
             }
+
 
             // advance longitudinal position and momentum
 
-            // the corresponding symplectic update to t
-            amrex::ParticleReal const term = pt + delta/bet;
-            amrex::ParticleReal const t0 = tout - term * slice_ds / delta1;
+            if (g == 0.0) {
+               // the corresponding symplectic update to t (zero strength = drift)
+               amrex::ParticleReal term = 2_prt * std::pow(pt,2) + std::pow(px,2) + std::pow(py,2);
+               term = 2_prt - 4_prt*bet*pt + std::pow(bet,2)*term;
+               term = -2_prt + std::pow(gam,2)*term;
+               term = (-1_prt+bet*pt)*term;
+               term = term/(2_prt * std::pow(bet,3) * std::pow(gam,2));
+               t = tout - slice_ds * (1_prt / bet + term /std::pow(delta1, 3));
+               // ptout = pt;
 
-            amrex::ParticleReal const w = omega*delta1;
-            amrex::ParticleReal const term1 = -(std::pow(p2,2) + std::pow(q2,2) * std::pow(w,2))*std::sinh(2_prt*slice_ds*omega);
-            amrex::ParticleReal const term2 = -(std::pow(p1,2)-pow(q1,2) * std::pow(w,2)) * std::sin(2_prt*slice_ds*omega);
-            amrex::ParticleReal const term3 = -2_prt*q2*p2*w*std::cosh(2_prt*slice_ds*omega);
-            amrex::ParticleReal const term4 = -2_prt*q1*p1*w * std::cos(2_prt*slice_ds*omega);
-            amrex::ParticleReal const term5 = 2_prt*omega*(q1*p1*delta1 + q2*p2*delta1
-                                        -(std::pow(p1,2) + std::pow(p2,2))*slice_ds - (std::pow(q1,2)-pow(q2,2)) * std::pow(w,2)*slice_ds);
-            t = t0 + (-1_prt+bet*pt)/(8_prt*bet * std::pow(delta1,3)*omega)
-                     *(term1+term2+term3+term4+term5);
+            } else {
+               // the corresponding symplectic update to t (nonzero strength)
+               amrex::ParticleReal const term = pt + delta/bet;
+               amrex::ParticleReal const t0 = tout - term * slice_ds / delta1;
 
-            // ptout = pt;
+               amrex::ParticleReal const w = omega*delta1;
+               amrex::ParticleReal const term1 = -(std::pow(p2,2) + std::pow(q2,2) * std::pow(w,2))*std::sinh(2_prt*slice_ds*omega);
+               amrex::ParticleReal const term2 = -(std::pow(p1,2)-pow(q1,2) * std::pow(w,2)) * std::sin(2_prt*slice_ds*omega);
+               amrex::ParticleReal const term3 = -2_prt*q2*p2*w*std::cosh(2_prt*slice_ds*omega);
+               amrex::ParticleReal const term4 = -2_prt*q1*p1*w * std::cos(2_prt*slice_ds*omega);
+               amrex::ParticleReal const term5 = 2_prt*omega*(q1*p1*delta1 + q2*p2*delta1
+                                           -(std::pow(p1,2) + std::pow(p2,2))*slice_ds - (std::pow(q1,2)-pow(q2,2)) * std::pow(w,2)*slice_ds);
+               t = t0 + (-1_prt+bet*pt)/(8_prt*bet * std::pow(delta1,3)*omega)
+                        *(term1+term2+term3+term4+term5);
+               // ptout = pt;
+
+             }
 
             // assign updated momenta
             px = pxout;
