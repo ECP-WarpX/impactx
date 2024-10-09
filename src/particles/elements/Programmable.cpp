@@ -19,16 +19,17 @@ namespace impactx
     void
     Programmable::operator() (
         ImpactXParticleContainer & pc,
-        int step
+        int step,
+        int period
     ) const
     {
         if (m_push == nullptr) {
             // TODO: print if verbose mode is set
-            push_all(pc, *this, step, m_threadsafe);
+            push_all(pc, *this, step, period, m_threadsafe);
         }
         else {
             BL_PROFILE("impactx::Push::Programmable");
-            m_push(&pc, step);
+            m_push(&pc, step, period);
         }
     }
 

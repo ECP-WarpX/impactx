@@ -57,10 +57,10 @@ namespace
         using Element = typename T_PyClass::type;  // py::class<T, options...>
 
         cl.def("push",
-            [](Element & el, ImpactXParticleContainer & pc, int step) {
-                el(pc, step);
+            [](Element & el, ImpactXParticleContainer & pc, int step, int period) {
+                el(pc, step, period);
             },
-            py::arg("pc"), py::arg("step")=0,
+            py::arg("pc"), py::arg("step")=0, py::arg("period")=0,
             "Push first the reference particle, then all other particles."
         );
     }
@@ -214,10 +214,11 @@ void init_elements(py::module& m)
 
     py::class_<diagnostics::BeamMonitor, elements::Thin> py_BeamMonitor(me, "BeamMonitor");
     py_BeamMonitor
-        .def(py::init<std::string, std::string, std::string>(),
+        .def(py::init<std::string, std::string, std::string, int>(),
              py::arg("name"),
              py::arg("backend") = "default",
              py::arg("encoding") = "g",
+             py::arg("period_sample_intervals") = 1,
              "This element writes the particle beam out to openPMD data."
         )
         .def_property_readonly("name",
@@ -914,9 +915,9 @@ void init_elements(py::module& m)
         .def_property("push",
               [](Programmable & p) { return p.m_push; },
               [](Programmable & p,
-                 std::function<void(ImpactXParticleContainer *, int)> new_hook
+                 std::function<void(ImpactXParticleContainer *, int, int)> new_hook
               ) { p.m_push = std::move(new_hook); },
-              "hook for push of whole container (pc, step)"
+              "hook for push of whole container (pc, step, period)"
         )
         .def_property("beam_particles",
               [](Programmable & p) { return p.m_beam_particles; },
@@ -1480,9 +1481,9 @@ void init_elements(py::module& m)
     register_beamoptics_push(py_TaperedPL);
 
 
-    // free-standing push function
+    // freestanding push function
     m.def("push", &Push,
-        py::arg("pc"), py::arg("element"), py::arg("step")=0,
+        py::arg("pc"), py::arg("element"), py::arg("step")=0, py::arg("period")=0,
         "Push particles through an element"
     );
 

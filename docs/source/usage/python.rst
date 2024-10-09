@@ -632,7 +632,7 @@ This module provides elements for the accelerator lattice.
    :param rotation: rotation error in the transverse plane [degrees]
    :param name: an optional name for the element
 
-.. py:class:: impactx.elements.BeamMonitor(name, backend="default", encoding="g")
+.. py:class:: impactx.elements.BeamMonitor(name, backend="default", encoding="g", period_sample_intervals=1)
 
    A beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
 
@@ -649,6 +649,7 @@ This module provides elements for the accelerator lattice.
    :param name: name of the series
    :param backend: I/O backend, e.g., ``bp``, ``h5``, ``json``
    :param encoding: openPMD iteration encoding: (v)ariable based, (f)ile based, (g)roup based (default)
+   :param period_sample_intervals: for periodic lattice, only output every Nth period (turn)
 
    .. py:property:: name
 

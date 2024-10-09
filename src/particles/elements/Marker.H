@@ -41,7 +41,8 @@ namespace impactx
         /** Push all particles - nothing to do here */
         void operator() (
             ImpactXParticleContainer & /* pc */,
-            int /* step */
+            int /* step */,
+            int /* period */
         ) {
             // nothing to do
         }

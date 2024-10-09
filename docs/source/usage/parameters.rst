@@ -449,6 +449,11 @@ Lattice Elements
                 openPMD `iteration encoding <https://openpmd-api.readthedocs.io/en/0.14.0/usage/concepts.html#iteration-and-series>`__: (v)ariable based, (f)ile based, (g)roup based (default)
                 variable based is an `experimental feature with ADIOS2 <https://openpmd-api.readthedocs.io/en/0.14.0/backends/adios2.html#experimental-new-adios2-schema>`__.
 
+            * ``<element_name>.period_sample_intervals`` (``int``, default value: ``1``)
+
+                for periodic lattice, only output every Nth period (turn).
+                By default, diagnostics are returned every cycle.
+
             * ``<element_name>.nonlinear_lens_invariants`` (``boolean``, default value: ``false``)
 
                 Compute and output the invariants H and I within the nonlinear magnetic insert element (see: ``nonlinear_lens``).
