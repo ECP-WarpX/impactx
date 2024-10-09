@@ -16,12 +16,15 @@ jobs:
       HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: TRUE
     steps:
     - uses: actions/checkout@v4
-    - name: install dependencies
+    - uses: actions/setup-python@v5
+      name: Install Python
+      with:
+        python-version: '3.x'
+    - name: install brew dependencies
       run: |
         set +e
         brew unlink gcc
         brew update
-        brew install --overwrite python
         brew install adios2
         brew install ccache
         brew install cmake
@@ -32,19 +35,15 @@ jobs:
         brew install ninja
         brew install open-mpi
         brew install pkg-config
-
-        python3 -m pip install --upgrade pip
-        python3 -m pip install --upgrade virtualenv
-
-        python3 -m venv py-venv
-        source py-venv/bin/activate
+        set -e
+    - name: install pip dependencies
+      run: |
         python3 -m pip install --upgrade pip
         python3 -m pip install --upgrade build packaging setuptools wheel pytest
         python3 -m pip install --upgrade -r requirements_mpi.txt
         python3 -m pip install --upgrade -r src/python/impactx/dashboard/requirements.txt
         python3 -m pip install --upgrade -r examples/requirements.txt
         python3 -m pip install --upgrade -r tests/python/requirements.txt
-        set -e
         python3 -m pip install --upgrade pipx
         python3 -m pipx install openPMD-validator
     - name: CCache Cache
@@ -65,13 +64,10 @@ jobs:
         export CCACHE_SLOPPINESS=time_macros
         ccache -z
 
-        source py-venv/bin/activate
-
         cmake -S . -B build            \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
           -DImpactX_FFT=ON             \
-          -DImpactX_PYTHON=ON          \
-          -DPython_EXECUTABLE=$(which python3)
+          -DImpactX_PYTHON=ON
         cmake --build build -j 3
 
         du -hs ~/Library/Caches/ccache
@@ -79,15 +75,12 @@ jobs:
 
     - name: run tests
       run: |
-        source py-venv/bin/activate
-
         ctest --test-dir build --output-on-failure -E pytest.AMReX
 
     - name: run installed python module
       run: |
         cmake --build build --target pip_install
 
-        source py-venv/bin/activate
         python3 examples/fodo/run_fodo.py
 
     - name: run installed app
