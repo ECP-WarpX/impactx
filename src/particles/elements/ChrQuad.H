@@ -112,8 +112,9 @@ namespace impactx
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
-            // access reference particle values to find beta
+            // access reference particle values to find beta and gamma
             amrex::ParticleReal const bet = refpart.beta();
+            amrex::ParticleReal const gam = refpart.gamma();
 
             // normalize quad units to MAD-X convention if needed
             amrex::ParticleReal g = m_k;
