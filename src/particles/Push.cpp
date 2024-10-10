@@ -16,17 +16,20 @@
 
 namespace impactx
 {
-    void Push (ImpactXParticleContainer & pc,
-               KnownElements & element_variant,
-               int step)
+    void Push (
+        ImpactXParticleContainer & pc,
+        KnownElements & element_variant,
+        int step,
+        int period
+    )
     {
         // here we just access the element by its respective type
-        std::visit([&pc, step](auto&& element)
+        std::visit([&pc, step, period](auto&& element)
         {
             BL_PROFILE("impactx::Push");
 
             // push reference particle & all particles
-            element(pc, step);
+            element(pc, step, period);
         }, element_variant);
     }
 

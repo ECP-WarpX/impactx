@@ -49,10 +49,10 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 ns = 1  # number of slices per ds in the element
 period = [
     monitor,
-    elements.ChrAcc(ds=0.038, ez=1.12188308693e-4, bz=1.0e-14, nslice=ns),
-    elements.ExactSbend(ds=0.25, phi=180.0, B=1),
-    elements.ChrAcc(ds=0.038, ez=1.12188308693e-4, bz=1.0e-14, nslice=ns),
-    elements.ExactSbend(ds=0.25, phi=180.0, B=1),
+    elements.ChrAcc(name="acc1", ds=0.038, ez=1.12188308693e-4, bz=1.0e-14, nslice=ns),
+    elements.ExactSbend(name="sbend1", ds=0.25, phi=180.0, B=1),
+    elements.ChrAcc(name="acc2", ds=0.038, ez=1.12188308693e-4, bz=1.0e-14, nslice=ns),
+    elements.ExactSbend(name="sbend2", ds=0.25, phi=180.0, B=1),
     monitor,
 ]
 

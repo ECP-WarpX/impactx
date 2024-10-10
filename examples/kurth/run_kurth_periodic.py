@@ -45,8 +45,8 @@ sim.add_particles(bunch_charge_C, distr, npart)
 monitor = elements.BeamMonitor("monitor", backend="h5")
 
 # design the accelerator lattice
-constf1 = elements.ConstF(ds=2.0, kx=0.7, ky=0.7, kt=0.7)
-drift1 = elements.Drift(ds=1.0)
+constf1 = elements.ConstF(name="constf1", ds=2.0, kx=0.7, ky=0.7, kt=0.7)
+drift1 = elements.Drift(name="drift1", ds=1.0)
 sim.lattice.extend([monitor, drift1, constf1, drift1, monitor])
 
 # run simulation

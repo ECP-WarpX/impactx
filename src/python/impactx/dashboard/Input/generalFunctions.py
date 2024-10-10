@@ -64,38 +64,53 @@ class generalFunctions:
                 return value, str
 
     @staticmethod
-    def validate_against(input_value, value_type):
+    def validate_against(input_value, value_type, additional_conditions=None):
         """
-        Returns an error message if the input value type does not match the desired type.
+        Validates the input value against the desired type and additional conditions.
         :param input_value: The value to validate.
         :param value_type: The desired type ('int', 'float', 'str').
+        :param conditions: A list of additional conditions to validate.
         :return: A list of error messages. An empty list if there are no errors.
         """
+        errors = []
+        value = None
 
+        # value_type checking
         if value_type == "int":
             if input_value is None:
-                return ["Must be an integer"]
-            try:
-                int(input_value)
-                return []
-            except ValueError:
-                return ["Must be an integer"]
-
+                errors.append("Must be an integer")
+            else:
+                try:
+                    value = int(input_value)
+                except ValueError:
+                    errors.append("Must be an integer")
         elif value_type == "float":
             if input_value is None:
-                return ["Must be a float"]
-            try:
-                float(input_value)
-                return []
-            except ValueError:
-                return ["Must be a float"]
-
+                errors.append("Must be a float")
+            else:
+                try:
+                    value = float(input_value)
+                except ValueError:
+                    errors.append("Must be a float")
         elif value_type == "str":
             if input_value is None:
-                return ["Must be a string"]
-            return []
+                errors.append("Must be a string")
+            else:
+                value = str(input_value)
         else:
-            return ["Unknown type"]
+            errors.append("Unknown type")
+
+        # addition_conditions checking
+        if errors == [] and additional_conditions:
+            for condition in additional_conditions:
+                if condition == "non_zero" and value == 0:
+                    errors.append("Must be non-zero")
+                if condition == "positive" and value <= 0:
+                    errors.append("Must be positive")
+                if condition == "negative" and value >= 0:
+                    errors.append("Must be negative")
+
+        return errors
 
     @staticmethod
     def update_simulation_validation_status():
@@ -128,6 +143,11 @@ class generalFunctions:
             error_details.append(f"Kinetic Energy: {state.kin_energy_validation}")
         if state.bunch_charge_C_validation:
             error_details.append(f"Bunch Charge: {state.bunch_charge_C_validation}")
+        if state.charge_qe_validation:
+            error_details.append(f"Ref. Particle Charge: {state.charge_qe_validation}")
+        if state.mass_MeV_validation:
+            error_details.append(f"Ref. Particle Mass: {state.mass_MeV}")
+
         if state.selectedLatticeList == []:
             error_details.append("LatticeListIsEmpty")
 

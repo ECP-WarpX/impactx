@@ -52,15 +52,15 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 ns = 25  # number of slices per ds in the element
 fodo = [
     monitor,
-    elements.Drift(ds=0.25, nslice=ns),
+    elements.Drift(name="d1", ds=0.25, nslice=ns),
     monitor,
-    elements.Quad(ds=1.0, k=1.0, nslice=ns),
+    elements.Quad(name="q1", ds=1.0, k=1.0, nslice=ns),
     monitor,
-    elements.Drift(ds=0.5, nslice=ns),
+    elements.Drift(name="d2", ds=0.5, nslice=ns),
     monitor,
-    elements.Quad(ds=1.0, k=-1.0, nslice=ns),
+    elements.Quad(name="q2", ds=1.0, k=-1.0, nslice=ns),
     monitor,
-    elements.Drift(ds=0.25, nslice=ns),
+    elements.Drift(name="d3", ds=0.25, nslice=ns),
     monitor,
 ]
 # assign a fodo segment

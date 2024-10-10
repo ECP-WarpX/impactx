@@ -26,7 +26,9 @@ __all__ = [
     "ExactSbend",
     "Kicker",
     "KnownElementsList",
+    "Marker",
     "Multipole",
+    "Named",
     "NonlinearLens",
     "PRot",
     "Programmable",
@@ -70,7 +72,7 @@ class Alignment:
     @rotation.setter
     def rotation(self, arg1: float) -> None: ...
 
-class Aperture(Thin, Alignment):
+class Aperture(Named, Thin, Alignment):
     def __init__(
         self,
         xmax: float,
@@ -79,13 +81,17 @@ class Aperture(Thin, Alignment):
         dx: float = 0,
         dy: float = 0,
         rotation: float = 0,
+        name: str | None = None,
     ) -> None:
         """
         A short collimator element applying a transverse aperture boundary.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -114,13 +120,20 @@ class Aperture(Thin, Alignment):
 
 class BeamMonitor(Thin):
     def __init__(
-        self, name: str, backend: str = "default", encoding: str = "g"
+        self,
+        name: str,
+        backend: str = "default",
+        encoding: str = "g",
+        period_sample_intervals: int = 1,
     ) -> None:
         """
         This element writes the particle beam out to openPMD data.
         """
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -168,16 +181,25 @@ class BeamMonitor(Thin):
     @tn.setter
     def tn(self, arg1: float) -> None: ...
 
-class Buncher(Thin, Alignment):
+class Buncher(Named, Thin, Alignment):
     def __init__(
-        self, V: float, k: float, dx: float = 0, dy: float = 0, rotation: float = 0
+        self,
+        V: float,
+        k: float,
+        dx: float = 0,
+        dy: float = 0,
+        rotation: float = 0,
+        name: str | None = None,
     ) -> None:
         """
         A short linear RF cavity element at zero-crossing for bunching.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -197,7 +219,7 @@ class Buncher(Thin, Alignment):
     @k.setter
     def k(self, arg1: float) -> None: ...
 
-class CFbend(Thick, Alignment):
+class CFbend(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -207,13 +229,17 @@ class CFbend(Thick, Alignment):
         dy: float = 0,
         rotation: float = 0,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         An ideal combined function bend (sector bend with quadrupole component).
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -233,7 +259,7 @@ class CFbend(Thick, Alignment):
     @rc.setter
     def rc(self, arg1: float) -> None: ...
 
-class ChrAcc(Thick, Alignment):
+class ChrAcc(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -243,13 +269,17 @@ class ChrAcc(Thick, Alignment):
         dy: float = 0,
         rotation: float = 0,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         A region of Uniform Acceleration, with chromatic effects included.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -269,7 +299,7 @@ class ChrAcc(Thick, Alignment):
     @ez.setter
     def ez(self, arg1: float) -> None: ...
 
-class ChrDrift(Thick, Alignment):
+class ChrDrift(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -277,19 +307,23 @@ class ChrDrift(Thick, Alignment):
         dy: float = 0,
         rotation: float = 0,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         A Drift with chromatic effects included.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
         """
 
-class ChrPlasmaLens(Thick, Alignment):
+class ChrPlasmaLens(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -299,13 +333,17 @@ class ChrPlasmaLens(Thick, Alignment):
         dy: float = 0,
         rotation: float = 0,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         An active Plasma Lens with chromatic effects included.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -325,7 +363,7 @@ class ChrPlasmaLens(Thick, Alignment):
     @unit.setter
     def unit(self, arg1: int) -> None: ...
 
-class ChrQuad(Thick, Alignment):
+class ChrQuad(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -335,13 +373,17 @@ class ChrQuad(Thick, Alignment):
         dy: float = 0,
         rotation: float = 0,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         A Quadrupole magnet with chromatic effects included.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -361,7 +403,7 @@ class ChrQuad(Thick, Alignment):
     @unit.setter
     def unit(self, arg1: int) -> None: ...
 
-class ConstF(Thick, Alignment):
+class ConstF(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -372,13 +414,17 @@ class ConstF(Thick, Alignment):
         dy: float = 0,
         rotation: float = 0,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         A linear Constant Focusing element.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -405,7 +451,7 @@ class ConstF(Thick, Alignment):
     @ky.setter
     def ky(self, arg1: float) -> None: ...
 
-class DipEdge(Thin, Alignment):
+class DipEdge(Named, Thin, Alignment):
     def __init__(
         self,
         psi: float,
@@ -415,13 +461,17 @@ class DipEdge(Thin, Alignment):
         dx: float = 0,
         dy: float = 0,
         rotation: float = 0,
+        name: str | None = None,
     ) -> None:
         """
         Edge focusing associated with bend entry or exit.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -455,7 +505,7 @@ class DipEdge(Thin, Alignment):
     @rc.setter
     def rc(self, arg1: float) -> None: ...
 
-class Drift(Thick, Alignment):
+class Drift(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -463,13 +513,17 @@ class Drift(Thick, Alignment):
         dy: float = 0,
         rotation: float = 0,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         A drift.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -482,13 +536,16 @@ class Empty(Thin):
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
         """
 
-class ExactDrift(Thick, Alignment):
+class ExactDrift(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -496,19 +553,23 @@ class ExactDrift(Thick, Alignment):
         dy: float = 0,
         rotation: float = 0,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         A Drift using the exact nonlinear map.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
         """
 
-class ExactSbend(Thick, Alignment):
+class ExactSbend(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -518,13 +579,17 @@ class ExactSbend(Thick, Alignment):
         dy: float = 0,
         rotation: float = 0,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         An ideal sector bend using the exact nonlinear map.  When B = 0, the reference bending radius is defined by r0 = length / (angle in rad), corresponding to a magnetic field of B = rigidity / r0; otherwise the reference bending radius is defined by r0 = rigidity / B.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -544,7 +609,7 @@ class ExactSbend(Thick, Alignment):
     @phi.setter
     def phi(self, arg1: float) -> None: ...
 
-class Kicker(Thin, Alignment):
+class Kicker(Named, Thin, Alignment):
     def __init__(
         self,
         xkick: float,
@@ -553,13 +618,17 @@ class Kicker(Thin, Alignment):
         dx: float = 0,
         dy: float = 0,
         rotation: float = 0,
+        name: str | None = None,
     ) -> None:
         """
         A thin transverse kicker element. Kicks are for unit "dimensionless" or in "T-m".
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -600,6 +669,7 @@ class KnownElementsList:
         | ExactDrift
         | ExactSbend
         | Kicker
+        | Marker
         | Multipole
         | NonlinearLens
         | Programmable
@@ -634,6 +704,7 @@ class KnownElementsList:
         | ExactDrift
         | ExactSbend
         | Kicker
+        | Marker
         | Multipole
         | NonlinearLens
         | Programmable
@@ -669,6 +740,7 @@ class KnownElementsList:
         | ExactDrift
         | ExactSbend
         | Kicker
+        | Marker
         | Multipole
         | NonlinearLens
         | Programmable
@@ -706,7 +778,23 @@ class KnownElementsList:
         Return and remove the last element of the list.
         """
 
-class Multipole(Thin, Alignment):
+class Marker(Named, Thin):
+    def __init__(self, arg0: str) -> None:
+        """
+        This named element does nothing.
+        """
+    def __repr__(self) -> str: ...
+    def push(
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
+    ) -> None:
+        """
+        Push first the reference particle, then all other particles.
+        """
+
+class Multipole(Named, Thin, Alignment):
     def __init__(
         self,
         multipole: int,
@@ -715,13 +803,17 @@ class Multipole(Thin, Alignment):
         dx: float = 0,
         dy: float = 0,
         rotation: float = 0,
+        name: str | None = None,
     ) -> None:
         """
         A general thin multipole element.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -748,7 +840,18 @@ class Multipole(Thin, Alignment):
     @multipole.setter
     def multipole(self, arg1: float) -> None: ...
 
-class NonlinearLens(Thin, Alignment):
+class Named:
+    @property
+    def has_name(self) -> bool: ...
+    @property
+    def name(self) -> str:
+        """
+        segment length in m
+        """
+    @name.setter
+    def name(self, arg1: str) -> None: ...
+
+class NonlinearLens(Named, Thin, Alignment):
     def __init__(
         self,
         knll: float,
@@ -756,13 +859,17 @@ class NonlinearLens(Thin, Alignment):
         dx: float = 0,
         dy: float = 0,
         rotation: float = 0,
+        name: str | None = None,
     ) -> None:
         """
         Single short segment of the nonlinear magnetic insert element.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -782,14 +889,17 @@ class NonlinearLens(Thin, Alignment):
     @knll.setter
     def knll(self, arg1: float) -> None: ...
 
-class PRot(Thin):
-    def __init__(self, phi_in: float, phi_out: float) -> None:
+class PRot(Named, Thin):
+    def __init__(self, phi_in: float, phi_out: float, name: str | None = None) -> None:
         """
         An exact pole-face rotation in the x-z plane. Both angles are in degrees.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -809,10 +919,12 @@ class PRot(Thin):
     @phi_out.setter
     def phi_out(self, arg1: float) -> None: ...
 
-class Programmable:
+class Programmable(Named):
     ds: float
     nslice: int
-    def __init__(self, ds: float = 0.0, nslice: int = 1) -> None:
+    def __init__(
+        self, ds: float = 0.0, nslice: int = 1, name: str | None = None
+    ) -> None:
         """
         A programmable beam optics element.
         """
@@ -837,15 +949,17 @@ class Programmable:
     @property
     def push(
         self,
-    ) -> typing.Callable[[impactx.impactx_pybind.ImpactXParticleContainer, int], None]:
+    ) -> typing.Callable[
+        [impactx.impactx_pybind.ImpactXParticleContainer, int, int], None
+    ]:
         """
-        hook for push of whole container (pc, step)
+        hook for push of whole container (pc, step, period)
         """
     @push.setter
     def push(
         self,
         arg1: typing.Callable[
-            [impactx.impactx_pybind.ImpactXParticleContainer, int], None
+            [impactx.impactx_pybind.ImpactXParticleContainer, int, int], None
         ],
     ) -> None: ...
     @property
@@ -865,7 +979,7 @@ class Programmable:
     @threadsafe.setter
     def threadsafe(self, arg1: bool) -> None: ...
 
-class Quad(Thick, Alignment):
+class Quad(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -874,13 +988,17 @@ class Quad(Thick, Alignment):
         dy: float = 0,
         rotation: float = 0,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         A Quadrupole magnet.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -893,7 +1011,7 @@ class Quad(Thick, Alignment):
     @k.setter
     def k(self, arg1: float) -> None: ...
 
-class RFCavity(Thick, Alignment):
+class RFCavity(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -907,13 +1025,17 @@ class RFCavity(Thick, Alignment):
         rotation: float = 0,
         mapsteps: int = 1,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         An RF cavity.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -947,7 +1069,7 @@ class RFCavity(Thick, Alignment):
     @phase.setter
     def phase(self, arg1: float) -> None: ...
 
-class Sbend(Thick, Alignment):
+class Sbend(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -956,13 +1078,17 @@ class Sbend(Thick, Alignment):
         dy: float = 0,
         rotation: float = 0,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         An ideal sector bend.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -975,7 +1101,7 @@ class Sbend(Thick, Alignment):
     @rc.setter
     def rc(self, arg1: float) -> None: ...
 
-class ShortRF(Thin, Alignment):
+class ShortRF(Named, Thin, Alignment):
     def __init__(
         self,
         V: float,
@@ -984,13 +1110,17 @@ class ShortRF(Thin, Alignment):
         dx: float = 0,
         dy: float = 0,
         rotation: float = 0,
+        name: str | None = None,
     ) -> None:
         """
         A short RF cavity element.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -1017,7 +1147,7 @@ class ShortRF(Thin, Alignment):
     @phase.setter
     def phase(self, arg1: float) -> None: ...
 
-class SoftQuadrupole(Thick, Alignment):
+class SoftQuadrupole(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -1029,13 +1159,17 @@ class SoftQuadrupole(Thick, Alignment):
         rotation: float = 0,
         mapsteps: int = 1,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         A soft-edge quadrupole.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -1055,7 +1189,7 @@ class SoftQuadrupole(Thick, Alignment):
     @mapsteps.setter
     def mapsteps(self, arg1: int) -> None: ...
 
-class SoftSolenoid(Thick, Alignment):
+class SoftSolenoid(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -1068,13 +1202,17 @@ class SoftSolenoid(Thick, Alignment):
         rotation: float = 0,
         mapsteps: int = 1,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         A soft-edge solenoid.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -1101,7 +1239,7 @@ class SoftSolenoid(Thick, Alignment):
     @unit.setter
     def unit(self, arg1: float) -> None: ...
 
-class Sol(Thick, Alignment):
+class Sol(Named, Thick, Alignment):
     def __init__(
         self,
         ds: float,
@@ -1110,13 +1248,17 @@ class Sol(Thick, Alignment):
         dy: float = 0,
         rotation: float = 0,
         nslice: int = 1,
+        name: str | None = None,
     ) -> None:
         """
         An ideal hard-edge Solenoid magnet.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -1129,7 +1271,7 @@ class Sol(Thick, Alignment):
     @ks.setter
     def ks(self, arg1: float) -> None: ...
 
-class TaperedPL(Thin, Alignment):
+class TaperedPL(Named, Thin, Alignment):
     def __init__(
         self,
         k: float,
@@ -1138,6 +1280,7 @@ class TaperedPL(Thin, Alignment):
         dx: float = 0,
         dy: float = 0,
         rotation: float = 0,
+        name: str | None = None,
     ) -> None:
         """
         A thin nonlinear plasma lens with transverse (horizontal) taper
@@ -1150,7 +1293,10 @@ class TaperedPL(Thin, Alignment):
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.
@@ -1213,16 +1359,25 @@ class Thin:
         number of slices used for the application of space charge
         """
 
-class ThinDipole(Thin, Alignment):
+class ThinDipole(Named, Thin, Alignment):
     def __init__(
-        self, theta: float, rc: float, dx: float = 0, dy: float = 0, rotation: float = 0
+        self,
+        theta: float,
+        rc: float,
+        dx: float = 0,
+        dy: float = 0,
+        rotation: float = 0,
+        name: str | None = None,
     ) -> None:
         """
         A thin kick model of a dipole bend.
         """
     def __repr__(self) -> str: ...
     def push(
-        self, pc: impactx.impactx_pybind.ImpactXParticleContainer, step: int = 0
+        self,
+        pc: impactx.impactx_pybind.ImpactXParticleContainer,
+        step: int = 0,
+        period: int = 0,
     ) -> None:
         """
         Push first the reference particle, then all other particles.

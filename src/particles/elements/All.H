@@ -25,6 +25,7 @@
 #include "ExactSbend.H"
 #include "Kicker.H"
 #include "LinearMap.H"
+#include "Marker.H"
 #include "Multipole.H"
 #include "NonlinearLens.H"
 #include "Programmable.H"
@@ -62,6 +63,7 @@ namespace impactx
         ExactSbend,
         Kicker,
         LinearMap,
+        Marker,
         Multipole,
         NonlinearLens,
         Programmable,

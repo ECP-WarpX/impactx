@@ -84,7 +84,7 @@ The code writes out the values in an ASCII file prefixed ``reduced_beam_characte
 * ``sig_px``, ``sig_py``, ``sig_pt``
     Standard deviation of the particle momentum deviations (energy difference for ``pt``) normalized by the magnitude of the reference particle momentum (unit: dimensionless)
 * ``emittance_x``, ``emittance_y``, ``emittance_t``
-    Normalized rms beam emittance (unit: meter)
+    Unnormalized rms beam emittances (unit: meter)
 * ``alpha_x``, ``alpha_y``, ``alpha_t``
     Courant-Snyder (Twiss) alpha (unit: dimensionless).  Transverse Twiss functions are calculated after removing correlations with particle energy.
 * ``beta_x``, ``beta_y``, ``beta_t``
@@ -93,6 +93,11 @@ The code writes out the values in an ASCII file prefixed ``reduced_beam_characte
     Horizontal and vertical dispersion (unit: meter)
 * ``dispersion_px``, ``dispersion_py``
     Derivative of horizontal and vertical dispersion (unit: dimensionless)
+* ``emittance_xn``, ``emittance_yn``, ``emittance_tn``
+    Normalized rms beam emittances (unit: meter)
+* ``emittance_1``, ``emittance_2``, ``emittance_3``
+    Normalized rms beam eigenemittances (aka mode emittances) (unit: meter)
+    These three diagnostics are written optionally if the flag eigenemittances = True.
 * ``charge``
     Total beam charge (unit: Coulomb)
 

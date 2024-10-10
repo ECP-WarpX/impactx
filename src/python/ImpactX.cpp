@@ -62,20 +62,6 @@ void init_ImpactX (py::module& m)
 
         .def("load_inputs_file",
             [](ImpactX const & /* ix */, std::string const & filename) {
-#if defined(AMREX_DEBUG) || defined(DEBUG)
-                // note: only in debug, since this is costly for the file
-                // system for highly parallel simulations with MPI
-                // possible improvement:
-                // - rank 0 tests file & broadcasts existence/failure
-                bool inputs_file_exists = false;
-                if (FILE *fp = fopen(filename.c_str(), "r")) {
-                    fclose(fp);
-                    inputs_file_exists = true;
-                }
-                AMREX_ALWAYS_ASSERT_WITH_MESSAGE(inputs_file_exists,
-                    "load_inputs_file: file does not exist: " + filename);
-#endif
-
                 amrex::ParmParse::addfile(filename);
             })
 
@@ -222,6 +208,16 @@ void init_ImpactX (py::module& m)
                 pp_algo.add("csr_bins", csr_bins);
             },
             "Number of longitudinal bins used for CSR calculations (default: 150)."
+        )
+        .def_property("eigenemittances",
+            [](ImpactX & /* ix */) {
+                return detail::get_or_throw<bool>("diag", "eigenemittances");
+            },
+            [](ImpactX & /* ix */, bool const enable) {
+                amrex::ParmParse pp_diag("diag");
+                pp_diag.add("eigenemittances", enable);
+            },
+            "Enable or disable eigenemittance diagnostic calculations (default: disabled)."
         )
         .def_property("space_charge",
              [](ImpactX & /* ix */) {

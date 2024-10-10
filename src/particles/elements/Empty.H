@@ -12,6 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -35,8 +36,9 @@ namespace impactx
 
         /** Push all particles - nothing to do here */
         void operator() (
-                ImpactXParticleContainer & /* pc */,
-                int /* step */
+            ImpactXParticleContainer & /* pc */,
+            int /* step */,
+            int /* period */
         ) {
             // nothing to do
         }
@@ -62,14 +64,14 @@ namespace impactx
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
         void operator() (
-                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT x,
-                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT y,
-                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT t,
-                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT px,
-                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT py,
-                [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT pt,
-                [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
-                [[maybe_unused]] RefPart const & refpart
+            [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT x,
+            [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT y,
+            [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT t,
+            [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT px,
+            [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT py,
+            [[maybe_unused]] amrex::ParticleReal & AMREX_RESTRICT pt,
+            [[maybe_unused]] uint64_t & AMREX_RESTRICT idcpu,
+            [[maybe_unused]] RefPart const & refpart
         ) const
         {
             // nothing to do

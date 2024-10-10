@@ -76,8 +76,9 @@ namespace detail
          * @param series_name name of the data series, usually the element name
          * @param backend file format backend for openPMD, e.g., "bp" or "h5"
          * @param encoding openPMD iteration encoding: "v"ariable based, "f"ile based, "g"roup based (default)
+         * @param period_sample_intervals for periodic lattice, only output every Nth period (turn)
          */
-        BeamMonitor (std::string series_name, std::string backend="default", std::string encoding="g");
+        BeamMonitor (std::string series_name, std::string backend="default", std::string encoding="g", int period_sample_intervals=1);
 
         BeamMonitor (BeamMonitor const & other) = default;
         BeamMonitor (BeamMonitor && other) = default;
@@ -108,10 +109,12 @@ namespace detail
          *
          * @param[in,out] pc particle container to push
          * @param[in] step global step for diagnostics
+         * @param[in] period for periodic lattices, this is the current period (turn or cycle)
          */
         void operator() (
             ImpactXParticleContainer & pc,
-            int step
+            int step,
+            int period
         );
 
         /** Write a tile of particles
@@ -155,6 +158,8 @@ namespace detail
         int m_step = 0; //! global step for output
 
         int m_file_min_digits = 6; //! minimum number of digits to iteration number in file name
+
+        int m_period_sample_intervals = 1; //! only output every Nth period (turn or cycle) of periodic lattices
 
         /** This rank's offset in the MPI-global particle array, by level
          *

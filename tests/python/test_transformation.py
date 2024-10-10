@@ -81,7 +81,7 @@ def test_transformation():
     for key, val in rbc_s0.items():
         if not np.isclose(val, rbc_s[key], rtol=rtol, atol=atol):
             print(f"initial[{key}]={val}, final[{key}]={rbc_s[key]} not equal")
-        assert np.isclose(val, rbc_s[key], rtol=rtol, atol=atol)
+            assert False
     # assert that the t-based beam is different, at least in the following keys:
     large_st_diff_keys = [
         "beta_x",

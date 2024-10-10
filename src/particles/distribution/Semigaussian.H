@@ -103,14 +103,14 @@ namespace impactx::distribution
             phi = amrex::Random(engine);
             phi = 2_prt*pi*phi;
             v = amrex::Random(engine);
-            r = sqrt(v);
-            x = r*cos(phi);
-            y = r*sin(phi);
+            r = std::sqrt(v);
+            x = r * std::cos(phi);
+            y = r * std::sin(phi);
             t = amrex::Random(engine);
             t = 2_prt*(t-0.5_prt);
 
             // Scale to produce the identity covariance matrix:
-            amrex::ParticleReal const c = sqrt(3.0_prt);
+            amrex::ParticleReal const c = std::sqrt(3.0_prt);
             x = 2_prt*x;
             y = 2_prt*y;
             t = c*t;
@@ -119,27 +119,27 @@ namespace impactx::distribution
 
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            px = ln1*cos(2_prt*pi*u2);
-            py = ln1*sin(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            px = ln1 * std::cos(2_prt*pi*u2);
+            py = ln1 * std::sin(2_prt*pi*u2);
 
             u1 = amrex::Random(engine);
             u2 = amrex::Random(engine);
-            ln1 = sqrt(-2_prt*log(u1));
-            pt = ln1*cos(2_prt*pi*u2);
+            ln1 = std::sqrt(-2_prt*std::log(u1));
+            pt = ln1 * std::cos(2_prt*pi*u2);
 
             // Transform to produce the desired second moments/correlations:
-            root = sqrt(1.0_prt-m_muxpx*m_muxpx);
+            root = std::sqrt(1.0_prt-m_muxpx*m_muxpx);
             a1 = m_lambdaX * x / root;
             a2 = m_lambdaPx * (-m_muxpx * x / root + px);
             x = a1;
             px = a2;
-            root = sqrt(1.0_prt-m_muypy*m_muypy);
+            root = std::sqrt(1.0_prt-m_muypy*m_muypy);
             a1 = m_lambdaY * y / root;
             a2 = m_lambdaPy * (-m_muypy * y / root + py);
             y = a1;
             py = a2;
-            root = sqrt(1.0_prt-m_mutpt*m_mutpt);
+            root = std::sqrt(1.0_prt-m_mutpt*m_mutpt);
             a1 = m_lambdaT * t / root;
             a2 = m_lambdaPt * (-m_mutpt * t / root + pt);
             t = a1;

@@ -219,6 +219,23 @@ add_impactx_test(FODO.py.MPI
     examples/fodo/plot_fodo.py
 )
 
+# FODO Channel ################################################################
+#
+add_impactx_test(FODO_channel
+        examples/fodo_channel/input_fodo.in
+        OFF  # ImpactX MPI-parallel
+        examples/fodo_channel/analysis_fodo.py
+        examples/fodo_channel/plot_fodo.py
+)
+add_impactx_test(FODO_channel.py
+        examples/fodo_channel/run_fodo.py
+        OFF  # ImpactX MPI-parallel
+        examples/fodo_channel/analysis_fodo.py
+        examples/fodo_channel/plot_fodo.py
+)
+label_impactx_test(FODO_channel slow)
+label_impactx_test(FODO_channel.py slow)
+
 # Chicane #####################################################################
 #
 add_impactx_test(chicane
@@ -957,5 +974,21 @@ add_impactx_test(dogleg.py
     examples/dogleg/run_dogleg.py
       OFF  # ImpactX MPI-parallel
     examples/dogleg/analysis_dogleg.py
+    OFF  # no plot script yet
+)
+
+# Coupled Optics #############################################################
+#
+# w/o space charge
+add_impactx_test(coupled-optics
+    examples/coupled_optics/input_coupled_optics.in
+    ON   # ImpactX MPI-parallel
+    examples/coupled_optics/analysis_coupled_optics.py
+    OFF  # no plot script yet
+)
+add_impactx_test(coupled-optics.py
+    examples/coupled_optics/run_coupled_optics.py
+    OFF  # ImpactX MPI-parallel
+    examples/coupled_optics/analysis_coupled_optics.py
     OFF  # no plot script yet
 )

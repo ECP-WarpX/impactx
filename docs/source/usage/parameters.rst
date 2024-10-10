@@ -449,6 +449,11 @@ Lattice Elements
                 openPMD `iteration encoding <https://openpmd-api.readthedocs.io/en/0.14.0/usage/concepts.html#iteration-and-series>`__: (v)ariable based, (f)ile based, (g)roup based (default)
                 variable based is an `experimental feature with ADIOS2 <https://openpmd-api.readthedocs.io/en/0.14.0/backends/adios2.html#experimental-new-adios2-schema>`__.
 
+            * ``<element_name>.period_sample_intervals`` (``int``, default value: ``1``)
+
+                for periodic lattice, only output every Nth period (turn).
+                By default, diagnostics are returned every cycle.
+
             * ``<element_name>.nonlinear_lens_invariants`` (``boolean``, default value: ``false``)
 
                 Compute and output the invariants H and I within the nonlinear magnetic insert element (see: ``nonlinear_lens``).
@@ -683,8 +688,8 @@ Diagnostics and output
   This option is ignored for the openPMD output elements (remove them from the lattice to disable).
 
 * ``diag.slice_step_diagnostics`` (``boolean``, optional, default: ``false``)
-  By default, diagnostics is performed at the beginning and end of the simulation.
-  Enabling this flag will write diagnostics every step and slice step
+  By default, diagnostics are computed and written at the beginning and end of the simulation.
+  Enabling this flag will write diagnostics at every step and slice step.
 
 * ``diag.file_min_digits`` (``integer``, optional, default: ``6``)
     The minimum number of digits used for the step number appended to the diagnostic file names.
@@ -693,6 +698,10 @@ Diagnostics and output
 
   Diagnostics for particles lost in apertures, stored as ``diags/openPMD/particles_lost.*`` at the end of the simulation.
   See the ``beam_monitor`` element for backend values.
+
+* ``diag.eigenemittances`` (``boolean``, optional, default: ``false``)
+  If this flag is enabled, the 3 eigenemittances of the 6D beam distribution are computed and written as diagnostics.
+  This flag is disabled by default to reduce computational cost.
 
 
 .. _running-cpp-parameters-diagnostics-insitu:

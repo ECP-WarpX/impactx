@@ -238,6 +238,13 @@ class ImpactX:
     @dynamic_size.setter
     def dynamic_size(self, arg1: bool) -> None: ...
     @property
+    def eigenemittances(self) -> bool:
+        """
+        Enable or disable eigenemittance diagnostic calculations (default: disabled).
+        """
+    @eigenemittances.setter
+    def eigenemittances(self, arg1: bool) -> None: ...
+    @property
     def finest_level(self) -> int:
         """
         The currently finest level of mesh-refinement used. This is always less or equal to max_level.
@@ -683,6 +690,7 @@ def push(
     | elements.ExactDrift
     | elements.ExactSbend
     | elements.Kicker
+    | elements.Marker
     | elements.Multipole
     | elements.NonlinearLens
     | elements.Programmable
@@ -697,6 +705,7 @@ def push(
     | elements.TaperedPL
     | elements.ThinDipole,
     step: int = 0,
+    period: int = 0,
 ) -> None:
     """
     Push particles through an element
@@ -706,6 +715,6 @@ __author__: str = (
     "Axel Huebl, Chad Mitchell, Ryan Sandberg, Marco Garten, Ji Qiang, et al."
 )
 __license__: str = "BSD-3-Clause-LBNL"
-__version__: str = "24.09"
+__version__: str = "24.10"
 s: CoordSystem  # value = <CoordSystem.s: 0>
 t: CoordSystem  # value = <CoordSystem.t: 1>

@@ -33,6 +33,8 @@ Single Particle Dynamics
    examples/achromatic_spectrometer/README.rst
    examples/fodo_programmable/README.rst
    examples/dogleg/README.rst
+   examples/coupled_optics/README.rst
+
 
 Collective Effects
 ------------------
@@ -69,6 +71,16 @@ Beam Distributions
    :maxdepth: 2
 
    examples/distgen/README
+
+
+Channels & Rings
+----------------
+
+.. toctree::
+   :maxdepth: 1
+
+   examples/fodo_channel/README.rst
+
 
 Lattice Design & Optimization
 -----------------------------

@@ -65,7 +65,7 @@ ds = lens_length / num_lenses
 
 # drift elements
 ds_half = ds / 2.0
-dr = elements.Drift(ds=ds_half)
+dr = elements.Drift(name="dr", ds=ds_half)
 
 # define the nonlinear lens segments
 for j in range(0, num_lenses):
@@ -76,13 +76,18 @@ for j in range(0, num_lenses):
     )
     knll_s = t_strength * c_parameter**2 * ds / beta
     cnll_s = c_parameter * math.sqrt(beta)
-    nllens = elements.NonlinearLens(knll=knll_s, cnll=cnll_s)
+    nllens = elements.NonlinearLens(name="nllens" + str(j), knll=knll_s, cnll=cnll_s)
     segments = [dr, nllens, dr]
     sim.lattice.extend(segments)
 
 # focusing lens
 const = elements.ConstF(
-    ds=1.0e-8, kx=12060.113295833, ky=12060.113295833, kt=1.0e-12, nslice=1
+    name="const",
+    ds=1.0e-8,
+    kx=12060.113295833,
+    ky=12060.113295833,
+    kt=1.0e-12,
+    nslice=1,
 )
 sim.lattice.append(const)
 sim.lattice.append(monitor)
