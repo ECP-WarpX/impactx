@@ -42,10 +42,20 @@ If your project leads to a scientific publication, please consider citing the pa
 Further ImpactX References
 **************************
 
-- Sandberg R T, Lehe R, Mitchell C E, Garten M, Myers A, Qiang J, Vay J-L and Huebl A.
+- Mitchell C, Formenti A, Huebl A, Vay J-L, Qiang J, Garten M, Lehe R.
+  **ImpactX Space Charge Modeling of High Intensity Linacs with Mesh Refinement**.
+  32nd Linear Accelerator Conference (LINAC'24), TUPB090, p. 505, 2024.
+  `DOI:10.18429/JACoW-LINAC2024-TUPB090 <https://doi.org/10.18429/JACoW-LINAC2024-TUPB090>`__
+
+- Mitchell C, Formenti A, Huebl A, Vay J-L, Qiang J, Garten M, Lehe R, Sandberg R.
+  **ImpactX Space Charge Modeling of High Intensity Linacs with Mesh Refinement**.
+  15th International Particle Accelerator Physics Conference (IPAC'24), WEPR65, p. 2653, 2024.
+  `DOI:10.18429/JACoW-IPAC2024-WEPR65 <https://doi.org/10.18429/JACoW-IPAC2024-WEPR65>`__
+
+- Sandberg R T, Lehe R, Mitchell C E, Garten M, Myers A, Qiang J, Vay J-L, Huebl A.
   **Synthesizing Particle-in-Cell Simulations Through Learning and GPU Computing for Hybrid Particle Accelerator Beamlines**.
-  Proc. of Platform for Advanced Scientific Computing (PASC'24), *submitted*, 2024.
-  `arXiv:2402.17248 <http://arxiv.org/abs/2402.17248>`__
+  Proc. of Platform for Advanced Scientific Computing (PASC'24), *PASC24 Best Paper Award*, 2024.
+  `DOI:10.1145/3659914.3659937 <https://doi.org/10.1145/3659914.3659937>`__
 
 - Mitchell C E, Huebl A, Qiang J, Lehe R, Garten M, Sandberg R T, Vay J-L.
   **ImpactX Modeling of Benchmark Tests for Space Charge Validation**.
