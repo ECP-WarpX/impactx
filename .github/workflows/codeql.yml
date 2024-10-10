@@ -30,23 +30,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        name: Install Python
+        with:
+          python-version: '3.x'
+
       - name: Install Packages
         run: |
           sudo apt-get update
           sudo apt-get install --yes cmake openmpi-bin libfftw3-dev libfftw3-mpi-dev libopenmpi-dev libhdf5-openmpi-dev
 
           python -m pip install --upgrade pip
+          python -m pip install --upgrade pipx
           python -m pip install --upgrade wheel
-          python -m pip install --upgrade cmake
-          export CMAKE="$HOME/.local/bin/cmake" && echo "CMAKE=$CMAKE" >> $GITHUB_ENV
           python -m pip install --upgrade numpy
           python -m pip install --upgrade mpi4py
           python -m pip install --upgrade pytest
+          python -m pip install --upgrade cmake
+          python -m pipx install cmake
 
       - name: Configure (C++)
         if: ${{ matrix.language == 'cpp' }}
         run: |
-          $CMAKE -S . -B build -DImpactX_FFT=ON -DImpactX_PYTHON=OFF
+          cmake -S . -B build -DImpactX_FFT=ON -DImpactX_PYTHON=OFF
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -64,7 +70,7 @@ jobs:
       - name: Build (C++)
         if: ${{ matrix.language == 'cpp' }}
         run: |
-          $CMAKE --build build -j 4
+          cmake --build build -j 4
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
