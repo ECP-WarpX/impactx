@@ -43,8 +43,8 @@ Initial Beam Distributions
         * ``beam.muypy`` (``float``, dimensionless, default: ``0``) correlation Y-Py
         * ``beam.mutpt`` (``float``, dimensionless, default: ``0``) correlation T-Pt
 
-    * Courant-Snyder / Twiss parameters.
-      To enable input via CS / Twiss parameters, add the suffix ``_from_cs`` or ``from_twiss`` to the name of the distribution.
+    * Courant-Snyder (Twiss) parameters.
+      To enable input via Courant-Snyder (Twiss) parameters, add the suffix ``from_twiss`` to the name of the distribution.
       Use the following parameters to characterize it:
 
         * ``beam.alphaX`` (``float``, dimensionless, default: ``0``) CS / Twiss :math:`\alpha` for X
@@ -59,21 +59,21 @@ Initial Beam Distributions
 
     The following distributions are available:
 
-    * ``waterbag`` or ``waterbag_from_cs``/``waterbag_from_twiss`` for initial Waterbag distribution.
+    * ``waterbag`` or ``waterbag_from_twiss`` for initial Waterbag distribution.
 
-    * ``kurth6d`` or ``kurth6d_from_cs``/``kurth6d_from_twiss`` for initial 6D Kurth distribution.
+    * ``kurth6d`` or ``kurth6d_from_twiss`` for initial 6D Kurth distribution.
 
-    * ``gaussian`` or ``gaussian_from_cs``/``gaussian_from_twiss`` for initial 6D Gaussian (normal) distribution.
+    * ``gaussian`` or ``gaussian_from_twiss`` for initial 6D Gaussian (normal) distribution.
 
-    * ``kvdist`` or ``kvdist_from_cs``/``kvdist_from_twiss`` for initial K-V distribution in the transverse plane.
+    * ``kvdist`` or ``kvdist_from_twiss`` for initial K-V distribution in the transverse plane.
       The distribution is uniform in t and Gaussian in pt.
 
-    * ``kurth4d`` or ``kurth4d_from_cs``/``kurth4d_from_twiss`` for initial 4D Kurth distribution in the transverse plane.
+    * ``kurth4d`` or ``kurth4d_from_twiss`` for initial 4D Kurth distribution in the transverse plane.
       The distribution is uniform in t and Gaussian in pt.
 
-    * ``semigaussian`` or ``semigaussian_from_cs``/``semigaussian_from_twiss`` for initial Semi-Gaussian distribution.  The distribution is uniform within a cylinder in (x,y,z) and Gaussian in momenta (px,py,pt).
+    * ``semigaussian`` or ``semigaussian_from_twiss`` for initial Semi-Gaussian distribution.  The distribution is uniform within a cylinder in (x,y,z) and Gaussian in momenta (px,py,pt).
 
-    * ``triangle`` or ``triangle_from_cs``/``triangle_from_twiss`` a triangle distribution for laser-plasma acceleration related applications.
+    * ``triangle`` or ``triangle_from_twiss`` a triangle distribution for laser-plasma acceleration related applications.
       A ramped, triangular current profile with a Gaussian energy spread (possibly correlated).
       The transverse distribution is a 4D waterbag.
 
@@ -449,6 +449,11 @@ Lattice Elements
                 openPMD `iteration encoding <https://openpmd-api.readthedocs.io/en/0.14.0/usage/concepts.html#iteration-and-series>`__: (v)ariable based, (f)ile based, (g)roup based (default)
                 variable based is an `experimental feature with ADIOS2 <https://openpmd-api.readthedocs.io/en/0.14.0/backends/adios2.html#experimental-new-adios2-schema>`__.
 
+            * ``<element_name>.period_sample_intervals`` (``int``, default value: ``1``)
+
+                for periodic lattice, only output every Nth period (turn).
+                By default, diagnostics are returned every cycle.
+
             * ``<element_name>.nonlinear_lens_invariants`` (``boolean``, default value: ``false``)
 
                 Compute and output the invariants H and I within the nonlinear magnetic insert element (see: ``nonlinear_lens``).
@@ -683,8 +688,8 @@ Diagnostics and output
   This option is ignored for the openPMD output elements (remove them from the lattice to disable).
 
 * ``diag.slice_step_diagnostics`` (``boolean``, optional, default: ``false``)
-  By default, diagnostics is performed at the beginning and end of the simulation.
-  Enabling this flag will write diagnostics every step and slice step
+  By default, diagnostics are computed and written at the beginning and end of the simulation.
+  Enabling this flag will write diagnostics at every step and slice step.
 
 * ``diag.file_min_digits`` (``integer``, optional, default: ``6``)
     The minimum number of digits used for the step number appended to the diagnostic file names.
@@ -693,6 +698,10 @@ Diagnostics and output
 
   Diagnostics for particles lost in apertures, stored as ``diags/openPMD/particles_lost.*`` at the end of the simulation.
   See the ``beam_monitor`` element for backend values.
+
+* ``diag.eigenemittances`` (``boolean``, optional, default: ``false``)
+  If this flag is enabled, the 3 eigenemittances of the 6D beam distribution are computed and written as diagnostics.
+  This flag is disabled by default to reduce computational cost.
 
 
 .. _running-cpp-parameters-diagnostics-insitu:

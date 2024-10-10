@@ -47,7 +47,7 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 sim.lattice.extend(
     [
         monitor,
-        elements.ConstF(ds=2.0, kx=1.0, ky=1.0, kt=1.0),
+        elements.ConstF(name="constf1", ds=2.0, kx=1.0, ky=1.0, kt=1.0),
         monitor,
     ]
 )

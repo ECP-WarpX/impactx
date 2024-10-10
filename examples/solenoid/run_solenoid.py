@@ -48,7 +48,7 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 sim.lattice.extend(
     [
         monitor,
-        elements.Sol(ds=3.820395, ks=0.8223219329893234),
+        elements.Sol(name="sol1", ds=3.820395, ks=0.8223219329893234),
         monitor,
     ]
 )

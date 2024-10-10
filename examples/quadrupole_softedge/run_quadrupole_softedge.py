@@ -50,6 +50,7 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 ns = 1  # number of slices per ds in the element
 
 quad1 = elements.SoftQuadrupole(
+    name="quad1",
     ds=1.0,
     gscale=1.0,
     cos_coefficients=[2],
@@ -59,6 +60,7 @@ quad1 = elements.SoftQuadrupole(
 )
 
 quad2 = elements.SoftQuadrupole(
+    name="quad2",
     ds=1.0,
     gscale=-1.0,
     cos_coefficients=[2],
@@ -67,8 +69,8 @@ quad2 = elements.SoftQuadrupole(
     nslice=ns,
 )
 
-drift1 = elements.Drift(ds=0.25, nslice=ns)
-drift2 = elements.Drift(ds=0.5, nslice=ns)
+drift1 = elements.Drift(name="drift1", ds=0.25, nslice=ns)
+drift2 = elements.Drift(name="drift2", ds=0.5, nslice=ns)
 
 # assign a fodo segment
 sim.lattice.extend([monitor, drift1, quad1, drift2, quad2, drift1, monitor])

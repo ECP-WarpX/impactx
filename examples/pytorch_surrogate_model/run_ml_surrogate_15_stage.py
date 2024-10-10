@@ -169,7 +169,7 @@ class LPASurrogateStage(elements.Programmable):
         self.push = self.surrogate_push
         self.ds = surrogate_length
 
-    def surrogate_push(self, pc, step):
+    def surrogate_push(self, pc, step, period):
         ref_part = pc.ref_particle()
         ref_z_i = ref_part.z
         ref_z_i_LPA = ref_z_i - self.stage_start
@@ -304,7 +304,7 @@ class UpdateConstF(elements.Programmable):
         self.x_or_y = x_or_y
         self.push = self.set_lens
 
-    def set_lens(self, pc, step):
+    def set_lens(self, pc, step, period):
         # get envelope parameters
         rbc = pc.reduced_beam_characteristics()
         alpha = rbc[f"alpha_{self.x_or_y}"]

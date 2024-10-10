@@ -4,6 +4,17 @@ Generation of beam distributions
 
 The following examples are tests of beam initialization for distributions of various types.
 
+.. note::
+
+    Please consult :ref:`theory-collective-beam-distribution-input` for our conventions on beam distribution input.
+    We currently offer two different methods:
+
+    1. Phase space ellipse axis intersections (ImpactX native)
+    2. Courant-Snyder (Twiss) parameters
+
+    For illustration purposes, some of the following examples use Twiss initialization while some use the ImpactX native initialization.
+    Both are equivalent.
+
 In each example, we use a 2 GeV electron beam with initial unnormalized rms emittance of 2 nm.
 
 The matched Twiss parameters are the same as those used in the FODO example:
@@ -20,10 +31,10 @@ In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_
 
 .. _examples-distgen-gaussian:
 
-A 6d Gaussian distribution
-=============================
+A 6d Gaussian distribution from Twiss functions
+===============================================
 
-A Gaussian distribution in all 6 phase space variables.
+A Gaussian distribution in all 6 phase space variables, initialized using Courant-Snyder (Twiss) functions.
 
 In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
@@ -33,8 +44,8 @@ Run
 
 This example can be run **either** as:
 
-* **Python** script: ``python3 run_gaussian.py`` or
-* ImpactX **executable** using an input file: ``impactx input_gaussian.in``
+* **Python** script: ``python3 run_gaussian_twiss.py`` or
+* ImpactX **executable** using an input file: ``impactx input_gaussian_twiss.in``
 
 For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
@@ -42,15 +53,15 @@ For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with `
 
    .. tab-item:: Python: Script
 
-       .. literalinclude:: run_gaussian.py
+       .. literalinclude:: run_gaussian_twiss.py
           :language: python3
-          :caption: You can copy this file from ``examples/distgen/run_gaussian.py``.
+          :caption: You can copy this file from ``examples/distgen/run_gaussian_twiss.py``.
 
    .. tab-item:: Executable: Input File
 
-       .. literalinclude:: input_gaussian.in
+       .. literalinclude:: input_gaussian_twiss.in
           :language: ini
-          :caption: You can copy this file from ``examples/distgen/input_gaussian.in``.
+          :caption: You can copy this file from ``examples/distgen/input_gaussian_twiss.in``.
 
 
 Analyze
@@ -65,13 +76,12 @@ We run the following script to analyze correctness:
       :caption: You can copy this file from ``examples/distgen/analysis_gaussian.py``.
 
 
+.. _examples-distgen-kvdist_from_twiss:
 
-.. _examples-distgen-kvdist:
+A K-V distribution initialized from Twiss functions
+======================================================
 
-A Kapchinskij-Vladimirskij (K-V) distribution
-===============================================
-
-A 4D K-V distribution in the transverse phase space variables ( + a longitudinally uniform distribution in :math:`t` + a Gaussian distribution in :math:`p_t` ).
+This example is initialized using Courant-Snyder (Twiss) functions.
 
 In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 
@@ -81,8 +91,8 @@ Run
 
 This example can be run **either** as:
 
-* **Python** script: ``python3 run_kvdist.py`` or
-* ImpactX **executable** using an input file: ``impactx input_kvdist.in``
+* **Python** script: ``python3 run_kvdist_twiss.py`` or
+* ImpactX **executable** using an input file: ``impactx input_kvdist_twiss.in``
 
 For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
@@ -90,15 +100,15 @@ For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with `
 
    .. tab-item:: Python: Script
 
-       .. literalinclude:: run_kvdist.py
+       .. literalinclude:: run_kvdist_twiss.py
           :language: python3
-          :caption: You can copy this file from ``examples/distgen/run_kvdist.py``.
+          :caption: You can copy this file from ``examples/distgen/run_kvdist_twiss.py``.
 
    .. tab-item:: Executable: Input File
 
-       .. literalinclude:: input_kvdist.in
+       .. literalinclude:: input_kvdist_twiss.in
           :language: ini
-          :caption: You can copy this file from ``examples/distgen/input_kvdist.in``.
+          :caption: You can copy this file from ``examples/distgen/input_kvdist_twiss.in``.
 
 
 Analyze
@@ -111,55 +121,6 @@ We run the following script to analyze correctness:
    .. literalinclude:: analysis_kvdist.py
       :language: python3
       :caption: You can copy this file from ``examples/distgen/analysis_kvdist.py``.
-
-
-
-
-.. _examples-distgen-kvdist_from_twiss:
-
-A K-V distribution initialized from Twiss functions
-======================================================
-
-Identical to the previous example (examples-kvdist), but initialized using Courant-Snyder Twiss functions.
-
-In this test, the initial and final values of :math:`\lambda_x`, :math:`\lambda_y`, :math:`\lambda_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
-
-
-Run
----
-
-This example can be run **either** as:
-
-* **Python** script: ``python3 run_kvdist_from_twiss.py`` or
-* ImpactX **executable** using an input file: ``impactx input_kvdist_from_twiss.in``
-
-For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
-
-.. tab-set::
-
-   .. tab-item:: Python: Script
-
-       .. literalinclude:: run_kvdist_from_twiss.py
-          :language: python3
-          :caption: You can copy this file from ``examples/distgen/run_kvdist_from_twiss.py``.
-
-   .. tab-item:: Executable: Input File
-
-       .. literalinclude:: input_kvdist_from_twiss.in
-          :language: ini
-          :caption: You can copy this file from ``examples/distgen/input_kvdist_from_twiss.in``.
-
-
-Analyze
--------
-
-We run the following script to analyze correctness:
-
-.. dropdown:: Script ``analysis_kvdist_from_twiss.py``
-
-   .. literalinclude:: analysis_kvdist_from_twiss.py
-      :language: python3
-      :caption: You can copy this file from ``examples/distgen/analysis_kvdist_from_twiss.py``.
 
 
 

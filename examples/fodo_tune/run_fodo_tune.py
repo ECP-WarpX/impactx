@@ -51,11 +51,11 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 ns = 1  # number of slices per ds in the element
 fodo = [
     monitor,
-    elements.Drift(ds=0.25, nslice=ns),
-    elements.Quad(ds=1.0, k=1.0, nslice=ns),
-    elements.Drift(ds=0.5, nslice=ns),
-    elements.Quad(ds=1.0, k=-1.0, nslice=ns),
-    elements.Drift(ds=0.25, nslice=ns),
+    elements.Drift(name="drift1", ds=0.25, nslice=ns),
+    elements.Quad(name="quad1", ds=1.0, k=1.0, nslice=ns),
+    elements.Drift(name="drift2", ds=0.5, nslice=ns),
+    elements.Quad(name="quad2", ds=1.0, k=-1.0, nslice=ns),
+    elements.Drift(name="drift3", ds=0.25, nslice=ns),
 ]
 # assign a fodo segment
 sim.lattice.extend(fodo)

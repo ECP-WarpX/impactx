@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,12 +26,13 @@
 namespace impactx
 {
     struct Kicker
-    : public elements::BeamOptic<Kicker>,
+    : public elements::Named,
+      public elements::BeamOptic<Kicker>,
       public elements::Thin,
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "Kicker";
+        static constexpr auto type = "Kicker";
         using PType = ImpactXParticleContainer::ParticleType;
 
         enum UnitSystem
@@ -48,6 +50,7 @@ namespace impactx
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         Kicker (
             amrex::ParticleReal xkick,
@@ -55,9 +58,11 @@ namespace impactx
             UnitSystem unit,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
-        : Alignment(dx, dy, rotation_degree),
+        : Named(name),
+          Alignment(dx, dy, rotation_degree),
           m_xkick(xkick), m_ykick(ykick), m_unit(unit)
         {
         }

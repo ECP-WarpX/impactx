@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,12 +26,13 @@
 namespace impactx
 {
     struct DipEdge
-    : public elements::BeamOptic<DipEdge>,
+    : public elements::Named,
+      public elements::BeamOptic<DipEdge>,
       public elements::Thin,
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "DipEdge";
+        static constexpr auto type = "DipEdge";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** Edge focusing associated with bend entry or exit
@@ -49,6 +51,7 @@ namespace impactx
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         DipEdge (
             amrex::ParticleReal psi,
@@ -57,9 +60,11 @@ namespace impactx
             amrex::ParticleReal K2,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
-        : Alignment(dx, dy, rotation_degree),
+        : Named(name),
+          Alignment(dx, dy, rotation_degree),
           m_psi(psi), m_rc(rc), m_g(g), m_K2(K2)
         {
         }
@@ -96,13 +101,13 @@ namespace impactx
             shift_in(x, y, px, py);
 
             // edge focusing matrix elements (zero gap)
-            amrex::ParticleReal const R21 = tan(m_psi)/m_rc;
+            amrex::ParticleReal const R21 = std::tan(m_psi)/m_rc;
             amrex::ParticleReal R43 = -R21;
             amrex::ParticleReal vf = 0;
 
             // first-order effect of nonzero gap
-            vf = (1.0_prt + pow(sin(m_psi),2))/(pow(cos(m_psi),3));
-            vf *= m_g * m_K2/(pow(m_rc,2));
+            vf = (1.0_prt + std::pow(sin(m_psi),2))/(std::pow(cos(m_psi),3));
+            vf *= m_g * m_K2/(std::pow(m_rc,2));
             R43 += vf;
 
             // apply edge focusing

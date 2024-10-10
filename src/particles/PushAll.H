@@ -26,6 +26,7 @@ namespace impactx
      * @param[in,out] pc particle container to push
      * @param[in,out] element the beamline element
      * @param[in] step global step for diagnostics
+     * @param[in] period for periodic lattices, this is the current period (turn or cycle)
      * @param[in] omp_parallel allow threading via OpenMP for the particle iterator loop (note: if OMP backend is active)
      */
     template<typename T_Element>
@@ -33,11 +34,12 @@ namespace impactx
             ImpactXParticleContainer & pc,
             T_Element & element,
             [[maybe_unused]] int step,
+            [[maybe_unused]] int period,
             [[maybe_unused]] bool omp_parallel = true
     )
     {
         // performance profiling per element
-        std::string const profile_name = "impactx::Push::" + std::string(T_Element::name);
+        std::string const profile_name = "impactx::Push::" + std::string(T_Element::type);
         BL_PROFILE(profile_name);
 
         // preparing to access reference particle data: RefPart

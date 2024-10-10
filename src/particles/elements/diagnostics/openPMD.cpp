@@ -154,8 +154,8 @@ namespace detail
 #endif // ImpactX_USE_OPENPMD
     }
 
-    BeamMonitor::BeamMonitor (std::string series_name, std::string backend, std::string encoding) :
-        m_series_name(std::move(series_name)), m_OpenPMDFileType(std::move(backend))
+    BeamMonitor::BeamMonitor (std::string series_name, std::string backend, std::string encoding, int period_sample_intervals) :
+        m_series_name(std::move(series_name)), m_OpenPMDFileType(std::move(backend)), m_period_sample_intervals(period_sample_intervals)
     {
 #ifdef ImpactX_USE_OPENPMD
         // pick first available backend if default is chosen
@@ -179,8 +179,10 @@ namespace detail
         else if ( "f" == encoding )
             series_encoding = openPMD::IterationEncoding::fileBased;
 
-        // legacy options from other diagnostics
         amrex::ParmParse pp_diag("diag");
+        // turn filter
+        pp_diag.queryAdd("period_sample_intervals", m_period_sample_intervals);
+        // legacy options from other diagnostics
         pp_diag.queryAdd("file_min_digits", m_file_min_digits);
 
         // Ensure m_series is the same for the same names.
@@ -311,11 +313,16 @@ namespace detail
     void
     BeamMonitor::operator() (
         ImpactXParticleContainer & pc,
-        int step
+        int step,
+        int period
     )
     {
+        // filter out this turn?
+        if (period % m_period_sample_intervals != 0)
+            return;
+
 #ifdef ImpactX_USE_OPENPMD
-        std::string profile_name = "impactx::Push::" + std::string(BeamMonitor::name);
+        std::string profile_name = "impactx::Push::" + std::string(BeamMonitor::type);
         BL_PROFILE(profile_name);
 
         // preparing to access reference particle data: RefPart

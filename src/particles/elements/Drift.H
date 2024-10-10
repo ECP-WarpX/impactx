@@ -14,6 +14,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,12 +26,13 @@
 namespace impactx
 {
     struct Drift
-    : public elements::BeamOptic<Drift>,
+    : public elements::Named,
+      public elements::BeamOptic<Drift>,
       public elements::Thick,
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "Drift";
+        static constexpr auto type = "Drift";
         using PType = ImpactXParticleContainer::ParticleType;
 
         /** A drift
@@ -40,15 +42,18 @@ namespace impactx
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param nslice number of slices used for the application of space charge
+         * @param name a user defined and not necessarily unique name of the element
          */
         Drift (
             amrex::ParticleReal ds,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
             amrex::ParticleReal rotation_degree = 0,
-            int nslice = 1
+            int nslice = 1,
+            std::optional<std::string> name = std::nullopt
         )
-        : Thick(ds, nslice),
+        : Named(name),
+          Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree)
         {
         }
@@ -97,7 +102,7 @@ namespace impactx
 
             // access reference particle values to find beta*gamma^2
             amrex::ParticleReal const pt_ref = refpart.pt;
-            amrex::ParticleReal const betgam2 = pow(pt_ref, 2) - 1.0_prt;
+            amrex::ParticleReal const betgam2 = std::pow(pt_ref, 2) - 1.0_prt;
 
             // advance position and momentum (drift)
             xout = x + slice_ds * px;
@@ -143,7 +148,7 @@ namespace impactx
             amrex::ParticleReal const slice_ds = m_ds / nslice();
 
             // assign intermediate parameter
-            amrex::ParticleReal const step = slice_ds / sqrt(pow(pt,2)-1.0_prt);
+            amrex::ParticleReal const step = slice_ds /std::sqrt(std::pow(pt,2)-1.0_prt);
 
             // advance position and momentum (drift)
             refpart.x = x + step*px;

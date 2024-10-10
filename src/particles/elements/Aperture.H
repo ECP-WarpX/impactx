@@ -15,6 +15,7 @@
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
+#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -25,19 +26,24 @@
 namespace impactx
 {
     struct Aperture
-    : public elements::BeamOptic<Aperture>,
+    : public elements::Named,
+      public elements::BeamOptic<Aperture>,
       public elements::Thin,
       public elements::Alignment,
       public elements::NoFinalize
     {
-        static constexpr auto name = "Aperture";
+        static constexpr auto type = "Aperture";
         using PType = ImpactXParticleContainer::ParticleType;
 
+        // TODO: make AMREX_ENUM and simplify @see shape_name implementation with it
         enum Shape
         {
             rectangular,
             elliptical
         };
+
+        static std::string
+        shape_name (Shape const & shape);
 
         /** A thin collimator element that applies a transverse aperture boundary.
          *  Particles outside the boundary are considered lost.
@@ -48,6 +54,7 @@ namespace impactx
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param name a user defined and not necessarily unique name of the element
          */
         Aperture (
             amrex::ParticleReal xmax,
@@ -55,9 +62,11 @@ namespace impactx
             Shape shape,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
-            amrex::ParticleReal rotation_degree = 0
+            amrex::ParticleReal rotation_degree = 0,
+            std::optional<std::string> name = std::nullopt
         )
-        : Alignment(dx, dy, rotation_degree),
+        : Named(name),
+          Alignment(dx, dy, rotation_degree),
           m_shape(shape), m_xmax(xmax), m_ymax(ymax)
         {
         }
@@ -102,13 +111,13 @@ namespace impactx
             switch (m_shape)
             {
                 case Shape::rectangular :  // default
-                  if (pow(u,2)>1 || pow(v,2) > 1_prt) {
+                  if (std::pow(u,2)>1 || std::pow(v,2) > 1_prt) {
                       amrex::ParticleIDWrapper{idcpu}.make_invalid();
                   }
                   break;
 
                case Shape::elliptical :
-                  if (pow(u,2)+pow(v,2) > 1_prt) {
+                  if (std::pow(u,2) + std::pow(v,2) > 1_prt) {
                       amrex::ParticleIDWrapper{idcpu}.make_invalid();
                   }
                   break;

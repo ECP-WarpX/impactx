@@ -6,24 +6,27 @@ beam.units = static
 beam.kin_energy = 2.0e3
 beam.charge = 1.0e-9
 beam.particle = electron
-beam.distribution = kvdist
-beam.lambdaX = 3.9984884770e-5
-beam.lambdaY = 3.9984884770e-5
-beam.lambdaT = 1.0e-3
-beam.lambdaPx = 2.6623538760e-5
-beam.lambdaPy = 2.6623538760e-5
-beam.lambdaPt = 2.0e-3
-beam.muxpx = -0.846574929020762
-beam.muypy = 0.846574929020762
-beam.mutpt = 0.0
+beam.distribution = waterbag_from_twiss
+beam.alphaX = -1.5905003499999992
+beam.alphaY = 1.5905003499999992
+beam.alphaT = 0.0
+beam.betaX = 2.8216194100262637
+beam.betaY = 2.8216194100262637
+beam.betaT = 0.5
+beam.emittX = 2e-09
+beam.emittY = 2e-09
+beam.emittT = 2e-06
 
 
 ###############################################################################
 # Beamline: lattice elements and segments
 ###############################################################################
-lattice.elements = monitor drift1 quad1 drift2 quad2 drift3 monitor
+lattice.elements = monitor drift1 quad1 drift2 quad2 drift3
+lattice.nslice = 5
+lattice.periods = 101  # FODO channel of 101 periods
 
 monitor.type = beam_monitor
+monitor.period_sample_intervals = 10
 monitor.backend = h5
 
 drift1.type = drift
@@ -49,3 +52,9 @@ drift3.ds = 0.25
 ###############################################################################
 algo.particle_shape = 2
 algo.space_charge = false
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = false
