@@ -238,6 +238,13 @@ class ImpactX:
     @dynamic_size.setter
     def dynamic_size(self, arg1: bool) -> None: ...
     @property
+    def eigenemittances(self) -> bool:
+        """
+        Enable or disable eigenemittance diagnostic calculations (default: disabled).
+        """
+    @eigenemittances.setter
+    def eigenemittances(self, arg1: bool) -> None: ...
+    @property
     def finest_level(self) -> int:
         """
         The currently finest level of mesh-refinement used. This is always less or equal to max_level.
