@@ -17,7 +17,7 @@ class csrConfiguration:
         Creates UI content for CSR.
         """
 
-        with vuetify.VCard(v_show="CSR", style="width: 170px;"):
+        with vuetify.VCard(v_show="csr", style="width: 170px;"):
             with vuetify.VCardTitle("CSR"):
                 vuetify.VSpacer()
                 vuetify.VIcon(

@@ -107,7 +107,7 @@ class InputParameters:
                     with vuetify.VCol(cols=6, classes="py-0"):
                         vuetify.VCheckbox(
                             label="CSR",
-                            v_model=("CSR", False),
+                            v_model=("csr", False),
                             dense=True,
                             classes="mt-0",
                         )
