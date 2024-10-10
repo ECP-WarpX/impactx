@@ -156,6 +156,13 @@ Collective Effects & Overall Simulation Parameters
       Diagnostics for particles lost in apertures.
       See the ``BeamMonitor`` element for backend values.
 
+   .. py:property:: eigenemittances
+
+      Enable (``True``) or disable (``False``) output of eigenemittances at every slice step in elements  (default: ``False``).
+
+      If this flag is enabled, the 3 eigenemittances of the 6D beam distribution are computed and written as diagnostics.
+      This flag is disabled by default to reduce computational cost.
+
    .. py:method:: init_grids()
 
       Initialize AMReX blocks/grids for domain decomposition & space charge mesh.

@@ -209,6 +209,16 @@ void init_ImpactX (py::module& m)
             },
             "Number of longitudinal bins used for CSR calculations (default: 150)."
         )
+        .def_property("eigenemittances",
+            [](ImpactX & /* ix */) {
+                return detail::get_or_throw<bool>("diag", "eigenemittances");
+            },
+            [](ImpactX & /* ix */, bool const enable) {
+                amrex::ParmParse pp_diag("diag");
+                pp_diag.add("eigenemittances", enable);
+            },
+            "Enable or disable eigenemittance diagnostic calculations (default: disabled)."
+        )
         .def_property("space_charge",
              [](ImpactX & /* ix */) {
                  return detail::get_or_throw<bool>("algo", "space_charge");

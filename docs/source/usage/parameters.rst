@@ -688,8 +688,8 @@ Diagnostics and output
   This option is ignored for the openPMD output elements (remove them from the lattice to disable).
 
 * ``diag.slice_step_diagnostics`` (``boolean``, optional, default: ``false``)
-  By default, diagnostics is performed at the beginning and end of the simulation.
-  Enabling this flag will write diagnostics every step and slice step
+  By default, diagnostics are computed and written at the beginning and end of the simulation.
+  Enabling this flag will write diagnostics at every step and slice step.
 
 * ``diag.file_min_digits`` (``integer``, optional, default: ``6``)
     The minimum number of digits used for the step number appended to the diagnostic file names.
@@ -698,6 +698,10 @@ Diagnostics and output
 
   Diagnostics for particles lost in apertures, stored as ``diags/openPMD/particles_lost.*`` at the end of the simulation.
   See the ``beam_monitor`` element for backend values.
+
+* ``diag.eigenemittances`` (``boolean``, optional, default: ``false``)
+  If this flag is enabled, the 3 eigenemittances of the 6D beam distribution are computed and written as diagnostics.
+  This flag is disabled by default to reduce computational cost.
 
 
 .. _running-cpp-parameters-diagnostics-insitu:
