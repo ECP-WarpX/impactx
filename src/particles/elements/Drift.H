@@ -20,6 +20,7 @@
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
+#include <AMReX_SmallMatrix.H>
 
 #include <cmath>
 
@@ -168,7 +169,7 @@ namespace impactx
          */
         AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
 
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6>
+        amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1>
         transport_map(RefPart & AMREX_RESTRICT refpart) {
 
             using namespace amrex::literals; // for _rt and _prt

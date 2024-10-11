@@ -17,6 +17,7 @@
 #include <AMReX_Math.H>
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
+#include <AMReX_SmallMatrix.H>
 
 
 namespace impactx::elements
@@ -41,7 +42,7 @@ namespace impactx::elements
         ~LinearTransport () = default;
 
         // 6x6 linear transport map
-        using Map6x6 = amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6>;
+        using Map6x6 = amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1>;
         Map6x6 m_transport_map; ///< linearized map
     };
 

@@ -10,14 +10,14 @@
 #ifndef IMPACTX_DISTRIBUTION_COVARIANCE_MATRIX_H
 #define IMPACTX_DISTRIBUTION_COVARIANCE_MATRIX_H
 
-#include <AMReX_Array.H>
 #include <AMReX_REAL.H>
+#include <AMReX_SmallMatrix.H>
 
 
 namespace impactx
 {
     /** this is a 6x6 matrix */
-    using CovarianceMatrix = amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6>;
+    using CovarianceMatrix = amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1>;
 
 } // namespace impactx::distribution
 
