@@ -10,6 +10,11 @@ function(find_pybind11)
         message(STATUS "pybind11 repository: ${ImpactX_pybind11_repo} (${ImpactX_pybind11_branch})")
         include(FetchContent)
     endif()
+
+    # rely on our find_package(Python ...) call
+    # https://pybind11.readthedocs.io/en/stable/compiling.html#modules-with-cmake
+    set(PYBIND11_FINDPYTHON ON)
+
     if(ImpactX_pybind11_internal OR ImpactX_pybind11_src)
         set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
