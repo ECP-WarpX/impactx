@@ -74,11 +74,18 @@ class CMakeBuild(build_ext):
         if not extdir.endswith(os.path.sep):
             extdir += os.path.sep
 
+        pyv = sys.version_info
         cmake_args = [
+            # Python: use the calling interpreter in CMake
+            # https://cmake.org/cmake/help/latest/module/FindPython.html#hints
+            # https://cmake.org/cmake/help/latest/command/find_package.html#config-mode-version-selection
+            f"-DPython_ROOT_DIR={sys.prefix}",
+            f"-DPython_FIND_VERSION={pyv.major}.{pyv.minor}.{pyv.micro}",
+            "-DPython_FIND_VERSION_EXACT=TRUE",
+            "-DPython_FIND_STRATEGY=LOCATION",
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + os.path.join(extdir, "impactx"),
             "-DCMAKE_VERBOSE_MAKEFILE=ON",
             "-DCMAKE_PYTHON_OUTPUT_DIRECTORY=" + extdir,
-            "-DPython_EXECUTABLE=" + sys.executable,
             ## variants
             "-DImpactX_COMPUTE=" + ImpactX_COMPUTE,
             "-DImpactX_FFT:BOOL=" + ImpactX_FFT,

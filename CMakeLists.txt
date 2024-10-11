@@ -136,7 +136,7 @@ impactx_make_third_party_includes_system(WarpX::ablastr_3d ablastr_3d)
 
 # Python
 if(ImpactX_PYTHON)
-    find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+    find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
 
     # default installation directories: Python
     impactx_set_default_install_dirs_python()
