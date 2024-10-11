@@ -44,16 +44,8 @@ namespace impactx::diagnostics
     {
         using namespace amrex::literals;
 
-        std::tuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal> invariants;
-        amrex::ParticleReal I2 = 0.0_prt;
-        amrex::ParticleReal I4 = 0.0_prt;
-        amrex::ParticleReal I6 = 0.0_prt;
-
         // Intermediate matrices used for storage.
-        amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> S1;
-        amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> S2;
-        amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> S4;
-        amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> S6;
+        amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> S1{};
 
         // Construct the matrix S1 = Sigma*J.  This is a
         // permutation of the columns of Sigma with
@@ -70,17 +62,17 @@ namespace impactx::diagnostics
         }
 
         // Carry out necessary matrix multiplications (3 are needed).
-        S2 = S1 * S1;
-        S4 = S2 * S2;
-        S6 = S2 * S4;
+        auto const S2 = S1 * S1;
+        auto const S4 = S2 * S2;
+        auto const S6 = S2 * S4;
 
         // Define the three kinematic invariants (should be nonnegative).
-        I2 = -S2.trace() / 2.0_prt;
-        I4 = +S4.trace() / 2.0_prt;
-        I6 = -S6.trace() / 2.0_prt;
+        amrex::ParticleReal const I2 = -S2.trace() / 2.0_prt;
+        amrex::ParticleReal const I4 = +S4.trace() / 2.0_prt;
+        amrex::ParticleReal const I6 = -S6.trace() / 2.0_prt;
 
 
-        invariants = std::make_tuple(I2,I4,I6);
+        std::tuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal> invariants = std::make_tuple(I2, I4, I6);
         return invariants;
     }
 
