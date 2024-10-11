@@ -20,9 +20,9 @@
 #include <ablastr/constant.H>
 
 #include <AMReX.H>
-#include <AMReX_Array.H>
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
+#include <AMReX_SmallMatrix.H>
 
 #include <array>
 #include <cmath>
@@ -219,7 +219,7 @@ namespace RFCavityData
             amrex::ParticleReal ptout = pt;
 
             // get the linear map
-            amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
+            amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> const R = refpart.map;
 
             // symplectic linear map for the RF cavity is computed using the
             // Hamiltonian formalism as described in:
@@ -228,18 +228,20 @@ namespace RFCavityData
             // so that, e.g., R(3,4) = dyf/dpyi.
 
             // push particles using the linear map
-            xout = R(1,1)*x + R(1,2)*px + R(1,3)*y
-                     + R(1,4)*py + R(1,5)*t + R(1,6)*pt;
-            pxout = R(2,1)*x + R(2,2)*px + R(2,3)*y
-                  + R(2,4)*py + R(2,5)*t + R(2,6)*pt;
-            yout = R(3,1)*x + R(3,2)*px + R(3,3)*y
-                     + R(3,4)*py + R(3,5)*t + R(3,6)*pt;
-            pyout = R(4,1)*x + R(4,2)*px + R(4,3)*y
-                  + R(4,4)*py + R(4,5)*t + R(4,6)*pt;
-            tout = R(5,1)*x + R(5,2)*px + R(5,3)*y
-                     + R(5,4)*py + R(5,5)*t + R(5,6)*pt;
-            ptout = R(6,1)*x + R(6,2)*px + R(6,3)*y
-                  + R(6,4)*py + R(6,5)*t + R(6,6)*pt;
+            // clang-format off
+            xout =  R(1,1)*x +  R(1,2)*px + R(1,3)*y
+                  + R(1,4)*py + R(1,5)*t +  R(1,6)*pt;
+            pxout = R(2,1)*x +  R(2,2)*px + R(2,3)*y
+                  + R(2,4)*py + R(2,5)*t +  R(2,6)*pt;
+            yout =  R(3,1)*x +  R(3,2)*px + R(3,3)*y
+                  + R(3,4)*py + R(3,5)*t +  R(3,6)*pt;
+            pyout = R(4,1)*x +  R(4,2)*px + R(4,3)*y
+                  + R(4,4)*py + R(4,5)*t +  R(4,6)*pt;
+            tout =  R(5,1)*x +  R(5,2)*px + R(5,3)*y
+                  + R(5,4)*py + R(5,5)*t +  R(5,6)*pt;
+            ptout = R(6,1)*x +  R(6,2)*px + R(6,3)*y
+                  + R(6,4)*py + R(6,5)*t +  R(6,6)*pt;
+            // clang-format on
 
             // assign updated values
             x = xout;
@@ -274,14 +276,7 @@ namespace RFCavityData
             amrex::ParticleReal const sedge = refpart.sedge;
 
             // initialize linear map (deviation) values
-            for (int i=1; i<7; i++) {
-               for (int j=1; j<7; j++) {
-                  if (i == j)
-                      refpart.map(i, j) = 1.0_prt;
-                  else
-                      refpart.map(i, j) = 0.0_prt;
-               }
-            }
+            refpart.map = decltype(refpart.map)::Identity();
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
@@ -422,11 +417,11 @@ namespace RFCavityData
             }
 
             // push the linear map equations
-            amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
+            amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> const R = refpart.map;
             amrex::ParticleReal const betgam = refpart.beta_gamma();
 
-            refpart.map(5,5) = R(5,5) + tau*R(6,5)/pow(betgam,3);
-            refpart.map(5,6) = R(5,6) + tau*R(6,6)/pow(betgam,3);
+            refpart.map(5,5) = R(5,5) + tau*R(6,5)/std::pow(betgam,3);
+            refpart.map(5,6) = R(5,6) + tau*R(6,6)/std::pow(betgam,3);
         }
 
         /** This pushes the reference particle and the linear map matrix
@@ -462,7 +457,7 @@ namespace RFCavityData
             refpart.pt = pt;
 
             // push the linear map equations
-            amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
+            amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> const R = refpart.map;
             amrex::ParticleReal const s = tau/refpart.beta_gamma();
             amrex::ParticleReal const L = E0*ezp * std::sin(k*t+phi)/(2.0_prt*k);
 
@@ -514,7 +509,7 @@ namespace RFCavityData
             refpart.pt = pt - E0*(ezintf-ezint) * std::cos(k*t+phi);
 
             // push the linear map equations
-            amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const R = refpart.map;
+            amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> const R = refpart.map;
             amrex::ParticleReal const M = E0*(ezintf-ezint)*k * std::sin(k*t+phi);
             amrex::ParticleReal const L = E0*(ezpf-ezp) * std::sin(k*t+phi)/(2.0_prt*k)+M/2.0_prt;
 

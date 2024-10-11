@@ -13,7 +13,6 @@
 #include <ablastr/constant.H>
 #include <ablastr/warn_manager/WarnManager.H>
 
-#include <AMReX_Array.H>
 #include <AMReX_REAL.H>
 #include <AMReX_GpuComplex.H>
 
@@ -162,57 +161,6 @@ namespace impactx::diagnostics
         roots = std::make_tuple(x1,x2,x3);
         return roots;
     }
-
-
-    /** Function to take the trace of a square 6x6 matrix.
-     *
-     * @param[in] A a square matrix
-     * @returns the trace of A
-     */
-    amrex::ParticleReal
-    TraceMat (
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & A
-    )
-    {
-        int const dim = 6;
-        amrex::ParticleReal trA = 0.0;
-
-        for (int i = 1; i < dim+1; i++) {
-            trA += A(i,i);
-        }
-        return trA;
-    }
-
-
-    /** Function to multiply two square matrices of dimension 6.
-     *
-     * @param[in] A a square matrix
-     * @param[in] B square matrix
-     * @returns the matrix C = AB
-     */
-    amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6>
-    MultiplyMat (
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & A,
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & B
-    )
-    {
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> C;
-        int const dim = 6;
-
-        for (int i = 1; i < dim+1; i++) {
-            for (int j = 1; j < dim+1; j++) {
-                C(i,j) = 0;
-
-                for (int k = 1; k < dim+1; k++) {
-                    C(i,j) += A(i,k) * B(k,j);
-                }
-
-            }
-
-        }
-        return C;
-    }
-
 
 } // namespace impactx::diagnostics
 
