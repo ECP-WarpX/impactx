@@ -126,7 +126,7 @@ def run(parameters: dict, write_particles=False, write_reduced=False) -> dict:
     sim.lattice.extend(build_lattice(parameters, write_particles=write_particles))
 
     # run simulation
-    sim.evolve()
+    sim.track_particles()
 
     # in situ calculate the reduced beam characteristics
     beam = sim.particle_container()

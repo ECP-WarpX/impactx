@@ -436,9 +436,12 @@ void init_ImpactX (py::module& m)
         )
 
         .def("evolve", &ImpactX::evolve,
-             "Run the main simulation loop for a number of steps."
+             "Run the main simulation loop."
         )
-        // TODO: step
+        .def("track_particles", &ImpactX::track_particles,
+             "Run the particle tracking simulation loop."
+        )
+
         .def("resize_mesh", &ImpactX::ResizeMesh,
              "Resize the mesh :py:attr:`~domain` based on the :py:attr:`~dynamic_size` and related parameters."
         )

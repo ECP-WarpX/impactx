@@ -78,7 +78,7 @@ sim.lattice.append(drift)
 sim.lattice.append(monitor)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

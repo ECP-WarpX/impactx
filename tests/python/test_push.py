@@ -58,7 +58,7 @@ def test_element_push():
     ]
     sim.lattice.extend(fodo)
 
-    sim.evolve()
+    sim.track_particles()
 
     # Push manually through a few (unnamed) elements
     elements.Quad(ds=1.0, k=1.0).push(pc)

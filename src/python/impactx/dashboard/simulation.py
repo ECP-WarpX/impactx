@@ -67,7 +67,7 @@ def run_simulation():
     sim.lattice.extend(lattice_configuration)
 
     # simulate
-    sim.evolve()
+    sim.track_particles()
 
     fig = adjusted_settings_plot(pc)
     fig_original = pc.plot_phasespace()

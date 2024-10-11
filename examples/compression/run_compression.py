@@ -56,7 +56,7 @@ sim.lattice.extend([shortrf1, drift1])
 sim.lattice.append(monitor)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

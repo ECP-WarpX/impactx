@@ -54,7 +54,7 @@ kicklattice = [
 sim.lattice.extend(kicklattice)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

@@ -355,6 +355,6 @@ for i in range(N_stage):
         )
 sim.lattice.extend([monitor])
 
-sim.evolve()
+sim.track_particles()
 sim.finalize()
 del sim

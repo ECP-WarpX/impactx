@@ -69,7 +69,7 @@ lattice_line = [monitor, dr1, q1, q2, q3, dr2, q4, q5, dr2, q6, q7, q8, dr1, mon
 sim.lattice.extend(lattice_line)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

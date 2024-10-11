@@ -96,9 +96,13 @@ namespace impactx
          */
         bool early_param_check ();
 
-        /** Run the main simulation loop for a number of steps
+        /** Run the main simulation loop
          */
         void evolve ();
+
+        /** Run the particle tracking simulation loop
+         */
+        void track_particles ();
 
         /** Query input for warning logger variables and set up warning logger accordingly
          *

@@ -79,7 +79,7 @@ sim.lattice.append(dr3)
 sim.lattice.append(monitor)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

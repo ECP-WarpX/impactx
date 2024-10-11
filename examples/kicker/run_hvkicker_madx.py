@@ -46,7 +46,7 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 sim.lattice.load_file("hvkicker.madx", nslice=1)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

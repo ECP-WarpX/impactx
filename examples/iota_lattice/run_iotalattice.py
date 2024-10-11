@@ -120,7 +120,7 @@ sim.lattice.append(monitor)
 sim.periods = 5
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

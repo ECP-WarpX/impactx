@@ -59,7 +59,7 @@ bend = [
 sim.lattice.extend(bend)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()
