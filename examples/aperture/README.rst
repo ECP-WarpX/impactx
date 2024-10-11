@@ -57,7 +57,7 @@ We run the following script to analyze correctness:
 Aperture Collimation with Periodic Masking
 ===========================================
 
-Proton beam undergoing collimation by a periodic array of rectangular apertures, such as those used in a pepperpot emittance measurement. 
+Proton beam undergoing collimation by a periodic array of rectangular apertures, such as those used in a pepperpot emittance measurement.
 
 We use a 250 MeV proton beam with a horizontal rms beam size of 1.56 mm and a vertical rms beam size of 2.21 mm.
 
@@ -101,4 +101,3 @@ We run the following script to analyze correctness:
    .. literalinclude:: analysis_aperture_pepperpot.py
       :language: python3
       :caption: You can copy this file from ``examples/aperture/analysis_aperture_pepperpot.py``.
-

@@ -105,4 +105,3 @@ assert np.greater_equal(dx.max(), 0.0)
 print(f"  y_max={particles_lost['position_y'].max()}")
 print(f"  y_min={particles_lost['position_y'].min()}")
 assert np.greater_equal(dy.max(), 0.0)
-
