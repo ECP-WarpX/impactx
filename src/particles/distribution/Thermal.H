@@ -420,7 +420,6 @@ namespace distribution
             pt = -pz * m_bg;
         }
 
-    private:
         amrex::ParticleReal m_k; //! linear focusing strength (1/meters)
         amrex::ParticleReal m_T1, m_T2; //! temperature of each particle population
         amrex::ParticleReal m_normalize, m_normalize_halo; //! normalization constant of first/second population
@@ -431,6 +430,7 @@ namespace distribution
         amrex::ParticleReal m_bg; ///< reference value of relativistic beta*gamma
         amrex::ParticleReal m_w;  ///< weight of the secondary (halo) population
 
+    private:
         // radial profile data
         amrex::ParticleReal const * m_cdf1 = nullptr; //! non-owning pointer to device core CDF
         amrex::ParticleReal const * m_cdf2 = nullptr; //! non-owning pointer to device halo CDF
