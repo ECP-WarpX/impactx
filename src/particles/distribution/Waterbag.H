@@ -151,9 +151,9 @@ namespace impactx::distribution
             pt = a2;
         }
 
-        amrex::ParticleReal m_lambdaX,m_lambdaY,m_lambdaT;  //! related position axis intercepts (length) of the phase space ellipse
-        amrex::ParticleReal m_lambdaPx,m_lambdaPy,m_lambdaPt;  //! related momentum axis intercepts of the phase space ellipse
-        amrex::ParticleReal m_muxpx,m_muypy,m_mutpt;  //! correlation length-momentum
+        amrex::ParticleReal m_lambdaX, m_lambdaY, m_lambdaT;  //! related position axis intercepts (length) of the phase space ellipse
+        amrex::ParticleReal m_lambdaPx, m_lambdaPy, m_lambdaPt;  //! related momentum axis intercepts of the phase space ellipse
+        amrex::ParticleReal m_muxpx, m_muypy, m_mutpt;  //! correlation length-momentum
     };
 
 } // namespace impactx::distribution
