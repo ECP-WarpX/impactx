@@ -1,0 +1,52 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 1000000
+beam.units = static
+beam.kin_energy = 250.0
+beam.charge = 1.0e-9
+beam.particle = proton
+beam.distribution = waterbag
+beam.lambdaX = 1.559531175539e-3
+beam.lambdaY = 2.205510139392e-3
+beam.lambdaT = 1.0e-3
+beam.lambdaPx = 6.41218345413e-4
+beam.lambdaPy = 9.06819680526e-4
+beam.lambdaPt = 1.0e-3
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor drift pepperpot monitor
+lattice.nslice = 1
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+drift.type = drift
+drift.ds = 0.123
+
+pepperpot.type = aperture
+pepperpot.shape = rectangular
+pepperpot.xmax = 1.5e-4
+pepperpot.ymax = 1.0e-4
+pepperpot.repeat_x = 1.0e-3
+pepperpot.repeat_y = 1.0e-3
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = true
+diag.backend = h5
