@@ -51,6 +51,8 @@ namespace impactx
          * @param shape aperture shape
          * @param xmax maximum value of horizontal coordinate (m)
          * @param ymax maximum value of vertical coordinate (m)
+         * @param repeat_x horizontal period for repeated masking, optional (m)
+         * @param repeat_y vertical period for repeated masking, optional (m)
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
@@ -59,6 +61,8 @@ namespace impactx
         Aperture (
             amrex::ParticleReal xmax,
             amrex::ParticleReal ymax,
+            amrex::ParticleReal repeat_x,
+            amrex::ParticleReal repeat_y,
             Shape shape,
             amrex::ParticleReal dx = 0,
             amrex::ParticleReal dy = 0,
@@ -67,7 +71,7 @@ namespace impactx
         )
         : Named(name),
           Alignment(dx, dy, rotation_degree),
-          m_shape(shape), m_xmax(xmax), m_ymax(ymax)
+          m_shape(shape), m_xmax(xmax), m_ymax(ymax), m_repeat_x(repeat_x), m_repeat_y(repeat_y)
         {
         }
 
@@ -104,8 +108,17 @@ namespace impactx
             shift_in(x, y, px, py);
 
             // scale horizontal and vertical coordinates
-            amrex::ParticleReal const u = x / m_xmax;
-            amrex::ParticleReal const v = y / m_ymax;
+            amrex::ParticleReal u;
+            amrex::ParticleReal v;
+            // first case: a single aperture
+            if (m_repeat_x == 0.0 || m_repeat_y == 0.0) {
+               u = x / m_xmax;
+               v = y / m_ymax;
+            // second case: a periodically repeated aperture
+            } else {
+               u = std::fmod(x,m_repeat_x) / m_xmax;
+               v = std::fmod(y,m_repeat_y) / m_ymax;
+            }
 
             // compare against the aperture boundary
             switch (m_shape)
@@ -133,6 +146,8 @@ namespace impactx
         Shape m_shape; //! aperture type (rectangular, elliptical)
         amrex::ParticleReal m_xmax; //! maximum horizontal coordinate
         amrex::ParticleReal m_ymax; //! maximum vertical coordinate
+        amrex::ParticleReal m_repeat_x; //! horizontal period for repeated masking
+        amrex::ParticleReal m_repeat_y; //! vertical period for repeated masking
 
     };
 

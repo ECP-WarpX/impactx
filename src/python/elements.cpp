@@ -286,6 +286,8 @@ void init_elements(py::module& m)
         .def(py::init([](
                  amrex::ParticleReal xmax,
                  amrex::ParticleReal ymax,
+                 amrex::ParticleReal repeat_x,
+                 amrex::ParticleReal repeat_y,
                  std::string const & shape,
                  amrex::ParticleReal dx,
                  amrex::ParticleReal dy,
@@ -299,10 +301,12 @@ void init_elements(py::module& m)
                  Aperture::Shape const s = shape == "rectangular" ?
                      Aperture::Shape::rectangular :
                      Aperture::Shape::elliptical;
-                 return new Aperture(xmax, ymax, s, dx, dy, rotation_degree, name);
+                 return new Aperture(xmax, ymax, repeat_x, repeat_y, s, dx, dy, rotation_degree, name);
              }),
              py::arg("xmax"),
              py::arg("ymax"),
+             py::arg("repeat_x") = 0,
+             py::arg("repeat_y") = 0,
              py::arg("shape") = "rectangular",
              py::arg("dx") = 0,
              py::arg("dy") = 0,
@@ -335,6 +339,16 @@ void init_elements(py::module& m)
             [](Aperture & ap) { return ap.m_ymax; },
             [](Aperture & ap, amrex::ParticleReal ymax) { ap.m_ymax = ymax; },
             "maximum vertical coordinate"
+        )
+        .def_property("repeat_x",
+            [](Aperture & ap) { return ap.m_repeat_x; },
+            [](Aperture & ap, amrex::ParticleReal repeat_x) { ap.m_repeat_x = repeat_x; },
+            "horizontal period for repeated aperture masking"
+        )
+        .def_property("repeat_y",
+            [](Aperture & ap) { return ap.m_repeat_y; },
+            [](Aperture & ap, amrex::ParticleReal repeat_y) { ap.m_repeat_y = repeat_y; },
+            "vertical period for repeated aperture masking"
         )
     ;
     register_beamoptics_push(py_Aperture);

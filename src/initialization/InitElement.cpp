@@ -376,9 +376,13 @@ namespace detail
             auto a = detail::query_alignment(pp_element);
 
             amrex::Real xmax, ymax;
+            amrex::ParticleReal repeat_x = 0.0;
+            amrex::ParticleReal repeat_y = 0.0;
             std::string shape_str = "rectangular";
             pp_element.get("xmax", xmax);
             pp_element.get("ymax", ymax);
+            pp_element.queryAdd("repeat_x", repeat_x);
+            pp_element.queryAdd("repeat_y", repeat_y);
             pp_element.queryAdd("shape", shape_str);
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(shape_str == "rectangular" || shape_str == "elliptical",
                                              element_name + ".shape must be \"rectangular\" or \"elliptical\"");
@@ -386,7 +390,7 @@ namespace detail
                                         Aperture::Shape::rectangular :
                                         Aperture::Shape::elliptical;
 
-            m_lattice.emplace_back( Aperture(xmax, ymax, shape, a["dx"], a["dy"], a["rotation_degree"], element_name) );
+            m_lattice.emplace_back( Aperture(xmax, ymax, repeat_x, repeat_y, shape, a["dx"], a["dy"], a["rotation_degree"], element_name) );
         } else if (element_type == "beam_monitor")
         {
             std::string openpmd_name = element_name;

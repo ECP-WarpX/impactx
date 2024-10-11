@@ -936,6 +936,8 @@ This module provides elements for the accelerator lattice.
 
    :param xmax: maximum allowed value of the horizontal coordinate (meter)
    :param ymax: maximum allowed value of the vertical coordinate (meter)
+   :param repeat_x: horizontal period for repeated aperture masking (inactive by default) (meter)
+   :param repeat_y: vertical period for repeated aperture masking (inactive by default) (meter)
    :param shape: aperture boundary shape: ``"rectangular"`` (default) or ``"elliptical"``
    :param dx: horizontal translation error in m
    :param dy: vertical translation error in m

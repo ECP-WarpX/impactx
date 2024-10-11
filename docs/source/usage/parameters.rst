@@ -401,6 +401,8 @@ Lattice Elements
 
             * ``<element_name>.xmax`` (``float``, in meters) maximum value of the horizontal coordinate
             * ``<element_name>.ymax`` (``float``, in meters) maximum value of the vertical coordinate
+            * ``<element_name>.repeat_x`` (``float``, in meters) horizontal period for repeated aperture masking (inactive by default)
+            * ``<element_name>.repeat_y`` (``float``, in meters) vertical period for repeated aperture masking (inactive by default)
             * ``<element_name>.shape`` (``string``) shape of the aperture boundary: ``rectangular`` (default) or ``elliptical``
             * ``<element_name>.dx`` (``float``, in meters) horizontal translation error
             * ``<element_name>.dy`` (``float``, in meters) vertical translation error
