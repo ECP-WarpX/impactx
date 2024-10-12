@@ -9,6 +9,7 @@ import numpy as np
 import openpmd_api as io
 from scipy.stats import moment
 
+
 def get_moments(beam):
     """Calculate standard deviations of beam position & momenta
     and emittance values
@@ -83,12 +84,12 @@ repeat_y = 1.0e-3
 # kept particles, shifted to the fundamental domain
 xshifted = abs(final["position_x"]) + xmax
 yshifted = abs(final["position_y"]) + ymax
-u = np.fmod(xshifted,repeat_x) - xmax
-v = np.fmod(yshifted,repeat_y) - ymax
+u = np.fmod(xshifted, repeat_x) - xmax
+v = np.fmod(yshifted, repeat_y) - ymax
 
 # difference from maximum aperture
 dx = abs(u) - xmax
-dy = abs(v) - ymax 
+dy = abs(v) - ymax
 
 print()
 print(f"  fundamental x_max={u.max()}")
@@ -102,12 +103,12 @@ assert np.less_equal(dy.max(), 0.0)
 # lost particles, shifted to the fundamental domain
 xshifted = abs(particles_lost["position_x"]) - xmax
 yshifted = abs(particles_lost["position_y"]) - ymax
-u = np.fmod(xshifted,repeat_x) - xmax
-v = np.fmod(yshifted,repeat_y) - ymax
+u = np.fmod(xshifted, repeat_x) - xmax
+v = np.fmod(yshifted, repeat_y) - ymax
 
 # difference from maximum aperture
 dx = abs(u) - xmax
-dy = abs(v) - ymax 
+dy = abs(v) - ymax
 
 print()
 print(f"  fundamental x_max={u.max()}")
