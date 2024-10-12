@@ -110,14 +110,16 @@ namespace impactx
             // scale horizontal and vertical coordinates
             amrex::ParticleReal u;
             amrex::ParticleReal v;
+            amrex::ParticleReal dx = m_xmax;
+            amrex::ParticleReal dy = m_ymax;
             // first case: a single aperture
             if (m_repeat_x == 0.0 || m_repeat_y == 0.0) {
                u = x / m_xmax;
                v = y / m_ymax;
             // second case: a periodically repeated aperture
             } else {
-               u = std::fmod(x,m_repeat_x) / m_xmax;
-               v = std::fmod(y,m_repeat_y) / m_ymax;
+               u = (std::fmod(std::abs(x)+dx,m_repeat_x)-dx) / m_xmax;
+               v = (std::fmod(std::abs(y)+dy,m_repeat_y)-dy) / m_ymax;
             }
 
             // compare against the aperture boundary
