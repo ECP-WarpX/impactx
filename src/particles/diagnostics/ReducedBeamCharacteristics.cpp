@@ -16,10 +16,11 @@
 
 #include <AMReX_BLProfiler.H>           // for TinyProfiler
 #include <AMReX_GpuQualifiers.H>        // for AMREX_GPU_DEVICE
-#include <AMReX_REAL.H>                 // for ParticleReal
-#include <AMReX_Reduce.H>               // for ReduceOps
 #include <AMReX_ParallelDescriptor.H>   // for ParallelDescriptor
 #include <AMReX_ParticleReduce.H>       // for ParticleReduce
+#include <AMReX_REAL.H>                 // for ParticleReal
+#include <AMReX_Reduce.H>               // for ReduceOps
+#include <AMReX_SmallMatrix.H>          // for SmallMatrix
 #include <AMReX_TypeList.H>             // for TypeMultiplier
 
 
@@ -320,7 +321,7 @@ namespace impactx::diagnostics
 
         if (compute_eigenemittances) {
            // Store the covariance matrix in dynamical variables:
-           amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> Sigma;
+           amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> Sigma;
            Sigma(1,1) = x_ms;
            Sigma(1,2) = xpx * bg;
            Sigma(1,3) = xy;
@@ -358,7 +359,7 @@ namespace impactx::diagnostics
            Sigma(6,5) = tpt * bg;
            Sigma(6,6) = pt_ms * bg2;
            // Calculate eigenemittances
-           std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> emittances = Eigenemittances(Sigma);
+           std::tuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal> emittances = Eigenemittances(Sigma);
            emittance_1 = std::get<0>(emittances);
            emittance_2 = std::get<1>(emittances);
            emittance_3 = std::get<2>(emittances);

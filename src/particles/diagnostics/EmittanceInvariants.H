@@ -12,11 +12,11 @@
 
 #include "particles/ImpactXParticleContainer.H"
 
-#include <AMReX_Array.H>
 #include <AMReX_REAL.H>
+#include <AMReX_SmallMatrix.H>
 
 #include <string>
-
+#include <tuple>
 
 
 namespace impactx::diagnostics
@@ -44,7 +44,7 @@ namespace impactx::diagnostics
         amrex::ParticleReal
     >
     KineticInvariants (
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & Sigma
+        amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> const & Sigma
     );
 
     /** Returns the three eigenemittances
@@ -65,11 +65,12 @@ namespace impactx::diagnostics
      * @returns tuple containing eigenemittances e1, e2, and e3
      */
     std::tuple<
-            amrex::ParticleReal,
-            amrex::ParticleReal,
-            amrex::ParticleReal>
+        amrex::ParticleReal,
+        amrex::ParticleReal,
+        amrex::ParticleReal
+    >
     Eigenemittances (
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & Sigma
+        amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> const & Sigma
     );
 
 } // namespace impactx::diagnostics

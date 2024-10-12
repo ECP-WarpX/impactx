@@ -7,12 +7,13 @@
  * Authors: Chad Mitchell, Axel Huebl
  * License: BSD-3-Clause-LBNL
  */
+#include "EmittanceInvariants.H"
 #include "CovarianceMatrixMath.H"
 
-#include <AMReX_Extension.H>
-#include <AMReX_REAL.H>
-#include <AMReX_GpuComplex.H>
 #include <AMReX_BLProfiler.H>
+#include <AMReX_Extension.H>
+#include <AMReX_GpuComplex.H>
+#include <AMReX_REAL.H>
 
 #include <cmath>
 #include <stdexcept>
@@ -30,7 +31,7 @@ namespace impactx::diagnostics
      *  calculation of the three eigenemittances.
      *
      * input - Sigma symmetric 6x6 covariance matrix
-     * returns - tuple containing invarants I2, I4, and I6
+     * returns - tuple containing invariants I2, I4, and I6
      */
     std::tuple<
         amrex::ParticleReal,
@@ -38,21 +39,13 @@ namespace impactx::diagnostics
         amrex::ParticleReal
     >
     KineticInvariants (
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & Sigma
+        amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> const & Sigma
     )
     {
         using namespace amrex::literals;
 
-        std::tuple <amrex::ParticleReal,amrex::ParticleReal,amrex::ParticleReal> invariants;
-        amrex::ParticleReal I2 = 0.0_prt;
-        amrex::ParticleReal I4 = 0.0_prt;
-        amrex::ParticleReal I6 = 0.0_prt;
-
         // Intermediate matrices used for storage.
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> S1;
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> S2;
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> S4;
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> S6;
+        amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> S1{};
 
         // Construct the matrix S1 = Sigma*J.  This is a
         // permutation of the columns of Sigma with
@@ -69,17 +62,17 @@ namespace impactx::diagnostics
         }
 
         // Carry out necessary matrix multiplications (3 are needed).
-        S2 = impactx::diagnostics::MultiplyMat(S1,S1);
-        S4 = impactx::diagnostics::MultiplyMat(S2,S2);
-        S6 = impactx::diagnostics::MultiplyMat(S2,S4);
+        auto const S2 = S1 * S1;
+        auto const S4 = S2 * S2;
+        auto const S6 = S2 * S4;
 
         // Define the three kinematic invariants (should be nonnegative).
-        I2 = -impactx::diagnostics::TraceMat(S2)/2.0_prt;
-        I4 = +impactx::diagnostics::TraceMat(S4)/2.0_prt;
-        I6 = -impactx::diagnostics::TraceMat(S6)/2.0_prt;
+        amrex::ParticleReal const I2 = -S2.trace() / 2.0_prt;
+        amrex::ParticleReal const I4 = +S4.trace() / 2.0_prt;
+        amrex::ParticleReal const I6 = -S6.trace() / 2.0_prt;
 
 
-        invariants = std::make_tuple(I2,I4,I6);
+        std::tuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal> invariants = std::make_tuple(I2, I4, I6);
         return invariants;
     }
 
@@ -99,7 +92,7 @@ namespace impactx::diagnostics
             amrex::ParticleReal,
             amrex::ParticleReal>
     Eigenemittances (
-        amrex::Array2D<amrex::ParticleReal, 1, 6, 1, 6> const & Sigma
+        amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> const & Sigma
     )
     {
         BL_PROFILE("impactx::diagnostics::Eigenemittances");
@@ -123,8 +116,8 @@ namespace impactx::diagnostics
         // doi:10.48550/arXiv.1305.1532.
         amrex::ParticleReal a = 1.0_prt;
         amrex::ParticleReal b = -I2;
-        amrex::ParticleReal c = (pow(I2,2)-I4)/2.0_prt;
-        amrex::ParticleReal d = -pow(I2,3)/6.0_prt + I2*I4/2.0_prt - I6/3.0_prt;
+        amrex::ParticleReal c = (std::pow(I2, 2) - I4) / 2.0_prt;
+        amrex::ParticleReal d = -std::pow(I2, 3) / 6.0_prt + I2 * I4 / 2.0_prt - I6 / 3.0_prt;
 
         // Return the cubic coefficients
         //std::cout << "Return a,b,c,d " << a << " " << b << " " << c << " " << d << "\n";
@@ -133,10 +126,10 @@ namespace impactx::diagnostics
         // Caution: The order of e1,e2,e3 should be consistent with the
         // order ex,ey,et in the limit of uncoupled transport.
         // The order below is important and has been checked.
-        roots = CubicRootsTrig(a,b,c,d);
-        amrex::ParticleReal e1 = sqrt(std::abs(std::get<1>(roots)));
-        amrex::ParticleReal e2 = sqrt(std::abs(std::get<2>(roots)));
-        amrex::ParticleReal e3 = sqrt(std::abs(std::get<0>(roots)));
+        roots = CubicRootsTrig(a, b, c, d);
+        amrex::ParticleReal e1 = std::sqrt(std::abs(std::get<1>(roots)));
+        amrex::ParticleReal e2 = std::sqrt(std::abs(std::get<2>(roots)));
+        amrex::ParticleReal e3 = std::sqrt(std::abs(std::get<0>(roots)));
 
         emittances = std::make_tuple(e1,e2,e3);
         return emittances;
