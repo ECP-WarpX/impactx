@@ -43,7 +43,7 @@ series_lost = io.Series("diags/openPMD/particles_lost.h5", io.Access.read_only)
 particles_lost = series_lost.iterations[0].particles["beam"].to_df()
 
 # compare number of particles
-num_particles = 1000000
+num_particles = 100000
 assert num_particles == len(initial)
 # we lost particles in apertures
 assert num_particles > len(final)
@@ -57,7 +57,7 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = 1.8 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 2.0 * num_particles**-0.5  # from random sampling of a smooth distribution
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(

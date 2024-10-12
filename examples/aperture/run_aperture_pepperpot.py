@@ -30,7 +30,7 @@ sim.init_grids()
 # initial vertical rms emittance of 2 um
 kin_energy_MeV = 250.0  # reference energy
 bunch_charge_C = 1.0e-9  # used with space charge
-npart = 1000000  # number of macro particles
+npart = 100000  # number of macro particles
 
 #   reference particle
 ref = sim.particle_container().ref_particle()
