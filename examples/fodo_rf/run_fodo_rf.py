@@ -64,7 +64,7 @@ for element in lattice_no_drifts[1:]:
 sim.lattice.append(monitor)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

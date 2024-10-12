@@ -37,7 +37,7 @@ def test_charge_deposition(save_png=True):
     sim.init_beam_distribution_from_inputs()
     sim.init_lattice_elements_from_inputs()
 
-    sim.evolve()
+    sim.track_particles()
 
     sim.deposit_charge()
 

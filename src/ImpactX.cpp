@@ -128,6 +128,13 @@ namespace impactx {
     {
         BL_PROFILE("ImpactX::evolve");
 
+        track_particles();
+    }
+
+    void ImpactX::track_particles ()
+    {
+        BL_PROFILE("ImpactX::track_particles");
+
         validate();
 
         // verbosity

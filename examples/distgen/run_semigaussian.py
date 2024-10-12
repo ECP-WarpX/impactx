@@ -65,7 +65,7 @@ fodo = [
 sim.lattice.extend(fodo)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

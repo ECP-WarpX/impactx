@@ -83,7 +83,7 @@ sim.add_particles(bunch_charge_C, distr, npart)
 sim.lattice.extend(lattice_configuration)
 
 # Simulate
-sim.evolve()
+sim.track_particles()
 
 sim.finalize()
 """

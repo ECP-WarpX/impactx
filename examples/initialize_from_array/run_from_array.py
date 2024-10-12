@@ -103,7 +103,7 @@ sim.lattice.extend(
     ]
 )
 
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

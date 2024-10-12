@@ -64,7 +64,7 @@ sim.lattice.extend(fodo)
 sim.periods = 100
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 del sim

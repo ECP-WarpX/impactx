@@ -43,7 +43,7 @@ sim.add_particles(bunch_charge_C, distr, npart)
 sim.lattice.load_file("solenoid.madx", nslice=1)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

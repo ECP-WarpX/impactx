@@ -66,7 +66,7 @@ def test_df_pandas(save_png=True):
     sim.lattice.extend(fodo)
 
     # simulate
-    sim.evolve()
+    sim.track_particles()
 
     # check local particles
     df = pc.to_df(local=True)

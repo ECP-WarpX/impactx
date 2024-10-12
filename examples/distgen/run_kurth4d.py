@@ -58,7 +58,7 @@ constf = [
 sim.lattice.extend(constf)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

@@ -96,7 +96,7 @@ sim.lattice.append(monitor)
 sim.periods = 1
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

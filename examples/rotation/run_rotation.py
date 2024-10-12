@@ -55,7 +55,7 @@ rotated_drift = [
 sim.lattice.extend(rotated_drift)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

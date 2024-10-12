@@ -108,7 +108,7 @@ lattice_line = [
 sim.lattice.extend(lattice_line)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

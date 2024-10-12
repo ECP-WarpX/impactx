@@ -34,7 +34,7 @@ def test_impactx_fodo_file():
     sim.init_beam_distribution_from_inputs()
     sim.init_lattice_elements_from_inputs()
 
-    sim.evolve()
+    sim.track_particles()
 
     # validate the results
     beam = sim.particle_container()
@@ -133,7 +133,7 @@ def test_impactx_nofile():
     print(len(sim.lattice))
     assert len(sim.lattice) > 5
 
-    sim.evolve()
+    sim.track_particles()
 
     # finalize simulation
     sim.finalize()
@@ -163,7 +163,7 @@ def test_impactx_noparticles():
     with pytest.raises(
         RuntimeError, match="No particles found. Cannot run evolve without a beam."
     ):
-        sim.evolve()
+        sim.track_particles()
 
     # finalize simulation
     sim.finalize()
@@ -231,7 +231,7 @@ def test_impactx_resting_refparticle():
         RuntimeError,
         match="The reference particle energy is zero. Not yet initialized?",
     ):
-        sim.evolve()
+        sim.track_particles()
 
     # finalize simulation
     sim.finalize()
@@ -254,7 +254,7 @@ def test_impactx_no_elements():
         RuntimeError,
         match="Beamline lattice has zero elements. Not yet initialized?",
     ):
-        sim.evolve()
+        sim.track_particles()
 
     # finalize simulation
     sim.finalize()

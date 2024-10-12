@@ -63,7 +63,7 @@ nllens_lattice = (
 sim.lattice.extend(nllens_lattice)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

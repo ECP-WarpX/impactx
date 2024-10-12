@@ -52,7 +52,7 @@ drift1 = elements.Drift(name="drift1", ds=1.0, nslice=nslice)
 sim.lattice.extend([monitor, drift1, constf1, drift1, monitor])
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

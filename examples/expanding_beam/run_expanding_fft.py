@@ -58,7 +58,7 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 sim.lattice.extend([monitor, elements.Drift(name="d1", ds=6.0, nslice=40), monitor])
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()

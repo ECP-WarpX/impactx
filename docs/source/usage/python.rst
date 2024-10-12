@@ -215,7 +215,11 @@ Collective Effects & Overall Simulation Parameters
 
    .. py:method:: evolve()
 
-      Run the main simulation loop for a number of steps.
+      Run the main simulation loop (deprecated, use ``track_particles``)
+
+   .. py:method:: track_particles()
+
+      Run the particle tracking simulation loop.
 
    .. py:method:: resize_mesh()
 

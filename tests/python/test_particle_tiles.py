@@ -59,7 +59,7 @@ def test_particle_tiles():
     sim.lattice.extend(fodo)
 
     # simulate
-    sim.evolve()
+    sim.track_particles()
 
     # access local particles
     for lvl in range(pc.finest_level + 1):

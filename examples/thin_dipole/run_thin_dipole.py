@@ -64,7 +64,7 @@ sim.lattice.append(inverse_bend)
 sim.lattice.append(monitor)
 
 # run simulation
-sim.evolve()
+sim.track_particles()
 
 # clean shutdown
 sim.finalize()
