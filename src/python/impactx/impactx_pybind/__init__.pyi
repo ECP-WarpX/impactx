@@ -110,7 +110,7 @@ class ImpactX:
         """
     def evolve(self) -> None:
         """
-        Run the main simulation loop for a number of steps.
+        Run the main simulation loop.
         """
     def finalize(self) -> None:
         """
@@ -146,6 +146,10 @@ class ImpactX:
     ) -> amrex.space3d.amrex_3d_pybind.MultiFab:
         """
         space charge force (vector: x,y,z) per level
+        """
+    def track_particles(self) -> None:
+        """
+        Run the particle tracking simulation loop.
         """
     @property
     def abort_on_unused_inputs(self) -> int:
