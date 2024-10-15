@@ -1509,7 +1509,7 @@ void init_elements(py::module& m)
         )
         .def_property("R",
             [](LinearMap & linearmap) { return linearmap.m_transport_map; },
-            [](LinearMap & linearmap, amrex::ParticleReal xkick) { linearmap.m_transport_map = linearmap; },
+            [](LinearMap & linearmap, LinearTransport::Map6x6 R) { linearmap.m_transport_map = linearmap; },
             "linear map as a 6x6 transport matrix"
         )
 
