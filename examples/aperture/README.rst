@@ -63,7 +63,7 @@ We use a 250 MeV proton beam with a horizontal rms beam size of 1.56 mm and a ve
 
 After a short drift of 0.123 m, the beam intercepts a periodic array of apertures of period 1 mm (in the horizontal and vertical), each of which is 0.15 mm x 0.1 mm in size.
 
-In this test, the initial values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nomin>
+In this test, the initial values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\sigma_t`, :math:`\epsilon_x`, :math:`\epsilon_y`, and :math:`\epsilon_t` must agree with nominal values.
 The test fails if:
 
 * any of the final coordinates for the valid (not lost) particles lie outside the aperture boundary or
