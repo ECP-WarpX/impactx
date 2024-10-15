@@ -1480,6 +1480,39 @@ void init_elements(py::module& m)
     ;
     register_beamoptics_push(py_TaperedPL);
 
+    py::class_<LinearMap, elements::Named, elements::Thin, elements::Alignment> py_LinearMap(me, "LinearMap");
+    py_LinearMap
+        .def("__repr__",
+             [](LinearMap const & linearmap) {
+                 return element_name(
+                     linearmap,
+                     std::make_pair("R", linearmap.m_transport_map),
+                 );
+             }
+        )
+        .def(py::init([](
+                LinearTransport::Map6x6 R,
+                amrex::ParticleReal dx,
+                amrex::ParticleReal dy,
+                amrex::ParticleReal rotation_degree,
+                std::optional<std::string> name
+             )
+             {
+             }),
+             py::arg("R"),
+             py::arg("unit") = "dimensionless",
+             py::arg("dx") = 0,
+             py::arg("dy") = 0,
+             py::arg("rotation") = 0,
+             py::arg("name") = py::none(),
+             R"(A user-provided linear map, represented as a 6x6 transport matrix.)"
+        )
+        .def_property("R",
+            [](LinearMap & linearmap) { return linearmap.m_transport_map; },
+            [](LinearMap & linearmap, amrex::ParticleReal xkick) { linearmap.m_transport_map = linearmap; },
+            "linear map as a 6x6 transport matrix"
+        )
+
 
     // freestanding push function
     m.def("push", &Push,
