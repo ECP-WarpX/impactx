@@ -996,15 +996,15 @@ add_impactx_test(coupled-optics.py
 # Aperture with Periodic Masking #########################################################
 #
 # w/o space charge
-add_impactx_test(aperture-pepperpot
-    examples/aperture/input_aperture_pepperpot.in
+add_impactx_test(aperture-periodic
+    examples/aperture/input_aperture_periodic.in
     ON   # ImpactX MPI-parallel
-    examples/aperture/analysis_aperture_pepperpot.py
+    examples/aperture/analysis_aperture_periodic.py
     OFF  # no plot script yet
 )
-add_impactx_test(aperture-pepperpot.py
-    examples/aperture/run_aperture_pepperpot.py
+add_impactx_test(aperture-periodic.py
+    examples/aperture/run_aperture_periodic.py
     OFF  # ImpactX MPI-parallel
-    examples/aperture/analysis_aperture_pepperpot.py
+    examples/aperture/analysis_aperture_periodic.py
     OFF  # no plot script yet
 )
