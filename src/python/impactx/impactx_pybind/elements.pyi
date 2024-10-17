@@ -77,6 +77,8 @@ class Aperture(Named, Thin, Alignment):
         self,
         xmax: float,
         ymax: float,
+        repeat_x: float = 0,
+        repeat_y: float = 0,
         shape: str = "rectangular",
         dx: float = 0,
         dy: float = 0,
@@ -96,6 +98,20 @@ class Aperture(Named, Thin, Alignment):
         """
         Push first the reference particle, then all other particles.
         """
+    @property
+    def repeat_x(self) -> float:
+        """
+        horizontal period for repeated aperture masking
+        """
+    @repeat_x.setter
+    def repeat_x(self, arg1: float) -> None: ...
+    @property
+    def repeat_y(self) -> float:
+        """
+        vertical period for repeated aperture masking
+        """
+    @repeat_y.setter
+    def repeat_y(self, arg1: float) -> None: ...
     @property
     def shape(self) -> str:
         """
