@@ -52,7 +52,7 @@ We run the following script to analyze correctness:
       :caption: You can copy this file from ``examples/aperture/analysis_aperture.py``.
 
 
-.. _examples-aperture-pepperpot:
+.. _examples-aperture-periodic:
 
 Aperture Collimation with Periodic Masking
 ===========================================
@@ -67,37 +67,37 @@ In this test, the initial values of :math:`\sigma_x`, :math:`\sigma_y`, :math:`\
 The test fails if:
 
 * any of the final coordinates for the valid (not lost) particles lie outside the aperture boundary or
-* any of the lost particles are inside the aperture boundary or
-* if the sum of lost and kept particles is not equal to the initial particles
+* any of the lost particles lie inside the aperture boundary or
+* if the sum of the numbers of lost and retained particles is not equal to the number of initial particles
 
 
 Run
 ---
 
-This example can be run as a Python script (``python3 run_aperture_pepperpot.py``) or with an app with an input file (``impactx input_aperture_pepperpot.in``).
+This example can be run as a Python script (``python3 run_aperture_periodic.py``) or with an app with an input file (``impactx input_aperture_periodic.in``).
 Each can also be prefixed with an `MPI executor <https://www.mpi-forum.org>`__, such as ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
 .. tab-set::
 
    .. tab-item:: Python Script
 
-       .. literalinclude:: run_aperture_pepperpot.py
+       .. literalinclude:: run_aperture_periodic.py
           :language: python3
-          :caption: You can copy this file from ``examples/aperture/run_aperture_pepperpot.py``.
+          :caption: You can copy this file from ``examples/aperture/run_aperture_periodic.py``.
 
    .. tab-item:: App Input File
 
-       .. literalinclude:: input_aperture_pepperpot.in
+       .. literalinclude:: input_aperture_periodic.in
           :language: ini
-          :caption: You can copy this file from ``examples/aperture/input_aperture_pepperpot.in``.
+          :caption: You can copy this file from ``examples/aperture/input_aperture_periodic.in``.
 
 Analyze
 -------
 
 We run the following script to analyze correctness:
 
-.. dropdown:: Script ``analysis_aperture_pepperpot.py``
+.. dropdown:: Script ``analysis_aperture_periodic.py``
 
-   .. literalinclude:: analysis_aperture_pepperpot.py
+   .. literalinclude:: analysis_aperture_periodic.py
       :language: python3
-      :caption: You can copy this file from ``examples/aperture/analysis_aperture_pepperpot.py``.
+      :caption: You can copy this file from ``examples/aperture/analysis_aperture_periodic.py``.
