@@ -107,20 +107,19 @@ namespace impactx
             // shift due to alignment errors of the element
             shift_in(x, y, px, py);
 
-            // scale horizontal and vertical coordinates
+            // define intermediate variables
             amrex::ParticleReal u;
             amrex::ParticleReal v;
             amrex::ParticleReal dx = m_xmax;
             amrex::ParticleReal dy = m_ymax;
-            // first case: a single aperture
-            if (m_repeat_x == 0.0 || m_repeat_y == 0.0) {
-               u = x / m_xmax;
-               v = y / m_ymax;
-            // second case: a periodically repeated aperture
-            } else {
-               u = (std::fmod(std::abs(x)+dx,m_repeat_x)-dx) / m_xmax;
-               v = (std::fmod(std::abs(y)+dy,m_repeat_y)-dy) / m_ymax;
-            }
+
+            // if the aperture is periodic, shift x,y coordinates to the fundamental domain
+            u = (m_repeat_x==0.0) ? x : (std::fmod(std::abs(x)+dx,m_repeat_x)-dx);
+            v = (m_repeat_y==0.0) ? y : (std::fmod(std::abs(y)+dy,m_repeat_y)-dy);
+
+            // scale horizontal and vertical coordinates
+            u = u / m_xmax;
+            v = v / m_ymax;
 
             // compare against the aperture boundary
             switch (m_shape)
