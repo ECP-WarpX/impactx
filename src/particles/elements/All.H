@@ -20,20 +20,21 @@
 #include "ConstF.H"
 #include "DipEdge.H"
 #include "Drift.H"
+#include "Empty.H"
 #include "ExactDrift.H"
 #include "ExactSbend.H"
 #include "Kicker.H"
+#include "LinearMap.H"
 #include "Marker.H"
 #include "Multipole.H"
-#include "Empty.H"
 #include "NonlinearLens.H"
 #include "Programmable.H"
+#include "PRot.H"
 #include "Quad.H"
 #include "RFCavity.H"
 #include "Sbend.H"
 #include "ShortRF.H"
 #include "Sol.H"
-#include "PRot.H"
 #include "SoftSol.H"
 #include "SoftQuad.H"
 #include "TaperedPL.H"
@@ -61,6 +62,7 @@ namespace impactx
         ExactDrift,
         ExactSbend,
         Kicker,
+        LinearMap,
         Marker,
         Multipole,
         NonlinearLens,

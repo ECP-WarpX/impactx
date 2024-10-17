@@ -9,6 +9,7 @@
  */
 #include "ImpactX.H"
 #include "particles/elements/All.H"
+#include "particles/elements/mixin/lineartransport.H"
 
 #include <AMReX.H>
 #include <AMReX_BLProfiler.H>
@@ -440,6 +441,23 @@ namespace detail
                     read_element(sub_element_name, m_lattice, nslice_default, mapsteps_default);
                 }
             }
+        } else if (element_type == "linear_map")
+        {
+            auto a = detail::query_alignment(pp_element);
+
+            elements::LinearTransport::Map6x6 transport_map;
+            for (int i=1; i<=6; ++i) {
+                for (int j=1; j<=6; ++j) {
+                    amrex::ParticleReal R_ij = (i == j) ? 1.0 : 0.0;
+                    std::string name = "R" + std::to_string(i) + std::to_string(j);
+                    pp_element.queryAdd(name.c_str(), R_ij);
+
+                    transport_map(i, j) = R_ij;
+                }
+            }
+            std::cout << "Caution: A user-provided linear map is used.  Transport may not be symplectic." << "\n";
+
+            m_lattice.emplace_back(LinearMap(transport_map, a["dx"], a["dy"], a["rotation_degree"]) );
         } else {
             amrex::Abort("Unknown type for lattice element " + element_name + ": " + element_type);
         }

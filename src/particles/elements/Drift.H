@@ -16,9 +16,11 @@
 #include "mixin/thick.H"
 #include "mixin/named.H"
 #include "mixin/nofinalize.H"
+#include "mixin/lineartransport.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_REAL.H>
+#include <AMReX_SmallMatrix.H>
 
 #include <cmath>
 
@@ -160,6 +162,40 @@ namespace impactx
             refpart.s = s + slice_ds;
 
         }
+
+        /** This function returns the linear transport map.
+         *
+         * @returns 6x6 transport matrix
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+
+        amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1>
+        transport_map(RefPart & AMREX_RESTRICT refpart) {
+
+            using namespace amrex::literals; // for _rt and _prt
+            elements::LinearTransport::Map6x6 R = {};
+
+            // length of the current slice
+            amrex::ParticleReal const slice_ds = m_ds / nslice();
+
+            // access reference particle values to find beta*gamma^2
+            amrex::ParticleReal const pt_ref = refpart.pt;
+            amrex::ParticleReal const betgam2 = std::pow(pt_ref, 2) - 1.0_prt;
+
+            // assign linear map matrix elements
+            R(1,1) = 1.0_prt;
+            R(1,2) = slice_ds;
+            R(2,2) = 1.0_prt;
+            R(3,3) = 1.0_prt;
+            R(3,4) = slice_ds;
+            R(4,4) = 1.0_prt;
+            R(5,5) = 1.0_prt;
+            R(5,6) = slice_ds/betgam2;
+            R(6,6) = 1.0_prt;
+            return R;
+
+        }
+
     };
 
 } // namespace impactx

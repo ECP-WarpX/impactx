@@ -51,6 +51,10 @@ namespace impactx
             element(ref_part);
         }
 
+        // push covariance matrix
+        // TODO
+        // note: decide what to do for elements that have no covariance matrix
+
         // loop over refinement levels
         int const nLevel = pc.finestLevel();
         for (int lev = 0; lev <= nLevel; ++lev)
