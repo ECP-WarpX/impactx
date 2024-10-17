@@ -992,3 +992,19 @@ add_impactx_test(coupled-optics.py
     examples/coupled_optics/analysis_coupled_optics.py
     OFF  # no plot script yet
 )
+
+# Aperture with Periodic Masking #########################################################
+#
+# w/o space charge
+add_impactx_test(aperture-periodic
+    examples/aperture/input_aperture_periodic.in
+    ON   # ImpactX MPI-parallel
+    examples/aperture/analysis_aperture_periodic.py
+    OFF  # no plot script yet
+)
+add_impactx_test(aperture-periodic.py
+    examples/aperture/run_aperture_periodic.py
+    OFF  # ImpactX MPI-parallel
+    examples/aperture/analysis_aperture_periodic.py
+    OFF  # no plot script yet
+)
