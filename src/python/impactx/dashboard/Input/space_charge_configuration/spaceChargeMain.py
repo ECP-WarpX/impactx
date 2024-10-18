@@ -22,9 +22,9 @@ state.n_cell_x = 32
 state.n_cell_y = 32
 state.n_cell_z = 32
 
-state.blocking_factor_x = 32
-state.blocking_factor_y = 32
-state.blocking_factor_z = 32
+state.blocking_factor_x = 16
+state.blocking_factor_y = 16
+state.blocking_factor_z = 16
 
 state.mlmg_relative_tolerance = 1.0e-7
 state.mlmg_absolute_tolerance = 0.0
