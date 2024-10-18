@@ -175,6 +175,7 @@ def on_filtered_data_change(**kwargs):
 
 @ctrl.add("run_simulation")
 def run_simulation_and_store():
+    state.simulation_complete = (True,)
     state.plot_options = available_plot_options(simulationClicked=True)
     run_simulation_impactX()
     update_plot()
@@ -228,7 +229,7 @@ class AnalyzeSimulation:
                 with vuetify.VCard(style="height: 50vh; width: 150vh;"):
                     with vuetify.VTabs(v_model=("active_tab", 0)):
                         vuetify.VTab("Plot")
-                        vuetify.VTab("Interact")
+                        vuetify.VTab("Interact", id="interact")
                     vuetify.VDivider()
                     with vuetify.VTabsItems(v_model="active_tab"):
                         with vuetify.VTabItem():

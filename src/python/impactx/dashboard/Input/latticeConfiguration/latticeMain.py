@@ -165,7 +165,6 @@ def on_add_lattice_element_click():
 def on_lattice_element_parameter_change(
     index, parameter_name, parameter_value, parameter_type
 ):
-    parameter_value, input_type = generalFunctions.determine_input_type(parameter_value)
     error_message = generalFunctions.validate_against(parameter_value, parameter_type)
 
     update_latticeElement_parameters(
@@ -253,6 +252,7 @@ class LatticeConfiguration:
                     with vuetify.VCol(cols=8):
                         vuetify.VCombobox(
                             label="Select Accelerator Lattice",
+                            id="selected_lattice",
                             v_model=("selectedLattice", None),
                             items=("listOfLatticeElements",),
                             error_messages=("isSelectedLatticeListEmpty",),
@@ -262,6 +262,7 @@ class LatticeConfiguration:
                     with vuetify.VCol(cols="auto"):
                         vuetify.VBtn(
                             "ADD",
+                            id="add_button",
                             color="primary",
                             dense=True,
                             classes="mr-2",
@@ -270,6 +271,7 @@ class LatticeConfiguration:
                     with vuetify.VCol(cols="auto"):
                         vuetify.VBtn(
                             "CLEAR",
+                            id="clear_button",
                             color="secondary",
                             dense=True,
                             classes="mr-2",
@@ -279,6 +281,7 @@ class LatticeConfiguration:
                         vuetify.VIcon(
                             "mdi-cog",
                             click="showDialog_settings = true",
+                            id="lattice_settings_icon",
                         )
                 with vuetify.VRow():
                     with vuetify.VCol():
@@ -337,6 +340,7 @@ class LatticeConfiguration:
                                     ):
                                         vuetify.VTextField(
                                             label=("parameter.parameter_name",),
+                                            id=("parameter.parameter_name + index",),
                                             v_model=(
                                                 "parameter.parameter_default_value",
                                             ),
@@ -420,6 +424,7 @@ class LatticeConfiguration:
                             with vuetify.VCol(no_gutters=True):
                                 vuetify.VTextField(
                                     v_model=("nsliceDefaultValue",),
+                                    id="nslice_default_value",
                                     change=(
                                         ctrl.nsliceDefaultChange,
                                         "['nslice', $event]",
@@ -431,3 +436,13 @@ class LatticeConfiguration:
                                     style="max-width: 75px",
                                     classes="ma-0 pa-0",
                                 )
+            vuetify.VDivider()
+            with vuetify.VCardActions():
+                vuetify.VSpacer()
+                vuetify.VBtn(
+                    "Close",
+                    id="lattice_settings_close",
+                    color="primary",
+                    text=True,
+                    click="showDialog_settings = false",
+                )

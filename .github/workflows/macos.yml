@@ -39,7 +39,7 @@ jobs:
     - name: install pip dependencies
       run: |
         python3 -m pip install --upgrade pip
-        python3 -m pip install --upgrade build packaging setuptools wheel pytest
+        python3 -m pip install --upgrade build packaging setuptools wheel
         python3 -m pip install --upgrade -r requirements_mpi.txt
         python3 -m pip install --upgrade -r src/python/impactx/dashboard/requirements.txt
         python3 -m pip install --upgrade -r examples/requirements.txt
