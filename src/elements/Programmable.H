@@ -11,9 +11,9 @@
 #define IMPACTX_ELEMENTS_PROGRAMMABLE_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "Element.H"
 #include "particles/CovarianceMatrix.H"
 #include "mixin/lineartransport.H"
-#include "mixin/named.H"
 #include "mixin/thick.H"
 
 #include <AMReX_Extension.H>
@@ -27,9 +27,8 @@
 
 namespace impactx::elements
 {
-    struct Programmable
-    : public mixin::Named,
-      public mixin::LinearTransport<Programmable, false>
+    struct ProgrammablePhysics
+    : public mixin::LinearTransport<ProgrammablePhysics, false>
       // TODO: public amrex::simd::Vectorized<amrex::simd::native_simd_size_particlereal>
     {
         static constexpr auto type = "Programmable";
@@ -42,14 +41,12 @@ namespace impactx::elements
          *
          * @param ds Segment length in m
          * @param nslice number of slices used for the application of space charge
-         * @param name a user defined and not necessarily unique name of the element
          */
-        Programmable (
+        ProgrammablePhysics (
             amrex::ParticleReal ds = DEFAULT_ds,
-            int nslice = DEFAULT_nslice,
-            std::optional<std::string> name = DEFAULT_name
+            int nslice = DEFAULT_nslice
         )
-          : Named(std::move(name)), m_ds(ds), m_nslice(nslice)
+          : m_ds(ds), m_nslice(nslice)
         {}
 
         /** Reverse the element (not supported for Programmable) */
@@ -145,6 +142,9 @@ namespace impactx::elements
         std::function<void(RefPart &)> m_ref_particle;  //! hook for reference particle
         std::function<void()> m_finalize;  //! hook for finalize cleanup
     };
+
+    /** Programmable: physics plus common host-only metadata */
+    using Programmable = Element<ProgrammablePhysics>;
 
 } // namespace impactx
 

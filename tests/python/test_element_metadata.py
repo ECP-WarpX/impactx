@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+#
+# Copyright 2022-2026 The ImpactX Community
+#
+# Authors: Axel Huebl, Chad Mitchell
+# License: BSD-3-Clause-LBNL
+#
+# -*- coding: utf-8 -*-
+
+"""Host-only element metadata carried by the public element envelope.
+
+Elements are split into an element-specific physics implementation, which is what gets
+copied into a particle-push kernel, and common host-only metadata such as the element
+name. These tests pin the behavior a user sees across that split.
+"""
+
+import pytest
+
+from impactx import elements
+
+
+def test_name_survives_a_copy():
+    """Copying an element must carry its metadata along.
+
+    Regression test for the construction adapter of the element envelope: a variadic
+    constructor that is not excluded from copy construction wins overload resolution for
+    a non-const lvalue, copy-constructs only the physics base and default-constructs the
+    metadata. That is not a compile error -- the copy just silently comes out unnamed.
+    """
+
+    drift = elements.Drift(ds=1.0, nslice=3, name="d1")
+
+    lattice = elements.KnownElementsList()
+    lattice.append(drift)  # copies on the C++ side, from a non-const lvalue
+
+    assert lattice[0].has_name
+    assert lattice[0].name == "d1"
+    assert lattice[0].nslice == 3
+    assert lattice[0].ds == 1.0
+
+
+def test_unnamed_element_stays_unnamed():
+    """An element without a name reports no name, and asking for one raises."""
+
+    drift = elements.Drift(ds=1.0)
+    assert not drift.has_name
+    assert drift.name is None
+
+    lattice = elements.KnownElementsList()
+    lattice.append(drift)
+    assert not lattice[0].has_name
+
+
+def test_empty_name_is_no_name():
+    """An empty name is not a name."""
+
+    assert not elements.Drift(ds=1.0, name="").has_name
+
+
+def test_name_is_settable_and_resettable():
+    """The name is ordinary mutable host metadata."""
+
+    drift = elements.Drift(ds=1.0, name="before")
+    assert drift.name == "before"
+
+    drift.name = "after"
+    assert drift.name == "after"
+
+    drift.name = ""
+    assert not drift.has_name
+
+
+@pytest.mark.parametrize("name", ["quad1", "a-very-long-element-name-" * 8, "ünïcodé"])
+def test_name_round_trips(name):
+    """Names are stored verbatim, including long and non-ASCII ones.
+
+    Worth pinning: the name used to be a raw ``char *`` with hand-written copy semantics.
+    """
+
+    lattice = elements.KnownElementsList()
+    lattice.append(elements.Drift(ds=1.0, name=name))
+
+    assert lattice[0].name == name

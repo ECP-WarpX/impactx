@@ -10,144 +10,97 @@
 #ifndef IMPACTX_ELEMENTS_MIXIN_NAMED_H
 #define IMPACTX_ELEMENTS_MIXIN_NAMED_H
 
-#include "particles/ImpactXParticleContainer.H"
+#include "hostonly.H"
 
 #include <AMReX_Extension.H>
-#include <AMReX_GpuQualifiers.H>
 
-#include <cstring>
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 
 namespace impactx::elements::mixin
 {
     /** This is a helper class for lattice elements with a user-defined name
+     *
+     * A name is host-only metadata: it describes the element to a human, and takes no
+     * part in the physics. It is carried by the public element envelope
+     * (@see impactx::elements::Element), which keeps it out of the execution snapshot
+     * that is copied into a particle-push kernel.
+     *
+     * That separation is what lets this be an ordinary rule-of-zero value type.
      */
-    struct Named
+    struct Named : HostOnly
     {
         static constexpr std::nullopt_t DEFAULT_name = std::nullopt;
 
+        /** An unnamed element */
+        Named () = default;
+
+        /** A user-named element
+         *
+         * An empty name is treated as no name.
+         *
+         * @param name a user defined and not necessarily unique name of the element
+         */
+        Named (
+            std::optional<std::string> name
+        )
+          : m_name(std::move(name))
+        {
+            if (m_name.has_value() && m_name->empty())
+            {
+                m_name.reset();
+            }
+        }
+
         /** Overwrite the name of the element
+         *
+         * An empty name unsets the name.
          *
          * @param new_name set a new name on the element
          */
-        AMREX_GPU_HOST
         void set_name (
             std::string const & new_name
         )
         {
-            // free old name
-            if (m_name != nullptr) {
-                delete[] m_name;
-                m_name = nullptr;
+            if (new_name.empty())
+            {
+                m_name.reset();
             }
-
-            // set new name
-            if (new_name.size() > 0) {
-                m_name = new char[new_name.size() + 1];
-                std::strcpy(m_name, new_name.c_str());
+            else
+            {
+                m_name = new_name;
             }
-        }
-
-        /** A user-named element
-         *
-         * @param name a user defined and not necessarily unique name of the element
-         */
-        AMREX_GPU_HOST
-        Named (
-            std::optional<std::string> name
-        )
-        {
-            if (name.has_value()) {
-                set_name(*name);
-            }
-        }
-
-        AMREX_GPU_HOST_DEVICE
-        ~Named ()
-        {
-            AMREX_IF_ON_HOST((
-                if (m_name != nullptr) {
-                    delete[] m_name;
-                    m_name = nullptr;
-                }
-            ))
-        }
-
-        AMREX_GPU_HOST
-        Named (Named const & other)
-        {
-            if (other.has_name()) {
-                m_name = new char[std::strlen(other.m_name) + 1];
-                std::strcpy(m_name, other.m_name);
-            }
-        }
-
-        AMREX_GPU_HOST
-        Named& operator=(Named const & other)
-        {
-            if (&other != this) {
-                if (other.has_name()) {
-                    m_name = new char[std::strlen(other.m_name) + 1];
-                    std::strcpy(m_name, other.m_name);
-                }
-            }
-            return *this;
-        }
-
-        AMREX_GPU_HOST_DEVICE
-        Named ([[maybe_unused]] Named && other) noexcept
-        {
-            AMREX_IF_ON_HOST((
-                std::swap(this->m_name, other.m_name);
-                other.m_name = nullptr;
-            ))
-        }
-
-        AMREX_GPU_HOST_DEVICE
-        Named& operator=([[maybe_unused]] Named && other) noexcept
-        {
-            AMREX_IF_ON_HOST((
-                std::swap(this->m_name, other.m_name);
-                other.m_name = nullptr;
-            ))
-            return *this;
         }
 
         /** Return the user provided name of the element
          *
          * @return user defined and not necessarily unique name
          */
-        AMREX_FORCE_INLINE
+        [[nodiscard]] AMREX_FORCE_INLINE
         std::string name () const
         {
-            if (!has_name()) {
+            if (!has_name())
+            {
                 throw std::runtime_error("Name not set on element!");
             }
-            return std::string(m_name);
+            return *m_name;
         }
 
         /** Return true if the user provided a name for this element
          *
          * @return true if the user provided a name
          */
-        AMREX_FORCE_INLINE
-        bool has_name () const
+        [[nodiscard]] AMREX_FORCE_INLINE
+        bool has_name () const noexcept
         {
-            return m_name != nullptr;
+            return m_name.has_value();
         }
 
     private:
-        // Implementation note:
-        // This is used as a mixin class in elements that are copied to GPU. GPU compilers copy
-        // a whole element by its sizeof(T).
-        // To save on this copy operation at kernel start, this is implemented
-        // as a simple C pointer (8 bytes), contrary to a std::string (32 bytes) or
-        // a std::optional<std::string> (40 bytes). m_name points to host-side memory and
-        // must not be dereferenced (used) on GPU.
-        char * m_name = nullptr; //! a user defined and not necessarily unique name of the element
+        std::optional<std::string> m_name; //! a user defined and not necessarily unique name of the element
     };
 
 } // namespace impactx::elements::mixin

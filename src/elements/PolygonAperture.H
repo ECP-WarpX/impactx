@@ -11,12 +11,11 @@
 #define IMPACTX_POLYGONAPERTURE_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "Element.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
-#include "mixin/dynamicdata.H"
+#include "mixin/devicebackedarrays.H"
 #include "mixin/lineartransport.H"
-#include "mixin/named.H"
-#include "mixin/nofinalize.H"
 #include "mixin/spintransport.H"
 #include "mixin/thin.H"
 
@@ -48,20 +47,20 @@ namespace impactx::elements
         amrex::Gpu::TrackedVector<amrex::ParticleReal> y;
     };
 
-    struct PolygonAperture
-    : public mixin::Named,
-      public mixin::BeamOptic<PolygonAperture>,
-      public mixin::LinearTransport<PolygonAperture>,
+    /** The prepared execution snapshot of a polygon aperture.
+     *
+     * Holds the particle-facing configuration and a bounded, non-owning view of the
+     * polygon vertices, resolved to the execution space of one element slice.
+     */
+    struct PolygonApertureCore
+    : public mixin::ParticlePush<PolygonApertureCore>,
       public mixin::Thin,
       public mixin::Alignment,
-      public mixin::SpinTransport,
-      public mixin::NoFinalize
+      public mixin::SpinTransport
       // public amrex::simd::Vectorized<amrex::simd::native_simd_size_particlereal>
     {
         static constexpr auto type = "PolygonAperture";
         using PType = ImpactXParticleContainer::ParticleType;
-
-        using DynamicData = mixin::GPUDataRegistry<PolygonVertices>;
 
         AMREX_ENUM_IN_CLASS(Action,
             transmit,  //! transmit particles inside the aperture
@@ -77,88 +76,44 @@ namespace impactx::elements
         static constexpr bool DEFAULT_shift_odd_x = false;
         static constexpr Action DEFAULT_action = Action::transmit;
 
-        /** A thin collimator element that applies a transverse aperture boundary defined
-         *  by points of a polygon vertices.
-         *  Particles outside the boundary are considered lost.
+        /** The particle-facing configuration of a polygon aperture
          *
-         * @param action specify action of domain (transmit/absorb)
-         * @param vertices_x array of coordinates of the horizontal vertex positions (m)
-         * @param vertices_y array of coordinates of the vertical vertex positions (m)
          * @param min_radius2 a minimum radius**2 below which all particles are transmitted
          * @param repeat_x horizontal period for repeated masking, optional (m)
          * @param repeat_y vertical period for repeated masking, optional (m)
-         * @param shift_odd_x for hexagonal/triangular mask patterns: horizontal shift of every 2nd (odd) vertical period by repeat_x / 2. Use alignment offsets dx,dy to move whole mask as needed.
+         * @param shift_odd_x horizontal shift of every 2nd (odd) vertical period by repeat_x / 2
+         * @param action specify action of domain (transmit/absorb)
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
-         * @param name a user defined and not necessarily unique name of the element
          */
-        PolygonAperture (
-            std::vector< amrex::ParticleReal> vertices_x,
-            std::vector< amrex::ParticleReal> vertices_y,
-            amrex::ParticleReal min_radius2 = DEFAULT_min_radius2,
-            amrex::ParticleReal repeat_x = DEFAULT_repeat_x,
-            amrex::ParticleReal repeat_y = DEFAULT_repeat_y,
-            bool shift_odd_x = DEFAULT_shift_odd_x,
-            Action action = DEFAULT_action,
-            amrex::ParticleReal dx = DEFAULT_dx,
-            amrex::ParticleReal dy = DEFAULT_dy,
-            amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
-            std::optional<std::string> name = DEFAULT_name
+        PolygonApertureCore (
+            amrex::ParticleReal min_radius2,
+            amrex::ParticleReal repeat_x,
+            amrex::ParticleReal repeat_y,
+            bool shift_odd_x,
+            Action action,
+            amrex::ParticleReal dx,
+            amrex::ParticleReal dy,
+            amrex::ParticleReal rotation_degree
         )
-        : Named(std::move(name)),
-          Alignment(dx, dy, rotation_degree),
-          m_action(action), m_repeat_x(repeat_x), m_repeat_y(repeat_y), m_shift_odd_x(shift_odd_x),
-          m_id(DynamicData::allocate_id()),
-          m_min_radius2(min_radius2)
+          : Alignment(dx, dy, rotation_degree),
+            m_action(action), m_repeat_x(repeat_x), m_repeat_y(repeat_y),
+            m_shift_odd_x(shift_odd_x), m_min_radius2(min_radius2)
         {
             using namespace amrex::literals; // for _rt and _prt
 
             if (m_repeat_y == 0_prt && m_shift_odd_x) {
                 throw std::invalid_argument("PolygonAperture: shift_odd_x can only be used if repeat_y is set, too!");
             }
-
-            m_nvert = vertices_x.size();
-            if (m_nvert != vertices_y.size()) {
-                throw std::invalid_argument("PolygonAperture: horizontal and vertical vertices arrays must have same length!");
-            }
-
-            if ((vertices_x[0] != vertices_x[m_nvert-1]) ||
-                (vertices_y[0] != vertices_y[m_nvert-1])) {
-                throw std::invalid_argument("PolygonAperture: first and last vertex must be exactly equal!");
-            }
-
-            auto& vert = DynamicData::emplace(
-                m_id,
-                std::move(vertices_x),
-                std::move(vertices_y)
-            );
-            m_vertices_x_h_data = vert.x.host_const().data();
-            m_vertices_y_h_data = vert.y.host_const().data();
         }
 
         /** Reverse the element (no-op: aperture is not invertible for absorbed particles) */
         void reverse () { /* no-op */ }
 
-        /** Push all particles */
-        using BeamOptic::operator();
+        /** Push all particles on a tile */
+        using mixin::ParticlePush<PolygonApertureCore>::operator();
 
-        /** Compute and cache the constants for the push.
-         *
-         * In particular, used to pre-compute and cache variables that are
-         * independent of the individually tracked particle.
-         *
-         * @param refpart reference particle (unused)
-         */
-        void compute_constants ([[maybe_unused]] RefPart const & refpart)
-        {
-            Alignment::compute_constants(refpart);
-
-            // Ensure dynamic vertex data is on GPU and we have fresh pointers to it
-            auto const & vert = *DynamicData::get(m_id);
-            m_vertices_x_d_data = vert.x.device_const().data();
-            m_vertices_y_d_data = vert.y.device_const().data();
-        }
 
         /** This is an aperture functor, so that a variable of this type can be used like an
          *  aperture function.
@@ -224,13 +179,8 @@ namespace impactx::elements
                 inside_aperture = VBool(true); // yes!
             } else{
 
-#if AMREX_DEVICE_COMPILE
-                amrex::ParticleReal const * vertices_x = m_vertices_x_d_data;
-                amrex::ParticleReal const * vertices_y = m_vertices_y_d_data;
-#else
-                amrex::ParticleReal const * vertices_x = m_vertices_x_h_data;
-                amrex::ParticleReal const * vertices_y = m_vertices_y_h_data;
-#endif
+                amrex::ParticleReal const * vertices_x = m_vertices.first;
+                amrex::ParticleReal const * vertices_y = m_vertices.second;
 
                 // no, we have to do the polygon calculation
 
@@ -253,7 +203,7 @@ namespace impactx::elements
                 T_Real thetasum = 0.0;
                 Complex v1conj, v2;
 
-                for (size_t i = 0; i < m_nvert-1; ++i) {
+                for (int i = 0; i < m_vertices.size - 1; ++i) {
                     v1conj = Complex(u - vertices_x[i], -(v-vertices_y[i]));
                     v2 = Complex(u - vertices_x[i+1], v-vertices_y[i+1]);
                     thetasum += arg(v2 * v1conj);
@@ -308,9 +258,6 @@ namespace impactx::elements
             (*this)(x, y, t, px, py, pt, idcpu, refpart);
         }
 
-        /** This pushes the covariance matrix. */
-        using LinearTransport::operator();
-
         /** This function returns the linear transport map.
          *
          * A polygon aperture (potentially) removes particles; it does not
@@ -333,21 +280,113 @@ namespace impactx::elements
         amrex::ParticleReal m_repeat_y; //! vertical period for repeated masking
         bool m_shift_odd_x; //! for hexagonal/triangular mask patterns: horizontal shift of every 2nd (odd) vertical period by m_repeat_x / 2. Use Alignment offsets to move whole mask as needed.
 
-        int m_id; //! unique PolygonAperture id used for data lookup map
+        /** Vertices resolved to this snapshot's execution space; non-owning */
+        mixin::DualArrayView m_vertices{};
 
         amrex::ParticleReal m_min_radius2; // minimum radius in which all pass squared
 
-        std::vector<double>::size_type m_nvert = 0; //! number of vertices
-        amrex::ParticleReal const * m_vertices_x_h_data = nullptr; //! non-owning pointer to host x vertices
-        amrex::ParticleReal const * m_vertices_y_h_data = nullptr; //! non-owning pointer to host vertices
-        amrex::ParticleReal const * m_vertices_x_d_data = nullptr; //! non-owning pointer to device x vertices
-        amrex::ParticleReal const * m_vertices_y_d_data = nullptr; //! non-owning pointer to device y vertices
 
     };
 
+    /** A polygon aperture: the canonical element that owns its vertices.
+     *
+     * Particle pushes run against @see PolygonApertureCore.
+     */
+    struct PolygonAperturePhysics
+    : public mixin::BeamOptic<PolygonAperturePhysics>,
+      public mixin::LinearTransport<PolygonAperturePhysics>,
+      public PolygonApertureCore
+    {
+        /** A thin collimator element that applies a transverse aperture boundary defined
+         *  by points of a polygon vertices.
+         *  Particles outside the boundary are considered lost.
+         *
+         * @param action specify action of domain (transmit/absorb)
+         * @param vertices_x array of coordinates of the horizontal vertex positions (m)
+         * @param vertices_y array of coordinates of the vertical vertex positions (m)
+         * @param min_radius2 a minimum radius**2 below which all particles are transmitted
+         * @param repeat_x horizontal period for repeated masking, optional (m)
+         * @param repeat_y vertical period for repeated masking, optional (m)
+         * @param shift_odd_x for hexagonal/triangular mask patterns: horizontal shift of every 2nd (odd) vertical period by repeat_x / 2. Use alignment offsets dx,dy to move whole mask as needed.
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error in the transverse plane [degrees]
+         */
+        PolygonAperturePhysics (
+            std::vector< amrex::ParticleReal> vertices_x,
+            std::vector< amrex::ParticleReal> vertices_y,
+            amrex::ParticleReal min_radius2 = DEFAULT_min_radius2,
+            amrex::ParticleReal repeat_x = DEFAULT_repeat_x,
+            amrex::ParticleReal repeat_y = DEFAULT_repeat_y,
+            bool shift_odd_x = DEFAULT_shift_odd_x,
+            Action action = DEFAULT_action,
+            amrex::ParticleReal dx = DEFAULT_dx,
+            amrex::ParticleReal dy = DEFAULT_dy,
+            amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree
+        )
+          : PolygonApertureCore(min_radius2, repeat_x, repeat_y, shift_odd_x, action, dx, dy, rotation_degree),
+            m_vertices_data(std::move(vertices_x), std::move(vertices_y), "PolygonAperture: horizontal and vertical vertices")
+        {
+            auto const vx = m_vertices_data.first_host();
+            auto const vy = m_vertices_data.second_host();
+
+            if (vx.empty()) {
+                throw std::invalid_argument("PolygonAperture: at least one vertex is required!");
+            }
+            if ((vx.front() != vx.back()) || (vy.front() != vy.back())) {
+                throw std::invalid_argument("PolygonAperture: first and last vertex must be exactly equal!");
+            }
+        }
+
+        /** Push all particles */
+        using mixin::BeamOptic<PolygonAperturePhysics>::operator();
+
+        /** This pushes the reference particle. */
+        using mixin::Thin::operator();
+
+        /** This pushes the covariance matrix. */
+        using mixin::LinearTransport<PolygonAperturePhysics>::operator();
+
+        /** Prepare the execution snapshot for one element slice
+         *
+         * @param refpart reference particle, already advanced for this slice
+         * @return a core holding an execution-space view of the vertices
+         */
+        [[nodiscard]] PolygonApertureCore make_particle_pusher (RefPart const & refpart) const
+        {
+            PolygonApertureCore core = *this;
+            core.Alignment::compute_constants(refpart);
+            core.m_vertices = m_vertices_data.device_view();
+            return core;
+        }
+
+        /** Horizontal vertex coordinates */
+        [[nodiscard]] std::vector<amrex::ParticleReal> vertices_x () const
+        {
+            return m_vertices_data.first_host();
+        }
+
+        /** Vertical vertex coordinates */
+        [[nodiscard]] std::vector<amrex::ParticleReal> vertices_y () const
+        {
+            return m_vertices_data.second_host();
+        }
+
+        /** Release device storage; host configuration survives for reuse */
+        void finalize ()
+        {
+            m_vertices_data.release_gpu();
+        }
+
+        //! the vertex arrays, owned by this element
+        mixin::DeviceBackedArrays m_vertices_data;
+    };
+
+    /** PolygonAperture: physics plus common host-only metadata */
+    using PolygonAperture = Element<PolygonAperturePhysics>;
+
 } // namespace impactx
 
-IMPACTX_GPUDATA_EXTERN(impactx::elements::PolygonAperture)
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::PolygonAperture)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::PolygonAperturePhysics)
 
 #endif // IMPACTX_POLYGONAPERTURE_H

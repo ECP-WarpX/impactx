@@ -11,12 +11,12 @@
 #define IMPACTX_QUADEDGE_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "Element.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 #include "mixin/pipeaperture.H"
 
@@ -31,10 +31,9 @@
 
 namespace impactx::elements
 {
-    struct QuadEdge
-    : public mixin::Named,
-      public mixin::BeamOptic<QuadEdge>,
-      public mixin::LinearTransport<QuadEdge>,
+    struct QuadEdgePhysics
+    : public mixin::BeamOptic<QuadEdgePhysics>,
+      public mixin::LinearTransport<QuadEdgePhysics>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -77,9 +76,8 @@ namespace impactx::elements
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
-         * @param name a user defined and not necessarily unique name of the element
          */
-        QuadEdge (
+        QuadEdgePhysics (
             amrex::ParticleReal k,
             int unit = DEFAULT_unit,
             Location flag = DEFAULT_flag,
@@ -87,11 +85,9 @@ namespace impactx::elements
             amrex::ParticleReal dy = DEFAULT_dy,
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
             amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
-            amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
-            std::optional<std::string> name = DEFAULT_name
+            amrex::ParticleReal aperture_y = DEFAULT_aperture_y
         )
-        : Named(std::move(name)),
-          Alignment(dx, dy, rotation_degree),
+        : Alignment(dx, dy, rotation_degree),
           PipeAperture(aperture_x, aperture_y),
           m_k(k), m_unit(unit), m_flag(flag)
         {
@@ -289,8 +285,11 @@ namespace impactx::elements
         amrex::ParticleReal m_beta;
     };
 
+    /** QuadEdge: physics plus common host-only metadata */
+    using QuadEdge = Element<QuadEdgePhysics>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::QuadEdge)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::QuadEdgePhysics)
 
 #endif // IMPACTX_QUADEDGE_H

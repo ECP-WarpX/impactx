@@ -11,12 +11,12 @@
 #define IMPACTX_APERTURE_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "Element.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Enum.H>
@@ -30,10 +30,9 @@
 
 namespace impactx::elements
 {
-    struct Aperture
-    : public mixin::Named,
-      public mixin::BeamOptic<Aperture>,
-      public mixin::LinearTransport<Aperture>,
+    struct AperturePhysics
+    : public mixin::BeamOptic<AperturePhysics>,
+      public mixin::LinearTransport<AperturePhysics>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::SpinTransport,
@@ -82,9 +81,8 @@ namespace impactx::elements
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
-         * @param name a user defined and not necessarily unique name of the element
          */
-        Aperture (
+        AperturePhysics (
             amrex::ParticleReal aperture_x,
             amrex::ParticleReal aperture_y,
             amrex::ParticleReal repeat_x = DEFAULT_repeat_x,
@@ -94,11 +92,9 @@ namespace impactx::elements
             Action action = DEFAULT_action,
             amrex::ParticleReal dx = DEFAULT_dx,
             amrex::ParticleReal dy = DEFAULT_dy,
-            amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
-            std::optional<std::string> name = DEFAULT_name
+            amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree
         )
-        : Named(std::move(name)),
-          Alignment(dx, dy, rotation_degree),
+        : Alignment(dx, dy, rotation_degree),
           m_shape(shape), m_action(action), m_repeat_x(repeat_x), m_repeat_y(repeat_y), m_shift_odd_x(shift_odd_x)
         {
             using namespace amrex::literals; // for _rt and _prt
@@ -344,8 +340,11 @@ namespace impactx::elements
 
     };
 
+    /** Aperture: physics plus common host-only metadata */
+    using Aperture = Element<AperturePhysics>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::Aperture)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::AperturePhysics)
 
 #endif // IMPACTX_APERTURE_H

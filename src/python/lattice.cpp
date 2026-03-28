@@ -27,6 +27,20 @@ void init_lattice(py::module& me)
     namespace ix_diag = ::impactx::diagnostics;
 
     // all-element type list
+    //
+    // Ref semantics (Python vs this binding): a Python list keeps references to mutable
+    // objects, but here each append/extend materializes a C++ KnownElements value in this
+    // list (copy or move). The original Python handle is a separate object unless we
+    // intentionally bind shared ownership (e.g. std::shared_ptr element types later).
+    //
+    // TODO: register GPU-heavy element types with py::class_<T, std::shared_ptr<T>> and
+    //       store std::shared_ptr in KnownElements (or a thin wrapper) so append/extend
+    //       match Python mutable-object reference semantics.
+    // TODO: optional weak_ptr to a SimulationLifetime/session object on elements for
+    //       clear errors on use after sim.finalize() (coordinate with pyAMReX session work).
+    //       The shared token should be created with ImpactX construction (not init_grids),
+    //       and expose readiness (amrex_ready) so pre-init objects can exist but reject
+    //       GPU use until sim.init_grids() makes AMReX ready.
     using KnownElementsList = std::list<KnownElements>;
     py::class_<KnownElementsList> kel(me, "KnownElementsList");
     kel

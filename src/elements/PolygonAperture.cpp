@@ -12,12 +12,10 @@
 #include <stdexcept>
 #include <string>
 
-IMPACTX_GPUDATA_INSTANTIATE(impactx::elements::PolygonAperture)
-
 std::string
-impactx::elements::PolygonAperture::action_name (Action const & action)
+impactx::elements::PolygonApertureCore::action_name (Action const & action)
 {
     return amrex::getEnumNameString(action);
 }
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::PolygonAperture)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::PolygonAperturePhysics)

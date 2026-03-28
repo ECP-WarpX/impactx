@@ -11,14 +11,13 @@
 #define IMPACTX_EXACTCFBEND_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "Element.H"
 #include "particles/integrators/Integrators.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
-#include "mixin/dynamicdata.H"
+#include "mixin/devicebackedarrays.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
-#include "mixin/named.H"
-#include "mixin/nofinalize.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/thick.H"
 
@@ -48,96 +47,62 @@ namespace impactx::elements
         amrex::Gpu::TrackedVector<amrex::ParticleReal> k_skew;
     };
 
-    struct ExactCFbend
-    : public mixin::Named,
-      public mixin::BeamOptic<ExactCFbend>,
-      public mixin::LinearTransport<ExactCFbend>,
+    /** The prepared execution snapshot of an exact combined-function bend.
+     *
+     * Holds the particle-facing configuration, the constants derived from the reference
+     * particle, and a bounded, non-owning view of the multipole coefficients.
+     */
+    struct ExactCFbendCore
+    : public mixin::ParticlePush<ExactCFbendCore>,
       public mixin::Thick,
       public mixin::Alignment,
-      public mixin::NoFinalize,
       public mixin::PipeAperture,
       public mixin::SpinTransport
     {
         static constexpr auto type = "ExactCFbend";
         using PType = ImpactXParticleContainer::ParticleType;
 
-        using DynamicData = mixin::GPUDataRegistry<CFbendCoefficients>;
-
         static constexpr int DEFAULT_unit = 0;
         static constexpr int DEFAULT_int_order = 2;
         static constexpr int DEFAULT_mapsteps = 10;
 
-        /** A general (thick) combined-function sector dipole whose field consists
-         *  of a superposition of ideal curvilinear hard-edge multipoles.
-         *  The magnet is treated using the exact Hamiltonian, which
-         *  includes all nonlinear kinematic effects.  This is a generalization
-         *  of the element CFbend, which is a linear sector bend that
-         *  supports quadrupole focusing.  Here, symplectic integration
-         *  is used based on a splitting of the underlying Hamiltonian.
+        /** The particle-facing configuration of an exact combined-function bend
          *
          * @param ds Segment length in m.
-         * @param k_normal Array of normal multipole coefficients (units below)
-         * @param k_skew   Array of skew multipole coefficients (units below)
-         * @param unit  Unit specification
-         *           unit = 0 multipole strengths in units of 1/m^n (default)
-         *           unit = 1 multipole strengths in units of T/m^(n-1)
+         * @param unit unit specification for the multipole strengths
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
          * @param int_order order used for symplectic integration (2, 4, or 6)
-         * @param mapsteps number of integration steps per slice used for
-         *        particle push in the applied fields
+         * @param mapsteps number of integration steps per slice
          * @param nslice number of slices used for the application of space charge
-         * @param name a user defined and not necessarily unique name of the element
          */
-        ExactCFbend (
+        ExactCFbendCore (
             amrex::ParticleReal ds,
-            std::vector<amrex::ParticleReal> k_normal,
-            std::vector<amrex::ParticleReal> k_skew,
-            int unit = DEFAULT_unit,
-            amrex::ParticleReal dx = DEFAULT_dx,
-            amrex::ParticleReal dy = DEFAULT_dy,
-            amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
-            amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
-            amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
-            int int_order = DEFAULT_int_order,
-            int mapsteps = DEFAULT_mapsteps,
-            int nslice = DEFAULT_nslice,
-            std::optional<std::string> name = DEFAULT_name
+            int unit,
+            amrex::ParticleReal dx,
+            amrex::ParticleReal dy,
+            amrex::ParticleReal rotation_degree,
+            amrex::ParticleReal aperture_x,
+            amrex::ParticleReal aperture_y,
+            int int_order,
+            int mapsteps,
+            int nslice
         )
-        : Named(std::move(name)),
-          Thick(ds, nslice),
-          Alignment(dx, dy, rotation_degree),
-          PipeAperture(aperture_x, aperture_y),
-          m_unit(unit), m_int_order(int_order), m_mapsteps(mapsteps),
-          m_id(DynamicData::allocate_id())
+          : Thick(ds, nslice),
+            Alignment(dx, dy, rotation_degree),
+            PipeAperture(aperture_x, aperture_y),
+            m_unit(unit), m_int_order(int_order), m_mapsteps(mapsteps)
         {
-            if (m_int_order != 2 && m_int_order != 4 && m_int_order != 6)
-                throw std::invalid_argument("ExactCFbend: The order used for symplectic integration must be 2, 4 or 6.");
-
-            if (m_mapsteps <= 0)
-                throw std::invalid_argument("ExactCFbend: mapsteps must be > 0!");
-
-            m_ncoef = int(k_normal.size());
-            if (m_ncoef != int(k_skew.size()))
-                throw std::invalid_argument("ExactCFbend: normal and skew coefficient arrays must have same length!");
-
-            auto& coef = DynamicData::emplace(
-                m_id,
-                std::move(k_normal),
-                std::move(k_skew)
-            );
-            m_k_normal_h_data = coef.k_normal.host_const().data();
-            m_k_skew_h_data = coef.k_skew.host_const().data();
         }
 
         /** Reverse the element (negate ds) */
         void reverse () { Thick::reverse(); }
 
-        /** Push all particles */
-        using BeamOptic::operator();
+        /** Push all particles on a tile */
+        using mixin::ParticlePush<ExactCFbendCore>::operator();
 
         /** Compute and cache the constants for the push.
          *
@@ -152,18 +117,13 @@ namespace impactx::elements
 
             Alignment::compute_constants(refpart);
 
-            // Ensure dynamic coefficient data is on GPU and we have fresh pointers to it
-            auto const & coef = *DynamicData::get(m_id);
-            m_k_normal_d_data = coef.k_normal.device_const().data();
-            m_k_skew_d_data = coef.k_skew.device_const().data();
-
             // access reference particle values to find relativistic factors
             m_beta = refpart.beta();
             m_ibeta = 1_prt / m_beta;
             m_ibetgam2 = 1_prt / amrex::Math::powi<2>(refpart.beta_gamma());
             m_brho = refpart.rigidity_Tm();
 
-            amrex::ParticleReal const * k_normal = m_k_normal_h_data;
+            amrex::ParticleReal const * k_normal = m_coefficients.first;
 
             // find magnetic field and curvature; normalize units to MAD-X convention if needed
             amrex::ParticleReal curvature = m_unit == 1 ? k_normal[0] / m_brho : k_normal[0];
@@ -363,8 +323,8 @@ namespace impactx::elements
             amrex::ParticleReal tout = t;
             amrex::ParticleReal ptout = pt;
 
-            amrex::ParticleReal const * k_normal = m_k_normal_d_data;
-            amrex::ParticleReal const * k_skew = m_k_skew_d_data;
+            amrex::ParticleReal const * k_normal = m_coefficients.first;
+            amrex::ParticleReal const * k_skew = m_coefficients.second;
 
             // defined dimensionless variables scaled by radius of curvature
             amrex::ParticleReal rho = 1_prt + x / m_rc;
@@ -376,7 +336,7 @@ namespace impactx::elements
             amrex::ParticleReal dpy = 0_prt;
 
             // loop over array of multipole coefficients
-            for (int m = 1; m < m_ncoef; m++) {
+            for (int m = 1; m < m_coefficients.size; m++) {
 
                // normalize units to MAD-X convention if needed
                amrex::ParticleReal kn = m_unit == 1 ? k_normal[m] / m_brho : k_normal[m];
@@ -479,13 +439,8 @@ namespace impactx::elements
             T_Real sy = particle_spin(2);
             T_Real sz = particle_spin(3);
 
-#if AMREX_DEVICE_COMPILE
-            const amrex::ParticleReal *const k_normal = m_k_normal_d_data;
-            const amrex::ParticleReal *const k_skew = m_k_skew_d_data;
-#else
-            const amrex::ParticleReal *const k_normal = m_k_normal_h_data;
-            const amrex::ParticleReal *const k_skew = m_k_skew_h_data;
-#endif
+            amrex::ParticleReal const * const k_normal = m_coefficients.first;
+            amrex::ParticleReal const * const k_skew = m_coefficients.second;
 
             // defined dimensionless variables scaled by radius of curvature
             amrex::ParticleReal rho = 1_prt + x / m_rc;
@@ -499,7 +454,7 @@ namespace impactx::elements
 
             // loop over array of multipole coefficients
             // NOTE:  Here we start at m = 0 in order to include the dipole contribution to the spin
-            for (int m = 0; m < m_ncoef; m++) {
+            for (int m = 0; m < m_coefficients.size; m++) {
 
                // normalize units to MAD-X convention if needed
                amrex::ParticleReal kn = m_unit == 1 ? k_normal[m] / m_brho : k_normal[m];
@@ -590,146 +545,6 @@ namespace impactx::elements
             zeval += 0_prt;
         }
 
-        /** This pushes the reference particle.
-         *
-         * @param[in,out] refpart reference particle
-         */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-        void operator() (RefPart & AMREX_RESTRICT refpart) const
-        {
-            using namespace amrex::literals; // for _rt and _prt
-
-            // assign input reference particle values
-            amrex::ParticleReal const x = refpart.x;
-            amrex::ParticleReal const px = refpart.px;
-            amrex::ParticleReal const y = refpart.y;
-            amrex::ParticleReal const py = refpart.py;
-            amrex::ParticleReal const z = refpart.z;
-            amrex::ParticleReal const pz = refpart.pz;
-            amrex::ParticleReal const t = refpart.t;
-            amrex::ParticleReal const pt = refpart.pt;
-            amrex::ParticleReal const s = refpart.s;
-            amrex::ParticleReal const brho = refpart.rigidity_Tm();
-
-#if AMREX_DEVICE_COMPILE
-            amrex::ParticleReal const * k_normal = m_k_normal_d_data;
-#else
-            amrex::ParticleReal const * k_normal = m_k_normal_h_data;
-#endif
-            // find magnetic field and curvature; normalize units to MAD-X convention if needed
-            amrex::ParticleReal const curvature = m_unit == 1 ? k_normal[0] / brho : k_normal[0];
-            amrex::ParticleReal const rc = curvature == 0.0 ? 0.0_prt : 1.0_prt/curvature;
-
-            // length of the current slice
-            amrex::ParticleReal const slice_ds = m_ds / nslice();
-
-            // special case of zero field = an exact drift
-            if (rc==0_prt) {
-               // advance position and momentum (drift)
-               amrex::ParticleReal const step = slice_ds / std::sqrt(amrex::Math::powi<2>(pt) - 1.0_prt);
-               refpart.x = x + step*px;
-               refpart.y = y + step*py;
-               refpart.z = z + step*pz;
-               refpart.t = t - step*pt;
-
-            } else {
-
-               // assign intermediate parameters
-               amrex::ParticleReal const B = refpart.beta_gamma() /rc;
-               amrex::ParticleReal const theta = slice_ds / rc;
-
-               // calculate expensive terms once
-               auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);
-
-               // advance position and momentum (bend)
-               refpart.px = px*cos_theta - pz*sin_theta;
-               refpart.py = py;
-               refpart.pz = pz*cos_theta + px*sin_theta;
-               refpart.pt = pt;
-
-               refpart.x = x + (refpart.pz - pz)/B;
-               refpart.y = y + (theta/B)*py;
-               refpart.z = z - (refpart.px - px)/B;
-               refpart.t = t - (theta/B)*pt;
-
-            }
-
-            // advance integrated path length
-            refpart.s = s + slice_ds;
-        }
-
-        /** This function returns the linear transport map.
-         *
-         * @returns 6x6 transport matrix
-         */
-        AMREX_GPU_HOST AMREX_FORCE_INLINE
-        Map6x6
-        transport_map (RefPart const & AMREX_RESTRICT refpart) const  // TODO: update as well, but needs more careful placement of calc_constants
-        {
-            using namespace amrex::literals; // for _rt and _prt
-
-            // length of the current slice
-            amrex::ParticleReal const slice_ds = m_ds / nslice();
-
-            // find beta*gamma^2, beta
-            amrex::ParticleReal const betgam2 = amrex::Math::powi<2>(refpart.pt) - 1_prt;
-            amrex::ParticleReal const bet = refpart.beta();
-            amrex::ParticleReal const ibetgam2 = 1_prt / betgam2;
-
-            amrex::ParticleReal const * k_normal = m_k_normal_h_data;
-
-            // magnetic rigidity of the reference particle
-            amrex::ParticleReal const brho_inv = 1.0_prt / refpart.rigidity_Tm();
-
-            // find magnetic field and curvature; normalize units to MAD-X convention if needed
-            amrex::ParticleReal const curvature = m_unit == 1 ? k_normal[0] * brho_inv : k_normal[0];
-            amrex::ParticleReal const rc = curvature == 0.0 ? 0.0_prt : 1.0_prt / curvature;
-            amrex::ParticleReal const kn = m_unit == 1 ? k_normal[1] * brho_inv : k_normal[1];
-            amrex::ParticleReal const b2rc2 = amrex::Math::powi<2>(bet) * amrex::Math::powi<2>(rc);
-
-            // update horizontal and longitudinal phase space variables
-            amrex::ParticleReal const gx = kn + amrex::Math::powi<-2>(rc);
-            amrex::ParticleReal const omega_x = std::sqrt(std::abs(gx));
-
-            // update vertical phase space variables
-            amrex::ParticleReal const gy = -kn;
-            amrex::ParticleReal const omega_y = std::sqrt(std::abs(gy));
-
-            // trigonometry
-            auto const [sinx, cosx] = amrex::Math::sincos(omega_x * slice_ds);
-            amrex::ParticleReal const sinhx = std::sinh(omega_x * slice_ds);
-            amrex::ParticleReal const coshx = std::cosh(omega_x * slice_ds);
-            auto const [siny, cosy] = amrex::Math::sincos(omega_y * slice_ds);
-            amrex::ParticleReal const sinhy = std::sinh(omega_y * slice_ds);
-            amrex::ParticleReal const coshy = std::cosh(omega_y * slice_ds);
-
-            amrex::ParticleReal const igbrc = 1_prt / (gx * bet * rc);
-            amrex::ParticleReal const iobrc = 1_prt / (omega_x * bet * rc);
-            amrex::ParticleReal const igobr = 1_prt / (gx * omega_x * b2rc2);
-
-            // initialize linear map matrix elements
-            Map6x6 R = Map6x6::Identity();
-
-            R(1,1) = gx > 0_prt ? cosx : coshx;
-            R(1,2) = gx > 0_prt ? sinx / omega_x : sinhx / omega_x;
-            R(1,6) = gx > 0_prt ? -(1_prt - cosx) * igbrc : -(1_prt - coshx) * igbrc;
-            R(2,1) = gx > 0_prt ? -omega_x * sinx : omega_x * sinhx;
-            R(2,2) = gx > 0_prt ? cosx : coshx;
-            R(2,6) = gx > 0_prt ? -sinx * iobrc : -sinhx * iobrc;
-            R(3,3) = gy > 0_prt ? cosy : coshy;
-            R(3,4) = gy > 0_prt ? siny / omega_y : sinhy / omega_y;
-            R(4,3) = gy > 0_prt ? -omega_y * siny : omega_y * sinhy;
-            R(4,4) = gy > 0_prt ? cosy : coshy;
-            R(5,1) = gx > 0_prt ? sinx * iobrc : sinhx * iobrc;
-            R(5,2) = gx > 0_prt ? (1_prt - cosx) * igbrc : (1_prt - coshx) * igbrc;
-            R(5,6) = gx > 0_prt ?
-                slice_ds * ibetgam2 + (sinx  - omega_x * slice_ds) * igobr :
-                slice_ds * ibetgam2 + (sinhx - omega_x * slice_ds) * igobr;
-
-            // apply the transverse rotation (roll) alignment error
-            return rotate_aligned_map(R);
-        }
-
 
         /** This operator pushes the particle spin.
          *
@@ -794,23 +609,17 @@ namespace impactx::elements
         }
 
 
-        /** This pushes the covariance matrix. */
-        using LinearTransport::operator();
-
         int m_unit; //! unit specification for Multipole strength
         int m_int_order; //! order used for the symplectic integration (2 or 4)
         int m_mapsteps; //! number of integration steps per slice
-        int m_id; //! unique ExactMultipole id used for data lookup map
+        /** Coefficients resolved to this snapshot's execution space; non-owning */
+        mixin::DualArrayView m_coefficients{};
 
-        int m_ncoef = 0; //! number of Fourier coefficients
-        amrex::ParticleReal const * m_k_normal_h_data = nullptr; //! non-owning pointer to host normal coefficients
-        amrex::ParticleReal const * m_k_skew_h_data = nullptr; //! non-owning pointer to host skew coefficients
-        amrex::ParticleReal const * m_k_normal_d_data = nullptr; //! non-owning pointer to device normal coefficients
-        amrex::ParticleReal const * m_k_skew_d_data = nullptr; //! non-owning pointer to device skew coefficients
 
-    private:
+    protected:
         // constants that are independent of the individually tracked particle,
-        // see: compute_constants() to refresh
+        // see: compute_constants() to refresh.
+        // protected: the owning element reads the rigidity in its transfer map.
         amrex::ParticleReal m_slice_ds;       //! m_ds / nslice();
         amrex::ParticleReal m_ibetgam2;       //! 1 / m_betgam2
         amrex::ParticleReal m_beta;           //! beta
@@ -819,9 +628,253 @@ namespace impactx::elements
         amrex::ParticleReal m_rc;             //! magnet radius of curvature
     };
 
+    /** An exact combined-function bend: the canonical element that owns its coefficients.
+     *
+     * The reference-particle push, the transfer map, serialization and finalization run
+     * here on the host. Particle pushes run against @see ExactCFbendCore.
+     */
+    struct ExactCFbendPhysics
+    : public mixin::BeamOptic<ExactCFbendPhysics>,
+      public mixin::LinearTransport<ExactCFbendPhysics>,
+      public ExactCFbendCore
+    {
+        /** A general (thick) combined-function sector dipole whose field consists
+         *  of a superposition of ideal curvilinear hard-edge multipoles.
+         *  The magnet is treated using the exact Hamiltonian, which
+         *  includes all nonlinear kinematic effects.  This is a generalization
+         *  of the element CFbend, which is a linear sector bend that
+         *  supports quadrupole focusing.  Here, symplectic integration
+         *  is used based on a splitting of the underlying Hamiltonian.
+         *
+         * @param ds Segment length in m.
+         * @param k_normal Array of normal multipole coefficients (units below)
+         * @param k_skew   Array of skew multipole coefficients (units below)
+         * @param unit  Unit specification
+         *           unit = 0 multipole strengths in units of 1/m^n (default)
+         *           unit = 1 multipole strengths in units of T/m^(n-1)
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param aperture_x horizontal half-aperture in m
+         * @param aperture_y vertical half-aperture in m
+         * @param int_order order used for symplectic integration (2, 4, or 6)
+         * @param mapsteps number of integration steps per slice used for
+         *        particle push in the applied fields
+         * @param nslice number of slices used for the application of space charge
+         */
+        ExactCFbendPhysics (
+            amrex::ParticleReal ds,
+            std::vector<amrex::ParticleReal> k_normal,
+            std::vector<amrex::ParticleReal> k_skew,
+            int unit = DEFAULT_unit,
+            amrex::ParticleReal dx = DEFAULT_dx,
+            amrex::ParticleReal dy = DEFAULT_dy,
+            amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
+            amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
+            amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
+            int int_order = DEFAULT_int_order,
+            int mapsteps = DEFAULT_mapsteps,
+            int nslice = DEFAULT_nslice
+        )
+          : ExactCFbendCore(ds, unit, dx, dy, rotation_degree, aperture_x, aperture_y, int_order, mapsteps, nslice),
+            m_coefficients_data(std::move(k_normal), std::move(k_skew), "ExactCFbend: normal and skew coefficient")
+        {
+            if (m_int_order != 2 && m_int_order != 4 && m_int_order != 6)
+                throw std::invalid_argument("ExactCFbend: The order used for symplectic integration must be 2, 4 or 6.");
+
+            if (m_mapsteps <= 0)
+                throw std::invalid_argument("ExactCFbend: mapsteps must be > 0!");
+        }
+
+        /** Push all particles */
+        using mixin::BeamOptic<ExactCFbendPhysics>::operator();
+
+        /** This pushes the covariance matrix. */
+        using mixin::LinearTransport<ExactCFbendPhysics>::operator();
+
+        /** This pushes the reference particle.
+         *
+         * @param[in,out] refpart reference particle
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void operator() (RefPart & AMREX_RESTRICT refpart) const
+        {
+            using namespace amrex::literals; // for _rt and _prt
+
+            // assign input reference particle values
+            amrex::ParticleReal const x = refpart.x;
+            amrex::ParticleReal const px = refpart.px;
+            amrex::ParticleReal const y = refpart.y;
+            amrex::ParticleReal const py = refpart.py;
+            amrex::ParticleReal const z = refpart.z;
+            amrex::ParticleReal const pz = refpart.pz;
+            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const pt = refpart.pt;
+            amrex::ParticleReal const s = refpart.s;
+            amrex::ParticleReal const brho = refpart.rigidity_Tm();
+
+            // host view, obtained at the point of use
+            amrex::ParticleReal const * k_normal = m_coefficients_data.host_view().first;
+            // find magnetic field and curvature; normalize units to MAD-X convention if needed
+            amrex::ParticleReal const curvature = m_unit == 1 ? k_normal[0] / brho : k_normal[0];
+            amrex::ParticleReal const rc = curvature == 0.0 ? 0.0_prt : 1.0_prt/curvature;
+
+            // length of the current slice
+            amrex::ParticleReal const slice_ds = m_ds / nslice();
+
+            // special case of zero field = an exact drift
+            if (rc==0_prt) {
+               // advance position and momentum (drift)
+               amrex::ParticleReal const step = slice_ds / std::sqrt(amrex::Math::powi<2>(pt) - 1.0_prt);
+               refpart.x = x + step*px;
+               refpart.y = y + step*py;
+               refpart.z = z + step*pz;
+               refpart.t = t - step*pt;
+
+            } else {
+
+               // assign intermediate parameters
+               amrex::ParticleReal const B = refpart.beta_gamma() /rc;
+               amrex::ParticleReal const theta = slice_ds / rc;
+
+               // calculate expensive terms once
+               auto const [sin_theta, cos_theta] = amrex::Math::sincos(theta);
+
+               // advance position and momentum (bend)
+               refpart.px = px*cos_theta - pz*sin_theta;
+               refpart.py = py;
+               refpart.pz = pz*cos_theta + px*sin_theta;
+               refpart.pt = pt;
+
+               refpart.x = x + (refpart.pz - pz)/B;
+               refpart.y = y + (theta/B)*py;
+               refpart.z = z - (refpart.px - px)/B;
+               refpart.t = t - (theta/B)*pt;
+
+            }
+
+            // advance integrated path length
+            refpart.s = s + slice_ds;
+        }
+        /** This function returns the linear transport map.
+         *
+         * @returns 6x6 transport matrix
+         */
+        AMREX_GPU_HOST AMREX_FORCE_INLINE
+        Map6x6
+        transport_map (RefPart const & AMREX_RESTRICT refpart) const  // TODO: update as well, but needs more careful placement of calc_constants
+        {
+            using namespace amrex::literals; // for _rt and _prt
+
+            // length of the current slice
+            amrex::ParticleReal const slice_ds = m_ds / nslice();
+
+            // find beta*gamma^2, beta
+            amrex::ParticleReal const betgam2 = amrex::Math::powi<2>(refpart.pt) - 1_prt;
+            amrex::ParticleReal const bet = refpart.beta();
+            amrex::ParticleReal const ibetgam2 = 1_prt / betgam2;
+
+            // host view, obtained at the point of use
+            amrex::ParticleReal const * k_normal = m_coefficients_data.host_view().first;
+
+            // find magnetic field and curvature; normalize units to MAD-X convention if needed
+            // magnetic rigidity of the reference particle
+            // note: read from the reference particle and not from the cached m_brho, because
+            //       compute_constants() does not run on the transport-map paths (map_trace,
+            //       envelope tracking, lattice.transfer_map)
+            amrex::ParticleReal const brho = refpart.rigidity_Tm();
+
+            amrex::ParticleReal const curvature = m_unit == 1 ? k_normal[0] / brho : k_normal[0];
+            amrex::ParticleReal const rc = curvature == 0.0 ? 0.0_prt : 1.0_prt/curvature;
+            amrex::ParticleReal const kn = m_unit == 1 ? k_normal[1] / brho : k_normal[1];
+            amrex::ParticleReal const b2rc2 = amrex::Math::powi<2>(bet) * amrex::Math::powi<2>(rc);
+
+            // update horizontal and longitudinal phase space variables
+            amrex::ParticleReal const gx = kn + amrex::Math::powi<-2>(rc);
+            amrex::ParticleReal const omega_x = std::sqrt(std::abs(gx));
+
+            // update vertical phase space variables
+            amrex::ParticleReal const gy = -kn;
+            amrex::ParticleReal const omega_y = std::sqrt(std::abs(gy));
+
+            // trigonometry
+            auto const [sinx, cosx] = amrex::Math::sincos(omega_x * slice_ds);
+            amrex::ParticleReal const sinhx = std::sinh(omega_x * slice_ds);
+            amrex::ParticleReal const coshx = std::cosh(omega_x * slice_ds);
+            auto const [siny, cosy] = amrex::Math::sincos(omega_y * slice_ds);
+            amrex::ParticleReal const sinhy = std::sinh(omega_y * slice_ds);
+            amrex::ParticleReal const coshy = std::cosh(omega_y * slice_ds);
+
+            amrex::ParticleReal const igbrc = 1_prt / (gx * bet * rc);
+            amrex::ParticleReal const iobrc = 1_prt / (omega_x * bet * rc);
+            amrex::ParticleReal const igobr = 1_prt / (gx * omega_x * b2rc2);
+
+            // initialize linear map matrix elements
+            Map6x6 R = Map6x6::Identity();
+
+            R(1,1) = gx > 0_prt ? cosx : coshx;
+            R(1,2) = gx > 0_prt ? sinx / omega_x : sinhx / omega_x;
+            R(1,6) = gx > 0_prt ? -(1_prt - cosx) * igbrc : -(1_prt - coshx) * igbrc;
+            R(2,1) = gx > 0_prt ? -omega_x * sinx : omega_x * sinhx;
+            R(2,2) = gx > 0_prt ? cosx : coshx;
+            R(2,6) = gx > 0_prt ? -sinx * iobrc : -sinhx * iobrc;
+            R(3,3) = gy > 0_prt ? cosy : coshy;
+            R(3,4) = gy > 0_prt ? siny / omega_y : sinhy / omega_y;
+            R(4,3) = gy > 0_prt ? -omega_y * siny : omega_y * sinhy;
+            R(4,4) = gy > 0_prt ? cosy : coshy;
+            R(5,1) = gx > 0_prt ? sinx * iobrc : sinhx * iobrc;
+            R(5,2) = gx > 0_prt ? (1_prt - cosx) * igbrc : (1_prt - coshx) * igbrc;
+            R(5,6) = gx > 0_prt ?
+                slice_ds * ibetgam2 + (sinx  - omega_x * slice_ds) * igobr :
+                slice_ds * ibetgam2 + (sinhx - omega_x * slice_ds) * igobr;
+
+            // apply the transverse rotation (roll) alignment error
+            return rotate_aligned_map(R);
+        }
+
+        /** Prepare the execution snapshot for one element slice
+         *
+         * @param refpart reference particle, already advanced for this slice
+         * @return a core holding an execution-space view of the coefficients
+         */
+        [[nodiscard]] ExactCFbendCore make_particle_pusher (RefPart const & refpart) const
+        {
+            ExactCFbendCore core = *this;
+            // compute_constants() derives the curvature from the first coefficient, so it
+            // needs host storage; the device view is installed afterwards.
+            core.m_coefficients = m_coefficients_data.host_view();
+            core.compute_constants(refpart);
+            core.m_coefficients = m_coefficients_data.device_view();
+            return core;
+        }
+
+        /** Normal multipole coefficients */
+        [[nodiscard]] std::vector<amrex::ParticleReal> k_normal_coefficients () const
+        {
+            return m_coefficients_data.first_host();
+        }
+
+        /** Skew multipole coefficients */
+        [[nodiscard]] std::vector<amrex::ParticleReal> k_skew_coefficients () const
+        {
+            return m_coefficients_data.second_host();
+        }
+
+        /** Release device storage; host configuration survives for reuse */
+        void finalize ()
+        {
+            m_coefficients_data.release_gpu();
+        }
+
+        //! the coefficient arrays, owned by this element
+        mixin::DeviceBackedArrays m_coefficients_data;
+    };
+
+    /** ExactCFbend: physics plus common host-only metadata */
+    using ExactCFbend = Element<ExactCFbendPhysics>;
+
 } // namespace impactx
 
-IMPACTX_GPUDATA_EXTERN(impactx::elements::ExactCFbend)
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ExactCFbend)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ExactCFbendPhysics)
 
 #endif // IMPACTX_EXACTCFBEND_H

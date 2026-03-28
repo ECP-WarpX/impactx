@@ -11,10 +11,10 @@
 #define IMPACTX_SHORTRF_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "Element.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/lineartransport.H"
@@ -29,10 +29,9 @@
 
 namespace impactx::elements
 {
-    struct ShortRF
-    : public mixin::Named,
-      public mixin::BeamOptic<ShortRF>,
-      public mixin::LinearTransport<ShortRF>,
+    struct ShortRFPhysics
+    : public mixin::BeamOptic<ShortRFPhysics>,
+      public mixin::LinearTransport<ShortRFPhysics>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -58,9 +57,8 @@ namespace impactx::elements
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
-         * @param name a user defined and not necessarily unique name of the element
          */
-        ShortRF (
+        ShortRFPhysics (
             amrex::ParticleReal V,
             amrex::ParticleReal freq,
             amrex::ParticleReal phase = DEFAULT_phase,
@@ -68,11 +66,9 @@ namespace impactx::elements
             amrex::ParticleReal dy = DEFAULT_dy,
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
             amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
-            amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
-            std::optional<std::string> name = DEFAULT_name
+            amrex::ParticleReal aperture_y = DEFAULT_aperture_y
         )
-        : Named(std::move(name)),
-          Alignment(dx, dy, rotation_degree),
+        : Alignment(dx, dy, rotation_degree),
           PipeAperture(aperture_x, aperture_y),
           m_V(V), m_freq(freq), m_phase(phase)
         {
@@ -383,8 +379,11 @@ namespace impactx::elements
         amrex::ParticleReal m_k, m_phi, m_V_cos_phi, m_bgi, m_bgf;
     };
 
+    /** ShortRF: physics plus common host-only metadata */
+    using ShortRF = Element<ShortRFPhysics>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ShortRF)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ShortRFPhysics)
 
 #endif // IMPACTX_SHORTRF_H

@@ -8,6 +8,7 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "Push.H"
+#include "elements/Element.H"
 
 #include <AMReX_BLProfiler.H>
 
@@ -28,8 +29,9 @@ namespace impactx
         {
             BL_PROFILE("impactx::push");
 
+            // unwrap the host-only metadata: only the physics may enter a kernel
             // push reference particle & all particles
-            element(pc, step, period);
+            elements::physics_of(element)(pc, step, period);
         }, element_variant);
     }
 
@@ -43,7 +45,7 @@ namespace impactx
         {
             // push reference particle in global coordinates
             BL_PROFILE("impactx::push::RefPart");
-            element(ref);
+            elements::physics_of(element)(ref);
         }, element_variant);
     }
 
