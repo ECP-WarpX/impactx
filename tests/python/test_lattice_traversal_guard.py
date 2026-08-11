@@ -84,6 +84,28 @@ def test_changing_the_sequence_is_rejected(sim, edit):
     assert len(sim.lattice) == 1
 
 
+@pytest.mark.parametrize("hook_name", ["before_period", "before_element"])
+def test_every_hook_is_guarded(sim, hook_name):
+    """The rule is the same wherever the hook runs, and for every tracker."""
+
+    sim.lattice.append(elements.Drift(ds=0.5, name="d"))
+
+    seen = {}
+
+    def hook(s):
+        try:
+            s.lattice.append(elements.Drift(ds=0.1))
+            seen["result"] = "allowed"
+        except RuntimeError as e:
+            seen["result"] = str(e)
+
+    sim.hook[hook_name] = hook
+    sim.track_reference(sim.beam.ref)
+
+    assert "while tracking" in seen["result"]
+    assert len(sim.lattice) == 1
+
+
 def test_the_lattice_is_editable_again_after_tracking(sim):
     sim.lattice.append(elements.Drift(ds=0.5, name="d"))
     _track(sim, lambda s: None)

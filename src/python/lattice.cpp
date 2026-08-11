@@ -19,6 +19,7 @@
 #include <functional>
 #include <string>
 #include <type_traits>
+#include <unordered_map>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -45,6 +46,26 @@ void init_lattice(py::module& me)
     // dynamic_attr: the lattice keeps the Python wrapper of each element alive in its
     // instance dictionary, where the cyclic garbage collector can see it.
     py::class_<KnownElementsList, py::smart_holder> kel(me, "KnownElementsList", py::dynamic_attr());
+
+    /** The element a Python object refers to, as an identity key
+     *
+     * ``nullptr`` when the object is not a lattice element at all, so that asking whether
+     * a string is in the lattice answers no rather than raising.
+     *
+     * Comparing elements rather than the Python objects wrapping them avoids creating a
+     * wrapper for every position looked at: a search that finds nothing would otherwise
+     * leave one behind for the whole lattice.
+     */
+    auto const element_address = [](py::handle obj) -> void const * {
+        try
+        {
+            return elements::address(handle_from_python(obj));
+        }
+        catch (py::type_error const &)
+        {
+            return nullptr;
+        }
+    };
 
     /** Normalize and bounds-check a Python index, allowing negative indexing */
     auto const checked_index = [](KnownElementsList const & v, py::ssize_t index) -> KnownElementsList::size_type {
@@ -94,6 +115,16 @@ void init_lattice(py::module& me)
              },
              py::arg("elements"),
              "Add several elements to the lattice."
+        )
+
+        .def_property_readonly("generation",
+             [](py::object self) { return lattice_of(self).generation(); },
+             "How often the sequence of elements changed.\n\n"
+             "Counts structural edits only: changing a parameter on an element that is\n"
+             "already in the lattice does not move anything and does not change this.\n"
+             "A view that remembers positions compares this to notice they went stale.\n\n"
+             "Compare it for equality, not by how far it moved: one call can edit the\n"
+             "sequence in several steps, as deleting a selection does."
         )
 
         .def("size", [](py::object self) { return lattice_of(self).size(); })
@@ -170,11 +201,20 @@ void init_lattice(py::module& me)
                  }
                  Owners owners(self, v);
 
-                 // a slice is a new lattice over the same elements, like a Python list slice
-                 py::object out = py::type::of(self)();
-                 py::list picked;
-                 for (size_t i = 0; i < length; ++i) { picked.append(owners.get(start + i * step)); }
-                 out.attr("extend")(picked);
+                 // A slice is a new lattice over the same elements, like a Python list
+                 // slice. It is a plain lattice even when sliced from a subclass, as
+                 // slicing a `list` subclass gives a plain `list`: the subclass may take
+                 // constructor arguments we have nothing to pass, and its `extend` may
+                 // mean something of its own.
+                 py::object out = py::type::of<KnownElementsList>()();
+                 auto & sliced = out.cast<KnownElementsList &>();
+                 Owners sliced_owners(out, sliced);
+                 for (size_t i = 0; i < length; ++i)
+                 {
+                     auto const at = start + i * step;
+                     sliced.push_back(v[at]);
+                     sliced_owners.append(owners.get(at));
+                 }
                  return out;
              },
              py::arg("slice"),
@@ -209,6 +249,9 @@ void init_lattice(py::module& me)
                          "attempt to assign sequence of size " + std::to_string(pending.size()) +
                          " to extended slice of size " + std::to_string(length));
                  }
+
+                 // replacing nothing with nothing changes nothing
+                 if (length == 0 && pending.empty()) { return; }
 
                  Owners owners(self, v);
                  if (step == 1)
@@ -262,6 +305,10 @@ void init_lattice(py::module& me)
                  if (!slice.compute(v.size(), &start, &stop, &step, &length)) {
                      throw py::error_already_set();
                  }
+                 // Nothing selected changes nothing, and must not count as an edit:
+                 // that would void every selection taken on this lattice.
+                 if (length == 0) { return; }
+
                  // Mark what goes, then keep the rest in one pass. Removing positions one
                  // at a time moves the tail of both the lattice and the owner list on every
                  // removal, which is quadratic in the length of the lattice; a slice over a
@@ -324,16 +371,18 @@ void init_lattice(py::module& me)
              "Insert an element before a position."
         )
 
-        // Identity first, then equality. Elements compare by value, so two distinct
-        // elements with the same parameters are equal; for locating an occurrence in a
-        // lattice, the object the caller means is the one they hold.
+        // By identity, deliberately, and by identity only. Elements compare by value, so
+        // two distinct elements with the same parameters are equal; for locating an
+        // occurrence in a lattice the caller means the element they hold, not another one
+        // configured the same way. This is why ``element in lattice`` can be False while
+        // ``lattice == [element]`` is True.
         .def("index",
-             [](py::object self, py::object el) {
+             [element_address](py::object self, py::object el) {
                  auto & v = lattice_of(self);
-                 Owners owners(self, v);
+                 auto const * wanted = element_address(el);
                  for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
                  {
-                     if (owners.get(i).is(el)) { return i; }
+                     if (wanted != nullptr && elements::address(v[i]) == wanted) { return i; }
                  }
                  throw py::value_error("element is not in the lattice");
              },
@@ -342,13 +391,14 @@ void init_lattice(py::module& me)
         )
 
         .def("count",
-             [](py::object self, py::object el) {
+             [element_address](py::object self, py::object el) {
                  auto & v = lattice_of(self);
-                 Owners owners(self, v);
+                 auto const * wanted = element_address(el);
                  KnownElementsList::size_type n = 0;
+                 if (wanted == nullptr) { return n; }
                  for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
                  {
-                     if (owners.get(i).is(el)) { ++n; }
+                     if (elements::address(v[i]) == wanted) { ++n; }
                  }
                  return n;
              },
@@ -357,12 +407,13 @@ void init_lattice(py::module& me)
         )
 
         .def("__contains__",
-             [](py::object self, py::object el) {
+             [element_address](py::object self, py::object el) {
                  auto & v = lattice_of(self);
-                 Owners owners(self, v);
+                 auto const * wanted = element_address(el);
+                 if (wanted == nullptr) { return false; }
                  for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
                  {
-                     if (owners.get(i).is(el)) { return true; }
+                     if (elements::address(v[i]) == wanted) { return true; }
                  }
                  return false;
              },
@@ -370,13 +421,15 @@ void init_lattice(py::module& me)
         )
 
         .def("remove",
-             [](py::object self, py::object el) {
+             [element_address](py::object self, py::object el) {
                  auto & v = lattice_of(self);
-                 Owners owners(self, v);
-                 for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
+                 auto const * wanted = element_address(el);
+                 if (wanted != nullptr)
                  {
-                     if (owners.get(i).is(el))
+                     for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
                      {
+                         if (elements::address(v[i]) != wanted) { continue; }
+                         Owners owners(self, v);
                          v.erase(i);
                          owners.erase(i);
                          return;
@@ -498,7 +551,53 @@ void init_lattice(py::module& me)
 
     met.def(
         "insert_element_every_ds",
-        &impactx::elements::transformation::insert_element_every_ds,
+        [](py::object source, amrex::ParticleReal ds, elements::KnownElements element) {
+            auto & from = lattice_of(source);
+
+            auto result = impactx::elements::transformation::insert_element_every_ds(
+                from, ds, std::move(element));
+
+            // Carry over the Python object of every element that came through unsplit, so
+            // that it is still the element the caller put in -- with its subclass and its
+            // attributes -- rather than a plain wrapper minted on first access. Positions
+            // holding a split half, or a copy of the inserted element, have no object of
+            // their own and are filled in when they are first asked for.
+            py::object out = py::type::of<KnownElementsList>()();
+            auto & into = out.cast<KnownElementsList &>();
+            Owners from_owners(source, from);
+            Owners into_owners(out, into);
+
+            // Where each element of the source sits, so that a position holding a newly
+            // made element -- an inserted copy, or half of one that was split -- does not
+            // cost a scan and does not lose track of the elements after it. An element at
+            // several positions is matched to them in order.
+            std::unordered_map<void const *, std::vector<KnownElementsList::size_type>> positions;
+            for (KnownElementsList::size_type i = 0; i < from.size(); ++i)
+            {
+                positions[elements::address(from[i])].push_back(i);
+            }
+            std::unordered_map<void const *, std::size_t> taken;
+
+            for (KnownElementsList::size_type i = 0; i < result.size(); ++i)
+            {
+                into.push_back(result[i]);
+
+                py::object owner = py::none();
+                auto const * key = elements::address(result[i]);
+                auto const found = positions.find(key);
+                if (found != positions.end())
+                {
+                    auto & next = taken[key];
+                    if (next < found->second.size())
+                    {
+                        owner = from_owners.owner_at(found->second[next]);
+                        ++next;
+                    }
+                }
+                into_owners.append(owner);
+            }
+            return out;
+        },
         py::arg("list"),
         py::arg("ds"),
         py::arg("element"),

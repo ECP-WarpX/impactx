@@ -328,3 +328,31 @@ def test_slice_assignment_is_all_or_nothing():
 
     assert len(lattice) == 3
     assert lattice[0] is els[0]
+
+
+def test_slicing_a_subclass_gives_a_plain_lattice():
+    """As slicing a ``list`` subclass gives a plain ``list``.
+
+    A subclass may take constructor arguments there is nothing to pass, and may mean
+    something of its own by ``extend``; neither is the slice's business.
+    """
+
+    class Beamline(elements.KnownElementsList):
+        def __init__(self, label):
+            super().__init__()
+            self.label = label
+
+        def extend(self, added):
+            raise AssertionError("a slice must not go through the subclass")
+
+    beamline = Beamline("ring")
+    elements.KnownElementsList.extend(
+        beamline, [elements.Drift(ds=0.1, name=f"d{i}") for i in range(4)]
+    )
+
+    sliced = beamline[0:2]
+
+    assert type(sliced) is elements.KnownElementsList
+    assert [element.name for element in sliced] == ["d0", "d1"]
+    assert sliced[0] is beamline[0]
+    assert beamline.label == "ring"

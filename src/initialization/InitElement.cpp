@@ -746,7 +746,7 @@ element_name) );
         BL_PROFILE("ImpactX::initLatticeElementsFromInputs");
 
         // make sure the element sequence is empty
-        m_lattice.clear();
+        m_lattice->clear();
 
         amrex::ParmParse pp_lattice("lattice");
 
@@ -772,7 +772,7 @@ element_name) );
 
         // Loop through lattice elements
         for (std::string const & element_name : lattice_elements) {
-            read_element(element_name, m_lattice, nslice_default);
+            read_element(element_name, *m_lattice, nslice_default);
         }
 
         amrex::Print() << "Initialized element list" << std::endl;

@@ -289,9 +289,18 @@ namespace impactx::elements
             elements::nslice(m_element_variant, nslice);
         }
 
+        /** Restore the slice count the element had
+         *
+         * The count came from this element and the element was checked to be sliceable, so
+         * putting it back cannot fail; a destructor may not throw if it somehow did.
+         */
         ~ScopedNslice ()
         {
-            elements::nslice(m_element_variant, m_nslice_original);
+            try
+            {
+                elements::nslice(m_element_variant, m_nslice_original);
+            }
+            catch (...) {}
         }
 
         ScopedNslice (ScopedNslice const &) = delete;

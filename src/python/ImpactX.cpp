@@ -22,6 +22,7 @@
 #if defined(AMREX_DEBUG) || defined(DEBUG)
 #   include <cstdio>
 #endif
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <type_traits>
@@ -918,12 +919,19 @@ void init_ImpactX (py::module& m)
                 {
                     auto & ix = self.cast<ImpactX &>();
 
+                    // A share, not a pointer: the view is registered against the address
+                    // of the lattice, and holding a share keeps the lattice at that
+                    // address. A lattice owned by the simulation would hand its address
+                    // back when the simulation ended, and a view still held by the user
+                    // would then be handed to whichever simulation was allocated there
+                    // next.
+                    //
                     // Deliberately not `reference_internal`: that is `keep_alive` under
                     // the hood, and its lifetime edge lives in a pybind-internal list the
                     // cyclic collector cannot see. Storing the view on the simulation
                     // would then form a cycle that never collects, and the simulation --
                     // with its mesh and its open diagnostics -- would leak.
-                    py::object view = py::cast(&ix.m_lattice, py::return_value_policy::reference);
+                    py::object view = py::cast(ix.m_lattice);
 
                     // The link back to the simulation is weak on purpose. A strong one
                     // would make simulation and view a cycle, and a simulation would then

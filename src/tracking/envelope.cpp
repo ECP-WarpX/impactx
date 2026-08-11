@@ -36,7 +36,7 @@ namespace impactx
     {
         BL_PROFILE("ImpactX::track_envelope");
 
-        if (m_lattice.empty())
+        if (m_lattice->empty())
         {
             throw std::runtime_error(
                 "Beamline lattice has zero elements. Not yet initialized?");
@@ -237,7 +237,7 @@ namespace impactx
         // traverse the lattice, applying the collective kick and the
         // element transport per element slice (\see track_lattice)
         track_lattice(
-            m_lattice,
+            *m_lattice,
             ref,
             m_tracking_state,
             collective_effects,

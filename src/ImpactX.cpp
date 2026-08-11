@@ -46,13 +46,22 @@ namespace impactx {
 
     void ImpactX::finalize ()
     {
+        // Refuse before anything is torn down. Reached from a tracking hook, finalizing
+        // the elements first and only then failing to empty the lattice would leave
+        // tracking to run on through elements that are already finished with.
+        if (m_lattice->is_being_traversed())
+        {
+            throw std::runtime_error(
+                "ImpactX: cannot finalize while tracking through the lattice.");
+        }
+
         // loop over all beamline elements & finalize them
         finalize_elements();
 
         // Release the elements whether or not grids were ever initialized: they have just
         // been finalized, so keeping them in the lattice would leave elements that are done
         // with -- a beam monitor with its series closed, say -- still trackable.
-        m_lattice.clear();
+        m_lattice->clear();
 
         if (m_grids_initialized)
         {
@@ -70,7 +79,7 @@ namespace impactx {
     void ImpactX::finalize_elements ()
     {
         // loop over all beamline elements & finalize them
-        for (auto & element_variant : m_lattice)
+        for (auto & element_variant : *m_lattice)
         {
             elements::finalize(element_variant);
         }

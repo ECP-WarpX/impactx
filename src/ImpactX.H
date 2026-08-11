@@ -142,8 +142,15 @@ namespace impactx
          */
         void ResizeMesh ();
 
-        /** The elements defining the accelerator lattice */
-        Lattice m_lattice;
+        /** The elements defining the accelerator lattice
+         *
+         * Held indirectly so that it has an address of its own. Python hands out a view of
+         * this lattice and keys that view on where the lattice lives; a lattice that were
+         * part of the simulation would give its address back when the simulation ended, and
+         * a later simulation allocated in the same place would be handed the earlier view.
+         * A share keeps the lattice where it is for as long as anyone refers to it.
+         */
+        std::shared_ptr<Lattice> m_lattice = std::make_shared<Lattice>();
 
         /** Was init_grids already called?
          *

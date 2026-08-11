@@ -204,7 +204,7 @@ namespace impactx
         // traverse the lattice, applying the collective kick and the
         // element transport per element slice (\see track_lattice)
         track_lattice(
-            m_lattice,
+            *m_lattice,
             pc->GetRefParticle(),
             m_tracking_state,
             collective_effects,
@@ -240,4 +240,10 @@ namespace impactx
             }
         }
     }
+
+    // Kept compiled: a class template is only type-checked where it is instantiated, and
+    // the split that subdivides an element while pushing it (#1530) is not in the tree yet.
+    // These are the two ways a lattice element is held.
+    template class elements::ScopedNslice<elements::KnownElements>;
+    template class elements::ScopedNslice<elements::ElementHandle>;
 } // namespace impactx

@@ -117,13 +117,19 @@ namespace impactx::elements
         );
     }
 
-    /** @see visit */
+    /** @see visit
+     *
+     * A const handle protects the element it owns. Dereferencing the shared pointer alone
+     * would not say so: it hands out a mutable element however const the pointer is.
+     */
     template<typename T_Visitor>
     decltype(auto) visit (T_Visitor && visitor, ElementHandle const & handle)
     {
         require_valid(handle, "visit");
         return std::visit(
-            [&](auto const & el) -> decltype(auto) { return std::forward<T_Visitor>(visitor)(*el); },
+            [&](auto const & el) -> decltype(auto) {
+                return std::forward<T_Visitor>(visitor)(std::as_const(*el));
+            },
             handle
         );
     }

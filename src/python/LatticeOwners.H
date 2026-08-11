@@ -47,6 +47,9 @@ namespace impactx::python
                 matched = true;
             }
         };
+        // One probe per alternative until it matches, so cost depends on where the element sits
+        // in `KnownElements`: 100k mixed elements take 109 ms against a 14 ms floor. A type map
+        // built from this same pack would recover that, with no second place to register a type.
         (try_alternative(static_cast<T_Elements *>(nullptr)), ...);
 
         if (!matched)
@@ -104,7 +107,9 @@ namespace impactx::python
      *
      * The list lives in the lattice's instance dictionary rather than in the C++ class, so
      * it is visible to Python's cyclic garbage collector: a lattice holding an element
-     * that refers back to the simulation still collects.
+     * whose attributes refer back to the simulation still collects. A hook installed on a
+     * ``Programmable`` is held by a C++ ``std::function`` instead, which the collector
+     * cannot look inside; such a cycle is broken by ``finalize()`` rather than collected.
      *
      * An entry is ``None`` when the element did not come from Python -- parsed from an
      * input file, say. It is filled in the first time that position is handed out.

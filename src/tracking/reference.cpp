@@ -32,7 +32,7 @@ namespace impactx
     {
         BL_PROFILE("ImpactX::track_reference");
 
-        if (m_lattice.empty())
+        if (m_lattice->empty())
         {
             throw std::runtime_error(
                 "Beamline lattice has zero elements. Not yet initialized?");
@@ -135,7 +135,7 @@ namespace impactx
         //   other collective effect, so it applies ``M`` alone and never calls the kick
         //   (\see track_lattice).
         track_lattice(
-            m_lattice,
+            *m_lattice,
             ref,
             m_tracking_state,
             false, // no collective effects

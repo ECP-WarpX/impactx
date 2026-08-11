@@ -221,11 +221,15 @@ class FilteredElementsList:
         self._original_list = original_list
         self._indices = list(indices) if not isinstance(indices, list) else indices
         self._invalidated = False
+        # A selection is a list of positions, so any edit that moves elements makes it
+        # describe something else. The lattice counts those edits, which catches the ones
+        # made directly on the lattice as well as those made through a view.
+        self._generation = original_list.generation
         _registry_for(original_list).add(self)
 
     def _require_valid(self) -> None:
-        """Raise if this view was invalidated after a lattice mutation."""
-        if self._invalidated:
+        """Raise if the lattice changed after this view was taken."""
+        if self._invalidated or self._original_list.generation != self._generation:
             raise RuntimeError(FILTERED_ELEMENTS_LIST_INVALID_MSG)
 
     def __getitem__(self, key):
@@ -323,7 +327,7 @@ class FilteredElementsList:
         original = self._original_list
         to_remove = set(self._indices)
         if not to_remove:
-            _invalidate_all_registered_views(original)
+            # nothing selected changes nothing, so other selections stay usable
             return None
 
         # Keep the rest, in one pass. Deleting the selected positions one at a time moves
@@ -344,11 +348,16 @@ class FilteredElementsList:
         original = self._original_list
         indices = self._indices
         if not indices:
-            _invalidate_all_registered_views(original)
+            # nothing selected changes nothing, so other selections stay usable
             return FilteredElementsList(original, [])
 
         # One copy per selected position, so the replacements are independent elements
         # rather than one element repeated. Unselected positions are left alone.
+        #
+        # Build every replacement before installing any of them: a template that cannot be
+        # copied, or whose name or length cannot be set, must leave the lattice as it was
+        # rather than replacing the positions reached before it failed.
+        replacements = []
         for i in indices:
             old_el = original[i]
             new_el = element.copy()
@@ -357,6 +366,9 @@ class FilteredElementsList:
                     new_el.name = old_el.name
             if keep_ds and hasattr(old_el, "ds"):
                 new_el.ds = old_el.ds
+            replacements.append((i, new_el))
+
+        for i, new_el in replacements:
             original[i] = new_el
 
         _invalidate_all_registered_views(original)
@@ -380,23 +392,31 @@ class FilteredElementsList:
         original = self._original_list
         indices = self._indices
         if not indices:
-            _invalidate_all_registered_views(original)
+            # nothing selected changes nothing, so other selections stay usable
             return FilteredElementsList(original, [])
 
         validate_model(model, argument="model", extra_values=("match",))
 
-        # Only the selected positions are rewritten; everything else stays as it is.
-        for i in indices:
-            old_el = original[i]
-            cls = _drift_class_for_replace_with_drifts(model, old_el)
-            original[i] = _make_drift_from_old(
-                cls,
-                old_el,
-                keep_name=True,
-                keep_ds=True,
-                keep_alignment=keep_alignment,
-                keep_aperture=keep_aperture,
+        # Only the selected positions are rewritten; everything else stays as it is. Every
+        # drift is built before any is installed, so a failure part-way leaves the lattice
+        # as it was.
+        replacements = [
+            (
+                i,
+                _make_drift_from_old(
+                    _drift_class_for_replace_with_drifts(model, original[i]),
+                    original[i],
+                    keep_name=True,
+                    keep_ds=True,
+                    keep_alignment=keep_alignment,
+                    keep_aperture=keep_aperture,
+                ),
             )
+            for i in indices
+        ]
+
+        for i, new_el in replacements:
+            original[i] = new_el
 
         _invalidate_all_registered_views(original)
         return FilteredElementsList(original, list(indices))
