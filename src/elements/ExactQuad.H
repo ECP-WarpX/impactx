@@ -11,7 +11,7 @@
 #define IMPACTX_EXACTQUAD_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "particles/integrators/Integrators.H"
 #include "mixin/alignment.H"
 #include "mixin/pipeaperture.H"
@@ -31,9 +31,9 @@
 
 namespace impactx::elements
 {
-    struct ExactQuadPhysics
-    : public mixin::BeamOptic<ExactQuadPhysics>,
-      public mixin::LinearTransport<ExactQuadPhysics>,
+    struct ExactQuadGPU
+    : public mixin::BeamOptic<ExactQuadGPU>,
+      public mixin::LinearTransport<ExactQuadGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -73,7 +73,7 @@ namespace impactx::elements
          *        particle push in the applied fields
          * @param nslice number of slices used for the application of space charge
          */
-        ExactQuadPhysics (
+        ExactQuadGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal k,
             int unit = DEFAULT_unit,
@@ -581,11 +581,11 @@ namespace impactx::elements
         amrex::ParticleReal m_omega;
     };
 
-    /** ExactQuad: physics plus common host-only metadata */
-    using ExactQuad = Element<ExactQuadPhysics>;
+    /** ExactQuad: GPU state plus common host-only metadata */
+    using ExactQuad = Element<ExactQuadGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ExactQuadPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ExactQuadGPU)
 
 #endif // IMPACTX_EXACTQUAD_H

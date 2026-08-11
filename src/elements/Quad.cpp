@@ -1,3 +1,3 @@
 #include "Quad.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::QuadPhysics)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::QuadGPU)

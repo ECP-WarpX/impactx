@@ -11,7 +11,7 @@
 #define IMPACTX_DRIFT_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/lineartransport.H"
@@ -31,9 +31,9 @@
 
 namespace impactx::elements
 {
-    struct DriftPhysics
-    : public mixin::BeamOptic<DriftPhysics>,
-      public mixin::LinearTransport<DriftPhysics>,
+    struct DriftGPU
+    : public mixin::BeamOptic<DriftGPU>,
+      public mixin::LinearTransport<DriftGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -54,7 +54,7 @@ namespace impactx::elements
          * @param aperture_y vertical half-aperture in m
          * @param nslice number of slices used for the application of space charge
          */
-        DriftPhysics (
+        DriftGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal dx = DEFAULT_dx,
             amrex::ParticleReal dy = DEFAULT_dy,
@@ -264,11 +264,11 @@ namespace impactx::elements
         amrex::ParticleReal m_slice_bg;  //! m_slice_ds / m_betgam2
     };
 
-    /** A drift: physics plus common host-only metadata */
-    using Drift = Element<DriftPhysics>;
+    /** A drift: GPU state plus common host-only metadata */
+    using Drift = Element<DriftGPU>;
 
 } // namespace impactx::elements
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::DriftPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::DriftGPU)
 
 #endif // IMPACTX_DRIFT_H

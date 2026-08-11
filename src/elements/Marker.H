@@ -11,7 +11,7 @@
 #define IMPACTX_ELEMENT_MARKER_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/thin.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
@@ -23,8 +23,8 @@
 
 namespace impactx::elements
 {
-    struct MarkerPhysics
-    : public mixin::LinearTransport<MarkerPhysics>,
+    struct MarkerGPU
+    : public mixin::LinearTransport<MarkerGPU>,
       public mixin::Thin,
       public mixin::SpinTransport,
       public mixin::NoFinalize,
@@ -35,11 +35,11 @@ namespace impactx::elements
 
         /** This named element does nothing.
          *
-         * The name is carried by the element envelope, so the physics is stateless.
+         * The name is carried by the element envelope, so the GPU part is stateless.
          * It must stay default-constructible: that is what lets the envelope build the
-         * physics from an empty argument prefix and route the name to the metadata.
+         * GPU part from an empty argument prefix and route the name to the metadata.
          */
-        MarkerPhysics () = default;
+        MarkerGPU () = default;
 
         /** Reverse the element (no-op) */
         void reverse () { }
@@ -152,8 +152,8 @@ namespace impactx::elements
         }
     };
 
-    /** Marker: physics plus common host-only metadata */
-    using Marker = Element<MarkerPhysics>;
+    /** Marker: GPU state plus common host-only metadata */
+    using Marker = Element<MarkerGPU>;
 
 } // namespace impactx
 

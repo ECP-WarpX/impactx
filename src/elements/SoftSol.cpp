@@ -1,3 +1,3 @@
 #include "SoftSol.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::SoftSolenoidPhysics)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::SoftSolenoidGPU)

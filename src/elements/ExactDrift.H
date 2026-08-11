@@ -11,7 +11,7 @@
 #define IMPACTX_EXACTDRIFT_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/beamoptic.H"
@@ -30,9 +30,9 @@
 
 namespace impactx::elements
 {
-    struct ExactDriftPhysics
-    : public mixin::BeamOptic<ExactDriftPhysics>,
-      public mixin::LinearTransport<ExactDriftPhysics>,
+    struct ExactDriftGPU
+    : public mixin::BeamOptic<ExactDriftGPU>,
+      public mixin::LinearTransport<ExactDriftGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -53,7 +53,7 @@ namespace impactx::elements
          * @param aperture_y vertical half-aperture in m
          * @param nslice number of slices used for the application of space charge
          */
-        ExactDriftPhysics (
+        ExactDriftGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal dx = DEFAULT_dx,
             amrex::ParticleReal dy = DEFAULT_dy,
@@ -271,11 +271,11 @@ namespace impactx::elements
         amrex::ParticleReal m_ibeta, m_ibetagam2;
     };
 
-    /** ExactDrift: physics plus common host-only metadata */
-    using ExactDrift = Element<ExactDriftPhysics>;
+    /** ExactDrift: GPU state plus common host-only metadata */
+    using ExactDrift = Element<ExactDriftGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ExactDriftPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ExactDriftGPU)
 
 #endif // IMPACTX_EXACTDRIFT_H

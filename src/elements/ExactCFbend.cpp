@@ -1,3 +1,3 @@
 #include "ExactCFbend.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::ExactCFbendPhysics)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::ExactCFbendGPU)

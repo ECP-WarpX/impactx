@@ -11,7 +11,7 @@
 #define IMPACTX_PLANE_XYROT_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
@@ -31,9 +31,9 @@
 
 namespace impactx::elements
 {
-    struct PlaneXYRotPhysics
-    : public mixin::BeamOptic<PlaneXYRotPhysics>,
-      public mixin::LinearTransport<PlaneXYRotPhysics>,
+    struct PlaneXYRotGPU
+    : public mixin::BeamOptic<PlaneXYRotGPU>,
+      public mixin::LinearTransport<PlaneXYRotGPU>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::SpinTransport,
@@ -54,7 +54,7 @@ namespace impactx::elements
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
          */
-        PlaneXYRotPhysics (
+        PlaneXYRotGPU (
             amrex::ParticleReal phi,
             amrex::ParticleReal dx = DEFAULT_dx,
             amrex::ParticleReal dy = DEFAULT_dy,
@@ -227,11 +227,11 @@ namespace impactx::elements
         amrex::ParticleReal m_sin_phi, m_cos_phi;
     };
 
-    /** PlaneXYRot: physics plus common host-only metadata */
-    using PlaneXYRot = Element<PlaneXYRotPhysics>;
+    /** PlaneXYRot: GPU state plus common host-only metadata */
+    using PlaneXYRot = Element<PlaneXYRotGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::PlaneXYRotPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::PlaneXYRotGPU)
 
 #endif // IMPACTX_PLANE_XYROT_H

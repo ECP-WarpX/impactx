@@ -1,3 +1,3 @@
 #include "ChrPlasmaLens.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::ChrPlasmaLensPhysics)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::ChrPlasmaLensGPU)

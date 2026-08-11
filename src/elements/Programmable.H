@@ -11,7 +11,7 @@
 #define IMPACTX_ELEMENTS_PROGRAMMABLE_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "particles/CovarianceMatrix.H"
 #include "mixin/hostonly.H"
 #include "mixin/lineartransport.H"
@@ -31,11 +31,11 @@ namespace impactx::elements
     /** An element whose push is supplied from Python
      *
      * Host-only: the callbacks below hold Python objects, which no kernel may touch. This
-     * element is never turned into an execution snapshot -- its push is the callback
+     * element is never turned into a pusher -- its push is the callback
      * itself -- and the marker says so rather than leaving it to that fact.
      */
-    struct ProgrammablePhysics
-    : public mixin::LinearTransport<ProgrammablePhysics, false>,
+    struct ProgrammableGPU
+    : public mixin::LinearTransport<ProgrammableGPU, false>,
       public mixin::HostOnly
       // TODO: public amrex::simd::Vectorized<amrex::simd::native_simd_size_particlereal>
     {
@@ -50,7 +50,7 @@ namespace impactx::elements
          * @param ds Segment length in m
          * @param nslice number of slices used for the application of space charge
          */
-        ProgrammablePhysics (
+        ProgrammableGPU (
             amrex::ParticleReal ds = DEFAULT_ds,
             int nslice = DEFAULT_nslice
         )
@@ -151,8 +151,8 @@ namespace impactx::elements
         std::function<void()> m_finalize;  //! hook for finalize cleanup
     };
 
-    /** Programmable: physics plus common host-only metadata */
-    using Programmable = Element<ProgrammablePhysics>;
+    /** Programmable: GPU state plus common host-only metadata */
+    using Programmable = Element<ProgrammableGPU>;
 
 } // namespace impactx
 

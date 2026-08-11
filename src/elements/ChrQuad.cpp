@@ -1,3 +1,3 @@
 #include "ChrQuad.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::ChrQuadPhysics)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::ChrQuadGPU)

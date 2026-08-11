@@ -11,7 +11,7 @@
 #define IMPACTX_EXACTSBEND_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/beamoptic.H"
@@ -30,9 +30,9 @@
 
 namespace impactx::elements
 {
-    struct ExactSbendPhysics
-    : public mixin::BeamOptic<ExactSbendPhysics>,
-      public mixin::LinearTransport<ExactSbendPhysics>,
+    struct ExactSbendGPU
+    : public mixin::BeamOptic<ExactSbendGPU>,
+      public mixin::LinearTransport<ExactSbendGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -67,7 +67,7 @@ namespace impactx::elements
          * @param aperture_y vertical half-aperture in m
          * @param nslice number of slices used for the application of space charge
          */
-        ExactSbendPhysics (
+        ExactSbendGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal phi,
             amrex::ParticleReal B = DEFAULT_B,
@@ -455,11 +455,11 @@ namespace impactx::elements
 
     };
 
-    /** ExactSbend: physics plus common host-only metadata */
-    using ExactSbend = Element<ExactSbendPhysics>;
+    /** ExactSbend: GPU state plus common host-only metadata */
+    using ExactSbend = Element<ExactSbendGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ExactSbendPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ExactSbendGPU)
 
 #endif // IMPACTX_EXACTSBEND_H

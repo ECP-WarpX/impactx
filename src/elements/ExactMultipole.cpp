@@ -1,3 +1,3 @@
 #include "ExactMultipole.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::ExactMultipolePhysics)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::ExactMultipoleGPU)

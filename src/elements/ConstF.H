@@ -11,7 +11,7 @@
 #define IMPACTX_CONSTF_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/beamoptic.H"
@@ -30,9 +30,9 @@
 
 namespace impactx::elements
 {
-    struct ConstFPhysics
-    : public mixin::BeamOptic<ConstFPhysics>,
-      public mixin::LinearTransport<ConstFPhysics>,
+    struct ConstFGPU
+    : public mixin::BeamOptic<ConstFGPU>,
+      public mixin::LinearTransport<ConstFGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -56,7 +56,7 @@ namespace impactx::elements
          * @param aperture_y vertical half-aperture in m
          * @param nslice number of slices used for the application of space charge
          */
-        ConstFPhysics (
+        ConstFGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal kx,
             amrex::ParticleReal ky,
@@ -395,11 +395,11 @@ namespace impactx::elements
         amrex::ParticleReal m_cos_kxds, m_cos_kyds, m_cos_ktds;
     };
 
-    /** ConstF: physics plus common host-only metadata */
-    using ConstF = Element<ConstFPhysics>;
+    /** ConstF: GPU state plus common host-only metadata */
+    using ConstF = Element<ConstFGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ConstFPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ConstFGPU)
 
 #endif // IMPACTX_CONSTF_H

@@ -1,3 +1,3 @@
 #include "TaperedPL.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::TaperedPLPhysics)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::TaperedPLGPU)

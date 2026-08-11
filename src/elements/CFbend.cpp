@@ -1,3 +1,3 @@
 #include "CFbend.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::CFbendPhysics)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::CFbendGPU)

@@ -1,3 +1,3 @@
 #include "RFCavity.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::RFCavityPhysics)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::RFCavityGPU)

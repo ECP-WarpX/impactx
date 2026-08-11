@@ -11,11 +11,11 @@
 #define IMPACTX_EXACTCFBEND_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "particles/integrators/Integrators.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
-#include "mixin/devicebackedarrays.H"
+#include "helper/ArrayValidation.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
 #include "mixin/pipeaperture.H"
@@ -47,13 +47,13 @@ namespace impactx::elements
         amrex::Gpu::TrackedVector<amrex::ParticleReal> k_skew;
     };
 
-    /** The prepared execution snapshot of an exact combined-function bend.
+    /** The prepared pusher for an exact combined-function bend.
      *
      * Holds the particle-facing configuration, the constants derived from the reference
      * particle, and a bounded, non-owning view of the multipole coefficients.
      */
-    struct ExactCFbendCore
-    : public mixin::ParticlePush<ExactCFbendCore>,
+    struct ExactCFbendPusher
+    : public mixin::ParticlePush<ExactCFbendPusher>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -79,7 +79,7 @@ namespace impactx::elements
          * @param mapsteps number of integration steps per slice
          * @param nslice number of slices used for the application of space charge
          */
-        ExactCFbendCore (
+        ExactCFbendPusher (
             amrex::ParticleReal ds,
             int unit,
             amrex::ParticleReal dx,
@@ -102,7 +102,7 @@ namespace impactx::elements
         void reverse () { Thick::reverse(); }
 
         /** Push all particles on a tile */
-        using mixin::ParticlePush<ExactCFbendCore>::operator();
+        using mixin::ParticlePush<ExactCFbendPusher>::operator();
 
         /** Compute and cache the constants for the push.
          *
@@ -123,7 +123,7 @@ namespace impactx::elements
             m_ibetgam2 = 1_prt / amrex::Math::powi<2>(refpart.beta_gamma());
             m_brho = refpart.rigidity_Tm();
 
-            amrex::ParticleReal const * k_normal = m_coefficients.first;
+            amrex::ParticleReal const * k_normal = m_k_normal;
 
             // find magnetic field and curvature; normalize units to MAD-X convention if needed
             amrex::ParticleReal curvature = m_unit == 1 ? k_normal[0] / m_brho : k_normal[0];
@@ -323,8 +323,8 @@ namespace impactx::elements
             amrex::ParticleReal tout = t;
             amrex::ParticleReal ptout = pt;
 
-            amrex::ParticleReal const * k_normal = m_coefficients.first;
-            amrex::ParticleReal const * k_skew = m_coefficients.second;
+            amrex::ParticleReal const * k_normal = m_k_normal;
+            amrex::ParticleReal const * k_skew = m_k_skew;
 
             // defined dimensionless variables scaled by radius of curvature
             amrex::ParticleReal rho = 1_prt + x / m_rc;
@@ -336,7 +336,7 @@ namespace impactx::elements
             amrex::ParticleReal dpy = 0_prt;
 
             // loop over array of multipole coefficients
-            for (int m = 1; m < m_coefficients.size; m++) {
+            for (int m = 1; m < m_ncoef; m++) {
 
                // normalize units to MAD-X convention if needed
                amrex::ParticleReal kn = m_unit == 1 ? k_normal[m] / m_brho : k_normal[m];
@@ -439,8 +439,8 @@ namespace impactx::elements
             T_Real sy = particle_spin(2);
             T_Real sz = particle_spin(3);
 
-            amrex::ParticleReal const * const k_normal = m_coefficients.first;
-            amrex::ParticleReal const * const k_skew = m_coefficients.second;
+            amrex::ParticleReal const * const k_normal = m_k_normal;
+            amrex::ParticleReal const * const k_skew = m_k_skew;
 
             // defined dimensionless variables scaled by radius of curvature
             amrex::ParticleReal rho = 1_prt + x / m_rc;
@@ -454,7 +454,7 @@ namespace impactx::elements
 
             // loop over array of multipole coefficients
             // NOTE:  Here we start at m = 0 in order to include the dipole contribution to the spin
-            for (int m = 0; m < m_coefficients.size; m++) {
+            for (int m = 0; m < m_ncoef; m++) {
 
                // normalize units to MAD-X convention if needed
                amrex::ParticleReal kn = m_unit == 1 ? k_normal[m] / m_brho : k_normal[m];
@@ -612,8 +612,11 @@ namespace impactx::elements
         int m_unit; //! unit specification for Multipole strength
         int m_int_order; //! order used for the symplectic integration (2 or 4)
         int m_mapsteps; //! number of integration steps per slice
-        /** Coefficients resolved to this snapshot's execution space; non-owning */
-        mixin::DualArrayView m_coefficients{};
+        /** Coefficients resolved to this pusher's execution space; non-owning */
+        //! non-owning, device-copyable; valid for the launch it was prepared for
+        amrex::ParticleReal const * m_k_normal = nullptr;
+        amrex::ParticleReal const * m_k_skew = nullptr;
+        int m_ncoef = 0;
 
 
     protected:
@@ -631,12 +634,12 @@ namespace impactx::elements
     /** An exact combined-function bend: the canonical element that owns its coefficients.
      *
      * The reference-particle push, the transfer map, serialization and finalization run
-     * here on the host. Particle pushes run against @see ExactCFbendCore.
+     * here on the host. Particle pushes run against @see ExactCFbendPusher.
      */
-    struct ExactCFbendPhysics
-    : public mixin::BeamOptic<ExactCFbendPhysics>,
-      public mixin::LinearTransport<ExactCFbendPhysics>,
-      public ExactCFbendCore
+    struct ExactCFbendGPU
+    : public mixin::BeamOptic<ExactCFbendGPU>,
+      public mixin::LinearTransport<ExactCFbendGPU>,
+      public ExactCFbendPusher
     {
         /** A general (thick) combined-function sector dipole whose field consists
          *  of a superposition of ideal curvilinear hard-edge multipoles.
@@ -662,7 +665,7 @@ namespace impactx::elements
          *        particle push in the applied fields
          * @param nslice number of slices used for the application of space charge
          */
-        ExactCFbendPhysics (
+        ExactCFbendGPU (
             amrex::ParticleReal ds,
             std::vector<amrex::ParticleReal> k_normal,
             std::vector<amrex::ParticleReal> k_skew,
@@ -676,9 +679,11 @@ namespace impactx::elements
             int mapsteps = DEFAULT_mapsteps,
             int nslice = DEFAULT_nslice
         )
-          : ExactCFbendCore(ds, unit, dx, dy, rotation_degree, aperture_x, aperture_y, int_order, mapsteps, nslice),
-            m_coefficients_data(std::move(k_normal), std::move(k_skew), "ExactCFbend: normal and skew coefficient", 1)
+          : ExactCFbendPusher(ds, unit, dx, dy, rotation_degree, aperture_x, aperture_y, int_order, mapsteps, nslice),
+            m_coefficients{std::move(k_normal), std::move(k_skew)}
         {
+            require_array_pair(m_coefficients.k_normal, m_coefficients.k_skew,
+                               "ExactCFbend: normal and skew coefficient", 1);
             if (m_int_order != 2 && m_int_order != 4 && m_int_order != 6)
                 throw std::invalid_argument("ExactCFbend: The order used for symplectic integration must be 2, 4 or 6.");
 
@@ -687,10 +692,10 @@ namespace impactx::elements
         }
 
         /** Push all particles */
-        using mixin::BeamOptic<ExactCFbendPhysics>::operator();
+        using mixin::BeamOptic<ExactCFbendGPU>::operator();
 
         /** This pushes the covariance matrix. */
-        using mixin::LinearTransport<ExactCFbendPhysics>::operator();
+        using mixin::LinearTransport<ExactCFbendGPU>::operator();
 
         /** This pushes the reference particle.
          *
@@ -718,7 +723,7 @@ namespace impactx::elements
             amrex::ParticleReal const brho = refpart.rigidity_Tm();
 
             // host view, obtained at the point of use
-            amrex::ParticleReal const * k_normal = m_coefficients_data.host_view().first;
+            amrex::ParticleReal const * k_normal = m_coefficients.k_normal.host_const().data();
             // find magnetic field and curvature; normalize units to MAD-X convention if needed
             amrex::ParticleReal const curvature = m_unit == 1 ? k_normal[0] / brho : k_normal[0];
             amrex::ParticleReal const rc = curvature == 0.0 ? 0.0_prt : 1.0_prt/curvature;
@@ -779,8 +784,8 @@ namespace impactx::elements
             amrex::ParticleReal const ibetgam2 = 1_prt / betgam2;
 
             // host view, obtained at the point of use
-            auto const coefficients = m_coefficients_data.host_view();
-            amrex::ParticleReal const * k_normal = coefficients.first;
+            auto const & k_normal_h = m_coefficients.k_normal.host_const();
+            amrex::ParticleReal const * k_normal = k_normal_h.data();
 
             // find magnetic field and curvature; normalize units to MAD-X convention if needed
             // magnetic rigidity of the reference particle
@@ -792,7 +797,7 @@ namespace impactx::elements
             amrex::ParticleReal const curvature = m_unit == 1 ? k_normal[0] / brho : k_normal[0];
             amrex::ParticleReal const rc = curvature == 0.0 ? 0.0_prt : 1.0_prt/curvature;
             // a pure bend carries no quadrupole component, and then supplies no k_normal[1]
-            amrex::ParticleReal const kn_raw = coefficients.size > 1 ? k_normal[1] : 0.0_prt;
+            amrex::ParticleReal const kn_raw = static_cast<int>(k_normal_h.size()) > 1 ? k_normal[1] : 0.0_prt;
             amrex::ParticleReal const kn = m_unit == 1 ? kn_raw / brho : kn_raw;
             amrex::ParticleReal const b2rc2 = amrex::Math::powi<2>(bet) * amrex::Math::powi<2>(rc);
 
@@ -839,39 +844,43 @@ namespace impactx::elements
             return rotate_aligned_map(R);
         }
 
-        /** Prepare the execution snapshot for one element slice
+        /** Prepare the pusher for one element slice
          *
          * @param refpart reference particle, already advanced for this slice
-         * @return a core holding an execution-space view of the coefficients
+         * @return a pusher holding an execution-space view of the coefficients
          */
-        [[nodiscard]] ExactCFbendCore make_particle_pusher (RefPart const & refpart) const
+        [[nodiscard]] ExactCFbendPusher make_particle_pusher (RefPart const & refpart) const
         {
-            ExactCFbendCore core = *this;
+            ExactCFbendPusher pusher = *this;
             // compute_constants() derives the curvature from the first coefficient, so it
             // needs host storage; the device view is installed afterwards.
-            core.m_coefficients = m_coefficients_data.host_view();
-            core.compute_constants(refpart);
-            core.m_coefficients = m_coefficients_data.device_view();
-            return core;
+            pusher.m_k_normal = m_coefficients.k_normal.host_const().data();
+            pusher.m_k_skew = m_coefficients.k_skew.host_const().data();
+            pusher.m_ncoef = static_cast<int>(m_coefficients.k_normal.host_const().size());
+            pusher.compute_constants(refpart);
+            pusher.m_k_normal = m_coefficients.k_normal.device_const().data();
+            pusher.m_k_skew = m_coefficients.k_skew.device_const().data();
+            pusher.m_ncoef = static_cast<int>(m_coefficients.k_normal.host_const().size());
+            return pusher;
         }
 
         /** Normal multipole coefficients */
         [[nodiscard]] std::vector<amrex::ParticleReal> k_normal_coefficients () const
         {
-            return m_coefficients_data.first_host();
+            return m_coefficients.k_normal.host_const();
         }
 
         /** Skew multipole coefficients */
         [[nodiscard]] std::vector<amrex::ParticleReal> k_skew_coefficients () const
         {
-            return m_coefficients_data.second_host();
+            return m_coefficients.k_skew.host_const();
         }
 
         /** Replace both arrays at once
          *
-         * The two are validated together and committed as one step, so a rejected update
-         * leaves the element as it was. They are always the same length, which is why
-         * this takes both rather than offering to change one of them alone.
+         * The two are validated before either is stored, so a rejected update leaves the
+         * element as it was. They are always the same length, which is why this takes
+         * both rather than offering to change one of them alone.
          *
          * @param first the new normal values
          * @param second the new skew values
@@ -881,24 +890,28 @@ namespace impactx::elements
             std::vector<amrex::ParticleReal> second
         )
         {
-            m_coefficients_data.commit(std::move(first), std::move(second), "ExactCFbend: normal and skew coefficient", 1);
+            require_array_pair(first, second, "ExactCFbend: normal and skew coefficient", 1);
+            m_coefficients.k_normal.host() = std::move(first);
+            m_coefficients.k_skew.host() = std::move(second);
         }
 
         /** Release device storage; host configuration survives for reuse */
         void finalize ()
         {
-            m_coefficients_data.release_gpu();
+            m_coefficients.k_normal.release_gpu();
+            m_coefficients.k_skew.release_gpu();
         }
 
         //! the coefficient arrays, owned by this element
-        mixin::DeviceBackedArrays m_coefficients_data;
+        //! the arrays this element owns, mirrored to the device on demand
+        CFbendCoefficients m_coefficients;
     };
 
-    /** ExactCFbend: physics plus common host-only metadata */
-    using ExactCFbend = Element<ExactCFbendPhysics>;
+    /** ExactCFbend: GPU state plus common host-only metadata */
+    using ExactCFbend = Element<ExactCFbendGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ExactCFbendPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ExactCFbendGPU)
 
 #endif // IMPACTX_EXACTCFBEND_H

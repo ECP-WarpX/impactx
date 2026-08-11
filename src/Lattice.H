@@ -10,11 +10,12 @@
 #ifndef IMPACTX_LATTICE_H
 #define IMPACTX_LATTICE_H
 
-#include "elements/Handle.H"
+#include "elements/helper/Handle.H"
 
 #include <cstddef>
 #include <cstdint>
 #include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -43,21 +44,6 @@ namespace impactx
         using const_reverse_iterator = storage_type::const_reverse_iterator;
 
         Lattice () = default;
-
-        /** Take shared ownership of a freshly constructed element
-         *
-         * @tparam T_Element the concrete element type
-         * @param args arguments forwarded to the element constructor
-         * @return a handle to the element just added
-         */
-        template<typename T_Element, typename... T_Args>
-        elements::ElementHandle & emplace (T_Args&&... args)
-        {
-            require_no_traversal("add an element");
-            m_elements.push_back(elements::make_handle<T_Element>(std::forward<T_Args>(args)...));
-            ++m_generation;
-            return m_elements.back();
-        }
 
         /** Take shared ownership of an element, copying the value given
          *

@@ -9,7 +9,7 @@
 #include "pyImpactX.H"
 #include "Lattice.H"
 
-#include <elements/Handle.H>
+#include <elements/helper/Handle.H>
 
 #include <cstdint>
 #include <memory>
@@ -267,8 +267,6 @@ namespace impactx::python
             m_list = py::list();
             m_self.attr(attr_name()) = m_list;
         }
-
-        [[nodiscard]] py::list const & list () const noexcept { return m_list; }
 
     private:
         /** Does this Python object wrap the element this handle owns? */

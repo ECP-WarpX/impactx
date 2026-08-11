@@ -11,7 +11,7 @@
 #define IMPACTX_ELEMENT_EMPTY_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/thin.H"
 #include "mixin/lineartransport.H"
 #include "mixin/nofinalize.H"
@@ -24,9 +24,9 @@
 
 namespace impactx::elements
 {
-    struct EmptyPhysics
+    struct EmptyGPU
     : public mixin::Thin,
-      public mixin::LinearTransport<EmptyPhysics>,
+      public mixin::LinearTransport<EmptyGPU>,
       public mixin::NoFinalize,
       public amrex::simd::Vectorized<amrex::simd::native_simd_size_particlereal>
     {
@@ -35,7 +35,7 @@ namespace impactx::elements
 
         /** This element does nothing.
          */
-        EmptyPhysics () = default;
+        EmptyGPU () = default;
 
         /** Reverse the element (no-op) */
         void reverse () { }
@@ -120,8 +120,8 @@ namespace impactx::elements
         using LinearTransport::operator();
     };
 
-    /** Empty: physics plus common host-only metadata */
-    using Empty = Element<EmptyPhysics>;
+    /** Empty: GPU state plus common host-only metadata */
+    using Empty = Element<EmptyGPU>;
 
 } // namespace impactx
 

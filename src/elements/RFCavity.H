@@ -11,11 +11,11 @@
 #define IMPACTX_RFCAVITY_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "particles/integrators/Integrators.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
-#include "mixin/devicebackedarrays.H"
+#include "helper/ArrayValidation.H"
 #include "mixin/lineartransport.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/thick.H"
@@ -96,14 +96,14 @@ namespace impactx::elements
         amrex::Gpu::TrackedVector<amrex::ParticleReal> sin;
     };
 
-    /** The prepared execution snapshot of an RF cavity.
+    /** The prepared pusher for an RF cavity.
      *
      * Holds the particle-facing configuration and a bounded, non-owning view of the
      * Fourier coefficients of the on-axis field, resolved to the execution space of one
      * element slice.
      */
-    struct RFCavityCore
-    : public mixin::ParticlePush<RFCavityCore>,
+    struct RFCavityPusher
+    : public mixin::ParticlePush<RFCavityPusher>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -129,7 +129,7 @@ namespace impactx::elements
          * @param mapsteps number of integration steps per slice
          * @param nslice number of slices used for the application of space charge
          */
-        RFCavityCore (
+        RFCavityPusher (
             amrex::ParticleReal ds,
             amrex::ParticleReal escale,
             amrex::ParticleReal freq,
@@ -157,7 +157,7 @@ namespace impactx::elements
         }
 
         /** Push all particles on a tile */
-        using mixin::ParticlePush<RFCavityCore>::operator();
+        using mixin::ParticlePush<RFCavityPusher>::operator();
 
 
         /** This is an RF cavity functor, so that a variable of this type can be used like
@@ -282,11 +282,11 @@ namespace impactx::elements
             using namespace amrex::literals; // for _rt and _prt
             using amrex::Math::powi;
 
-            // the coefficients were resolved to this snapshot's execution space when it
+            // the coefficients were resolved to this pusher's execution space when it
             // was prepared, so there is a single copy of the field expansion below
-            amrex::ParticleReal const * cos_data = m_coefficients.first;
-            amrex::ParticleReal const * sin_data = m_coefficients.second;
-            int const ncoef = m_coefficients.size;
+            amrex::ParticleReal const * cos_data = m_cos_coefficients;
+            amrex::ParticleReal const * sin_data = m_sin_coefficients;
+            int const ncoef = m_ncoef;
 
             // specify constants
             using ablastr::constant::math::pi;
@@ -494,8 +494,11 @@ namespace impactx::elements
         amrex::ParticleReal m_freq; //! RF frequency in Hz
         amrex::ParticleReal m_phase; //! RF driven phase in deg
         int m_mapsteps; //! number of map integration steps per slice
-        /** Coefficients resolved to this snapshot's execution space; non-owning */
-        mixin::DualArrayView m_coefficients{};
+        /** Coefficients resolved to this pusher's execution space; non-owning */
+        //! non-owning, device-copyable; valid for the launch it was prepared for
+        amrex::ParticleReal const * m_cos_coefficients = nullptr;
+        amrex::ParticleReal const * m_sin_coefficients = nullptr;
+        int m_ncoef = 0;
 
 
         // Reference-trajectory linearization around the reference particle.
@@ -510,12 +513,12 @@ namespace impactx::elements
     /** An RF cavity: the canonical element that owns its field coefficients.
      *
      * The reference-particle push, the transfer map, serialization and finalization run
-     * here on the host. Particle pushes run against @see RFCavityCore.
+     * here on the host. Particle pushes run against @see RFCavityPusher.
      */
-    struct RFCavityPhysics
-    : public mixin::BeamOptic<RFCavityPhysics>,
-      public mixin::LinearTransport<RFCavityPhysics>,
-      public RFCavityCore
+    struct RFCavityGPU
+    : public mixin::BeamOptic<RFCavityGPU>,
+      public mixin::LinearTransport<RFCavityGPU>,
+      public RFCavityPusher
     {
         /** An RF cavity
          *
@@ -534,7 +537,7 @@ namespace impactx::elements
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
          */
-        RFCavityPhysics (
+        RFCavityGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal escale,
             amrex::ParticleReal freq,
@@ -549,15 +552,17 @@ namespace impactx::elements
             int mapsteps = DEFAULT_mapsteps,
             int nslice = DEFAULT_nslice
         )
-          : RFCavityCore(ds, escale, freq, phase, dx, dy, rotation_degree, aperture_x, aperture_y, mapsteps, nslice),
-            m_coefficients_data(std::move(cos_coef), std::move(sin_coef), "RFCavity: cos and sin coefficient", 1)
+          : RFCavityPusher(ds, escale, freq, phase, dx, dy, rotation_degree, aperture_x, aperture_y, mapsteps, nslice),
+            m_coefficients{std::move(cos_coef), std::move(sin_coef)}
         {
+            require_array_pair(m_coefficients.cos, m_coefficients.sin,
+                               "RFCavity: cos and sin coefficient", 1);
             if (m_mapsteps <= 0)
                 throw std::invalid_argument("RFCavity: mapsteps must be > 0!");
         }
 
         /** Push all particles */
-        using mixin::BeamOptic<RFCavityPhysics>::operator();
+        using mixin::BeamOptic<RFCavityGPU>::operator();
 
         /** This pushes the reference particle.
          *
@@ -570,8 +575,10 @@ namespace impactx::elements
             using amrex::Math::powi;
 
             // evaluate the field against a host view obtained at the point of use
-            RFCavityCore core = *this;
-            core.m_coefficients = m_coefficients_data.host_view();
+            RFCavityPusher pusher = *this;
+            pusher.m_cos_coefficients = m_coefficients.cos.host_const().data();
+            pusher.m_sin_coefficients = m_coefficients.sin.host_const().data();
+            pusher.m_ncoef = static_cast<int>(m_coefficients.cos.host_const().size());
 
             // assign input reference particle values
             amrex::ParticleReal const x = refpart.x;
@@ -585,10 +592,10 @@ namespace impactx::elements
             amrex::ParticleReal const sedge = refpart.sedge;
 
             // initialize linear map (deviation) values
-            core.m_map = decltype(m_map)::Identity();
+            pusher.m_map = decltype(m_map)::Identity();
 
             // initialize the spin-orbit coupling matrix
-            core.m_spin_coupling = {};
+            pusher.m_spin_coupling = {};
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
@@ -601,11 +608,11 @@ namespace impactx::elements
             amrex::ParticleReal const zout = zin + slice_ds;
             int const nsteps = m_mapsteps;
 
-            integrators::symp2_integrate_split3(refpart,zin,zout,nsteps,core);
+            integrators::symp2_integrate_split3(refpart,zin,zout,nsteps,pusher);
 
             // keep the linearization the integrator produced
-            m_map = core.m_map;
-            m_spin_coupling = core.m_spin_coupling;
+            m_map = pusher.m_map;
+            m_spin_coupling = pusher.m_spin_coupling;
             amrex::ParticleReal const ptf = refpart.pt;
 
             // advance position (x,y,z)
@@ -667,36 +674,38 @@ namespace impactx::elements
             // apply the transverse rotation (roll) alignment error
             return rotate_aligned_map(R);
         }
-        /** Prepare the execution snapshot for one element slice
+        /** Prepare the pusher for one element slice
          *
          * @param refpart reference particle, already advanced for this slice
-         * @return a core holding an execution-space view of the coefficients
+         * @return a pusher holding an execution-space view of the coefficients
          */
-        [[nodiscard]] RFCavityCore make_particle_pusher (RefPart const & refpart) const
+        [[nodiscard]] RFCavityPusher make_particle_pusher (RefPart const & refpart) const
         {
-            RFCavityCore core = *this;
-            core.Alignment::compute_constants(refpart);
-            core.m_coefficients = m_coefficients_data.device_view();
-            return core;
+            RFCavityPusher pusher = *this;
+            pusher.Alignment::compute_constants(refpart);
+            pusher.m_cos_coefficients = m_coefficients.cos.device_const().data();
+            pusher.m_sin_coefficients = m_coefficients.sin.device_const().data();
+            pusher.m_ncoef = static_cast<int>(m_coefficients.cos.host_const().size());
+            return pusher;
         }
 
         /** Cosine coefficients of the on-axis field expansion */
         [[nodiscard]] std::vector<amrex::ParticleReal> cos_coefficients () const
         {
-            return m_coefficients_data.first_host();
+            return m_coefficients.cos.host_const();
         }
 
         /** Sine coefficients of the on-axis field expansion */
         [[nodiscard]] std::vector<amrex::ParticleReal> sin_coefficients () const
         {
-            return m_coefficients_data.second_host();
+            return m_coefficients.sin.host_const();
         }
 
         /** Replace both arrays at once
          *
-         * The two are validated together and committed as one step, so a rejected update
-         * leaves the element as it was. They are always the same length, which is why
-         * this takes both rather than offering to change one of them alone.
+         * The two are validated before either is stored, so a rejected update leaves the
+         * element as it was. They are always the same length, which is why this takes
+         * both rather than offering to change one of them alone.
          *
          * @param first the new cosine values
          * @param second the new sine values
@@ -706,24 +715,28 @@ namespace impactx::elements
             std::vector<amrex::ParticleReal> second
         )
         {
-            m_coefficients_data.commit(std::move(first), std::move(second), "RFCavity: cos and sin coefficient", 1);
+            require_array_pair(first, second, "RFCavity: cos and sin coefficient", 1);
+            m_coefficients.cos.host() = std::move(first);
+            m_coefficients.sin.host() = std::move(second);
         }
 
         /** Release device storage; host configuration survives for reuse */
         void finalize ()
         {
-            m_coefficients_data.release_gpu();
+            m_coefficients.cos.release_gpu();
+            m_coefficients.sin.release_gpu();
         }
 
         //! the coefficient arrays, owned by this element
-        mixin::DeviceBackedArrays m_coefficients_data;
+        //! the arrays this element owns, mirrored to the device on demand
+        CavityFourierCoefficients m_coefficients;
     };
 
-    /** RFCavity: physics plus common host-only metadata */
-    using RFCavity = Element<RFCavityPhysics>;
+    /** RFCavity: GPU state plus common host-only metadata */
+    using RFCavity = Element<RFCavityGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::RFCavityPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::RFCavityGPU)
 
 #endif // IMPACTX_RFCAVITY_H

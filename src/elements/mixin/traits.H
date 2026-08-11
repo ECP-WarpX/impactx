@@ -124,7 +124,7 @@ namespace impactx::elements::mixin
      * True exactly for the elements that derive their per-push transport length from their
      * own ``nslice()`` at push time, i.e. everything deriving from @see Thick. Only for those
      * does temporarily raising the slice count actually shorten the transport of one push,
-     * @see ScopedNslice in accessors.H.
+     * @see ScopedNslice in helper/Accessors.H.
      *
      * This is deliberately narrower than @see has_settable_nslice_v:
      * - Programmable *stores* a slice count, but its push is an opaque user callback. The

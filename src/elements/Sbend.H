@@ -11,7 +11,7 @@
 #define IMPACTX_SBEND_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/beamoptic.H"
@@ -29,9 +29,9 @@
 
 namespace impactx::elements
 {
-    struct SbendPhysics
-    : public mixin::BeamOptic<SbendPhysics>,
-      public mixin::LinearTransport<SbendPhysics>,
+    struct SbendGPU
+    : public mixin::BeamOptic<SbendGPU>,
+      public mixin::LinearTransport<SbendGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -55,7 +55,7 @@ namespace impactx::elements
          * @param aperture_y vertical half-aperture in m
          * @param nslice number of slices used for the application of space charge
          */
-        SbendPhysics (
+        SbendGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal rc,
             amrex::ParticleReal dx = DEFAULT_dx,
@@ -402,11 +402,11 @@ namespace impactx::elements
         amrex::ParticleReal m_lambday, m_A14, m_A21, m_A22, m_A26, m_A34;
     };
 
-    /** Sbend: physics plus common host-only metadata */
-    using Sbend = Element<SbendPhysics>;
+    /** Sbend: GPU state plus common host-only metadata */
+    using Sbend = Element<SbendGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::SbendPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::SbendGPU)
 
 #endif // IMPACTX_SBEND_H

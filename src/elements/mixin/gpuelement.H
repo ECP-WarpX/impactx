@@ -4,14 +4,14 @@
  *
  * This file is part of ImpactX.
  *
- * Authors: Axel Huebl
+ * Authors: Axel Huebl, Chad Mitchell
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_ELEMENTS_ELEMENT_H
-#define IMPACTX_ELEMENTS_ELEMENT_H
+#ifndef IMPACTX_ELEMENTS_MIXIN_GPUELEMENT_H
+#define IMPACTX_ELEMENTS_MIXIN_GPUELEMENT_H
 
-#include "mixin/hostonly.H"
-#include "mixin/named.H"
+#include "hostonly.H"
+#include "named.H"
 
 #include <optional>
 #include <string>
@@ -25,12 +25,12 @@ namespace impactx::elements
     /** Common host-only metadata carried by every public lattice element.
      *
      * This is the single home for element state that describes the element to a human or
-     * to tooling, as opposed to state that takes part in the physics: names today, and
+     * to tooling, as opposed to state that enters a kernel: names today, and
      * descriptions, provenance, import annotations, tags or visualization data later.
      *
-     * Adding a field here costs nothing in a kernel and requires no edit to any physics
+     * Adding a field here costs nothing in a kernel and requires no edit to any GPU
      * implementation, because @see Element keeps this subobject out of the execution
-     * snapshot that is copied into a launch closure.
+     * pusher that is copied into a launch closure.
      */
     struct ElementMetadata : mixin::Named
     {
@@ -46,26 +46,26 @@ namespace impactx::elements
  */
 namespace envelope_detail
 {
-    /** True if @c T_Physics can be constructed from the whole argument pack */
-    template<typename T_Physics, typename... T_Args>
-    inline constexpr bool physics_from_all_v = std::is_constructible_v<T_Physics, T_Args...>;
+    /** True if @c T_GPU can be constructed from the whole argument pack */
+    template<typename T_GPU, typename... T_Args>
+    inline constexpr bool gpu_from_all_v = std::is_constructible_v<T_GPU, T_Args...>;
 
-    template<typename T_Physics, typename T_Tuple, typename T_Idx>
-    struct physics_from_prefix : std::false_type
+    template<typename T_GPU, typename T_Tuple, typename T_Idx>
+    struct gpu_from_prefix : std::false_type
     {
     };
 
-    template<typename T_Physics, typename... T_Args, std::size_t... T_I>
-    struct physics_from_prefix<T_Physics, std::tuple<T_Args...>, std::index_sequence<T_I...>>
+    template<typename T_GPU, typename... T_Args, std::size_t... T_I>
+    struct gpu_from_prefix<T_GPU, std::tuple<T_Args...>, std::index_sequence<T_I...>>
       : std::bool_constant<
-            std::is_constructible_v<T_Physics, std::tuple_element_t<T_I, std::tuple<T_Args...>>...>
+            std::is_constructible_v<T_GPU, std::tuple_element_t<T_I, std::tuple<T_Args...>>...>
         >
     {
     };
 
-    /** True if the pack is "physics arguments, then a trailing element name"
+    /** True if the pack is "GPU arguments, then a trailing element name"
      *
-     * The all-physics form is checked first and wins, so that an element whose physics
+     * The all-GPU form is checked first and wins, so that an element whose GPU type
      * genuinely accepts a trailing string keeps today's overload resolution.
      *
      * This is a class template rather than one `&&` expression on purpose. `&&` in a
@@ -74,17 +74,17 @@ namespace envelope_detail
      * ask for a `std::make_index_sequence` of `SIZE_MAX`. Splitting the empty case into
      * the primary template keeps that expression from ever being formed.
      */
-    template<typename T_Physics, typename... T_Args>
-    struct physics_with_trailing_name : std::false_type
+    template<typename T_GPU, typename... T_Args>
+    struct gpu_with_trailing_name : std::false_type
     {
     };
 
-    template<typename T_Physics, typename T_First, typename... T_Rest>
-    struct physics_with_trailing_name<T_Physics, T_First, T_Rest...>
+    template<typename T_GPU, typename T_First, typename... T_Rest>
+    struct gpu_with_trailing_name<T_GPU, T_First, T_Rest...>
       : std::bool_constant<
-            !physics_from_all_v<T_Physics, T_First, T_Rest...> &&
-            physics_from_prefix<
-                T_Physics,
+            !gpu_from_all_v<T_GPU, T_First, T_Rest...> &&
+            gpu_from_prefix<
+                T_GPU,
                 std::tuple<T_First, T_Rest...>,
                 std::make_index_sequence<sizeof...(T_Rest)>
             >::value &&
@@ -96,19 +96,19 @@ namespace envelope_detail
     {
     };
 
-    template<typename T_Physics, typename... T_Args>
-    inline constexpr bool physics_with_trailing_name_v =
-        physics_with_trailing_name<T_Physics, T_Args...>::value;
+    template<typename T_GPU, typename... T_Args>
+    inline constexpr bool gpu_with_trailing_name_v =
+        gpu_with_trailing_name<T_GPU, T_Args...>::value;
 
     /** True if the pack is a single argument of (a type derived from) @c T_Self
      *
      * Used to keep the variadic constructors out of copy and move construction. Without
      * this, @c Element e2(e1) with a non-const lvalue @c e1 prefers the variadic template
-     * over the copy constructor, because @c Element& converts to @c T_Physics const&
+     * over the copy constructor, because @c Element& converts to @c T_GPU const&
      * (derived-to-base) and so is an exact match for the template.
      *
      * The failure mode is not a compile error, which is why this guard is easy to lose
-     * and important to keep: the variadic would copy-construct only the *physics* base
+     * and important to keep: the variadic would copy-construct only the *GPU* base
      * and default-construct the metadata, so the copy would silently come out unnamed.
      * See tests/python/test_element_metadata.py for the behavioral regression test.
      */
@@ -119,62 +119,64 @@ namespace envelope_detail
 
 } // namespace envelope_detail
 
-    /** A public lattice element: element-specific physics plus common host metadata.
+    /** A public lattice element: element-specific GPU state plus common host metadata.
      *
      * ImpactX copies an element by value into the closure of a particle-push kernel. Any
      * host-only state reachable from that copy is either dead weight or, for owning state,
      * an outright hazard. This envelope makes the split explicit and generic:
      *
-     * - @c T_Physics holds configuration, reference-particle and transfer-map algorithms,
-     *   and the particle equations. It is what becomes an execution snapshot.
+     * - @c T_GPU holds configuration, reference-particle and transfer-map algorithms,
+     *   and the particle equations. It is what becomes a pusher.
      * - @see ElementMetadata holds everything that only ever exists on the host.
      *
-     * Because both are public bases, the scalar accessors and mixin properties that
-     * existed before this split remain available directly on the public element, and no
-     * per-element forwarding constructor or accessor is needed. Tracking and preparation
-     * code nevertheless unwraps through @see physics explicitly, so the boundary is
-     * visible at every call site rather than implied.
+     * Because both are public bases, the scalar accessors, mixin properties and host
+     * entry points -- the particle-container push, the reference-particle push, the
+     * covariance-matrix transport and @c transport_map -- remain callable directly on the
+     * public element, and no per-element forwarding is needed. Those entry points reach
+     * the GPU subobject on their own: each casts @c this to @c T_GPU, so metadata cannot
+     * follow them into a kernel. Only pusher preparation takes the subobject
+     * explicitly, through @see gpu, and @see make_particle_pusher rejects the envelope.
      *
-     * @tparam T_Physics the element-specific physics implementation
+     * @tparam T_GPU the element-specific GPU implementation
      */
-    template<typename T_Physics>
+    template<typename T_GPU>
     class Element
-      : public T_Physics,
+      : public T_GPU,
         public ElementMetadata
     {
     public:
-        using physics_type = T_Physics;
+        using gpu_type = T_GPU;
 
-        /** Default-construct physics and metadata */
+        /** Default-construct GPU state and metadata */
         Element () = default;
 
-        /** Construct from physics arguments only; the element stays unnamed
+        /** Construct from GPU arguments only; the element stays unnamed
          *
-         * All arguments are forwarded to the physics constructor.
+         * All arguments are forwarded to the GPU constructor.
          */
         template<
             typename... T_Args,
             std::enable_if_t<
-                envelope_detail::physics_from_all_v<T_Physics, T_Args...> &&
+                envelope_detail::gpu_from_all_v<T_GPU, T_Args...> &&
                 !envelope_detail::is_self_like_v<Element, T_Args...>,
                 int
             > = 0
         >
         explicit (sizeof...(T_Args) == 1)
         Element (T_Args&&... args)
-          : T_Physics(std::forward<T_Args>(args)...)
+          : T_GPU(std::forward<T_Args>(args)...)
         {
         }
 
-        /** Construct from physics arguments plus a trailing element name
+        /** Construct from GPU arguments plus a trailing element name
          *
-         * The leading arguments are forwarded to the physics constructor and the last one
+         * The leading arguments are forwarded to the GPU constructor and the last one
          * becomes the element name.
          */
         template<
             typename... T_Args,
             std::enable_if_t<
-                envelope_detail::physics_with_trailing_name_v<T_Physics, T_Args...> &&
+                envelope_detail::gpu_with_trailing_name_v<T_GPU, T_Args...> &&
                 !envelope_detail::is_self_like_v<Element, T_Args...>,
                 int
             > = 0
@@ -188,26 +190,26 @@ namespace envelope_detail
         {
         }
 
-        /** Access the physics subobject, i.e. everything that may enter a kernel */
-        [[nodiscard]] T_Physics & physics () noexcept
+        /** Access the GPU subobject, i.e. everything that may enter a kernel */
+        [[nodiscard]] T_GPU & gpu () noexcept
         {
-            return static_cast<T_Physics &>(*this);
+            return static_cast<T_GPU &>(*this);
         }
 
-        /** Access the physics subobject, i.e. everything that may enter a kernel */
-        [[nodiscard]] T_Physics const & physics () const noexcept
+        /** Access the GPU subobject, i.e. everything that may enter a kernel */
+        [[nodiscard]] T_GPU const & gpu () const noexcept
         {
-            return static_cast<T_Physics const &>(*this);
+            return static_cast<T_GPU const &>(*this);
         }
 
     private:
         /** Peel the trailing name off the argument pack
          *
-         * @param args physics arguments, followed by the element name
+         * @param args GPU arguments, followed by the element name
          */
         template<typename T_Tuple, std::size_t... T_I>
         Element (T_Tuple&& args, std::index_sequence<T_I...>)
-          : T_Physics(std::get<T_I>(std::forward<T_Tuple>(args))...),
+          : T_GPU(std::get<T_I>(std::forward<T_Tuple>(args))...),
             ElementMetadata(
                 std::get<std::tuple_size_v<std::remove_reference_t<T_Tuple>> - 1>(
                     std::forward<T_Tuple>(args)
@@ -221,31 +223,9 @@ namespace envelope_detail
     template<typename T>
     inline constexpr bool is_element_envelope_v = false;
 
-    template<typename T_Physics>
-    inline constexpr bool is_element_envelope_v<Element<T_Physics>> = true;
-
-    /** Unwrap a public element down to its physics.
-     *
-     * Use this at every point where an element crosses from host book-keeping into
-     * reference tracking, transfer-map evaluation or pusher preparation, so that the
-     * boundary is visible in the code rather than implied by an inherited member.
-     *
-     * Elements that carry no common metadata, and are therefore not wrapped
-     * (@see diagnostics::BeamMonitor), are passed through unchanged.
-     */
-    template<typename T_Element>
-    [[nodiscard]] decltype(auto) physics_of (T_Element && element) noexcept
-    {
-        if constexpr (is_element_envelope_v<std::remove_cvref_t<T_Element>>)
-        {
-            return std::forward<T_Element>(element).physics();
-        }
-        else
-        {
-            return static_cast<T_Element &&>(element);
-        }
-    }
+    template<typename T_GPU>
+    inline constexpr bool is_element_envelope_v<Element<T_GPU>> = true;
 
 } // namespace impactx::elements
 
-#endif // IMPACTX_ELEMENTS_ELEMENT_H
+#endif // IMPACTX_ELEMENTS_MIXIN_GPUELEMENT_H

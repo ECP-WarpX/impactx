@@ -11,7 +11,7 @@
 #define IMPACTX_QUAD_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/beamoptic.H"
@@ -29,9 +29,9 @@
 
 namespace impactx::elements
 {
-    struct QuadPhysics
-    : public mixin::BeamOptic<QuadPhysics>,
-      public mixin::LinearTransport<QuadPhysics>,
+    struct QuadGPU
+    : public mixin::BeamOptic<QuadGPU>,
+      public mixin::LinearTransport<QuadGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -63,7 +63,7 @@ namespace impactx::elements
          * @param aperture_y vertical half-aperture in m
          * @param nslice number of slices used for the application of space charge
          */
-        QuadPhysics (
+        QuadGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal k,
             amrex::ParticleReal dx = DEFAULT_dx,
@@ -385,11 +385,11 @@ namespace impactx::elements
 
     };
 
-    /** Quad: physics plus common host-only metadata */
-    using Quad = Element<QuadPhysics>;
+    /** Quad: GPU state plus common host-only metadata */
+    using Quad = Element<QuadGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::QuadPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::QuadGPU)
 
 #endif // IMPACTX_QUAD_H

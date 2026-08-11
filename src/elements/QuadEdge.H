@@ -11,7 +11,7 @@
 #define IMPACTX_QUADEDGE_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
@@ -31,9 +31,9 @@
 
 namespace impactx::elements
 {
-    struct QuadEdgePhysics
-    : public mixin::BeamOptic<QuadEdgePhysics>,
-      public mixin::LinearTransport<QuadEdgePhysics>,
+    struct QuadEdgeGPU
+    : public mixin::BeamOptic<QuadEdgeGPU>,
+      public mixin::LinearTransport<QuadEdgeGPU>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -77,7 +77,7 @@ namespace impactx::elements
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
          */
-        QuadEdgePhysics (
+        QuadEdgeGPU (
             amrex::ParticleReal k,
             int unit = DEFAULT_unit,
             Location flag = DEFAULT_flag,
@@ -285,11 +285,11 @@ namespace impactx::elements
         amrex::ParticleReal m_beta;
     };
 
-    /** QuadEdge: physics plus common host-only metadata */
-    using QuadEdge = Element<QuadEdgePhysics>;
+    /** QuadEdge: GPU state plus common host-only metadata */
+    using QuadEdge = Element<QuadEdgeGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::QuadEdgePhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::QuadEdgeGPU)
 
 #endif // IMPACTX_QUADEDGE_H

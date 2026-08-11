@@ -11,11 +11,11 @@
 #define IMPACTX_SOFTSOL_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "particles/integrators/Integrators.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
-#include "mixin/devicebackedarrays.H"
+#include "helper/ArrayValidation.H"
 #include "mixin/lineartransport.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/thick.H"
@@ -109,15 +109,15 @@ namespace impactx::elements
         amrex::Gpu::TrackedVector<amrex::ParticleReal> sin;
     };
 
-    /** The prepared execution snapshot of a soft-edge solenoid.
+    /** The prepared pusher for a soft-edge solenoid.
      *
      * Holds the particle-facing configuration and a bounded, non-owning view of the
      * Fourier coefficients, resolved to the execution space of one element slice.
      * It can be pushed over a tile, but not advance the reference particle: that needs
      * the canonical element, which owns the coefficients.
      */
-    struct SoftSolenoidCore
-    : public mixin::ParticlePush<SoftSolenoidCore>,
+    struct SoftSolenoidPusher
+    : public mixin::ParticlePush<SoftSolenoidPusher>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -143,7 +143,7 @@ namespace impactx::elements
          * @param mapsteps number of integration steps per slice
          * @param nslice number of slices used for the application of space charge
          */
-        SoftSolenoidCore (
+        SoftSolenoidPusher (
             amrex::ParticleReal ds,
             amrex::ParticleReal bscale,
             int unit,
@@ -170,7 +170,7 @@ namespace impactx::elements
         }
 
         /** Push all particles on a tile */
-        using mixin::ParticlePush<SoftSolenoidCore>::operator();
+        using mixin::ParticlePush<SoftSolenoidPusher>::operator();
 
 
         /** This is a soft-edge solenoid functor, so that a variable of this type can be used
@@ -303,11 +303,11 @@ namespace impactx::elements
         {
             using namespace amrex::literals; // for _rt and _prt
 
-            // the coefficients were resolved to this snapshot's execution space when it
+            // the coefficients were resolved to this pusher's execution space when it
             // was prepared, so there is a single copy of the field expansion below
-            amrex::ParticleReal const * cos_data = m_coefficients.first;
-            amrex::ParticleReal const * sin_data = m_coefficients.second;
-            int const ncoef = m_coefficients.size;
+            amrex::ParticleReal const * cos_data = m_cos_coefficients;
+            amrex::ParticleReal const * sin_data = m_sin_coefficients;
+            int const ncoef = m_ncoef;
 
             // specify constants
             using ablastr::constant::math::pi;
@@ -534,8 +534,11 @@ namespace impactx::elements
         amrex::ParticleReal m_bscale; //! scaling factor for solenoid Bz field
         int m_unit; //! unit specification for quad strength
         int m_mapsteps; //! number of map integration steps per slice
-        /** Coefficients resolved to this snapshot's execution space; non-owning */
-        mixin::DualArrayView m_coefficients{};
+        /** Coefficients resolved to this pusher's execution space; non-owning */
+        //! non-owning, device-copyable; valid for the launch it was prepared for
+        amrex::ParticleReal const * m_cos_coefficients = nullptr;
+        amrex::ParticleReal const * m_sin_coefficients = nullptr;
+        int m_ncoef = 0;
 
 
         // Reference-trajectory linearization around the reference particle.
@@ -551,12 +554,12 @@ namespace impactx::elements
     /** A soft-edge solenoid: the canonical element that owns its coefficients.
      *
      * The reference-particle push, the transfer map, serialization and finalization run
-     * here on the host. Particle pushes run against @see SoftSolenoidCore.
+     * here on the host. Particle pushes run against @see SoftSolenoidPusher.
      */
-    struct SoftSolenoidPhysics
-    : public mixin::BeamOptic<SoftSolenoidPhysics>,
-      public mixin::LinearTransport<SoftSolenoidPhysics>,
-      public SoftSolenoidCore
+    struct SoftSolenoidGPU
+    : public mixin::BeamOptic<SoftSolenoidGPU>,
+      public mixin::LinearTransport<SoftSolenoidGPU>,
+      public SoftSolenoidPusher
     {
         /** A soft-edge solenoid
          *
@@ -578,7 +581,7 @@ namespace impactx::elements
          *        map and reference particle push in applied fields
          * @param nslice number of slices used for the application of space charge
          */
-        SoftSolenoidPhysics (
+        SoftSolenoidGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal bscale,
             std::vector<amrex::ParticleReal> cos_coef,
@@ -592,15 +595,17 @@ namespace impactx::elements
             int mapsteps = DEFAULT_mapsteps,
             int nslice = DEFAULT_nslice
         )
-          : SoftSolenoidCore(ds, bscale, unit, dx, dy, rotation_degree, aperture_x, aperture_y, mapsteps, nslice),
-            m_coefficients_data(std::move(cos_coef), std::move(sin_coef), "SoftSolenoid: cos and sin coefficient", 1)
+          : SoftSolenoidPusher(ds, bscale, unit, dx, dy, rotation_degree, aperture_x, aperture_y, mapsteps, nslice),
+            m_coefficients{std::move(cos_coef), std::move(sin_coef)}
         {
+            require_array_pair(m_coefficients.cos, m_coefficients.sin,
+                               "SoftSolenoid: cos and sin coefficient", 1);
             if (m_mapsteps <= 0)
                 throw std::invalid_argument("SoftSolenoid: mapsteps must be > 0!");
         }
 
         /** Push all particles */
-        using mixin::BeamOptic<SoftSolenoidPhysics>::operator();
+        using mixin::BeamOptic<SoftSolenoidGPU>::operator();
 
         /** This pushes the reference particle.
          *
@@ -613,8 +618,10 @@ namespace impactx::elements
             using amrex::Math::powi;
 
             // evaluate the field against a host view obtained at the point of use
-            SoftSolenoidCore core = *this;
-            core.m_coefficients = m_coefficients_data.host_view();
+            SoftSolenoidPusher pusher = *this;
+            pusher.m_cos_coefficients = m_coefficients.cos.host_const().data();
+            pusher.m_sin_coefficients = m_coefficients.sin.host_const().data();
+            pusher.m_ncoef = static_cast<int>(m_coefficients.cos.host_const().size());
 
             // assign input reference particle values
             amrex::ParticleReal const x = refpart.x;
@@ -628,11 +635,11 @@ namespace impactx::elements
             amrex::ParticleReal const sedge = refpart.sedge;
 
             // initialize linear map (deviation) values
-            core.m_map = decltype(m_map)::Identity();
+            pusher.m_map = decltype(m_map)::Identity();
 
             // initialize the spin-orbit coupling matrix and the spin rotation vector
-            core.m_spin_rotation_vector = {};
-            core.m_spin_coupling = {};
+            pusher.m_spin_rotation_vector = {};
+            pusher.m_spin_coupling = {};
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
@@ -645,12 +652,12 @@ namespace impactx::elements
             amrex::ParticleReal const zout = zin + slice_ds;
             int const nsteps = m_mapsteps;
 
-            integrators::symp2_integrate_split3(refpart,zin,zout,nsteps,core);
+            integrators::symp2_integrate_split3(refpart,zin,zout,nsteps,pusher);
 
             // keep the linearization the integrator produced
-            m_map = core.m_map;
-            m_spin_coupling = core.m_spin_coupling;
-            m_spin_rotation_vector = core.m_spin_rotation_vector;
+            m_map = pusher.m_map;
+            m_spin_coupling = pusher.m_spin_coupling;
+            m_spin_rotation_vector = pusher.m_spin_rotation_vector;
             amrex::ParticleReal const ptf = refpart.pt;
 
             /* print computed linear map:
@@ -697,36 +704,38 @@ namespace impactx::elements
             // apply the transverse rotation (roll) alignment error
             return rotate_aligned_map(R);
         }
-        /** Prepare the execution snapshot for one element slice
+        /** Prepare the pusher for one element slice
          *
          * @param refpart reference particle, already advanced for this slice
-         * @return a core holding an execution-space view of the coefficients
+         * @return a pusher holding an execution-space view of the coefficients
          */
-        [[nodiscard]] SoftSolenoidCore make_particle_pusher (RefPart const & refpart) const
+        [[nodiscard]] SoftSolenoidPusher make_particle_pusher (RefPart const & refpart) const
         {
-            SoftSolenoidCore core = *this;
-            core.Alignment::compute_constants(refpart);
-            core.m_coefficients = m_coefficients_data.device_view();
-            return core;
+            SoftSolenoidPusher pusher = *this;
+            pusher.Alignment::compute_constants(refpart);
+            pusher.m_cos_coefficients = m_coefficients.cos.device_const().data();
+            pusher.m_sin_coefficients = m_coefficients.sin.device_const().data();
+            pusher.m_ncoef = static_cast<int>(m_coefficients.cos.host_const().size());
+            return pusher;
         }
 
         /** Cosine coefficients of the on-axis field expansion */
         [[nodiscard]] std::vector<amrex::ParticleReal> cos_coefficients () const
         {
-            return m_coefficients_data.first_host();
+            return m_coefficients.cos.host_const();
         }
 
         /** Sine coefficients of the on-axis field expansion */
         [[nodiscard]] std::vector<amrex::ParticleReal> sin_coefficients () const
         {
-            return m_coefficients_data.second_host();
+            return m_coefficients.sin.host_const();
         }
 
         /** Replace both arrays at once
          *
-         * The two are validated together and committed as one step, so a rejected update
-         * leaves the element as it was. They are always the same length, which is why
-         * this takes both rather than offering to change one of them alone.
+         * The two are validated before either is stored, so a rejected update leaves the
+         * element as it was. They are always the same length, which is why this takes
+         * both rather than offering to change one of them alone.
          *
          * @param first the new cosine values
          * @param second the new sine values
@@ -736,24 +745,28 @@ namespace impactx::elements
             std::vector<amrex::ParticleReal> second
         )
         {
-            m_coefficients_data.commit(std::move(first), std::move(second), "SoftSolenoid: cos and sin coefficient", 1);
+            require_array_pair(first, second, "SoftSolenoid: cos and sin coefficient", 1);
+            m_coefficients.cos.host() = std::move(first);
+            m_coefficients.sin.host() = std::move(second);
         }
 
         /** Release device storage; host configuration survives for reuse */
         void finalize ()
         {
-            m_coefficients_data.release_gpu();
+            m_coefficients.cos.release_gpu();
+            m_coefficients.sin.release_gpu();
         }
 
         //! the coefficient arrays, owned by this element
-        mixin::DeviceBackedArrays m_coefficients_data;
+        //! the arrays this element owns, mirrored to the device on demand
+        SolenoidFourierCoefficients m_coefficients;
     };
 
-    /** SoftSolenoid: physics plus common host-only metadata */
-    using SoftSolenoid = Element<SoftSolenoidPhysics>;
+    /** SoftSolenoid: GPU state plus common host-only metadata */
+    using SoftSolenoid = Element<SoftSolenoidGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::SoftSolenoidPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::SoftSolenoidGPU)
 
 #endif // IMPACTX_SOFTSOL_H

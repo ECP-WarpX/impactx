@@ -7,12 +7,12 @@
  * Authors: Axel Huebl, Edoardo Zoni, Chad Mitchell
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_ELEMENTS_MIXIN_ACCESSORS_H
-#define IMPACTX_ELEMENTS_MIXIN_ACCESSORS_H
+#ifndef IMPACTX_ELEMENTS_HELPER_ACCESSORS_H
+#define IMPACTX_ELEMENTS_HELPER_ACCESSORS_H
 
-#include "traits.H"
+#include "elements/mixin/traits.H"
 
-#include "elements/Handle.H"
+#include "Handle.H"
 
 #include <AMReX_REAL.H>
 
@@ -51,7 +51,7 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return value in meters, zero for zero-length elements
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline amrex::ParticleReal
     ds (T_Element const & element_variant)
     {
@@ -63,7 +63,7 @@ namespace impactx::elements
      * @param[in,out] element_variant the element to modify
      * @param ds segment length in meters
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline void
     ds (T_Element & element_variant, amrex::ParticleReal ds)
     {
@@ -82,7 +82,7 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return positive integer, one for elements that cannot be sliced
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline int
     nslice (T_Element const & element_variant)
     {
@@ -97,7 +97,7 @@ namespace impactx::elements
      * @param[in,out] element_variant the element to modify
      * @param nslice number of slices, a positive integer
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline void
     nslice (T_Element & element_variant, int nslice)
     {
@@ -120,7 +120,7 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return ``ds/nslice`` in meters, zero for zero-length elements
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline amrex::ParticleReal
     slice_ds (T_Element const & element_variant)
     {
@@ -134,7 +134,7 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return the element name, or an empty string if it has none
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline std::string
     name (T_Element const & element_variant)
     {
@@ -148,7 +148,7 @@ namespace impactx::elements
      * @param[in,out] element_variant the element to modify
      * @param name the new element name
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline void
     name (T_Element & element_variant, std::string const & name)
     {
@@ -167,7 +167,7 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return true if the element has a name
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline bool
     has_name (T_Element const & element_variant)
     {
@@ -179,7 +179,7 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return the element's static type name
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline std::string
     type (T_Element const & element_variant)
     {
@@ -193,7 +193,7 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return true for finite-length elements
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline bool
     is_thick (T_Element const & element_variant)
     {
@@ -207,7 +207,7 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return true for zero-length elements
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline bool
     is_thin (T_Element const & element_variant)
     {
@@ -226,7 +226,7 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return true if the element can be subdivided, @see ScopedNslice
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline bool
     can_slice (T_Element const & element_variant)
     {
@@ -242,7 +242,7 @@ namespace impactx::elements
      *
      * @param[in,out] element_variant the element to reverse
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline void
     reverse (T_Element & element_variant)
     {
@@ -253,7 +253,7 @@ namespace impactx::elements
      *
      * @param[in,out] element_variant the element to finalize
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     inline void
     finalize (T_Element & element_variant)
     {
@@ -269,7 +269,7 @@ namespace impactx::elements
      *
      * The element must be sliceable, @see can_slice.
      */
-    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
+    template<ElementRepr T_Element>
     class ScopedNslice
     {
     public:
@@ -315,4 +315,4 @@ namespace impactx::elements
 
 } // namespace impactx::elements
 
-#endif // IMPACTX_ELEMENTS_MIXIN_ACCESSORS_H
+#endif // IMPACTX_ELEMENTS_HELPER_ACCESSORS_H

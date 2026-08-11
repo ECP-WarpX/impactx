@@ -4,13 +4,13 @@
  *
  * This file is part of ImpactX.
  *
- * Authors: Axel Huebl
+ * Authors: Axel Huebl, Chad Mitchell
  * License: BSD-3-Clause-LBNL
  */
-#ifndef IMPACTX_ELEMENTS_HANDLE_H
-#define IMPACTX_ELEMENTS_HANDLE_H
+#ifndef IMPACTX_ELEMENTS_HELPER_HANDLE_H
+#define IMPACTX_ELEMENTS_HELPER_HANDLE_H
 
-#include "All.H"
+#include "elements/All.H"
 
 #include <memory>
 #include <stdexcept>
@@ -56,6 +56,10 @@ namespace impactx::elements
     inline constexpr bool is_element_repr_v =
         std::is_same_v<std::remove_cvref_t<T>, KnownElements> ||
         std::is_same_v<std::remove_cvref_t<T>, ElementHandle>;
+
+    /** @see is_element_repr_v, as a constraint */
+    template<typename T>
+    concept ElementRepr = is_element_repr_v<T>;
 
     /** True if this handle owns an element */
     [[nodiscard]] inline bool valid (ElementHandle const & handle) noexcept
@@ -207,4 +211,4 @@ namespace impactx::elements
 
 } // namespace impactx::elements
 
-#endif // IMPACTX_ELEMENTS_HANDLE_H
+#endif // IMPACTX_ELEMENTS_HELPER_HANDLE_H

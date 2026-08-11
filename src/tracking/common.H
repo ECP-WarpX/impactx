@@ -12,7 +12,7 @@
 
 #include "elements/All.H"
 #include "Lattice.H"
-#include "elements/mixin/accessors.H"
+#include "elements/helper/Accessors.H"
 #include "particles/ReferenceParticle.H"
 #include "tracking/TrackingDirection.H"
 #include "tracking/TrackingState.H"

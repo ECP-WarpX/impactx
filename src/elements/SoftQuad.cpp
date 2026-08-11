@@ -1,3 +1,3 @@
 #include "SoftQuad.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::SoftQuadrupolePhysics)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::SoftQuadrupoleGPU)

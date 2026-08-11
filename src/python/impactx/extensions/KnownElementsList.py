@@ -8,17 +8,10 @@ License: BSD-3-Clause-LBNL
 
 import os
 import re
-import weakref
 
 from impactx import Config, elements
 
 from ..element_models import DRIFT_MODEL_CLASSES, tier_of_class, validate_model
-
-# All live FilteredElementsList views for a lattice (WeakKeyDictionary: key is KnownElementsList).
-_filtered_views_by_lattice: weakref.WeakKeyDictionary = weakref.WeakKeyDictionary()
-_filtered_views_by_lattice.__repr__ = lambda: (
-    "WeakKeyDictionary()"
-)  # stable repr for .pyi stub generation
 
 FILTERED_ELEMENTS_LIST_INVALID_MSG = (
     "This lattice selection is no longer valid because the lattice was modified; "
@@ -37,24 +30,6 @@ def _drift_class_for_replace_with_drifts(model: str, old_el) -> type:
     else:
         key = model
     return DRIFT_MODEL_CLASSES[key]
-
-
-def _registry_for(lattice):
-    """Return the WeakSet of FilteredElementsList instances for this lattice."""
-    rs = _filtered_views_by_lattice.get(lattice)
-    if rs is None:
-        rs = weakref.WeakSet()
-        _filtered_views_by_lattice[lattice] = rs
-    return rs
-
-
-def _invalidate_all_registered_views(lattice) -> None:
-    """Mark every registered FilteredElementsList for this lattice as invalid."""
-    rs = _filtered_views_by_lattice.get(lattice)
-    if rs is None:
-        return
-    for fel in list(rs):
-        fel._invalidated = True
 
 
 # These report an angle in radians from ``to_dict()`` although their constructors
@@ -220,16 +195,14 @@ class FilteredElementsList:
     def __init__(self, original_list, indices):
         self._original_list = original_list
         self._indices = list(indices) if not isinstance(indices, list) else indices
-        self._invalidated = False
         # A selection is a list of positions, so any edit that moves elements makes it
-        # describe something else. The lattice counts those edits, which catches the ones
-        # made directly on the lattice as well as those made through a view.
+        # describe something else. The lattice counts those edits, which catches every
+        # edit, whether it was made on the lattice or through another selection.
         self._generation = original_list.generation
-        _registry_for(original_list).add(self)
 
     def _require_valid(self) -> None:
         """Raise if the lattice changed after this view was taken."""
-        if self._invalidated or self._original_list.generation != self._generation:
+        if self._original_list.generation != self._generation:
             raise RuntimeError(FILTERED_ELEMENTS_LIST_INVALID_MSG)
 
     def __getitem__(self, key):
@@ -337,7 +310,6 @@ class FilteredElementsList:
         kept = [original[i] for i in range(len(original)) if i not in to_remove]
         original.clear()
         original.extend(kept)
-        _invalidate_all_registered_views(original)
         return None
 
     def replace_each(self, element, *, keep_name=True, keep_ds=False):
@@ -371,7 +343,6 @@ class FilteredElementsList:
         for i, new_el in replacements:
             original[i] = new_el
 
-        _invalidate_all_registered_views(original)
         return FilteredElementsList(original, list(indices))
 
     def replace_with_drifts(
@@ -418,7 +389,6 @@ class FilteredElementsList:
         for i, new_el in replacements:
             original[i] = new_el
 
-        _invalidate_all_registered_views(original)
         return FilteredElementsList(original, list(indices))
 
     def get_kinds(self) -> list[type]:
@@ -1074,11 +1044,9 @@ def _lattice_isclose(self, other, *, rtol=1e-12, atol=0.0, ignore_attributes=Non
 # patched inside register_KnownElementsList_extension() below, since that is
 # the sole entry point that receives the bound class.
 #
-# We deliberately do NOT touch __hash__: FilteredElementsList instances are
-# tracked in a WeakSet (see ``_registry_for``) and need to remain hashable.
-# Keeping the inherited identity-based hash means two value-equal containers
-# may hash differently, but containers are not intended as dict/set keys for
-# value-based deduplication.
+# We deliberately do NOT touch __hash__: keeping the inherited identity-based
+# hash means two value-equal containers may hash differently, but containers are
+# mutable and are not intended as dict/set keys for value-based deduplication.
 FilteredElementsList.__eq__ = _lattice_eq
 FilteredElementsList.isclose = _lattice_isclose
 

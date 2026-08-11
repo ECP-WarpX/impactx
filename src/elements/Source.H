@@ -11,7 +11,7 @@
 #define IMPACTX_SOURCE_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/lineartransport.H"
 #include "mixin/nofinalize.H"
 #include "mixin/thin.H"
@@ -22,8 +22,8 @@
 
 namespace impactx::elements
 {
-    struct SourcePhysics
-    : public mixin::LinearTransport<SourcePhysics>,
+    struct SourceGPU
+    : public mixin::LinearTransport<SourceGPU>,
       public mixin::Thin,
       public mixin::NoFinalize
     {
@@ -52,7 +52,7 @@ namespace impactx::elements
          * @throws std::invalid_argument if distribution is not "openPMD", if both load_step and
          *         load_step_index are set or if load_step is negative
          */
-        SourcePhysics (
+        SourceGPU (
             std::string distribution,
             std::string openpmd_path,
             bool active_once = DEFAULT_active_once,
@@ -138,8 +138,8 @@ namespace impactx::elements
         std::optional<int> m_load_step_index = DEFAULT_load_step_index; //! position of the step in the file, -1 is the last step
     };
 
-    /** Source: physics plus common host-only metadata */
-    using Source = Element<SourcePhysics>;
+    /** Source: GPU state plus common host-only metadata */
+    using Source = Element<SourceGPU>;
 
 } // namespace impactx
 

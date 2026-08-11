@@ -553,7 +553,7 @@ namespace detail
      *
      * @param[in,out] pti the particle iterator, pointing at the tile/box to push
      * @param[in] ref_part the reference particle, already advanced for this slice
-     * @param[in] element an already prepared execution snapshot,
+     * @param[in] element an already prepared pusher,
      *                    @see impactx::elements::make_particle_pusher
      * @param[in] spin whether to perform spin tracking
      */
@@ -607,14 +607,14 @@ namespace detail
 
     /** Push beam particles on one tile, relative to the reference particle.
      *
-     * This is deliberately separate from @see BeamOptic. An execution snapshot -- the
+     * This is deliberately separate from @see BeamOptic. A pusher -- the
      * prepared, resource-free thing that is copied into a launch closure -- needs exactly
      * this and nothing more. It must *not* be able to start a lattice push or advance the
      * reference particle: those are the canonical element's job, they run once per slice
-     * on the host, and they may need resources the snapshot does not own.
+     * on the host, and they may need resources the pusher does not own.
      *
-     * Ordinary elements are their own snapshot and get this through @see BeamOptic. The
-     * resource-owning elements give it to their core alone.
+     * Ordinary elements are their own pusher and get this through @see BeamOptic. The
+     * resource-owning elements give it to their pusher alone.
      */
     template<typename T_Element>
     struct ParticlePush
@@ -638,7 +638,7 @@ namespace detail
                 "ParticlePush can only be used as a mixin class!"
             );
 
-            // Note: *this must already be a prepared execution snapshot here,
+            // Note: *this must already be a prepared pusher here,
             // @see impactx::elements::make_particle_pusher and impactx::push_all.
             T_Element const & element = *static_cast<T_Element const *>(this);
             detail::push_all_particles<T_Element>(pti, ref_part, element, spin);
@@ -653,7 +653,7 @@ namespace detail
      * On top of @see ParticlePush, which pushes the beam particles of one tile, this adds
      * the whole-container push: it advances the reference particle first and then every
      * beam particle, once per element slice. An element that owns resources a launch
-     * closure must not carry gives @see ParticlePush to its execution snapshot alone and
+     * closure must not carry gives @see ParticlePush to its pusher alone and
      * keeps this for itself.
      */
     template<typename T_Element>

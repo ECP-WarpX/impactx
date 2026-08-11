@@ -186,18 +186,14 @@ namespace impactx
         {
             elements::visit([&ref, &cm](auto&& element)
             {
-                // unwrap the host-only metadata: reference tracking and the
-                // transfer map are physics, not book-keeping
-                auto && physics = elements::physics_of(element);
-
                 // push reference particle in global coordinates
                 {
                     BL_PROFILE("impactx::push::RefPart");
-                    physics(ref);
+                    element(ref);
                 }
 
                 // push Covariance Matrix in external fields
-                physics(cm, ref);
+                element(cm, ref);
 
             }, element_variant);
         };

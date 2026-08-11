@@ -11,7 +11,7 @@
 #define IMPACTX_CHRPLASMALENS_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/beamoptic.H"
@@ -30,9 +30,9 @@
 
 namespace impactx::elements
 {
-    struct ChrPlasmaLensPhysics
-    : public mixin::BeamOptic<ChrPlasmaLensPhysics>,
-      public mixin::LinearTransport<ChrPlasmaLensPhysics>,
+    struct ChrPlasmaLensGPU
+    : public mixin::BeamOptic<ChrPlasmaLensGPU>,
+      public mixin::LinearTransport<ChrPlasmaLensGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -64,7 +64,7 @@ namespace impactx::elements
          * @param aperture_y vertical half-aperture in m
          * @param nslice number of slices used for the application of space charge
          */
-        ChrPlasmaLensPhysics (
+        ChrPlasmaLensGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal k,
             int unit = DEFAULT_unit,
@@ -443,11 +443,11 @@ namespace impactx::elements
         amrex::ParticleReal m_const1;
     };
 
-    /** ChrPlasmaLens: physics plus common host-only metadata */
-    using ChrPlasmaLens = Element<ChrPlasmaLensPhysics>;
+    /** ChrPlasmaLens: GPU state plus common host-only metadata */
+    using ChrPlasmaLens = Element<ChrPlasmaLensGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ChrPlasmaLensPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ChrPlasmaLensGPU)
 
 #endif // IMPACTX_CHRPLASMALENS_H

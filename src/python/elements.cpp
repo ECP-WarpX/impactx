@@ -7,8 +7,8 @@
 
 #include <particles/Push.H>
 #include <elements/All.H>
-#include <elements/Copy.H>
-#include <elements/mixin/accessors.H>
+#include <elements/helper/Copy.H>
+#include <elements/helper/Accessors.H>
 #include <particles/CovarianceMatrix.H>
 
 #include <AMReX_Enum.H>

@@ -11,10 +11,10 @@
 #define IMPACTX_POLYGONAPERTURE_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
-#include "mixin/devicebackedarrays.H"
+#include "helper/ArrayValidation.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
 #include "mixin/thin.H"
@@ -47,13 +47,13 @@ namespace impactx::elements
         amrex::Gpu::TrackedVector<amrex::ParticleReal> y;
     };
 
-    /** The prepared execution snapshot of a polygon aperture.
+    /** The prepared pusher for a polygon aperture.
      *
      * Holds the particle-facing configuration and a bounded, non-owning view of the
      * polygon vertices, resolved to the execution space of one element slice.
      */
-    struct PolygonApertureCore
-    : public mixin::ParticlePush<PolygonApertureCore>,
+    struct PolygonAperturePusher
+    : public mixin::ParticlePush<PolygonAperturePusher>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::SpinTransport
@@ -87,7 +87,7 @@ namespace impactx::elements
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
          */
-        PolygonApertureCore (
+        PolygonAperturePusher (
             amrex::ParticleReal min_radius2,
             amrex::ParticleReal repeat_x,
             amrex::ParticleReal repeat_y,
@@ -112,7 +112,7 @@ namespace impactx::elements
         void reverse () { /* no-op */ }
 
         /** Push all particles on a tile */
-        using mixin::ParticlePush<PolygonApertureCore>::operator();
+        using mixin::ParticlePush<PolygonAperturePusher>::operator();
 
 
         /** This is an aperture functor, so that a variable of this type can be used like an
@@ -179,8 +179,8 @@ namespace impactx::elements
                 inside_aperture = VBool(true); // yes!
             } else{
 
-                amrex::ParticleReal const * vertices_x = m_vertices.first;
-                amrex::ParticleReal const * vertices_y = m_vertices.second;
+                amrex::ParticleReal const * vertices_x = m_vertices_x;
+                amrex::ParticleReal const * vertices_y = m_vertices_y;
 
                 // no, we have to do the polygon calculation
 
@@ -203,7 +203,7 @@ namespace impactx::elements
                 T_Real thetasum = 0.0;
                 Complex v1conj, v2;
 
-                for (int i = 0; i < m_vertices.size - 1; ++i) {
+                for (int i = 0; i < m_nvertices - 1; ++i) {
                     v1conj = Complex(u - vertices_x[i], -(v-vertices_y[i]));
                     v2 = Complex(u - vertices_x[i+1], v-vertices_y[i+1]);
                     thetasum += arg(v2 * v1conj);
@@ -280,8 +280,11 @@ namespace impactx::elements
         amrex::ParticleReal m_repeat_y; //! vertical period for repeated masking
         bool m_shift_odd_x; //! for hexagonal/triangular mask patterns: horizontal shift of every 2nd (odd) vertical period by m_repeat_x / 2. Use Alignment offsets to move whole mask as needed.
 
-        /** Vertices resolved to this snapshot's execution space; non-owning */
-        mixin::DualArrayView m_vertices{};
+        /** Vertices resolved to this pusher's execution space; non-owning */
+        //! non-owning, device-copyable; valid for the launch it was prepared for
+        amrex::ParticleReal const * m_vertices_x = nullptr;
+        amrex::ParticleReal const * m_vertices_y = nullptr;
+        int m_nvertices = 0;
 
         amrex::ParticleReal m_min_radius2; // minimum radius in which all pass squared
 
@@ -290,12 +293,12 @@ namespace impactx::elements
 
     /** A polygon aperture: the canonical element that owns its vertices.
      *
-     * Particle pushes run against @see PolygonApertureCore.
+     * Particle pushes run against @see PolygonAperturePusher.
      */
-    struct PolygonAperturePhysics
-    : public mixin::BeamOptic<PolygonAperturePhysics>,
-      public mixin::LinearTransport<PolygonAperturePhysics>,
-      public PolygonApertureCore
+    struct PolygonApertureGPU
+    : public mixin::BeamOptic<PolygonApertureGPU>,
+      public mixin::LinearTransport<PolygonApertureGPU>,
+      public PolygonAperturePusher
     {
         /** A thin collimator element that applies a transverse aperture boundary defined
          *  by points of a polygon vertices.
@@ -312,7 +315,7 @@ namespace impactx::elements
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
          */
-        PolygonAperturePhysics (
+        PolygonApertureGPU (
             std::vector< amrex::ParticleReal> vertices_x,
             std::vector< amrex::ParticleReal> vertices_y,
             amrex::ParticleReal min_radius2 = DEFAULT_min_radius2,
@@ -324,51 +327,53 @@ namespace impactx::elements
             amrex::ParticleReal dy = DEFAULT_dy,
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree
         )
-          : PolygonApertureCore(min_radius2, repeat_x, repeat_y, shift_odd_x, action, dx, dy, rotation_degree),
-            m_vertices_data(std::move(vertices_x), std::move(vertices_y), "PolygonAperture: horizontal and vertical vertices")
+          : PolygonAperturePusher(min_radius2, repeat_x, repeat_y, shift_odd_x, action, dx, dy, rotation_degree),
+            m_vertices{std::move(vertices_x), std::move(vertices_y)}
         {
-            require_closed_outline(m_vertices_data.first_host(), m_vertices_data.second_host());
+            require_closed_outline(m_vertices.x.host_const(), m_vertices.y.host_const());
         }
 
         /** Push all particles */
-        using mixin::BeamOptic<PolygonAperturePhysics>::operator();
+        using mixin::BeamOptic<PolygonApertureGPU>::operator();
 
         /** This pushes the reference particle. */
         using mixin::Thin::operator();
 
         /** This pushes the covariance matrix. */
-        using mixin::LinearTransport<PolygonAperturePhysics>::operator();
+        using mixin::LinearTransport<PolygonApertureGPU>::operator();
 
-        /** Prepare the execution snapshot for one element slice
+        /** Prepare the pusher for one element slice
          *
          * @param refpart reference particle, already advanced for this slice
-         * @return a core holding an execution-space view of the vertices
+         * @return a pusher holding an execution-space view of the vertices
          */
-        [[nodiscard]] PolygonApertureCore make_particle_pusher (RefPart const & refpart) const
+        [[nodiscard]] PolygonAperturePusher make_particle_pusher (RefPart const & refpart) const
         {
-            PolygonApertureCore core = *this;
-            core.Alignment::compute_constants(refpart);
-            core.m_vertices = m_vertices_data.device_view();
-            return core;
+            PolygonAperturePusher pusher = *this;
+            pusher.Alignment::compute_constants(refpart);
+            pusher.m_vertices_x = m_vertices.x.device_const().data();
+            pusher.m_vertices_y = m_vertices.y.device_const().data();
+            pusher.m_nvertices = static_cast<int>(m_vertices.x.host_const().size());
+            return pusher;
         }
 
         /** Horizontal vertex coordinates */
         [[nodiscard]] std::vector<amrex::ParticleReal> vertices_x () const
         {
-            return m_vertices_data.first_host();
+            return m_vertices.x.host_const();
         }
 
         /** Vertical vertex coordinates */
         [[nodiscard]] std::vector<amrex::ParticleReal> vertices_y () const
         {
-            return m_vertices_data.second_host();
+            return m_vertices.y.host_const();
         }
 
         /** Replace both arrays at once
          *
-         * The two are validated together and committed as one step, so a rejected update
-         * leaves the element as it was. They are always the same length, which is why
-         * this takes both rather than offering to change one of them alone.
+         * The two are validated before either is stored, so a rejected update leaves the
+         * element as it was. They are always the same length, which is why this takes
+         * both rather than offering to change one of them alone.
          *
          * @param first the new horizontal values
          * @param second the new vertical values
@@ -379,29 +384,24 @@ namespace impactx::elements
         )
         {
             require_closed_outline(first, second);
-            m_vertices_data.commit(std::move(first), std::move(second), "PolygonAperture: horizontal and vertical vertices");
+            m_vertices.x.host() = std::move(first);
+            m_vertices.y.host() = std::move(second);
         }
 
         /** Reject vertices that do not describe a closed outline
          *
-         * Checked before anything is read positionally, so a mismatched or empty pair is
-         * reported rather than indexed into.
+         * The pair is validated first, so a mismatched or empty one is reported rather
+         * than indexed into.
          *
          * @param vx the horizontal values
          * @param vy the vertical values
          */
-        template<typename T_Values>
-        static void require_closed_outline (T_Values const & vx, T_Values const & vy)
+        static void require_closed_outline (
+            std::vector<amrex::ParticleReal> const & vx,
+            std::vector<amrex::ParticleReal> const & vy
+        )
         {
-            if (vx.size() != vy.size()) {
-                throw std::invalid_argument(
-                    "PolygonAperture: horizontal and vertical vertices must have the same "
-                    "length, got " + std::to_string(vx.size()) + " and " +
-                    std::to_string(vy.size()) + "!");
-            }
-            if (vx.empty()) {
-                throw std::invalid_argument("PolygonAperture: at least one vertex is required!");
-            }
+            require_array_pair(vx, vy, "PolygonAperture: horizontal and vertical vertices", 1);
             if ((vx.front() != vx.back()) || (vy.front() != vy.back())) {
                 throw std::invalid_argument("PolygonAperture: first and last vertex must be exactly equal!");
             }
@@ -410,18 +410,20 @@ namespace impactx::elements
         /** Release device storage; host configuration survives for reuse */
         void finalize ()
         {
-            m_vertices_data.release_gpu();
+            m_vertices.x.release_gpu();
+            m_vertices.y.release_gpu();
         }
 
         //! the vertex arrays, owned by this element
-        mixin::DeviceBackedArrays m_vertices_data;
+        //! the arrays this element owns, mirrored to the device on demand
+        PolygonVertices m_vertices;
     };
 
-    /** PolygonAperture: physics plus common host-only metadata */
-    using PolygonAperture = Element<PolygonAperturePhysics>;
+    /** PolygonAperture: GPU state plus common host-only metadata */
+    using PolygonAperture = Element<PolygonApertureGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::PolygonAperturePhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::PolygonApertureGPU)
 
 #endif // IMPACTX_POLYGONAPERTURE_H

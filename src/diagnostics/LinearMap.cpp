@@ -58,8 +58,7 @@ namespace
             // parameter/set/string work in the "missing" branch entirely
             // so the compiler can inline this to a direct call.
             amrex::ignore_unused(warned_types, on_missing);
-            // the transfer map is physics; the name used in the cold path below is not
-            return elements::physics_of(element).transport_map(ref);
+            return element.transport_map(ref);
         }
         else
         {
@@ -179,15 +178,10 @@ namespace
             {
                 using E = std::decay_t<decltype(element)>;
 
-                // unwrap the host-only metadata: reference tracking is physics, not
-                // book-keeping. safe_transport_map() keeps the full element, because its
-                // diagnostics name the element.
-                auto && physics = elements::physics_of(element);
-
                 int const nslice = element.nslice();
                 for (int slice_i = 0; slice_i < nslice; ++slice_i)
                 {
-                    physics(ref);
+                    element(ref);
                     Map6x6 const R_slice = safe_transport_map<E>(
                         element, ref, warned_types, on_missing
                     );

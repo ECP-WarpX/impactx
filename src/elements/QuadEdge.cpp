@@ -1,3 +1,3 @@
 #include "QuadEdge.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::QuadEdgePhysics)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::QuadEdgeGPU)

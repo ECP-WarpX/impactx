@@ -1,3 +1,3 @@
 #include "Multipole.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::MultipolePhysics)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::MultipoleGPU)

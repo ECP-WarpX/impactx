@@ -11,7 +11,7 @@
 #define IMPACTX_APERTURE_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
@@ -30,9 +30,9 @@
 
 namespace impactx::elements
 {
-    struct AperturePhysics
-    : public mixin::BeamOptic<AperturePhysics>,
-      public mixin::LinearTransport<AperturePhysics>,
+    struct ApertureGPU
+    : public mixin::BeamOptic<ApertureGPU>,
+      public mixin::LinearTransport<ApertureGPU>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::SpinTransport,
@@ -82,7 +82,7 @@ namespace impactx::elements
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
          */
-        AperturePhysics (
+        ApertureGPU (
             amrex::ParticleReal aperture_x,
             amrex::ParticleReal aperture_y,
             amrex::ParticleReal repeat_x = DEFAULT_repeat_x,
@@ -340,11 +340,11 @@ namespace impactx::elements
 
     };
 
-    /** Aperture: physics plus common host-only metadata */
-    using Aperture = Element<AperturePhysics>;
+    /** Aperture: GPU state plus common host-only metadata */
+    using Aperture = Element<ApertureGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::AperturePhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ApertureGPU)
 
 #endif // IMPACTX_APERTURE_H

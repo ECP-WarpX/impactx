@@ -11,7 +11,7 @@
 #define IMPACTX_PROT_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
@@ -31,9 +31,9 @@
 
 namespace impactx::elements
 {
-    struct PRotPhysics
-    : public mixin::BeamOptic<PRotPhysics>,
-      public mixin::LinearTransport<PRotPhysics>,
+    struct PRotGPU
+    : public mixin::BeamOptic<PRotGPU>,
+      public mixin::LinearTransport<PRotGPU>,
       public mixin::Thin,
       public mixin::SpinTransport,
       public mixin::NoFinalize,
@@ -50,7 +50,7 @@ namespace impactx::elements
          * @param phi_in Initial angle of reference trajectory w/r/t z (degrees)
          * @param phi_out Final angle of reference trajectory w/r/t/ z (degrees)
          */
-        PRotPhysics (
+        PRotGPU (
             amrex::ParticleReal phi_in,
             amrex::ParticleReal phi_out
         )
@@ -273,11 +273,11 @@ namespace impactx::elements
         amrex::ParticleReal m_inv_beta, m_sin_theta, m_cos_theta, m_sin_phi_in, m_cos_phi_in;
     };
 
-    /** PRot: physics plus common host-only metadata */
-    using PRot = Element<PRotPhysics>;
+    /** PRot: GPU state plus common host-only metadata */
+    using PRot = Element<PRotGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::PRotPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::PRotGPU)
 
 #endif // IMPACTX_PROT_H

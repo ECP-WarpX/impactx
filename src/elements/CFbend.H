@@ -11,7 +11,7 @@
 #define IMPACTX_CFBEND_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/beamoptic.H"
@@ -30,9 +30,9 @@
 
 namespace impactx::elements
 {
-    struct CFbendPhysics
-    : public mixin::BeamOptic<CFbendPhysics>,
-      public mixin::LinearTransport<CFbendPhysics>,
+    struct CFbendGPU
+    : public mixin::BeamOptic<CFbendGPU>,
+      public mixin::LinearTransport<CFbendGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -61,7 +61,7 @@ namespace impactx::elements
          * @param aperture_y vertical half-aperture in m
          * @param nslice number of slices used for the application of space charge
          */
-        CFbendPhysics (
+        CFbendGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal rc,
             amrex::ParticleReal k,
@@ -409,11 +409,11 @@ namespace impactx::elements
         amrex::ParticleReal m_lambday, m_A13, m_A14, m_A21, m_A22, m_A26, m_A33, m_A34;
     };
 
-    /** CFbend: physics plus common host-only metadata */
-    using CFbend = Element<CFbendPhysics>;
+    /** CFbend: GPU state plus common host-only metadata */
+    using CFbend = Element<CFbendGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::CFbendPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::CFbendGPU)
 
 #endif // IMPACTX_CFBEND_H

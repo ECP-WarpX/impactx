@@ -11,7 +11,7 @@
 #define IMPACTX_PUSH_ALL_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "elements/mixin/snapshot.H"
+#include "elements/helper/Pusher.H"
 
 #include <AMReX_BLProfiler.H>
 
@@ -21,7 +21,7 @@ namespace impactx
     /** Push all particles on every tile of every refinement level.
      *
      * @param[in,out] pc particle container to push
-     * @param[in] element a prepared execution snapshot, or an element that has none
+     * @param[in] element a prepared pusher, or an element that has none
      * @param[in] ref_part the reference particle, already advanced for this slice
      * @param[in] spin whether to perform spin tracking
      * @param[in] omp_parallel allow threading via OpenMP for the particle iterator loop
@@ -89,9 +89,9 @@ namespace impactx
             element(ref_part);
         }
 
-        // Prepare the execution snapshot exactly once for this element slice, after the
+        // Prepare the pusher exactly once for this element slice, after the
         // reference particle has been advanced and before any tile is launched. The
-        // snapshot is then copied into each tile's launch closure.
+        // pusher is then copied into each tile's launch closure.
         //
         // Elements whose push is an opaque user callback (Programmable) have nothing to
         // prepare and keep using the element itself.

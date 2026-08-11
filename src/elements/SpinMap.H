@@ -11,7 +11,7 @@
 #define IMPACTX_ELEMENT_SPIN_MAP_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/lineartransport.H"
@@ -34,9 +34,9 @@ using Vector3 = amrex::SmallMatrix<amrex::ParticleReal, 3, 1, amrex::Order::F, 1
 
 namespace impactx::elements
 {
-    struct SpinMapPhysics
-    : public mixin::BeamOptic<SpinMapPhysics>,
-      public mixin::LinearTransport<SpinMapPhysics>,
+    struct SpinMapGPU
+    : public mixin::BeamOptic<SpinMapGPU>,
+      public mixin::LinearTransport<SpinMapGPU>,
       public mixin::Alignment,
       public mixin::SpinTransport,
       public mixin::NoFinalize,
@@ -60,7 +60,7 @@ namespace impactx::elements
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
          */
-        SpinMapPhysics (
+        SpinMapGPU (
             Vector3 const & v,
             Map3x6 const & A,
             amrex::ParticleReal ds = DEFAULT_ds,
@@ -269,11 +269,11 @@ namespace impactx::elements
         // bool m_reversed = false;  // apply inverse spin rotations in reverse order after reverse()
     };
 
-    /** SpinMap: physics plus common host-only metadata */
-    using SpinMap = Element<SpinMapPhysics>;
+    /** SpinMap: GPU state plus common host-only metadata */
+    using SpinMap = Element<SpinMapGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::SpinMapPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::SpinMapGPU)
 
 #endif // IMPACTX_ELEMENT_SPIN_MAP_H

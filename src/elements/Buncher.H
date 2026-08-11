@@ -11,7 +11,7 @@
 #define IMPACTX_BUNCHER_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
@@ -30,9 +30,9 @@
 
 namespace impactx::elements
 {
-    struct BuncherPhysics
-    : public mixin::BeamOptic<BuncherPhysics>,
-      public mixin::LinearTransport<BuncherPhysics>,
+    struct BuncherGPU
+    : public mixin::BeamOptic<BuncherGPU>,
+      public mixin::LinearTransport<BuncherGPU>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -55,7 +55,7 @@ namespace impactx::elements
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
          */
-        BuncherPhysics (
+        BuncherGPU (
             amrex::ParticleReal V,
             amrex::ParticleReal k,
             amrex::ParticleReal dx = DEFAULT_dx,
@@ -285,11 +285,11 @@ namespace impactx::elements
         amrex::ParticleReal m_beta;  // relativistic factor
     };
 
-    /** Buncher: physics plus common host-only metadata */
-    using Buncher = Element<BuncherPhysics>;
+    /** Buncher: GPU state plus common host-only metadata */
+    using Buncher = Element<BuncherGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::BuncherPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::BuncherGPU)
 
 #endif // IMPACTX_BUNCHER_H

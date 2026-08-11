@@ -10,7 +10,7 @@
 #ifndef IMPACTX_TRACKING_STATE_H
 #define IMPACTX_TRACKING_STATE_H
 
-#include "elements/Handle.H"
+#include "elements/helper/Handle.H"
 #include "tracking/TrackingDirection.H"
 
 #include <optional>

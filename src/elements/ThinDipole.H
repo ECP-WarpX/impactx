@@ -11,7 +11,7 @@
 #define IMPACTX_THINDIPOLE_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
@@ -30,9 +30,9 @@
 
 namespace impactx::elements
 {
-    struct ThinDipolePhysics
-    : public mixin::BeamOptic<ThinDipolePhysics>,
-      public mixin::LinearTransport<ThinDipolePhysics>,
+    struct ThinDipoleGPU
+    : public mixin::BeamOptic<ThinDipoleGPU>,
+      public mixin::LinearTransport<ThinDipoleGPU>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -58,7 +58,7 @@ namespace impactx::elements
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
          */
-        ThinDipolePhysics (
+        ThinDipoleGPU (
             amrex::ParticleReal theta,
             amrex::ParticleReal rc,
             amrex::ParticleReal dx = DEFAULT_dx,
@@ -330,11 +330,11 @@ namespace impactx::elements
         amrex::ParticleReal m_kx;    //! effective (equivalent) curvature
     };
 
-    /** ThinDipole: physics plus common host-only metadata */
-    using ThinDipole = Element<ThinDipolePhysics>;
+    /** ThinDipole: GPU state plus common host-only metadata */
+    using ThinDipole = Element<ThinDipoleGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ThinDipolePhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ThinDipoleGPU)
 
 #endif // IMPACTX_THINDIPOLE_H

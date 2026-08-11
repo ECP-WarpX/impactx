@@ -13,9 +13,9 @@
 #include <string>
 
 std::string
-impactx::elements::PolygonApertureCore::action_name (Action const & action)
+impactx::elements::PolygonAperturePusher::action_name (Action const & action)
 {
     return amrex::getEnumNameString(action);
 }
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::PolygonAperturePhysics)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::PolygonApertureGPU)

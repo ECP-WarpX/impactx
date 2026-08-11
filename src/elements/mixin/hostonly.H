@@ -18,7 +18,7 @@ namespace impactx::elements::mixin
     /** Marker for state that must never be copied into a device kernel.
      *
      * Derive from this in any mixin that owns host memory, holds a Python object, or is
-     * otherwise meaningless on a device. Execution snapshots are checked against this
+     * otherwise meaningless on a device. Pushers are checked against this
      * marker, so a future host-only mixin is rejected at compile time instead of silently
      * inflating every launch closure.
      *

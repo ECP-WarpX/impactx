@@ -10,7 +10,7 @@
 #include "ImpactX.H"
 #include "diagnostics/DiagnosticOutput.H"
 #include "diagnostics/FilePrefix.H"
-#include "elements/mixin/accessors.H"
+#include "elements/helper/Accessors.H"
 #include "initialization/InitAmrCore.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"

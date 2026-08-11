@@ -11,7 +11,7 @@
 #define IMPACTX_SHORTRF_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "Element.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
@@ -29,9 +29,9 @@
 
 namespace impactx::elements
 {
-    struct ShortRFPhysics
-    : public mixin::BeamOptic<ShortRFPhysics>,
-      public mixin::LinearTransport<ShortRFPhysics>,
+    struct ShortRFGPU
+    : public mixin::BeamOptic<ShortRFGPU>,
+      public mixin::LinearTransport<ShortRFGPU>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -58,7 +58,7 @@ namespace impactx::elements
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
          */
-        ShortRFPhysics (
+        ShortRFGPU (
             amrex::ParticleReal V,
             amrex::ParticleReal freq,
             amrex::ParticleReal phase = DEFAULT_phase,
@@ -379,11 +379,11 @@ namespace impactx::elements
         amrex::ParticleReal m_k, m_phi, m_V_cos_phi, m_bgi, m_bgf;
     };
 
-    /** ShortRF: physics plus common host-only metadata */
-    using ShortRF = Element<ShortRFPhysics>;
+    /** ShortRF: GPU state plus common host-only metadata */
+    using ShortRF = Element<ShortRFGPU>;
 
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ShortRFPhysics)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ShortRFGPU)
 
 #endif // IMPACTX_SHORTRF_H
