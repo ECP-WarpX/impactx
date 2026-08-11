@@ -65,8 +65,7 @@ Installation
    install/users
    install/cmake
    install/hpc
-..   install/changelog
-..   install/upgrade
+   install/upgrade
 
 Usage
 -----

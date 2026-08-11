@@ -412,8 +412,8 @@ Collective Effects & Overall Simulation Parameters
 
    .. py:property:: lattice
 
-      Access the elements in the accelerator lattice.
-      See :py:mod:`impactx.elements` for lattice elements.
+      The accelerator lattice, a :py:class:`~impactx.elements.KnownElementsList`.
+      See :py:mod:`impactx.elements` for the available elements.
 
    .. py:property:: periods
 
@@ -527,7 +527,22 @@ Collective Effects & Overall Simulation Parameters
 
    .. py:property:: tracking_element
 
-      For tracking hooks/callbacks, the current lattice element.
+      For tracking hooks/callbacks, the element currently being tracked through.
+
+      This is the element in the lattice, so a hook may retune it for the push that is
+      about to happen:
+
+      .. code-block:: python
+
+         def before_element(sim):
+             element = sim.tracking_element
+             if element.name == "cavity":
+                 element.phase = my_phase(sim.beam.ref)
+
+         sim.hook["before_element"] = before_element
+
+      An element placed at several positions is one element: a hook that reads a parameter
+      it also writes sees the value left by the previous position.
 
    .. py:method:: resize_mesh()
 
@@ -1020,19 +1035,70 @@ This module provides elements and methods for the accelerator lattice.
 
 .. py:class:: impactx.elements.KnownElementsList
 
-   An iterable, ``list``-like type of elements.
+   The accelerator lattice: a ``list``-like sequence of elements.
+
+   The lattice holds the element objects it is given, the way a Python list holds its
+   items. Changing an element changes what is tracked, and the same element may sit at
+   several positions:
+
+   .. code-block:: python
+
+      q = elements.Quad(ds=0.3, k=2.0)
+      sim.lattice.append(q)
+
+      q.k = 3.0                    # the lattice tracks q, so this applies
+
+      sim.lattice.extend([q, q])   # q now sits at three positions
+
+   For separate elements, construct one per position or add a copy:
+
+   .. code-block:: python
+
+      sim.lattice.append(elements.Quad(ds=0.3, k=2.0))
+      sim.lattice.append(elements.Quad(ds=0.3, k=2.0))   # two elements
+
+      template = elements.Quad(ds=0.3, k=2.0)
+      sim.lattice.extend([template.copy(), template.copy()])
+
+   ``extend()`` holds every element of the list it is given, so repeating a list repeats
+   its elements rather than duplicating them:
+
+   .. code-block:: python
+
+      cell = [elements.Drift(ds=0.25), elements.Quad(ds=1.0, k=1.0)]
+
+      sim.lattice.extend(cell * 3)          # 6 positions, 2 elements
+      sim.lattice[0].ds = 0.5               # all three cells
+
+   That is what you want when the cells are meant to stay identical -- retuning the cell
+   retunes the whole channel. To tune the cells separately, copy the list per repetition:
+
+   .. code-block:: python
+
+      for _ in range(3):
+          sim.lattice.extend([element.copy() for element in cell])
+
+   Indexing, slicing, iteration, ``len()``, ``in``, ``insert()``, ``remove()``, ``index()``,
+   ``count()`` and ``del`` work as they do for a list. ``in``, ``index()``, ``count()`` and
+   ``remove()`` match on the element itself, so an element with the same parameters as
+   another is not mistaken for it.
+
+   .. note::
+
+      Scripts written for earlier ImpactX versions may need an adjustment here, see the
+      :ref:`Upgrade Guide <install-upgrade>`.
 
    .. py:method:: clear()
 
-      Clear the list to become empty.
+      Remove all elements from the lattice.
 
-   .. py:method:: extend(list)
+   .. py:method:: extend(elements)
 
-      Add a list of elements to the list.
+      Add several elements to the end of the lattice.
 
    .. py:method:: append(element)
 
-      Add a single element to the list.
+      Add an element to the end of the lattice.
 
    .. py:method:: load_file(filename, nslice=1, *, min_model="linear")
 
@@ -1181,8 +1247,8 @@ This module provides elements and methods for the accelerator lattice.
          # Chain filters (AND logic)
          drift_named_d1 = lattice.select(kind="Drift").select(name="drift1")
 
-         # Modify original elements through references
-         drift_elements[0].ds = 2.0  # modifies original lattice
+         # A selection holds the lattice's elements, so changes apply to the lattice
+         drift_elements[0].ds = 2.0
 
          # delete all drifts
          lattice.select(kind=r".*Drift").delete()
@@ -1658,8 +1724,39 @@ Lattice Elements
 Lattice elements expose multiple methods, including: (i) ``push(pc)`` to advance particles ``pc`` (e.g., ``sim.beam``),
 (ii) ``push(cm, ref)`` to advance a covariance matrix ``cm``, (iii) ``transfer_map(ref)`` that returns the
 element's analytic 6x6 linear transport map (phase-space ordering ``(x, px, y, py, t, pt)``) for the reference
-particle ``ref``, (iv) ``reverse()`` to reverse the element in place, and (v) ``to_dict()`` to serialize it.
+particle ``ref``, (iv) ``reverse()`` to reverse the element in place, (v) ``to_dict()`` to serialize it, and
+(vi) ``copy()`` to make a new element with the same configuration.
 For an element with ``nslice`` > 1, the pushes and maps refer to a single ``ds/nslice`` slice.
+
+Element parameters can be changed after construction, and a lattice tracks the elements it
+holds, so an element can be retuned between runs:
+
+.. code-block:: python
+
+   quad = elements.Quad(ds=0.3, k=2.0)
+   sim.lattice.append(quad)
+
+   quad.k = 2.5          # applies to the next tracking run
+
+Use ``copy()`` when a second, separately tunable element is wanted:
+
+.. code-block:: python
+
+   focus = elements.Quad(ds=0.3, k=2.0)
+   defocus = focus.copy()
+   defocus.k = -2.0
+
+The elements carrying array-valued parameters -- the soft-edge elements, the exact multipole
+and combined-function bend, and the polygon aperture -- expose those arrays as properties,
+plus a setter that takes both at once. The two arrays of an element always have the same
+length, so the paired setter is the one that can change that length:
+
+.. code-block:: python
+
+   cavity.cos_coefficients = new_cos            # same length as before
+   cavity.set_coefficients(new_cos, new_sin)    # any length, applied together
+
+   aperture.set_vertices(x, y)                  # outline must be closed: x[0] == x[-1]
 
 Many elements take a transverse aperture via ``aperture_x`` and ``aperture_y``: the ``Aperture``
 collimator, and as a beam pipe most other elements.

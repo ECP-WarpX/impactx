@@ -216,10 +216,9 @@ namespace
                 }
                 return copied;
             },
-            "Return a distinct element with the same configuration.\n\n"
-            "Use this to place an independent element where you already have one:\n"
-            "``lattice.append(q.copy())`` adds a second element, whereas\n"
-            "``lattice.append(q)`` adds another occurrence of ``q``.\n\n"
+            "Return a new element with the same configuration.\n\n"
+            "``lattice.append(q)`` places ``q`` itself; ``lattice.append(q.copy())``\n"
+            "places a separate element.\n\n"
             "Keyword arguments give the copy a different value for a parameter, which is\n"
             "how one element supplies the values for many::\n\n"
             "    cavities = [rf.copy(name=f\"rf{i}\") for i in range(1, 5)]\n"

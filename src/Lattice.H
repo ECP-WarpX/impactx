@@ -181,7 +181,7 @@ namespace impactx
         class TraversalGuard
         {
         public:
-            explicit TraversalGuard (Lattice & lattice)
+            explicit TraversalGuard (Lattice const & lattice)
               : m_lattice(&lattice)
             {
                 ++m_lattice->m_active_traversals;
@@ -195,7 +195,7 @@ namespace impactx
             TraversalGuard & operator= (TraversalGuard &&) = delete;
 
         private:
-            Lattice * m_lattice;
+            Lattice const * m_lattice;
         };
 
         [[nodiscard]] bool is_being_traversed () const noexcept { return m_active_traversals > 0; }
@@ -218,7 +218,7 @@ namespace impactx
 
         storage_type m_elements;
         std::uint64_t m_generation = 0;
-        std::size_t m_active_traversals = 0;
+        mutable std::size_t m_active_traversals = 0;
     };
 
 } // namespace impactx

@@ -130,6 +130,11 @@ namespace impactx
 
         bool const forward = tracking_state.forward();
 
+        // Reject changes to the sequence of elements while we are walking it. Changing an
+        // element's own parameters from a hook stays allowed; that is how a lattice is
+        // retuned mid-run.
+        Lattice::TraversalGuard const traversal(lattice);
+
         // periods through the lattice (turns/cycles) and verbosity
         int num_periods = 1;
         amrex::ParmParse("lattice").queryAddWithParser("periods", num_periods);

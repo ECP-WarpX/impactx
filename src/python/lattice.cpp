@@ -29,10 +29,8 @@ void init_lattice(py::module& me)
     using elements::KnownElements;
     namespace ix_diag = ::impactx::diagnostics;
 
-    // Elements are shared, not copied: appending keeps the object the caller passed in,
-    // exactly as appending to a Python list does. Two positions holding the same object
-    // are two occurrences of one element. Independent elements come from constructing one
-    // per position, or from an explicit copy.
+    // The lattice holds the element objects it is given, as a Python list holds its items:
+    // one object may sit at several positions, and changing it changes what is tracked.
     using KnownElementsList = Lattice;
     using impactx::python::Owners;
     using impactx::python::handle_from_python;
@@ -61,9 +59,10 @@ void init_lattice(py::module& me)
                  owners.append(el);
              },
              py::arg("element"),
-             "Add a single element to the lattice.\n\n"
-             "The element is shared, not copied: later changes to it are visible here, and\n"
-             "appending the same element twice creates two occurrences of one element."
+             "Add an element to the end of the lattice.\n\n"
+             "The lattice holds this element, so changing it afterwards changes what is\n"
+             "tracked. Adding the same element twice places it at two positions. For two\n"
+             "independent elements, add ``element.copy()`` or construct a second one."
         )
 
         .def("extend",
@@ -139,7 +138,7 @@ void init_lattice(py::module& me)
                  return owners.get(i);
              },
              py::arg("index"),
-             "Return the element at a position. This is the element itself, not a copy."
+             "Return the element at a position."
         )
 
         .def("__setitem__",
@@ -172,7 +171,7 @@ void init_lattice(py::module& me)
                  return out;
              },
              py::arg("slice"),
-             "Return a new lattice over the selected elements. The elements are shared."
+             "Return a new lattice holding the selected elements."
         )
 
         .def("__setitem__",
@@ -254,8 +253,7 @@ void init_lattice(py::module& me)
              },
              py::arg("index"),
              "Remove the element at a position.\n\n"
-             "If the same element occupies other positions, those are untouched: this\n"
-             "removes one occurrence, not the element."
+             "An element that also sits at other positions keeps those."
         )
 
         .def("insert",

@@ -157,6 +157,11 @@ namespace
         F_OnElementExit && on_element_exit = NoopElementExit{}
     )
     {
+        // A reference push can run a user callback (Programmable), and that callback can
+        // reach the very lattice this loop is walking. Appending would reallocate the
+        // storage under the iterator below, so refuse structural edits for the walk.
+        Lattice::TraversalGuard const traversal(lattice);
+
         // private copy of the reference particle
         RefPart ref = ref_part_init;
         Map6x6 M_cum = Map6x6::Identity();

@@ -70,9 +70,15 @@ def test_name_is_settable_and_resettable():
     assert not drift.has_name
 
 
-@pytest.mark.parametrize("name", ["quad1", "a-very-long-element-name-" * 8, "ünïcodé"])
+@pytest.mark.parametrize(
+    "name",
+    ["quad1", "a-very-long-element-name-" * 8, "\u00fcn\u00efcod\u00e9"],
+)
 def test_name_round_trips(name):
     """Names are stored verbatim, including long and non-ASCII ones.
+
+    The non-ASCII case is written as escapes so this file stays ASCII, as the
+    repository's style check requires; the string itself is unchanged.
 
     Worth pinning: the name used to be a raw ``char *`` with hand-written copy semantics.
     """
