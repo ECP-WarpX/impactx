@@ -92,8 +92,25 @@ namespace impactx
         void insert (size_type i, elements::ElementHandle handle)
         {
             elements::require_valid(handle, "insert");
+            require_insertion_point(i);
             require_no_traversal("add an element");
             m_elements.insert(m_elements.begin() + static_cast<std::ptrdiff_t>(i), std::move(handle));
+            ++m_generation;
+        }
+
+        /** Replace the element at a position
+         *
+         * Other positions holding the element that was there are unaffected.
+         *
+         * @param i the position to replace, less than @see size
+         * @param handle a non-null element handle
+         */
+        void replace (size_type i, elements::ElementHandle handle)
+        {
+            elements::require_valid(handle, "replace");
+            require_element_at(i, "replace");
+            require_no_traversal("replace an element");
+            m_elements[i] = std::move(handle);
             ++m_generation;
         }
 
@@ -104,6 +121,7 @@ namespace impactx
          */
         void erase (size_type i)
         {
+            require_element_at(i, "remove");
             require_no_traversal("remove an element");
             m_elements.erase(m_elements.begin() + static_cast<std::ptrdiff_t>(i));
             ++m_generation;
@@ -112,6 +130,7 @@ namespace impactx
         /** Remove the last element */
         void pop_back ()
         {
+            require_not_empty("remove an element");
             require_no_traversal("remove an element");
             m_elements.pop_back();
             ++m_generation;
@@ -134,10 +153,26 @@ namespace impactx
         [[nodiscard]] elements::ElementHandle & at (size_type i) { return m_elements.at(i); }
         [[nodiscard]] elements::ElementHandle const & at (size_type i) const { return m_elements.at(i); }
 
-        [[nodiscard]] elements::ElementHandle & front () { return m_elements.front(); }
-        [[nodiscard]] elements::ElementHandle const & front () const { return m_elements.front(); }
-        [[nodiscard]] elements::ElementHandle & back () { return m_elements.back(); }
-        [[nodiscard]] elements::ElementHandle const & back () const { return m_elements.back(); }
+        [[nodiscard]] elements::ElementHandle & front ()
+        {
+            require_not_empty("read the first element of");
+            return m_elements.front();
+        }
+        [[nodiscard]] elements::ElementHandle const & front () const
+        {
+            require_not_empty("read the first element of");
+            return m_elements.front();
+        }
+        [[nodiscard]] elements::ElementHandle & back ()
+        {
+            require_not_empty("read the last element of");
+            return m_elements.back();
+        }
+        [[nodiscard]] elements::ElementHandle const & back () const
+        {
+            require_not_empty("read the last element of");
+            return m_elements.back();
+        }
 
         [[nodiscard]] iterator begin () noexcept { return m_elements.begin(); }
         [[nodiscard]] iterator end () noexcept { return m_elements.end(); }
@@ -201,6 +236,50 @@ namespace impactx
         [[nodiscard]] bool is_being_traversed () const noexcept { return m_active_traversals > 0; }
 
     private:
+        /** Throw unless @p i names an element that is there
+         *
+         * @param i the position that was asked for
+         * @param what the operation that was attempted, used in the error message
+         */
+        void require_element_at (size_type i, char const * what) const
+        {
+            if (i >= m_elements.size())
+            {
+                throw std::out_of_range(
+                    std::string("Lattice: cannot ") + what + " position " + std::to_string(i) +
+                    ": the lattice holds " + std::to_string(m_elements.size()) + " elements.");
+            }
+        }
+
+        /** Throw unless @p i is a position an element can be inserted before
+         *
+         * One past the last element is a valid place to insert.
+         *
+         * @param i the position that was asked for
+         */
+        void require_insertion_point (size_type i) const
+        {
+            if (i > m_elements.size())
+            {
+                throw std::out_of_range(
+                    "Lattice: cannot insert at position " + std::to_string(i) +
+                    ": the lattice holds " + std::to_string(m_elements.size()) + " elements.");
+            }
+        }
+
+        /** Throw if there is no element to operate on
+         *
+         * @param what the operation that was attempted, used in the error message
+         */
+        void require_not_empty (char const * what) const
+        {
+            if (m_elements.empty())
+            {
+                throw std::out_of_range(
+                    std::string("Lattice: cannot ") + what + " an empty lattice.");
+            }
+        }
+
         /** Throw if a tracking traversal is walking this lattice
          *
          * @param what the edit that was attempted, used in the error message

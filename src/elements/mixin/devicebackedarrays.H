@@ -65,20 +65,40 @@ namespace impactx::elements::mixin
          * @param first the first array
          * @param second the second array, which must have the same length
          * @param what element and array names, used in the error message
+         * @param min_size the fewest entries this element can be evaluated with
          */
         DeviceBackedArrays (
             std::vector<amrex::ParticleReal> first,
             std::vector<amrex::ParticleReal> second,
-            std::string const & what
+            std::string const & what,
+            int min_size = 0
         )
         {
-            validate(first, second, what);
+            validate(first, second, what, min_size);
             m_first = amrex::Gpu::TrackedVector<amrex::ParticleReal>(std::move(first));
             m_second = amrex::Gpu::TrackedVector<amrex::ParticleReal>(std::move(second));
         }
 
-        DeviceBackedArrays (DeviceBackedArrays const &) = default;
-        DeviceBackedArrays (DeviceBackedArrays &&) noexcept = default;
+        /** Copy the arrays; no kernel has been handed a view of the copy
+         *
+         * The flag records whether a device view of *these* arrays was ever handed out,
+         * which is what decides if there can be a kernel to wait for. A copy is new
+         * storage that nothing has been given yet, so it starts clear -- as it does after
+         * copy assignment. (``TrackedVector`` may well copy the device mirror along with
+         * the host values; that is storage, not a consumer.)
+         */
+        DeviceBackedArrays (DeviceBackedArrays const & other)
+          : m_first(other.m_first), m_second(other.m_second)
+        {
+        }
+
+        /** Take over the arrays, and with them any kernel still reading from them */
+        DeviceBackedArrays (DeviceBackedArrays && other) noexcept
+          : m_first(std::move(other.m_first)),
+            m_second(std::move(other.m_second)),
+            m_device_materialized(std::exchange(other.m_device_materialized, false))
+        {
+        }
 
         DeviceBackedArrays & operator= (DeviceBackedArrays const & other)
         {
@@ -162,14 +182,16 @@ namespace impactx::elements::mixin
          * @param first the new first array
          * @param second the new second array, which must have the same length
          * @param what element and array names, used in the error message
+         * @param min_size the fewest entries this element can be evaluated with
          */
         void commit (
             std::vector<amrex::ParticleReal> first,
             std::vector<amrex::ParticleReal> second,
-            std::string const & what
+            std::string const & what,
+            int min_size = 0
         )
         {
-            validate(first, second, what);
+            validate(first, second, what, min_size);
             wait_for_device_consumers();
 
             m_first = amrex::Gpu::TrackedVector<amrex::ParticleReal>(std::move(first));
@@ -192,15 +214,29 @@ namespace impactx::elements::mixin
         }
 
     private:
+        /** Reject a pair of arrays the element cannot be evaluated with
+         *
+         * @param first the first array
+         * @param second the second array, which must have the same length
+         * @param what element and array names, used in the error message
+         * @param min_size the fewest entries this element can be evaluated with
+         */
         static void validate (
             std::vector<amrex::ParticleReal> const & first,
             std::vector<amrex::ParticleReal> const & second,
-            std::string const & what
+            std::string const & what,
+            int min_size
         )
         {
             if (first.size() != second.size())
             {
                 throw std::invalid_argument(what + " arrays must have the same length!");
+            }
+            if (first.size() < static_cast<std::size_t>(min_size))
+            {
+                throw std::invalid_argument(
+                    what + " arrays need at least " + std::to_string(min_size) +
+                    " entries, got " + std::to_string(first.size()) + "!");
             }
         }
 

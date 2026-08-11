@@ -677,7 +677,7 @@ namespace impactx::elements
             int nslice = DEFAULT_nslice
         )
           : ExactCFbendCore(ds, unit, dx, dy, rotation_degree, aperture_x, aperture_y, int_order, mapsteps, nslice),
-            m_coefficients_data(std::move(k_normal), std::move(k_skew), "ExactCFbend: normal and skew coefficient")
+            m_coefficients_data(std::move(k_normal), std::move(k_skew), "ExactCFbend: normal and skew coefficient", 1)
         {
             if (m_int_order != 2 && m_int_order != 4 && m_int_order != 6)
                 throw std::invalid_argument("ExactCFbend: The order used for symplectic integration must be 2, 4 or 6.");
@@ -694,9 +694,13 @@ namespace impactx::elements
 
         /** This pushes the reference particle.
          *
+         * Host-only: the curvature is read from the host-side coefficients, as for the
+         * other elements that carry dynamic arrays. The reference particle is advanced on
+         * the host, once per slice, before any tile is launched.
+         *
          * @param[in,out] refpart reference particle
          */
-        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        AMREX_GPU_HOST AMREX_FORCE_INLINE
         void operator() (RefPart & AMREX_RESTRICT refpart) const
         {
             using namespace amrex::literals; // for _rt and _prt
@@ -775,7 +779,8 @@ namespace impactx::elements
             amrex::ParticleReal const ibetgam2 = 1_prt / betgam2;
 
             // host view, obtained at the point of use
-            amrex::ParticleReal const * k_normal = m_coefficients_data.host_view().first;
+            auto const coefficients = m_coefficients_data.host_view();
+            amrex::ParticleReal const * k_normal = coefficients.first;
 
             // find magnetic field and curvature; normalize units to MAD-X convention if needed
             // magnetic rigidity of the reference particle
@@ -786,7 +791,9 @@ namespace impactx::elements
 
             amrex::ParticleReal const curvature = m_unit == 1 ? k_normal[0] / brho : k_normal[0];
             amrex::ParticleReal const rc = curvature == 0.0 ? 0.0_prt : 1.0_prt/curvature;
-            amrex::ParticleReal const kn = m_unit == 1 ? k_normal[1] / brho : k_normal[1];
+            // a pure bend carries no quadrupole component, and then supplies no k_normal[1]
+            amrex::ParticleReal const kn_raw = coefficients.size > 1 ? k_normal[1] : 0.0_prt;
+            amrex::ParticleReal const kn = m_unit == 1 ? kn_raw / brho : kn_raw;
             amrex::ParticleReal const b2rc2 = amrex::Math::powi<2>(bet) * amrex::Math::powi<2>(rc);
 
             // update horizontal and longitudinal phase space variables
@@ -873,7 +880,8 @@ namespace impactx::elements
             std::vector<amrex::ParticleReal> first,
             std::vector<amrex::ParticleReal> second
         )
-        {            m_coefficients_data.commit(std::move(first), std::move(second), "ExactCFbend: normal and skew coefficient");
+        {
+            m_coefficients_data.commit(std::move(first), std::move(second), "ExactCFbend: normal and skew coefficient", 1);
         }
 
         /** Release device storage; host configuration survives for reuse */

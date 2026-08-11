@@ -321,16 +321,18 @@ class FilteredElementsList:
         live selections on the same lattice. Returns None."""
         self._require_valid()
         original = self._original_list
-        to_remove = sorted(set(self._indices), reverse=True)
+        to_remove = set(self._indices)
         if not to_remove:
             _invalidate_all_registered_views(original)
             return None
 
-        # Remove the selected positions in place, back to front so the earlier indices
-        # stay valid. Elements that were not selected are never touched: they keep their
+        # Keep the rest, in one pass. Deleting the selected positions one at a time moves
+        # everything after each of them, which is quadratic in the length of the lattice.
+        # Elements that were not selected are carried over as they are: they keep their
         # identity, their Python subclass and their callbacks.
-        for i in to_remove:
-            del original[i]
+        kept = [original[i] for i in range(len(original)) if i not in to_remove]
+        original.clear()
+        original.extend(kept)
         _invalidate_all_registered_views(original)
         return None
 
@@ -508,12 +510,29 @@ def _matches_kind_pattern(element, kind_pattern):
         bool: True if element matches the pattern
     """
     if isinstance(kind_pattern, str):
-        # String pattern (exact match or regex)
-        return _matches_string(type(element).__name__, kind_pattern)
+        # An element written as a Python subclass is still of its element kind, so match
+        # the kind rather than the name of the user's class.
+        if _matches_string(type(element).__name__, kind_pattern):
+            return True
+        return _matches_string(_element_kind(element), kind_pattern)
     elif isinstance(kind_pattern, type):
-        # Element type (exact match)
-        return type(element) is kind_pattern
+        return isinstance(element, kind_pattern)
     return False
+
+
+def _element_kind(element):
+    """The element kind, which a Python subclass keeps.
+
+    Args:
+        element: The element to inspect
+
+    Returns:
+        str: the name of the element type this is a kind of, e.g. ``"Drift"``
+    """
+    for base in type(element).__mro__:
+        if getattr(elements, base.__name__, None) is base:
+            return base.__name__
+    return type(element).__name__
 
 
 def _matches_name_pattern(element, name_pattern):

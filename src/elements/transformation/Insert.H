@@ -20,14 +20,14 @@
 
 namespace impactx::elements::transformation
 {
-    /** Insert an element every s into an element list
+    /** Insert an element every s into a lattice
      *
      * Splits up every element that is on s = N * ds for N>0.
      *
-     * @param[in] list element lattice list
+     * @param[in] lattice the lattice to insert into
      * @param[in] ds spacing in meters along s to add an element
      * @param[in] element the extra element to add every s
-     * @return modified list with inserted elements
+     * @return a new lattice with the inserted elements
      */
     Lattice
     insert_element_every_ds (

@@ -40,19 +40,19 @@ namespace impactx::particles::wakefields
         amrex::Real R = 0;
         bool element_has_isr = false;
 
-        if (auto const * element = elements::get_if<elements::Sbend>(element_variant))
+        if (auto const * sbend = elements::get_if<elements::Sbend>(element_variant))
         {
-            R = std::abs(element->m_rc);
+            R = std::abs(sbend->m_rc);
             element_has_isr = true;
         }
-        else if (auto const * element = elements::get_if<elements::CFbend>(element_variant))
+        else if (auto const * cfbend = elements::get_if<elements::CFbend>(element_variant))
         {
-            R = std::abs(element->m_rc);
+            R = std::abs(cfbend->m_rc);
             element_has_isr = true;
         }
-        else if (auto const * element = elements::get_if<elements::ExactSbend>(element_variant))
+        else if (auto const * exact_sbend = elements::get_if<elements::ExactSbend>(element_variant))
         {
-            R = std::abs(element->rc(refpart));
+            R = std::abs(exact_sbend->rc(refpart));
             element_has_isr = true;
         }
 

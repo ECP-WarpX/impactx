@@ -49,10 +49,13 @@ namespace impactx {
         // loop over all beamline elements & finalize them
         finalize_elements();
 
+        // Release the elements whether or not grids were ever initialized: they have just
+        // been finalized, so keeping them in the lattice would leave elements that are done
+        // with -- a beam monitor with its series closed, say -- still trackable.
+        m_lattice.clear();
+
         if (m_grids_initialized)
         {
-            m_lattice.clear();
-
             // this one last
             amr_data.reset();
 

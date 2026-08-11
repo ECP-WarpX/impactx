@@ -4,6 +4,7 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "pyImpactX.H"
+#include "LatticeOwners.H"
 
 #include <ImpactX.H>
 #include <diagnostics/FilePrefix.H>
@@ -912,7 +913,7 @@ void init_ImpactX (py::module& m)
         // temporary here would drop those the moment it was collected, and an element
         // would come back as a plain base-class wrapper without its attributes.
         .def_property("lattice",
-            [](py::object self) {
+            [](py::object self) -> py::object {
                 if (!py::hasattr(self, "_lattice_view"))
                 {
                     auto & ix = self.cast<ImpactX &>();
@@ -935,9 +936,18 @@ void init_ImpactX (py::module& m)
                 return self.attr("_lattice_view");
             },
             [](py::object self, py::iterable const & elements) {
+                // Materialize the new contents before touching the lattice: assigning a bad
+                // entry must leave the previous lattice in place, and `sim.lattice =
+                // sim.lattice` must not empty the very sequence it is reading.
+                py::list const wanted(elements);
+                for (auto const & item : wanted)
+                {
+                    python::handle_from_python(item);
+                }
+
                 py::object view = self.attr("lattice");
                 view.attr("clear")();
-                view.attr("extend")(elements);
+                view.attr("extend")(wanted);
             },
             "Access the accelerator element lattice."
         )

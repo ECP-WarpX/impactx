@@ -655,8 +655,12 @@ namespace impactx::elements
             amrex::ParticleReal const * k_skew = coefficients.second;
 
             // normalize quad units to MAD-X convention if needed
-            amrex::ParticleReal const kn = m_unit == 1 ? k_normal[1] / refpart.rigidity_Tm() : k_normal[1];
-            amrex::ParticleReal const ks = m_unit == 1 ? k_skew[1] / refpart.rigidity_Tm() : k_skew[1];
+            // a pure dipole (or an element with no coefficients at all) has no quadrupole
+            // component, and then supplies no index 1
+            amrex::ParticleReal const kn_raw = coefficients.size > 1 ? k_normal[1] : 0.0_prt;
+            amrex::ParticleReal const ks_raw = coefficients.size > 1 ? k_skew[1] : 0.0_prt;
+            amrex::ParticleReal const kn = m_unit == 1 ? kn_raw / refpart.rigidity_Tm() : kn_raw;
+            amrex::ParticleReal const ks = m_unit == 1 ? ks_raw / refpart.rigidity_Tm() : ks_raw;
             amrex::ParticleReal const kabs = std::sqrt(powi<2>(kn) + powi<2>(ks));
 
             // initialize linear map matrix elements
@@ -752,7 +756,8 @@ namespace impactx::elements
             std::vector<amrex::ParticleReal> first,
             std::vector<amrex::ParticleReal> second
         )
-        {            m_coefficients_data.commit(std::move(first), std::move(second), "ExactMultipole: normal and skew coefficient");
+        {
+            m_coefficients_data.commit(std::move(first), std::move(second), "ExactMultipole: normal and skew coefficient");
         }
 
         /** Release device storage; host configuration survives for reuse */

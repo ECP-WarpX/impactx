@@ -551,8 +551,11 @@ namespace detail
 
     /** This pushes all particles on a particle iterator tile/box
      *
-     * @param element an already prepared execution snapshot,
-     *                @see impactx::elements::make_particle_pusher
+     * @param[in,out] pti the particle iterator, pointing at the tile/box to push
+     * @param[in] ref_part the reference particle, already advanced for this slice
+     * @param[in] element an already prepared execution snapshot,
+     *                    @see impactx::elements::make_particle_pusher
+     * @param[in] spin whether to perform spin tracking
      */
     template< typename T_Element >
     void push_all_particles (
@@ -602,11 +605,6 @@ namespace detail
     }
 } // namespace detail
 
-    /** Mixin class for a regular beam optics lattice element.
-     *
-     * This element pushes particles relative to a reference particle.
-     * All particles are pushed independently with the same logic.
-     */
     /** Push beam particles on one tile, relative to the reference particle.
      *
      * This is deliberately separate from @see BeamOptic. An execution snapshot -- the
@@ -647,6 +645,17 @@ namespace detail
          }
     };
 
+    /** Mixin class for a regular beam optics lattice element.
+     *
+     * This element pushes particles relative to a reference particle. All particles are
+     * pushed independently with the same logic.
+     *
+     * On top of @see ParticlePush, which pushes the beam particles of one tile, this adds
+     * the whole-container push: it advances the reference particle first and then every
+     * beam particle, once per element slice. An element that owns resources a launch
+     * closure must not carry gives @see ParticlePush to its execution snapshot alone and
+     * keeps this for itself.
+     */
     template<typename T_Element>
     struct BeamOptic : ParticlePush<T_Element>
     {

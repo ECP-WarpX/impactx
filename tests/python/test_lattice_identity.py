@@ -134,9 +134,9 @@ def test_negative_indexing():
     assert lattice[-2] is q
 
     with pytest.raises(IndexError):
-        lattice[2]
+        _ = lattice[2]
     with pytest.raises(IndexError):
-        lattice[-3]
+        _ = lattice[-3]
 
 
 def test_iteration_yields_the_same_objects():

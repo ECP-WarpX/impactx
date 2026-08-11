@@ -150,7 +150,7 @@ namespace envelope_detail
 
         /** Construct from physics arguments only; the element stays unnamed
          *
-         * @param args arguments forwarded to the physics constructor
+         * All arguments are forwarded to the physics constructor.
          */
         template<
             typename... T_Args,
@@ -168,7 +168,8 @@ namespace envelope_detail
 
         /** Construct from physics arguments plus a trailing element name
          *
-         * @param args physics arguments, followed by the element name
+         * The leading arguments are forwarded to the physics constructor and the last one
+         * becomes the element name.
          */
         template<
             typename... T_Args,

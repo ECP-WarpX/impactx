@@ -550,7 +550,7 @@ namespace impactx::elements
             int nslice = DEFAULT_nslice
         )
           : RFCavityCore(ds, escale, freq, phase, dx, dy, rotation_degree, aperture_x, aperture_y, mapsteps, nslice),
-            m_coefficients_data(std::move(cos_coef), std::move(sin_coef), "RFCavity: cos and sin coefficient")
+            m_coefficients_data(std::move(cos_coef), std::move(sin_coef), "RFCavity: cos and sin coefficient", 1)
         {
             if (m_mapsteps <= 0)
                 throw std::invalid_argument("RFCavity: mapsteps must be > 0!");
@@ -705,7 +705,8 @@ namespace impactx::elements
             std::vector<amrex::ParticleReal> first,
             std::vector<amrex::ParticleReal> second
         )
-        {            m_coefficients_data.commit(std::move(first), std::move(second), "RFCavity: cos and sin coefficient");
+        {
+            m_coefficients_data.commit(std::move(first), std::move(second), "RFCavity: cos and sin coefficient", 1);
         }
 
         /** Release device storage; host configuration survives for reuse */

@@ -57,6 +57,13 @@ def test_retuning_an_element_is_allowed(sim):
         pytest.param(lambda lat: lat.clear(), id="clear"),
         pytest.param(lambda lat: lat.pop_back(), id="pop_back"),
         pytest.param(lambda lat: lat.__delitem__(0), id="del"),
+        pytest.param(
+            lambda lat: lat.__setitem__(0, elements.Drift(ds=0.1)), id="setitem"
+        ),
+        pytest.param(
+            lambda lat: lat.__setitem__(slice(0, 1), [elements.Drift(ds=0.1)]),
+            id="setitem_slice",
+        ),
     ],
 )
 def test_changing_the_sequence_is_rejected(sim, edit):

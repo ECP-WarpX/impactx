@@ -36,6 +36,12 @@ namespace impactx
     {
         BL_PROFILE("ImpactX::track_envelope");
 
+        if (m_lattice.empty())
+        {
+            throw std::runtime_error(
+                "Beamline lattice has zero elements. Not yet initialized?");
+        }
+
         using namespace amrex::literals;
 
         // verbosity

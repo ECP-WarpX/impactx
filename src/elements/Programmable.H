@@ -13,6 +13,7 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "Element.H"
 #include "particles/CovarianceMatrix.H"
+#include "mixin/hostonly.H"
 #include "mixin/lineartransport.H"
 #include "mixin/thick.H"
 
@@ -27,8 +28,15 @@
 
 namespace impactx::elements
 {
+    /** An element whose push is supplied from Python
+     *
+     * Host-only: the callbacks below hold Python objects, which no kernel may touch. This
+     * element is never turned into an execution snapshot -- its push is the callback
+     * itself -- and the marker says so rather than leaving it to that fact.
+     */
     struct ProgrammablePhysics
-    : public mixin::LinearTransport<ProgrammablePhysics, false>
+    : public mixin::LinearTransport<ProgrammablePhysics, false>,
+      public mixin::HostOnly
       // TODO: public amrex::simd::Vectorized<amrex::simd::native_simd_size_particlereal>
     {
         static constexpr auto type = "Programmable";

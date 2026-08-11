@@ -97,8 +97,12 @@ namespace impactx
         // prepare and keep using the element itself.
         if constexpr (elements::has_particle_pusher_v<T_Element>)
         {
-            BL_PROFILE("impactx::prepare");
-            auto const pusher = elements::make_particle_pusher(element, ref_part);
+            // the profiler covers the preparation only, so that the push keeps being
+            // reported per element
+            auto const pusher = [&] {
+                BL_PROFILE("impactx::prepare");
+                return elements::make_particle_pusher(element, ref_part);
+            }();
             push_tiles(pc, pusher, ref_part, spin, omp_parallel);
         }
         else

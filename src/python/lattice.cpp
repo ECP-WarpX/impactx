@@ -15,13 +15,21 @@
 #include <particles/ReferenceParticle.H>
 
 #include <algorithm>
+#include <cstddef>
+#include <functional>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <variant>
+#include <vector>
 
 namespace py = pybind11;
 using namespace impactx;
+
+// at namespace scope: MSVC does not find a block-scope using-declaration of a function
+// from inside a nested lambda, and every use below sits in one
+using impactx::python::handle_from_python;
+using impactx::python::lattice_of;
 
 
 void init_lattice(py::module& me)
@@ -33,7 +41,6 @@ void init_lattice(py::module& me)
     // one object may sit at several positions, and changing it changes what is tracked.
     using KnownElementsList = Lattice;
     using impactx::python::Owners;
-    using impactx::python::handle_from_python;
 
     // dynamic_attr: the lattice keeps the Python wrapper of each element alive in its
     // instance dictionary, where the cyclic garbage collector can see it.
@@ -52,7 +59,7 @@ void init_lattice(py::module& me)
 
         .def("append",
              [](py::object self, py::object el) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  auto handle = handle_from_python(el);
                  Owners owners(self, v);
                  v.push_back(std::move(handle));
@@ -67,7 +74,7 @@ void init_lattice(py::module& me)
 
         .def("extend",
              [](py::object self, py::iterable const & l) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
 
                  // convert everything first, so a bad entry leaves the lattice unchanged
                  std::vector<std::pair<elements::ElementHandle, py::object>> pending;
@@ -89,14 +96,14 @@ void init_lattice(py::module& me)
              "Add several elements to the lattice."
         )
 
-        .def("size", &KnownElementsList::size)
-        .def("is_empty", &KnownElementsList::empty)
-        .def("__len__", [](const KnownElementsList &v) { return v.size(); },
+        .def("size", [](py::object self) { return lattice_of(self).size(); })
+        .def("is_empty", [](py::object self) { return lattice_of(self).empty(); })
+        .def("__len__", [](py::object self) { return lattice_of(self).size(); },
              "The length of the list.")
 
         .def("clear",
              [](py::object self) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  Owners owners(self, v);
                  v.clear();
                  owners.clear();
@@ -106,7 +113,7 @@ void init_lattice(py::module& me)
 
         .def("pop_back",
              [](py::object self) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  if (v.empty()) { throw py::index_error("pop from empty lattice"); }
                  Owners owners(self, v);
                  py::object const last = owners.get(v.size() - 1);
@@ -119,7 +126,7 @@ void init_lattice(py::module& me)
 
         .def("__iter__",
              [](py::object self) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  Owners owners(self, v);
                  // materialize the exact wrappers, so iteration yields the objects that
                  // were put in rather than fresh views of them
@@ -132,7 +139,7 @@ void init_lattice(py::module& me)
 
         .def("__getitem__",
              [checked_index](py::object self, py::ssize_t index) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  auto const i = checked_index(v, index);
                  Owners owners(self, v);
                  return owners.get(i);
@@ -143,11 +150,11 @@ void init_lattice(py::module& me)
 
         .def("__setitem__",
              [checked_index](py::object self, py::ssize_t index, py::object el) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  auto const i = checked_index(v, index);
                  auto handle = handle_from_python(el);
                  Owners owners(self, v);
-                 v[i] = std::move(handle);
+                 v.replace(i, std::move(handle));
                  owners.set(i, el);
              },
              py::arg("index"), py::arg("element"),
@@ -156,7 +163,7 @@ void init_lattice(py::module& me)
 
         .def("__getitem__",
              [](py::object self, py::slice const & slice) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  size_t start = 0, stop = 0, step = 0, length = 0;
                  if (!slice.compute(v.size(), &start, &stop, &step, &length)) {
                      throw py::error_already_set();
@@ -176,18 +183,24 @@ void init_lattice(py::module& me)
 
         .def("__setitem__",
              [](py::object self, py::slice const & slice, py::iterable const & value) {
-                 auto & v = self.cast<KnownElementsList &>();
-                 size_t start = 0, stop = 0, step = 0, length = 0;
-                 if (!slice.compute(v.size(), &start, &stop, &step, &length)) {
-                     throw py::error_already_set();
-                 }
+                 auto & v = lattice_of(self);
 
-                 // convert first: a bad entry must leave the lattice untouched
+                 // Convert first, for two reasons: a bad entry must leave the lattice
+                 // untouched, and consuming the iterable can itself change the lattice --
+                 // a generator is free to append to it. Positions computed before that
+                 // would name the wrong elements, so the bounds are taken afterwards,
+                 // against the length the lattice actually has. This is also the order
+                 // list.__setitem__ uses.
                  std::vector<std::pair<elements::ElementHandle, py::object>> pending;
                  for (auto const & item : value)
                  {
                      py::object el = py::reinterpret_borrow<py::object>(item);
                      pending.emplace_back(handle_from_python(el), el);
+                 }
+
+                 size_t start = 0, stop = 0, step = 0, length = 0;
+                 if (!slice.compute(v.size(), &start, &stop, &step, &length)) {
+                     throw py::error_already_set();
                  }
 
                  if (step != 1 && pending.size() != length)
@@ -200,20 +213,40 @@ void init_lattice(py::module& me)
                  Owners owners(self, v);
                  if (step == 1)
                  {
-                     // a contiguous slice may change the length
-                     for (size_t i = 0; i < length; ++i) { v.erase(start); owners.erase(start); }
-                     for (size_t i = 0; i < pending.size(); ++i)
+                     // A contiguous slice may change the length, so build the result in one
+                     // pass: head, the new elements, tail. Erasing and inserting one position
+                     // at a time moves everything after `start` on every step, which is
+                     // quadratic -- and `lattice[:] = new` is the ordinary way to say
+                     // "replace the lattice".
+                     Lattice::storage_type next;
+                     next.reserve(v.size() - length + pending.size());
+                     py::list next_owners;
+
+                     for (Lattice::size_type i = 0; i < start; ++i)
                      {
-                         v.insert(start + i, std::move(pending[i].first));
-                         owners.insert(start + i, pending[i].second);
+                         next.push_back(v[i]);
+                         next_owners.append(owners.owner_at(i));
                      }
+                     for (auto & [handle, el] : pending)
+                     {
+                         next.push_back(std::move(handle));
+                         next_owners.append(el);
+                     }
+                     for (Lattice::size_type i = start + length; i < v.size(); ++i)
+                     {
+                         next.push_back(v[i]);
+                         next_owners.append(owners.owner_at(i));
+                     }
+
+                     v.assign(std::move(next));
+                     owners.assign(next_owners);
                  }
                  else
                  {
                      for (size_t i = 0; i < length; ++i)
                      {
                          auto const at = start + i * step;
-                         v[at] = std::move(pending[i].first);
+                         v.replace(at, std::move(pending[i].first));
                          owners.set(at, pending[i].second);
                      }
                  }
@@ -224,20 +257,37 @@ void init_lattice(py::module& me)
 
         .def("__delitem__",
              [](py::object self, py::slice const & slice) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  size_t start = 0, stop = 0, step = 0, length = 0;
                  if (!slice.compute(v.size(), &start, &stop, &step, &length)) {
                      throw py::error_already_set();
                  }
+                 // Mark what goes, then keep the rest in one pass. Removing positions one
+                 // at a time moves the tail of both the lattice and the owner list on every
+                 // removal, which is quadratic in the length of the lattice; a slice over a
+                 // long beamline is exactly where that bites. `step` is unsigned, so a
+                 // negative step counts down through wraparound -- marking sidesteps the
+                 // question of which position is the largest.
+                 std::vector<bool> dropped(v.size(), false);
+                 for (size_t i = 0; i < length; ++i)
+                 {
+                     dropped[start + i * step] = true;
+                 }
+
                  Owners owners(self, v);
 
-                 // back to front, so earlier positions stay valid as we remove
-                 for (size_t i = length; i-- > 0; )
+                 Lattice::storage_type kept;
+                 kept.reserve(v.size() - length);
+                 py::list kept_owners;
+                 for (Lattice::size_type i = 0; i < v.size(); ++i)
                  {
-                     auto const at = start + i * step;
-                     v.erase(at);
-                     owners.erase(at);
+                     if (dropped[i]) { continue; }
+                     kept.push_back(v[i]);
+                     kept_owners.append(owners.owner_at(i));
                  }
+
+                 v.assign(std::move(kept));
+                 owners.assign(kept_owners);
              },
              py::arg("slice"),
              "Remove the selected elements."
@@ -245,7 +295,7 @@ void init_lattice(py::module& me)
 
         .def("__delitem__",
              [checked_index](py::object self, py::ssize_t index) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  auto const i = checked_index(v, index);
                  Owners owners(self, v);
                  v.erase(i);
@@ -258,7 +308,7 @@ void init_lattice(py::module& me)
 
         .def("insert",
              [](py::object self, py::ssize_t index, py::object el) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  auto handle = handle_from_python(el);
 
                  // Python list semantics: an out-of-range index clamps rather than raises
@@ -279,7 +329,7 @@ void init_lattice(py::module& me)
         // lattice, the object the caller means is the one they hold.
         .def("index",
              [](py::object self, py::object el) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  Owners owners(self, v);
                  for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
                  {
@@ -293,7 +343,7 @@ void init_lattice(py::module& me)
 
         .def("count",
              [](py::object self, py::object el) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  Owners owners(self, v);
                  KnownElementsList::size_type n = 0;
                  for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
@@ -308,7 +358,7 @@ void init_lattice(py::module& me)
 
         .def("__contains__",
              [](py::object self, py::object el) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  Owners owners(self, v);
                  for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
                  {
@@ -321,7 +371,7 @@ void init_lattice(py::module& me)
 
         .def("remove",
              [](py::object self, py::object el) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  Owners owners(self, v);
                  for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
                  {
@@ -340,7 +390,7 @@ void init_lattice(py::module& me)
 
         .def("__reversed__",
              [](py::object self) {
-                 auto & v = self.cast<KnownElementsList &>();
+                 auto & v = lattice_of(self);
                  Owners owners(self, v);
                  py::list out;
                  for (KnownElementsList::size_type i = v.size(); i-- > 0; ) { out.append(owners.get(i)); }
@@ -356,12 +406,13 @@ void init_lattice(py::module& me)
             // not modified when the internal traversal advances the
             // reference.
             [](
-                KnownElementsList const & v,
+                py::object self,
                 RefPart ref,
                 std::string order,
                 bool fallback_identity_map
             )
             {
+                auto const & v = lattice_of(self);
                 if (order != "linear") {
                     throw std::runtime_error(
                         "Only the calculation of linear transfer maps is "
@@ -393,8 +444,9 @@ void init_lattice(py::module& me)
 
         .def(
             "map_trace",
-            [](KnownElementsList const & v, RefPart ref)  // intentional copy of ref
+            [](py::object self, RefPart ref)  // intentional copy of ref
             {
+                auto const & v = lattice_of(self);
                 auto const trace = ix_diag::map_trace(v, ref);
 
                 py::list out;
@@ -450,6 +502,10 @@ void init_lattice(py::module& me)
         py::arg("list"),
         py::arg("ds"),
         py::arg("element"),
-        "Insert an element every s into an element list"
+        "Insert an element every s into an element list.\n\n"
+        "Returns a new lattice. Elements that are not split are the same objects as\n"
+        "in the lattice given; an element that a split falls inside is replaced by two\n"
+        "new elements covering its halves, which carry its parameters but not a Python\n"
+        "subclass or attributes."
     );
 }

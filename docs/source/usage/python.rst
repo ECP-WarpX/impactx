@@ -2775,6 +2775,11 @@ Each lattice element provides a ``.to_dict()`` method, which can be used to seri
 
    Splits up every element that is on s = N * ds for N>0.
 
+   Returns a new lattice. Elements that are not split are the same objects as in the
+   lattice given, so changing one afterwards changes both lattices. An element that a
+   split falls inside is replaced by two new elements covering its halves: these carry
+   its parameters, but a Python subclass and any attributes on it do not carry over.
+
    :param list: element lattice list
    :param ds: spacing in meters along s to add an element
    :param element: the extra element to add every s

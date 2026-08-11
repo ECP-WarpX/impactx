@@ -327,15 +327,7 @@ namespace impactx::elements
           : PolygonApertureCore(min_radius2, repeat_x, repeat_y, shift_odd_x, action, dx, dy, rotation_degree),
             m_vertices_data(std::move(vertices_x), std::move(vertices_y), "PolygonAperture: horizontal and vertical vertices")
         {
-            auto const vx = m_vertices_data.first_host();
-            auto const vy = m_vertices_data.second_host();
-
-            if (vx.empty()) {
-                throw std::invalid_argument("PolygonAperture: at least one vertex is required!");
-            }
-            if ((vx.front() != vx.back()) || (vy.front() != vy.back())) {
-                throw std::invalid_argument("PolygonAperture: first and last vertex must be exactly equal!");
-            }
+            require_closed_outline(m_vertices_data.first_host(), m_vertices_data.second_host());
         }
 
         /** Push all particles */
@@ -386,15 +378,33 @@ namespace impactx::elements
             std::vector<amrex::ParticleReal> second
         )
         {
-            if (first.empty())
-            {
+            require_closed_outline(first, second);
+            m_vertices_data.commit(std::move(first), std::move(second), "PolygonAperture: horizontal and vertical vertices");
+        }
+
+        /** Reject vertices that do not describe a closed outline
+         *
+         * Checked before anything is read positionally, so a mismatched or empty pair is
+         * reported rather than indexed into.
+         *
+         * @param vx the horizontal values
+         * @param vy the vertical values
+         */
+        template<typename T_Values>
+        static void require_closed_outline (T_Values const & vx, T_Values const & vy)
+        {
+            if (vx.size() != vy.size()) {
+                throw std::invalid_argument(
+                    "PolygonAperture: horizontal and vertical vertices must have the same "
+                    "length, got " + std::to_string(vx.size()) + " and " +
+                    std::to_string(vy.size()) + "!");
+            }
+            if (vx.empty()) {
                 throw std::invalid_argument("PolygonAperture: at least one vertex is required!");
             }
-            if ((first.front() != first.back()) || (second.front() != second.back()))
-            {
+            if ((vx.front() != vx.back()) || (vy.front() != vy.back())) {
                 throw std::invalid_argument("PolygonAperture: first and last vertex must be exactly equal!");
             }
-            m_vertices_data.commit(std::move(first), std::move(second), "PolygonAperture: horizontal and vertical vertices");
         }
 
         /** Release device storage; host configuration survives for reuse */
