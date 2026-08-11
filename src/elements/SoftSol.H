@@ -722,6 +722,22 @@ namespace impactx::elements
             return m_coefficients_data.second_host();
         }
 
+        /** Replace both arrays at once
+         *
+         * The two are validated together and committed as one step, so a rejected update
+         * leaves the element as it was. They are always the same length, which is why
+         * this takes both rather than offering to change one of them alone.
+         *
+         * @param first the new cosine values
+         * @param second the new sine values
+         */
+        void set_coefficients (
+            std::vector<amrex::ParticleReal> first,
+            std::vector<amrex::ParticleReal> second
+        )
+        {            m_coefficients_data.commit(std::move(first), std::move(second), "SoftSolenoid: cos and sin coefficient");
+        }
+
         /** Release device storage; host configuration survives for reuse */
         void finalize ()
         {

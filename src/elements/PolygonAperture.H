@@ -372,6 +372,31 @@ namespace impactx::elements
             return m_vertices_data.second_host();
         }
 
+        /** Replace both arrays at once
+         *
+         * The two are validated together and committed as one step, so a rejected update
+         * leaves the element as it was. They are always the same length, which is why
+         * this takes both rather than offering to change one of them alone.
+         *
+         * @param first the new horizontal values
+         * @param second the new vertical values
+         */
+        void set_vertices (
+            std::vector<amrex::ParticleReal> first,
+            std::vector<amrex::ParticleReal> second
+        )
+        {
+            if (first.empty())
+            {
+                throw std::invalid_argument("PolygonAperture: at least one vertex is required!");
+            }
+            if ((first.front() != first.back()) || (second.front() != second.back()))
+            {
+                throw std::invalid_argument("PolygonAperture: first and last vertex must be exactly equal!");
+            }
+            m_vertices_data.commit(std::move(first), std::move(second), "PolygonAperture: horizontal and vertical vertices");
+        }
+
         /** Release device storage; host configuration survives for reuse */
         void finalize ()
         {

@@ -127,7 +127,7 @@ namespace impactx
         // collective effect kicks applied per element slice:
         // space charge, coherent and incoherent synchrotron radiation, etc.
         auto collective_kicks = [this, &pc] (
-            elements::KnownElements & element_variant,
+            elements::ElementHandle & element_variant,
             amrex::ParticleReal slice_ds
         )
         {
@@ -146,7 +146,7 @@ namespace impactx
         //   per half-map, so it carries no book-keeping: that lives in @see
         //   slice_diagnostics below.
         auto element_push = [&pc] (
-            elements::KnownElements & element_variant,
+            elements::ElementHandle & element_variant,
             int step_,
             int period_
         )

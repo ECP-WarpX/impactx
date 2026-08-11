@@ -153,7 +153,7 @@ namespace impactx
         // the collective effect kick ``K`` of one element slice
         auto collective_kicks = [&ref, &cm, &intensity, space_charge] (
             //! (unused) the kick does not depend on the element
-            [[maybe_unused]] elements::KnownElements & element_variant,
+            [[maybe_unused]] elements::ElementHandle & element_variant,
             amrex::ParticleReal kick_ds
         )
         {
@@ -173,12 +173,12 @@ namespace impactx
         //   per half-map, so it carries no book-keeping: that lives in @see
         //   slice_diagnostics below.
         auto element_push = [&ref, &cm] (
-            elements::KnownElements & element_variant,
+            elements::ElementHandle & element_variant,
             [[maybe_unused]] int step_,   //! (unused) the envelope has no per-step element output
             [[maybe_unused]] int period_  //! (unused) the envelope has no per-period element output
         )
         {
-            std::visit([&ref, &cm](auto&& element)
+            elements::visit([&ref, &cm](auto&& element)
             {
                 // unwrap the host-only metadata: reference tracking and the
                 // transfer map are physics, not book-keeping

@@ -31,7 +31,7 @@ namespace impactx
         // beam and, by default, also the reference particle during tracking?
         bool source_loads_beam = false;
         bool source_loads_ref = false;
-        if (auto const * source = std::get_if<elements::Source>(&m_lattice.front())) {
+        if (auto const * source = elements::get_if<elements::Source>(m_lattice.front())) {
             source_loads_beam = true;
             source_loads_ref = source->m_load_ref_particle;
         }

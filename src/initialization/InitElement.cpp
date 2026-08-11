@@ -134,7 +134,7 @@ namespace detail
      * @param[in] nslice_default
      */
     void read_element (std::string const & element_name,
-                       std::list<elements::KnownElements> & m_lattice,
+                       Lattice & m_lattice,
                        int nslice_default)
     {
         using namespace amrex::literals; // for _prt

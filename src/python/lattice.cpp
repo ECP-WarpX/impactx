@@ -4,6 +4,8 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "pyImpactX.H"
+#include "Lattice.H"
+#include "LatticeOwners.H"
 
 #include <diagnostics/LinearMap.H>
 #include <elements/All.H>
@@ -12,6 +14,7 @@
 #include <particles/CovarianceMatrix.H>
 #include <particles/ReferenceParticle.H>
 
+#include <algorithm>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -26,73 +29,327 @@ void init_lattice(py::module& me)
     using elements::KnownElements;
     namespace ix_diag = ::impactx::diagnostics;
 
-    // all-element type list
-    //
-    // Ref semantics (Python vs this binding): a Python list keeps references to mutable
-    // objects, but here each append/extend materializes a C++ KnownElements value in this
-    // list (copy or move). The original Python handle is a separate object unless we
-    // intentionally bind shared ownership (e.g. std::shared_ptr element types later).
-    //
-    // TODO: register GPU-heavy element types with py::class_<T, std::shared_ptr<T>> and
-    //       store std::shared_ptr in KnownElements (or a thin wrapper) so append/extend
-    //       match Python mutable-object reference semantics.
-    // TODO: optional weak_ptr to a SimulationLifetime/session object on elements for
-    //       clear errors on use after sim.finalize() (coordinate with pyAMReX session work).
-    //       The shared token should be created with ImpactX construction (not init_grids),
-    //       and expose readiness (amrex_ready) so pre-init objects can exist but reject
-    //       GPU use until sim.init_grids() makes AMReX ready.
-    using KnownElementsList = std::list<KnownElements>;
-    py::class_<KnownElementsList> kel(me, "KnownElementsList");
+    // Elements are shared, not copied: appending keeps the object the caller passed in,
+    // exactly as appending to a Python list does. Two positions holding the same object
+    // are two occurrences of one element. Independent elements come from constructing one
+    // per position, or from an explicit copy.
+    using KnownElementsList = Lattice;
+    using impactx::python::Owners;
+    using impactx::python::handle_from_python;
+
+    // dynamic_attr: the lattice keeps the Python wrapper of each element alive in its
+    // instance dictionary, where the cyclic garbage collector can see it.
+    py::class_<KnownElementsList, py::smart_holder> kel(me, "KnownElementsList", py::dynamic_attr());
+
+    /** Normalize and bounds-check a Python index, allowing negative indexing */
+    auto const checked_index = [](KnownElementsList const & v, py::ssize_t index) -> KnownElementsList::size_type {
+        py::ssize_t const n = static_cast<py::ssize_t>(v.size());
+        if (index < 0) { index += n; }
+        if (index < 0 || index >= n) { throw py::index_error("Index out of range"); }
+        return static_cast<KnownElementsList::size_type>(index);
+    };
+
     kel
         .def(py::init<>())
-        .def(py::init<KnownElements>())
-        .def(py::init([](py::list const & l){
-            KnownElementsList v;
-            for (auto const & handle : l)
-                v.push_back(handle.cast<KnownElements>());
-            return v;  // return by value
-        }))
 
-        .def("append", [](KnownElementsList &v, KnownElements el) { v.emplace_back(std::move(el)); },
-             "Add a single element to the list.")
-
-        .def("extend",
-             [](KnownElementsList &v, KnownElementsList const & l) {
-                 for (auto const & el : l)
-                     v.push_back(el);
-                 return v;
+        .def("append",
+             [](py::object self, py::object el) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 auto handle = handle_from_python(el);
+                 Owners owners(self, v);
+                 v.push_back(std::move(handle));
+                 owners.append(el);
              },
-             "Add a list of elements to the list.")
+             py::arg("element"),
+             "Add a single element to the lattice.\n\n"
+             "The element is shared, not copied: later changes to it are visible here, and\n"
+             "appending the same element twice creates two occurrences of one element."
+        )
+
         .def("extend",
-             [](KnownElementsList &v, py::list const & l) {
-                 for (auto const & handle : l)
+             [](py::object self, py::iterable const & l) {
+                 auto & v = self.cast<KnownElementsList &>();
+
+                 // convert everything first, so a bad entry leaves the lattice unchanged
+                 std::vector<std::pair<elements::ElementHandle, py::object>> pending;
+                 for (auto const & item : l)
                  {
-                     auto el = handle.cast<KnownElements>();
-                     v.push_back(el);
+                     py::object el = py::reinterpret_borrow<py::object>(item);
+                     pending.emplace_back(handle_from_python(el), el);
                  }
-                 return v;
+
+                 Owners owners(self, v);
+                 for (auto & [handle, el] : pending)
+                 {
+                     v.push_back(std::move(handle));
+                     owners.append(el);
+                 }
+                 return self;
              },
-             "Add a list of elements to the list."
+             py::arg("elements"),
+             "Add several elements to the lattice."
         )
 
         .def("size", &KnownElementsList::size)
-        .def("clear", &KnownElementsList::clear,
-             "Clear the list to become empty.")
         .def("is_empty", &KnownElementsList::empty)
-        .def("pop_back", &KnownElementsList::pop_back,
-             "Return and remove the last element of the list.")
         .def("__len__", [](const KnownElementsList &v) { return v.size(); },
              "The length of the list.")
-        .def("__iter__", [](KnownElementsList &v) {
-            return py::make_iterator(v.begin(), v.end());
-        }, py::keep_alive<0, 1>())  // Keep list alive while iterator is used
-        .def("__getitem__", [](KnownElementsList &v, size_t index) -> elements::KnownElements& {
-            if (index >= v.size()) {
-                throw std::out_of_range("Index out of range");
-            }
-            auto it = std::next(v.begin(), index);
-            return *it;  // return by reference
-        }, py::return_value_policy::reference_internal)
+
+        .def("clear",
+             [](py::object self) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 Owners owners(self, v);
+                 v.clear();
+                 owners.clear();
+             },
+             "Remove all elements from the lattice."
+        )
+
+        .def("pop_back",
+             [](py::object self) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 if (v.empty()) { throw py::index_error("pop from empty lattice"); }
+                 Owners owners(self, v);
+                 py::object const last = owners.get(v.size() - 1);
+                 v.pop_back();
+                 owners.erase(v.size());
+                 return last;
+             },
+             "Remove and return the last element of the lattice."
+        )
+
+        .def("__iter__",
+             [](py::object self) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 Owners owners(self, v);
+                 // materialize the exact wrappers, so iteration yields the objects that
+                 // were put in rather than fresh views of them
+                 py::list out;
+                 for (KnownElementsList::size_type i = 0; i < v.size(); ++i) { out.append(owners.get(i)); }
+                 return out.attr("__iter__")();
+             },
+             "Iterate over the elements of the lattice."
+        )
+
+        .def("__getitem__",
+             [checked_index](py::object self, py::ssize_t index) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 auto const i = checked_index(v, index);
+                 Owners owners(self, v);
+                 return owners.get(i);
+             },
+             py::arg("index"),
+             "Return the element at a position. This is the element itself, not a copy."
+        )
+
+        .def("__setitem__",
+             [checked_index](py::object self, py::ssize_t index, py::object el) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 auto const i = checked_index(v, index);
+                 auto handle = handle_from_python(el);
+                 Owners owners(self, v);
+                 v[i] = std::move(handle);
+                 owners.set(i, el);
+             },
+             py::arg("index"), py::arg("element"),
+             "Replace the element at a position."
+        )
+
+        .def("__getitem__",
+             [](py::object self, py::slice const & slice) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 size_t start = 0, stop = 0, step = 0, length = 0;
+                 if (!slice.compute(v.size(), &start, &stop, &step, &length)) {
+                     throw py::error_already_set();
+                 }
+                 Owners owners(self, v);
+
+                 // a slice is a new lattice over the same elements, like a Python list slice
+                 py::object out = py::type::of(self)();
+                 py::list picked;
+                 for (size_t i = 0; i < length; ++i) { picked.append(owners.get(start + i * step)); }
+                 out.attr("extend")(picked);
+                 return out;
+             },
+             py::arg("slice"),
+             "Return a new lattice over the selected elements. The elements are shared."
+        )
+
+        .def("__setitem__",
+             [](py::object self, py::slice const & slice, py::iterable const & value) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 size_t start = 0, stop = 0, step = 0, length = 0;
+                 if (!slice.compute(v.size(), &start, &stop, &step, &length)) {
+                     throw py::error_already_set();
+                 }
+
+                 // convert first: a bad entry must leave the lattice untouched
+                 std::vector<std::pair<elements::ElementHandle, py::object>> pending;
+                 for (auto const & item : value)
+                 {
+                     py::object el = py::reinterpret_borrow<py::object>(item);
+                     pending.emplace_back(handle_from_python(el), el);
+                 }
+
+                 if (step != 1 && pending.size() != length)
+                 {
+                     throw py::value_error(
+                         "attempt to assign sequence of size " + std::to_string(pending.size()) +
+                         " to extended slice of size " + std::to_string(length));
+                 }
+
+                 Owners owners(self, v);
+                 if (step == 1)
+                 {
+                     // a contiguous slice may change the length
+                     for (size_t i = 0; i < length; ++i) { v.erase(start); owners.erase(start); }
+                     for (size_t i = 0; i < pending.size(); ++i)
+                     {
+                         v.insert(start + i, std::move(pending[i].first));
+                         owners.insert(start + i, pending[i].second);
+                     }
+                 }
+                 else
+                 {
+                     for (size_t i = 0; i < length; ++i)
+                     {
+                         auto const at = start + i * step;
+                         v[at] = std::move(pending[i].first);
+                         owners.set(at, pending[i].second);
+                     }
+                 }
+             },
+             py::arg("slice"), py::arg("elements"),
+             "Replace the selected elements."
+        )
+
+        .def("__delitem__",
+             [](py::object self, py::slice const & slice) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 size_t start = 0, stop = 0, step = 0, length = 0;
+                 if (!slice.compute(v.size(), &start, &stop, &step, &length)) {
+                     throw py::error_already_set();
+                 }
+                 Owners owners(self, v);
+
+                 // back to front, so earlier positions stay valid as we remove
+                 for (size_t i = length; i-- > 0; )
+                 {
+                     auto const at = start + i * step;
+                     v.erase(at);
+                     owners.erase(at);
+                 }
+             },
+             py::arg("slice"),
+             "Remove the selected elements."
+        )
+
+        .def("__delitem__",
+             [checked_index](py::object self, py::ssize_t index) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 auto const i = checked_index(v, index);
+                 Owners owners(self, v);
+                 v.erase(i);
+                 owners.erase(i);
+             },
+             py::arg("index"),
+             "Remove the element at a position.\n\n"
+             "If the same element occupies other positions, those are untouched: this\n"
+             "removes one occurrence, not the element."
+        )
+
+        .def("insert",
+             [](py::object self, py::ssize_t index, py::object el) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 auto handle = handle_from_python(el);
+
+                 // Python list semantics: an out-of-range index clamps rather than raises
+                 py::ssize_t const n = static_cast<py::ssize_t>(v.size());
+                 if (index < 0) { index += n; }
+                 index = std::clamp<py::ssize_t>(index, 0, n);
+
+                 Owners owners(self, v);
+                 v.insert(static_cast<KnownElementsList::size_type>(index), std::move(handle));
+                 owners.insert(static_cast<KnownElementsList::size_type>(index), el);
+             },
+             py::arg("index"), py::arg("element"),
+             "Insert an element before a position."
+        )
+
+        // Identity first, then equality. Elements compare by value, so two distinct
+        // elements with the same parameters are equal; for locating an occurrence in a
+        // lattice, the object the caller means is the one they hold.
+        .def("index",
+             [](py::object self, py::object el) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 Owners owners(self, v);
+                 for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
+                 {
+                     if (owners.get(i).is(el)) { return i; }
+                 }
+                 throw py::value_error("element is not in the lattice");
+             },
+             py::arg("element"),
+             "Return the first position holding this element."
+        )
+
+        .def("count",
+             [](py::object self, py::object el) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 Owners owners(self, v);
+                 KnownElementsList::size_type n = 0;
+                 for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
+                 {
+                     if (owners.get(i).is(el)) { ++n; }
+                 }
+                 return n;
+             },
+             py::arg("element"),
+             "Return how many positions this element occupies."
+        )
+
+        .def("__contains__",
+             [](py::object self, py::object el) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 Owners owners(self, v);
+                 for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
+                 {
+                     if (owners.get(i).is(el)) { return true; }
+                 }
+                 return false;
+             },
+             py::arg("element")
+        )
+
+        .def("remove",
+             [](py::object self, py::object el) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 Owners owners(self, v);
+                 for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
+                 {
+                     if (owners.get(i).is(el))
+                     {
+                         v.erase(i);
+                         owners.erase(i);
+                         return;
+                     }
+                 }
+                 throw py::value_error("element is not in the lattice");
+             },
+             py::arg("element"),
+             "Remove the first occurrence of this element."
+        )
+
+        .def("__reversed__",
+             [](py::object self) {
+                 auto & v = self.cast<KnownElementsList &>();
+                 Owners owners(self, v);
+                 py::list out;
+                 for (KnownElementsList::size_type i = v.size(); i-- > 0; ) { out.append(owners.get(i)); }
+                 return out.attr("__iter__")();
+             },
+             "Iterate over the elements from the end."
+        )
 
         .def(
             "transfer_map",

@@ -11,6 +11,7 @@
 #define IMPACT_X_H
 
 #include "elements/All.H"
+#include "Lattice.H"
 #include "initialization/AmrCoreData.H"
 #include "particles/distribution/All.H"
 #include "tracking/TrackingState.H"
@@ -18,7 +19,6 @@
 #include <AMReX_REAL.H>
 
 #include <functional>
-#include <list>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -142,19 +142,8 @@ namespace impactx
          */
         void ResizeMesh ();
 
-        /** Elements defining the accelerator lattice (stored by value).
-         *
-         * Python exposes this as sim.lattice; pybind append/extend copy C++ lattice elements
-         * into this list — not Python reference identity. See KnownElementsList in lattice.cpp.
-         *
-         * TODO: own std::shared_ptr<SimulationLifetime> here (create in ImpactX ctor, i.e.
-         *       before init_grids()) so elements created early from Python can safely hold
-         *       std::weak_ptr to it.
-         * TODO: track readiness on the token (e.g. amrex_ready=false until init_grids(),
-         *       then true) for clear host-vs-GPU usage errors.
-         * TODO: invalidate/reset token in finalize() for use-after-finalize checks.
-         */
-        std::list<elements::KnownElements> m_lattice;
+        /** The elements defining the accelerator lattice */
+        Lattice m_lattice;
 
         /** Was init_grids already called?
          *

@@ -745,7 +745,23 @@ void init_ImpactX (py::module& m)
             "Deposit charge in x,y,z."
         )
 
-        .def("finalize", &ImpactX::finalize,
+        .def("finalize",
+             [](py::object self) {
+                 self.cast<ImpactX &>().finalize();
+
+                 // finalize() empties the lattice on the C++ side. Release the Python
+                 // objects it was keeping alive as well, so an element that only the
+                 // lattice still referred to is destroyed here rather than lingering with
+                 // its diagnostics files still open.
+                 if (py::hasattr(self, "_lattice_view"))
+                 {
+                     py::object view = self.attr("_lattice_view");
+                     if (py::hasattr(view, "_element_owners"))
+                     {
+                         view.attr("_element_owners") = py::list();
+                     }
+                 }
+             },
              "Deallocate all contexts and data."
         )
         .def("init_grids", &ImpactX::init_grids,
@@ -891,8 +907,38 @@ void init_ImpactX (py::module& m)
             py::return_value_policy::reference_internal,
             "space charge force (vector: x,y,z) per level"
         )
-        .def_readwrite("lattice",
-            &ImpactX::m_lattice,
+        // A cached view, not a fresh wrapper per access. The lattice keeps the Python
+        // object of each element alive in its instance dictionary, so handing out a
+        // temporary here would drop those the moment it was collected, and an element
+        // would come back as a plain base-class wrapper without its attributes.
+        .def_property("lattice",
+            [](py::object self) {
+                if (!py::hasattr(self, "_lattice_view"))
+                {
+                    auto & ix = self.cast<ImpactX &>();
+
+                    // Deliberately not `reference_internal`: that is `keep_alive` under
+                    // the hood, and its lifetime edge lives in a pybind-internal list the
+                    // cyclic collector cannot see. Storing the view on the simulation
+                    // would then form a cycle that never collects, and the simulation --
+                    // with its mesh and its open diagnostics -- would leak.
+                    py::object view = py::cast(&ix.m_lattice, py::return_value_policy::reference);
+
+                    // The link back to the simulation is weak on purpose. A strong one
+                    // would make simulation and view a cycle, and a simulation would then
+                    // be destroyed by the collector at an arbitrary later point -- after
+                    // AMReX has been finalized, which fails while freeing its MPI
+                    // communicator. Weak keeps destruction deterministic.
+                    view.attr("_parent_sim") = py::module_::import("weakref").attr("ref")(self);
+                    self.attr("_lattice_view") = view;
+                }
+                return self.attr("_lattice_view");
+            },
+            [](py::object self, py::iterable const & elements) {
+                py::object view = self.attr("lattice");
+                view.attr("clear")();
+                view.attr("extend")(elements);
+            },
             "Access the accelerator element lattice."
         )
         .def_property("periods",

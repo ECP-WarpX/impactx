@@ -85,7 +85,7 @@ namespace impactx
 
         // the external-field transport map ``M`` of one element slice
         auto element_push = [&ref] (
-            elements::KnownElements & element_variant,
+            elements::ElementHandle & element_variant,
             //! (unused) the reference particle has no per-step or per-period element output
             [[maybe_unused]] int step_,
             [[maybe_unused]] int period_
@@ -135,7 +135,7 @@ namespace impactx
             false, // no collective effects
             false, // nothing to Strang-split
             [this](std::string const & name) { call_hook(name); },
-            [](elements::KnownElements &, amrex::ParticleReal) {}, // never called
+            [](elements::ElementHandle &, amrex::ParticleReal) {}, // never called
             element_push,
             slice_diagnostics
         );

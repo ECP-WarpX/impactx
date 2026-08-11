@@ -19,13 +19,13 @@ namespace impactx
 {
     void push (
         ImpactXParticleContainer & pc,
-        elements::KnownElements & element_variant,
+        elements::ElementHandle & element_variant,
         int step,
         int period
     )
     {
         // here we just access the element by its respective type
-        std::visit([&pc, step, period](auto&& element)
+        elements::visit([&pc, step, period](auto&& element)
         {
             BL_PROFILE("impactx::push");
 
@@ -37,11 +37,11 @@ namespace impactx
 
     void push (
         RefPart & ref,
-        elements::KnownElements & element_variant
+        elements::ElementHandle & element_variant
     )
     {
         // here we just access the element by its respective type
-        std::visit([&ref](auto&& element)
+        elements::visit([&ref](auto&& element)
         {
             // push reference particle in global coordinates
             BL_PROFILE("impactx::push::RefPart");

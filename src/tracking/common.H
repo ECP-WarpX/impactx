@@ -11,6 +11,7 @@
 #define IMPACTX_TRACKING_COMMON_H
 
 #include "elements/All.H"
+#include "Lattice.H"
 #include "elements/mixin/accessors.H"
 #include "particles/ReferenceParticle.H"
 #include "tracking/TrackingDirection.H"
@@ -85,10 +86,10 @@ namespace impactx
      *
      *  @tparam HookFn callable ``void (std::string const & name)`` invoking a named hook
      *  @tparam CollectiveKicks callable
-     *    ``void (elements::KnownElements & element, amrex::ParticleReal slice_ds)``
+     *    ``void (elements::ElementHandle & element, amrex::ParticleReal slice_ds)``
      *    applying the collective-effect kick over the length @p slice_ds
      *  @tparam ElementPush callable
-     *    ``void (elements::KnownElements & element, int step, int period)``
+     *    ``void (elements::ElementHandle & element, int step, int period)``
      *    applying one slice of the element's external-field transport map (no book-keeping)
      *  @tparam SliceDiagnostics callable ``void (int step, int period)`` running the
      *    once-per-slice book-keeping (boundary conditions, lost particles, slice diagnostics)
@@ -109,7 +110,7 @@ namespace impactx
         typename ElementPush, typename SliceDiagnostics
     >
     void track_lattice (
-        std::list<elements::KnownElements> & lattice,
+        Lattice & lattice,
         RefPart & ref,
         TrackingState & tracking_state,
         bool collective_effects,
@@ -140,7 +141,7 @@ namespace impactx
 
         // visit one element for all of its space-charge slices
         auto visit_element = [&] (
-            elements::KnownElements & element_variant,
+            elements::ElementHandle & element_variant,
             int period
         )
         {
@@ -151,7 +152,7 @@ namespace impactx
             if (forward)
             {
                 // book-keeping: currently visited element reference
-                tracking_state.m_element = &element_variant;
+                tracking_state.m_element = element_variant;
 
                 // optional, user-defined function call
                 call_hook("before_element");
@@ -260,7 +261,7 @@ namespace impactx
             if (forward)
             {
                 // book-keeping update
-                tracking_state.m_element = &lattice.front();
+                tracking_state.m_element = lattice.front();
 
                 // optional, user-defined function call
                 call_hook("before_period");

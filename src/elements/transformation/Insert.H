@@ -11,6 +11,7 @@
 #define IMPACTX_TRANSFORM_LATTICE_INSERT_H
 
 #include "elements/All.H"
+#include "Lattice.H"
 
 #include <AMReX_REAL.H>
 
@@ -28,9 +29,9 @@ namespace impactx::elements::transformation
      * @param[in] element the extra element to add every s
      * @return modified list with inserted elements
      */
-    std::list<elements::KnownElements>
+    Lattice
     insert_element_every_ds (
-        std::list<elements::KnownElements> list,
+        Lattice const & lattice,
         amrex::ParticleReal ds,
         elements::KnownElements element
     );

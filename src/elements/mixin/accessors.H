@@ -12,7 +12,7 @@
 
 #include "traits.H"
 
-#include "elements/All.H"
+#include "elements/Handle.H"
 
 #include <AMReX_REAL.H>
 
@@ -51,10 +51,11 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return value in meters, zero for zero-length elements
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline amrex::ParticleReal
-    ds (KnownElements const & element_variant)
+    ds (T_Element const & element_variant)
     {
-        return std::visit([](auto const & element) { return element.ds(); }, element_variant);
+        return elements::visit([](auto const & element) { return element.ds(); }, element_variant);
     }
 
     /** Set the segment length of an element
@@ -62,10 +63,11 @@ namespace impactx::elements
      * @param[in,out] element_variant the element to modify
      * @param ds segment length in meters
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline void
-    ds (KnownElements & element_variant, amrex::ParticleReal ds)
+    ds (T_Element & element_variant, amrex::ParticleReal ds)
     {
-        std::visit([ds](auto & element) {
+        elements::visit([ds](auto & element) {
             if constexpr (mixin::has_settable_ds_v<decltype(element)>) {
                 element.m_ds = ds;
             } else {
@@ -80,10 +82,11 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return positive integer, one for elements that cannot be sliced
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline int
-    nslice (KnownElements const & element_variant)
+    nslice (T_Element const & element_variant)
     {
-        return std::visit([](auto const & element) { return element.nslice(); }, element_variant);
+        return elements::visit([](auto const & element) { return element.nslice(); }, element_variant);
     }
 
     /** Set the number of slices used for the application of collective effects
@@ -94,10 +97,11 @@ namespace impactx::elements
      * @param[in,out] element_variant the element to modify
      * @param nslice number of slices, a positive integer
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline void
-    nslice (KnownElements & element_variant, int nslice)
+    nslice (T_Element & element_variant, int nslice)
     {
-        std::visit([nslice](auto & element) {
+        elements::visit([nslice](auto & element) {
             if constexpr (mixin::has_settable_nslice_v<decltype(element)>) {
                 if (nslice <= 0) {
                     throw std::invalid_argument(
@@ -116,10 +120,11 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return ``ds/nslice`` in meters, zero for zero-length elements
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline amrex::ParticleReal
-    slice_ds (KnownElements const & element_variant)
+    slice_ds (T_Element const & element_variant)
     {
-        return std::visit([](auto const & element) {
+        return elements::visit([](auto const & element) {
             return element.ds() / element.nslice();
         }, element_variant);
     }
@@ -129,10 +134,11 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return the element name, or an empty string if it has none
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline std::string
-    name (KnownElements const & element_variant)
+    name (T_Element const & element_variant)
     {
-        return std::visit([](auto const & element) {
+        return elements::visit([](auto const & element) {
             return element.has_name() ? element.name() : std::string{};
         }, element_variant);
     }
@@ -142,10 +148,11 @@ namespace impactx::elements
      * @param[in,out] element_variant the element to modify
      * @param name the new element name
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline void
-    name (KnownElements & element_variant, std::string const & name)
+    name (T_Element & element_variant, std::string const & name)
     {
-        std::visit([&name](auto & element) {
+        elements::visit([&name](auto & element) {
             if constexpr (mixin::is_named_v<decltype(element)>) {
                 element.set_name(name);
             } else {
@@ -160,10 +167,11 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return true if the element has a name
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline bool
-    has_name (KnownElements const & element_variant)
+    has_name (T_Element const & element_variant)
     {
-        return std::visit([](auto const & element) { return element.has_name(); }, element_variant);
+        return elements::visit([](auto const & element) { return element.has_name(); }, element_variant);
     }
 
     /** Return the element type, e.g. "quad"
@@ -171,10 +179,11 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return the element's static type name
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline std::string
-    type (KnownElements const & element_variant)
+    type (T_Element const & element_variant)
     {
-        return std::visit([](auto const & element) {
+        return elements::visit([](auto const & element) {
             return std::string(std::decay_t<decltype(element)>::type);
         }, element_variant);
     }
@@ -184,10 +193,11 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return true for finite-length elements
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline bool
-    is_thick (KnownElements const & element_variant)
+    is_thick (T_Element const & element_variant)
     {
-        return std::visit([](auto const & element) {
+        return elements::visit([](auto const & element) {
             return mixin::is_thick_v<decltype(element)>;
         }, element_variant);
     }
@@ -197,10 +207,11 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return true for zero-length elements
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline bool
-    is_thin (KnownElements const & element_variant)
+    is_thin (T_Element const & element_variant)
     {
-        return std::visit([](auto const & element) {
+        return elements::visit([](auto const & element) {
             return mixin::is_thin_v<decltype(element)>;
         }, element_variant);
     }
@@ -215,10 +226,11 @@ namespace impactx::elements
      * @param element_variant the element to query
      * @return true if the element can be subdivided, @see ScopedNslice
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline bool
-    can_slice (KnownElements const & element_variant)
+    can_slice (T_Element const & element_variant)
     {
-        return std::visit([](auto const & element) {
+        return elements::visit([](auto const & element) {
             return mixin::can_slice_v<decltype(element)>;
         }, element_variant);
     }
@@ -230,20 +242,22 @@ namespace impactx::elements
      *
      * @param[in,out] element_variant the element to reverse
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline void
-    reverse (KnownElements & element_variant)
+    reverse (T_Element & element_variant)
     {
-        std::visit([](auto & element) { element.reverse(); }, element_variant);
+        elements::visit([](auto & element) { element.reverse(); }, element_variant);
     }
 
     /** Close and deallocate all data and handles of an element
      *
      * @param[in,out] element_variant the element to finalize
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     inline void
-    finalize (KnownElements & element_variant)
+    finalize (T_Element & element_variant)
     {
-        std::visit([](auto & element) { element.finalize(); }, element_variant);
+        elements::visit([](auto & element) { element.finalize(); }, element_variant);
     }
 
     /** Temporarily override an element's slice count, restoring it on scope exit
@@ -255,6 +269,7 @@ namespace impactx::elements
      *
      * The element must be sliceable, @see can_slice.
      */
+    template<typename T_Element, std::enable_if_t<is_element_repr_v<T_Element>, int> = 0>
     class ScopedNslice
     {
     public:
@@ -263,7 +278,7 @@ namespace impactx::elements
          * @param[in,out] element_variant the element to subdivide
          * @param nslice the temporary number of slices, a positive integer
          */
-        ScopedNslice (KnownElements & element_variant, int nslice)
+        ScopedNslice (T_Element & element_variant, int nslice)
         : m_element_variant(element_variant),
           m_nslice_original(elements::nslice(element_variant))
         {
@@ -285,7 +300,7 @@ namespace impactx::elements
         ScopedNslice & operator= (ScopedNslice &&) = delete;
 
     private:
-        KnownElements & m_element_variant; //! the subdivided element
+        T_Element & m_element_variant; //! the subdivided element
         int m_nslice_original; //! slice count to restore on scope exit
     };
 
