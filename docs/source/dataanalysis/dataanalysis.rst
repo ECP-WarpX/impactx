@@ -61,6 +61,35 @@ Example to print the integrated orbit path length ``s`` at each beam monitor pos
        print(f"step {k_i:>3}: s_ref={s_ref}")
 
 
+.. _dataanalysis-lost-particles:
+
+Lost Particles
+--------------
+
+Particles that are removed from the beam, e.g., because they hit an aperture, are collected and written to ``<diag.file_prefix>/openPMD/particles_lost.*`` at the end of the simulation.
+The file contains a single iteration ``0``, with the openPMD species ``beam`` holding the same phase space variables as the beam monitor output plus:
+
+* ``s_lost`` integrated orbit path length at which the particle was lost, in meters
+
+The species carries the same reference particle attributes as a :ref:`beam monitor <dataanalysis-monitor-refparticle>`.
+``mass_ref``, ``charge_ref`` and ``gyromagnetic_anomaly_ref`` are invariants of the reference particle and describe every lost particle.
+The remaining attributes are those of the reference particle at ``s_ref``, the end of tracking, while the individual particles were lost at their respective ``s_lost``.
+In a lattice that changes the reference energy, e.g., through RF cavities, ``beta_ref``, ``gamma_ref``, ``beta_gamma_ref`` and ``pt_ref`` at the position of loss can thus differ from the values in this file.
+
+.. code-block:: python
+
+   import openpmd_api as io
+
+   series = io.Series("diags/openPMD/particles_lost.h5", io.Access.read_only)
+
+   beam = series.iterations[0].particles["beam"]
+   print(f"mass_ref={beam.get_attribute('mass_ref')} kg")
+   print(f"charge_ref={beam.get_attribute('charge_ref')} C")
+
+   lost = beam.to_df()
+   print(lost[["position_x", "position_y", "s_lost"]])
+
+
 .. _dataanalysis-python-inmemory:
 
 In-Memory Python Access

@@ -91,6 +91,16 @@ namespace impactx
         RefPart const ref_part = source.GetRefParticle();
         auto const s_lost = ref_part.s;
 
+        // hand the reference particle over to the lost particle container:
+        //   the lost particles are stored relative to the reference particle and
+        //   are otherwise not interpretable, e.g., in openPMD output.
+        //   Mass, charge and the gyromagnetic anomaly are invariants of the
+        //   reference particle; the remaining attributes are those at the last
+        //   time this function was called, i.e., at the end of tracking.
+        //   The path length at which each individual particle was lost is stored
+        //   per particle in "s_lost".
+        dest.SetRefParticle(ref_part);
+
         // have to resize here, not in the constructor because grids have not
         // been built when constructor was called.
         dest.reserveData();

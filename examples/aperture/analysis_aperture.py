@@ -40,7 +40,8 @@ initial = series.iterations[1].particles["beam"].to_df()
 final = series.iterations[last_step].particles["beam"].to_df()
 
 series_lost = io.Series("diags/openPMD/particles_lost.h5", io.Access.read_only)
-particles_lost = series_lost.iterations[0].particles["beam"].to_df()
+beam_lost = series_lost.iterations[0].particles["beam"]
+particles_lost = beam_lost.to_df()
 
 # compare number of particles
 num_particles = 10000
@@ -108,3 +109,35 @@ assert np.greater_equal(dy.max(), 0.0)
 lost_at_s = particles_lost["s_lost"]
 drift_s = np.ones_like(lost_at_s) * 0.123
 assert np.allclose(lost_at_s, drift_s)
+
+# lost particles carry the reference particle of the beam they were lost from
+beam_final = series.iterations[last_step].particles["beam"]
+print()
+for attr in [
+    "mass_ref",
+    "charge_ref",
+    "gyromagnetic_anomaly_ref",
+    "beta_ref",
+    "gamma_ref",
+    "beta_gamma_ref",
+    "s_ref",
+    "pt_ref",
+]:
+    lost_value = beam_lost.get_attribute(attr)
+    final_value = beam_final.get_attribute(attr)
+    print(f"  {attr}: lost={lost_value} final={final_value}")
+    assert np.isclose(lost_value, final_value, rtol=1.0e-12, atol=0.0)
+
+# proton at 250 MeV kinetic energy
+assert np.isclose(beam_lost.get_attribute("mass_ref"), 1.67262192369e-27, rtol=1.0e-6)
+assert np.isclose(beam_lost.get_attribute("charge_ref"), 1.602176634e-19, rtol=1.0e-6)
+assert np.isclose(beam_lost.get_attribute("gamma_ref"), 1.2664472, rtol=1.0e-5)
+
+# the reduced beam characteristics of the lost beam are scaled with the
+# reference particle charge and momentum
+charge_lost = beam_lost.get_attribute("charge_C")
+charge_total = 1.0e-9
+print(f"  charge_C={charge_lost}")
+assert np.isclose(
+    charge_lost, charge_total * len(particles_lost) / num_particles, rtol=1.0e-6
+)

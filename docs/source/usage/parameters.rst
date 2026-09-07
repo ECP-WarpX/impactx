@@ -2911,7 +2911,7 @@ Diagnostics and output
     :default: ``default``
 
     Diagnostics for particles lost in apertures, stored as ``<diag.file_prefix>/openPMD/particles_lost.*`` at the end of the simulation.
-    See the ``beam_monitor`` element for backend values.
+    See the ``beam_monitor`` element for backend values and :ref:`Lost Particles <dataanalysis-lost-particles>` for the content of this file.
 
 .. pp:param:: diag.eigenemittances
     :type: ``boolean``
