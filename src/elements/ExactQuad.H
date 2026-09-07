@@ -139,6 +139,58 @@ namespace impactx::elements
             m_omega = std::sqrt(std::abs(m_g));
         }
 
+        /** Wrapper that carries the particle global index through the (id-agnostic)
+         *  symplectic integrator, so that the exact-drift substep (map2) can invalidate a
+         *  particle that leaves the map domain at the source. It forwards map1 unchanged and
+         *  adds the domain guard around map2; the integrator drives it exactly like the
+         *  element itself.
+         */
+        template<typename T_IdCpu>
+        struct MapWithDomainGuard
+        {
+            ExactQuad const & AMREX_RESTRICT m_elem;
+            T_IdCpu & AMREX_RESTRICT m_idcpu;
+
+            template<typename T_Real>
+            AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+            void map1 (amrex::ParticleReal const tau,
+                       amrex::SmallVector<T_Real, 6, 1> & particle,
+                       amrex::ParticleReal & zeval,
+                       RefPart const & AMREX_RESTRICT refpart) const
+            {
+                m_elem.map1(tau, particle, zeval, refpart);
+            }
+
+            template<typename T_Real>
+            AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+            void map2 (amrex::ParticleReal const tau,
+                       amrex::SmallVector<T_Real, 6, 1> & particle,
+                       amrex::ParticleReal & zeval,
+                       RefPart const & AMREX_RESTRICT refpart) const
+            {
+                using namespace amrex::literals; // for _prt
+                using amrex::Math::powi;
+
+                // Source domain guard for the exact-drift substep. The longitudinal momentum
+                // squared is pz^2 = (pt - 1/beta)^2 - 1/(beta*gamma)^2 - px^2 - py^2. A deep-tail
+                // particle amplified by a strong quadrupole can reach a transverse momentum that
+                // exceeds its total momentum (pz^2 <= 0) -- a genuinely lost particle, outside
+                // the domain of the map. Flag it invalid BEFORE the sqrt so it is dropped at the
+                // next redistribute, mirroring the exact bend (ExactSbend), instead of the
+                // otherwise unguarded sqrt(<0) = NaN poisoning the whole-beam moments. The check
+                // is a comparison, so it survives -ffast-math (a post-hoc NaN test would not);
+                // it is never set in double precision, leaving that path numerically unchanged.
+                T_Real const px = particle(2);
+                T_Real const py = particle(4);
+                T_Real const pt = particle(6);
+                T_Real const pzden2 = powi<2>(pt - m_elem.m_ibeta) - m_elem.m_ibetgam2
+                                      - powi<2>(px) - powi<2>(py);
+                amrex::ParticleIDWrapper<T_IdCpu>{m_idcpu}.make_invalid(pzden2 <= 0_prt);
+
+                m_elem.map2(tau, particle, zeval, refpart);
+            }
+        };
+
         /** This is a quad functor, so that a variable of this type can be used like a quad function.
          *
          * The @see compute_constants method must be called before pushing particles through this operator.
@@ -161,7 +213,7 @@ namespace impactx::elements
             T_Real & AMREX_RESTRICT px,
             T_Real & AMREX_RESTRICT py,
             T_Real & AMREX_RESTRICT pt,
-            [[maybe_unused]] T_IdCpu const & AMREX_RESTRICT idcpu,
+            T_IdCpu & AMREX_RESTRICT idcpu,
             RefPart const & AMREX_RESTRICT refpart
         ) const
         {
@@ -177,15 +229,19 @@ namespace impactx::elements
                 x, px, y, py, t, pt
             };
 
+            // Drive the symplectic integrator through a wrapper that carries the particle id,
+            // so the exact-drift substep (map2) can reject a particle that leaves the map domain.
+            MapWithDomainGuard<T_IdCpu> const guarded{*this, idcpu};
+
             // call integrator to advance through slice (int_order = 2 or 4, otherwise default 2)
             if (m_int_order == 2) {
-                integrators::symp2_integrate_particle(particle,zin,zout,nsteps,refpart,*this);
+                integrators::symp2_integrate_particle(particle,zin,zout,nsteps,refpart,guarded);
             } else if (m_int_order == 4) {
-                integrators::symp4_integrate_particle(particle,zin,zout,nsteps,refpart,*this);
+                integrators::symp4_integrate_particle(particle,zin,zout,nsteps,refpart,guarded);
             } else if (m_int_order == 6) {
-                integrators::symp6_integrate_particle(particle,zin,zout,nsteps,refpart,*this);
+                integrators::symp6_integrate_particle(particle,zin,zout,nsteps,refpart,guarded);
             } else {
-                integrators::symp2_integrate_particle(particle,zin,zout,nsteps,refpart,*this);
+                integrators::symp2_integrate_particle(particle,zin,zout,nsteps,refpart,guarded);
             }
 
             // assign updated values

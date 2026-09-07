@@ -123,7 +123,7 @@ namespace impactx::elements
             T_Real const & AMREX_RESTRICT px,
             T_Real const & AMREX_RESTRICT py,
             T_Real const & AMREX_RESTRICT pt,
-            [[maybe_unused]] T_IdCpu const & AMREX_RESTRICT idcpu,
+            T_IdCpu & AMREX_RESTRICT idcpu,
             [[maybe_unused]] RefPart const & AMREX_RESTRICT refpart
         ) const
         {
@@ -141,13 +141,21 @@ namespace impactx::elements
             // T_Real const pyout = py;
             // T_Real const ptout = pt;
 
-            // compute the radical in the denominator (= pz):
-            T_Real const inv_pzden = 1_prt / sqrt(
+            // Longitudinal momentum squared, pz^2 = (pt - 1/beta)^2 - 1/(beta*gamma)^2 - px^2 - py^2.
+            // A particle whose transverse momentum exceeds its total momentum has no real
+            // longitudinal momentum (pz^2 <= 0): it lies outside the domain of the exact drift
+            // map. Flag it invalid at the source so it is dropped at the next redistribute,
+            // mirroring the exact bend (ExactSbend), instead of the otherwise unguarded
+            // sqrt(<0) = NaN poisoning the whole-beam moments. The mask is a comparison, so it
+            // survives -ffast-math; it is never set in double precision, leaving that path
+            // numerically unchanged.
+            T_Real const pzden2 =
                 powi<2>(pt - m_ibeta) -
                 m_ibetagam2 -
                 powi<2>(px) -
-                powi<2>(py)
-            );
+                powi<2>(py);
+            amrex::ParticleIDWrapper<T_IdCpu>{idcpu}.make_invalid(pzden2 <= 0_prt);
+            T_Real const inv_pzden = 1_prt / sqrt(pzden2);
 
             // advance position and momentum (exact drift)
             x = xout + m_slice_ds * px * inv_pzden;
@@ -226,7 +234,7 @@ namespace impactx::elements
             [[maybe_unused]] T_Real const & AMREX_RESTRICT sx,
             [[maybe_unused]] T_Real const & AMREX_RESTRICT sy,
             [[maybe_unused]] T_Real const & AMREX_RESTRICT sz,
-            T_IdCpu const & AMREX_RESTRICT idcpu,
+            T_IdCpu & AMREX_RESTRICT idcpu,
             RefPart const & AMREX_RESTRICT refpart
         ) const
         {
