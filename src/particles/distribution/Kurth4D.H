@@ -16,9 +16,11 @@
 
 #include <AMReX_Math.H>
 #include <AMReX_Random.H>
+#include <AMReX_Algorithm.H>
 #include <AMReX_REAL.H>
 
 #include <cmath>
+#include <limits>
 
 
 namespace impactx::distribution
@@ -143,6 +145,7 @@ namespace impactx::distribution
             t = amrex::Random(engine);
             t = 2.0_prt*(t-0.5_prt);
             u1 = amrex::Random(engine);
+            u1 = amrex::max(u1, std::numeric_limits<amrex::ParticleReal>::min());  // guard log(0): amrex::Random() may be exactly 0 in single precision
             u2 = amrex::Random(engine);
             ln1 = std::sqrt(-2_prt*std::log(u1));
             pt = ln1 * std::cos(2_prt*pi*u2);

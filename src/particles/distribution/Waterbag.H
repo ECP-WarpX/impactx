@@ -15,9 +15,11 @@
 #include <ablastr/constant.H>
 
 #include <AMReX_Random.H>
+#include <AMReX_Algorithm.H>
 #include <AMReX_REAL.H>
 
 #include <cmath>
+#include <limits>
 
 
 namespace impactx::distribution
@@ -114,16 +116,19 @@ namespace impactx::distribution
 
             // Generate six standard normal random variables using Box-Muller:
             u1 = amrex::Random(engine);
+            u1 = amrex::max(u1, std::numeric_limits<amrex::ParticleReal>::min());  // guard log(0): amrex::Random() may be exactly 0 in single precision
             u2 = amrex::Random(engine);
             ln1 = std::sqrt(-2_prt*std::log(u1));
             g1 = ln1*std::cos(2_prt*pi*u2);
             g2 = ln1*std::sin(2_prt*pi*u2);
             u1 = amrex::Random(engine);
+            u1 = amrex::max(u1, std::numeric_limits<amrex::ParticleReal>::min());  // guard log(0): amrex::Random() may be exactly 0 in single precision
             u2 = amrex::Random(engine);
             ln1 = std::sqrt(-2_prt*std::log(u1));
             g3 = ln1*std::cos(2_prt*pi*u2);
             g4 = ln1*std::sin(2_prt*pi*u2);
             u1 = amrex::Random(engine);
+            u1 = amrex::max(u1, std::numeric_limits<amrex::ParticleReal>::min());  // guard log(0): amrex::Random() may be exactly 0 in single precision
             u2 = amrex::Random(engine);
             ln1 = std::sqrt(-2_prt*std::log(u1));
             g5 = ln1*std::cos(2_prt*pi*u2);

@@ -12,11 +12,13 @@
 
 #include <ablastr/constant.H>
 
+#include <AMReX_Algorithm.H>
 #include <AMReX_Math.H>
 #include <AMReX_Random.H>
 #include <AMReX_REAL.H>
 
 #include <cmath>
+#include <limits>
 
 
 namespace impactx::distribution
@@ -91,6 +93,14 @@ namespace impactx::distribution
             // Sample two iid random variables:
             amrex::ParticleReal x1 = amrex::Random(engine);
             amrex::ParticleReal x2 = amrex::Random(engine);
+            // amrex::Random() is documented as [0,1) but in single precision its GPU path
+            // (1.0f - curand_uniform()) can round UP to exactly 1.0f (when curand < ~2^-25). For a
+            // strongly concentrated / fully polarized mean vector, expm1(-2*kappa) == -1 in single
+            // precision, so x2 == 1 makes log1p(x2*expm1(-2*kappa)) == log1p(-1) == -inf -> t == NaN
+            // -> u == sqrt(1 - NaN) == NaN, a NaN spin that poisons the whole-beam moments. Clamp x2
+            // back into [0,1); a no-op in double precision and for every non-pathological draw.
+            // Same amrex::Random() single-precision edge as the Box-Muller guards above (AMReX #5638).
+            x2 = amrex::min(x2, amrex::ParticleReal(1) - std::numeric_limits<amrex::ParticleReal>::epsilon());
 
             // Basic transformation of the random variables:
             amrex::ParticleReal c = std::cos(2_prt*pi*x1);

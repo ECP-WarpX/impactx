@@ -15,9 +15,11 @@
 #include <ablastr/constant.H>
 
 #include <AMReX_Random.H>
+#include <AMReX_Algorithm.H>
 #include <AMReX_REAL.H>
 
 #include <cmath>
+#include <limits>
 
 
 namespace impactx::distribution
@@ -120,6 +122,7 @@ namespace impactx::distribution
             // Generate three pairs of (optionally truncated) normal random variables using Box-Muller:
 
             u1 = amrex::Random(engine);
+            u1 = amrex::max(u1, std::numeric_limits<amrex::ParticleReal>::min());  // guard log(0): amrex::Random() may be exactly 0 in single precision
             u2 = amrex::Random(engine);
             if (m_cutX > 0.0_prt) {
                 amrex::ParticleReal f = m_cutX*m_cutX/2.0_prt;
@@ -134,6 +137,7 @@ namespace impactx::distribution
             px = ln1 * std::sin(2_prt*pi*u2);
 
             u1 = amrex::Random(engine);
+            u1 = amrex::max(u1, std::numeric_limits<amrex::ParticleReal>::min());  // guard log(0): amrex::Random() may be exactly 0 in single precision
             u2 = amrex::Random(engine);
             if (m_cutY > 0.0_prt) {
                 amrex::ParticleReal f = m_cutY*m_cutY/2.0_prt;
@@ -148,6 +152,7 @@ namespace impactx::distribution
             py = ln1 * std::sin(2_prt*pi*u2);
 
             u1 = amrex::Random(engine);
+            u1 = amrex::max(u1, std::numeric_limits<amrex::ParticleReal>::min());  // guard log(0): amrex::Random() may be exactly 0 in single precision
             u2 = amrex::Random(engine);
             if (m_cutT > 0.0_prt) {
                 amrex::ParticleReal f = m_cutT*m_cutT/2.0_prt;
