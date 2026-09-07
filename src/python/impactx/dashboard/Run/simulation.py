@@ -8,6 +8,7 @@ License: BSD-3-Clause-LBNL
 
 from .. import state
 from ..Input.distribution.utils import DistributionFunctions
+from ..Input.validation import DashboardValidation
 
 TRACKING_MODE_COMMANDS = {
     "Particle Tracking": """\
@@ -68,6 +69,12 @@ def build_lattice_list() -> str:
             param_name = param["parameter_name"]
             param_value = param["sim_input"]
             param_type = param["parameter_type"]
+
+            # an optional parameter left blank stays at its default: passing an
+            # empty string instead would build the wrong element
+            if param.get("parameter_is_optional", False):
+                if DashboardValidation.is_blank(param_value):
+                    continue
 
             if param_type == "str":
                 formatted_value = f'"{param_value}"'

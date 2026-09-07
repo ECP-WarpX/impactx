@@ -52,11 +52,26 @@ class DashboardValidation:
             setattr(state, validation_name, error_message)
 
     @staticmethod
+    def is_blank(input_value) -> bool:
+        """
+        Check whether a value was left blank by the user.
+
+        The literal ``"None"`` counts as blank as well: it is the signature
+        default that :meth:`InputDefaultsHelper.extract_parameters` reports for
+        an optional parameter.
+
+        :param input_value: The value to check.
+        :return: True if the value carries no user input.
+        """
+        return input_value is None or str(input_value).strip() in ("", "None")
+
+    @staticmethod
     def validate(
         input_name: str,
         input_value: Union[float, int],
         category: str | None = None,
         parameter_type: str | None = None,
+        optional: bool = False,
     ) -> list[str]:
         """
         Validates the input value against its default type and any additional conditions.
@@ -65,8 +80,12 @@ class DashboardValidation:
         :param input_value: The value to validate.
         :param category: The category of validation (e.g., 'distribution', 'lattice').
         :param parameter_type: The explicit type to use ('int', 'float', 'str', 'bool'). If provided, overrides type lookup.
+        :param optional: If True, a blank value is accepted and the parameter is left at its default.
         :return: A list of error messages. An empty list if there are no errors.
         """
+        if optional and DashboardValidation.is_blank(input_value):
+            return []
+
         input_type = DashboardValidation._get_input_type(
             input_name, category, parameter_type
         )

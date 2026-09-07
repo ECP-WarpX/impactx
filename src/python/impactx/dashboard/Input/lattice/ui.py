@@ -47,7 +47,12 @@ def add_lattice_element() -> dict:
 
     parameters = []
     for name, default_value, default_type in parameters_data:
-        value = default_value
+        # extract_parameters() reports the string "None" for a parameter whose
+        # signature default is None, and the value None for a parameter without
+        # a default. The former is optional, the latter is required.
+        is_optional = default_value == "None"
+
+        value = "" if is_optional else default_value
         if default_type == "bool":
             # real boolean for the checkbox v-model (the string "False" is truthy in JS)
             value = str(value).strip().lower() == "true"
@@ -55,7 +60,11 @@ def add_lattice_element() -> dict:
             value = BEAM_MONITOR_DEFAULT_NAME
 
         error_message = DashboardValidation.validate(
-            name, value, category="lattice", parameter_type=default_type
+            name,
+            value,
+            category="lattice",
+            parameter_type=default_type,
+            optional=is_optional,
         )
 
         parameters.append(
@@ -64,6 +73,7 @@ def add_lattice_element() -> dict:
                 "ui_input": value,
                 "sim_input": value,
                 "parameter_type": default_type,
+                "parameter_is_optional": is_optional,
                 "parameter_error_message": error_message,
             }
         )
@@ -164,15 +174,17 @@ def on_lattice_element_parameter_change(
     else:
         state.lattice_elements_using_variables.pop(key, None)
 
-    error_message = DashboardValidation.validate(
-        parameter_name, sim_input, category="lattice", parameter_type=parameter_type
-    )
-
     for param in state.selected_lattice_list[index]["parameters"]:
         if param["parameter_name"] == parameter_name:
             param["ui_input"] = ui_input
             param["sim_input"] = sim_input
-            param["parameter_error_message"] = error_message
+            param["parameter_error_message"] = DashboardValidation.validate(
+                parameter_name,
+                sim_input,
+                category="lattice",
+                parameter_type=parameter_type,
+                optional=param.get("parameter_is_optional", False),
+            )
 
     errors_tracker.update_simulation_validation_status()
     state.dirty("selected_lattice_list")

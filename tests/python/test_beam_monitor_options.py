@@ -65,8 +65,7 @@ def track_and_finalize(sim):
 def check_series(name, particles, beam_moments, npart):
     """Validate the series written by a monitor with the given flags.
 
-    Reads with linear access, which supports all iteration encodings
-    (variable-based encoding does not support random access reads).
+    Reads with linear access, which supports all iteration encodings.
     """
     files = sorted(Path("diags/openPMD").glob(f"{name}.*"))
     assert files, f"no openPMD series found for monitor '{name}'"

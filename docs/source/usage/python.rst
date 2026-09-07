@@ -1996,7 +1996,8 @@ The aperture is disabled entirely only if both planes are zero or less, which is
    By default, the first available backend in the order given above is taken.
 
    openPMD `iteration encoding <https://openpmd-api.readthedocs.io/en/latest/usage/concepts.html#iteration-and-series>`__ determines if multiple files are created for individual output steps or not.
-   Variable based is an `experimental feature with ADIOS2 <https://openpmd-api.readthedocs.io/en/0.14.0/backends/adios2.html#experimental-new-adios2-schema>`__ and currently requires linear read access (``Access.read_linear``) in downstream readers.
+   Variable based is an experimental encoding and needs the ADIOS2 backend to store more than one iteration.
+   openPMD-api 0.17 and newer read it with random access (``Access.read_only``) as well as with linear access (``Access.read_linear``); readers older than 0.17 see only a single iteration.
 
    :param name: name of the series
    :param backend: I/O backend, e.g., ``bp``, ``h5``, ``json``
