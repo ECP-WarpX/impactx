@@ -290,8 +290,16 @@ namespace impactx::particles::spacecharge
                         std::cerr << "Warning: Index out of range for 2.5D Gaussian SC: " << idx << std::endl;
                     }
 #endif
-                    amrex::ParticleReal const Fxy = beam_profile[idx] * chargesign;
-                    amrex::ParticleReal const Fz = (apply_longitudinal_kick)? beam_profile_slope[idx] * charge : 0_prt;
+                    // Interpolation
+                    amrex::ParticleReal const idxreal = static_cast<amrex::ParticleReal>(idx);
+                    amrex::ParticleReal const lambda = (z - bin_min) / bin_size - idxreal - 0.5;
+                    amrex::ParticleReal const beam_profile_interp = (1_prt-lambda)*beam_profile[idx] + lambda*beam_profile[idx+1];
+                    amrex::ParticleReal const beam_profile_slope_interp = (idx==num_bins)? beam_profile_slope[idx] : (1_prt-lambda)*beam_profile_slope[idx] + lambda*beam_profile_slope[idx+1];
+
+
+                    // Force evaluation
+                    amrex::ParticleReal const Fxy = beam_profile_interp * chargesign;
+                    amrex::ParticleReal const Fz = (apply_longitudinal_kick)? beam_profile_slope_interp * charge : 0_prt;
 
                     // push momentum
                     px += eintx * Fxy * push_consts;
