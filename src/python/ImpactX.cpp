@@ -602,7 +602,11 @@ void init_ImpactX (py::module& m)
                  amrex::ParmParse pp_impactx("impactx");
                  pp_impactx.add("abort_on_warning_threshold", str_abort_on_warning_threshold);
                  // query input for warning logger variables and set up warning logger accordingly
-                 ix.init_warning_logger();
+                 //   the warning logger needs AMReX: if it is not yet initialized,
+                 //   ImpactX::init_grids sets the logger up from the same input
+                 if (amrex::Initialized()) {
+                     ix.init_warning_logger();
+                 }
              },
              "Set WarnPriority threshold to decide if ImpactX\n"
              "has to abort when a warning is recorded.\n"
@@ -628,7 +632,11 @@ void init_ImpactX (py::module& m)
                 amrex::ParmParse pp_amrex("amrex");
                 pp_amrex.add("abort_on_unused_inputs", abort_on_unused_inputs);
                 // query input for warning logger variables and set up warning logger accordingly
-                ix.init_warning_logger();
+                //   the warning logger needs AMReX: if it is not yet initialized,
+                //   ImpactX::init_grids sets the logger up from the same input
+                if (amrex::Initialized()) {
+                    ix.init_warning_logger();
+                }
             },
             "Configure simulation to abort AFTER it has run\n"
             "if there are unused parameters in the input."

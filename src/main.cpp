@@ -10,19 +10,17 @@
 #include "ImpactX.H"
 #include "initialization/InitAMReX.H"
 
+#include <ablastr/parallelization/MPIInitHelpers.H>
+
 #include <AMReX.H>
 #include <AMReX_BLProfiler.H>
-
-#if defined(AMREX_USE_MPI)
-#   include <mpi.h>
-#endif
 
 
 int main(int argc, char* argv[])
 {
-#if defined(AMREX_USE_MPI)
-    AMREX_ALWAYS_ASSERT(MPI_SUCCESS == MPI_Init(&argc, &argv));
-#endif
+    // initialize MPI with the thread support level that this build was
+    // configured for, e.g., for async I/O (a no-op if built without MPI)
+    ablastr::parallelization::mpi_init(argc, argv);
 
     // although ImpactX' init_grids will call this if not done before, we call
     // it here so users can pass command line arguments
@@ -39,7 +37,5 @@ int main(int argc, char* argv[])
         impactX.finalize();
     }
 
-#if defined(AMREX_USE_MPI)
-    AMREX_ALWAYS_ASSERT(MPI_SUCCESS == MPI_Finalize());
-#endif
+    ablastr::parallelization::mpi_finalize();
 }

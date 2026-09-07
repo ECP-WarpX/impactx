@@ -12,6 +12,7 @@
 #include "diagnostics/FilePrefix.H"
 #include "elements/mixin/accessors.H"
 #include "elements/mixin/dynamicdata.H"
+#include "initialization/InitAMReX.H"
 #include "initialization/InitAmrCore.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
@@ -57,8 +58,9 @@ namespace impactx {
             // this one last
             amr_data.reset();
 
-            if (amrex::Initialized())
-                amrex::Finalize();
+            // only finalize AMReX if we initialized it: another library or the
+            // user (e.g., via pyAMReX) might own AMReX in this process
+            initialization::default_finalize_AMReX();
 
             // only finalize once
             m_grids_initialized = false;

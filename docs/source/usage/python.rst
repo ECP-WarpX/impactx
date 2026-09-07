@@ -533,6 +533,22 @@ Collective Effects & Overall Simulation Parameters
 
       Resize the mesh :py:attr:`~domain` based on the :py:attr:`~dynamic_size` and related parameters.
 
+   .. py:method:: finalize()
+
+      Deallocate all contexts and data of the simulation.
+      This is also called when the simulation object is destroyed.
+
+      Afterwards, a new :py:class:`impactx.ImpactX` simulation can be created in the same process, e.g., for parameter scans and optimization loops that run one simulation per iteration.
+      A new simulation starts with fresh inputs: set the parameters of interest again on the new simulation object.
+
+      .. note::
+
+         In :py:meth:`~init_grids`, ImpactX initializes MPI and AMReX if they are not yet initialized.
+         MPI stays initialized until the end of the process, so that any number of simulations can run in it; AMReX is finalized in ``finalize()``.
+
+         Whoever initializes MPI or AMReX also finalizes it.
+         If MPI is initialized before ImpactX, e.g., by importing ``mpi4py.MPI``, or if AMReX is initialized before ImpactX, e.g., by calling ``amrex.space3d.initialize()``, then ImpactX leaves both initialization and finalization to the caller.
+
 
 .. py:class:: impactx.Envelope
 
