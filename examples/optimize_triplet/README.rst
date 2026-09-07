@@ -56,6 +56,21 @@ Run
          :language: python3
          :caption: You can copy this file from ``tests/python/test_xopt.py``.
 
+   .. tab-item:: optimas
+
+      This example uses `optimas <https://optimas.readthedocs.io>`__ 0.10.1+ (method: `Bayesian Optimization <https://optimas.readthedocs.io/en/latest/api/_autosummary/optimas.generators.AxSingleFidelityGenerator.html>`__) to find the quadrupole strengths by minimizing the objective.
+
+      Machine-learning based, surrogate optimization like Bayesian Optimization (BO) works well for highly dimensional inputs and/or to find global minima in an objective that has potentially many local minima, where conventional optimizers can get stuck.
+      At the same time, the BO is prone to over-explore an objective (at the cost of finding a point closer to the global minima).
+
+      This optimizer requires the ``optimas`` package with its Ax backend, e.g. installed via ``python3 -m pip install "optimas[all]"``.
+
+      This example can be run as a **Python** script: ``python3 tests/python/test_optimas.py``.
+
+      .. literalinclude:: test_optimas.py
+         :language: python3
+         :caption: You can copy this file from ``tests/python/test_optimas.py``.
+
 
 Analyze
 -------
@@ -78,7 +93,7 @@ You can run the following script to visualize the optimized beam evolution over 
 
    .. literalinclude:: plot_triplet.py
       :language: python3
-      :caption: You can copy this file from ``examples/fodo/plot_triplet.py``.
+      :caption: You can copy this file from ``examples/optimize_triplet/plot_triplet.py``.
 
 .. figure:: https://gist.github.com/assets/1353258/d3bf0184-a102-47cf-98d3-da2a5d511b96
    :alt: CS Twiss beta

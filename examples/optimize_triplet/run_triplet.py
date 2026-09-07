@@ -10,11 +10,10 @@ import numpy as np
 from scipy.optimize import minimize
 
 import amrex.space3d as amr
-import impactx
-from impactx import ImpactX, distribution, elements
+from impactx import Config, ImpactX, distribution, elements
 
 # Call MPI_Init and MPI_Finalize only once:
-if impactx.Config.have_mpi:
+if Config.have_mpi:
     from mpi4py import MPI  # noqa
 
 verbose = False

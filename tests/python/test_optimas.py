@@ -15,10 +15,19 @@ import pytest
 import amrex.space3d as amr
 from impactx import Config, ImpactX, distribution, elements
 
+# Pre-initialize MPI (if ImpactX was built with MPI support) so that MPI stays
+# owned by mpi4py and is not finalized between evaluations. Each call to run()
+# below constructs and finalizes an ImpactX simulation (amrex Initialize /
+# Finalize); without an external MPI owner, the first sim.finalize() would
+# finalize MPI and break all following evaluations. This is safe because the
+# exploration below uses the "threads" libEnsemble backend (no process forking).
+if Config.have_mpi:
+    from mpi4py import MPI  # noqa
+
 # configure the test
 verbose = True
-gen_name = "Nelder-Mead"  # TuRBO or Nelder-Mead
-max_steps = 60
+n_init = 4  # number of initial, random samples before Bayesian optimization starts
+max_evals = 60  # total number of ImpactX simulations to evaluate
 
 
 def build_lattice(parameters: dict, write_particles: bool) -> list:
@@ -87,6 +96,7 @@ def run(parameters: dict, write_particles=False, write_reduced=False) -> dict:
     sim = ImpactX()
 
     sim.verbose = 0
+    sim.tiny_profiler = False
 
     # set numerical parameters and IO control
     sim.space_charge = False
@@ -136,20 +146,29 @@ def run(parameters: dict, write_particles=False, write_reduced=False) -> dict:
     return rbc
 
 
-def objective(parameters: dict) -> dict:
+def evaluate(input_params: dict, output_params) -> None:
     """
-    A function that is evaluated by the optimizer.
+    A single evaluation for an ``optimas`` ``FunctionEvaluator``.
+
+    optimas calls this function once per trial. The values of the varying
+    parameters are provided in ``input_params`` and the results (objective
+    and observables) have to be written back into ``output_params`` in place.
 
     Parameters
     ----------
-    parameters: dict
-      quadrupole strengths k of quad 1/3 and quad 2.
+    input_params: dict
+      values of the varying parameters, here the quadrupole strengths k of
+      quad 1/3 and quad 2.
 
-    Returns
-    -------
-    The L2 norm of alpha and beta of the beam at the end of the
-    simulation.
+    output_params:
+      a mapping to fill with the value of the objective ``f`` (the L2 norm of
+      alpha and beta of the beam at the end of the simulation) and the
+      observables (alpha & beta).
     """
+    parameters = {
+        "q1_k": input_params["q1_k"],
+        "q2_k": input_params["q2_k"],
+    }
     if verbose:
         print(f"Run objective with parameters={parameters}...")
 
@@ -161,9 +180,7 @@ def objective(parameters: dict) -> dict:
         rbc["beta_y"],
     )
     if verbose:
-        print(
-            f"  -> alpha_x={alpha_x}, alpha_y={alpha_y}, beta_x={beta_x}, beta_y={beta_y}"
-        )
+        print(f"alpha_x={alpha_x}, alpha_y={alpha_y}, beta_x={beta_x}, beta_y={beta_y}")
     alpha_beta_is = np.array([alpha_x, alpha_y, beta_x, beta_y])
 
     beta_x_goal = 0.55
@@ -171,85 +188,78 @@ def objective(parameters: dict) -> dict:
     alpha_beta_goal = np.array([0, 0, beta_x_goal, beta_y_goal])
 
     error = np.sum((alpha_beta_is - alpha_beta_goal) ** 2)
+    if np.isnan(error):
+        error = 1.0e99
 
-    # xopt will ignore NaN results, no cleaning needed
-    rbc["error"] = error
-
-    return rbc
+    # objective to minimize
+    output_params["f"] = error
+    # additional observables to record in the exploration history
+    output_params["alpha_x"] = alpha_x
+    output_params["alpha_y"] = alpha_y
+    output_params["beta_x"] = beta_x
+    output_params["beta_y"] = beta_y
 
 
 @pytest.mark.skipif(
-    importlib.util.find_spec("xopt") is None, reason="xopt is not available"
+    importlib.util.find_spec("optimas") is None, reason="optimas is not available"
 )
-def test_xopt():
-    from xopt import Xopt
-    from xopt.evaluator import Evaluator
-    from xopt.vocs import VOCS, select_best
+def test_optimas():
+    from gest_api.vocs import VOCS
+    from optimas.diagnostics import ExplorationDiagnostics
+    from optimas.evaluators import FunctionEvaluator
+    from optimas.explorations import Exploration
+    from optimas.generators import AxSingleFidelityGenerator
 
-    if gen_name == "TuRBO":
-        from xopt.generators.bayesian.upper_confidence_bound import (
-            UpperConfidenceBoundGenerator as Generator,
-        )
-
-        gen_args = {"turbo_controller": "optimize"}
-    elif gen_name == "Nelder-Mead":
-        from xopt.generators.sequential.neldermead import (
-            NelderMeadGenerator as Generator,
-        )
-
-        gen_args = {}
-    else:
-        raise RuntimeError(f"Unconfigured generator named '{gen_name}'")
-
-    # Bounds for values to test: (min, max)
-    positive = [0, 10]
-    negative = [-10, 0]
-
-    # define variables and function objectives
+    # Define the varying parameters (with their bounds), the objective to
+    # minimize and the additional observables to record.
     vocs = VOCS(
         variables={
-            "q1_k": negative,
-            "q2_k": positive,
+            "q1_k": [-6.0, 0.0],
+            "q2_k": [0.0, 6.0],
         },
-        objectives={"error": "MINIMIZE"},
+        objectives={"f": "MINIMIZE"},
+        observables=["alpha_x", "alpha_y", "beta_x", "beta_y"],
     )
 
-    # create Xopt evaluator, generator, and Xopt objects
-    evaluator = Evaluator(function=objective)
-    generator = Generator(vocs=vocs, **gen_args)
-    X = Xopt(evaluator=evaluator, generator=generator)
+    # Create the generator: single-fidelity Bayesian optimization using Ax.
+    gen = AxSingleFidelityGenerator(vocs=vocs, n_init=n_init)
 
-    # Initial guess for the quadrople strengths
-    initial_quad_strengths = {
-        "q1_k": -3.0,
-        "q2_k": 3.0,
-    }
-    if gen_name == "TuRBO":
-        # a few random guesses
-        # X.random_evaluate(3)
-        # a few somewhat educated guesses
-        X.evaluate_data(initial_quad_strengths)
-    elif gen_name == "Nelder-Mead":
-        # a few somewhat educated guesses
-        X.generator.initial_point = initial_quad_strengths
+    # Create the evaluator: run each trial in-process via our ImpactX function.
+    ev = FunctionEvaluator(function=evaluate)
 
-    # run optimization for 60 steps (iterations)
-    for i in range(max_steps):
-        X.step()
+    # Create the exploration.
+    #
+    # We use the "threads" libEnsemble backend: it runs the evaluations and the
+    # Ax generator in threads of a single process instead of forking worker
+    # processes. Forking would deadlock the PyTorch/BoTorch-based Ax generator
+    # and is incompatible with the repeated (re)initialization of ImpactX/AMReX
+    # and MPI done here. The "threads" backend supports FunctionEvaluators.
+    exp = Exploration(
+        generator=gen,
+        evaluator=ev,
+        max_evals=max_evals,
+        sim_workers=1,
+        libe_comms="threads",
+        exploration_dir_path="./optimize_triplet",
+    )
 
-    # Print all trials
+    # run the optimization
+    exp.run()
+
+    # Analyze the exploration history and select the best result.
+    diags = ExplorationDiagnostics(exp)
     if verbose:
-        print(X.data)
+        print(diags.history)
 
-        # plot
-        # X.vocs.normalize_inputs(X.data).plot(*X.vocs.variable_names, kind="scatter")
-
-    # Select the best result
-    best_idx, best_error, best_ks = select_best(X.vocs, X.data)
+    best = diags.get_best_evaluation()
+    best_ks = {
+        "q1_k": best["q1_k"].iloc[0],
+        "q2_k": best["q2_k"].iloc[0],
+    }
 
     # Print the optimization result
     print("Optimal parameters for k:", best_ks)
-    print("L2 norm of alpha & beta at the optimum:", best_error[0])
+    print("L2 norm of alpha & beta at the optimum:", best["f"].iloc[0])
 
     # analytical result:
     #   k: -3.5, 2.75
@@ -267,8 +277,4 @@ def test_xopt():
 
 
 if __name__ == "__main__":
-    # Call MPI_Init and MPI_Finalize only once:
-    if Config.have_mpi:
-        from mpi4py import MPI  # noqa
-
-    test_xopt()
+    test_optimas()

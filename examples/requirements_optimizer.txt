@@ -1,6 +1,8 @@
 # Optional numerical optimizers, e.g., for the optimize_triplet example.
 #
-# Optimizers often pull in the PyTorch/BoTorch stack, so keep
+# Optimizers often pull in the PyTorch/BoTorch/Ax stack, so keep
 # torch on CPU wheels for CI (see also requirements_torch_cpu.txt).
+# optimas needs its Ax backend, hence the [all] extra.
 --extra-index-url https://download.pytorch.org/whl/cpu
+optimas[all]>=0.10.1
 xopt>=3.0
