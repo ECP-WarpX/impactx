@@ -307,14 +307,22 @@ namespace detail
             RF_field_data const ez;
             std::vector<amrex::ParticleReal> cos_coef = ez.default_cos_coef;
             std::vector<amrex::ParticleReal> sin_coef = ez.default_sin_coef;
+            std::vector<amrex::ParticleReal> z_data;
+            std::vector<amrex::ParticleReal> wake_x_data;
+            std::vector<amrex::ParticleReal> wake_y_data;
+            std::vector<amrex::ParticleReal> wake_z_data;
             pp_element.getWithParser("escale", escale);
             pp_element.getWithParser("freq", freq);
             pp_element.getWithParser("phase", phase);
             pp_element.queryAddWithParser("mapsteps", mapsteps);
             detail::queryAddResize(pp_element, "cos_coefficients", cos_coef);
             detail::queryAddResize(pp_element, "sin_coefficients", sin_coef);
+            detail::queryAddResize(pp_element, "z_data", z_data);
+            detail::queryAddResize(pp_element, "wake_x_data", wake_x_data);
+            detail::queryAddResize(pp_element, "wake_y_data", wake_y_data);
+            detail::queryAddResize(pp_element, "wake_z_data", wake_z_data);
 
-            m_lattice.emplace_back( RFCavity(ds, escale, freq, phase, cos_coef, sin_coef, a["dx"], a["dy"], a["rotation_degree"], b["aperture_x"], b["aperture_y"], mapsteps, nslice, element_name) );
+            m_lattice.emplace_back( RFCavity(ds, escale, freq, phase, cos_coef, sin_coef, z_data, wake_x_data, wake_y_data, wake_z_data, a["dx"], a["dy"], a["rotation_degree"], b["aperture_x"], b["aperture_y"], mapsteps, nslice, element_name) );
         } else if (element_type == "solenoid")
         {
             auto const [ds, nslice] = detail::query_ds(pp_element, nslice_default);

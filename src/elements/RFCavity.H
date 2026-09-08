@@ -97,6 +97,19 @@ namespace impactx::elements
         amrex::Gpu::TrackedVector<amrex::ParticleReal> sin;
     };
 
+    /** On-axis wake function as specified by the user.
+     *
+     * Host data persists across simulations; device data is uploaded
+     * on-demand "lazily" on first use and released when AMReX shuts down.
+     */
+    struct CavityWakeFunction
+    {
+        amrex::Gpu::TrackedVector<amrex::ParticleReal> z_data;
+        amrex::Gpu::TrackedVector<amrex::ParticleReal> wake_x_data;
+        amrex::Gpu::TrackedVector<amrex::ParticleReal> wake_y_data;
+        amrex::Gpu::TrackedVector<amrex::ParticleReal> wake_z_data;
+    };
+
     struct RFCavity
     : public mixin::Named,
       public mixin::BeamOptic<RFCavity>,
@@ -112,6 +125,7 @@ namespace impactx::elements
         using PType = ImpactXParticleContainer::ParticleType;
 
         using DynamicData = mixin::GPUDataRegistry<CavityFourierCoefficients>;
+        using WakeData = mixin::GPUDataRegistry<CavityWakeFunction>;
 
         static constexpr int DEFAULT_mapsteps = 10;
 
@@ -123,6 +137,10 @@ namespace impactx::elements
          * @param phase RF driven phase in deg
          * @param cos_coef TODO
          * @param sin_coef TODO
+         * @param z_data Optional longitudinal positions of the single-particle wake function in m
+         * @param wake_x_data Optional horizontal single-particle wake function data
+         * @param wake_y_data Optional vertical single-particle wake function data
+         * @param wake_z_data Optional longitudinal single-particle wake function data
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
@@ -140,6 +158,10 @@ namespace impactx::elements
             amrex::ParticleReal phase,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
+            std::optional<std::vector<amrex::ParticleReal>> z_data,
+            std::optional<std::vector<amrex::ParticleReal>> wake_x_data,
+            std::optional<std::vector<amrex::ParticleReal>> wake_y_data,
+            std::optional<std::vector<amrex::ParticleReal>> wake_z_data,
             amrex::ParticleReal dx = DEFAULT_dx,
             amrex::ParticleReal dy = DEFAULT_dy,
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
@@ -154,7 +176,8 @@ namespace impactx::elements
             Alignment(dx, dy, rotation_degree),
             PipeAperture(aperture_x, aperture_y),
             m_escale(escale), m_freq(freq), m_phase(phase), m_mapsteps(mapsteps),
-            m_id(DynamicData::allocate_id())
+            m_id(DynamicData::allocate_id()),
+            m_wake_id(WakeData::allocate_id())
         {
             if (m_mapsteps <= 0)
                 throw std::invalid_argument("RFCavity: mapsteps must be > 0!");
@@ -170,6 +193,15 @@ namespace impactx::elements
             );
             m_cos_h_data = coef.cos.host_const().data();
             m_sin_h_data = coef.sin.host_const().data();
+
+            // Optional user-specified wake data; absent data is stored as empty.
+            WakeData::emplace(
+                m_wake_id,
+                std::move(z_data).value_or(std::vector<amrex::ParticleReal>{}),
+                std::move(wake_x_data).value_or(std::vector<amrex::ParticleReal>{}),
+                std::move(wake_y_data).value_or(std::vector<amrex::ParticleReal>{}),
+                std::move(wake_z_data).value_or(std::vector<amrex::ParticleReal>{})
+            );
         }
 
         /** Reverse the element (negate ds) */
@@ -641,6 +673,7 @@ namespace impactx::elements
         amrex::ParticleReal m_phase; //! RF driven phase in deg
         int m_mapsteps; //! number of map integration steps per slice
         int m_id; //! unique RF cavity id used for data lookup map
+        int m_wake_id; //! unique id used for user-specified wake data lookup
 
         int m_ncoef = 0; //! number of Fourier coefficients
         amrex::ParticleReal const * m_cos_h_data = nullptr; //! non-owning pointer to host cosine coefficients
@@ -660,6 +693,9 @@ namespace impactx::elements
 } // namespace impactx
 
 IMPACTX_GPUDATA_EXTERN(impactx::elements::RFCavity)
+// second registry of this element: the user-specified wake data.
+// IMPACTX_GPUDATA_EXTERN only covers `ElementType::DynamicData`, so spell this one out.
+extern template struct impactx::elements::mixin::GPUDataRegistry<impactx::elements::CavityWakeFunction>;
 IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::RFCavity)
 
 #endif // IMPACTX_RFCAVITY_H

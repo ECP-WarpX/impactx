@@ -92,10 +92,12 @@ namespace impactx
         pp_algo.query("csr", csr);
         bool isr = false;
         pp_algo.query("isr", isr);
+        bool short_range_wakefields = false;
+        pp_algo.query("short_range_wakefields", short_range_wakefields);
 
         // whether any collective effect is active: only then is a kick applied per slice
         bool const collective_effects =
-            (space_charge != SpaceChargeAlgo::False) || csr || isr;
+            (space_charge != SpaceChargeAlgo::False) || csr || isr || short_range_wakefields;
 
         // second-order Strang split of the collective kicks, on by default
         //   Disabling it composes kick and transport to first order instead, which is what
@@ -118,6 +120,7 @@ namespace impactx
         if (verbose > 0) {
             amrex::Print() << " CSR effects: " << csr << "\n";
             amrex::Print() << " ISR effects: " << isr << "\n";
+            amrex::Print() << " Short-range wakefields: " << short_range_wakefields << "\n";
             amrex::Print() << " Spin tracking: " << spin << "\n";
             if (collective_effects) {
                 amrex::Print() << " Strang split: " << strang_split << "\n";

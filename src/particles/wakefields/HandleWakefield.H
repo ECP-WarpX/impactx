@@ -13,6 +13,7 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "ChargeBinning.H"
 #include "CSRBendElement.H"
+#include "ShortRangeWakeElement.H"
 #include "WakeConvolution.H"
 #include "WakePush.H"
 
@@ -22,12 +23,13 @@
 
 #include <cmath>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 
 namespace impactx::particles::wakefields
 {
-    /** Function to handle CSR bending process including charge deposition,
+    /** Function to handle wakefield calculations, including charge deposition,
      * mean transverse position calculation, wakefield generation, and convolution.
      *
      * Returns immediately if slice_ds is zero.
@@ -50,21 +52,38 @@ namespace impactx::particles::wakefields
         BL_PROFILE("impactx::particles::wakefields::HandleWakefield")
 
         amrex::ParmParse pp_algo("algo");
+
         bool csr = false;
         pp_algo.queryAdd("csr", csr);
+
+        bool short_range_wakefields = false;
+        pp_algo.queryAdd("short_range_wakefields", short_range_wakefields);
 
         // Call the CSR bend function
         auto const [element_has_csr, R] = impactx::particles::wakefields::CSRBendElement(element_variant, particle_container.GetRefParticle());
 
-        // Enter loop if lattice has bend element
-        if (csr && element_has_csr)
+        // Call the function preparing short range wake elements
+        auto const short_range_wake = impactx::particles::wakefields::ShortRangeWakeElement(element_variant, particle_container.GetRefParticle());
+
+        // Which effect applies to this very element?
+        bool const apply_csr = csr && element_has_csr;
+        bool const apply_short_range_wake = short_range_wakefields && short_range_wake.has_wake;
+
+        // Enter loop if wakefields are turned on
+        if (apply_csr || apply_short_range_wake)
         {
 #ifndef ImpactX_USE_FFT
-            throw std::runtime_error("algo.csr was requested but ImpactX was not compiled with FFT support. Recompile with ImpactX_FFT=ON.");
+            throw std::runtime_error(
+                std::string(apply_csr ? "algo.csr" : "algo.short_range_wakefields") +
+                " was requested but ImpactX was not compiled with FFT support. Recompile with ImpactX_FFT=ON."
+            );
 #endif
 
             int csr_bins = 150;
             pp_algo.queryAddWithParser("csr_bins", csr_bins);
+
+            int wake_bins = 150;
+            pp_algo.queryAddWithParser("wake_bins", wake_bins);
 
             // Measure beam size, extract the min, max of particle positions
             [[maybe_unused]] auto const [x_min, y_min, t_min, x_max, y_max, t_max] =
@@ -93,7 +112,7 @@ namespace impactx::particles::wakefields
             bool const is_unity_particle_weight = false; // Only true if w = 1
             bool const GetNumberDensity = true;
 
-            int const num_bins = csr_bins;  // Set resolution
+            int const num_bins = apply_csr ? csr_bins : wake_bins;  // Set resolution
             amrex::Real const bin_min = t_min;
             amrex::Real const bin_max = t_max;
             amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);  // number of evaluation points
@@ -119,32 +138,63 @@ namespace impactx::particles::wakefields
             // same length.
             amrex::Gpu::DeviceVector<amrex::Real> convolved_wakefield(num_bins, 0.0);
             if (amrex::ParallelDescriptor::IOProcessor()) {
-                // Call the mean transverse position function
-                impactx::particles::wakefields::MeanTransversePosition(particle_container, mean_x, mean_y, bin_min,
-                                                                       bin_size, is_unity_particle_weight);
 
-                // Call charge density derivative function
-                amrex::Gpu::DeviceVector<amrex::Real> slopes(charge_distribution.size() - 1, 0.0);
-                impactx::particles::wakefields::DerivativeCharge1D(charge_distribution, slopes, bin_size,
-                                                                   GetNumberDensity); // Use number derivatives for convolution with CSR
-
-                // Construct CSR wake function on 2N support
+                // Data for line density (derivative, in the case of CSR) source and 1D wake function
+                amrex::Gpu::DeviceVector<amrex::Real> source_data(charge_distribution.size() - 1, 0.0);
                 amrex::Gpu::DeviceVector<amrex::Real> wake_function(num_bins*2, 0.0);
                 amrex::Real *const dptr_wake_function = wake_function.data();
-                auto const dR = R;  // for NVCC capture
-                amrex::ParallelFor(num_bins*2, [=] AMREX_GPU_DEVICE(int i) {
-                    if (i < num_bins) {
-                        amrex::Real const s = static_cast<amrex::Real>(i) * bin_size;
-                        dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR, bin_size);
-                    }
-                    else if (i > num_bins) {
-                        amrex::Real const s = static_cast<amrex::Real>(i - 2*num_bins) * bin_size;
-                        dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR, bin_size);
-                    }
-                });
 
-                // Call convolution function
-                convolved_wakefield = impactx::particles::wakefields::convolve_fft(slopes, wake_function, bin_size);
+                // Derivative of the line density is required for the CSR wake
+                if (apply_csr){
+                    // Call charge density derivative function
+                    impactx::particles::wakefields::DerivativeCharge1D(charge_distribution, source_data, bin_size,
+                                                                   GetNumberDensity); // Use number derivatives for convolution with CSR
+                }
+
+                // Slice mean transverse position is required for the short range structure wake
+                if (apply_short_range_wake){
+                    // Call the mean transverse position function
+                    impactx::particles::wakefields::MeanTransversePosition(particle_container, mean_x, mean_y, bin_min,
+                                                                           bin_size, is_unity_particle_weight);
+                }
+
+                if (apply_csr){
+                    // Construct wake function on 2N support
+                    auto const dR = R;  // for NVCC capture
+                    amrex::ParallelFor(num_bins*2, [=] AMREX_GPU_DEVICE(int i) {
+                        if (i < num_bins) {
+                            amrex::Real const s = static_cast<amrex::Real>(i) * bin_size;
+                            dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR, bin_size);
+                        }
+                        else if (i > num_bins) {
+                            amrex::Real const s = static_cast<amrex::Real>(i - 2*num_bins) * bin_size;
+                            dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(s, dR, bin_size);
+                        }
+                    });
+
+                    // Call convolution function
+                    convolved_wakefield = impactx::particles::wakefields::convolve_fft(source_data, wake_function, bin_size);
+                }
+                if (apply_short_range_wake){
+                    // TODO:  This section needs to be updated to use the interpolated data from
+                    //        short_range_wake.z, short_range_wake.wake_z, etc.
+                    // Construct wake function on 2N support
+                    auto const wake = short_range_wake;  // trivially copyable view, captured by value
+                    amrex::ParallelFor(num_bins*2, [=] AMREX_GPU_DEVICE(int i) {
+                        if (i < num_bins) {
+                            amrex::Real const s = static_cast<amrex::Real>(i) * bin_size;
+                            dptr_wake_function[i] = impactx::particles::wakefields::w_user(s, wake.wake_z, wake.n_data, bin_min, bin_size);
+                        }
+                        else if (i > num_bins) {
+                            amrex::Real const s = static_cast<amrex::Real>(i - 2*num_bins) * bin_size;
+                            dptr_wake_function[i] = impactx::particles::wakefields::w_user(s, wake.wake_z, wake.n_data, bin_min, bin_size);
+                        }
+                    });
+
+                    // Call convolution function
+                    convolved_wakefield = impactx::particles::wakefields::convolve_fft(source_data, wake_function, bin_size);
+                }
+
             }
 
             // Broadcast the global wakefield from the IO processor (which alone

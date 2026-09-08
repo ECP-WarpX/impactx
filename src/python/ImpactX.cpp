@@ -289,6 +289,27 @@ void init_ImpactX (py::module& m)
             },
             "Number of longitudinal bins used for CSR calculations (default: 150)."
         )
+
+        .def_property("short_range_wakefields",
+            [](ImpactX & /* ix */) {
+                return detail::get_or_throw<bool>("algo", "short_range_wakefields");
+            },
+            [](ImpactX & /* ix */, bool const enable) {
+                amrex::ParmParse pp_algo("algo");
+                pp_algo.add("short_range_wakefields", enable);
+            },
+            "Enable or disable short range structure wakefield calculations (default: disabled)."
+        )
+        .def_property("wake_bins",
+            [](ImpactX & /* ix */) {
+                return detail::get_or_throw<int>("algo", "wake_bins");
+            },
+            [](ImpactX & /* ix */, int wake_bins) {
+                amrex::ParmParse pp_algo("algo");
+                pp_algo.add("wake_bins", wake_bins);
+            },
+            "Number of longitudinal bins used for short range wakefield calculations (default: 150)."
+        )
         .def_property("isr",
             [](ImpactX & /* ix */) {
                 return detail::get_or_throw<bool>("algo", "isr");

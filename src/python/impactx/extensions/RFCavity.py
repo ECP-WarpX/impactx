@@ -30,6 +30,10 @@ def register_RFCavity_extension(cls):
         z=None,
         field_on_axis=None,
         ncoef=None,
+        z_data=None,
+        wake_x_data=None,
+        wake_y_data=None,
+        wake_z_data=None,
         dx=0,
         dy=0,
         rotation=0,
@@ -79,6 +83,14 @@ def register_RFCavity_extension(cls):
             kwargs["cos_coefficients"] = cos_coefficients
         if sin_coefficients is not None:
             kwargs["sin_coefficients"] = sin_coefficients
+        if z_data is not None:
+            kwargs["z_data"] = z_data
+        if wake_x_data is not None:
+            kwargs["wake_x_data"] = wake_x_data
+        if wake_y_data is not None:
+            kwargs["wake_y_data"] = wake_y_data
+        if wake_z_data is not None:
+            kwargs["wake_z_data"] = wake_z_data
 
         _original_init(self, **kwargs)
 
