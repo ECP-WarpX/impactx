@@ -1058,6 +1058,77 @@ def _lattice_isclose(self, other, *, rtol=1e-12, atol=0.0, ignore_attributes=Non
     return True
 
 
+def _ref_trace_entries(self, ref):
+    """``map_trace`` entries excluding the leading ``<start>`` entry.
+
+    ``map_trace`` returns one entry per element plus a leading entry for the
+    starting position; the element entries are what a name lookup addresses.
+    """
+    return self.map_trace(ref)[1:]
+
+
+def ref_at(self, ref, name, *, occurrence=1):
+    """The reference particle at the exit of a named element.
+
+    The reference particle is advanced by every element's non-linear
+    reference push, so its energy — and with it the magnetic rigidity — differs
+    on either side of an accelerating element. This is the state needed to
+    convert an element's normalized strength to or from an engineering unit.
+
+    Nothing is tracked: the lattice is walked analytically, the same way
+    :py:meth:`map_trace` and ``sim.twiss()`` walk it.
+
+    :param ref: reference particle at the start of the lattice
+        (:py:class:`impactx.RefPart`); not modified in place
+    :param name: element name, matched exactly and case-sensitively
+    :param occurrence: which occurrence to address when ``name`` is used more
+        than once, 1-based in beam order. Element names are not required to be
+        unique; without this, a repeated name is an error rather than a silent
+        pick of the first one.
+    :return: a copy of the reference particle at that element's exit
+        (:py:class:`impactx.RefPart`)
+    :raises ValueError: if no element carries ``name``, or if ``occurrence``
+        exceeds the number of elements that do
+
+    Examples
+    --------
+    >>> brho = sim.lattice.ref_at(ref, "QF01").rigidity_Tm  # T*m
+    >>> integrated_gradient = qf.k * qf.ds * brho  # T
+    """
+    if occurrence < 1:
+        raise ValueError(f"occurrence must be >= 1, got {occurrence}.")
+
+    entries = _ref_trace_entries(self, ref)
+    matches = [e for e in entries if e["name"] == name]
+    if not matches:
+        named = sorted({e["name"] for e in entries if e["name"]})
+        detail = f" Named elements: {named}." if named else " No element is named."
+        raise ValueError(f"No element named {name!r} in the lattice.{detail}")
+    if occurrence > len(matches):
+        raise ValueError(
+            f"Element name {name!r} occurs {len(matches)} time(s) in the "
+            f"lattice, but occurrence={occurrence} was requested."
+        )
+    return matches[occurrence - 1]["ref"]
+
+
+def rigidity_at(self, ref, name, *, occurrence=1):
+    """The magnetic rigidity ``Brho`` in T*m at the exit of a named element.
+
+    Shorthand for ``ref_at(...).rigidity_Tm``. This is the conversion constant
+    between an element's normalized strength and its field: a quadrupole's
+    integrated gradient in T is ``k * ds * rigidity_at(...)``.
+
+    :param ref: reference particle at the start of the lattice
+        (:py:class:`impactx.RefPart`); not modified in place
+    :param name: element name, matched exactly and case-sensitively
+    :param occurrence: which occurrence to address when ``name`` is used more
+        than once, 1-based in beam order
+    :return: magnetic rigidity in T*m
+    """
+    return ref_at(self, ref, name, occurrence=occurrence).rigidity_Tm
+
+
 # Apply to FilteredElementsList immediately. The pybind11 KnownElementsList is
 # patched inside register_KnownElementsList_extension() below, since that is
 # the sole entry point that receives the bound class.
@@ -1084,6 +1155,10 @@ def register_KnownElementsList_extension(kel):
     kel.to_dicts = to_dicts
     kel.to_py = to_py
     kel.from_dicts = from_dicts
+
+    # Reference particle along the lattice
+    kel.ref_at = ref_at
+    kel.rigidity_at = rigidity_at
 
     # Enhanced element selection methods
     kel.select = select

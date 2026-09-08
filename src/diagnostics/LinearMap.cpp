@@ -203,14 +203,16 @@ namespace
         std::vector<MapTraceEntry> trace;
         trace.reserve(lattice.size() + 1u);
 
-        // Leading entry: identity map at the starting s. This makes the
-        // returned vector always start at the beginning of the lattice so
-        // downstream code (e.g., Twiss propagation) can treat every entry uniformly.
+        // Leading entry: identity map at the starting s, carrying the incoming
+        // reference particle. This makes the returned vector always start at the
+        // beginning of the lattice so downstream code (e.g., Twiss propagation)
+        // can treat every entry uniformly.
         trace.push_back(MapTraceEntry{
             ref_part_init.s,
             std::string{},
             std::string{"<start>"},
-            Map6x6::Identity()
+            Map6x6::Identity(),
+            ref_part_init
         });
 
         walk_lattice(
@@ -222,7 +224,8 @@ namespace
                     ref_now.s,
                     element.has_name() ? element.name() : std::string{},
                     std::string{E::type},
-                    M_now
+                    M_now,
+                    ref_now
                 });
             }
         );
@@ -241,8 +244,8 @@ namespace
 
         // End-to-end map only: rely on walk_lattice's default no-op
         // element-exit hook (NoopElementExit), so no per-element
-        // MapTraceEntry (two std::string copies plus a 6x6 matrix per
-        // element) is constructed.
+        // MapTraceEntry (two std::string copies, a 6x6 matrix and a
+        // RefPart per element) is constructed.
         return walk_lattice(lattice, ref_part_init, on_missing);
     }
 

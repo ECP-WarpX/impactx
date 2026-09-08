@@ -1271,12 +1271,59 @@ This module provides elements and methods for the accelerator lattice.
                * ``M``    -- cumulative 6x6 linear transport map from the
                  start of the lattice to the exit of this element (a
                  ``Map6x6`` instance; call ``.to_numpy()`` for a standard
-                 C-ordered NumPy array).
+                 C-ordered NumPy array);
+               * ``ref``  -- the reference particle (:py:class:`impactx.RefPart`)
+                 at the exit of this element.
 
-               The first entry always has the identity map at the starting
-               ``s``; the last entry contains the same map as
-               :py:meth:`~transfer_map`.
+               The first entry always has the identity map and the incoming
+               reference particle at the starting ``s``; the last entry
+               contains the same map as :py:meth:`~transfer_map`.
       :rtype: list[dict]
+
+   .. py:method:: ref_at(ref, name, occurrence=1)
+
+      The reference particle at the exit of a named element.
+
+      The reference particle is advanced by every element's non-linear
+      reference push, so its energy -- and with it the magnetic rigidity --
+      differs on either side of an accelerating element. This is the state
+      needed to convert an element's normalized strength to or from an
+      engineering unit.
+
+      Nothing is tracked: the lattice is walked analytically, the same way
+      :py:meth:`~map_trace` walks it.
+
+      .. code-block:: python
+
+         brho = sim.lattice.ref_at(ref, "QF01").rigidity_Tm   # T*m
+         integrated_gradient = qf.k * qf.ds * brho            # T
+
+      :param ref: reference particle at the start of the lattice; not
+                  modified in place
+      :param name: element name, matched exactly and case-sensitively
+      :param occurrence: which occurrence to address when ``name`` is used
+                         more than once, 1-based in beam order. Element names
+                         are not required to be unique; without this, a
+                         repeated name is an error rather than a silent pick
+                         of the first one.
+      :return: a copy of the reference particle at that element's exit
+      :rtype: RefPart
+
+   .. py:method:: rigidity_at(ref, name, occurrence=1)
+
+      The magnetic rigidity ``Brho`` in T*m at the exit of a named element.
+
+      Shorthand for ``ref_at(...).rigidity_Tm``. This is the conversion
+      constant between an element's normalized strength and its field: a
+      quadrupole's integrated gradient in T is ``k * ds * rigidity_at(...)``.
+
+      :param ref: reference particle at the start of the lattice; not
+                  modified in place
+      :param name: element name, matched exactly and case-sensitively
+      :param occurrence: which occurrence to address when ``name`` is used
+                         more than once, 1-based in beam order
+      :return: magnetic rigidity in T*m
+      :rtype: float
 
    .. py:method:: to_dicts()
 
