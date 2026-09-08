@@ -136,6 +136,7 @@ void init_lattice(py::module& me)
                     d["name"] = e.element_name;
                     d["type"] = e.element_type;
                     d["M"] = e.M_cumulative;
+                    d["ref"] = e.ref;
                     out.append(std::move(d));
                 }
                 return out;
@@ -162,9 +163,16 @@ void init_lattice(py::module& me)
             "    * ``M``    -- cumulative 6x6 linear transport map from the\n"
             "      start of the lattice to the exit of this element (a\n"
             "      ``Map6x6`` instance; call ``.to_numpy()`` for a standard\n"
-            "      C-ordered NumPy array).\n\n"
-            "    The first entry always has the identity map at the starting\n"
-            "    ``s``; the last entry contains the same map as ``transfer_map``."
+            "      C-ordered NumPy array);\n"
+            "    * ``ref``  -- the reference particle (:py:class:`impactx.RefPart`)\n"
+            "      at the exit of this element. Use ``ref.rigidity_Tm`` to convert\n"
+            "      an element's normalized strength to or from an engineering\n"
+            "      unit; the rigidity changes across accelerating elements, so\n"
+            "      the value at the start of the lattice is the wrong one for\n"
+            "      anything downstream of a cavity.\n\n"
+            "    The first entry always has the identity map and the incoming\n"
+            "    reference particle at the starting ``s``; the last entry\n"
+            "    contains the same map as ``transfer_map``."
         )
     ;
 

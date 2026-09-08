@@ -56,6 +56,14 @@ namespace impactx::diagnostics
      *  normalized by the reference momentum, t arrival-time deviation relative
      *  to the reference (in meters of c*dt), and pt the momentum deviation
      *  relative to the reference (dimensionless).
+     *
+     *  @c ref is the reference particle at the *exit* of this element, i.e. the
+     *  state against which @c M_cumulative was evaluated. It is the reference
+     *  state a downstream consumer needs in order to convert an element's
+     *  normalized strength to or from an engineering unit: a quadrupole's
+     *  gradient in T/m is @c k times @c RefPart::rigidity_Tm , and the rigidity
+     *  changes across accelerating elements, so the value at the start of the
+     *  lattice is the wrong one for anything downstream of a cavity.
      */
     struct MapTraceEntry
     {
@@ -63,6 +71,7 @@ namespace impactx::diagnostics
         std::string element_name;       //!< user-supplied element name; empty if the element was not named
         std::string element_type;       //!< element type string (e.g. "Drift", "Quad", "Sbend")
         Map6x6 M_cumulative;            //!< cumulative 6x6 linear transport map from the start up to the exit of this element
+        RefPart ref;                    //!< reference particle at the exit of this element
     };
 
     /** Compose the linear transport map element-by-element along a lattice.
@@ -99,9 +108,10 @@ namespace impactx::diagnostics
      * @param[in] on_missing      policy for elements without a linear map;
      *                            default is identity + warning
      * @return                    vector of entries, size @c lattice.size() + 1 ;
-     *                            the first entry is the identity map at the
-     *                            starting s, each subsequent entry is the
-     *                            cumulative map at the exit of one element.
+     *                            the first entry is the identity map and the
+     *                            incoming reference particle at the starting s,
+     *                            each subsequent entry is the cumulative map and
+     *                            the reference particle at the exit of one element.
      */
     std::vector<MapTraceEntry>
     map_trace (
