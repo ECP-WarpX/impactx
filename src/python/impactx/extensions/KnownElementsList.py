@@ -340,6 +340,14 @@ class FilteredElementsList:
                 new_el.ds = old_el.ds
             replacements.append((i, new_el))
 
+        # Check every replacement before installing any. Assigning to a position is what
+        # rejects something that is not an element, and by then the positions before it
+        # have already changed -- a `copy()` that returns an element once and something
+        # else next would leave the lattice half replaced. Filling a throwaway lattice
+        # applies exactly the same rule, so there is no second list of element types here
+        # to keep in step with the bindings.
+        elements.KnownElementsList().extend([new_el for _, new_el in replacements])
+
         for i, new_el in replacements:
             original[i] = new_el
 

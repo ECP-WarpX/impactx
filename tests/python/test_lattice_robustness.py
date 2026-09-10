@@ -227,3 +227,41 @@ def test_extended_slice_survives_a_finalizer_that_reads_the_lattice():
     assert lattice[0].tag == "retained"
     assert lattice[2].tag == "retained"
     assert reads == [2.0]
+
+
+@pytest.mark.parametrize("operation", ["read", "delete", "assign"])
+def test_slice_bounds_follow_an_index_that_edits_the_lattice(operation):
+    """A slice bound may be an object whose ``__index__`` reaches the lattice.
+
+    Regression test: the length was read before ``__index__`` ran, so bounds computed
+    against the old length were used to index the new one. Reading raised IndexError and
+    deleting read past the end outright, where a list simply normalizes against whatever
+    length it has by then. ``list`` unpacks the slice first and adjusts afterwards.
+    """
+
+    lattice = drifts("a", "b", "c")
+    reference = ["a", "b", "c"]
+
+    class ClearsWhenAsked:
+        def __init__(self, value, target):
+            self.value, self.target = value, target
+
+        def __index__(self):
+            self.target.clear()
+            return self.value
+
+    if operation == "read":
+        assert (
+            names_of(lattice[0 : ClearsWhenAsked(3, lattice)])
+            == reference[0 : ClearsWhenAsked(3, reference)]
+        )
+    elif operation == "delete":
+        del lattice[0 : ClearsWhenAsked(3, lattice)]
+        del reference[0 : ClearsWhenAsked(3, reference)]
+        assert names_of(lattice) == reference
+    else:
+        lattice[0 : ClearsWhenAsked(3, lattice)] = []
+        reference[0 : ClearsWhenAsked(3, reference)] = []
+        assert names_of(lattice) == reference
+
+    assert names_of(lattice) == []

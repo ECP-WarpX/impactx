@@ -33,6 +33,48 @@ using impactx::python::handle_from_python;
 using impactx::python::lattice_of;
 
 
+/** Resolve a slice against the lattice, the way a list does
+ *
+ * The bounds of a slice can be arbitrary objects with an @c __index__ of their own,
+ * and running one is Python: it can reach this very lattice and clear or resize it.
+ * Reading the length first and normalizing against it would leave bounds describing a
+ * lattice that no longer exists, and the callers index without checking.
+ *
+ * So do it in the order @c list does: unpack the slice, which is what runs
+ * @c __index__, and only then adjust against the length the lattice has by that point.
+ *
+ * @param slice the slice to resolve
+ * @param v the lattice it indexes
+ * @param[out] start first position
+ * @param[out] stop one past the last position
+ * @param[out] step distance between positions
+ * @param[out] length how many positions the slice names
+ */
+inline void resolve_slice (
+    py::slice const & slice,
+    impactx::Lattice const & v,
+    size_t & start,
+    size_t & stop,
+    size_t & step,
+    size_t & length
+    )
+    {
+    Py_ssize_t start_i = 0, stop_i = 0, step_i = 0;
+    if (PySlice_Unpack(slice.ptr(), &start_i, &stop_i, &step_i) < 0)
+    {
+        throw py::error_already_set();
+    }
+
+    // __index__ has run by now and may have changed the lattice
+    Py_ssize_t const length_i = PySlice_AdjustIndices(
+        static_cast<Py_ssize_t>(v.size()), &start_i, &stop_i, step_i);
+
+    start = static_cast<size_t>(start_i);
+    stop = static_cast<size_t>(stop_i);
+    step = static_cast<size_t>(step_i);
+    length = static_cast<size_t>(length_i);
+    }
+
 void init_lattice(py::module& me)
 {
     using elements::KnownElements;
@@ -196,9 +238,7 @@ void init_lattice(py::module& me)
              [](py::object self, py::slice const & slice) {
                  auto & v = lattice_of(self);
                  size_t start = 0, stop = 0, step = 0, length = 0;
-                 if (!slice.compute(v.size(), &start, &stop, &step, &length)) {
-                     throw py::error_already_set();
-                 }
+                 resolve_slice(slice, v, start, stop, step, length);
                  Owners owners(self, v);
 
                  // A slice is a new lattice over the same elements, like a Python list
@@ -239,9 +279,7 @@ void init_lattice(py::module& me)
                  }
 
                  size_t start = 0, stop = 0, step = 0, length = 0;
-                 if (!slice.compute(v.size(), &start, &stop, &step, &length)) {
-                     throw py::error_already_set();
-                 }
+                 resolve_slice(slice, v, start, stop, step, length);
 
                  if (step != 1 && pending.size() != length)
                  {
@@ -323,9 +361,7 @@ void init_lattice(py::module& me)
              [](py::object self, py::slice const & slice) {
                  auto & v = lattice_of(self);
                  size_t start = 0, stop = 0, step = 0, length = 0;
-                 if (!slice.compute(v.size(), &start, &stop, &step, &length)) {
-                     throw py::error_already_set();
-                 }
+                 resolve_slice(slice, v, start, stop, step, length);
                  // Nothing selected changes nothing, and must not count as an edit:
                  // that would void every selection taken on this lattice.
                  if (length == 0) { return; }

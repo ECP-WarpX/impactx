@@ -252,6 +252,31 @@ class TestFilteredEditsAreAllOrNothing:
 
         assert [type(element).__name__ for element in lattice] == ["Quad"] * 3
 
+    def test_a_template_that_copies_once_changes_nothing(self):
+        """The failure can arrive after a good copy, not on the first one.
+
+        Regression test: the replacements were checked only as they were installed, so a
+        `copy()` that returned an element once and something else next left the earlier
+        positions already replaced.
+        """
+
+        class CopiesOnce(elements.Drift):
+            calls = 0
+
+            def copy(self, **overrides):
+                CopiesOnce.calls += 1
+                return elements.Drift(ds=0.5) if CopiesOnce.calls == 1 else None
+
+        # unnamed, so `keep_name` does not touch the replacement first and the bad
+        # value reaches the point where the type is checked
+        lattice = elements.KnownElementsList()
+        lattice.extend([elements.Quad(ds=0.1, k=1.0) for _ in range(3)])
+
+        with pytest.raises(TypeError, match="expected a lattice element"):
+            lattice.select(kind="Quad").replace_each(CopiesOnce(ds=0.5))
+
+        assert [type(element).__name__ for element in lattice] == ["Quad"] * 3
+
 
 class TestInsertEveryDsKeepsElements:
     @staticmethod
