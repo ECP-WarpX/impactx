@@ -176,6 +176,23 @@ class TestCopyWithOverrides:
         with pytest.raises(AttributeError):
             template.copy(kk=2.0)
 
+    def test_a_mistyped_name_is_reported_on_a_dynamic_attribute_element(self):
+        """`Programmable` takes attributes of its own, which hid mistyped names.
+
+        Regression test: the overrides were applied with `setattr`, and an element that
+        accepts dynamic attributes took a mistyped name as a new attribute instead of
+        rejecting it -- leaving the parameter it was meant for unchanged, where every
+        other element type raises.
+        """
+
+        template = elements.Programmable(ds=1.0, nslice=3)
+
+        with pytest.raises(AttributeError, match="nslcie"):
+            template.copy(nslcie=5)
+
+        # the name it was meant for still works
+        assert template.copy(nslice=5).nslice == 5
+
     def test_an_element_carrying_arrays_keeps_them(self):
         element = elements.SoftQuadrupole(
             ds=0.1, gscale=1.0, cos_coefficients=[2.0], sin_coefficients=[0.0]

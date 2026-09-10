@@ -45,6 +45,48 @@ namespace impactx
 
         Lattice () = default;
 
+        /** A copy is a new lattice holding the same elements
+         *
+         * The traversal count is deliberately not copied. It says something about a loop
+         * walking *this* instance, not about which elements a lattice holds, so a copy
+         * made while the original is being walked would refuse every structural edit for
+         * the rest of its life.
+         */
+        Lattice (Lattice const & other)
+          : m_elements(other.m_elements), m_generation(other.m_generation)
+        {
+        }
+
+        /** @see Lattice(Lattice const &); a lattice being walked cannot be replaced */
+        Lattice & operator= (Lattice const & other)
+        {
+            if (this != &other)
+            {
+                require_no_traversal("replace the lattice");
+                m_elements = other.m_elements;
+                ++m_generation;
+            }
+            return *this;
+        }
+
+        /** @see Lattice(Lattice const &) */
+        Lattice (Lattice && other) noexcept
+          : m_elements(std::move(other.m_elements)), m_generation(other.m_generation)
+        {
+        }
+
+        /** @see Lattice(Lattice const &); a lattice being walked cannot be replaced */
+        Lattice & operator= (Lattice && other) noexcept(false)
+        {
+            if (this != &other)
+            {
+                require_no_traversal("replace the lattice");
+                m_elements = std::move(other.m_elements);
+                ++m_generation;
+            }
+            return *this;
+        }
+
         /** Take shared ownership of an element, copying the value given
          *
          * @param element the element to copy into the lattice

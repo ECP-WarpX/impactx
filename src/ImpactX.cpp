@@ -83,6 +83,11 @@ namespace impactx {
 
     void ImpactX::finalize_elements ()
     {
+        // An element's finalization can run a callback of its own, and that callback can
+        // reach this lattice. Appending would reallocate the storage under the loop below,
+        // so refuse structural edits for the walk.
+        Lattice::TraversalGuard const traversal(*m_lattice);
+
         // loop over all beamline elements & finalize them
         for (auto & element_variant : *m_lattice)
         {

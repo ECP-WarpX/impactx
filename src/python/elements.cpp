@@ -209,9 +209,19 @@ namespace
                 }
 
                 // Apply the rest one at a time. Setting a parameter the element does not
-                // have raises, so a mistyped name is reported rather than quietly ignored.
+                // have has to be reported rather than quietly ignored, and `setattr` alone
+                // does not do that everywhere: an element that accepts dynamic attributes
+                // (Programmable) would take a mistyped name as a new attribute and leave
+                // the parameter it was meant for unchanged. Ask first.
                 for (auto const & item : remaining)
                 {
+                    if (!py::hasattr(copied, item.first))
+                    {
+                        throw py::attribute_error(
+                            std::string("'") + py::str(py::type::of(copied).attr("__name__")).cast<std::string>() +
+                            "' object has no attribute '" +
+                            py::str(item.first).cast<std::string>() + "'");
+                    }
                     py::setattr(copied, item.first, item.second);
                 }
                 return copied;
