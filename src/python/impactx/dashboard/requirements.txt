@@ -1,8 +1,16 @@
 pandas>=2.2.0
 plotly>=5.23.0
-trame>=3.6.2
+# trame 4.0 pulls in trame-client 4.0, which merged trame_client.widgets.trame
+# into trame_client.widgets.client. Two of our widget packages have not followed:
+#   - trame-router (2.3.0) still imports trame_client.widgets.trame -> ImportError
+#     https://github.com/Kitware/trame-router/blob/master/trame_router/ui/router.py
+#   - trame-vuetify (3.2.5) pins trame-client<4, so pip backtracks the whole
+#     dashboard UI to the ancient trame-vuetify 2.7.2
+# Lift the cap once both support trame-client 4.
+trame>=3.6.2,<4
+trame-client<4
 trame-matplotlib>=2.0.3
 trame-plotly>=3.0.2
 trame-router>=2.2.0
-trame-vuetify>=2.6.2
+trame-vuetify>=3.0.0,<4
 trame-xterm>=0.2.1
