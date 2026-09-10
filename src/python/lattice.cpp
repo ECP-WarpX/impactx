@@ -31,6 +31,7 @@ using namespace impactx;
 // from inside a nested lambda, and every use below sits in one
 using impactx::python::handle_from_python;
 using impactx::python::lattice_of;
+using impactx::python::retain_parent;
 
 
 /** Resolve a slice against the lattice, the way a list does
@@ -122,6 +123,7 @@ void init_lattice(py::module& me)
 
         .def("append",
              [](py::object self, py::object el) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  auto handle = handle_from_python(el);
                  Owners owners(self, v);
@@ -137,6 +139,7 @@ void init_lattice(py::module& me)
 
         .def("extend",
              [](py::object self, py::iterable const & l) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
 
                  // convert everything first, so a bad entry leaves the lattice unchanged
@@ -160,7 +163,7 @@ void init_lattice(py::module& me)
         )
 
         .def_property_readonly("generation",
-             [](py::object self) { return lattice_of(self).generation(); },
+             [](py::object self) { auto const parent = retain_parent(self); return lattice_of(self).generation(); },
              "How often the sequence of elements changed.\n\n"
              "Counts structural edits only: changing a parameter on an element that is\n"
              "already in the lattice does not move anything and does not change this.\n"
@@ -169,13 +172,14 @@ void init_lattice(py::module& me)
              "sequence in several steps, as deleting a selection does."
         )
 
-        .def("size", [](py::object self) { return lattice_of(self).size(); })
-        .def("is_empty", [](py::object self) { return lattice_of(self).empty(); })
-        .def("__len__", [](py::object self) { return lattice_of(self).size(); },
+        .def("size", [](py::object self) { auto const parent = retain_parent(self); return lattice_of(self).size(); })
+        .def("is_empty", [](py::object self) { auto const parent = retain_parent(self); return lattice_of(self).empty(); })
+        .def("__len__", [](py::object self) { auto const parent = retain_parent(self); return lattice_of(self).size(); },
              "The length of the list.")
 
         .def("clear",
              [](py::object self) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  Owners owners(self, v);
                  v.clear();
@@ -186,6 +190,7 @@ void init_lattice(py::module& me)
 
         .def("pop_back",
              [](py::object self) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  if (v.empty()) { throw py::index_error("pop from empty lattice"); }
                  Owners owners(self, v);
@@ -199,6 +204,7 @@ void init_lattice(py::module& me)
 
         .def("__iter__",
              [](py::object self) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  Owners owners(self, v);
                  // materialize the exact wrappers, so iteration yields the objects that
@@ -212,6 +218,7 @@ void init_lattice(py::module& me)
 
         .def("__getitem__",
              [checked_index](py::object self, py::ssize_t index) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  auto const i = checked_index(v, index);
                  Owners owners(self, v);
@@ -223,6 +230,7 @@ void init_lattice(py::module& me)
 
         .def("__setitem__",
              [checked_index](py::object self, py::ssize_t index, py::object el) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  auto const i = checked_index(v, index);
                  auto handle = handle_from_python(el);
@@ -236,6 +244,7 @@ void init_lattice(py::module& me)
 
         .def("__getitem__",
              [](py::object self, py::slice const & slice) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  size_t start = 0, stop = 0, step = 0, length = 0;
                  resolve_slice(slice, v, start, stop, step, length);
@@ -263,6 +272,7 @@ void init_lattice(py::module& me)
 
         .def("__setitem__",
              [](py::object self, py::slice const & slice, py::iterable const & value) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
 
                  // Convert first, for two reasons: a bad entry must leave the lattice
@@ -359,6 +369,7 @@ void init_lattice(py::module& me)
 
         .def("__delitem__",
              [](py::object self, py::slice const & slice) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  size_t start = 0, stop = 0, step = 0, length = 0;
                  resolve_slice(slice, v, start, stop, step, length);
@@ -399,6 +410,7 @@ void init_lattice(py::module& me)
 
         .def("__delitem__",
              [checked_index](py::object self, py::ssize_t index) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  auto const i = checked_index(v, index);
                  Owners owners(self, v);
@@ -412,6 +424,7 @@ void init_lattice(py::module& me)
 
         .def("insert",
              [](py::object self, py::ssize_t index, py::object el) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  auto handle = handle_from_python(el);
 
@@ -435,6 +448,7 @@ void init_lattice(py::module& me)
         // ``lattice == [element]`` is True.
         .def("index",
              [element_address](py::object self, py::object el) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  auto const * wanted = element_address(el);
                  for (KnownElementsList::size_type i = 0; i < v.size(); ++i)
@@ -449,6 +463,7 @@ void init_lattice(py::module& me)
 
         .def("count",
              [element_address](py::object self, py::object el) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  auto const * wanted = element_address(el);
                  KnownElementsList::size_type n = 0;
@@ -465,6 +480,7 @@ void init_lattice(py::module& me)
 
         .def("__contains__",
              [element_address](py::object self, py::object el) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  auto const * wanted = element_address(el);
                  if (wanted == nullptr) { return false; }
@@ -479,6 +495,7 @@ void init_lattice(py::module& me)
 
         .def("remove",
              [element_address](py::object self, py::object el) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  auto const * wanted = element_address(el);
                  if (wanted != nullptr)
@@ -500,6 +517,7 @@ void init_lattice(py::module& me)
 
         .def("__reversed__",
              [](py::object self) {
+                 auto const parent = retain_parent(self);  // outlives this call
                  auto & v = lattice_of(self);
                  Owners owners(self, v);
                  py::list out;
@@ -522,6 +540,7 @@ void init_lattice(py::module& me)
                 bool fallback_identity_map
             )
             {
+                auto const parent = retain_parent(self);  // outlives this call
                 auto const & v = lattice_of(self);
                 if (order != "linear") {
                     throw std::runtime_error(
@@ -556,6 +575,7 @@ void init_lattice(py::module& me)
             "map_trace",
             [](py::object self, RefPart ref)  // intentional copy of ref
             {
+                auto const parent = retain_parent(self);  // outlives this call
                 auto const & v = lattice_of(self);
                 auto const trace = ix_diag::map_trace(v, ref);
 

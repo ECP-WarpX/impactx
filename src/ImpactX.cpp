@@ -41,7 +41,23 @@ namespace impactx {
 
     ImpactX::~ImpactX()
     {
-        this->finalize();
+        // A destructor may not let an exception out: doing so ends the process, and
+        // finalize() does throw -- it refuses while a traversal is walking the lattice.
+        // The Python bindings hold the simulation for the duration of a lattice call so
+        // that cannot happen from there, but a destructor is the wrong place to find out.
+        // Report and carry on: whatever is left unfinalized is going away with us.
+        try
+        {
+            this->finalize();
+        }
+        catch (std::exception const & e)
+        {
+            amrex::Print() << "ImpactX: could not finalize on destruction: " << e.what() << "\n";
+        }
+        catch (...)
+        {
+            amrex::Print() << "ImpactX: could not finalize on destruction.\n";
+        }
     }
 
     void ImpactX::finalize ()

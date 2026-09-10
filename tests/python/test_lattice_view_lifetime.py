@@ -336,6 +336,44 @@ def test_a_copy_that_edits_the_lattice_is_refused():
     assert [element.name for element in lattice] == ["inserted", "q0", "d0", "q1"]
 
 
+def test_dropping_the_simulation_inside_a_callback_does_not_abort():
+    """A callback may release the last reference to the simulation it is tracking in.
+
+    Regression test: the lattice bindings checked that the simulation was still there but
+    did not hold it, so a callback that dropped the last reference had the simulation
+    destroyed mid-traversal. Its destructor finalizes, finalizing refuses while a
+    traversal is in progress, and an exception out of a destructor ends the process --
+    this aborted with SIGABRT.
+    """
+
+    import subprocess
+    import sys
+
+    program = """
+from impactx import ImpactX, RefPart, elements
+
+holder = [ImpactX()]
+lattice = holder[0].lattice
+
+ref = RefPart()
+ref.set_species("electron").set_kin_energy_MeV(100)
+
+dropper = elements.Programmable()
+dropper.ref_particle = lambda refpart: holder.clear()
+lattice.append(dropper)
+
+lattice.transfer_map(ref, fallback_identity_map=True)
+print("survived")
+"""
+
+    finished = subprocess.run(
+        [sys.executable, "-c", program], capture_output=True, text=True
+    )
+
+    assert finished.returncode == 0, finished.stderr[-2000:]
+    assert "survived" in finished.stdout
+
+
 class TestFinalizersDuringFilteredEdits:
     """A displaced element's `__del__` runs while the edit is still going.
 

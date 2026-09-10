@@ -97,6 +97,35 @@ namespace impactx::python
         return self.cast<Lattice &>();
     }
 
+    /** Keep the simulation alive for as long as the returned object lives
+     *
+     * @see require_parent_alive only asks whether the simulation is still there. That is
+     * not enough for an operation that runs Python -- a user callback, or a finalizer of
+     * an element it releases -- because that code can drop the last reference to the
+     * simulation while this operation is still walking its lattice. The simulation would
+     * then be destroyed mid-operation, and its destructor finalizes, which refuses while
+     * a traversal is in progress: an exception out of a destructor ends the process.
+     *
+     * Holding a strong reference for the duration makes that impossible; the simulation
+     * is destroyed after the call returns, as the caller intended.
+     *
+     * @param self the Python lattice object
+     * @return a reference to the owning simulation, or None for a standalone lattice
+     */
+    [[nodiscard]] inline py::object retain_parent (py::object const & self)
+    {
+        if (!py::hasattr(self, "_parent_sim")) { return py::none(); }  // a standalone lattice
+
+        py::object parent = self.attr("_parent_sim")();
+        if (parent.is_none())
+        {
+            throw std::runtime_error(
+                "This lattice belonged to a simulation that no longer exists. Keep a "
+                "reference to the simulation for as long as you use its lattice.");
+        }
+        return parent;
+    }
+
     /** The Python objects a lattice keeps alive, one entry per lattice position.
      *
      * Sharing a C++ element is not by itself enough to give a user back the object they
