@@ -265,3 +265,34 @@ def test_slice_bounds_follow_an_index_that_edits_the_lattice(operation):
         assert names_of(lattice) == reference
 
     assert names_of(lattice) == []
+
+
+def test_assigning_the_lattice_never_shows_an_empty_one():
+    """Replacing `sim.lattice` releases the old wrappers; they must not see it empty.
+
+    Regression test: the setter cleared before extending, so a subclass finalizer running
+    from that `clear()` observed an empty lattice, and anything it appended landed ahead
+    of the replacements.
+    """
+
+    sim = ImpactX()
+    sim.particle_shape = 2
+    sim.slice_step_diagnostics = False
+    sim.init_grids()
+
+    seen = []
+
+    class Watcher(elements.Drift):
+        def __del__(self):
+            seen.append([element.name for element in sim.lattice])
+
+    sim.lattice.extend([Watcher(ds=1.0, name="old")])
+    sim.lattice = [
+        elements.Drift(ds=1.0, name="new1"),
+        elements.Drift(ds=1.0, name="new2"),
+    ]
+
+    assert [element.name for element in sim.lattice] == ["new1", "new2"]
+    assert seen == [["new1", "new2"]]
+
+    sim.finalize()

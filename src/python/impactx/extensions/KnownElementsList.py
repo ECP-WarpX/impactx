@@ -26,7 +26,9 @@ def _drift_class_for_replace_with_drifts(model: str, old_el) -> type:
     ``impactx.element_models.tier_of_class``). Otherwise ``model`` must already be
     validated against :data:`impactx.element_models.MODEL_TIERS`."""
     if model == "match":
-        key = tier_of_class(type(old_el).__name__)
+        # the kind, not the class name: an element written as a Python subclass is still
+        # of its element kind, and its matching drift follows that kind's tier
+        key = tier_of_class(_element_kind(old_el))
     else:
         key = model
     return DRIFT_MODEL_CLASSES[key]
@@ -49,7 +51,9 @@ def _element_to_dict(element) -> dict:
     Applies the radians/degrees work-around for the element types whose
     ``to_dict()`` disagrees with their constructor.
     """
-    if type(element).__name__ in _DEGREE_ELEMENTS:
+    # the kind, not the class name: a Python subclass of one of these still reports its
+    # angle in radians, and would otherwise round-trip as radians read back as degrees
+    if _element_kind(element) in _DEGREE_ELEMENTS:
         return element.to_dict(in_degrees=True)
     return element.to_dict()
 
@@ -339,6 +343,13 @@ class FilteredElementsList:
             if keep_ds and hasattr(old_el, "ds"):
                 new_el.ds = old_el.ds
             replacements.append((i, new_el))
+
+        # Building the replacements ran `copy()` on the template, which is user code for a
+        # Python subclass and free to edit the very lattice being replaced. The positions
+        # were taken before that, so check the selection still describes this lattice
+        # before writing at them -- otherwise the writes land on whatever moved into those
+        # positions.
+        self._require_valid()
 
         # Check every replacement before installing any. Assigning to a position is what
         # rejects something that is not an element, and by then the positions before it

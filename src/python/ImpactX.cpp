@@ -954,6 +954,14 @@ void init_ImpactX (py::module& m)
                 }
 
                 py::object view = self.attr("lattice");
+
+                // Hold on to what is being displaced until the new contents are in place.
+                // `clear()` can drop the last reference to an element's Python wrapper and
+                // run its `__del__` there, and a finalizer that reads the lattice would
+                // see it empty -- a state the caller never asked for. Released at the end
+                // of this setter, once the replacement is committed.
+                py::list const displaced(view);
+
                 view.attr("clear")();
                 view.attr("extend")(wanted);
             },

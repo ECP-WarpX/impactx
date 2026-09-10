@@ -876,3 +876,27 @@ def test_lattice_rebuild_covers_all_element_types(all_elements):
     # delete a single element: every *other* element has to be cloned
     lattice.select(kind="Marker").delete()
     assert len(lattice) < n_before
+
+
+def test_a_subclass_serializes_by_its_element_kind():
+    """The lattice keeps Python subclasses, and serialization has to see through them.
+
+    Regression test: the radians/degrees work-around keyed off the exact class name, so a
+    subclass of one of those elements skipped it and a 30 degree bend came back as 0.52.
+    """
+
+    class MyBend(elements.ExactSbend):
+        pass
+
+    lattice = elements.KnownElementsList()
+    lattice.extend(
+        [
+            elements.ExactSbend(ds=1.0, phi=30.0, B=0.0),
+            MyBend(ds=1.0, phi=30.0, B=0.0),
+        ]
+    )
+
+    plain, subclassed = lattice.to_dicts()
+
+    assert plain["phi"] == pytest.approx(30.0)
+    assert subclassed["phi"] == pytest.approx(30.0)

@@ -278,6 +278,64 @@ class TestFilteredEditsAreAllOrNothing:
         assert [type(element).__name__ for element in lattice] == ["Quad"] * 3
 
 
+def test_matching_drifts_follow_the_element_kind_of_a_subclass():
+    """`model="match"` picks the drift for the element's kind, subclass or not.
+
+    Regression test: the tier came from the exact class name, so a subclass of
+    `ExactSbend` matched nothing and was replaced with a plain `Drift`.
+    """
+
+    class MyBend(elements.ExactSbend):
+        pass
+
+    lattice = elements.KnownElementsList()
+    lattice.extend(
+        [
+            elements.ExactSbend(ds=1.0, phi=30.0, B=0.0),
+            MyBend(ds=1.0, phi=30.0, B=0.0),
+        ]
+    )
+
+    lattice.select(kind="ExactSbend").replace_with_drifts(model="match")
+
+    assert [type(element).__name__ for element in lattice] == ["ExactDrift"] * 2
+
+
+def test_a_copy_that_edits_the_lattice_is_refused():
+    """Building the replacements runs user code, which may move the positions.
+
+    Regression test: the positions were taken before `copy()` ran and used afterwards
+    without rechecking, so a template whose `copy()` inserted an element wrote the
+    replacements over whatever had moved into those positions.
+    """
+
+    lattice = elements.KnownElementsList()
+    lattice.extend(
+        [
+            elements.Quad(ds=1.0, k=1.0, name="q0"),
+            elements.Drift(ds=1.0, name="d0"),
+            elements.Quad(ds=1.0, k=2.0, name="q1"),
+        ]
+    )
+
+    class Meddler(elements.Drift):
+        edited = False
+
+        def copy(self, **overrides):
+            if not Meddler.edited:
+                Meddler.edited = True
+                lattice.insert(0, elements.Drift(ds=0.1, name="inserted"))
+            return elements.Drift(ds=0.5)
+
+    selection = lattice.select(kind="Quad")
+
+    with pytest.raises(RuntimeError, match="no longer valid"):
+        selection.replace_each(Meddler(ds=0.5))
+
+    # only what the callback itself did; nothing written at the stale positions
+    assert [element.name for element in lattice] == ["inserted", "q0", "d0", "q1"]
+
+
 class TestInsertEveryDsKeepsElements:
     @staticmethod
     def tagged_quad():
