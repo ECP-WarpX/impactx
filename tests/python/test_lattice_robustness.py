@@ -194,3 +194,36 @@ def test_slice_assignment_from_a_generator_that_clears():
 
     assert names_of(lattice) == ["new"]
     assert names_of(lattice) == reference
+
+
+def test_extended_slice_survives_a_finalizer_that_reads_the_lattice():
+    """A displaced element's ``__del__`` may run while the replacement is still going.
+
+    Regression test: assigning through an extended slice released each displaced element
+    as it went -- both its handle and, through the owner list, the last reference to its
+    Python wrapper. A subclass finalizer that read the lattice from there saw a generation
+    that had already moved and rebuilt the owner list, so the remaining writes landed in a
+    list that was no longer the lattice's. The second replacement lost its wrapper and came
+    back as a plain ``Drift`` without its attributes.
+    """
+
+    lattice = elements.KnownElementsList()
+    reads = []
+
+    class Observed(elements.Drift):
+        def __del__(self):
+            reads.append(lattice[1].ds)
+
+    class Tagged(elements.Drift):
+        def __init__(self, ds):
+            super().__init__(ds=ds)
+            self.tag = "retained"
+
+    lattice.extend([Observed(ds=1.0), elements.Drift(ds=2.0), elements.Drift(ds=3.0)])
+    lattice[::2] = [Tagged(10.0), Tagged(30.0)]
+
+    assert type(lattice[0]) is Tagged
+    assert type(lattice[2]) is Tagged
+    assert lattice[0].tag == "retained"
+    assert lattice[2].tag == "retained"
+    assert reads == [2.0]

@@ -55,6 +55,11 @@ namespace impactx {
                 "ImpactX: cannot finalize while tracking through the lattice.");
         }
 
+        // Let go of the element the tracking state points at. Tracking releases it on
+        // its way out, but a run that ended in an exception from a user hook may not
+        // have got there, and a share kept here would outlive the element it names.
+        m_tracking_state.set_no_element();
+
         // loop over all beamline elements & finalize them
         finalize_elements();
 

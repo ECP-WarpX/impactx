@@ -176,3 +176,38 @@ def test_element_reuse_across_simulations():
     run_minimal_simulation(sim2, [reusable_sol])
 
     sim2.finalize()
+
+
+@pytest.mark.manages_amrex
+def test_a_failed_run_does_not_leave_an_element_behind():
+    """A run that ends in an exception must let go of the element it was tracking.
+
+    ``sim.tracking_element`` holds a share of the element being tracked. A hook that raises
+    used to leave that share in place: the release sat after the element loop, so the
+    exception carried straight past it, and finalize() never let go either. A finalized
+    simulation then still named an element it had already finished with.
+    """
+
+    sim = ImpactX()
+    sim.particle_shape = 2
+    sim.slice_step_diagnostics = False
+    sim.init_grids()
+    sim.beam.ref.set_species("electron").set_kin_energy_MeV(100.0)
+
+    stopper = elements.Programmable()
+
+    def stop(refpart):
+        raise RuntimeError("stop tracking")
+
+    stopper.ref_particle = stop
+    sim.lattice.append(stopper)
+
+    with pytest.raises(RuntimeError, match="stop tracking"):
+        sim.track_reference(sim.beam.ref)
+
+    # the traversal releases its share on the way out, exception or not
+    assert sim.tracking_element is None
+
+    # and finalize() leaves nothing naming an element either
+    sim.finalize()
+    assert sim.tracking_element is None

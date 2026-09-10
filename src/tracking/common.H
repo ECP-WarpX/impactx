@@ -135,6 +135,17 @@ namespace impactx
         // retuned mid-run.
         Lattice::TraversalGuard const traversal(lattice);
 
+        // Give up the share of the current element on every exit, including one taken by
+        // an exception out of a user hook. The state is reachable from Python as
+        // ``sim.tracking_element``, so a share left behind outlives the run and keeps a
+        // finalized element alive. Backward tracking never sets it.
+        struct ReleaseTrackedElement
+        {
+            TrackingState & m_state;
+            bool m_active;
+            ~ReleaseTrackedElement () { if (m_active) { m_state.set_no_element(); } }
+        } const release_tracked{tracking_state, forward};
+
         // periods through the lattice (turns/cycles) and verbosity
         int num_periods = 1;
         amrex::ParmParse("lattice").queryAddWithParser("periods", num_periods);
@@ -292,11 +303,6 @@ namespace impactx
             if (forward) { call_hook("after_period"); }
         }
 
-        if (forward)
-        {
-            // avoid dangling references if users manipulate the lattice
-            tracking_state.set_no_element();
-        }
     }
 } // namespace impactx
 

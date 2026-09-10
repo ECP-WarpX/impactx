@@ -253,7 +253,28 @@ void init_lattice(py::module& me)
                  // replacing nothing with nothing changes nothing
                  if (length == 0 && pending.empty()) { return; }
 
+                 // Replacing a position lets go of what was there: the C++ handle, and
+                 // with the owner list the last reference to its Python wrapper. Either
+                 // can run a subclass' `__del__` from inside the update, and a finalizer
+                 // that reads the lattice sees a generation that has already moved, so it
+                 // rebuilds the owner list -- leaving the writes below to land in a list
+                 // that is no longer the lattice's. Hold both the displaced handles and
+                 // their wrappers until every position and every owner is committed.
+                 // Declared before `owners` so they outlive it and are released only once
+                 // the owner list has been stamped.
+                 std::vector<elements::ElementHandle> displaced;
+                 py::list displaced_owners;
+                 displaced.reserve(length);
+                 for (size_t i = 0; i < length; ++i)
+                 {
+                     displaced.push_back(v[start + i * step]);
+                 }
+
                  Owners owners(self, v);
+                 for (size_t i = 0; i < length; ++i)
+                 {
+                     displaced_owners.append(owners.owner_at(start + i * step));
+                 }
                  if (step == 1)
                  {
                      // A contiguous slice may change the length, so build the result in one
