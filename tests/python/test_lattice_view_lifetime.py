@@ -421,6 +421,83 @@ class TestFinalizersDuringFilteredEdits:
             ("b", "Quad"),
         ]
 
+    def test_a_property_getter_that_edits_the_lattice_is_refused(self):
+        """`replace_with_drifts` reads the elements it replaces to pick their drift.
+
+        Regression test: on a Python subclass a property getter is user code and can edit
+        the lattice, and the positions were taken before it ran. `replace_each` rechecked
+        afterwards; this one did not, and wrote the replacements at stale positions.
+        """
+
+        lattice = elements.KnownElementsList()
+
+        class MutatingQuad(elements.Quad):
+            edited = False
+
+            @property
+            def ds(self):
+                if not MutatingQuad.edited:
+                    MutatingQuad.edited = True
+                    lattice.insert(0, elements.Drift(ds=0.25, name="inserted"))
+                return super().ds
+
+        lattice.extend(
+            [
+                MutatingQuad(ds=1.0, k=1.0, name="a"),
+                elements.Drift(ds=1.0, name="keep"),
+                elements.Quad(ds=1.0, k=1.0, name="b"),
+            ]
+        )
+
+        with pytest.raises(RuntimeError, match="no longer valid"):
+            lattice.select(kind="Quad").replace_with_drifts()
+
+        assert [element.name for element in lattice] == ["inserted", "a", "keep", "b"]
+
+    def test_the_returned_selection_goes_stale_if_a_finalizer_edits(self):
+        """The selection handed back is stamped before the displaced elements are let go.
+
+        Regression test: it was built after the release, so a finalizer that edited the
+        lattice left it carrying positions from before the edit and the generation from
+        after -- it looked valid and named the wrong elements. Built beforehand, that edit
+        invalidates it, as it invalidates any other selection.
+        """
+
+        lattice = elements.KnownElementsList()
+
+        class Watcher(elements.Quad):
+            def __del__(self):
+                lattice.insert(0, elements.Quad(ds=1.0, k=2.0, name="added"))
+
+        lattice.extend(
+            [
+                Watcher(ds=1.0, k=1.0, name="a"),
+                elements.Drift(ds=1.0, name="keep"),
+                elements.Quad(ds=1.0, k=1.0, name="b"),
+            ]
+        )
+
+        replaced = lattice.select(kind="Quad").replace_with_drifts()
+
+        with pytest.raises(RuntimeError, match="no longer valid"):
+            list(replaced)
+
+    def test_the_returned_selection_is_usable_when_nothing_edits(self):
+        """The ordinary case still hands back a selection over the replacements."""
+
+        lattice = elements.KnownElementsList()
+        lattice.extend(
+            [
+                elements.Quad(ds=1.0, k=1.0, name="a"),
+                elements.Drift(ds=1.0, name="keep"),
+                elements.Quad(ds=1.0, k=1.0, name="b"),
+            ]
+        )
+
+        replaced = lattice.select(kind="Quad").replace_with_drifts()
+
+        assert [element.name for element in replaced] == ["a", "b"]
+
     def test_replace_with_drifts_is_not_derailed_by_a_finalizer(self):
         lattice = elements.KnownElementsList()
 

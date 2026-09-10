@@ -378,8 +378,15 @@ class FilteredElementsList:
         for i, new_el in replacements:
             original[i] = new_el
 
+        # Build the returned selection before letting the displaced elements go. Releasing
+        # them can run a finalizer that edits the lattice, and a selection made after that
+        # would carry the positions from before it while recording the generation from
+        # after -- looking valid and naming the wrong elements. Made here, it is stamped
+        # with the generation these positions belong to, so such an edit invalidates it.
+        result = FilteredElementsList(original, list(indices))
+
         del displaced
-        return FilteredElementsList(original, list(indices))
+        return result
 
     def replace_with_drifts(
         self, *, model="match", keep_alignment=True, keep_aperture=False
@@ -422,6 +429,11 @@ class FilteredElementsList:
             for i in indices
         ]
 
+        # Building those read the elements being replaced, and on a Python subclass a
+        # property getter is user code that can edit the lattice. The positions were taken
+        # before that, so check the selection still describes this lattice.
+        self._require_valid()
+
         # Hold on to what is being displaced until every position is written. Assigning
         # over a position can drop the last reference to the old element and run a
         # subclass' `__del__` right there, and a finalizer is free to insert or remove
@@ -432,8 +444,15 @@ class FilteredElementsList:
         for i, new_el in replacements:
             original[i] = new_el
 
+        # Build the returned selection before letting the displaced elements go. Releasing
+        # them can run a finalizer that edits the lattice, and a selection made after that
+        # would carry the positions from before it while recording the generation from
+        # after -- looking valid and naming the wrong elements. Made here, it is stamped
+        # with the generation these positions belong to, so such an edit invalidates it.
+        result = FilteredElementsList(original, list(indices))
+
         del displaced
-        return FilteredElementsList(original, list(indices))
+        return result
 
     def get_kinds(self) -> list[type]:
         """Get all unique element kinds in the filtered list.
