@@ -13,8 +13,17 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "elements/helper/Pusher.H"
 
+#include <type_traits>
+
 #include <AMReX_BLProfiler.H>
 
+
+namespace impactx::elements::mixin
+{
+    // defined in elements/mixin/beamoptic.H, which includes this header
+    template<typename T_Element>
+    struct ParticlePush;
+}
 
 namespace impactx
 {
@@ -45,7 +54,20 @@ namespace impactx
 #endif
             for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
                 // push beam particles relative to reference particle
-                element(pti, ref_part, spin);
+                //
+                // Reach the tile push directly: `element` here is already prepared, and
+                // going through the element's own call operator would prepare it again on
+                // every tile (@see elements::mixin::BeamOptic). Elements whose push is an
+                // opaque callback (Programmable) have no such base and are called plainly.
+                if constexpr (std::is_base_of_v<elements::mixin::ParticlePush<T_Element>, T_Element>)
+                {
+                    static_cast<elements::mixin::ParticlePush<T_Element> const &>(element)(
+                        pti, ref_part, spin);
+                }
+                else
+                {
+                    element(pti, ref_part, spin);
+                }
             } // end loop over all particle boxes
         } // end mesh-refinement level loop
     }

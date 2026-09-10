@@ -215,10 +215,15 @@ namespace
                 // the parameter it was meant for unchanged. Ask first.
                 for (auto const & item : remaining)
                 {
-                    if (!py::hasattr(copied, item.first))
+                    // Ask the type, not the instance: on the instance this would call the
+                    // property's getter, and a getter can refuse for a value that has not
+                    // been configured yet -- a fresh BeamMonitor's `beta` among them --
+                    // which would reject an override that is perfectly good to set.
+                    py::object const cls = py::type::of(copied);
+                    if (!py::hasattr(cls, item.first))
                     {
                         throw py::attribute_error(
-                            std::string("'") + py::str(py::type::of(copied).attr("__name__")).cast<std::string>() +
+                            std::string("'") + py::str(cls.attr("__name__")).cast<std::string>() +
                             "' object has no attribute '" +
                             py::str(item.first).cast<std::string>() + "'");
                     }

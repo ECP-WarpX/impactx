@@ -661,6 +661,32 @@ namespace detail
     {
         using ParticlePush<T_Element>::operator();
 
+        /** Push the beam particles of one tile through the canonical element.
+         *
+         * @see ParticlePush does the same thing but assumes it is already prepared, which
+         * is what the once-per-slice path hands it. The canonical element is not: its
+         * constants belong to a reference particle and a slice, and on a fresh element
+         * they have never been written at all. So prepare a copy here and push with that,
+         * leaving the element itself alone.
+         *
+         * The tile loop in @see impactx::push_tiles reaches @see ParticlePush directly and
+         * does not pay for this.
+         *
+         * @param[in] pti particle iterator for a current tile or box.
+         * @param[in] ref_part reference particle
+         * @param[in] spin whether to perform spin tracking
+         */
+        void operator() (
+            ImpactXParticleContainer::iterator & pti,
+            RefPart & AMREX_RESTRICT ref_part,
+            bool spin
+        ) const
+        {
+            T_Element prepared = static_cast<T_Element const &>(*this);
+            prepared.compute_constants(ref_part);
+            static_cast<ParticlePush<T_Element> const &>(prepared)(pti, ref_part, spin);
+        }
+
         /** Push first the reference particle, then all other particles
          *
          * @param[inout] pc container of the particles to push

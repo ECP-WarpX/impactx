@@ -193,6 +193,18 @@ class TestCopyWithOverrides:
         # the name it was meant for still works
         assert template.copy(nslice=5).nslice == 5
 
+    def test_an_override_for_a_property_that_is_not_configured_yet(self):
+        """Checking the name must not run the getter.
+
+        A fresh `BeamMonitor` has properties whose getters refuse until something has been
+        configured. Asking the instance whether it has `beta` runs that getter and reports
+        no such attribute, which would reject an override that assignment accepts.
+        """
+
+        monitor = elements.BeamMonitor("mon")
+
+        assert monitor.copy(beta=2.0).beta == 2.0
+
     def test_an_element_carrying_arrays_keeps_them(self):
         element = elements.SoftQuadrupole(
             ds=0.1, gscale=1.0, cos_coefficients=[2.0], sin_coefficients=[0.0]
