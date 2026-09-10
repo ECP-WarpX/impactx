@@ -193,17 +193,39 @@ class TestCopyWithOverrides:
         # the name it was meant for still works
         assert template.copy(nslice=5).nslice == 5
 
-    def test_an_override_for_a_property_that_is_not_configured_yet(self):
-        """Checking the name must not run the getter.
+    def test_a_setting_the_copy_cannot_own_is_refused(self):
+        """A BeamMonitor's Twiss settings are keyed by its name, which a copy shares.
 
-        A fresh `BeamMonitor` has properties whose getters refuse until something has been
-        configured. Asking the instance whether it has `beta` runs that getter and reports
-        no such attribute, which would reject an override that assignment accepts.
+        Regression test: `monitor.copy(beta=5.0)` applied the override to state the
+        original reads too, so it silently retuned the original's diagnostics. Its name
+        has no setter, so the copy cannot be given values of its own either.
         """
 
-        monitor = elements.BeamMonitor("mon")
+        monitor = elements.BeamMonitor("mon_shared")
+        monitor.beta = 2.0
 
-        assert monitor.copy(beta=2.0).beta == 2.0
+        with pytest.raises(ValueError, match="shares with its copy"):
+            monitor.copy(beta=5.0)
+
+        assert monitor.beta == 2.0
+
+        # copying without those overrides is still fine
+        assert type(monitor.copy()).__name__ == "BeamMonitor"
+
+    def test_a_name_is_checked_without_running_its_getter(self):
+        """Checking an override's name must not call the property's getter.
+
+        Regression test: the name was looked up on the instance, which runs the getter,
+        and a fresh `BeamMonitor`'s getters refuse until something is configured -- so a
+        perfectly good name was reported as no such attribute. Asking the type finds the
+        property without calling it, which is why a fresh monitor reaches the rule below
+        rather than an `AttributeError`.
+        """
+
+        fresh = elements.BeamMonitor("mon_fresh")
+
+        with pytest.raises(ValueError, match="shares with its copy"):
+            fresh.copy(beta=5.0)
 
     def test_an_element_carrying_arrays_keeps_them(self):
         element = elements.SoftQuadrupole(

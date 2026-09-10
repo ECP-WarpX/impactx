@@ -18,6 +18,7 @@
 #include <optional>
 #include <stdexcept>
 #include <array>
+#include <algorithm>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -164,14 +165,20 @@ namespace
         register_transfer_map(cl);
     }
 
-    /** Register copy(), giving a distinct element with the same configuration */
+    /** Register copy(), giving a distinct element with the same configuration
+     *
+     * @param cl the element's Python class
+     * @param shared_overrides parameter names this element cannot give a copy of its own,
+     *        because they live in state shared with the original. Overriding one on a copy
+     *        would change the original too, so they are refused rather than applied.
+     */
     template<typename T_PyClass>
-    void register_copy (T_PyClass & cl)
+    void register_copy (T_PyClass & cl, std::vector<std::string> shared_overrides = {})
     {
         using Element = typename T_PyClass::type;
 
         cl.def("copy",
-            [](py::object self, py::kwargs const & overrides) {
+            [shared_overrides](py::object self, py::kwargs const & overrides) {
                 // A Python subclass carries state we cannot reproduce here -- its type, its
                 // attributes, whatever its __init__ did. Returning a plain base element
                 // would look like it worked and quietly lose all of it, so ask the subclass
@@ -213,13 +220,28 @@ namespace
                 // does not do that everywhere: an element that accepts dynamic attributes
                 // (Programmable) would take a mistyped name as a new attribute and leave
                 // the parameter it was meant for unchanged. Ask first.
+                // Check every name before setting any of them. Setting is not always
+                // confined to the copy -- a BeamMonitor's Twiss settings live in state
+                // keyed by its name, which the copy shares -- so a bad name discovered
+                // half way through would leave the earlier ones already applied.
+                //
+                // Ask the type, not the instance: on the instance this would call the
+                // property's getter, and a getter can refuse for a value that has not
+                // been configured yet -- a fresh BeamMonitor's `beta` among them --
+                // which would reject an override that is perfectly good to set.
+                py::object const cls = py::type::of(copied);
                 for (auto const & item : remaining)
                 {
-                    // Ask the type, not the instance: on the instance this would call the
-                    // property's getter, and a getter can refuse for a value that has not
-                    // been configured yet -- a fresh BeamMonitor's `beta` among them --
-                    // which would reject an override that is perfectly good to set.
-                    py::object const cls = py::type::of(copied);
+                    auto const key = py::str(item.first).cast<std::string>();
+                    if (std::find(shared_overrides.begin(), shared_overrides.end(), key)
+                        != shared_overrides.end())
+                    {
+                        throw py::value_error(
+                            "'" + key + "' is kept in state this element shares with its "
+                            "copy, so giving the copy a different value would change this "
+                            "one too. Configure it on the element you want it on, or make "
+                            "a separate element instead of a copy.");
+                    }
                     if (!py::hasattr(cls, item.first))
                     {
                         throw py::attribute_error(
@@ -227,6 +249,10 @@ namespace
                             "' object has no attribute '" +
                             py::str(item.first).cast<std::string>() + "'");
                     }
+                }
+
+                for (auto const & item : remaining)
+                {
                     py::setattr(copied, item.first, item.second);
                 }
                 return copied;
@@ -642,7 +668,10 @@ void init_elements(py::module& m)
     ;
     register_push(py_BeamMonitor);
     register_reverse(py_BeamMonitor);
-    register_copy(py_BeamMonitor);
+    // A BeamMonitor's Twiss settings live in inputs keyed by its name, and its name has
+    // no setter, so a copy is always the same series and cannot be given its own values.
+    register_copy(py_BeamMonitor,
+                  {"nonlinear_lens_invariants", "alpha", "beta", "tn", "cn"});
 
     // beam optics
 
