@@ -154,21 +154,16 @@ def test_slice_assignment_from_a_generator_that_appends():
     """
 
     lattice = drifts("initial")
-    reference = ["initial"]
 
     def grow_lattice():
         lattice.append(elements.Drift(ds=1.0, name="added"))
         yield elements.Drift(ds=1.0, name="replacement")
 
-    def grow_list():
-        reference.append("added")
-        yield "replacement"
-
     lattice[-1:] = grow_lattice()
-    reference[-1:] = grow_list()
 
+    # Spelled out rather than compared against a live ``list``: CPython did this the other
+    # way round until a 3.11 patch release, so a list is not a fixed reference here.
     assert names_of(lattice) == ["initial", "replacement"]
-    assert names_of(lattice) == reference
 
 
 def test_slice_assignment_from_a_generator_that_clears():
@@ -179,21 +174,14 @@ def test_slice_assignment_from_a_generator_that_clears():
     """
 
     lattice = drifts("a", "b", "c")
-    reference = ["a", "b", "c"]
 
     def clear_lattice():
         lattice.clear()
         yield elements.Drift(ds=1.0, name="new")
 
-    def clear_list():
-        reference.clear()
-        yield "new"
-
     lattice[-1:] = clear_lattice()
-    reference[-1:] = clear_list()
 
     assert names_of(lattice) == ["new"]
-    assert names_of(lattice) == reference
 
 
 def test_extended_slice_survives_a_finalizer_that_reads_the_lattice():
@@ -240,7 +228,6 @@ def test_slice_bounds_follow_an_index_that_edits_the_lattice(operation):
     """
 
     lattice = drifts("a", "b", "c")
-    reference = ["a", "b", "c"]
 
     class ClearsWhenAsked:
         def __init__(self, value, target):
@@ -250,19 +237,14 @@ def test_slice_bounds_follow_an_index_that_edits_the_lattice(operation):
             self.target.clear()
             return self.value
 
+    # Spelled out rather than compared against a live ``list``: CPython's own ordering
+    # here changed in a 3.11 patch release, so a list is not a fixed reference.
     if operation == "read":
-        assert (
-            names_of(lattice[0 : ClearsWhenAsked(3, lattice)])
-            == reference[0 : ClearsWhenAsked(3, reference)]
-        )
+        assert names_of(lattice[0 : ClearsWhenAsked(3, lattice)]) == []
     elif operation == "delete":
         del lattice[0 : ClearsWhenAsked(3, lattice)]
-        del reference[0 : ClearsWhenAsked(3, reference)]
-        assert names_of(lattice) == reference
     else:
         lattice[0 : ClearsWhenAsked(3, lattice)] = []
-        reference[0 : ClearsWhenAsked(3, reference)] = []
-        assert names_of(lattice) == reference
 
     assert names_of(lattice) == []
 
