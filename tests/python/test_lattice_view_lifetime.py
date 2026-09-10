@@ -336,6 +336,77 @@ def test_a_copy_that_edits_the_lattice_is_refused():
     assert [element.name for element in lattice] == ["inserted", "q0", "d0", "q1"]
 
 
+class TestFinalizersDuringFilteredEdits:
+    """A displaced element's `__del__` runs while the edit is still going.
+
+    Regression tests: the filtered edits released each displaced element as they went, so
+    a subclass finalizer saw a half-finished lattice and could move the positions the rest
+    of the edit was about to write at.
+    """
+
+    def test_delete_never_shows_an_empty_lattice(self):
+        lattice = elements.KnownElementsList()
+        seen = []
+
+        class Watcher(elements.Drift):
+            def __del__(self):
+                seen.append([element.name for element in lattice])
+
+        lattice.extend(
+            [Watcher(ds=1.0, name="remove"), elements.Drift(ds=1.0, name="keep")]
+        )
+        lattice.select(name="remove").delete()
+
+        assert [element.name for element in lattice] == ["keep"]
+        assert seen == [["keep"]]
+
+    def test_replace_each_is_not_derailed_by_a_finalizer(self):
+        lattice = elements.KnownElementsList()
+
+        class Watcher(elements.Drift):
+            def __del__(self):
+                lattice.insert(0, elements.Drift(ds=1.0, name="added"))
+
+        lattice.extend(
+            [
+                Watcher(ds=1.0, name="a"),
+                elements.Drift(ds=1.0, name="keep"),
+                elements.Drift(ds=1.0, name="b"),
+            ]
+        )
+        lattice.select(name=["a", "b"]).replace_each(elements.Quad(ds=1.0, k=1.0))
+
+        assert [(e.name, type(e).__name__) for e in lattice] == [
+            ("added", "Drift"),
+            ("a", "Quad"),
+            ("keep", "Drift"),
+            ("b", "Quad"),
+        ]
+
+    def test_replace_with_drifts_is_not_derailed_by_a_finalizer(self):
+        lattice = elements.KnownElementsList()
+
+        class Watcher(elements.Quad):
+            def __del__(self):
+                lattice.insert(0, elements.Drift(ds=1.0, name="added"))
+
+        lattice.extend(
+            [
+                Watcher(ds=1.0, k=1.0, name="a"),
+                elements.Drift(ds=1.0, name="keep"),
+                elements.Quad(ds=1.0, k=1.0, name="b"),
+            ]
+        )
+        lattice.select(kind="Quad").replace_with_drifts()
+
+        assert [(e.name, type(e).__name__) for e in lattice] == [
+            ("added", "Drift"),
+            ("a", "Drift"),
+            ("keep", "Drift"),
+            ("b", "Drift"),
+        ]
+
+
 class TestInsertEveryDsKeepsElements:
     @staticmethod
     def tagged_quad():

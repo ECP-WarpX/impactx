@@ -312,8 +312,17 @@ class FilteredElementsList:
         # Elements that were not selected are carried over as they are: they keep their
         # identity, their Python subclass and their callbacks.
         kept = [original[i] for i in range(len(original)) if i not in to_remove]
+
+        # Hold the removed elements until the survivors are back in place. `clear()` can
+        # drop the last reference to one and run a subclass' `__del__` there, and a
+        # finalizer that reads the lattice would see it empty -- a state no caller asked
+        # for -- while anything it appends would land ahead of the survivors.
+        removed = [original[i] for i in sorted(to_remove)]
+
         original.clear()
         original.extend(kept)
+
+        del removed
         return None
 
     def replace_each(self, element, *, keep_name=True, keep_ds=False):
@@ -359,9 +368,17 @@ class FilteredElementsList:
         # to keep in step with the bindings.
         elements.KnownElementsList().extend([new_el for _, new_el in replacements])
 
+        # Hold on to what is being displaced until every position is written. Assigning
+        # over a position can drop the last reference to the old element and run a
+        # subclass' `__del__` right there, and a finalizer is free to insert or remove
+        # positions -- which would leave the saved positions below naming the wrong
+        # elements. Released when this returns, once the whole replacement is committed.
+        displaced = [original[i] for i, _ in replacements]
+
         for i, new_el in replacements:
             original[i] = new_el
 
+        del displaced
         return FilteredElementsList(original, list(indices))
 
     def replace_with_drifts(
@@ -405,9 +422,17 @@ class FilteredElementsList:
             for i in indices
         ]
 
+        # Hold on to what is being displaced until every position is written. Assigning
+        # over a position can drop the last reference to the old element and run a
+        # subclass' `__del__` right there, and a finalizer is free to insert or remove
+        # positions -- which would leave the saved positions below naming the wrong
+        # elements. Released when this returns, once the whole replacement is committed.
+        displaced = [original[i] for i, _ in replacements]
+
         for i, new_el in replacements:
             original[i] = new_el
 
+        del displaced
         return FilteredElementsList(original, list(indices))
 
     def get_kinds(self) -> list[type]:

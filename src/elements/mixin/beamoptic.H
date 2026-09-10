@@ -682,9 +682,19 @@ namespace detail
             bool spin
         ) const
         {
-            T_Element prepared = static_cast<T_Element const &>(*this);
-            prepared.compute_constants(ref_part);
-            static_cast<ParticlePush<T_Element> const &>(prepared)(pti, ref_part, spin);
+            // Prepare through @see elements::make_particle_pusher, as the whole-container
+            // push does: what a prepared pusher *is* differs by element. Ordinary ones are
+            // their own, while the elements that own array data return a separate,
+            // resource-free type -- copying the element and pushing that would not even
+            // compile for those, as their canonical type has no particle call operator.
+            auto const pusher = make_particle_pusher(
+                static_cast<T_Element const &>(*this), ref_part);
+            using pusher_type = std::decay_t<decltype(pusher)>;
+
+            // through ParticlePush, not the pusher's own call operator: for an ordinary
+            // element the pusher is this very type, and calling it plainly would come
+            // straight back here
+            static_cast<ParticlePush<pusher_type> const &>(pusher)(pti, ref_part, spin);
         }
 
         /** Push first the reference particle, then all other particles
