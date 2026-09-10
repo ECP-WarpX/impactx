@@ -560,13 +560,18 @@ Environment Variable          Default & Values                             Descr
 ``IMPACTX_PYAMREX_REPO``      *None (uses cmake default)*                  Repository URI to pull and build pyAMReX from
 ``IMPACTX_PYAMREX_BRANCH``    *None (uses cmake default)*                  Repository branch for ``IMPACTX_PYAMREX_REPO``
 ``IMPACTX_PYAMREX_INTERNAL``  **ON**/OFF                                   Needs a pre-installed pyAMReX library if set to ``OFF``
+``IMPACTX_OPENPMD_SRC``       *None*                                       Absolute path to openPMD-api source directory (preferred if set)
+``IMPACTX_OPENPMD_REPO``      *None (uses cmake default)*                  Repository URI to pull and build openPMD-api from
+``IMPACTX_OPENPMD_BRANCH``    *None (uses cmake default)*                  Repository branch for ``IMPACTX_OPENPMD_REPO``
+``IMPACTX_OPENPMD_INTERNAL``  **ON**/OFF                                   Needs a pre-installed openPMD-api library if set to ``OFF``
 ``PYIMPACTX_LIBDIR``          *None*                                       If set, search for pre-built ImpactX C++ libraries (see below)
 ============================= ============================================ ================================================================
 
 Note that we currently change the ``IMPACTX_MPI`` default intentionally to ``OFF``, to simplify a first install from source.
 
 Additional CMake options can be passed through ``pip`` using variables of the form ``IMPACTX_CMAKE_<NAME>=<VALUE>``, which will be forwarded as ``-D<NAME>=<VALUE>`` to CMake.
-Use this to control, e.g., ABLASTR, openPMD-api, or pybind11 source/repo/branch selection when building via ``pip``.
+Use this to control, e.g., ABLASTR or pybind11 source/repo/branch selection when building via ``pip``.
+Note that Windows upper-cases environment variable names while CMake variables are case-sensitive, so mixed-case CMake options (e.g. ``ImpactX_openpmd_internal``) cannot be passed this way on Windows -- use the dedicated all-caps variables above.
 
 Some hints and workflows follow.
 Developers that want to test a change of the source code but did not change the ``impactx`` version number can force a reinstall via:

@@ -123,6 +123,7 @@ class CMakeBuild(build_ext):
             ## dependency control (developers & package managers)
             "-DImpactX_amrex_internal=" + ImpactX_amrex_internal,
             "-DImpactX_pyamrex_internal=" + ImpactX_pyamrex_internal,
+            "-DImpactX_openpmd_internal=" + ImpactX_openpmd_internal,
             # PEP-440 conformant version from package
             "-DpyImpactX_VERSION_INFO=" + self.distribution.get_version(),
             #        see PICSAR and openPMD below
@@ -147,6 +148,12 @@ class CMakeBuild(build_ext):
             cmake_args.append("-DImpactX_amrex_branch=" + ImpactX_amrex_branch)
         if ImpactX_pyamrex_branch:
             cmake_args.append("-DImpactX_pyamrex_branch=" + ImpactX_pyamrex_branch)
+        if ImpactX_openpmd_src:
+            cmake_args.append("-DImpactX_openpmd_src=" + ImpactX_openpmd_src)
+        if ImpactX_openpmd_repo:
+            cmake_args.append("-DImpactX_openpmd_repo=" + ImpactX_openpmd_repo)
+        if ImpactX_openpmd_branch:
+            cmake_args.append("-DImpactX_openpmd_branch=" + ImpactX_openpmd_branch)
 
         if CMAKE_INTERPROCEDURAL_OPTIMIZATION is not None:
             cmake_args.append(
@@ -226,6 +233,11 @@ ImpactX_pyamrex_src = os.environ.get("IMPACTX_PYAMREX_SRC")
 ImpactX_pyamrex_internal = os.environ.get("IMPACTX_PYAMREX_INTERNAL", "ON")
 ImpactX_pyamrex_repo = os.environ.get("IMPACTX_PYAMREX_REPO")
 ImpactX_pyamrex_branch = os.environ.get("IMPACTX_PYAMREX_BRANCH")
+
+ImpactX_openpmd_src = os.environ.get("IMPACTX_OPENPMD_SRC")
+ImpactX_openpmd_internal = os.environ.get("IMPACTX_OPENPMD_INTERNAL", "ON")
+ImpactX_openpmd_repo = os.environ.get("IMPACTX_OPENPMD_REPO")
+ImpactX_openpmd_branch = os.environ.get("IMPACTX_OPENPMD_BRANCH")
 
 # extra CMake arguments
 extra_cmake_args = []
