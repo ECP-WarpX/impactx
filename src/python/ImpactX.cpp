@@ -749,12 +749,27 @@ void init_ImpactX (py::module& m)
 
         .def("finalize",
              [](py::object self) {
-                 self.cast<ImpactX &>().finalize();
+                 auto & sim = self.cast<ImpactX &>();
 
-                 // finalize() empties the lattice on the C++ side. Release the Python
-                 // objects it was keeping alive as well, so an element that only the
-                 // lattice still referred to is destroyed here rather than lingering with
-                 // its diagnostics files still open.
+                 // Refuse first, before anything has been let go, exactly as finalize()
+                 // does. A refused finalization has to leave the lattice and the objects
+                 // it owns as they were.
+                 if (sim.m_lattice->is_being_traversed())
+                 {
+                     throw std::runtime_error(
+                         "ImpactX: cannot finalize while tracking through the lattice.");
+                 }
+
+                 // Finalize the elements before releasing anything: an element's own
+                 // finalization can run a user callback, and that callback may read what
+                 // the element's Python wrapper holds.
+                 sim.finalize_elements();
+
+                 // Then release the Python objects the lattice was keeping alive, while
+                 // AMReX is still up. An element can carry AMReX-backed data on its Python
+                 // side -- a MultiFab attached to a Programmable, say -- and that has to be
+                 // destroyed before the arena it came from. Doing this after finalize()
+                 // freed those arenas first and crashed.
                  if (py::hasattr(self, "_lattice_view"))
                  {
                      py::object view = self.attr("_lattice_view");
@@ -763,6 +778,10 @@ void init_ImpactX (py::module& m)
                          view.attr("_element_owners") = py::list();
                      }
                  }
+
+                 // The rest: empty the lattice and tear AMReX down. Element finalization
+                 // runs again here and is idempotent.
+                 sim.finalize();
              },
              "Deallocate all contexts and data."
         )

@@ -211,3 +211,84 @@ def test_a_failed_run_does_not_leave_an_element_behind():
     # and finalize() leaves nothing naming an element either
     sim.finalize()
     assert sim.tracking_element is None
+
+
+@pytest.mark.manages_amrex
+def test_finalize_releases_python_owners_before_amrex_shuts_down():
+    """An element can hold AMReX-backed data on its Python side.
+
+    Regression test: finalize() tore AMReX down and only then released the objects the
+    lattice was keeping alive, so a `MultiFab` attached to an element was destroyed after
+    the arena it came from. On a pinned arena that segfaulted.
+    """
+
+    import subprocess
+    import sys
+
+    program = """
+from impactx import ImpactX, elements
+import amrex.space3d as amr
+
+sim = ImpactX()
+sim.particle_shape = 2
+sim.diagnostics = False
+sim.init_grids()
+
+box = amr.Box([0, 0, 0], [3, 3, 3])
+ba = amr.BoxArray(box)
+dm = amr.DistributionMapping(ba)
+
+holder = elements.Programmable()
+holder.buffer = amr.MultiFab(
+    ba, dm, 1, 0, amr.MFInfo().set_arena(amr.The_Pinned_Arena())
+)
+sim.lattice.append(holder)
+del holder, dm, ba, box
+
+sim.finalize()
+print("survived")
+"""
+
+    finished = subprocess.run(
+        [sys.executable, "-c", program], capture_output=True, text=True, timeout=120
+    )
+
+    assert finished.returncode == 0, finished.stdout + finished.stderr[-2000:]
+    assert "survived" in finished.stdout
+
+
+@pytest.mark.manages_amrex
+def test_element_finalizers_run_while_amrex_is_still_up():
+    """The wrappers are released before the teardown, so their `__del__` sees a live AMReX."""
+
+    import subprocess
+    import sys
+
+    program = """
+from impactx import ImpactX, elements
+import amrex.space3d as amr
+
+sim = ImpactX()
+sim.particle_shape = 2
+sim.diagnostics = False
+sim.init_grids()
+
+seen = []
+
+class Watcher(elements.Drift):
+    def __del__(self):
+        seen.append(amr.initialized())
+
+sim.lattice.append(Watcher(ds=1.0))
+sim.finalize()
+
+assert seen == [True], seen
+print("survived")
+"""
+
+    finished = subprocess.run(
+        [sys.executable, "-c", program], capture_output=True, text=True, timeout=120
+    )
+
+    assert finished.returncode == 0, finished.stdout + finished.stderr[-2000:]
+    assert "survived" in finished.stdout
