@@ -61,7 +61,7 @@ namespace impactx {
         }
     }
 
-    void ImpactX::finalize (std::function<void()> const & release_owners)
+    void ImpactX::finalize ()
     {
         // Refuse before anything is torn down. Reached from a tracking hook, finalizing
         // the elements first and only then failing to empty the lattice would leave
@@ -86,9 +86,9 @@ namespace impactx {
         // Programmable, say -- and that has to be destroyed before the arena it came from.
         // This runs after the elements' own finalization, which may run a user callback
         // that reads what a wrapper holds.
-        if (release_owners)
+        if (m_release_lattice_owners)
         {
-            release_owners();
+            m_release_lattice_owners();
         }
 
         // Release the elements whether or not grids were ever initialized: they have just

@@ -52,13 +52,10 @@ namespace impactx
          * Finalizes the elements, empties the lattice and shuts AMReX down, in that order.
          * Refuses while a tracking traversal is walking the lattice.
          *
-         * @param release_owners called once the elements are finalized and before the
-         *        lattice is emptied and AMReX is torn down. The Python bindings use it to
-         *        let go of the objects the lattice keeps alive, so that AMReX-backed data
-         *        attached to them is freed while the arena it came from still exists. Not
-         *        stored: the destructor finalizes without one.
+         * Calls @see m_release_lattice_owners before releasing the lattice and AMReX,
+         * including when called from the destructor.
          */
-        void finalize (std::function<void()> const & release_owners = {});
+        void finalize ();
 
         /** Finalize the lattice elements
          *
@@ -164,6 +161,13 @@ namespace impactx
          * A share keeps the lattice where it is for as long as anyone refers to it.
          */
         std::shared_ptr<Lattice> m_lattice = std::make_shared<Lattice>();
+
+        /** Release external lattice owners after element finalization, before AMReX teardown.
+         *
+         * The Python bindings install a callback holding only a weak reference to the
+         * lattice view, so it does not prevent garbage collection of the simulation.
+         */
+        std::function<void()> m_release_lattice_owners;
 
         /** Was init_grids already called?
          *

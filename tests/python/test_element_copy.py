@@ -112,10 +112,13 @@ def _track_monitors(name, tail, tmp_path, monkeypatch):
 
     (path,) = sorted(Path("diags/openPMD").glob(f"{name}.*"))
     series = io.Series(str(path), io.Access.read_linear)
-    return [
-        iteration.particles["beam"].get_attribute("s_ref")
-        for iteration in series.read_iterations()
-    ]
+    positions = []
+    # openPMD's StatefulIterator lacks __iter__; a comprehension can try to iterate
+    # that iterator again on some Python versions. Keep the streaming read explicit.
+    for iteration in series.read_iterations():
+        positions.append(iteration.particles["beam"].get_attribute("s_ref"))
+    series.close()
+    return positions
 
 
 @pytest.mark.skipif(not Config.have_openpmd, reason="built without openPMD")

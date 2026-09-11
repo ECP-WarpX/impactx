@@ -214,7 +214,12 @@ def test_a_failed_run_does_not_leave_an_element_behind():
 
 
 @pytest.mark.manages_amrex
-def test_finalize_releases_python_owners_before_amrex_shuts_down():
+@pytest.mark.parametrize(
+    "cleanup",
+    ["sim.finalize()", "del sim", "kept_view = sim.lattice\ndel sim"],
+    ids=["explicit", "destructor", "kept_view"],
+)
+def test_finalize_releases_python_owners_before_amrex_shuts_down(cleanup):
     """An element can hold AMReX-backed data on its Python side.
 
     Regression test: finalize() tore AMReX down and only then released the objects the
@@ -250,7 +255,10 @@ print("survived")
 """
 
     finished = subprocess.run(
-        [sys.executable, "-c", program], capture_output=True, text=True, timeout=120
+        [sys.executable, "-c", program.replace("sim.finalize()", cleanup)],
+        capture_output=True,
+        text=True,
+        timeout=120,
     )
 
     assert finished.returncode == 0, finished.stdout + finished.stderr[-2000:]
@@ -258,7 +266,12 @@ print("survived")
 
 
 @pytest.mark.manages_amrex
-def test_element_finalizers_run_while_amrex_is_still_up():
+@pytest.mark.parametrize(
+    "cleanup",
+    ["sim.finalize()", "del sim", "kept_view = sim.lattice\ndel sim"],
+    ids=["explicit", "destructor", "kept_view"],
+)
+def test_element_finalizers_run_while_amrex_is_still_up(cleanup):
     """The wrappers are released before the teardown, so their `__del__` sees a live AMReX."""
 
     import subprocess
@@ -287,7 +300,10 @@ print("survived")
 """
 
     finished = subprocess.run(
-        [sys.executable, "-c", program], capture_output=True, text=True, timeout=120
+        [sys.executable, "-c", program.replace("sim.finalize()", cleanup)],
+        capture_output=True,
+        text=True,
+        timeout=120,
     )
 
     assert finished.returncode == 0, finished.stdout + finished.stderr[-2000:]

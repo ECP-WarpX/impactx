@@ -552,3 +552,56 @@ class TestInsertEveryDsKeepsElements:
 
         held = [element for element in result if element is shared]
         assert len(held) == 2
+
+
+@pytest.mark.parametrize("chained", [False, True], ids=["direct", "chained"])
+@pytest.mark.parametrize("edit", ["insert", "clear"])
+@pytest.mark.parametrize("position", [0, 1], ids=["first", "last"])
+def test_selection_rejects_edits_during_matching(chained, edit, position):
+    """Matching a subclass property must not stamp old positions as current."""
+    lattice = elements.KnownElementsList()
+
+    class MutatingQuad(elements.Quad):
+        edited = False
+
+        @property
+        def name(self):
+            if not self.edited:
+                self.edited = True
+                if edit == "insert":
+                    lattice.insert(0, elements.Drift(ds=0.5, name="inserted"))
+                else:
+                    lattice.clear()
+            return super().name
+
+    row = [elements.Quad(ds=1.0, k=1.0, name="keep")]
+    row.insert(position, MutatingQuad(ds=1.0, k=1.0, name="selected"))
+    lattice.extend(row)
+    source = lattice.select(kind="Quad") if chained else lattice
+
+    with pytest.raises(RuntimeError, match="no longer valid"):
+        source.select(name="selected").delete()
+
+    # Only the getter's edit took effect; no stale selection deleted a different element.
+    expected = (
+        ["inserted"] + [element.name for element in row] if edit == "insert" else []
+    )
+    assert names_of(lattice) == expected
+
+
+def test_owner_release_callback_does_not_keep_a_simulation_cycle_alive():
+    """The C++ cleanup callback must not hide a strong Python ownership cycle."""
+    import weakref
+
+    sim = ImpactX()
+    element = elements.Programmable()
+    element.sim = sim
+    sim.lattice.append(element)
+    observed_sim = weakref.ref(sim)
+    observed_element = weakref.ref(element)
+
+    del sim, element
+    gc.collect()
+
+    assert observed_sim() is None
+    assert observed_element() is None

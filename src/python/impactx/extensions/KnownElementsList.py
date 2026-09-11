@@ -289,7 +289,10 @@ class FilteredElementsList:
 
             for i in self._indices:
                 element = self._original_list[i]
-                if _check_element_match(element, kind, name):
+                matches = _check_element_match(element, kind, name)
+                # A subclass property getter may move the positions while filtering.
+                self._require_valid()
+                if matches:
                     matching_indices.append(i)
 
             return FilteredElementsList(self._original_list, matching_indices)
@@ -749,9 +752,15 @@ def select(
         _validate_select_parameters(kind, name)
 
         matching_indices = []
+        generation = self.generation
 
         for i, element in enumerate(self):
-            if _check_element_match(element, kind, name):
+            matches = _check_element_match(element, kind, name)
+            # Stamp only positions from an unchanged lattice. Filtering can run Python
+            # property getters on element subclasses, including ones that edit it.
+            if self.generation != generation:
+                raise RuntimeError(FILTERED_ELEMENTS_LIST_INVALID_MSG)
+            if matches:
                 matching_indices.append(i)
 
         return FilteredElementsList(self, matching_indices)

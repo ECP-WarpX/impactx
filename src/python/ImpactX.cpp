@@ -747,27 +747,7 @@ void init_ImpactX (py::module& m)
             "Deposit charge in x,y,z."
         )
 
-        .def("finalize",
-             [](py::object self) {
-                 auto & sim = self.cast<ImpactX &>();
-
-                 // finalize() owns the order: refuse while tracking, finalize the elements,
-                 // then run this, then empty the lattice and tear AMReX down. This releases
-                 // the Python objects the lattice keeps alive while AMReX is still up: an
-                 // element can carry AMReX-backed data on its Python side -- a MultiFab
-                 // attached to a Programmable, say -- which has to be destroyed before the
-                 // arena it came from. Releasing after the teardown crashed.
-                 sim.finalize([&self]() {
-                     if (py::hasattr(self, "_lattice_view"))
-                     {
-                         py::object view = self.attr("_lattice_view");
-                         if (py::hasattr(view, "_element_owners"))
-                         {
-                             view.attr("_element_owners") = py::list();
-                         }
-                     }
-                 });
-             },
+        .def("finalize", &ImpactX::finalize,
              "Deallocate all contexts and data."
         )
         .def("init_grids", &ImpactX::init_grids,
@@ -944,6 +924,17 @@ void init_ImpactX (py::module& m)
                     // communicator. Weak keeps destruction deterministic.
                     view.attr("_parent_sim") = py::module_::import("weakref").attr("ref")(self);
                     self.attr("_lattice_view") = view;
+
+                    // The destructor must release wrappers before AMReX too. A weak view
+                    // reference remains usable while the simulation wrapper is being
+                    // destroyed, without creating an invisible ownership cycle.
+                    ix.m_release_lattice_owners = [weak_view = py::weakref(view)]() {
+                        py::object const live_view = weak_view();
+                        if (!live_view.is_none() && py::hasattr(live_view, "_element_owners"))
+                        {
+                            live_view.attr("_element_owners") = py::list();
+                        }
+                    };
                 }
                 return self.attr("_lattice_view");
             },
