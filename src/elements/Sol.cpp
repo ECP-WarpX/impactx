@@ -1,3 +1,3 @@
 #include "Sol.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::Sol)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::SolGPU)

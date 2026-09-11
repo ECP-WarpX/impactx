@@ -11,6 +11,7 @@
 #define IMPACTX_DIAGNOSTICS_LINEAR_MAP_H
 
 #include "elements/All.H"
+#include "Lattice.H"
 #include "particles/CovarianceMatrix.H"
 #include "particles/ReferenceParticle.H"
 
@@ -105,7 +106,7 @@ namespace impactx::diagnostics
      */
     std::vector<MapTraceEntry>
     map_trace (
-        std::list<elements::KnownElements> const & lattice,
+        Lattice const & lattice,
         RefPart const & ref_part_init,
         OnMissingLinearMap on_missing = OnMissingLinearMap::IdentityWithWarning
     );
@@ -130,7 +131,7 @@ namespace impactx::diagnostics
      */
     Map6x6
     linear_map (
-        std::list<elements::KnownElements> const & lattice,
+        Lattice const & lattice,
         RefPart const & ref_part_init,
         OnMissingLinearMap on_missing = OnMissingLinearMap::IdentityWithWarning
     );

@@ -9,4 +9,4 @@
  */
 #include "Aperture.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::Aperture)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::ApertureGPU)

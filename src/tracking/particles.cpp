@@ -127,7 +127,7 @@ namespace impactx
         // collective effect kicks applied per element slice:
         // space charge, coherent and incoherent synchrotron radiation, etc.
         auto collective_kicks = [this, &pc] (
-            elements::KnownElements & element_variant,
+            elements::ElementHandle & element_variant,
             amrex::ParticleReal slice_ds
         )
         {
@@ -146,7 +146,7 @@ namespace impactx
         //   per half-map, so it carries no book-keeping: that lives in @see
         //   slice_diagnostics below.
         auto element_push = [&pc] (
-            elements::KnownElements & element_variant,
+            elements::ElementHandle & element_variant,
             int step_,
             int period_
         )
@@ -204,7 +204,7 @@ namespace impactx
         // traverse the lattice, applying the collective kick and the
         // element transport per element slice (\see track_lattice)
         track_lattice(
-            m_lattice,
+            *m_lattice,
             pc->GetRefParticle(),
             m_tracking_state,
             collective_effects,
@@ -240,4 +240,10 @@ namespace impactx
             }
         }
     }
+
+    // Kept compiled: a class template is only type-checked where it is instantiated, and
+    // the split that subdivides an element while pushing it (#1530) is not in the tree yet.
+    // These are the two ways a lattice element is held.
+    template class elements::ScopedNslice<elements::KnownElements>;
+    template class elements::ScopedNslice<elements::ElementHandle>;
 } // namespace impactx

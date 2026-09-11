@@ -11,12 +11,12 @@
 #define IMPACTX_TAPEREDPL_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 #include "mixin/pipeaperture.H"
 
@@ -30,10 +30,9 @@
 
 namespace impactx::elements
 {
-    struct TaperedPL
-    : public mixin::Named,
-      public mixin::BeamOptic<TaperedPL>,
-      public mixin::LinearTransport<TaperedPL>,
+    struct TaperedPLGPU
+    : public mixin::BeamOptic<TaperedPLGPU>,
+      public mixin::LinearTransport<TaperedPLGPU>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -65,9 +64,8 @@ namespace impactx::elements
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
-         * @param name a user defined and not necessarily unique name of the element
          */
-        TaperedPL (
+        TaperedPLGPU (
             amrex::ParticleReal k,
             amrex::ParticleReal taper,
             int unit = DEFAULT_unit,
@@ -75,11 +73,9 @@ namespace impactx::elements
             amrex::ParticleReal dy = DEFAULT_dy,
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
             amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
-            amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
-            std::optional<std::string> name = DEFAULT_name
+            amrex::ParticleReal aperture_y = DEFAULT_aperture_y
         )
-        : Named(std::move(name)),
-          Alignment(dx, dy, rotation_degree),
+        : Alignment(dx, dy, rotation_degree),
           PipeAperture(aperture_x, aperture_y),
           m_k(k), m_taper(taper), m_unit(unit)
         {
@@ -327,8 +323,11 @@ for beam-quality preservation between plasma-accelerator stages",
         amrex::ParticleReal m_g;              //! quadrupole strength
     };
 
+    /** TaperedPL: GPU state plus common host-only metadata */
+    using TaperedPL = Element<TaperedPLGPU>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::TaperedPL)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::TaperedPLGPU)
 
 #endif // IMPACTX_TAPEREDPL_H

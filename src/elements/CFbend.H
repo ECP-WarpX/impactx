@@ -11,13 +11,13 @@
 #define IMPACTX_CFBEND_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -30,10 +30,9 @@
 
 namespace impactx::elements
 {
-    struct CFbend
-    : public mixin::Named,
-      public mixin::BeamOptic<CFbend>,
-      public mixin::LinearTransport<CFbend>,
+    struct CFbendGPU
+    : public mixin::BeamOptic<CFbendGPU>,
+      public mixin::LinearTransport<CFbendGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -61,9 +60,8 @@ namespace impactx::elements
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
          * @param nslice number of slices used for the application of space charge
-         * @param name a user defined and not necessarily unique name of the element
          */
-        CFbend (
+        CFbendGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal rc,
             amrex::ParticleReal k,
@@ -72,11 +70,9 @@ namespace impactx::elements
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
             amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
             amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
-            int nslice = DEFAULT_nslice,
-            std::optional<std::string> name = DEFAULT_name
+            int nslice = DEFAULT_nslice
         )
-        : Named(std::move(name)),
-          Thick(ds, nslice),
+        : Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
           PipeAperture(aperture_x, aperture_y),
           m_rc(rc), m_k(k)
@@ -413,8 +409,11 @@ namespace impactx::elements
         amrex::ParticleReal m_lambday, m_A13, m_A14, m_A21, m_A22, m_A26, m_A33, m_A34;
     };
 
+    /** CFbend: GPU state plus common host-only metadata */
+    using CFbend = Element<CFbendGPU>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::CFbend)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::CFbendGPU)
 
 #endif // IMPACTX_CFBEND_H

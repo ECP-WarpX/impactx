@@ -11,12 +11,12 @@
 #define IMPACTX_BUNCHER_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 #include "mixin/pipeaperture.H"
 
@@ -30,10 +30,9 @@
 
 namespace impactx::elements
 {
-    struct Buncher
-    : public mixin::Named,
-      public mixin::BeamOptic<Buncher>,
-      public mixin::LinearTransport<Buncher>,
+    struct BuncherGPU
+    : public mixin::BeamOptic<BuncherGPU>,
+      public mixin::LinearTransport<BuncherGPU>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -55,20 +54,17 @@ namespace impactx::elements
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
-         * @param name a user defined and not necessarily unique name of the element
          */
-        Buncher (
+        BuncherGPU (
             amrex::ParticleReal V,
             amrex::ParticleReal k,
             amrex::ParticleReal dx = DEFAULT_dx,
             amrex::ParticleReal dy = DEFAULT_dy,
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
             amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
-            amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
-            std::optional<std::string> name = DEFAULT_name
+            amrex::ParticleReal aperture_y = DEFAULT_aperture_y
         )
-        : Named(std::move(name)),
-          Alignment(dx, dy, rotation_degree),
+        : Alignment(dx, dy, rotation_degree),
           PipeAperture(aperture_x, aperture_y),
           m_V(V), m_k(k)
         {
@@ -289,8 +285,11 @@ namespace impactx::elements
         amrex::ParticleReal m_beta;  // relativistic factor
     };
 
+    /** Buncher: GPU state plus common host-only metadata */
+    using Buncher = Element<BuncherGPU>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::Buncher)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::BuncherGPU)
 
 #endif // IMPACTX_BUNCHER_H

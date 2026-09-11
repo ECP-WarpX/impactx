@@ -9,16 +9,18 @@
  */
 #include "elements/transformation/Insert.H"
 
-#include "elements/mixin/accessors.H"
+#include "elements/helper/Accessors.H"
 
+#include <optional>
 #include <stdexcept>
+#include <utility>
 
 
 namespace impactx::elements::transformation
 {
-    std::list<elements::KnownElements>
+    Lattice
     insert_element_every_ds (
-        std::list<elements::KnownElements> list,
+        Lattice const & lattice,
         amrex::ParticleReal ds,
         elements::KnownElements element
     )
@@ -30,55 +32,61 @@ namespace impactx::elements::transformation
             "insert_element_ever_s: Only thin elements are supported."
         );
 
-        std::list<elements::KnownElements> new_list;
+        Lattice new_lattice;
 
         double s = 0.0;  // in meters   // TODO: if we can avoid a global s, we can avoid wasting significant digits for long lattices
         double s_next_insert = ds;  // in meters
 
-        while (!list.empty())
+        // the tail of an element that was split, still waiting to be placed
+        std::optional<elements::ElementHandle> pending;
+        Lattice::size_type next = 0;
+
+        while (pending.has_value() || next < lattice.size())
         {
-            // copy out front element
-            elements::KnownElements cur_element_variant = list.front();
-            list.pop_front();
+            // take the leftover of the last split first, else the next element
+            elements::ElementHandle cur_element = pending.has_value()
+                ? *std::exchange(pending, std::nullopt)
+                : lattice[next++];
 
             // check where the current element ends
-            double const cur_s_out = s + elements::ds(cur_element_variant);  // in meters
+            double const cur_s_out = s + elements::ds(cur_element);  // in meters
 
             // case 1: current element is thick and ends after next insert
             if (s_next_insert < cur_s_out)
             {
                 double const s_rel_insert = s_next_insert - s;
 
-                if (elements::is_thin(cur_element_variant))
+                if (elements::is_thin(cur_element))
                 {
                     throw std::runtime_error("insert_element_ever_s: Thin element cannot be split.");
                 }
 
-                // split element and shorten each part
-                elements::KnownElements cur_element_leftover = cur_element_variant;
-                elements::ds(cur_element_variant, static_cast<amrex::ParticleReal>(s_rel_insert));
+                // splitting creates two new physical elements, so neither may alias the
+                // element that was split: the caller still owns that one
+                elements::ElementHandle head = elements::copy_element(cur_element);
+                elements::ElementHandle leftover = elements::copy_element(cur_element);
+
+                elements::ds(head, static_cast<amrex::ParticleReal>(s_rel_insert));
                 elements::ds(
-                    cur_element_leftover,
-                    elements::ds(cur_element_leftover) - static_cast<amrex::ParticleReal>(s_rel_insert)
+                    leftover,
+                    elements::ds(leftover) - static_cast<amrex::ParticleReal>(s_rel_insert)
                 );
-                elements::name(cur_element_leftover, elements::name(cur_element_leftover) + "_leftover");
+                elements::name(leftover, elements::name(leftover) + "_leftover");
 
                 // insert element in between
-                new_list.push_back(cur_element_variant);
-                new_list.push_back(element);
+                new_lattice.push_back(std::move(head));
+                new_lattice.emplace_back(element);
 
-                // add leftover element to front of old list
-                list.push_front(cur_element_leftover);
+                // the tail is carried into the next iteration
+                pending = std::move(leftover);
 
                 s += s_rel_insert;
                 s_next_insert += ds;
             }
             // case 2: current element ends exactly with next insert
             else if (s_next_insert == cur_s_out) {
-                // copy current element
-                new_list.push_back(cur_element_variant);
-                // insert element
-                new_list.push_back(element);
+                new_lattice.push_back(std::move(cur_element));
+                new_lattice.emplace_back(element);
 
                 s = cur_s_out;
                 s_next_insert += ds;
@@ -86,14 +94,13 @@ namespace impactx::elements::transformation
             // case 3: current element ends before next insert
             else {
                 // thin element or element too thin to slice in ds
-                new_list.push_back(cur_element_variant);
+                new_lattice.push_back(std::move(cur_element));
 
                 s = cur_s_out;
-                // unchanged: s_next_insert
             }
         }
 
-        return new_list;
+        return new_lattice;
     }
 
 } // namespace impactx::elements::transformation

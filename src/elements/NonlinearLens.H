@@ -11,12 +11,12 @@
 #define IMPACTX_NONLINEARLENS_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 #include "mixin/pipeaperture.H"
 
@@ -33,10 +33,9 @@
 
 namespace impactx::elements
 {
-    struct NonlinearLens
-    : public mixin::Named,
-      public mixin::BeamOptic<NonlinearLens>,
-      public mixin::LinearTransport<NonlinearLens>,
+    struct NonlinearLensGPU
+    : public mixin::BeamOptic<NonlinearLensGPU>,
+      public mixin::LinearTransport<NonlinearLensGPU>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -61,20 +60,17 @@ namespace impactx::elements
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
-         * @param name a user defined and not necessarily unique name of the element
          */
-        NonlinearLens (
+        NonlinearLensGPU (
             amrex::ParticleReal knll,
             amrex::ParticleReal cnll,
             amrex::ParticleReal dx = DEFAULT_dx,
             amrex::ParticleReal dy = DEFAULT_dy,
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
             amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
-            amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
-            std::optional<std::string> name = DEFAULT_name
+            amrex::ParticleReal aperture_y = DEFAULT_aperture_y
         )
-        : Named(std::move(name)),
-          Alignment(dx, dy, rotation_degree),
+        : Alignment(dx, dy, rotation_degree),
           PipeAperture(aperture_x, aperture_y),
           m_knll(knll), m_cnll(cnll)
         {
@@ -358,8 +354,11 @@ namespace impactx::elements
         amrex::ParticleReal m_beta;
     };
 
+    /** NonlinearLens: GPU state plus common host-only metadata */
+    using NonlinearLens = Element<NonlinearLensGPU>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::NonlinearLens)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::NonlinearLensGPU)
 
 #endif // IMPACTX_NONLINEARLENS_H

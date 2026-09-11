@@ -1,3 +1,3 @@
 #include "LinearMap.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::LinearMap)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::LinearMapGPU)

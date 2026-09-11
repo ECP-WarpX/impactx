@@ -11,12 +11,12 @@
 #define IMPACTX_MULTIPOLE_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 #include "mixin/pipeaperture.H"
 
@@ -30,10 +30,9 @@
 
 namespace impactx::elements
 {
-    struct Multipole
-    : public mixin::Named,
-      public mixin::BeamOptic<Multipole>,
-      public mixin::LinearTransport<Multipole>,
+    struct MultipoleGPU
+    : public mixin::BeamOptic<MultipoleGPU>,
+      public mixin::LinearTransport<MultipoleGPU>,
       public mixin::Thin,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -71,9 +70,8 @@ namespace impactx::elements
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
-         * @param name a user defined and not necessarily unique name of the element
          */
-        Multipole (
+        MultipoleGPU (
             int multipole,
             amrex::ParticleReal K_normal,
             amrex::ParticleReal K_skew,
@@ -81,11 +79,9 @@ namespace impactx::elements
             amrex::ParticleReal dy = DEFAULT_dy,
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
             amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
-            amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
-            std::optional<std::string> name = DEFAULT_name
+            amrex::ParticleReal aperture_y = DEFAULT_aperture_y
         )
-        : Named(std::move(name)),
-          Alignment(dx, dy, rotation_degree),
+        : Alignment(dx, dy, rotation_degree),
           PipeAperture(aperture_x, aperture_y),
           m_multipole(multipole), m_Kn(K_normal), m_Ks(K_skew)
         {
@@ -368,8 +364,11 @@ namespace impactx::elements
         amrex::ParticleReal m_ibeta;          //! inverse of beta
     };
 
+    /** Multipole: GPU state plus common host-only metadata */
+    using Multipole = Element<MultipoleGPU>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::Multipole)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::MultipoleGPU)
 
 #endif // IMPACTX_MULTIPOLE_H

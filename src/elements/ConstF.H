@@ -11,13 +11,13 @@
 #define IMPACTX_CONSTF_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -30,10 +30,9 @@
 
 namespace impactx::elements
 {
-    struct ConstF
-    : public mixin::Named,
-      public mixin::BeamOptic<ConstF>,
-      public mixin::LinearTransport<ConstF>,
+    struct ConstFGPU
+    : public mixin::BeamOptic<ConstFGPU>,
+      public mixin::LinearTransport<ConstFGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -56,9 +55,8 @@ namespace impactx::elements
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
          * @param nslice number of slices used for the application of space charge
-         * @param name a user defined and not necessarily unique name of the element
          */
-        ConstF (
+        ConstFGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal kx,
             amrex::ParticleReal ky,
@@ -68,11 +66,9 @@ namespace impactx::elements
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
             amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
             amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
-            int nslice = DEFAULT_nslice,
-            std::optional<std::string> name = DEFAULT_name
+            int nslice = DEFAULT_nslice
         )
-        : Named(std::move(name)),
-          Thick(ds, nslice),
+        : Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
           PipeAperture(aperture_x, aperture_y),
           m_kx(kx), m_ky(ky), m_kt(kt)
@@ -399,8 +395,11 @@ namespace impactx::elements
         amrex::ParticleReal m_cos_kxds, m_cos_kyds, m_cos_ktds;
     };
 
+    /** ConstF: GPU state plus common host-only metadata */
+    using ConstF = Element<ConstFGPU>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ConstF)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ConstFGPU)
 
 #endif // IMPACTX_CONSTF_H

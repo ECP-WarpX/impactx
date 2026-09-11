@@ -26,7 +26,7 @@ namespace io = openPMD;
 namespace impactx::elements
 {
     void
-    Source::check_step_selection () const
+    SourceGPU::check_step_selection () const
     {
         if (m_load_step.has_value() && m_load_step_index.has_value()) {
             throw std::invalid_argument(
@@ -43,7 +43,7 @@ namespace impactx::elements
     }
 
     void
-    Source::operator() (
+    SourceGPU::operator() (
         ImpactXParticleContainer & pc,
         int,
         int period

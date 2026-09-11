@@ -7,7 +7,8 @@
 
 #include <particles/Push.H>
 #include <elements/All.H>
-#include <elements/mixin/accessors.H>
+#include <elements/helper/Copy.H>
+#include <elements/helper/Accessors.H>
 #include <particles/CovarianceMatrix.H>
 
 #include <AMReX_Enum.H>
@@ -16,6 +17,8 @@
 #include <map>
 #include <optional>
 #include <stdexcept>
+#include <array>
+#include <algorithm>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -160,6 +163,111 @@ namespace
         register_beamoptics_push(cl);
         register_envelope_push(cl);
         register_transfer_map(cl);
+    }
+
+    /** Register copy(), giving a distinct element with the same configuration
+     *
+     * @param cl the element's Python class
+     * @param shared_overrides parameter names this element cannot give a copy of its own,
+     *        because they live in state shared with the original. Overriding one on a copy
+     *        would change the original too, so they are refused rather than applied.
+     */
+    template<typename T_PyClass>
+    void register_copy (T_PyClass & cl, std::vector<std::string> shared_overrides = {})
+    {
+        using Element = typename T_PyClass::type;
+
+        cl.def("copy",
+            [shared_overrides](py::object self, py::kwargs const & overrides) {
+                // A Python subclass carries state we cannot reproduce here -- its type, its
+                // attributes, whatever its __init__ did. Returning a plain base element
+                // would look like it worked and quietly lose all of it, so ask the subclass
+                // to say what a copy of it means.
+                if (!py::type::of(self).is(py::type::of<Element>()))
+                {
+                    throw py::type_error(
+                        "copy() is not defined for '" +
+                        std::string(py::str(py::type::of(self).attr("__name__"))) +
+                        "'. Define copy() on your subclass to say what a copy of it should be.");
+                }
+
+                py::object copied = py::cast(elements::copy_of(self.cast<Element const &>()));
+
+                py::dict remaining;
+                for (auto const & item : overrides) { remaining[item.first] = item.second; }
+
+                // Parameters that only mean something as a pair are handed over together,
+                // the way the constructor takes them. Setting one and then the other would
+                // measure a new array against the one it is replacing.
+                static constexpr std::array<std::array<char const *, 3>, 3> paired = {{
+                    {{"cos_coefficients", "sin_coefficients", "set_coefficients"}},
+                    {{"k_normal",         "k_skew",           "set_coefficients"}},
+                    {{"vertices_x",       "vertices_y",       "set_vertices"}},
+                }};
+                for (auto const & pair : paired)
+                {
+                    if (remaining.contains(pair[0]) && remaining.contains(pair[1]) &&
+                        py::hasattr(copied, pair[2]))
+                    {
+                        copied.attr(pair[2])(remaining[pair[0]], remaining[pair[1]]);
+                        remaining.attr("pop")(pair[0]);
+                        remaining.attr("pop")(pair[1]);
+                    }
+                }
+
+                // Apply the rest one at a time. Setting a parameter the element does not
+                // have has to be reported rather than quietly ignored, and `setattr` alone
+                // does not do that everywhere: an element that accepts dynamic attributes
+                // (Programmable) would take a mistyped name as a new attribute and leave
+                // the parameter it was meant for unchanged. Ask first.
+                // Check every name before setting any of them. Setting is not always
+                // confined to the copy -- a BeamMonitor's Twiss settings live in state
+                // keyed by its name, which the copy shares -- so a bad name discovered
+                // half way through would leave the earlier ones already applied.
+                //
+                // Ask the type, not the instance: on the instance this would call the
+                // property's getter, and a getter can refuse for a value that has not
+                // been configured yet -- a fresh BeamMonitor's `beta` among them --
+                // which would reject an override that is perfectly good to set.
+                py::object const cls = py::type::of(copied);
+                for (auto const & item : remaining)
+                {
+                    auto const key = py::str(item.first).cast<std::string>();
+                    if (std::find(shared_overrides.begin(), shared_overrides.end(), key)
+                        != shared_overrides.end())
+                    {
+                        throw py::value_error(
+                            "'" + key + "' is kept in state this element shares with its "
+                            "copy, so giving the copy a different value would change this "
+                            "one too. Configure it on the element you want it on, or make "
+                            "a separate element instead of a copy.");
+                    }
+                    if (!py::hasattr(cls, item.first))
+                    {
+                        throw py::attribute_error(
+                            std::string("'") + py::str(cls.attr("__name__")).cast<std::string>() +
+                            "' object has no attribute '" +
+                            py::str(item.first).cast<std::string>() + "'");
+                    }
+                }
+
+                for (auto const & item : remaining)
+                {
+                    py::setattr(copied, item.first, item.second);
+                }
+                return copied;
+            },
+            "Return a new element with the same configuration.\n\n"
+            "``lattice.append(q)`` places ``q`` itself; ``lattice.append(q.copy())``\n"
+            "places a separate element.\n\n"
+            "Keyword arguments give the copy a different value for a parameter, which is\n"
+            "how one element supplies the values for many::\n\n"
+            "    cavities = [rf.copy(name=f\"rf{i}\") for i in range(1, 5)]\n"
+            "    scan = [quad.copy(k=k) for k in (0.8, 0.9, 1.0)]\n\n"
+            "Parameters that only mean something as a pair -- the cosine and sine\n"
+            "coefficients, the normal and skew coefficients, the polygon vertices -- are\n"
+            "given together, as the constructor takes them."
+        );
     }
 
     /** Register reverse() method */
@@ -362,7 +470,7 @@ void init_elements(py::module& m)
         "Mixin classes for accelerator lattice elements in ImpactX"
     );
 
-    py::class_<elements::mixin::Named>(mx, "Named")
+    py::class_<elements::mixin::Named, py::smart_holder>(mx, "Named")
         .def_property("name",
             [](elements::mixin::Named & nm) -> std::optional<std::string> {
                 return nm.has_name() ? std::optional<std::string>{nm.name()} : std::nullopt;
@@ -373,7 +481,7 @@ void init_elements(py::module& m)
         .def_property_readonly("has_name", &elements::mixin::Named::has_name)
     ;
 
-    py::class_<elements::mixin::Thick>(mx, "Thick")
+    py::class_<elements::mixin::Thick, py::smart_holder>(mx, "Thick")
         .def_property("ds",
             [](elements::mixin::Thick & th) { return th.m_ds; },
             [](elements::mixin::Thick & th, amrex::ParticleReal ds) { th.m_ds = ds; },
@@ -390,7 +498,7 @@ void init_elements(py::module& m)
         )
     ;
 
-    py::class_<elements::mixin::Thin>(mx, "Thin")
+    py::class_<elements::mixin::Thin, py::smart_holder>(mx, "Thin")
         .def_property_readonly("ds",
             &elements::mixin::Thin::ds,
             "segment length in m"
@@ -401,7 +509,7 @@ void init_elements(py::module& m)
         )
     ;
 
-    py::class_<elements::mixin::Alignment>(mx, "Alignment")
+    py::class_<elements::mixin::Alignment, py::smart_holder>(mx, "Alignment")
         .def_property("dx",
             [](elements::mixin::Alignment & a) { return a.dx(); },
             [](elements::mixin::Alignment & a, amrex::ParticleReal dx) { a.m_dx = dx; },
@@ -422,7 +530,7 @@ void init_elements(py::module& m)
         )
     ;
 
-    py::class_<elements::mixin::PipeAperture>(mx, "PipeAperture")
+    py::class_<elements::mixin::PipeAperture, py::smart_holder>(mx, "PipeAperture")
         .def_property("aperture_x",
             [](elements::mixin::PipeAperture & pa) { return pa.aperture_x(); },
             [](elements::mixin::PipeAperture & pa, amrex::ParticleReal aperture_x)
@@ -458,7 +566,7 @@ void init_elements(py::module& m)
 
     // diagnostics
 
-    py::class_<diagnostics::BeamMonitor, elements::mixin::Thin> py_BeamMonitor(me, "BeamMonitor");
+    py::class_<diagnostics::BeamMonitor, elements::mixin::Thin, py::smart_holder> py_BeamMonitor(me, "BeamMonitor");
     py_BeamMonitor
         .def("__repr__",
              [](diagnostics::BeamMonitor const & bm) {
@@ -560,10 +668,14 @@ void init_elements(py::module& m)
     ;
     register_push(py_BeamMonitor);
     register_reverse(py_BeamMonitor);
+    // A BeamMonitor's Twiss settings live in inputs keyed by its name, and its name has
+    // no setter, so a copy is always the same series and cannot be given its own values.
+    register_copy(py_BeamMonitor,
+                  {"nonlinear_lens_invariants", "alpha", "beta", "tn", "cn"});
 
     // beam optics
 
-    py::class_<Aperture, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment> py_Aperture(me, "Aperture");
+    py::class_<Aperture, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, py::smart_holder> py_Aperture(me, "Aperture");
     py_Aperture
         .def("__repr__",
              [](Aperture const & ap) {
@@ -670,8 +782,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_Aperture);
     register_reverse(py_Aperture);
+    register_copy(py_Aperture);
 
-    py::class_<ChrDrift, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_ChrDrift(me, "ChrDrift");
+    py::class_<ChrDrift, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_ChrDrift(me, "ChrDrift");
     py_ChrDrift
         .def("__repr__",
              [](ChrDrift const & chr_drift) {
@@ -706,8 +819,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_ChrDrift);
     register_reverse(py_ChrDrift);
+    register_copy(py_ChrDrift);
 
-    py::class_<ChrQuad, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_ChrQuad(me, "ChrQuad");
+    py::class_<ChrQuad, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_ChrQuad(me, "ChrQuad");
     py_ChrQuad
         .def("__repr__",
              [](ChrQuad const & chr_quad) {
@@ -763,8 +877,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_ChrQuad);
     register_reverse(py_ChrQuad);
+    register_copy(py_ChrQuad);
 
-    py::class_<ChrPlasmaLens, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_ChrPlasmaLens(me, "ChrPlasmaLens");
+    py::class_<ChrPlasmaLens, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_ChrPlasmaLens(me, "ChrPlasmaLens");
     py_ChrPlasmaLens
         .def("__repr__",
              [](ChrPlasmaLens const & chr_pl_lens) {
@@ -820,8 +935,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_ChrPlasmaLens);
     register_reverse(py_ChrPlasmaLens);
+    register_copy(py_ChrPlasmaLens);
 
-    py::class_<ChrAcc, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment> py_ChrAcc(me, "ChrAcc");
+    py::class_<ChrAcc, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, py::smart_holder> py_ChrAcc(me, "ChrAcc");
     py_ChrAcc
         .def("__repr__",
              [](ChrAcc const & chr_acc) {
@@ -878,8 +994,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_ChrAcc);
     register_reverse(py_ChrAcc);
+    register_copy(py_ChrAcc);
 
-    py::class_<ConstF, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_ConstF(me, "ConstF");
+    py::class_<ConstF, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_ConstF(me, "ConstF");
     py_ConstF
         .def("__repr__",
              [](ConstF const & constf) {
@@ -945,8 +1062,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_ConstF);
     register_reverse(py_ConstF);
+    register_copy(py_ConstF);
 
-    py::class_<DipEdge, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture> py_DipEdge(me, "DipEdge");
+    py::class_<DipEdge, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_DipEdge(me, "DipEdge");
     py_DipEdge
         .def("__repr__",
              [](DipEdge const & dip_edge) {
@@ -1124,8 +1242,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_DipEdge);
     register_reverse(py_DipEdge);
+    register_copy(py_DipEdge);
 
-    py::class_<QuadEdge, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture> py_QuadEdge(me, "QuadEdge");
+    py::class_<QuadEdge, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_QuadEdge(me, "QuadEdge");
     py_QuadEdge
         .def("__repr__",
              [](QuadEdge const & quadedge) {
@@ -1184,8 +1303,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_QuadEdge);
     register_reverse(py_QuadEdge);
+    register_copy(py_QuadEdge);
 
-    py::class_<Drift, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_Drift(me, "Drift");
+    py::class_<Drift, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_Drift(me, "Drift");
     py_Drift
         .def("__repr__",
              [](Drift const & drift) {
@@ -1220,8 +1340,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_Drift);
     register_reverse(py_Drift);
+    register_copy(py_Drift);
 
-    py::class_<ExactDrift, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_ExactDrift(me, "ExactDrift");
+    py::class_<ExactDrift, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_ExactDrift(me, "ExactDrift");
     py_ExactDrift
         .def("__repr__",
              [](ExactDrift const & exact_drift) {
@@ -1256,8 +1377,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_ExactDrift);
     register_reverse(py_ExactDrift);
+    register_copy(py_ExactDrift);
 
-    py::class_<ExactMultipole, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_ExactMultipole(me, "ExactMultipole");
+    py::class_<ExactMultipole, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_ExactMultipole(me, "ExactMultipole");
     py_ExactMultipole
         .def("__repr__",
              [](ExactMultipole const & exact_multipole) {
@@ -1267,13 +1389,40 @@ void init_elements(py::module& m)
                  );
              }
         )
+        .def_property("k_normal",
+            [](elements::ExactMultipole const & el) { return el.k_normal_coefficients(); },
+            [](elements::ExactMultipole & el, std::vector<amrex::ParticleReal> v) {
+                el.set_coefficients(std::move(v), el.k_skew_coefficients());
+            },
+            "normal multipole coefficients\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_coefficients()``."
+        )
+        .def_property("k_skew",
+            [](elements::ExactMultipole const & el) { return el.k_skew_coefficients(); },
+            [](elements::ExactMultipole & el, std::vector<amrex::ParticleReal> v) {
+                el.set_coefficients(el.k_normal_coefficients(), std::move(v));
+            },
+            "skew multipole coefficients\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_coefficients()``."
+        )
+        .def("set_coefficients",
+            [](elements::ExactMultipole & el, std::vector<amrex::ParticleReal> f, std::vector<amrex::ParticleReal> s) {
+                el.set_coefficients(std::move(f), std::move(s));
+            },
+            py::arg("k_normal"), py::arg("k_skew"),
+            "Replace both arrays at once.\n\n"
+            "They are validated together and applied as one step, so a rejected update\n"
+            "leaves the element unchanged."
+        )
         .def("to_dict",
              [](ExactMultipole const & exact_multipole) {
                  return element_dict(
                      exact_multipole,
                      std::make_pair("unit", exact_multipole.m_unit),
-                     std::make_pair("k_normal", ExactMultipole::DynamicData::get(exact_multipole.m_id)->k_normal.host_const()),
-                     std::make_pair("k_skew", ExactMultipole::DynamicData::get(exact_multipole.m_id)->k_skew.host_const()),
+                     std::make_pair("k_normal", exact_multipole.k_normal_coefficients()),
+                     std::make_pair("k_skew", exact_multipole.k_skew_coefficients()),
                      std::make_pair("mapsteps", exact_multipole.m_mapsteps),
                      std::make_pair("int_order", exact_multipole.m_int_order)
                  );
@@ -1335,8 +1484,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_ExactMultipole);
     register_reverse(py_ExactMultipole);
+    register_copy(py_ExactMultipole);
 
-    py::class_<ExactCFbend, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_ExactCFbend(me, "ExactCFbend");
+    py::class_<ExactCFbend, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_ExactCFbend(me, "ExactCFbend");
     py_ExactCFbend
         .def("__repr__",
              [](ExactCFbend const & exact_cfbend) {
@@ -1346,13 +1496,40 @@ void init_elements(py::module& m)
                  );
              }
         )
+        .def_property("k_normal",
+            [](elements::ExactCFbend const & el) { return el.k_normal_coefficients(); },
+            [](elements::ExactCFbend & el, std::vector<amrex::ParticleReal> v) {
+                el.set_coefficients(std::move(v), el.k_skew_coefficients());
+            },
+            "normal multipole coefficients\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_coefficients()``."
+        )
+        .def_property("k_skew",
+            [](elements::ExactCFbend const & el) { return el.k_skew_coefficients(); },
+            [](elements::ExactCFbend & el, std::vector<amrex::ParticleReal> v) {
+                el.set_coefficients(el.k_normal_coefficients(), std::move(v));
+            },
+            "skew multipole coefficients\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_coefficients()``."
+        )
+        .def("set_coefficients",
+            [](elements::ExactCFbend & el, std::vector<amrex::ParticleReal> f, std::vector<amrex::ParticleReal> s) {
+                el.set_coefficients(std::move(f), std::move(s));
+            },
+            py::arg("k_normal"), py::arg("k_skew"),
+            "Replace both arrays at once.\n\n"
+            "They are validated together and applied as one step, so a rejected update\n"
+            "leaves the element unchanged."
+        )
         .def("to_dict",
              [](ExactCFbend const & exact_cfbend) {
                  return element_dict(
                      exact_cfbend,
                      std::make_pair("unit", exact_cfbend.m_unit),
-                     std::make_pair("k_normal", ExactCFbend::DynamicData::get(exact_cfbend.m_id)->k_normal.host_const()),
-                     std::make_pair("k_skew", ExactCFbend::DynamicData::get(exact_cfbend.m_id)->k_skew.host_const()),
+                     std::make_pair("k_normal", exact_cfbend.k_normal_coefficients()),
+                     std::make_pair("k_skew", exact_cfbend.k_skew_coefficients()),
                      std::make_pair("mapsteps", exact_cfbend.m_mapsteps),
                      std::make_pair("int_order", exact_cfbend.m_int_order)
                  );
@@ -1414,8 +1591,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_ExactCFbend);
     register_reverse(py_ExactCFbend);
+    register_copy(py_ExactCFbend);
 
-    py::class_<ExactQuad, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_ExactQuad(me, "ExactQuad");
+    py::class_<ExactQuad, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_ExactQuad(me, "ExactQuad");
     py_ExactQuad
         .def("__repr__",
              [](ExactQuad const & exact_quad) {
@@ -1496,8 +1674,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_ExactQuad);
     register_reverse(py_ExactQuad);
+    register_copy(py_ExactQuad);
 
-    py::class_<ExactSbend, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_ExactSbend(me, "ExactSbend");
+    py::class_<ExactSbend, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_ExactSbend(me, "ExactSbend");
     py_ExactSbend
         .def("__repr__",
              [](ExactSbend const & exact_sbend) {
@@ -1585,8 +1764,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_ExactSbend);
     register_reverse(py_ExactSbend);
+    register_copy(py_ExactSbend);
 
-    py::class_<Kicker, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture> py_Kicker(me, "Kicker");
+    py::class_<Kicker, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_Kicker(me, "Kicker");
     py_Kicker
         .def("__repr__",
              [](Kicker const & kicker) {
@@ -1647,8 +1827,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_Kicker);
     register_reverse(py_Kicker);
+    register_copy(py_Kicker);
 
-    py::class_<Multipole, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture> py_Multipole(me, "Multipole");
+    py::class_<Multipole, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_Multipole(me, "Multipole");
     py_Multipole
         .def("__repr__",
              [](Multipole const & multipole) {
@@ -1713,8 +1894,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_Multipole);
     register_reverse(py_Multipole);
+    register_copy(py_Multipole);
 
-    py::class_<Empty, elements::mixin::Named, elements::mixin::Thin> py_Empty(me, "Empty");
+    py::class_<Empty, elements::mixin::Named, elements::mixin::Thin, py::smart_holder> py_Empty(me, "Empty");
     py_Empty
         .def("__repr__",
              [](Empty const & /* empty */) {
@@ -1732,8 +1914,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_Empty);
     register_reverse(py_Empty);
+    register_copy(py_Empty);
 
-    py::class_<Marker, elements::mixin::Named, elements::mixin::Thin> py_Marker(me, "Marker");
+    py::class_<Marker, elements::mixin::Named, elements::mixin::Thin, py::smart_holder> py_Marker(me, "Marker");
     py_Marker
         .def("__repr__",
              [](Marker const & marker) {
@@ -1752,8 +1935,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_Marker);
     register_reverse(py_Marker);
+    register_copy(py_Marker);
 
-    py::class_<NonlinearLens, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture> py_NonlinearLens(me, "NonlinearLens");
+    py::class_<NonlinearLens, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_NonlinearLens(me, "NonlinearLens");
     py_NonlinearLens
         .def("__repr__",
              [](NonlinearLens const & nl) {
@@ -1806,8 +1990,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_NonlinearLens);
     register_reverse(py_NonlinearLens);
+    register_copy(py_NonlinearLens);
 
-    py::class_<PlaneXYRot, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment> py_PlaneXYRot(me, "PlaneXYRot");
+    py::class_<PlaneXYRot, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, py::smart_holder> py_PlaneXYRot(me, "PlaneXYRot");
     py_PlaneXYRot
         .def("__repr__",
              [](PlaneXYRot const & plane_xyrot) {
@@ -1873,8 +2058,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_PlaneXYRot);
     register_reverse(py_PlaneXYRot);
+    register_copy(py_PlaneXYRot);
 
-    py::class_<PolygonAperture, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment> py_PolygonAperture(me, "PolygonAperture");
+    py::class_<PolygonAperture, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, py::smart_holder> py_PolygonAperture(me, "PolygonAperture");
     py_PolygonAperture
         .def("__repr__",
              [](PolygonAperture const & polygon_aperture) {
@@ -1884,13 +2070,40 @@ void init_elements(py::module& m)
                 );
              }
         )
+        .def_property("vertices_x",
+            [](elements::PolygonAperture const & el) { return el.vertices_x(); },
+            [](elements::PolygonAperture & el, std::vector<amrex::ParticleReal> v) {
+                el.set_vertices(std::move(v), el.vertices_y());
+            },
+            "horizontal vertex coordinates in m\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_vertices()``."
+        )
+        .def_property("vertices_y",
+            [](elements::PolygonAperture const & el) { return el.vertices_y(); },
+            [](elements::PolygonAperture & el, std::vector<amrex::ParticleReal> v) {
+                el.set_vertices(el.vertices_x(), std::move(v));
+            },
+            "vertical vertex coordinates in m\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_vertices()``."
+        )
+        .def("set_vertices",
+            [](elements::PolygonAperture & el, std::vector<amrex::ParticleReal> f, std::vector<amrex::ParticleReal> s) {
+                el.set_vertices(std::move(f), std::move(s));
+            },
+            py::arg("vertices_x"), py::arg("vertices_y"),
+            "Replace both arrays at once.\n\n"
+            "They are validated together and applied as one step, so a rejected update\n"
+            "leaves the element unchanged."
+        )
         .def("to_dict",
             [](PolygonAperture const & polygon_aperture) {
                 using namespace amrex::literals;
                 return element_dict(
                     polygon_aperture,
-                    std::make_pair("vertices_x", PolygonAperture::DynamicData::get(polygon_aperture.m_id)->x.host_const()),
-                    std::make_pair("vertices_y", PolygonAperture::DynamicData::get(polygon_aperture.m_id)->y.host_const()),
+                    std::make_pair("vertices_x", polygon_aperture.vertices_x()),
+                    std::make_pair("vertices_y", polygon_aperture.vertices_y()),
                     std::make_pair("min_radius2", polygon_aperture.m_min_radius2),
                     std::make_pair("action", polygon_aperture.action_name(polygon_aperture.m_action)),
                     std::make_pair("repeat_x", polygon_aperture.m_repeat_x),
@@ -1967,8 +2180,10 @@ void init_elements(py::module& m)
     ;
     register_push(py_PolygonAperture);
     register_reverse(py_PolygonAperture);
+    register_copy(py_PolygonAperture);
 
-    py::class_<Programmable, elements::mixin::Named>(me, "Programmable", py::dynamic_attr())
+    py::class_<Programmable, elements::mixin::Named, py::smart_holder> py_Programmable(me, "Programmable", py::dynamic_attr());
+    py_Programmable
         .def("__repr__",
              [](Programmable const & prg) {
                  return element_name(prg);
@@ -2032,8 +2247,9 @@ void init_elements(py::module& m)
               "hook for reference particle (RefPart)"
         )
     ;
+    register_copy(py_Programmable);
 
-    py::class_<Quad, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_Quad(me, "Quad");
+    py::class_<Quad, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_Quad(me, "Quad");
     py_Quad
         .def("__repr__",
              [](Quad const & quad) {
@@ -2081,8 +2297,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_Quad);
     register_reverse(py_Quad);
+    register_copy(py_Quad);
 
-    py::class_<RFCavity, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_RFCavity(me, "RFCavity");
+    py::class_<RFCavity, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_RFCavity(me, "RFCavity");
     py_RFCavity
         .def("__repr__",
              [](RFCavity const & rfc) {
@@ -2094,6 +2311,33 @@ void init_elements(py::module& m)
                  );
              }
         )
+        .def_property("cos_coefficients",
+            [](elements::RFCavity const & el) { return el.cos_coefficients(); },
+            [](elements::RFCavity & el, std::vector<amrex::ParticleReal> v) {
+                el.set_coefficients(std::move(v), el.sin_coefficients());
+            },
+            "cosine coefficients in the Fourier expansion of the on-axis RF electric field\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_coefficients()``."
+        )
+        .def_property("sin_coefficients",
+            [](elements::RFCavity const & el) { return el.sin_coefficients(); },
+            [](elements::RFCavity & el, std::vector<amrex::ParticleReal> v) {
+                el.set_coefficients(el.cos_coefficients(), std::move(v));
+            },
+            "sine coefficients in the Fourier expansion of the on-axis RF electric field\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_coefficients()``."
+        )
+        .def("set_coefficients",
+            [](elements::RFCavity & el, std::vector<amrex::ParticleReal> f, std::vector<amrex::ParticleReal> s) {
+                el.set_coefficients(std::move(f), std::move(s));
+            },
+            py::arg("cos_coefficients"), py::arg("sin_coefficients"),
+            "Replace both arrays at once.\n\n"
+            "They are validated together and applied as one step, so a rejected update\n"
+            "leaves the element unchanged."
+        )
         .def("to_dict",
             [](RFCavity const & rfc) {
                 return element_dict(
@@ -2101,8 +2345,8 @@ void init_elements(py::module& m)
                     std::make_pair("escale", rfc.m_escale),
                     std::make_pair("freq", rfc.m_freq),
                     std::make_pair("phase", rfc.m_phase),
-                    std::make_pair("cos_coefficients", RFCavity::DynamicData::get(rfc.m_id)->cos.host_const()),
-                    std::make_pair("sin_coefficients", RFCavity::DynamicData::get(rfc.m_id)->sin.host_const()),
+                    std::make_pair("cos_coefficients", rfc.cos_coefficients()),
+                    std::make_pair("sin_coefficients", rfc.sin_coefficients()),
                     std::make_pair("mapsteps", rfc.m_mapsteps)
                 );
             }
@@ -2176,8 +2420,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_RFCavity);
     register_reverse(py_RFCavity);
+    register_copy(py_RFCavity);
 
-    py::class_<Sbend, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_Sbend(me, "Sbend");
+    py::class_<Sbend, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_Sbend(me, "Sbend");
     py_Sbend
         .def("__repr__",
              [](Sbend const & sbend) {
@@ -2224,8 +2469,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_Sbend);
     register_reverse(py_Sbend);
+    register_copy(py_Sbend);
 
-    py::class_<CFbend, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_CFbend(me, "CFbend");
+    py::class_<CFbend, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_CFbend(me, "CFbend");
     py_CFbend
         .def("__repr__",
              [](CFbend const & cfbend) {
@@ -2282,8 +2528,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_CFbend);
     register_reverse(py_CFbend);
+    register_copy(py_CFbend);
 
-    py::class_<Buncher, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture> py_Buncher(me, "Buncher");
+    py::class_<Buncher, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_Buncher(me, "Buncher");
     py_Buncher
         .def("__repr__",
              [](Buncher const & buncher) {
@@ -2336,8 +2583,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_Buncher);
     register_reverse(py_Buncher);
+    register_copy(py_Buncher);
 
-    py::class_<ShortRF, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture> py_ShortRF(me, "ShortRF");
+    py::class_<ShortRF, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_ShortRF(me, "ShortRF");
     py_ShortRF
         .def("__repr__",
              [](ShortRF const & short_rf) {
@@ -2399,8 +2647,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_ShortRF);
     register_reverse(py_ShortRF);
+    register_copy(py_ShortRF);
 
-    py::class_<SoftSolenoid, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_SoftSolenoid(me, "SoftSolenoid");
+    py::class_<SoftSolenoid, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_SoftSolenoid(me, "SoftSolenoid");
     py_SoftSolenoid
         .def("__repr__",
              [](SoftSolenoid const & soft_sol) {
@@ -2410,14 +2659,41 @@ void init_elements(py::module& m)
                  );
              }
         )
+        .def_property("cos_coefficients",
+            [](elements::SoftSolenoid const & el) { return el.cos_coefficients(); },
+            [](elements::SoftSolenoid & el, std::vector<amrex::ParticleReal> v) {
+                el.set_coefficients(std::move(v), el.sin_coefficients());
+            },
+            "cosine coefficients in the Fourier expansion of the on-axis magnetic field Bz\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_coefficients()``."
+        )
+        .def_property("sin_coefficients",
+            [](elements::SoftSolenoid const & el) { return el.sin_coefficients(); },
+            [](elements::SoftSolenoid & el, std::vector<amrex::ParticleReal> v) {
+                el.set_coefficients(el.cos_coefficients(), std::move(v));
+            },
+            "sine coefficients in the Fourier expansion of the on-axis magnetic field Bz\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_coefficients()``."
+        )
+        .def("set_coefficients",
+            [](elements::SoftSolenoid & el, std::vector<amrex::ParticleReal> f, std::vector<amrex::ParticleReal> s) {
+                el.set_coefficients(std::move(f), std::move(s));
+            },
+            py::arg("cos_coefficients"), py::arg("sin_coefficients"),
+            "Replace both arrays at once.\n\n"
+            "They are validated together and applied as one step, so a rejected update\n"
+            "leaves the element unchanged."
+        )
         .def("to_dict",
             [](SoftSolenoid const & soft_sol) {
                 return element_dict(
                     soft_sol,
                     std::make_pair("bscale", soft_sol.m_bscale),
                     std::make_pair("unit", soft_sol.m_unit),
-                    std::make_pair("cos_coefficients", SoftSolenoid::DynamicData::get(soft_sol.m_id)->cos.host_const()),
-                    std::make_pair("sin_coefficients", SoftSolenoid::DynamicData::get(soft_sol.m_id)->sin.host_const()),
+                    std::make_pair("cos_coefficients", soft_sol.cos_coefficients()),
+                    std::make_pair("sin_coefficients", soft_sol.sin_coefficients()),
                     std::make_pair("mapsteps", soft_sol.m_mapsteps)
                 );
             }
@@ -2457,36 +2733,6 @@ void init_elements(py::module& m)
             [](SoftSolenoid & soft_sol, amrex::ParticleReal bscale) { soft_sol.m_bscale = bscale; },
             "Scaling factor for on-axis magnetic field Bz in inverse meters (if unit = 0) or magnetic field Bz in T (SI units, if unit = 1)"
         )
-        /* TODO Before we can expose this we need to ensure that sim.lattice takes a list of shared pointers
-         *    and not copies of elements. Otherwise, users can invalidate their cached host pointers with
-         *      sol = SoftSolenoid(...)
-         *      sim.lattice.append(sol)  # copy in lattice has same m_id
-         *      sol.cos_coef = new_values  # updates data of m_id and sol.m_cos_h_data, but NOT the lattice copy
-        .def_property("cos_coefficients",
-            [](SoftSolenoid & soft_sol) {
-                return SoftSolenoid::DynamicData::get(soft_sol.m_id)->h_cos;
-            },
-            [](SoftSolenoid & soft_sol, std::vector<amrex::ParticleReal> v) {
-                auto & coef = *SoftSolenoid::DynamicData::get(soft_sol.m_id);
-                coef.h_cos = std::move(v);
-                coef.mark_dirty();
-                soft_sol.m_cos_h_data = coef.h_cos.data();
-            },
-            "cosine coefficients in Fourier expansion of on-axis magnetic field Bz"
-        )
-        .def_property("sin_coefficients",
-            [](SoftSolenoid & soft_sol) {
-                return SoftSolenoid::DynamicData::get(soft_sol.m_id)->h_sin;
-            },
-            [](SoftSolenoid & soft_sol, std::vector<amrex::ParticleReal> v) {
-                auto & coef = *SoftSolenoid::DynamicData::get(soft_sol.m_id);
-                coef.h_sin = std::move(v);
-                coef.mark_dirty();
-                soft_sol.m_sin_h_data = coef.h_sin.data();
-            },
-            "sine coefficients in Fourier expansion of on-axis magnetic field Bz"
-        )
-        */
         .def_property("unit",
             [](SoftSolenoid & soft_sol) { return soft_sol.m_unit; },
             [](SoftSolenoid & soft_sol, int unit) { soft_sol.m_unit = unit; },
@@ -2516,8 +2762,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_SoftSolenoid);
     register_reverse(py_SoftSolenoid);
+    register_copy(py_SoftSolenoid);
 
-    py::class_<Source, elements::mixin::Named, elements::mixin::Thin> py_Source(me, "Source");
+    py::class_<Source, elements::mixin::Named, elements::mixin::Thin, py::smart_holder> py_Source(me, "Source");
     py_Source
         .def("__repr__",
              [](Source const & src) {
@@ -2608,8 +2855,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_Source);
     register_reverse(py_Source);
+    register_copy(py_Source);
 
-    py::class_<Sol, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_Sol(me, "Sol");
+    py::class_<Sol, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_Sol(me, "Sol");
     py_Sol
         .def("__repr__",
              [](Sol const & sol) {
@@ -2657,8 +2905,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_Sol);
     register_reverse(py_Sol);
+    register_copy(py_Sol);
 
-    py::class_<PRot, elements::mixin::Named, elements::mixin::Thin> py_PRot(me, "PRot");
+    py::class_<PRot, elements::mixin::Named, elements::mixin::Thin, py::smart_holder> py_PRot(me, "PRot");
     py_PRot
         .def("__repr__",
              [](PRot const & prot) {
@@ -2731,8 +2980,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_PRot);
     register_reverse(py_PRot);
+    register_copy(py_PRot);
 
-    py::class_<SoftQuadrupole, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture> py_SoftQuadrupole(me, "SoftQuadrupole");
+    py::class_<SoftQuadrupole, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_SoftQuadrupole(me, "SoftQuadrupole");
     py_SoftQuadrupole
         .def("__repr__",
              [](SoftQuadrupole const & soft_quad) {
@@ -2742,13 +2992,40 @@ void init_elements(py::module& m)
                  );
              }
         )
+        .def_property("cos_coefficients",
+            [](elements::SoftQuadrupole const & el) { return el.cos_coefficients(); },
+            [](elements::SoftQuadrupole & el, std::vector<amrex::ParticleReal> v) {
+                el.set_coefficients(std::move(v), el.sin_coefficients());
+            },
+            "cosine coefficients in the Fourier expansion of the on-axis field gradient\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_coefficients()``."
+        )
+        .def_property("sin_coefficients",
+            [](elements::SoftQuadrupole const & el) { return el.sin_coefficients(); },
+            [](elements::SoftQuadrupole & el, std::vector<amrex::ParticleReal> v) {
+                el.set_coefficients(el.cos_coefficients(), std::move(v));
+            },
+            "sine coefficients in the Fourier expansion of the on-axis field gradient\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_coefficients()``."
+        )
+        .def("set_coefficients",
+            [](elements::SoftQuadrupole & el, std::vector<amrex::ParticleReal> f, std::vector<amrex::ParticleReal> s) {
+                el.set_coefficients(std::move(f), std::move(s));
+            },
+            py::arg("cos_coefficients"), py::arg("sin_coefficients"),
+            "Replace both arrays at once.\n\n"
+            "They are validated together and applied as one step, so a rejected update\n"
+            "leaves the element unchanged."
+        )
         .def("to_dict",
             [](SoftQuadrupole const & soft_quad) {
                 return element_dict(
                     soft_quad,
                     std::make_pair("gscale", soft_quad.m_gscale),
-                    std::make_pair("cos_coefficients", SoftQuadrupole::DynamicData::get(soft_quad.m_id)->cos.host_const()),
-                    std::make_pair("sin_coefficients", SoftQuadrupole::DynamicData::get(soft_quad.m_id)->sin.host_const()),
+                    std::make_pair("cos_coefficients", soft_quad.cos_coefficients()),
+                    std::make_pair("sin_coefficients", soft_quad.sin_coefficients()),
                     std::make_pair("mapsteps", soft_quad.m_mapsteps)
                 );
             }
@@ -2808,8 +3085,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_SoftQuadrupole);
     register_reverse(py_SoftQuadrupole);
+    register_copy(py_SoftQuadrupole);
 
-    py::class_<ThinDipole, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture> py_ThinDipole(me, "ThinDipole");
+    py::class_<ThinDipole, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_ThinDipole(me, "ThinDipole");
     py_ThinDipole
         .def("__repr__",
              [](ThinDipole const & thin_dp) {
@@ -2889,8 +3167,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_ThinDipole);
     register_reverse(py_ThinDipole);
+    register_copy(py_ThinDipole);
 
-    py::class_<TaperedPL, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture> py_TaperedPL(me, "TaperedPL");
+    py::class_<TaperedPL, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_TaperedPL(me, "TaperedPL");
     py_TaperedPL
         .def("__repr__",
              [](TaperedPL const & taperedpl) {
@@ -2958,8 +3237,9 @@ void init_elements(py::module& m)
     ;
     register_push(py_TaperedPL);
     register_reverse(py_TaperedPL);
+    register_copy(py_TaperedPL);
 
-    py::class_<LinearMap, elements::mixin::Named, elements::mixin::Alignment, elements::mixin::PipeAperture> py_LinearMap(me, "LinearMap");
+    py::class_<LinearMap, elements::mixin::Named, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_LinearMap(me, "LinearMap");
     py_LinearMap
         .def("__repr__",
              [](LinearMap const & linearmap) {
@@ -3017,8 +3297,9 @@ void init_elements(py::module& m)
      ;
      register_push(py_LinearMap);
      register_reverse(py_LinearMap);
+     register_copy(py_LinearMap);
 
-    py::class_<SpinMap, elements::mixin::Named, elements::mixin::Alignment> py_SpinMap(me, "SpinMap");
+    py::class_<SpinMap, elements::mixin::Named, elements::mixin::Alignment, py::smart_holder> py_SpinMap(me, "SpinMap");
     py_SpinMap
         .def("__repr__",
              [](SpinMap const & spinmap) {
@@ -3075,19 +3356,20 @@ void init_elements(py::module& m)
      ;
      register_push(py_SpinMap);
      register_reverse(py_SpinMap);
+     register_copy(py_SpinMap);
 
 
     // freestanding push function
-    m.def("push", py::overload_cast<ImpactXParticleContainer &, elements::KnownElements &, int, int>(&push),
+    m.def("push", py::overload_cast<ImpactXParticleContainer &, elements::ElementHandle &, int, int>(&push),
         py::arg("pc"), py::arg("element"), py::arg("step")=0, py::arg("period")=0,
         "Push a whole particle beam (incl. reference particle) through an element"
     );
-    m.def("push", py::overload_cast<RefPart &, elements::KnownElements &>(&push),
+    m.def("push", py::overload_cast<RefPart &, elements::ElementHandle &>(&push),
         py::arg("ref"), py::arg("element"),
         "Push the reference particle through an element"
     );
 
-    m.def("reverse", [](elements::KnownElements & el) {
+    m.def("reverse", [](elements::ElementHandle & el) {
             elements::reverse(el);
         },
         py::arg("element"),

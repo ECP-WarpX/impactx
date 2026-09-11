@@ -150,12 +150,17 @@ namespace
     template <typename F_OnElementExit = NoopElementExit>
     Map6x6
     walk_lattice (
-        std::list<elements::KnownElements> const & lattice,
+        Lattice const & lattice,
         RefPart const & ref_part_init,
         OnMissingLinearMap on_missing,
         F_OnElementExit && on_element_exit = NoopElementExit{}
     )
     {
+        // A reference push can run a user callback (Programmable), and that callback can
+        // reach the very lattice this loop is walking. Appending would reallocate the
+        // storage under the iterator below, so refuse structural edits for the walk.
+        Lattice::TraversalGuard const traversal(lattice);
+
         // private copy of the reference particle
         RefPart ref = ref_part_init;
         Map6x6 M_cum = Map6x6::Identity();
@@ -169,7 +174,7 @@ namespace
         {
             ref.set_edge();
 
-            std::visit([&](auto && element)
+            elements::visit([&](auto && element)
             {
                 using E = std::decay_t<decltype(element)>;
 
@@ -193,7 +198,7 @@ namespace
 
     std::vector<MapTraceEntry>
     map_trace (
-        std::list<elements::KnownElements> const & lattice,
+        Lattice const & lattice,
         RefPart const & ref_part_init,
         OnMissingLinearMap on_missing
     )
@@ -232,7 +237,7 @@ namespace
 
     Map6x6
     linear_map (
-        std::list<elements::KnownElements> const & lattice,
+        Lattice const & lattice,
         RefPart const & ref_part_init,
         OnMissingLinearMap on_missing
     )

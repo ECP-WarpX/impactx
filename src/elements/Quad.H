@@ -11,11 +11,11 @@
 #define IMPACTX_QUAD_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
@@ -29,10 +29,9 @@
 
 namespace impactx::elements
 {
-    struct Quad
-    : public mixin::Named,
-      public mixin::BeamOptic<Quad>,
-      public mixin::LinearTransport<Quad>,
+    struct QuadGPU
+    : public mixin::BeamOptic<QuadGPU>,
+      public mixin::LinearTransport<QuadGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -63,9 +62,8 @@ namespace impactx::elements
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
          * @param nslice number of slices used for the application of space charge
-         * @param name a user defined and not necessarily unique name of the element
          */
-        Quad (
+        QuadGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal k,
             amrex::ParticleReal dx = DEFAULT_dx,
@@ -73,11 +71,9 @@ namespace impactx::elements
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
             amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
             amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
-            int nslice = DEFAULT_nslice,
-            std::optional<std::string> name = DEFAULT_name
+            int nslice = DEFAULT_nslice
         )
-        : Named(std::move(name)),
-          Thick(ds, nslice),
+        : Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
           PipeAperture(aperture_x, aperture_y),
           m_k(k)
@@ -389,8 +385,11 @@ namespace impactx::elements
 
     };
 
+    /** Quad: GPU state plus common host-only metadata */
+    using Quad = Element<QuadGPU>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::Quad)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::QuadGPU)
 
 #endif // IMPACTX_QUAD_H

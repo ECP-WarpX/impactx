@@ -11,12 +11,12 @@
 #define IMPACTX_PROT_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thin.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <ablastr/constant.H>
@@ -31,10 +31,9 @@
 
 namespace impactx::elements
 {
-    struct PRot
-    : public mixin::Named,
-      public mixin::BeamOptic<PRot>,
-      public mixin::LinearTransport<PRot>,
+    struct PRotGPU
+    : public mixin::BeamOptic<PRotGPU>,
+      public mixin::LinearTransport<PRotGPU>,
       public mixin::Thin,
       public mixin::SpinTransport,
       public mixin::NoFinalize,
@@ -50,15 +49,12 @@ namespace impactx::elements
          *
          * @param phi_in Initial angle of reference trajectory w/r/t z (degrees)
          * @param phi_out Final angle of reference trajectory w/r/t/ z (degrees)
-         * @param name a user defined and not necessarily unique name of the element
          */
-        PRot (
+        PRotGPU (
             amrex::ParticleReal phi_in,
-            amrex::ParticleReal phi_out,
-            std::optional<std::string> name = DEFAULT_name
+            amrex::ParticleReal phi_out
         )
-        : Named(std::move(name)),
-          m_phi_in(phi_in * mixin::Alignment::degree2rad),
+        : m_phi_in(phi_in * mixin::Alignment::degree2rad),
           m_phi_out(phi_out * mixin::Alignment::degree2rad)
         {
         }
@@ -277,8 +273,11 @@ namespace impactx::elements
         amrex::ParticleReal m_inv_beta, m_sin_theta, m_cos_theta, m_sin_phi_in, m_cos_phi_in;
     };
 
+    /** PRot: GPU state plus common host-only metadata */
+    using PRot = Element<PRotGPU>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::PRot)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::PRotGPU)
 
 #endif // IMPACTX_PROT_H

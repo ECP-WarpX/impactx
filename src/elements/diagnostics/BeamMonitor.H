@@ -103,6 +103,23 @@ namespace detail
         BeamMonitor& operator= (BeamMonitor const & other) = default;
         BeamMonitor& operator= (BeamMonitor && other) = default;
 
+        /** A distinct monitor with the same output configuration
+         *
+         * The open output series is deliberately not carried over: two monitors writing
+         * through one series handle would interleave into the same iterations. The copy
+         * opens its own on first use.
+         */
+        [[nodiscard]] BeamMonitor copy () const
+        {
+            BeamMonitor out(*this);
+            out.m_series.reset();
+            out.m_series_key.clear();
+            out.m_step = 0;
+            out.m_offset.clear();
+            out.m_rbc.clear();
+            return out;
+        }
+
         /** Reverse the element (no-op for diagnostics) */
         void reverse () { }
 

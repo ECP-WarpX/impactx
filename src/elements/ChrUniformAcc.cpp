@@ -1,3 +1,3 @@
 #include "ChrUniformAcc.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::ChrAcc)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::ChrAccGPU)

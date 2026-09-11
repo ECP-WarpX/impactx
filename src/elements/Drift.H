@@ -11,11 +11,11 @@
 #define IMPACTX_DRIFT_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/thick.H"
@@ -31,10 +31,9 @@
 
 namespace impactx::elements
 {
-    struct Drift
-    : public mixin::Named,
-      public mixin::BeamOptic<Drift>,
-      public mixin::LinearTransport<Drift>,
+    struct DriftGPU
+    : public mixin::BeamOptic<DriftGPU>,
+      public mixin::LinearTransport<DriftGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -54,20 +53,17 @@ namespace impactx::elements
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
          * @param nslice number of slices used for the application of space charge
-         * @param name a user defined and not necessarily unique name of the element
          */
-        Drift (
+        DriftGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal dx = DEFAULT_dx,
             amrex::ParticleReal dy = DEFAULT_dy,
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
             amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
             amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
-            int nslice = DEFAULT_nslice,
-            std::optional<std::string> name = DEFAULT_name
+            int nslice = DEFAULT_nslice
         )
-        : Named(std::move(name)),
-          Thick(ds, nslice),
+        : Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
           PipeAperture(aperture_x, aperture_y)
         {
@@ -268,8 +264,11 @@ namespace impactx::elements
         amrex::ParticleReal m_slice_bg;  //! m_slice_ds / m_betgam2
     };
 
-} // namespace impactx
+    /** A drift: GPU state plus common host-only metadata */
+    using Drift = Element<DriftGPU>;
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::Drift)
+} // namespace impactx::elements
+
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::DriftGPU)
 
 #endif // IMPACTX_DRIFT_H

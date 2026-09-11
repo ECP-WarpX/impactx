@@ -1,0 +1,308 @@
+#!/usr/bin/env python3
+#
+# Copyright 2022-2026 ImpactX contributors
+# Authors: Axel Huebl, Chad Mitchell
+# License: BSD-3-Clause-LBNL
+#
+"""Edges of the lattice API: empty lattices, odd slices, and views that outlive things."""
+
+import gc
+
+import pytest
+
+from impactx import ImpactX, elements
+
+
+def drifts(*names):
+    lattice = elements.KnownElementsList()
+    for i, name in enumerate(names):
+        lattice.append(elements.Drift(ds=0.1 * (i + 1), name=name))
+    return lattice
+
+
+def names_of(lattice):
+    return [element.name for element in lattice]
+
+
+@pytest.mark.parametrize(
+    ("count", "key"),
+    [
+        (8, slice(0, 4)),
+        (8, slice(3, 7)),
+        (8, slice(None)),
+        (8, slice(None, None, 2)),
+        (9, slice(None, None, 3)),
+        (4, slice(None, None, -1)),
+        (5, slice(None, None, -2)),
+        (4, slice(None, None, -2)),
+        (6, slice(4, 1, -1)),
+    ],
+)
+def test_delete_slice_matches_a_list(count, key):
+    """Deleting through a slice removes what the same slice removes from a list."""
+
+    lattice = drifts(*[f"d{i}" for i in range(count)])
+    reference = [f"d{i}" for i in range(count)]
+
+    del lattice[key]
+    del reference[key]
+
+    assert names_of(lattice) == reference
+
+
+@pytest.mark.parametrize(
+    ("count", "key", "replacements"),
+    [
+        (6, slice(0, 3), 3),
+        (6, slice(0, 3), 5),
+        (6, slice(0, 3), 1),
+        (6, slice(None), 2),
+        (6, slice(0, 0), 2),
+        (6, slice(6, 6), 2),
+        (6, slice(2, 4), 0),
+    ],
+)
+def test_contiguous_slice_assignment_matches_a_list(count, key, replacements):
+    """Assigning through a contiguous slice resizes as it does on a list."""
+
+    lattice = drifts(*[f"d{i}" for i in range(count)])
+    reference = [f"d{i}" for i in range(count)]
+    new = [elements.Drift(ds=0.2, name=f"n{i}") for i in range(replacements)]
+
+    lattice[key] = new
+    reference[key] = [element.name for element in new]
+
+    assert names_of(lattice) == reference
+
+
+def test_delete_slice_keeps_the_owner_list_in_step():
+    """A slice delete leaves as many wrappers as elements, so indexing stays correct."""
+
+    lattice = drifts("d0", "d1", "d2", "d3")
+    del lattice[::-1]
+
+    assert len(lattice) == 0
+    lattice.append(elements.Drift(ds=0.9, name="fresh"))
+    assert names_of(lattice) == ["fresh"]
+
+
+@pytest.mark.parametrize("method", ["erase", "index"])
+def test_out_of_range_position_raises(method):
+    """A position past the end is reported, not read."""
+
+    lattice = drifts("d0")
+    with pytest.raises(IndexError):
+        if method == "erase":
+            del lattice[5]
+        else:
+            _ = lattice[5]
+
+
+def test_pop_on_an_empty_lattice_raises():
+    lattice = elements.KnownElementsList()
+    with pytest.raises(IndexError):
+        lattice.pop_back()
+
+
+def test_tracking_an_empty_lattice_raises():
+    """An empty lattice is reported rather than walked off the front."""
+
+    from impactx import distribution
+
+    sim = ImpactX()
+    sim.particle_shape = 2
+    sim.slice_step_diagnostics = False
+    sim.diagnostics = False
+    sim.init_grids()
+
+    ref = sim.beam.ref
+    ref.set_species("electron").set_kin_energy_MeV(2.0e3)
+    distr = distribution.Waterbag(
+        lambdaX=4.0e-5,
+        lambdaY=4.0e-5,
+        lambdaT=1.0e-3,
+        lambdaPx=2.7e-5,
+        lambdaPy=2.7e-5,
+        lambdaPt=2.0e-3,
+    )
+    sim.init_envelope(ref, distr)
+
+    assert len(sim.lattice) == 0
+    with pytest.raises(RuntimeError, match="zero elements"):
+        sim.track_envelope()
+
+    sim.finalize()
+
+
+class TestViewOutlivingItsSimulation:
+    """A lattice reached through ``sim.lattice`` says so rather than reading freed memory."""
+
+    @staticmethod
+    def orphaned_view():
+        sim = ImpactX()
+        view = sim.lattice
+        view.append(elements.Drift(ds=0.2, name="d"))
+        del sim
+        gc.collect()
+        return view
+
+    @pytest.mark.parametrize(
+        "use",
+        [
+            pytest.param(len, id="len"),
+            pytest.param(lambda v: v.size(), id="size"),
+            pytest.param(lambda v: v.is_empty(), id="is_empty"),
+            pytest.param(lambda v: v[0], id="getitem"),
+            pytest.param(list, id="iterate"),
+            pytest.param(lambda v: v.append(elements.Drift(ds=0.1)), id="append"),
+        ],
+    )
+    def test_reports_instead_of_reading_freed_memory(self, use):
+        view = self.orphaned_view()
+
+        with pytest.raises(RuntimeError, match="no longer exists"):
+            use(view)
+
+
+def test_a_standalone_lattice_is_not_affected():
+    """Only a view of a simulation's lattice has a parent to outlive."""
+
+    lattice = drifts("d0", "d1")
+    assert len(lattice) == 2
+    assert names_of(lattice) == ["d0", "d1"]
+
+
+def test_slice_assignment_from_a_generator_that_appends():
+    """A replacement iterable may change the lattice while it is being consumed.
+
+    Regression test: the slice bounds were computed before the iterable was consumed, so
+    a generator that appended left the assignment writing at stale positions. Starting
+    from ["initial"], this produced ["replacement", "added"] where a list gives
+    ["initial", "replacement"]. ``list.__setitem__`` materializes first; so do we.
+    """
+
+    lattice = drifts("initial")
+
+    def grow_lattice():
+        lattice.append(elements.Drift(ds=1.0, name="added"))
+        yield elements.Drift(ds=1.0, name="replacement")
+
+    lattice[-1:] = grow_lattice()
+
+    # Spelled out rather than compared against a live ``list``: CPython did this the other
+    # way round until a 3.11 patch release, so a list is not a fixed reference here.
+    assert names_of(lattice) == ["initial", "replacement"]
+
+
+def test_slice_assignment_from_a_generator_that_clears():
+    """The stale bounds could also index past the end after the generator shortened it.
+
+    Regression test: with the bounds taken first, clearing inside the generator left the
+    head loop reading positions that were no longer there, raising IndexError.
+    """
+
+    lattice = drifts("a", "b", "c")
+
+    def clear_lattice():
+        lattice.clear()
+        yield elements.Drift(ds=1.0, name="new")
+
+    lattice[-1:] = clear_lattice()
+
+    assert names_of(lattice) == ["new"]
+
+
+def test_extended_slice_survives_a_finalizer_that_reads_the_lattice():
+    """A displaced element's ``__del__`` may run while the replacement is still going.
+
+    Regression test: assigning through an extended slice released each displaced element
+    as it went -- both its handle and, through the owner list, the last reference to its
+    Python wrapper. A subclass finalizer that read the lattice from there saw a generation
+    that had already moved and rebuilt the owner list, so the remaining writes landed in a
+    list that was no longer the lattice's. The second replacement lost its wrapper and came
+    back as a plain ``Drift`` without its attributes.
+    """
+
+    lattice = elements.KnownElementsList()
+    reads = []
+
+    class Observed(elements.Drift):
+        def __del__(self):
+            reads.append(lattice[1].ds)
+
+    class Tagged(elements.Drift):
+        def __init__(self, ds):
+            super().__init__(ds=ds)
+            self.tag = "retained"
+
+    lattice.extend([Observed(ds=1.0), elements.Drift(ds=2.0), elements.Drift(ds=3.0)])
+    lattice[::2] = [Tagged(10.0), Tagged(30.0)]
+
+    assert type(lattice[0]) is Tagged
+    assert type(lattice[2]) is Tagged
+    assert lattice[0].tag == "retained"
+    assert lattice[2].tag == "retained"
+    assert reads == [2.0]
+
+
+@pytest.mark.parametrize("operation", ["read", "delete", "assign"])
+def test_slice_bounds_follow_an_index_that_edits_the_lattice(operation):
+    """A slice bound may be an object whose ``__index__`` reaches the lattice.
+
+    Regression test: the length was read before ``__index__`` ran, so bounds computed
+    against the old length were used to index the new one. Reading raised IndexError and
+    deleting read past the end outright, where a list simply normalizes against whatever
+    length it has by then. ``list`` unpacks the slice first and adjusts afterwards.
+    """
+
+    lattice = drifts("a", "b", "c")
+
+    class ClearsWhenAsked:
+        def __init__(self, value, target):
+            self.value, self.target = value, target
+
+        def __index__(self):
+            self.target.clear()
+            return self.value
+
+    # Spelled out rather than compared against a live ``list``: CPython's own ordering
+    # here changed in a 3.11 patch release, so a list is not a fixed reference.
+    if operation == "read":
+        assert names_of(lattice[0 : ClearsWhenAsked(3, lattice)]) == []
+    elif operation == "delete":
+        del lattice[0 : ClearsWhenAsked(3, lattice)]
+    else:
+        lattice[0 : ClearsWhenAsked(3, lattice)] = []
+
+    assert names_of(lattice) == []
+
+
+def test_assigning_the_lattice_never_shows_an_empty_one():
+    """Replacing `sim.lattice` releases the old wrappers; they must not see it empty.
+
+    Regression test: the setter cleared before extending, so a subclass finalizer running
+    from that `clear()` observed an empty lattice, and anything it appended landed ahead
+    of the replacements.
+    """
+
+    sim = ImpactX()
+    sim.particle_shape = 2
+    sim.slice_step_diagnostics = False
+    sim.init_grids()
+
+    seen = []
+
+    class Watcher(elements.Drift):
+        def __del__(self):
+            seen.append([element.name for element in sim.lattice])
+
+    sim.lattice.extend([Watcher(ds=1.0, name="old")])
+    sim.lattice = [
+        elements.Drift(ds=1.0, name="new1"),
+        elements.Drift(ds=1.0, name="new2"),
+    ]
+
+    assert [element.name for element in sim.lattice] == ["new1", "new2"]
+    assert seen == [["new1", "new2"]]
+
+    sim.finalize()

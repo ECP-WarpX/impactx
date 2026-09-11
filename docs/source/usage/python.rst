@@ -412,8 +412,8 @@ Collective Effects & Overall Simulation Parameters
 
    .. py:property:: lattice
 
-      Access the elements in the accelerator lattice.
-      See :py:mod:`impactx.elements` for lattice elements.
+      The accelerator lattice, a :py:class:`~impactx.elements.KnownElementsList`.
+      See :py:mod:`impactx.elements` for the available elements.
 
    .. py:property:: periods
 
@@ -527,7 +527,22 @@ Collective Effects & Overall Simulation Parameters
 
    .. py:property:: tracking_element
 
-      For tracking hooks/callbacks, the current lattice element.
+      For tracking hooks/callbacks, the element currently being tracked through.
+
+      This is the element in the lattice, so a hook may retune it for the push that is
+      about to happen:
+
+      .. code-block:: python
+
+         def before_element(sim):
+             element = sim.tracking_element
+             if element.name == "cavity":
+                 element.phase = my_phase(sim.beam.ref)
+
+         sim.hook["before_element"] = before_element
+
+      An element placed at several positions is one element: a hook that reads a parameter
+      it also writes sees the value left by the previous position.
 
    .. py:method:: resize_mesh()
 
@@ -1020,19 +1035,106 @@ This module provides elements and methods for the accelerator lattice.
 
 .. py:class:: impactx.elements.KnownElementsList
 
-   An iterable, ``list``-like type of elements.
+   The accelerator lattice: a ``list``-like sequence of elements.
+
+   The lattice holds the element objects it is given, the way a Python list holds its
+   items: changing an element changes what is tracked, and the same element may sit at
+   several positions.
+
+   Indexing, slicing, iteration, ``len()``, ``in``, ``insert()``, ``remove()``, ``index()``,
+   ``count()``, ``del`` and ``reversed()`` are supported, alongside
+   :py:meth:`~impactx.elements.KnownElementsList.append`,
+   :py:meth:`~impactx.elements.KnownElementsList.extend`,
+   :py:meth:`~impactx.elements.KnownElementsList.clear` and
+   :py:meth:`~impactx.elements.KnownElementsList.pop_back`.
+
+   ``in``, ``index()``, ``count()`` and ``remove()`` match on the element itself, so an
+   element with the same parameters as another is not mistaken for it -- which is why
+   ``element in lattice`` can be ``False`` while ``lattice == [element]`` is ``True``,
+   see :ref:`element-comparison-methods`.
+
+   Iteration and ``reversed()`` take a snapshot of the element references when the iterator
+   is created. Later structural edits do not change its sequence, while parameter changes
+   to those elements remain visible. This type supports the methods documented below;
+   it does not implement the entire Python ``list`` API.
+
+   .. seealso::
+
+      :ref:`usage-howto-lattice-manipulation` walks through the workflows: repeating a
+      cell, editing a lattice in place, building one lattice per run, and keeping a
+      lattice for longer than the simulation that used it.
+
+   .. note::
+
+      Scripts written for earlier ImpactX versions may need an adjustment here, see the
+      :ref:`Upgrade Guide <install-upgrade>`.
 
    .. py:method:: clear()
 
-      Clear the list to become empty.
+      Remove all elements from the lattice.
 
-   .. py:method:: extend(list)
+   .. py:method:: pop_back()
 
-      Add a list of elements to the list.
+      Remove the last element of the lattice and return it.
+
+   .. py:property:: generation
+
+      How often the sequence of elements changed.
+
+      Counts structural edits only: changing a parameter on an element that is already in
+      the lattice does not move anything and does not change this. A selection taken with
+      :py:meth:`select` compares this to notice that its positions went stale.
+
+   .. py:method:: extend(elements)
+
+      Add several elements to the end of the lattice.
 
    .. py:method:: append(element)
 
-      Add a single element to the list.
+      Add an element to the end of the lattice.
+
+   .. py:method:: insert(index, element)
+
+      Insert an element before a position. The position is clamped to the ends, as for a
+      ``list``.
+
+   .. py:method:: remove(element)
+
+      Remove the first position holding this element. Matches on the element itself, not on
+      its parameters. Raises ``ValueError`` if the element is not in the lattice.
+
+   .. py:method:: index(element)
+
+      Return the first position holding this element. Matches on the element itself.
+      Raises ``ValueError`` if the element is not in the lattice.
+
+   .. py:method:: count(element)
+
+      Return how many positions this element occupies. Matches on the element itself.
+
+   .. py:method:: __contains__(element)
+
+      ``element in lattice``: whether the lattice holds this very element. An element with
+      the same parameters as another is not mistaken for it.
+
+   .. py:method:: __reversed__()
+
+      ``reversed(lattice)``: iterate the elements from the end.
+
+   .. py:method:: __getitem__(index_or_slice)
+
+      ``lattice[i]`` returns the element at a position, with negative indices as for a
+      ``list``. ``lattice[a:b]`` returns a new lattice over the same elements.
+
+   .. py:method:: __setitem__(index_or_slice, element_or_elements)
+
+      ``lattice[i] = element`` replaces one position. ``lattice[a:b] = elements`` replaces a
+      range, which may change the length.
+
+   .. py:method:: __delitem__(index_or_slice)
+
+      ``del lattice[i]`` and ``del lattice[a:b]`` remove positions. Other positions holding
+      the same element are unaffected: this removes an occurrence, not the element.
 
    .. py:method:: load_file(filename, nslice=1, *, min_model="linear")
 
@@ -1181,8 +1283,8 @@ This module provides elements and methods for the accelerator lattice.
          # Chain filters (AND logic)
          drift_named_d1 = lattice.select(kind="Drift").select(name="drift1")
 
-         # Modify original elements through references
-         drift_elements[0].ds = 2.0  # modifies original lattice
+         # A selection holds the lattice's elements, so changes apply to the lattice
+         drift_elements[0].ds = 2.0
 
          # delete all drifts
          lattice.select(kind=r".*Drift").delete()
@@ -1418,10 +1520,23 @@ This module provides elements and methods for the accelerator lattice.
    Indexing returns the same element objects as the full lattice; assigning to fields updates the
    underlying list.
 
-   All mutating operations (``delete``, ``replace_each``, ``replace_with_drifts``) rebuild the
-   lattice using cloned elements. Existing Python references to lattice elements will then point
-   to objects that are **no longer in the lattice**. If you cache element references, re-fetch
-   them from the lattice after any mutation.
+   A selection is a set of positions in the lattice, so it describes the lattice as it was
+   when the selection was taken. Any edit that adds, removes or moves elements -- through
+   the selection or directly on the lattice -- makes it stale, and using it afterwards
+   raises. Take a new one with
+   :py:meth:`~impactx.elements.KnownElementsList.select`. Changing an element's own
+   parameters moves nothing and leaves selections usable.
+
+   Mutating operations rewrite only the positions selected. Elements at other positions are
+   left exactly as they are, keeping their identity, their Python subclass and their
+   attributes. Every replacement is prepared and validated before any is installed.
+   A failure during preparation or validation installs no replacements. Python callbacks,
+   property getters and finalizers may make their own edits; those edits are not rolled back.
+   If preparation changes the lattice, the stale selection is rejected before installation.
+
+   Replacement methods return a new selection over the replaced positions. A finalizer
+   that structurally edits the lattice as displaced elements are released can invalidate
+   that selection before the method returns. In that case, take a new selection.
 
    If the selection is empty, ``delete`` is a no-op and ``replace_*`` return
    an empty ``FilteredElementsList``.
@@ -1437,20 +1552,22 @@ This module provides elements and methods for the accelerator lattice.
 
    .. py:method:: delete()
 
-      Remove all elements in the current selection from the underlying lattice. Invalidates this
-      view **and** all other live selections on that lattice.
+      Remove all elements in the current selection from the underlying lattice. This is an
+      edit, so it makes this view and every other live selection on that lattice stale.
       Call :py:meth:`~impactx.elements.KnownElementsList.select` on the underlying lattice again to obtain a new view.
 
       :rtype: None
 
    .. py:method:: replace_each(element, *, keep_name=True, keep_ds=False)
 
-      Replace each selected element with a copy of ``element``. Invalidates all **other** live
-      selections on the same lattice; returns a **new** filtered view over the same indices (the
-      returned view is valid).
+      Replace each selected element with a copy of ``element``. This is an edit, so it makes
+      this selection and every other live selection on the same lattice stale. Returns a
+      new filtered view over the same positions, subject to the finalizer caveat above.
 
-      :param element: Element to clone at each selected index (names and ``ds`` may be overridden;
-         see below).
+      :param element: Element copied into each selected position (names and ``ds`` may be
+         overridden; see below). A Python subclass of an element must define ``copy()`` to be
+         used here, as :py:meth:`~impactx.elements.Drift.copy` does not know how to reproduce
+         one.
       :param keep_name: If true (default), copy ``name`` from each replaced element when present.
       :param keep_ds: If true, copy segment length ``ds`` from each replaced element; otherwise
          ``ds`` comes from the template (default false).
@@ -1473,14 +1590,15 @@ This module provides elements and methods for the accelerator lattice.
    .. py:method:: replace_with_drifts(*, model="match", keep_alignment=True, keep_aperture=False)
 
       Replace each selected element with a drift of the chosen physics family. Names and ``ds``
-      are always taken from the replaced element. Invalidates all **other** live selections on the
-      same lattice; returns a **new** filtered view over the same indices (the returned view is
-      valid).
+      are always taken from the replaced element. Invalidates this selection and every other
+      live selection on the same lattice. Returns a new filtered view over the same positions,
+      subject to the finalizer caveat above.
 
-      :param model: With ``"match"`` (default), linear elements become ``Drift``, class names
-         starting with ``Chr`` become ``ChrDrift``, and class names starting with ``Exact`` become
-         ``ExactDrift``. With ``"linear"``, ``"paraxial"``, or ``"exact"``, every selected slot
-         uses that drift type.
+      :param model: With ``"match"`` (default), the underlying element kind determines the
+         physics family: linear elements become ``Drift``, paraxial elements become
+         ``ChrDrift``, and exact elements become ``ExactDrift``. Python subclasses retain
+         their underlying element's family, regardless of the subclass name. With
+         ``"linear"``, ``"paraxial"``, or ``"exact"``, every selected slot uses that drift type.
       :param keep_alignment: If true (default), copy ``dx``, ``dy``, and ``rotation`` from each
          replaced element; otherwise zero them.
       :param keep_aperture: If true, copy ``aperture_x`` and ``aperture_y`` from each replaced
@@ -1511,6 +1629,47 @@ This module provides elements and methods for the accelerator lattice.
       Tolerant element-wise comparison, with the same semantics as
       :py:meth:`impactx.elements.KnownElementsList.isclose`.
       ``ignore_attributes`` is forwarded to each element's ``isclose``.
+
+.. _element-copy:
+
+Copying a lattice element
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. py:method:: impactx.elements.Element.copy(**overrides)
+
+   Return a new element with the same configuration.
+
+   ``lattice.append(q)`` places ``q`` itself; ``lattice.append(q.copy())`` places a
+   separate element. See :ref:`usage-howto-lattice-manipulation` for when each is wanted.
+
+   Keyword arguments give the copy a different value for a parameter, so that one element
+   supplies the values for many:
+
+   .. code-block:: python
+
+      scan = [quad.copy(k=k) for k in [0.8, 0.9, 1.0]]
+      cavities = [rf] + [rf.copy(name=f"rf{i}") for i in range(2, 5)]
+
+   Parameters that only mean something as a pair are given together, as the constructor
+   takes them: ``cos_coefficients`` with ``sin_coefficients``, ``k_normal`` with
+   ``k_skew``, and ``vertices_x`` with ``vertices_y``.
+
+   Setting a parameter the element does not have raises ``AttributeError``, so a mistyped
+   name is reported rather than quietly ignored.
+
+   :param overrides: parameters whose value differs in the copy.
+   :raises AttributeError: if a named parameter is not one the element has.
+   :raises TypeError: if called on a Python subclass that does not define its own
+      ``copy()``, since the subclass carries state that cannot be reproduced here.
+   :raises ValueError: if an override changes a beam monitor setting shared with the original.
+
+   .. note::
+
+      A copy of a :py:class:`impactx.elements.BeamMonitor` does not inherit an
+      already-open output file. Its ``alpha``, ``beta``, ``tn``, ``cn`` and
+      ``nonlinear_lens_invariants`` settings are keyed by its name and shared with the
+      original. Passing any of these as a ``copy()`` override raises ``ValueError``.
+      Construct a monitor with a different name for independent settings.
 
 .. _element-comparison-methods:
 
@@ -1658,8 +1817,39 @@ Lattice Elements
 Lattice elements expose multiple methods, including: (i) ``push(pc)`` to advance particles ``pc`` (e.g., ``sim.beam``),
 (ii) ``push(cm, ref)`` to advance a covariance matrix ``cm``, (iii) ``transfer_map(ref)`` that returns the
 element's analytic 6x6 linear transport map (phase-space ordering ``(x, px, y, py, t, pt)``) for the reference
-particle ``ref``, (iv) ``reverse()`` to reverse the element in place, and (v) ``to_dict()`` to serialize it.
+particle ``ref``, (iv) ``reverse()`` to reverse the element in place, (v) ``to_dict()`` to serialize it, and
+(vi) ``copy()`` to make a new element with the same configuration.
 For an element with ``nslice`` > 1, the pushes and maps refer to a single ``ds/nslice`` slice.
+
+Element parameters can be changed after construction, and a lattice tracks the elements it
+holds, so an element can be retuned between runs:
+
+.. code-block:: python
+
+   quad = elements.Quad(ds=0.3, k=2.0)
+   sim.lattice.append(quad)
+
+   quad.k = 2.5          # applies to the next tracking run
+
+Use ``copy()`` when a second, separately tunable element is wanted:
+
+.. code-block:: python
+
+   focus = elements.Quad(ds=0.3, k=2.0)
+   defocus = focus.copy()
+   defocus.k = -2.0
+
+The elements carrying array-valued parameters (e.g., the soft-edge elements, the exact multipole
+and combined-function bend, and the polygon aperture) expose those arrays as properties,
+plus a setter that takes both at once. The two arrays of an element always have the same
+length, so the paired setter is the one that can change that length:
+
+.. code-block:: python
+
+   cavity.cos_coefficients = new_cos            # same length as before
+   cavity.set_coefficients(new_cos, new_sin)    # any length, applied together
+
+   aperture.set_vertices(x, y)                  # closed outline: x[0] == x[-1], y[0] == y[-1]
 
 Many elements take a transverse aperture via ``aperture_x`` and ``aperture_y``: the ``Aperture``
 collimator, and as a beam pipe most other elements.
@@ -2678,6 +2868,11 @@ Each lattice element provides a ``.to_dict()`` method, which can be used to seri
 
    Splits up every element that is on s = N * ds for N>0.
 
+   Returns a new lattice. Elements that are not split are the same objects as in the
+   lattice given, so changing one afterwards changes both lattices. An element that a
+   split falls inside is replaced by two new elements covering its halves: these carry
+   its parameters, but a Python subclass and any attributes on it do not carry over.
+
    :param list: element lattice list
    :param ds: spacing in meters along s to add an element
    :param element: the extra element to add every s
@@ -2692,6 +2887,27 @@ Coordinate Transformation
 
    :param to_fixed_t:
    :param to_fixed_s:
+
+.. py:function:: impactx.push(pc, element, step=0, period=0)
+
+   Push a whole particle beam, including the reference particle, through an element.
+   Acts on the element passed in.
+
+   :param pc: the particle container to push
+   :param element: the element to push through
+   :param step: global step, for diagnostics
+   :param period: the current period, for a periodic lattice
+
+.. py:function:: impactx.push(ref, element)
+   :no-index:
+
+   Push only the reference particle through an element.
+
+.. py:function:: impactx.reverse(element)
+
+   Reverse an element in place, so that pushing particles through it reverses the effect of
+   the original element. Acts on the element passed in, so an element that sits at several
+   lattice positions is reversed at all of them.
 
 .. py:function:: impactx.coordinate_transformation(pc, direction)
 

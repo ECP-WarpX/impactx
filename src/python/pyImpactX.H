@@ -27,7 +27,6 @@
 namespace py = pybind11;
 using namespace impactx;
 
-PYBIND11_MAKE_OPAQUE(std::list<elements::KnownElements>)
 PYBIND11_MAKE_OPAQUE(std::unordered_map<std::string, std::function<void(ImpactX *)> >)
 
 #endif // IMPACTX_PYIMPACTX_H

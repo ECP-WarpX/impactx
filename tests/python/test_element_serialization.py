@@ -840,18 +840,12 @@ def test_to_py_roundtrip(all_elements):
         )
 
 
-def test_clone_element_covers_all_element_types(all_elements):
-    """Every element type must survive the clone used to rebuild a lattice.
+def test_copy_covers_all_element_types(all_elements):
+    """Every element type must survive ``copy()`` with its configuration intact.
 
-    ``delete()``, ``replace_each()`` and ``replace_with_drifts()`` rebuild the
-    lattice by cloning the elements they are not replacing. That clone goes
-    through ``to_dict()`` and back into the constructor, and the two are not
-    symmetric for thin elements: ``Marker.to_dict()`` reports ``ds=0.0`` while
-    ``Marker.__init__`` takes only a name. Cloning such an element used to raise
-    ``TypeError``, breaking all three operations on any lattice containing one.
+    ``replace_each()`` copies the template it is given once per selected position, so a
+    type that cannot be copied would break that operation for any lattice containing one.
     """
-    from impactx.extensions.KnownElementsList import _clone_element
-
     lattice, _ = all_elements
 
     failures = []
@@ -860,15 +854,15 @@ def test_clone_element_covers_all_element_types(all_elements):
         if type_name in SKIP_ELEMENTS:
             continue
         try:
-            clone = _clone_element(element)
+            duplicate = element.copy()
         except Exception as e:  # noqa: BLE001 - report every offender at once
             failures.append(f"{type_name}: {type(e).__name__}: {e}")
             continue
-        assert type(clone) is type(element), type_name
-        assert dicts_equal(clone.to_dict(), element.to_dict()), (
-            f"clone of {type_name} does not match the original:\n"
+        assert type(duplicate) is type(element), type_name
+        assert dicts_equal(duplicate.to_dict(), element.to_dict()), (
+            f"copy of {type_name} does not match the original:\n"
             f"  Original: {element.to_dict()}\n"
-            f"  Clone:    {clone.to_dict()}"
+            f"  Copy:     {duplicate.to_dict()}"
         )
 
     assert not failures, "elements that cannot be cloned:\n  " + "\n  ".join(failures)
@@ -882,3 +876,27 @@ def test_lattice_rebuild_covers_all_element_types(all_elements):
     # delete a single element: every *other* element has to be cloned
     lattice.select(kind="Marker").delete()
     assert len(lattice) < n_before
+
+
+def test_a_subclass_serializes_by_its_element_kind():
+    """The lattice keeps Python subclasses, and serialization has to see through them.
+
+    Regression test: the radians/degrees work-around keyed off the exact class name, so a
+    subclass of one of those elements skipped it and a 30 degree bend came back as 0.52.
+    """
+
+    class MyBend(elements.ExactSbend):
+        pass
+
+    lattice = elements.KnownElementsList()
+    lattice.extend(
+        [
+            elements.ExactSbend(ds=1.0, phi=30.0, B=0.0),
+            MyBend(ds=1.0, phi=30.0, B=0.0),
+        ]
+    )
+
+    plain, subclassed = lattice.to_dicts()
+
+    assert plain["phi"] == pytest.approx(30.0)
+    assert subclassed["phi"] == pytest.approx(30.0)

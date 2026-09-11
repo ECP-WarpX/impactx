@@ -11,11 +11,11 @@
 #define IMPACTX_ELEMENT_LINEAR_MAP_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 #include "mixin/pipeaperture.H"
 
@@ -30,10 +30,9 @@
 
 namespace impactx::elements
 {
-    struct LinearMap
-    : public mixin::Named,
-      public mixin::BeamOptic<LinearMap>,
-      public mixin::LinearTransport<LinearMap>,
+    struct LinearMapGPU
+    : public mixin::BeamOptic<LinearMapGPU>,
+      public mixin::LinearTransport<LinearMapGPU>,
       public mixin::Alignment,
       public mixin::PipeAperture,
       public mixin::SpinTransport,
@@ -57,20 +56,17 @@ namespace impactx::elements
          * @param rotation_degree rotation error in the transverse plane [degrees]
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
-         * @param name a user defined and not necessarily unique name of the element
          */
-        LinearMap (
+        LinearMapGPU (
             Map6x6 const & R,
             amrex::ParticleReal ds = DEFAULT_ds,
             amrex::ParticleReal dx = DEFAULT_dx,
             amrex::ParticleReal dy = DEFAULT_dy,
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
             amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
-            amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
-            std::optional<std::string> name = DEFAULT_name
+            amrex::ParticleReal aperture_y = DEFAULT_aperture_y
         )
-        : Named(std::move(name)),
-          Alignment(dx, dy, rotation_degree),
+        : Alignment(dx, dy, rotation_degree),
           PipeAperture(aperture_x, aperture_y)
         {
             m_transport_map = R;
@@ -298,8 +294,11 @@ namespace impactx::elements
         amrex::ParticleReal m_ds;  // finite ds allowed for bookkeeping, but we do not allow slicing
     };
 
+    /** LinearMap: GPU state plus common host-only metadata */
+    using LinearMap = Element<LinearMapGPU>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::LinearMap)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::LinearMapGPU)
 
 #endif // IMPACTX_ELEMENT_LINEAR_MAP_H

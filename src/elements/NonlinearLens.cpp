@@ -1,3 +1,3 @@
 #include "NonlinearLens.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::NonlinearLens)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::NonlinearLensGPU)

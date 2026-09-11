@@ -10,8 +10,7 @@
 #include "ImpactX.H"
 #include "diagnostics/DiagnosticOutput.H"
 #include "diagnostics/FilePrefix.H"
-#include "elements/mixin/accessors.H"
-#include "elements/mixin/dynamicdata.H"
+#include "elements/helper/Accessors.H"
 #include "initialization/InitAmrCore.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
@@ -27,6 +26,7 @@
 #include <AMReX_Print.H>
 #include <AMReX_Utility.H>
 
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -42,18 +42,65 @@ namespace impactx {
 
     ImpactX::~ImpactX()
     {
-        this->finalize();
+        // A destructor may not let an exception out: doing so ends the process, and
+        // finalize() does throw -- it refuses while a traversal is walking the lattice.
+        // The Python bindings hold the simulation for the duration of a lattice call so
+        // that cannot happen from there, but a destructor is the wrong place to find out.
+        // Report and carry on: whatever is left unfinalized is going away with us.
+        try
+        {
+            this->finalize();
+        }
+        catch (std::exception const & e)
+        {
+            amrex::Print() << "ImpactX: could not finalize on destruction: " << e.what() << "\n";
+        }
+        catch (...)
+        {
+            amrex::Print() << "ImpactX: could not finalize on destruction.\n";
+        }
     }
 
     void ImpactX::finalize ()
     {
+        // Refuse before anything is torn down. Reached from a tracking hook, finalizing
+        // the elements first and only then failing to empty the lattice would leave
+        // tracking to run on through elements that are already finished with.
+        if (m_lattice->is_being_traversed())
+        {
+            throw std::runtime_error(
+                "ImpactX: cannot finalize while tracking through the lattice.");
+        }
+
+        // Let go of the element the tracking state points at. Tracking releases it on
+        // its way out, but a run that ended in an exception from a user hook may not
+        // have got there, and a share kept here would outlive the element it names.
+        m_tracking_state.set_no_element();
+
         // loop over all beamline elements & finalize them
         finalize_elements();
 
+        // Empty the lattice before releasing Python wrappers. A wrapper's finalizer may
+        // iterate the lattice; it must not find the elements being released and recreate
+        // their owner list, keeping AMReX-backed data alive past AMReX shutdown.
+        m_lattice->clear();
+
+        // Let the caller release what it keeps alive on behalf of the lattice, while AMReX
+        // is still up. The Python bindings drop the element wrappers here: an element can
+        // carry AMReX-backed data on its Python side -- a MultiFab attached to a
+        // Programmable, say -- and that has to be destroyed before the arena it came from.
+        // This runs after the elements' own finalization, which may run a user callback
+        // that reads what a wrapper holds.
+        if (m_release_lattice_owners)
+        {
+            // Releasing wrappers runs Python finalizers. They may read the empty lattice,
+            // but must not repopulate it and retain AMReX-backed data past shutdown.
+            Lattice::TraversalGuard const cleanup(*m_lattice);
+            m_release_lattice_owners();
+        }
+
         if (m_grids_initialized)
         {
-            m_lattice.clear();
-
             // this one last
             amr_data.reset();
 
@@ -67,8 +114,13 @@ namespace impactx {
 
     void ImpactX::finalize_elements ()
     {
+        // An element's finalization can run a callback of its own, and that callback can
+        // reach this lattice. Appending would reallocate the storage under the loop below,
+        // so refuse structural edits for the walk.
+        Lattice::TraversalGuard const traversal(*m_lattice);
+
         // loop over all beamline elements & finalize them
-        for (auto & element_variant : m_lattice)
+        for (auto & element_variant : *m_lattice)
         {
             elements::finalize(element_variant);
         }

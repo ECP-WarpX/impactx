@@ -11,8 +11,9 @@
 #define IMPACTX_SOURCE_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
+#include "mixin/hostonly.H"
 #include "mixin/lineartransport.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 #include "mixin/thin.H"
 
@@ -22,11 +23,16 @@
 
 namespace impactx::elements
 {
-    struct Source
-    : public mixin::Named,
-      public mixin::LinearTransport<Source>,
+    /** A particle source
+     *
+     * Host-only: it holds the path of the file it reads and pushes nothing itself, so it
+     * is never turned into a pusher. The marker says so rather than leaving it to that fact.
+     */
+    struct SourceGPU
+    : public mixin::LinearTransport<SourceGPU>,
       public mixin::Thin,
-      public mixin::NoFinalize
+      public mixin::NoFinalize,
+      public mixin::HostOnly
     {
         static constexpr auto type = "Source";
         using PType = ImpactXParticleContainer::ParticleType;
@@ -50,21 +56,18 @@ namespace impactx::elements
          *        stored as the openPMD iteration in the file; it must be a step in the file
          * @param load_step_index the position of the step in the file: 0 is the first step and
          *        -1 the last step, counting back from it as in Python (-2 is the second to last)
-         * @param name a user defined and not necessarily unique name of the element
          * @throws std::invalid_argument if distribution is not "openPMD", if both load_step and
          *         load_step_index are set or if load_step is negative
          */
-        Source (
+        SourceGPU (
             std::string distribution,
             std::string openpmd_path,
             bool active_once = DEFAULT_active_once,
             bool load_ref_particle = DEFAULT_load_ref_particle,
             std::optional<int> load_step = DEFAULT_load_step,
-            std::optional<int> load_step_index = DEFAULT_load_step_index,
-            std::optional<std::string> name = DEFAULT_name
+            std::optional<int> load_step_index = DEFAULT_load_step_index
         )
-        : Named(std::move(name)),
-          m_distribution(distribution),
+        : m_distribution(distribution),
           m_series_name(std::move(openpmd_path)),
           m_active_once(active_once),
           m_load_ref_particle(load_ref_particle),
@@ -141,6 +144,9 @@ namespace impactx::elements
         std::optional<int> m_load_step = DEFAULT_load_step; //! ImpactX step (openPMD iteration) to load
         std::optional<int> m_load_step_index = DEFAULT_load_step_index; //! position of the step in the file, -1 is the last step
     };
+
+    /** Source: GPU state plus common host-only metadata */
+    using Source = Element<SourceGPU>;
 
 } // namespace impactx
 

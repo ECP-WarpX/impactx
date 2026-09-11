@@ -11,11 +11,11 @@
 #define IMPACTX_SBEND_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
@@ -29,10 +29,9 @@
 
 namespace impactx::elements
 {
-    struct Sbend
-    : public mixin::Named,
-      public mixin::BeamOptic<Sbend>,
-      public mixin::LinearTransport<Sbend>,
+    struct SbendGPU
+    : public mixin::BeamOptic<SbendGPU>,
+      public mixin::LinearTransport<SbendGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -55,9 +54,8 @@ namespace impactx::elements
          * @param aperture_x horizontal half-aperture in m
          * @param aperture_y vertical half-aperture in m
          * @param nslice number of slices used for the application of space charge
-         * @param name a user defined and not necessarily unique name of the element
          */
-        Sbend (
+        SbendGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal rc,
             amrex::ParticleReal dx = DEFAULT_dx,
@@ -65,11 +63,9 @@ namespace impactx::elements
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
             amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
             amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
-            int nslice = DEFAULT_nslice,
-            std::optional<std::string> name = DEFAULT_name
+            int nslice = DEFAULT_nslice
         )
-        : Named(std::move(name)),
-          Thick(ds, nslice),
+        : Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
           PipeAperture(aperture_x, aperture_y),
           m_rc(rc)
@@ -406,8 +402,11 @@ namespace impactx::elements
         amrex::ParticleReal m_lambday, m_A14, m_A21, m_A22, m_A26, m_A34;
     };
 
+    /** Sbend: GPU state plus common host-only metadata */
+    using Sbend = Element<SbendGPU>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::Sbend)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::SbendGPU)
 
 #endif // IMPACTX_SBEND_H

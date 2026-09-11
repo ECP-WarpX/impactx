@@ -11,12 +11,67 @@
 #define IMPACTX_PUSH_ALL_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "elements/helper/Pusher.H"
+
+#include <type_traits>
 
 #include <AMReX_BLProfiler.H>
 
 
+namespace impactx::elements::mixin
+{
+    // defined in elements/mixin/beamoptic.H, which includes this header
+    template<typename T_Element>
+    struct ParticlePush;
+}
+
 namespace impactx
 {
+    /** Push all particles on every tile of every refinement level.
+     *
+     * @param[in,out] pc particle container to push
+     * @param[in] element a prepared pusher, or an element that has none
+     * @param[in] ref_part the reference particle, already advanced for this slice
+     * @param[in] spin whether to perform spin tracking
+     * @param[in] omp_parallel allow threading via OpenMP for the particle iterator loop
+     */
+    template<typename T_Element>
+    void push_tiles (
+        ImpactXParticleContainer & pc,
+        T_Element const & element,
+        RefPart & ref_part,
+        bool spin,
+        [[maybe_unused]] bool omp_parallel
+    )
+    {
+        int const nLevel = pc.finestLevel();
+        for (int lev = 0; lev <= nLevel; ++lev)
+        {
+            // loop over all particle boxes
+            using ParIt = ImpactXParticleContainer::iterator;
+#ifdef AMREX_USE_OMP
+#pragma omp parallel if (amrex::Gpu::notInLaunchRegion() && omp_parallel)
+#endif
+            for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
+                // push beam particles relative to reference particle
+                //
+                // Reach the tile push directly: `element` here is already prepared, and
+                // going through the element's own call operator would prepare it again on
+                // every tile (@see elements::mixin::BeamOptic). Elements whose push is an
+                // opaque callback (Programmable) have no such base and are called plainly.
+                if constexpr (std::is_base_of_v<elements::mixin::ParticlePush<T_Element>, T_Element>)
+                {
+                    static_cast<elements::mixin::ParticlePush<T_Element> const &>(element)(
+                        pti, ref_part, spin);
+                }
+                else
+                {
+                    element(pti, ref_part, spin);
+                }
+            } // end loop over all particle boxes
+        } // end mesh-refinement level loop
+    }
+
     /** Push all particles in a particle container.
      *
      * This element pushes first the reference particle, then all other particles.
@@ -56,20 +111,26 @@ namespace impactx
             element(ref_part);
         }
 
-        // loop over refinement levels
-        int const nLevel = pc.finestLevel();
-        for (int lev = 0; lev <= nLevel; ++lev)
+        // Prepare the pusher exactly once for this element slice, after the
+        // reference particle has been advanced and before any tile is launched. The
+        // pusher is then copied into each tile's launch closure.
+        //
+        // Elements whose push is an opaque user callback (Programmable) have nothing to
+        // prepare and keep using the element itself.
+        if constexpr (elements::has_particle_pusher_v<T_Element>)
         {
-            // loop over all particle boxes
-            using ParIt = ImpactXParticleContainer::iterator;
-#ifdef AMREX_USE_OMP
-#pragma omp parallel if (amrex::Gpu::notInLaunchRegion() && omp_parallel)
-#endif
-            for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
-                // push beam particles relative to reference particle
-                element(pti, ref_part, spin);
-            } // end loop over all particle boxes
-        } // env mesh-refinement level loop
+            // the profiler covers the preparation only, so that the push keeps being
+            // reported per element
+            auto const pusher = [&] {
+                BL_PROFILE("impactx::prepare");
+                return elements::make_particle_pusher(element, ref_part);
+            }();
+            push_tiles(pc, pusher, ref_part, spin, omp_parallel);
+        }
+        else
+        {
+            push_tiles(pc, element, ref_part, spin, omp_parallel);
+        }
     }
 
 } // namespace impactx

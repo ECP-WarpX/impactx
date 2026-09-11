@@ -1,3 +1,3 @@
 #include "Sbend.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::Sbend)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::SbendGPU)

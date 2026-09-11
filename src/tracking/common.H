@@ -11,7 +11,8 @@
 #define IMPACTX_TRACKING_COMMON_H
 
 #include "elements/All.H"
-#include "elements/mixin/accessors.H"
+#include "Lattice.H"
+#include "elements/helper/Accessors.H"
 #include "particles/ReferenceParticle.H"
 #include "tracking/TrackingDirection.H"
 #include "tracking/TrackingState.H"
@@ -85,10 +86,10 @@ namespace impactx
      *
      *  @tparam HookFn callable ``void (std::string const & name)`` invoking a named hook
      *  @tparam CollectiveKicks callable
-     *    ``void (elements::KnownElements & element, amrex::ParticleReal slice_ds)``
+     *    ``void (elements::ElementHandle & element, amrex::ParticleReal slice_ds)``
      *    applying the collective-effect kick over the length @p slice_ds
      *  @tparam ElementPush callable
-     *    ``void (elements::KnownElements & element, int step, int period)``
+     *    ``void (elements::ElementHandle & element, int step, int period)``
      *    applying one slice of the element's external-field transport map (no book-keeping)
      *  @tparam SliceDiagnostics callable ``void (int step, int period)`` running the
      *    once-per-slice book-keeping (boundary conditions, lost particles, slice diagnostics)
@@ -109,7 +110,7 @@ namespace impactx
         typename ElementPush, typename SliceDiagnostics
     >
     void track_lattice (
-        std::list<elements::KnownElements> & lattice,
+        Lattice & lattice,
         RefPart & ref,
         TrackingState & tracking_state,
         bool collective_effects,
@@ -129,6 +130,22 @@ namespace impactx
 
         bool const forward = tracking_state.forward();
 
+        // Reject changes to the sequence of elements while we are walking it. Changing an
+        // element's own parameters from a hook stays allowed; that is how a lattice is
+        // retuned mid-run.
+        Lattice::TraversalGuard const traversal(lattice);
+
+        // Give up the share of the current element on every exit, including one taken by
+        // an exception out of a user hook. The state is reachable from Python as
+        // ``sim.tracking_element``, so a share left behind outlives the run and keeps a
+        // finalized element alive. Backward tracking never sets it.
+        struct ReleaseTrackedElement
+        {
+            TrackingState & m_state;
+            bool m_active;
+            ~ReleaseTrackedElement () { if (m_active) { m_state.set_no_element(); } }
+        } const release_tracked{tracking_state, forward};
+
         // periods through the lattice (turns/cycles) and verbosity
         int num_periods = 1;
         amrex::ParmParse("lattice").queryAddWithParser("periods", num_periods);
@@ -140,7 +157,7 @@ namespace impactx
 
         // visit one element for all of its space-charge slices
         auto visit_element = [&] (
-            elements::KnownElements & element_variant,
+            elements::ElementHandle & element_variant,
             int period
         )
         {
@@ -151,7 +168,7 @@ namespace impactx
             if (forward)
             {
                 // book-keeping: currently visited element reference
-                tracking_state.m_element = &element_variant;
+                tracking_state.m_element = element_variant;
 
                 // optional, user-defined function call
                 call_hook("before_element");
@@ -260,7 +277,7 @@ namespace impactx
             if (forward)
             {
                 // book-keeping update
-                tracking_state.m_element = &lattice.front();
+                tracking_state.m_element = lattice.front();
 
                 // optional, user-defined function call
                 call_hook("before_period");
@@ -286,11 +303,6 @@ namespace impactx
             if (forward) { call_hook("after_period"); }
         }
 
-        if (forward)
-        {
-            // avoid dangling references if users manipulate the lattice
-            tracking_state.set_no_element();
-        }
     }
 } // namespace impactx
 

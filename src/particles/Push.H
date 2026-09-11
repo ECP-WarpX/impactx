@@ -10,7 +10,7 @@
 #ifndef IMPACTX_PUSH_H
 #define IMPACTX_PUSH_H
 
-#include "elements/All.H"
+#include "elements/helper/Handle.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/ReferenceParticle.H"
 
@@ -26,7 +26,7 @@ namespace impactx
      */
     void push (
         ImpactXParticleContainer & pc,
-        elements::KnownElements & element_variant,
+        elements::ElementHandle & element_variant,
         int step,
         int period
     );
@@ -38,7 +38,7 @@ namespace impactx
      */
     void push (
         RefPart & ref,
-        elements::KnownElements & element_variant
+        elements::ElementHandle & element_variant
     );
 
 } // namespace impactx

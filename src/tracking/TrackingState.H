@@ -10,7 +10,7 @@
 #ifndef IMPACTX_TRACKING_STATE_H
 #define IMPACTX_TRACKING_STATE_H
 
-#include "elements/All.H"
+#include "elements/helper/Handle.H"
 #include "tracking/TrackingDirection.H"
 
 #include <optional>
@@ -34,8 +34,12 @@ namespace impactx
         /** For tracking hooks/callbacks, the period in the lattice (e.g., turn or channel period) */
         int m_period = 0;
 
-        /** For tracking hooks/callbacks, the current lattice element */
-        std::optional<elements::KnownElements*> m_element;
+        /** For tracking hooks/callbacks, the current lattice element
+         *
+         * A share of the element, not a pointer into the lattice: a hook may hold on to it,
+         * and the lattice may be edited afterwards, without leaving a dangling reference.
+         */
+        std::optional<elements::ElementHandle> m_element;
 
         /** Tracking direction in the lattice */
         TrackingDirection m_direction = TrackingDirection::Forward;

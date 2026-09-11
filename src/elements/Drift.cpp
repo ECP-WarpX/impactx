@@ -1,3 +1,3 @@
 #include "Drift.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::Drift)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::DriftGPU)

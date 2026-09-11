@@ -11,11 +11,11 @@
 #define IMPACTX_ELEMENT_SPIN_MAP_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
 #include "mixin/alignment.H"
 #include "mixin/beamoptic.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -34,10 +34,9 @@ using Vector3 = amrex::SmallMatrix<amrex::ParticleReal, 3, 1, amrex::Order::F, 1
 
 namespace impactx::elements
 {
-    struct SpinMap
-    : public mixin::Named,
-      public mixin::BeamOptic<SpinMap>,
-      public mixin::LinearTransport<SpinMap>,
+    struct SpinMapGPU
+    : public mixin::BeamOptic<SpinMapGPU>,
+      public mixin::LinearTransport<SpinMapGPU>,
       public mixin::Alignment,
       public mixin::SpinTransport,
       public mixin::NoFinalize,
@@ -60,19 +59,16 @@ namespace impactx::elements
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
-         * @param name a user defined and not necessarily unique name of the element
          */
-        SpinMap (
+        SpinMapGPU (
             Vector3 const & v,
             Map3x6 const & A,
             amrex::ParticleReal ds = DEFAULT_ds,
             amrex::ParticleReal dx = DEFAULT_dx,
             amrex::ParticleReal dy = DEFAULT_dy,
-            amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
-            std::optional<std::string> name = DEFAULT_name
+            amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree
         )
-        : Named(std::move(name)),
-          Alignment(dx, dy, rotation_degree)
+        : Alignment(dx, dy, rotation_degree)
         {
             m_spin_rotation_vector = v;
             m_spin_orbit_coupling = A;
@@ -273,8 +269,11 @@ namespace impactx::elements
         // bool m_reversed = false;  // apply inverse spin rotations in reverse order after reverse()
     };
 
+    /** SpinMap: GPU state plus common host-only metadata */
+    using SpinMap = Element<SpinMapGPU>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::SpinMap)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::SpinMapGPU)
 
 #endif // IMPACTX_ELEMENT_SPIN_MAP_H

@@ -1,3 +1,3 @@
 #include "ExactQuad.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::ExactQuad)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::ExactQuadGPU)

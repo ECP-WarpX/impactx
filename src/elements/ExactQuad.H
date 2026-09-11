@@ -11,12 +11,12 @@
 #define IMPACTX_EXACTQUAD_H
 
 #include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
 #include "particles/integrators/Integrators.H"
 #include "mixin/alignment.H"
 #include "mixin/pipeaperture.H"
 #include "mixin/beamoptic.H"
 #include "mixin/thick.H"
-#include "mixin/named.H"
 #include "mixin/nofinalize.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
@@ -31,10 +31,9 @@
 
 namespace impactx::elements
 {
-    struct ExactQuad
-    : public mixin::Named,
-      public mixin::BeamOptic<ExactQuad>,
-      public mixin::LinearTransport<ExactQuad>,
+    struct ExactQuadGPU
+    : public mixin::BeamOptic<ExactQuadGPU>,
+      public mixin::LinearTransport<ExactQuadGPU>,
       public mixin::Thick,
       public mixin::Alignment,
       public mixin::PipeAperture,
@@ -73,9 +72,8 @@ namespace impactx::elements
          * @param mapsteps number of integration steps per slice used for
          *        particle push in the applied fields
          * @param nslice number of slices used for the application of space charge
-         * @param name a user defined and not necessarily unique name of the element
          */
-        ExactQuad (
+        ExactQuadGPU (
             amrex::ParticleReal ds,
             amrex::ParticleReal k,
             int unit = DEFAULT_unit,
@@ -86,11 +84,9 @@ namespace impactx::elements
             amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
             int int_order = DEFAULT_int_order,
             int mapsteps = DEFAULT_mapsteps,
-            int nslice = DEFAULT_nslice,
-            std::optional<std::string> name = DEFAULT_name
+            int nslice = DEFAULT_nslice
         )
-        : Named(std::move(name)),
-          Thick(ds, nslice),
+        : Thick(ds, nslice),
           Alignment(dx, dy, rotation_degree),
           PipeAperture(aperture_x, aperture_y),
           m_k(k),m_unit(unit),m_int_order(int_order),m_mapsteps(mapsteps)
@@ -585,8 +581,11 @@ namespace impactx::elements
         amrex::ParticleReal m_omega;
     };
 
+    /** ExactQuad: GPU state plus common host-only metadata */
+    using ExactQuad = Element<ExactQuadGPU>;
+
 } // namespace impactx
 
-IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ExactQuad)
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ExactQuadGPU)
 
 #endif // IMPACTX_EXACTQUAD_H

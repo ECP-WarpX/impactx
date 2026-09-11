@@ -176,3 +176,268 @@ def test_element_reuse_across_simulations():
     run_minimal_simulation(sim2, [reusable_sol])
 
     sim2.finalize()
+
+
+@pytest.mark.manages_amrex
+def test_a_failed_run_does_not_leave_an_element_behind():
+    """A run that ends in an exception must let go of the element it was tracking.
+
+    ``sim.tracking_element`` holds a share of the element being tracked. A hook that raises
+    used to leave that share in place: the release sat after the element loop, so the
+    exception carried straight past it, and finalize() never let go either. A finalized
+    simulation then still named an element it had already finished with.
+    """
+
+    sim = ImpactX()
+    sim.particle_shape = 2
+    sim.slice_step_diagnostics = False
+    sim.init_grids()
+    sim.beam.ref.set_species("electron").set_kin_energy_MeV(100.0)
+
+    stopper = elements.Programmable()
+
+    def stop(refpart):
+        raise RuntimeError("stop tracking")
+
+    stopper.ref_particle = stop
+    sim.lattice.append(stopper)
+
+    with pytest.raises(RuntimeError, match="stop tracking"):
+        sim.track_reference(sim.beam.ref)
+
+    # the traversal releases its share on the way out, exception or not
+    assert sim.tracking_element is None
+
+    # and finalize() leaves nothing naming an element either
+    sim.finalize()
+    assert sim.tracking_element is None
+
+
+@pytest.mark.manages_amrex
+@pytest.mark.parametrize(
+    "cleanup",
+    ["sim.finalize()", "del sim", "kept_view = sim.lattice\ndel sim"],
+    ids=["explicit", "destructor", "kept_view"],
+)
+def test_finalize_releases_python_owners_before_amrex_shuts_down(cleanup):
+    """An element can hold AMReX-backed data on its Python side.
+
+    Regression test: finalize() tore AMReX down and only then released the objects the
+    lattice was keeping alive, so a `MultiFab` attached to an element was destroyed after
+    the arena it came from. On a pinned arena that segfaulted.
+    """
+
+    import subprocess
+    import sys
+
+    program = """
+from impactx import ImpactX, elements
+import amrex.space3d as amr
+
+sim = ImpactX()
+sim.particle_shape = 2
+sim.diagnostics = False
+sim.init_grids()
+
+box = amr.Box([0, 0, 0], [3, 3, 3])
+ba = amr.BoxArray(box)
+dm = amr.DistributionMapping(ba)
+
+holder = elements.Programmable()
+holder.buffer = amr.MultiFab(
+    ba, dm, 1, 0, amr.MFInfo().set_arena(amr.The_Pinned_Arena())
+)
+sim.lattice.append(holder)
+del holder, dm, ba, box
+
+sim.finalize()
+print("survived")
+"""
+
+    finished = subprocess.run(
+        [sys.executable, "-c", program.replace("sim.finalize()", cleanup)],
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+
+    assert finished.returncode == 0, finished.stdout + finished.stderr[-2000:]
+    assert "survived" in finished.stdout
+
+
+@pytest.mark.manages_amrex
+@pytest.mark.parametrize(
+    "cleanup",
+    ["sim.finalize()", "del sim", "kept_view = sim.lattice\ndel sim"],
+    ids=["explicit", "destructor", "kept_view"],
+)
+def test_element_finalizers_run_while_amrex_is_still_up(cleanup):
+    """The wrappers are released before the teardown, so their `__del__` sees a live AMReX."""
+
+    import subprocess
+    import sys
+
+    program = """
+from impactx import ImpactX, elements
+import amrex.space3d as amr
+
+sim = ImpactX()
+sim.particle_shape = 2
+sim.diagnostics = False
+sim.init_grids()
+
+seen = []
+
+class Watcher(elements.Drift):
+    def __del__(self):
+        seen.append(amr.initialized())
+
+sim.lattice.append(Watcher(ds=1.0))
+sim.finalize()
+
+assert seen == [True], seen
+print("survived")
+"""
+
+    finished = subprocess.run(
+        [sys.executable, "-c", program.replace("sim.finalize()", cleanup)],
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+
+    assert finished.returncode == 0, finished.stdout + finished.stderr[-2000:]
+    assert "survived" in finished.stdout
+
+
+@pytest.mark.manages_amrex
+def test_finalizer_iteration_does_not_retain_python_owners():
+    """Reading the lattice during cleanup must not retain an element's AMReX buffer."""
+    import subprocess
+    import sys
+
+    program = """
+from impactx import ImpactX, elements
+import amrex.space3d as amr
+import weakref
+
+sim = ImpactX()
+sim.particle_shape = 2
+sim.diagnostics = False
+sim.init_grids()
+
+seen = []
+
+class Watcher(elements.Programmable):
+    def __del__(self):
+        seen.append((amr.initialized(), [type(e).__name__ for e in sim.lattice]))
+
+box = amr.Box([0, 0, 0], [3, 3, 3])
+ba = amr.BoxArray(box)
+dm = amr.DistributionMapping(ba)
+holder = Watcher()
+holder.buffer = amr.MultiFab(
+    ba, dm, 1, 0, amr.MFInfo().set_arena(amr.The_Pinned_Arena())
+)
+observed = weakref.ref(holder)
+sim.lattice.append(holder)
+del holder, dm, ba, box
+
+sim.finalize()
+assert seen == [(True, [])], seen
+assert observed() is None
+del sim
+print("survived")
+"""
+
+    finished = subprocess.run(
+        [sys.executable, "-c", program],
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+
+    assert finished.returncode == 0, finished.stdout + finished.stderr[-2000:]
+    assert "survived" in finished.stdout
+
+
+@pytest.mark.manages_amrex
+@pytest.mark.parametrize(
+    "edit",
+    [
+        "lattice.append(replacement)",
+        "lattice.extend([replacement])",
+        "lattice.insert(0, replacement)",
+        "lattice[:] = [replacement]",
+        "sim.lattice = [replacement]",
+    ],
+    ids=["append", "extend", "insert", "slice", "assign"],
+)
+def test_finalizers_cannot_repopulate_the_lattice_during_shutdown(edit):
+    """A finalizer must not retain a pinned buffer in the lattice past AMReX shutdown.
+
+    Releasing the replacement after shutdown used to segfault because its arena was
+    already destroyed. Run in a subprocess so that failure cannot crash the test suite.
+    """
+    import subprocess
+    import sys
+
+    program = """
+from impactx import ImpactX, elements
+import amrex.space3d as amr
+import weakref
+
+sim = ImpactX()
+sim.particle_shape = 2
+sim.diagnostics = False
+sim.init_grids()
+lattice = sim.lattice
+seen = []
+
+class Watcher(elements.Programmable):
+    def __del__(self):
+        seen.append((amr.initialized(), len(lattice)))
+        replacement = elements.Programmable()
+        replacement.buffer = self.buffer
+        try:
+            EDIT
+        except RuntimeError:
+            seen.append("rejected")
+
+box = amr.Box([0, 0, 0], [3, 3, 3])
+ba = amr.BoxArray(box)
+dm = amr.DistributionMapping(ba)
+holder = Watcher()
+holder.buffer = amr.MultiFab(
+    ba, dm, 1, 0, amr.MFInfo().set_arena(amr.The_Pinned_Arena())
+)
+observed = weakref.ref(holder)
+lattice.append(holder)
+del holder, dm, ba, box
+
+sim.finalize()
+# Release any retained buffer to exercise the crash before checking the result.
+remaining = len(lattice)
+lattice.clear()
+assert remaining == 0, remaining
+assert seen == [(True, 0), "rejected"], seen
+assert observed() is None
+assert not amr.initialized()
+
+# The cleanup guard must not prevent subsequent lattice edits.
+lattice.append(elements.Drift(ds=0.1))
+assert len(lattice) == 1
+lattice.clear()
+del sim
+print("survived")
+"""
+
+    finished = subprocess.run(
+        [sys.executable, "-c", program.replace("EDIT", edit)],
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+
+    assert finished.returncode == 0, finished.stdout + finished.stderr[-2000:]
+    assert "survived" in finished.stdout

@@ -1,3 +1,3 @@
 #include "PlaneXYRot.H"
 
-IMPACTX_PUSH_INSTANTIATE(impactx::elements::PlaneXYRot)
+IMPACTX_PUSH_INSTANTIATE(impactx::elements::PlaneXYRotGPU)

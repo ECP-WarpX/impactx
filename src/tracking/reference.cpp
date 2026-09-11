@@ -32,6 +32,12 @@ namespace impactx
     {
         BL_PROFILE("ImpactX::track_reference");
 
+        if (m_lattice->empty())
+        {
+            throw std::runtime_error(
+                "Beamline lattice has zero elements. Not yet initialized?");
+        }
+
         // verbosity
         amrex::ParmParse pp_impactx("impactx");
         int verbose = 1;
@@ -85,7 +91,7 @@ namespace impactx
 
         // the external-field transport map ``M`` of one element slice
         auto element_push = [&ref] (
-            elements::KnownElements & element_variant,
+            elements::ElementHandle & element_variant,
             //! (unused) the reference particle has no per-step or per-period element output
             [[maybe_unused]] int step_,
             [[maybe_unused]] int period_
@@ -129,13 +135,13 @@ namespace impactx
         //   other collective effect, so it applies ``M`` alone and never calls the kick
         //   (\see track_lattice).
         track_lattice(
-            m_lattice,
+            *m_lattice,
             ref,
             m_tracking_state,
             false, // no collective effects
             false, // nothing to Strang-split
             [this](std::string const & name) { call_hook(name); },
-            [](elements::KnownElements &, amrex::ParticleReal) {}, // never called
+            [](elements::ElementHandle &, amrex::ParticleReal) {}, // never called
             element_push,
             slice_diagnostics
         );
