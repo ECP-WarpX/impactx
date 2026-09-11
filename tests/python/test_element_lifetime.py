@@ -308,3 +308,54 @@ print("survived")
 
     assert finished.returncode == 0, finished.stdout + finished.stderr[-2000:]
     assert "survived" in finished.stdout
+
+
+@pytest.mark.manages_amrex
+def test_finalizer_iteration_does_not_retain_python_owners():
+    """Reading the lattice during cleanup must not retain an element's AMReX buffer."""
+    import subprocess
+    import sys
+
+    program = """
+from impactx import ImpactX, elements
+import amrex.space3d as amr
+import weakref
+
+sim = ImpactX()
+sim.particle_shape = 2
+sim.diagnostics = False
+sim.init_grids()
+
+seen = []
+
+class Watcher(elements.Programmable):
+    def __del__(self):
+        seen.append((amr.initialized(), [type(e).__name__ for e in sim.lattice]))
+
+box = amr.Box([0, 0, 0], [3, 3, 3])
+ba = amr.BoxArray(box)
+dm = amr.DistributionMapping(ba)
+holder = Watcher()
+holder.buffer = amr.MultiFab(
+    ba, dm, 1, 0, amr.MFInfo().set_arena(amr.The_Pinned_Arena())
+)
+observed = weakref.ref(holder)
+sim.lattice.append(holder)
+del holder, dm, ba, box
+
+sim.finalize()
+assert seen == [(True, [])], seen
+assert observed() is None
+del sim
+print("survived")
+"""
+
+    finished = subprocess.run(
+        [sys.executable, "-c", program],
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+
+    assert finished.returncode == 0, finished.stdout + finished.stderr[-2000:]
+    assert "survived" in finished.stdout

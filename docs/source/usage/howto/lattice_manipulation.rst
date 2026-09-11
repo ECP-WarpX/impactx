@@ -5,7 +5,7 @@ Manipulate a Lattice
 
 :py:attr:`sim.lattice <impactx.ImpactX.lattice>` is a sequence of elements that behaves like a Python list.
 When you add elements to ``sim.lattice`` it will **hold references to** the Python variables it is given rather than copies of them.
-Concretely: if you create an element as a Python variable, append it to ``sim.lattice``, you can continue to change and manipulate the element that now sits inside `sim.lattice` through the variable (see below).
+Concretely: if you create an element as a Python variable, append it to ``sim.lattice``, you can continue to change and manipulate the element that now sits inside ``sim.lattice`` through the variable (see below).
 _The same element (variable) may sit at several lattice positions_, making tuning and ramping operations for whole channels, ring arcs, etc. easy.
 
 This page collects the operations that come up most often:

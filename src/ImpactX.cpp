@@ -80,6 +80,11 @@ namespace impactx {
         // loop over all beamline elements & finalize them
         finalize_elements();
 
+        // Empty the lattice before releasing Python wrappers. A wrapper's finalizer may
+        // iterate the lattice; it must not find the elements being released and recreate
+        // their owner list, keeping AMReX-backed data alive past AMReX shutdown.
+        m_lattice->clear();
+
         // Let the caller release what it keeps alive on behalf of the lattice, while AMReX
         // is still up. The Python bindings drop the element wrappers here: an element can
         // carry AMReX-backed data on its Python side -- a MultiFab attached to a
@@ -90,11 +95,6 @@ namespace impactx {
         {
             m_release_lattice_owners();
         }
-
-        // Release the elements whether or not grids were ever initialized: they have just
-        // been finalized, so keeping them in the lattice would leave elements that are done
-        // with -- a beam monitor with its series closed, say -- still trackable.
-        m_lattice->clear();
 
         if (m_grids_initialized)
         {

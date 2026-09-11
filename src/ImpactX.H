@@ -52,8 +52,8 @@ namespace impactx
          * Finalizes the elements, empties the lattice and shuts AMReX down, in that order.
          * Refuses while a tracking traversal is walking the lattice.
          *
-         * Calls @see m_release_lattice_owners before releasing the lattice and AMReX,
-         * including when called from the destructor.
+         * Calls @see m_release_lattice_owners after emptying the lattice and before
+         * shutting AMReX down, including when called from the destructor.
          */
         void finalize ();
 
@@ -162,7 +162,7 @@ namespace impactx
          */
         std::shared_ptr<Lattice> m_lattice = std::make_shared<Lattice>();
 
-        /** Release external lattice owners after element finalization, before AMReX teardown.
+        /** Release external lattice owners after emptying the lattice, before AMReX teardown.
          *
          * The Python bindings install a callback holding only a weak reference to the
          * lattice view, so it does not prevent garbage collection of the simulation.
