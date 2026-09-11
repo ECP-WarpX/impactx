@@ -18,6 +18,7 @@ import gc
 
 import pytest
 
+import impactx
 from impactx import elements
 
 
@@ -103,16 +104,39 @@ def test_python_subclass_and_attributes_survive():
     assert lattice[0].tag == "kept"
 
 
-def test_constructor_shares_too():
-    """Building a lattice from a list keeps those objects, like ``extend`` does."""
+@pytest.mark.parametrize(
+    "source",
+    [
+        pytest.param(lambda q, d: [q, d], id="list"),
+        pytest.param(lambda q, d: (q, d), id="tuple"),
+        pytest.param(lambda q, d: elements.KnownElementsList([q, d]), id="lattice"),
+        pytest.param(
+            lambda q, d: elements.KnownElementsList([q, d]).select(kind=r".*"),
+            id="selection",
+        ),
+        pytest.param(lambda q, d: (element for element in (q, d)), id="generator"),
+    ],
+)
+def test_constructor_shares_too(source):
+    """Building a lattice from any iterable keeps those objects, like ``extend`` does."""
 
     q = elements.Quad(ds=0.3, k=2.0)
     d = elements.Drift(ds=1.0)
 
-    lattice = elements.KnownElementsList([q, d])
+    lattice = elements.KnownElementsList(source(q, d))
 
+    assert len(lattice) == 2
     assert lattice[0] is q
     assert lattice[1] is d
+
+
+def test_constructor_takes_a_single_element():
+    q = elements.Quad(ds=0.3, k=2.0)
+
+    lattice = elements.KnownElementsList(q)
+
+    assert len(lattice) == 1
+    assert lattice[0] is q
 
 
 def test_setitem_replaces_with_the_object_given():
@@ -155,7 +179,9 @@ def test_pop_back_returns_the_object():
     d = elements.Drift(ds=1.0)
     lattice = elements.KnownElementsList([q, d])
 
-    assert lattice.pop_back() is d
+    last = lattice.pop_back()
+
+    assert last is d
     assert len(lattice) == 1
     assert lattice[0] is q
 
@@ -165,6 +191,28 @@ def test_appending_a_non_element_is_rejected():
 
     with pytest.raises(TypeError):
         lattice.append("not an element")
+
+
+def test_free_functions_act_on_the_element_given():
+    """``impactx.reverse`` and ``impactx.push`` change and use the object passed in.
+
+    Both took a copy while the lattice copied elements, so reversing was silently
+    discarded and a push ran without the callbacks set on the element.
+    """
+
+    d = elements.Drift(ds=1.0)
+    impactx.reverse(d)
+    assert d.ds == -1.0
+
+    seen = []
+    hooked = elements.Programmable()
+    hooked.ref_particle = lambda refpart: seen.append(refpart.s)
+
+    ref = impactx.RefPart()
+    ref.set_species("electron").set_kin_energy_MeV(100.0)
+    impactx.push(ref, hooked)
+
+    assert seen == [0.0]
 
 
 def test_extend_is_all_or_nothing():

@@ -1117,19 +1117,21 @@ FilteredElementsList.isclose = _lattice_isclose
 def _lattice_init(self, elements=None):
     """Create a lattice, optionally filled with elements.
 
-    The elements are shared, not copied, so the caller keeps handles to the very
-    elements the lattice holds. Constructing goes through ``extend`` for exactly that
-    reason: the C++ constructor cannot see the object being constructed, and so cannot
-    record which Python objects own the elements.
+    ``elements`` is a single element or any iterable of elements: a list, another
+    lattice, a selection, a generator. The elements are shared, not copied, so the
+    caller keeps handles to the very elements the lattice holds. Constructing goes
+    through ``extend`` for exactly that reason: the C++ constructor cannot see the
+    object being constructed, and so cannot record which Python objects own the
+    elements.
     """
     _lattice_init_cxx(self)
-    if elements is not None:
-        if isinstance(elements, _elements_module.KnownElementsList) or isinstance(
-            elements, (list, tuple)
-        ):
-            self.extend(elements)
-        else:
-            self.append(elements)
+    if elements is None:
+        return
+    # an element is not iterable, so anything that is holds elements
+    if hasattr(elements, "__iter__"):
+        self.extend(elements)
+    else:
+        self.append(elements)
 
 
 def register_KnownElementsList_extension(kel):
@@ -1137,11 +1139,8 @@ def register_KnownElementsList_extension(kel):
     from ..plot.Survey import plot_survey
 
     # Construction from an iterable of elements; see _lattice_init.
-    global _lattice_init_cxx, _elements_module
+    global _lattice_init_cxx
     _lattice_init_cxx = kel.__init__
-    from .. import impactx_pybind as _ix
-
-    _elements_module = _ix.elements
     kel.__init__ = _lattice_init
 
     # register member functions for KnownElementsList
