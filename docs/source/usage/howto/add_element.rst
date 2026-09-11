@@ -85,6 +85,21 @@ After this brief boilerplate, our beamline elements implement these parts:
    * a reference-particle operator: pushing the reference particle
 #. for envelope tracking: a linear transport map
 
+The struct holds only what a particle-push kernel needs, which is why it is named ``DriftGPU``.
+The public element adds the host-only metadata that every element carries, such as its name,
+through the ``Element`` envelope:
+
+.. literalinclude:: ../../../../src/elements/Drift.H
+   :language: cpp
+   :dedent: 4
+   :start-at: /** A drift: GPU state plus common host-only metadata */
+   :end-at: using Drift = Element<DriftGPU>;
+
+The explicit template instantiation of the particle push at the end of the header and in
+``Drift.cpp`` names the GPU type as well: ``IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::DriftGPU)``
+and ``IMPACTX_PUSH_INSTANTIATE(impactx::elements::DriftGPU)``.
+Add the public name, ``Drift``, to the ``KnownElements`` variant in ``src/elements/All.H``.
+
 .. dropdown:: Example Element: Drift.H
    :color: light
    :icon: info

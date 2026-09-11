@@ -103,6 +103,21 @@ namespace impactx::elements
         );
     }
 
+    /** Build a handle by moving an element value into it
+     *
+     * Spares the copy for elements that own arrays: a moved-from array is a pointer swap.
+     */
+    [[nodiscard]] inline ElementHandle make_handle (KnownElements && element)
+    {
+        return std::visit(
+            [](auto && el) {
+                return ElementHandle{
+                    std::make_shared<std::decay_t<decltype(el)>>(std::move(el))};
+            },
+            std::move(element)
+        );
+    }
+
     /** Apply a visitor to the element a handle owns
      *
      * The visitor receives the concrete element by reference, exactly as it would for a

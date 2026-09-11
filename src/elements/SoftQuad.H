@@ -172,7 +172,8 @@ namespace impactx::elements
         /** This is a soft-edge quadrupole functor, so that a variable of this type can be used
          *  like a soft-edge quadrupole function.
          *
-         * The @see compute_constants method must be called before pushing particles through this operator.
+         * The pusher must be prepared through ``make_particle_pusher`` on the owning element
+         * before particles are pushed through this operator.
          *
          * @param x particle position in x
          * @param y particle position in y
@@ -658,8 +659,7 @@ namespace impactx::elements
             m_coefficients.sin.release_gpu();
         }
 
-        //! the coefficient arrays, owned by this element
-        //! the arrays this element owns, mirrored to the device on demand
+        //! the coefficient arrays this element owns, mirrored to the device on demand
         QuadrupoleFourierCoefficients m_coefficients;
     };
 

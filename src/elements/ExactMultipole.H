@@ -777,8 +777,7 @@ namespace impactx::elements
             m_coefficients.k_skew.release_gpu();
         }
 
-        //! the coefficient arrays, owned by this element
-        //! the arrays this element owns, mirrored to the device on demand
+        //! the coefficient arrays this element owns, mirrored to the device on demand
         MultipoleCoefficients m_coefficients;
     };
 

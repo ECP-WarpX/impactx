@@ -12,6 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 #include "mixin/gpuelement.H"
+#include "mixin/hostonly.H"
 #include "mixin/lineartransport.H"
 #include "mixin/nofinalize.H"
 #include "mixin/thin.H"
@@ -22,10 +23,16 @@
 
 namespace impactx::elements
 {
+    /** A particle source
+     *
+     * Host-only: it holds the path of the file it reads and pushes nothing itself, so it
+     * is never turned into a pusher. The marker says so rather than leaving it to that fact.
+     */
     struct SourceGPU
     : public mixin::LinearTransport<SourceGPU>,
       public mixin::Thin,
-      public mixin::NoFinalize
+      public mixin::NoFinalize,
+      public mixin::HostOnly
     {
         static constexpr auto type = "Source";
         using PType = ImpactXParticleContainer::ParticleType;

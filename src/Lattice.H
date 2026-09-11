@@ -87,9 +87,11 @@ namespace impactx
             return *this;
         }
 
-        /** Take shared ownership of an element, copying the value given
+        /** Take shared ownership of an element value
          *
-         * @param element the element to copy into the lattice
+         * An rvalue is moved into the lattice, an lvalue copied.
+         *
+         * @param element the element to store
          */
         template<typename T_Element>
         void emplace_back (T_Element && element)

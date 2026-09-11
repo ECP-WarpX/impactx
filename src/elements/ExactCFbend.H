@@ -123,6 +123,16 @@ namespace impactx::elements
             m_ibetgam2 = 1_prt / amrex::Math::powi<2>(refpart.beta_gamma());
             m_brho = refpart.rigidity_Tm();
 
+            // The curvature comes from the first coefficient, which only a prepared pusher
+            // has a view of (@see ExactCFbendGPU::make_particle_pusher). The canonical
+            // element inherits this method but never resolves the view, so say so rather
+            // than read through a null pointer. Not on the hot path.
+            if (m_k_normal == nullptr)
+            {
+                throw std::runtime_error(
+                    "ExactCFbend: compute_constants() called without a view of the "
+                    "coefficients; prepare through make_particle_pusher() instead.");
+            }
             amrex::ParticleReal const * k_normal = m_k_normal;
 
             // find magnetic field and curvature; normalize units to MAD-X convention if needed
@@ -619,10 +629,9 @@ namespace impactx::elements
         int m_ncoef = 0;
 
 
-    protected:
+    private:
         // constants that are independent of the individually tracked particle,
-        // see: compute_constants() to refresh.
-        // protected: the owning element reads the rigidity in its transfer map.
+        // see: compute_constants() to refresh
         amrex::ParticleReal m_slice_ds;       //! m_ds / nslice();
         amrex::ParticleReal m_ibetgam2;       //! 1 / m_betgam2
         amrex::ParticleReal m_beta;           //! beta
@@ -860,7 +869,6 @@ namespace impactx::elements
             pusher.compute_constants(refpart);
             pusher.m_k_normal = m_coefficients.k_normal.device_const().data();
             pusher.m_k_skew = m_coefficients.k_skew.device_const().data();
-            pusher.m_ncoef = static_cast<int>(m_coefficients.k_normal.host_const().size());
             return pusher;
         }
 
@@ -902,8 +910,7 @@ namespace impactx::elements
             m_coefficients.k_skew.release_gpu();
         }
 
-        //! the coefficient arrays, owned by this element
-        //! the arrays this element owns, mirrored to the device on demand
+        //! the coefficient arrays this element owns, mirrored to the device on demand
         CFbendCoefficients m_coefficients;
     };
 

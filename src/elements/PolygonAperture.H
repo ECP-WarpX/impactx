@@ -414,8 +414,7 @@ namespace impactx::elements
             m_vertices.y.release_gpu();
         }
 
-        //! the vertex arrays, owned by this element
-        //! the arrays this element owns, mirrored to the device on demand
+        //! the vertex arrays this element owns, mirrored to the device on demand
         PolygonVertices m_vertices;
     };
 
