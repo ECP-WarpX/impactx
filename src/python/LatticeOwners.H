@@ -189,6 +189,9 @@ namespace impactx::python
                     }
                     rebuilt.append(keep);
                 }
+                // Retiring wrappers can run finalizers that read or edit the lattice.
+                // Keep them until this operation has finished and stamped the new owners.
+                m_previous_owners = previous;
                 self.attr(attr_name()) = rebuilt;
                 list = rebuilt;
             }
@@ -317,6 +320,8 @@ namespace impactx::python
         py::object m_self;
         Lattice const & m_lattice;
         py::list m_list;
+        // Destroyed after the destructor body stamps m_list, while m_self is still alive.
+        py::object m_previous_owners;
     };
 
 } // namespace impactx::python

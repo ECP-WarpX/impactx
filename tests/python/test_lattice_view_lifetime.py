@@ -128,6 +128,8 @@ class TestSelectionsGoStaleWithTheLattice:
         lattice = self.lattice_of_six()
         selection = lattice.select(kind="Quad")
         assert len(selection) == 3
+        iterator = iter(selection)
+        assert next(iterator) is lattice[0]
 
         edit(lattice)
 
@@ -135,6 +137,28 @@ class TestSelectionsGoStaleWithTheLattice:
             len(selection)
         with pytest.raises(RuntimeError, match="no longer valid"):
             _ = selection[0]
+        with pytest.raises(RuntimeError, match="no longer valid"):
+            next(iterator)
+
+    @pytest.mark.parametrize("bound", ["start", "stop", "step"])
+    @pytest.mark.parametrize("edit", ["insert", "clear"])
+    def test_slice_bounds_cannot_revalidate_a_stale_selection(self, bound, edit):
+        lattice = self.lattice_of_six()
+        selection = lattice.select(kind="Quad")
+
+        class EditingBound:
+            def __index__(self):
+                if edit == "insert":
+                    lattice.insert(0, elements.Drift(ds=0.1, name="new_head"))
+                else:
+                    lattice.clear()
+                return 1
+
+        bounds = {"start": None, "stop": None, "step": None}
+        bounds[bound] = EditingBound()
+        key = slice(bounds["start"], bounds["stop"], bounds["step"])
+        with pytest.raises(RuntimeError, match="no longer valid"):
+            selection[key]
 
     def test_writing_through_a_stale_selection_raises(self):
         """The dangerous case: the positions now name different elements."""
@@ -159,12 +183,16 @@ class TestSelectionsGoStaleWithTheLattice:
         lattice = self.lattice_of_six()
         selection = lattice.select(kind="Quad")
         generation = lattice.generation
+        iterator = iter(selection)
+        assert next(iterator) is lattice[0]
 
         lattice[0].k = 3.0
 
         assert lattice.generation == generation
         assert len(selection) == 3
         assert selection[0].k == 3.0
+        assert next(iterator) is lattice[1]
+        assert list(iterator) == [lattice[2]]
 
     def test_a_fresh_selection_after_an_edit_is_usable(self):
         lattice = self.lattice_of_six()

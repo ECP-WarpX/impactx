@@ -215,6 +215,8 @@ class FilteredElementsList:
             return self._original_list[self._indices[key]]
         elif isinstance(key, slice):
             sliced_indices = self._indices[key]
+            # Slice bounds may run __index__ methods that edit the lattice.
+            self._require_valid()
             return FilteredElementsList(self._original_list, sliced_indices)
         else:
             raise TypeError(f"Invalid key type: {type(key)}")
@@ -226,6 +228,8 @@ class FilteredElementsList:
     def __iter__(self):
         self._require_valid()
         for i in self._indices:
+            # The caller may edit the lattice between yields, invalidating these positions.
+            self._require_valid()
             yield self._original_list[i]
 
     def select(

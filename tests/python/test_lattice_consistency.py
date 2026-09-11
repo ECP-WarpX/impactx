@@ -70,6 +70,42 @@ def test_lattice_follows_a_replacement_of_the_same_length(sim, tmp_path, monkeyp
     assert sim.lattice[0].ds == pytest.approx(1.23)
 
 
+@pytest.mark.parametrize("edit_in_finalizer", [False, True], ids=["read", "insert"])
+def test_owner_refresh_preserves_wrappers_when_a_finalizer_reenters(
+    sim, edit_in_finalizer
+):
+    """Retired owners see the completed operation when their finalizers access the lattice."""
+
+    lattice = sim.lattice
+    seen = []
+
+    class Watcher(elements.Drift):
+        def __del__(self):
+            seen.append(names_of(lattice))
+            if edit_in_finalizer:
+                lattice.insert(0, elements.Drift(ds=1.0, name="from_finalizer"))
+
+    class Tagged(elements.Drift):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.tag = "preserved"
+
+    lattice.append(Watcher(ds=1.0, name="old"))
+    # Input parsing replaces the native lattice without refreshing its Python owners.
+    sim.init_lattice_elements_from_inputs()
+    assert len(lattice) == 0
+
+    # No outside reference keeps this Python subclass alive for the lattice.
+    lattice.append(Tagged(ds=1.0, name="new"))
+
+    assert isinstance(lattice[-1], Tagged)
+    assert lattice[-1].tag == "preserved"
+    assert seen == [["new"]]
+    assert names_of(lattice) == (
+        ["from_finalizer", "new"] if edit_in_finalizer else ["new"]
+    )
+
+
 def test_assigning_a_bad_element_leaves_the_lattice_alone(sim):
     """A rejected assignment is not allowed to destroy what was there."""
 
