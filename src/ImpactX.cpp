@@ -26,6 +26,7 @@
 #include <AMReX_Print.H>
 #include <AMReX_Utility.H>
 
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -60,7 +61,7 @@ namespace impactx {
         }
     }
 
-    void ImpactX::finalize ()
+    void ImpactX::finalize (std::function<void()> const & release_owners)
     {
         // Refuse before anything is torn down. Reached from a tracking hook, finalizing
         // the elements first and only then failing to empty the lattice would leave
@@ -78,6 +79,17 @@ namespace impactx {
 
         // loop over all beamline elements & finalize them
         finalize_elements();
+
+        // Let the caller release what it keeps alive on behalf of the lattice, while AMReX
+        // is still up. The Python bindings drop the element wrappers here: an element can
+        // carry AMReX-backed data on its Python side -- a MultiFab attached to a
+        // Programmable, say -- and that has to be destroyed before the arena it came from.
+        // This runs after the elements' own finalization, which may run a user callback
+        // that reads what a wrapper holds.
+        if (release_owners)
+        {
+            release_owners();
+        }
 
         // Release the elements whether or not grids were ever initialized: they have just
         // been finalized, so keeping them in the lattice would leave elements that are done

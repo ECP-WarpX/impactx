@@ -48,10 +48,23 @@ namespace impactx
         ~ImpactX ();
 
         /** Deallocate all contexts and data
+         *
+         * Finalizes the elements, empties the lattice and shuts AMReX down, in that order.
+         * Refuses while a tracking traversal is walking the lattice.
+         *
+         * @param release_owners called once the elements are finalized and before the
+         *        lattice is emptied and AMReX is torn down. The Python bindings use it to
+         *        let go of the objects the lattice keeps alive, so that AMReX-backed data
+         *        attached to them is freed while the arena it came from still exists. Not
+         *        stored: the destructor finalizes without one.
          */
-        void finalize ();
+        void finalize (std::function<void()> const & release_owners = {});
 
-        /** Finalize elements
+        /** Finalize the lattice elements
+         *
+         * Runs each element's ``finalize()`` once per lattice position: a beam monitor
+         * closes its output series, an element owning device arrays releases them, a
+         * programmable element runs its finalize hook. Called by @see finalize.
          */
         void finalize_elements ();
 
