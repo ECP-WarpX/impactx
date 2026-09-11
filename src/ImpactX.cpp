@@ -93,6 +93,9 @@ namespace impactx {
         // that reads what a wrapper holds.
         if (m_release_lattice_owners)
         {
+            // Releasing wrappers runs Python finalizers. They may read the empty lattice,
+            // but must not repopulate it and retain AMReX-backed data past shutdown.
+            Lattice::TraversalGuard const cleanup(*m_lattice);
             m_release_lattice_owners();
         }
 

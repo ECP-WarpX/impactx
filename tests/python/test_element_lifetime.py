@@ -359,3 +359,85 @@ print("survived")
 
     assert finished.returncode == 0, finished.stdout + finished.stderr[-2000:]
     assert "survived" in finished.stdout
+
+
+@pytest.mark.manages_amrex
+@pytest.mark.parametrize(
+    "edit",
+    [
+        "lattice.append(replacement)",
+        "lattice.extend([replacement])",
+        "lattice.insert(0, replacement)",
+        "lattice[:] = [replacement]",
+        "sim.lattice = [replacement]",
+    ],
+    ids=["append", "extend", "insert", "slice", "assign"],
+)
+def test_finalizers_cannot_repopulate_the_lattice_during_shutdown(edit):
+    """A finalizer must not retain a pinned buffer in the lattice past AMReX shutdown.
+
+    Releasing the replacement after shutdown used to segfault because its arena was
+    already destroyed. Run in a subprocess so that failure cannot crash the test suite.
+    """
+    import subprocess
+    import sys
+
+    program = """
+from impactx import ImpactX, elements
+import amrex.space3d as amr
+import weakref
+
+sim = ImpactX()
+sim.particle_shape = 2
+sim.diagnostics = False
+sim.init_grids()
+lattice = sim.lattice
+seen = []
+
+class Watcher(elements.Programmable):
+    def __del__(self):
+        seen.append((amr.initialized(), len(lattice)))
+        replacement = elements.Programmable()
+        replacement.buffer = self.buffer
+        try:
+            EDIT
+        except RuntimeError:
+            seen.append("rejected")
+
+box = amr.Box([0, 0, 0], [3, 3, 3])
+ba = amr.BoxArray(box)
+dm = amr.DistributionMapping(ba)
+holder = Watcher()
+holder.buffer = amr.MultiFab(
+    ba, dm, 1, 0, amr.MFInfo().set_arena(amr.The_Pinned_Arena())
+)
+observed = weakref.ref(holder)
+lattice.append(holder)
+del holder, dm, ba, box
+
+sim.finalize()
+# Release any retained buffer to exercise the crash before checking the result.
+remaining = len(lattice)
+lattice.clear()
+assert remaining == 0, remaining
+assert seen == [(True, 0), "rejected"], seen
+assert observed() is None
+assert not amr.initialized()
+
+# The cleanup guard must not prevent subsequent lattice edits.
+lattice.append(elements.Drift(ds=0.1))
+assert len(lattice) == 1
+lattice.clear()
+del sim
+print("survived")
+"""
+
+    finished = subprocess.run(
+        [sys.executable, "-c", program.replace("EDIT", edit)],
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+
+    assert finished.returncode == 0, finished.stdout + finished.stderr[-2000:]
+    assert "survived" in finished.stdout
