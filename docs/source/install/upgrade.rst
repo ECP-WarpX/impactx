@@ -164,7 +164,7 @@ New in this release
 - The array-valued element parameters (Fourier coefficients, multipole coefficients and
   polygon vertices) can be set after construction, via their properties or the paired
   setter (``set_coefficients()``, ``set_vertices()``).
-- ``sim.lattice`` supports the rest of the list API: slices, negative indices,
+- ``sim.lattice`` supports additional list operations: slices, negative indices,
   :py:meth:`~impactx.elements.KnownElementsList.insert`, :py:meth:`~impactx.elements.KnownElementsList.remove`,
   :py:meth:`~impactx.elements.KnownElementsList.index`, :py:meth:`~impactx.elements.KnownElementsList.count`,
   :py:meth:`in <impactx.elements.KnownElementsList.__contains__>`,

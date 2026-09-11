@@ -3,10 +3,12 @@
 Manipulate a Lattice
 ====================
 
-:py:attr:`sim.lattice <impactx.ImpactX.lattice>` is a sequence of elements that behaves like a Python list.
-When you add elements to ``sim.lattice`` it will **hold references to** the Python variables it is given rather than copies of them.
-Concretely: if you create an element as a Python variable, append it to ``sim.lattice``, you can continue to change and manipulate the element that now sits inside ``sim.lattice`` through the variable (see below).
-_The same element (variable) may sit at several lattice positions_, making tuning and ramping operations for whole channels, ring arcs, etc. easy.
+:py:attr:`sim.lattice <impactx.ImpactX.lattice>` is a list-like sequence of elements.
+It holds **strong references to the element objects** added to it.
+You can continue to change an element through a Python variable referring to it, and
+the lattice keeps the object alive even if you delete or reassign that variable.
+*The same element may sit at several lattice positions*, making tuning and ramping
+operations for whole channels or ring arcs easy.
 
 This page collects the operations that come up most often:
 editing a lattice in place, building one lattice per run, and keeping a lattice for longer
@@ -17,15 +19,15 @@ For the full signature of every method, see
 Everything is a Reference
 -------------------------
 
-Adding an element borrows the object to the lattice.
-Changing it afterwards changes what is tracked:
+Adding an element gives the lattice a strong reference to that object.
+Changing the object afterwards changes what is tracked:
 
 .. code-block:: python
 
    q = elements.Quad(ds=0.3, k=2.0)
    sim.lattice.append(q)
 
-   q.k = 4.0              # sim.lattice references variable q, this changes the lattice
+   q.k = 4.0              # q and sim.lattice[0] refer to the same element
 
    sim.track_particles()  # tracks through Quad(ds=0.3, k=4.0)
 
@@ -84,7 +86,7 @@ To tune the cells separately, copy the elements once per repetition:
 Editing a Lattice in Place
 --------------------------
 
-The list operations work as they do on a ``list``, and act on the lattice being tracked:
+Use indexing, insertion, deletion and slice assignment to edit the lattice being tracked:
 
 .. code-block:: python
 
@@ -102,6 +104,10 @@ Indexing, slicing, iteration, ``len()``, :py:meth:`in <impactx.elements.KnownEle
 Membership, :py:meth:`~impactx.elements.KnownElementsList.index`, :py:meth:`~impactx.elements.KnownElementsList.count` and :py:meth:`~impactx.elements.KnownElementsList.remove` match on
 the element itself, so an element that merely has the same parameters as another is not
 mistaken for it.
+
+Iteration and ``reversed()`` take a snapshot of the element references when the iterator
+is created. Later additions, removals and replacements do not change that iterator's
+sequence; changes to the referenced elements' parameters remain visible.
 
 To work on a group of elements at once, select them with
 :py:meth:`~impactx.elements.KnownElementsList.select`, which gives a
@@ -200,6 +206,9 @@ Setting a parameter the element does not have raises an error, e.g., for typos.
    :py:meth:`element.copy() <impactx.elements.Element.copy>` gives a new element with the same configuration.
    A copy of a beam monitor does not inherit an already-open output file, and an element
    written as a Python subclass must define ``copy()`` for this to work.
+   A beam monitor's copy shares settings keyed by its name; overriding ``alpha``, ``beta``,
+   ``tn``, ``cn`` or ``nonlinear_lens_invariants`` in ``copy()`` raises ``ValueError``.
+   Construct a monitor with a different name for independent settings.
 
 Keeping a Lattice Longer Than a Simulation
 ------------------------------------------

@@ -1042,7 +1042,7 @@ This module provides elements and methods for the accelerator lattice.
    several positions.
 
    Indexing, slicing, iteration, ``len()``, ``in``, ``insert()``, ``remove()``, ``index()``,
-   ``count()``, ``del`` and ``reversed()`` work as they do for a list, alongside
+   ``count()``, ``del`` and ``reversed()`` are supported, alongside
    :py:meth:`~impactx.elements.KnownElementsList.append`,
    :py:meth:`~impactx.elements.KnownElementsList.extend`,
    :py:meth:`~impactx.elements.KnownElementsList.clear` and
@@ -1052,6 +1052,11 @@ This module provides elements and methods for the accelerator lattice.
    element with the same parameters as another is not mistaken for it -- which is why
    ``element in lattice`` can be ``False`` while ``lattice == [element]`` is ``True``,
    see :ref:`element-comparison-methods`.
+
+   Iteration and ``reversed()`` take a snapshot of the element references when the iterator
+   is created. Later structural edits do not change its sequence, while parameter changes
+   to those elements remain visible. This type supports the methods documented below;
+   it does not implement the entire Python ``list`` API.
 
    .. seealso::
 
@@ -1524,8 +1529,14 @@ This module provides elements and methods for the accelerator lattice.
 
    Mutating operations rewrite only the positions selected. Elements at other positions are
    left exactly as they are, keeping their identity, their Python subclass and their
-   attributes. Every replacement is prepared before any is installed, so an operation that
-   fails leaves the lattice unchanged.
+   attributes. Every replacement is prepared and validated before any is installed.
+   A failure during preparation or validation installs no replacements. Python callbacks,
+   property getters and finalizers may make their own edits; those edits are not rolled back.
+   If preparation changes the lattice, the stale selection is rejected before installation.
+
+   Replacement methods return a new selection over the replaced positions. A finalizer
+   that structurally edits the lattice as displaced elements are released can invalidate
+   that selection before the method returns. In that case, take a new selection.
 
    If the selection is empty, ``delete`` is a no-op and ``replace_*`` return
    an empty ``FilteredElementsList``.
@@ -1550,8 +1561,8 @@ This module provides elements and methods for the accelerator lattice.
    .. py:method:: replace_each(element, *, keep_name=True, keep_ds=False)
 
       Replace each selected element with a copy of ``element``. This is an edit, so it makes
-      every other live selection on the same lattice stale; the filtered view it returns,
-      over the same positions, is usable.
+      this selection and every other live selection on the same lattice stale. Returns a
+      new filtered view over the same positions, subject to the finalizer caveat above.
 
       :param element: Element copied into each selected position (names and ``ds`` may be
          overridden; see below). A Python subclass of an element must define ``copy()`` to be
@@ -1579,14 +1590,15 @@ This module provides elements and methods for the accelerator lattice.
    .. py:method:: replace_with_drifts(*, model="match", keep_alignment=True, keep_aperture=False)
 
       Replace each selected element with a drift of the chosen physics family. Names and ``ds``
-      are always taken from the replaced element. Invalidates all **other** live selections on the
-      same lattice; returns a **new** filtered view over the same indices (the returned view is
-      valid).
+      are always taken from the replaced element. Invalidates this selection and every other
+      live selection on the same lattice. Returns a new filtered view over the same positions,
+      subject to the finalizer caveat above.
 
-      :param model: With ``"match"`` (default), linear elements become ``Drift``, class names
-         starting with ``Chr`` become ``ChrDrift``, and class names starting with ``Exact`` become
-         ``ExactDrift``. With ``"linear"``, ``"paraxial"``, or ``"exact"``, every selected slot
-         uses that drift type.
+      :param model: With ``"match"`` (default), the underlying element kind determines the
+         physics family: linear elements become ``Drift``, paraxial elements become
+         ``ChrDrift``, and exact elements become ``ExactDrift``. Python subclasses retain
+         their underlying element's family, regardless of the subclass name. With
+         ``"linear"``, ``"paraxial"``, or ``"exact"``, every selected slot uses that drift type.
       :param keep_alignment: If true (default), copy ``dx``, ``dy``, and ``rotation`` from each
          replaced element; otherwise zero them.
       :param keep_aperture: If true, copy ``aperture_x`` and ``aperture_y`` from each replaced
@@ -1649,11 +1661,15 @@ Copying a lattice element
    :raises AttributeError: if a named parameter is not one the element has.
    :raises TypeError: if called on a Python subclass that does not define its own
       ``copy()``, since the subclass carries state that cannot be reproduced here.
+   :raises ValueError: if an override changes a beam monitor setting shared with the original.
 
    .. note::
 
       A copy of a :py:class:`impactx.elements.BeamMonitor` does not inherit an
-      already-open output file.
+      already-open output file. Its ``alpha``, ``beta``, ``tn``, ``cn`` and
+      ``nonlinear_lens_invariants`` settings are keyed by its name and shared with the
+      original. Passing any of these as a ``copy()`` override raises ``ValueError``.
+      Construct a monitor with a different name for independent settings.
 
 .. _element-comparison-methods:
 
