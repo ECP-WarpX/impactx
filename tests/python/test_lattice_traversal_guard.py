@@ -15,7 +15,7 @@ the lattice contains, while tracking is walking it, is not.
 
 import pytest
 
-from impactx import ImpactX, elements
+from impactx import ImpactX, distribution, elements
 
 
 @pytest.fixture()
@@ -24,10 +24,44 @@ def sim():
     s.particle_shape = 2
     s.n_cell = [8, 8, 8]
     s.slice_step_diagnostics = False
+    s.diagnostics = False
     s.init_grids()
     s.beam.ref.set_species("electron").set_kin_energy_MeV(100.0)
     yield s
     s.finalize()
+
+
+def _distribution():
+    return distribution.Waterbag(
+        lambdaX=1.0e-4,
+        lambdaY=1.0e-4,
+        lambdaT=1.0e-3,
+        lambdaPx=1.0e-5,
+        lambdaPy=1.0e-5,
+        lambdaPt=1.0e-3,
+    )
+
+
+def _track_reference(sim):
+    sim.track_reference(sim.beam.ref)
+
+
+def _track_envelope(sim):
+    sim.init_envelope(sim.beam.ref, _distribution())
+    sim.track_envelope()
+
+
+def _track_particles(sim):
+    sim.add_particles(1.0e-9, _distribution(), 16)
+    sim.track_particles()
+
+
+#: the three trackers walk the lattice through the same traversal
+TRACKERS = [
+    pytest.param(_track_reference, id="reference"),
+    pytest.param(_track_envelope, id="envelope"),
+    pytest.param(_track_particles, id="particles"),
+]
 
 
 def _track(sim, hook):
@@ -36,16 +70,17 @@ def _track(sim, hook):
 
 
 def test_retuning_an_element_is_allowed(sim):
-    sim.lattice.append(elements.Drift(ds=0.5, name="d"))
+    """A retuned element is what the push that follows goes through."""
 
-    seen = {}
+    sim.lattice.append(elements.Drift(ds=0.5, name="d"))
 
     def hook(s):
         s.tracking_element.ds = 0.25
-        seen["ds"] = s.tracking_element.ds
 
     _track(sim, hook)
-    assert seen["ds"] == 0.25
+
+    # the reference particle advanced by the retuned length, not the original one
+    assert sim.beam.ref.s == pytest.approx(0.25)
 
 
 @pytest.mark.parametrize(
@@ -84,8 +119,11 @@ def test_changing_the_sequence_is_rejected(sim, edit):
     assert len(sim.lattice) == 1
 
 
-@pytest.mark.parametrize("hook_name", ["before_period", "before_element"])
-def test_every_hook_is_guarded(sim, hook_name):
+@pytest.mark.parametrize(
+    "hook_name", ["before_period", "before_element", "after_element", "after_period"]
+)
+@pytest.mark.parametrize("track", TRACKERS)
+def test_every_hook_is_guarded(sim, hook_name, track):
     """The rule is the same wherever the hook runs, and for every tracker."""
 
     sim.lattice.append(elements.Drift(ds=0.5, name="d"))
@@ -100,7 +138,7 @@ def test_every_hook_is_guarded(sim, hook_name):
             seen["result"] = str(e)
 
     sim.hook[hook_name] = hook
-    sim.track_reference(sim.beam.ref)
+    track(sim)
 
     assert "while tracking" in seen["result"]
     assert len(sim.lattice) == 1

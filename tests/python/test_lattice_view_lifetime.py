@@ -151,13 +151,18 @@ class TestSelectionsGoStaleWithTheLattice:
         assert names_of(lattice) == ["new_head", "q0", "q1", "q2", "d0", "d1", "d2"]
 
     def test_retuning_an_element_does_not_void_a_selection(self):
-        """Only moving elements invalidates; changing one in place does not."""
+        """Only moving elements invalidates; changing one in place does not.
+
+        The lattice counts structural edits, and a retune is not one of them.
+        """
 
         lattice = self.lattice_of_six()
         selection = lattice.select(kind="Quad")
+        generation = lattice.generation
 
         lattice[0].k = 3.0
 
+        assert lattice.generation == generation
         assert len(selection) == 3
         assert selection[0].k == 3.0
 
@@ -208,18 +213,6 @@ def test_an_empty_selection_leaves_other_selections_alone():
     nothing.delete()
 
     assert len(quads) == 1
-
-
-def test_generation_counts_structural_edits_only():
-    lattice = elements.KnownElementsList()
-    start = lattice.generation
-
-    lattice.append(elements.Drift(ds=0.1, name="d"))
-    after_append = lattice.generation
-    assert after_append != start
-
-    lattice[0].ds = 0.5
-    assert lattice.generation == after_append
 
 
 class TestFilteredEditsAreAllOrNothing:
@@ -367,7 +360,7 @@ print("survived")
 """
 
     finished = subprocess.run(
-        [sys.executable, "-c", program], capture_output=True, text=True
+        [sys.executable, "-c", program], capture_output=True, text=True, timeout=120
     )
 
     assert finished.returncode == 0, finished.stderr[-2000:]

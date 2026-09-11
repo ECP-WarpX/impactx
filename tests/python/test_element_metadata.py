@@ -24,19 +24,21 @@ def test_name_survives_a_copy():
 
     Regression test for the construction adapter of the element envelope: a variadic
     constructor that is not excluded from copy construction wins overload resolution for
-    a non-const lvalue, copy-constructs only the physics base and default-constructs the
+    an lvalue, copy-constructs only the physics base and default-constructs the
     metadata. That is not a compile error -- the copy just silently comes out unnamed.
+    ``copy()`` is the C++ copy of the element; the lattice itself shares, so it would not
+    exercise this.
     """
 
     drift = elements.Drift(ds=1.0, nslice=3, name="d1")
 
-    lattice = elements.KnownElementsList()
-    lattice.append(drift)  # copies on the C++ side, from a non-const lvalue
+    copied = drift.copy()
 
-    assert lattice[0].has_name
-    assert lattice[0].name == "d1"
-    assert lattice[0].nslice == 3
-    assert lattice[0].ds == 1.0
+    assert copied is not drift
+    assert copied.has_name
+    assert copied.name == "d1"
+    assert copied.nslice == 3
+    assert copied.ds == 1.0
 
 
 def test_unnamed_element_stays_unnamed():

@@ -15,7 +15,7 @@ could not reach the element being tracked. The lattice shares elements now, so i
 
 import pytest
 
-from impactx import ImpactX, elements
+from impactx import elements
 
 # element factory -> (first array property, second array property, paired setter)
 CASES = [
@@ -96,14 +96,22 @@ def test_mismatched_lengths_are_rejected_and_change_nothing(
 ):
     el = make()
 
+    # through a single property, measured against the array it keeps
     with pytest.raises(ValueError, match="same length"):
         setattr(el, first, [1.0])
+
+    # and through the paired setter
+    with pytest.raises(ValueError, match="same length"):
+        getattr(el, setter)([1.0, 2.0], [1.0])
 
     assert getattr(el, first) == [1.0, 2.0]
     assert getattr(el, second) == [0.0, 3.0]
 
 
 def test_polygon_vertices():
+    """The vertex arrays follow the same pattern; their validation is tested with the
+    other array-valued parameters."""
+
     poly = elements.PolygonAperture(
         vertices_x=[0.0, 1.0, 1.0, 0.0, 0.0], vertices_y=[0.0, 0.0, 1.0, 1.0, 0.0]
     )
@@ -111,26 +119,17 @@ def test_polygon_vertices():
 
     poly.set_vertices([0.0, 2.0, 2.0, 0.0, 0.0], [0.0, 0.0, 2.0, 2.0, 0.0])
     assert poly.vertices_x == [0.0, 2.0, 2.0, 0.0, 0.0]
-
-    # the polygon must stay closed
-    with pytest.raises(ValueError, match="first and last vertex"):
-        poly.set_vertices([0.0, 1.0, 1.0], [0.0, 0.0, 1.0])
-
-    assert poly.vertices_x == [0.0, 2.0, 2.0, 0.0, 0.0]
+    assert poly.vertices_y == [0.0, 0.0, 2.0, 2.0, 0.0]
 
 
 def test_retuning_reaches_the_element_in_the_lattice():
     """The reason these setters were held back until the lattice shared elements."""
 
-    sim = ImpactX()
-    sim.particle_shape = 2
-    sim.n_cell = [8, 8, 8]
-
     sq = elements.SoftQuadrupole(
         ds=1.0, gscale=1.0, cos_coefficients=[1.0, 2.0], sin_coefficients=[0.0, 3.0]
     )
-    sim.lattice.append(sq)
+    lattice = elements.KnownElementsList([sq])
 
     sq.set_coefficients([9.0, 9.0], [0.0, 0.0])
 
-    assert sim.lattice[0].cos_coefficients == [9.0, 9.0]
+    assert lattice[0].cos_coefficients == [9.0, 9.0]

@@ -25,16 +25,20 @@ def names_of(lattice):
 
 
 @pytest.mark.parametrize(
-    ("count", "key", "expected"),
+    ("count", "key"),
     [
-        (4, slice(None, None, -1), []),
-        (5, slice(None, None, -2), ["d1", "d3"]),
-        (5, slice(None, None, 2), ["d1", "d3"]),
-        (4, slice(None, None, -2), ["d0", "d2"]),
-        (6, slice(4, 1, -1), ["d0", "d1", "d5"]),
+        (8, slice(0, 4)),
+        (8, slice(3, 7)),
+        (8, slice(None)),
+        (8, slice(None, None, 2)),
+        (9, slice(None, None, 3)),
+        (4, slice(None, None, -1)),
+        (5, slice(None, None, -2)),
+        (4, slice(None, None, -2)),
+        (6, slice(4, 1, -1)),
     ],
 )
-def test_delete_slice_matches_a_list(count, key, expected):
+def test_delete_slice_matches_a_list(count, key):
     """Deleting through a slice removes what the same slice removes from a list."""
 
     lattice = drifts(*[f"d{i}" for i in range(count)])
@@ -43,7 +47,31 @@ def test_delete_slice_matches_a_list(count, key, expected):
     del lattice[key]
     del reference[key]
 
-    assert names_of(lattice) == expected
+    assert names_of(lattice) == reference
+
+
+@pytest.mark.parametrize(
+    ("count", "key", "replacements"),
+    [
+        (6, slice(0, 3), 3),
+        (6, slice(0, 3), 5),
+        (6, slice(0, 3), 1),
+        (6, slice(None), 2),
+        (6, slice(0, 0), 2),
+        (6, slice(6, 6), 2),
+        (6, slice(2, 4), 0),
+    ],
+)
+def test_contiguous_slice_assignment_matches_a_list(count, key, replacements):
+    """Assigning through a contiguous slice resizes as it does on a list."""
+
+    lattice = drifts(*[f"d{i}" for i in range(count)])
+    reference = [f"d{i}" for i in range(count)]
+    new = [elements.Drift(ds=0.2, name=f"n{i}") for i in range(replacements)]
+
+    lattice[key] = new
+    reference[key] = [element.name for element in new]
+
     assert names_of(lattice) == reference
 
 

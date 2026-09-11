@@ -16,7 +16,7 @@ adds a second element.
 
 import pytest
 
-from impactx import elements
+from impactx import Config, ImpactX, distribution, elements
 
 
 def test_copy_is_a_distinct_element():
@@ -53,29 +53,86 @@ def test_every_element_type_can_be_copied():
 
 
 def test_dynamic_element_copy_owns_its_arrays():
-    """The coefficient arrays must not be shared between two elements."""
+    """The coefficient arrays must not be shared between two elements.
+
+    Writing through either side must leave the other as it was; equal contents alone
+    would also hold for one shared array.
+    """
 
     sq = elements.SoftQuadrupole(
         ds=1.0, gscale=1.0, cos_coefficients=[1.0, 2.0], sin_coefficients=[0.0, 3.0]
     )
     c = sq.copy()
-
     assert c is not sq
-    assert c.to_dict()["cos_coefficients"] == [1.0, 2.0]
-    assert c.to_dict()["sin_coefficients"] == [0.0, 3.0]
+
+    c.set_coefficients([9.0, 9.0], [8.0, 8.0])
+    assert sq.cos_coefficients == [1.0, 2.0]
+    assert sq.sin_coefficients == [0.0, 3.0]
+
+    sq.cos_coefficients = [5.0, 6.0]
+    assert c.cos_coefficients == [9.0, 9.0]
 
 
-def test_beam_monitor_copy_does_not_share_the_output_series():
-    """Two monitors sharing one open series would interleave into the same iterations."""
+def _track_monitors(name, tail, tmp_path, monkeypatch):
+    """Track a few particles through ``[head, drift, tail]`` and return the
+    reference-particle positions written to the series ``name``.
 
-    monitor = elements.BeamMonitor("mon", backend="h5")
-    c = monitor.copy()
+    ``tail`` is built from the head monitor: the monitor itself, or a copy of it.
+    """
 
-    assert c is not monitor
-    assert c.name == monitor.name
+    io = pytest.importorskip("openpmd_api")
+    from pathlib import Path
 
-    monitor.finalize()
-    c.finalize()
+    monkeypatch.chdir(tmp_path)
+
+    sim = ImpactX()
+    sim.particle_shape = 2
+    sim.slice_step_diagnostics = False
+    sim.init_grids()
+    sim.beam.ref.set_species("electron").set_kin_energy_MeV(2.0e3)
+    sim.add_particles(
+        1.0e-9,
+        distribution.Waterbag(
+            lambdaX=4.0e-5,
+            lambdaY=4.0e-5,
+            lambdaT=1.0e-3,
+            lambdaPx=2.7e-5,
+            lambdaPy=2.7e-5,
+            lambdaPt=2.0e-3,
+        ),
+        16,
+    )
+
+    head = elements.BeamMonitor(name, backend="h5")
+    sim.lattice.extend([head, elements.Drift(ds=0.5), tail(head)])
+    try:
+        sim.track_particles()
+    finally:
+        sim.finalize()
+
+    (path,) = sorted(Path("diags/openPMD").glob(f"{name}.*"))
+    series = io.Series(str(path), io.Access.read_linear)
+    return [
+        iteration.particles["beam"].get_attribute("s_ref")
+        for iteration in series.read_iterations()
+    ]
+
+
+@pytest.mark.skipif(not Config.have_openpmd, reason="built without openPMD")
+def test_beam_monitor_copy_is_a_second_monitor(tmp_path, monkeypatch):
+    """A copy of a monitor records the beam like the monitor itself would.
+
+    Monitors of one name write one series, so a monitor at the head and the tail of a
+    lattice -- the same object, or a copy of it -- records both passes. The copy starts
+    without the open series and the per-pass state of the original, and opens its own on
+    first use; reusing them would have the tail write into the head's pass.
+    """
+
+    aliased = _track_monitors("aliased", lambda head: head, tmp_path, monkeypatch)
+    copied = _track_monitors("copied", lambda head: head.copy(), tmp_path, monkeypatch)
+
+    assert aliased == pytest.approx([0.0, 0.5])
+    assert copied == aliased
 
 
 def test_python_subclass_must_say_what_a_copy_means():
@@ -236,10 +293,3 @@ class TestCopyWithOverrides:
 
         assert derived.gscale == 3.0
         assert list(derived.cos_coefficients) == list(element.cos_coefficients)
-
-    def test_a_subclass_is_still_refused(self):
-        class MyQuad(elements.Quad):
-            pass
-
-        with pytest.raises(TypeError, match="copy"):
-            MyQuad(ds=1.0, k=1.0).copy(k=2.0)

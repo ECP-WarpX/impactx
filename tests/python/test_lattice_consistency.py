@@ -8,7 +8,7 @@
 
 import pytest
 
-from impactx import ImpactX, elements
+from impactx import ImpactX, distribution, elements
 
 
 @pytest.fixture
@@ -101,6 +101,75 @@ def test_assigning_the_lattice_to_itself_keeps_it(sim):
     sim.lattice = sim.lattice
 
     assert names_of(sim.lattice) == ["d0", "d1"]
+
+
+def _envelope_through(cavity_at_tail):
+    """Track an envelope through ``[rf, d, rf', d]`` and return what came out.
+
+    ``cavity_at_tail(rf)`` supplies the second cavity: the first one again, or a copy.
+    """
+
+    sim = ImpactX()
+    sim.particle_shape = 2
+    sim.slice_step_diagnostics = False
+    sim.diagnostics = False
+    sim.init_grids()
+
+    ref = sim.beam.ref
+    ref.set_species("electron").set_kin_energy_MeV(100.0)
+    sim.init_envelope(
+        ref,
+        distribution.Waterbag(
+            lambdaX=1.0e-4,
+            lambdaY=1.0e-4,
+            lambdaT=1.0e-3,
+            lambdaPx=1.0e-5,
+            lambdaPy=1.0e-5,
+            lambdaPt=1.0e-3,
+        ),
+    )
+
+    rf = elements.RFCavity(
+        ds=1.0,
+        escale=20.0,
+        freq=1.3e9,
+        phase=-89.5,
+        cos_coefficients=[2.0],
+        sin_coefficients=[0.0],
+        mapsteps=10,
+    )
+    drift = elements.Drift(ds=0.5)
+    sim.lattice.extend([rf, drift, cavity_at_tail(rf), drift])
+    # the envelope tracker advances a reference particle of its own; the moments are
+    # what comes out, taken in the units of the reference particle they started from
+    before = _finite(sim.envelope.beam_moments(ref))
+    try:
+        sim.track_envelope()
+        return before, _finite(sim.envelope.beam_moments(ref))
+    finally:
+        sim.finalize()
+
+
+def _finite(moments):
+    """The moments an envelope has: the per-particle extrema are NaN without particles,
+    and NaN compares unequal to itself."""
+
+    return {name: value for name, value in moments.items() if value == value}
+
+
+def test_an_element_at_two_positions_tracks_like_two_copies():
+    """One cavity at two positions gives what two identical cavities give.
+
+    An element carries state between the reference push and the particle push of a
+    slice -- the cavity's linearized map, say. Sharing the element between positions
+    must not carry that state from one position into the next.
+    """
+
+    before, shared = _envelope_through(lambda rf: rf)
+    _, copied = _envelope_through(lambda rf: rf.copy())
+
+    assert shared != before  # the lattice did something
+    assert shared == copied
 
 
 def test_finalize_releases_elements_without_init_grids(sim):

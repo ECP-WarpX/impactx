@@ -64,14 +64,6 @@ def test_constructing_without_coefficients_is_rejected(name):
         getattr(elements, name)(**kwargs)
 
 
-@pytest.mark.parametrize("name", sorted(COEFFICIENT_ELEMENTS))
-def test_mismatched_lengths_are_rejected(name):
-    element = build(name)
-
-    with pytest.raises(ValueError):
-        element.set_coefficients([1.0, 2.0], [1.0])
-
-
 def test_multipole_transfer_map_survives_a_single_coefficient():
     """A pure dipole has no quadrupole component and supplies no second coefficient."""
 
