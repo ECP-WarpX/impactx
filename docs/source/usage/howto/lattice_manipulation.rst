@@ -4,7 +4,9 @@ Manipulate a Lattice
 ====================
 
 :py:attr:`sim.lattice <impactx.ImpactX.lattice>` is a sequence of elements that behaves like a Python list.
-It **holds references to** the elements it is given rather than copies of them, so an element you keep a variable to is the element that is tracked, and the same element may sit at several positions.
+When you add elements to ``sim.lattice`` it will **hold references to** the Python variables it is given rather than copies of them.
+Concretely: if you create an element as a Python variable, append it to ``sim.lattice``, you can continue to change and manipulate the element that now sits inside `sim.lattice` through the variable (see below).
+_The same element (variable) may sit at several lattice positions_, making tuning and ramping operations for whole channels, ring arcs, etc. easy.
 
 This page collects the operations that come up most often:
 editing a lattice in place, building one lattice per run, and keeping a lattice for longer
@@ -23,7 +25,9 @@ Changing it afterwards changes what is tracked:
    q = elements.Quad(ds=0.3, k=2.0)
    sim.lattice.append(q)
 
-   q.k = 3.0                     # the lattice tracks q, so this applies
+   q.k = 4.0              # sim.lattice references variable q, this changes the lattice
+
+   sim.track_particles()  # tracks through Quad(ds=0.3, k=4.0)
 
 Adding the same variable twice therefore places **one** element at two positions, and
 retuning it changes both:
@@ -37,10 +41,10 @@ For elements that are tuned separately, construct one per position or add a copy
 .. code-block:: python
 
    sim.lattice.append(elements.Quad(ds=0.3, k=2.0))
-   sim.lattice.append(elements.Quad(ds=0.3, k=2.0))   # two elements
+   sim.lattice.append(elements.Quad(ds=0.3, k=2.0))   # two distinct elements
 
    template = elements.Quad(ds=0.3, k=2.0)
-   sim.lattice.extend([template.copy(), template.copy()])
+   sim.lattice.extend([template.copy(), template.copy()])  # also two distinct elements
 
 Repeating a Cell
 ----------------
@@ -52,7 +56,7 @@ repeats its elements rather than duplicating them:
 
    cell = [elements.Drift(ds=0.25), elements.Quad(ds=1.0, k=1.0)]
 
-   sim.lattice.extend(cell * 3)          # 6 positions, 2 elements
+   sim.lattice.extend(cell * 3)          # 6 positions, 2 elements used repeatedly
    sim.lattice[0].ds = 0.5               # changes all three cells
 
 That is usually what a periodic channel wants: retuning the cell retunes the channel.

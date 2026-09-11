@@ -24,9 +24,9 @@ items. Previously it stored a copy of each element.
    assert sim.lattice[0] is q
    q.k = 3.0                       # applies to tracking
 
-**What to check in your scripts:** adding the same variable more than once now places one
-element at several positions, where it used to place independent copies. Retuning it
-afterwards affects every one of those positions.
+**What to check in your scripts:** previously, when storing an element in a variable and adding that variable more than once used to place independent copies.
+Now, this *places the same element at several positions*.
+Changing the variable (tuning the element) afterwards affects every one of those positions.
 
 .. code-block:: python
 
