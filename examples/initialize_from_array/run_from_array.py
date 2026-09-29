@@ -73,10 +73,10 @@ beam = sim.beam
 #   In the example here, we add all particles from one MPI rank.
 #   This is simple but not scalable -- for many particles just
 #   add 1/N unique particles per MPI rank.
-#
-#   The particles are given at fixed t, so we add them inside a
-#   `with beam.at_fixed_t():` block: ImpactX transforms them to
-#   fixed s when the block ends, using the design energy of `ref`.
+
+# The particles are given at fixed t, so we add them inside a
+# `with beam.at_fixed_t():` block: ImpactX transforms them to
+# fixed s when the block ends, using the design energy of `ref`.
 with beam.at_fixed_t():
     if amr.ParallelDescriptor.IOProcessor():
         # particle coordinates relative to the reference particle, at fixed t

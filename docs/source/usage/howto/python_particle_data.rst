@@ -136,7 +136,7 @@ using :py:meth:`~impactx.ParticleContainer.add_n_particles`. See its API referen
 Exchanging particles with time-based codes
 ------------------------------------------
 
-Codes that use time as the independent variable (e.g., particle-in-cell codes) describe the beam at fixed time :math:`t`, while ImpactX describes it at a fixed position :math:`s`.
+Codes that use time as the independent variable (e.g., WarpX) describe the beam at fixed time :math:`t`, while ImpactX describes it at a fixed reference position :math:`s`.
 To read, modify, or add particles at fixed :math:`t`, work inside a :py:meth:`~impactx.ParticleContainer.at_fixed_t` block:
 
 .. code-block:: python

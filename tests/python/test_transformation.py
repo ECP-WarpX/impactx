@@ -144,9 +144,13 @@ def test_at_fixed_t():
     class Oops(Exception):
         pass
 
+    def raise_oops():
+        # raising via a call keeps the code after pytest.raises reachable for linters
+        raise Oops()
+
     with pytest.raises(Oops):
         with beam.at_fixed_t():
-            raise Oops()
+            raise_oops()
     assert beam.coord_system == CoordSystem.s
     _assert_moments_close(rbc_s0, beam.beam_moments())
 
@@ -168,7 +172,7 @@ def test_at_fixed_t():
     with pytest.raises(Oops):
         with beam.at_fixed_t():
             coordinate_transformation(beam, direction=CoordSystem.s)
-            raise Oops()
+            raise_oops()
     assert beam.coord_system == CoordSystem.s
     _assert_moments_close(rbc_s0, beam.beam_moments())
 
