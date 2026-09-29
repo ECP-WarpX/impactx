@@ -8,10 +8,9 @@ This allows various applications of interest,
 such as using a beam from a different simulation,
 initializing a beam from file,
 or creating a custom distribution.
-This example includes a set of utilities for transforming the beam to the fixed-s coordinates of ImpactX.
-
-In this example, a custom beam is specified at fixed t, transformed to fixed s, and
-then loaded in ImpactX.
+In this example, a custom beam is specified at fixed t and added to ImpactX inside a
+``with beam.at_fixed_t():`` block, which transforms it to the fixed-s coordinates of ImpactX
+when the block ends (see :ref:`usage-howto-python-particle-data-fixed-t`).
 The custom beam is a ring in x-y,
 with radius r=2 mm,
 radial width :math:`\sigma_r = 5\ \mathrm{\mu m}`;
@@ -23,8 +22,9 @@ In specifying the beam at fixed t and transforming to fixed s,
 it is assumed that the local and global coordinate frames align.
 That is, the beam transverse directions x and y are the global x and y directions
 and the beam z/t direction is the global z direction.
-The transformation utility function reproduces the t-to-s and s-to-t transformations
-done internally in ImpactX given this assumption that the beam and global coordinate systems align.
+The run script uses a utility function to express the global particle coordinates relative to the reference particle.
+The analysis script uses further utilities that reproduce the s-to-t transformation
+done internally in ImpactX, given this assumption that the beam and global coordinate systems align.
 These utility functions are provided in the following script:
 
 .. dropdown:: Script ``transformation_utilities.py``

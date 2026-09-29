@@ -131,6 +131,34 @@ Adding new particles
 New particles can be appended to the beam at any time after :py:meth:`~impactx.ImpactX.init_grids`
 using :py:meth:`~impactx.ParticleContainer.add_n_particles`. See its API reference for parameters.
 
+.. _usage-howto-python-particle-data-fixed-t:
+
+Exchanging particles with time-based codes
+------------------------------------------
+
+Codes that use time as the independent variable (e.g., particle-in-cell codes) describe the beam at fixed time :math:`t`, while ImpactX describes it at a fixed position :math:`s`.
+To read, modify, or add particles at fixed :math:`t`, work inside a :py:meth:`~impactx.ParticleContainer.at_fixed_t` block:
+
+.. code-block:: python
+
+   with sim.beam.at_fixed_t() as beam:
+       for lvl in range(beam.finest_level + 1):
+           for pti in ImpactXParIter(beam, level=lvl):
+               soa = pti.soa().to_xp()
+               z = soa.real["position_t"]   # holds z at fixed t
+               pz = soa.real["momentum_t"]  # holds pz at fixed t
+               ...  # hand x, y, z, px, py, pz to the other code, write back its result
+
+   # here, the beam is at fixed s again
+
+Inside the block, the arrays keep their fixed-:math:`s` names, but ``position_t`` and ``momentum_t`` hold the longitudinal position :math:`z` (in meters) and momentum deviation :math:`p_z`, both relative to the reference particle.
+When the block ends, normally or through an exception, the beam is transformed back to fixed :math:`s`.
+
+Each transformation uses the reference energy ``beam.ref.pt`` at the moment it runs: the transformation to fixed :math:`t` uses the reference particle as the block starts, the transformation back to fixed :math:`s` uses the reference particle as the block ends.
+If the other code changes the beam energy, update the reference particle inside the block (e.g., with :py:meth:`~impactx.RefPart.set_kin_energy_MeV`) and write the particle coordinates relative to the updated reference particle.
+
+The :ref:`initialize from arrays <examples-from-array>` and :ref:`ML surrogate <examples-ml-surrogate>` examples use this pattern.
+
 See also
 --------
 

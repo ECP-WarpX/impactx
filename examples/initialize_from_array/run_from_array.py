@@ -73,23 +73,30 @@ beam = sim.beam
 #   In the example here, we add all particles from one MPI rank.
 #   This is simple but not scalable -- for many particles just
 #   add 1/N unique particles per MPI rank.
-if amr.ParallelDescriptor.IOProcessor():
-    dx, dy, dz, dpx, dpy, dpz = pycoord.to_ref_part_t_from_global_t(
-        ref, x, y, z, px, py, pz
-    )
-    dx, dy, dt, dpx, dpy, dpt = pycoord.to_s_from_t(ref, dx, dy, dz, dpx, dpy, dpz)
+#
+#   The particles are given at fixed t, so we add them inside a
+#   `with beam.at_fixed_t():` block: ImpactX transforms them to
+#   fixed s when the block ends, using the design energy of `ref`.
+with beam.at_fixed_t():
+    if amr.ParallelDescriptor.IOProcessor():
+        # particle coordinates relative to the reference particle, at fixed t
+        dx, dy, dz, dpx, dpy, dpz = pycoord.to_ref_part_t_from_global_t(
+            ref, x, y, z, px, py, pz
+        )
 
-    # here we use equal particle weighting, but you can assign any weight to each particle
-    w = np.ones_like(dx) * (bunch_charge_C / q_e_C / N_part)
+        # here we use equal particle weighting, but you can assign any weight to each particle
+        w = np.ones_like(dx) * (bunch_charge_C / q_e_C / N_part)
 
-    # This call has two options:
-    # A) reassign equal weighting according to bunch_charge_C
-    # B) use the particle weighting from the input array w
-    beam.add_n_particles(dx, dy, dt, dpx, dpy, dpt, qm_eev, bunch_charge=bunch_charge_C)
-    # ok, let's clear all particles and do option B
-    beam.clear_particles()
+        # This call has two options:
+        # A) reassign equal weighting according to bunch_charge_C
+        # B) use the particle weighting from the input array w
+        beam.add_n_particles(
+            dx, dy, dz, dpx, dpy, dpz, qm_eev, bunch_charge=bunch_charge_C
+        )
+        # ok, let's clear all particles and do option B
+        beam.clear_particles()
 
-    beam.add_n_particles(dx, dy, dt, dpx, dpy, dpt, qm_eev, w=w)
+        beam.add_n_particles(dx, dy, dz, dpx, dpy, dpz, qm_eev, w=w)
 
 # build the accelerator lattice
 monitor = elements.BeamMonitor("monitor", backend="h5")
