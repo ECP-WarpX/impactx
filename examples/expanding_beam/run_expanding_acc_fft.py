@@ -136,33 +136,34 @@ print(
 print("")
 atol = 0.0  # ignored
 rtol = 2.5 * npart**-0.5  # from random sampling of a smooth distribution
+if Config.precision == "SINGLE":
+    # FIXME: in single precision, sigma_t degrades to 3.2x the envelope value over the
+    # 10 m of tracking, and sigma_x follows because the over-long bunch weakens the
+    # space-charge kick. The deviation grows with propagation distance: 0.34, 1.5 and
+    # 2.2 relative for ds = 0.1, 1.0 and 10.0 m.
+    rtol = 5.0
 print(f"  rtol for beam size = {rtol} (ignored: atol~={atol})")
 
-# FIXME: real SP precision issue
-# In SINGLE, sigma_t degrades to 3.2x the envelope value over the 10 m of
-# tracking, and sigma_x follows because the over-long bunch weakens the
-# space-charge kick. The deviation grows with propagation distance: 0.34,
-# 1.5 and 2.2 relative for ds = 0.1, 1.0 and 10.0 m. Compare the moments in
-# DOUBLE only until this is resolved; the energy gain is checked in both.
-if Config.precision == "DOUBLE":
-    assert np.allclose(
-        [sigx_part, sigy_part, sigt_part],
-        [sigx_env, sigy_env, sigt_env],
-        rtol=rtol,
-        atol=atol,
-    )
+assert np.allclose(
+    [sigx_part, sigy_part, sigt_part],
+    [sigx_env, sigy_env, sigt_env],
+    rtol=rtol,
+    atol=atol,
+)
 
 atol = 3.0e-9
+if Config.precision == "SINGLE":
+    # FIXME: in single precision, the particle emittance_t grows to 3.7e-8, see sigma_t
+    atol = 1.0e-7
 rtol = 0.0
 print(f"  atol for emittances = {atol} (ignored: rtol~={rtol})")
 
-if Config.precision == "DOUBLE":
-    assert np.allclose(
-        [emitx_part, emity_part, emitt_part],
-        [emitx_env, emity_env, emitt_env],
-        rtol=rtol,
-        atol=atol,
-    )
+assert np.allclose(
+    [emitx_part, emity_part, emitt_part],
+    [emitx_env, emity_env, emitt_env],
+    rtol=rtol,
+    atol=atol,
+)
 
 print("")
 

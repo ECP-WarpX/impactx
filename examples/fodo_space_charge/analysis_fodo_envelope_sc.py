@@ -11,6 +11,8 @@ import re
 import numpy as np
 import pandas as pd
 
+from impactx import Config
+
 
 def read_file(file_pattern):
     for filename in glob.glob(file_pattern):
@@ -38,6 +40,7 @@ def read_time_series(file_pattern):
 
 # read reduced diagnostics
 rbc = read_time_series("diags/reduced_beam_characteristics.*")
+is_double = Config.precision != "SINGLE"
 
 s = rbc["s"]
 sigma_x = rbc["sigma_x"]
@@ -99,6 +102,11 @@ print(
 
 atol = 0.0  # ignored
 rtol = 1.0e-3  # from random sampling of a smooth distribution
+if not is_double:
+    # FIXME: in single precision, the final emittance_t is off by up to 0.7% (the
+    # envelope model preserves it to 4e-6 in double precision)
+    # https://github.com/BLAST-ImpactX/impactx/issues/1684
+    rtol = 1.0e-2
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 # the beam returns to within 0.1% of its initial transverse size over the FODO cell:

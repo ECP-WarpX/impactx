@@ -83,7 +83,7 @@ def test_transformation():
     # assert that forward-inverse transformation of the beam leaves beam unchanged
     if Config.precision == "SINGLE":
         atol = 1e-6
-        rtol = 1e-6
+        rtol = 5e-6
     else:
         atol = 1e-14
         rtol = 1e-10

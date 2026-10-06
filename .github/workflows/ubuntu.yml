@@ -227,17 +227,93 @@ jobs:
     - name: validate created openPMD files
       run: find build -name *.h5 | xargs -n1 -I{} openPMD_check_h5 -i {}
 
-    - name: build ImpactX (SP) w/o running
+  build_gcc_sp:
+    name: GCC SP w/ SIMD w/ MPI w/ Python
+    runs-on: ubuntu-24.04
+    if: github.event.pull_request.draft == false
+    env:
+      CMAKE_GENERATOR: Ninja
+      # same x86-64 microarchitecture level (AVX2 + FMA) as the conda-forge packages
+      CXXFLAGS: "-Werror -march=x86-64-v3 -mtune=generic"
+      OMP_NUM_THREADS: 2
+    steps:
+    - name: system info
       run: |
-        cmake -S . -B build_sp         \
+        cat /proc/cpuinfo
+        lscpu
+        grep -q '\bavx2\b' /proc/cpuinfo || { echo "runner lacks AVX2"; exit 1; }
+
+    - name: Free More Disk Space
+      uses: ax3l/free-disk-space@44eeae95a80954c3eb6161397b5b201b22e178cc # main
+      with:
+        tool-cache: false
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: false  # apt takes ~1:30min
+        docker-images: true
+        swap-storage: false
+
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    - name: Setup Python
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      with:
+        python-version: "3.12"
+
+    - name: install dependencies
+      run: |
+        .github/workflows/dependencies/gcc-openmpi.sh
+
+    - name: install optimizer dependencies (covers optional tests)
+      run: |
+        python3 -m pip install -U -r examples/requirements_optimizer.txt
+
+    - name: CCache Cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      # - once stored under a key, they become immutable (even if local cache path content changes)
+      # - for a refresh the key has to change, e.g., hash of a tracked file in the key
+      with:
+        path: |
+          ~/.ccache
+          ~/.cache/ccache
+        key: ccache-${{ github.workflow }}-${{ github.job }}-git-${{ github.sha }}
+        restore-keys: |
+             ccache-${{ github.workflow }}-${{ github.job }}-git-
+
+    - name: build ImpactX
+      # same precision and math options as the single-precision conda-forge packages
+      run: |
+        cmake -S . -B build            \
           -DBUILD_SHARED_LIBS=ON       \
           -DCMAKE_BUILD_TYPE=Release   \
           -DCMAKE_INSTALL_PREFIX=$HOME/.local  \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
+          -DImpactX_FASTMATH=ON        \
           -DImpactX_FFT=ON             \
-          -DImpactX_MPI=OFF            \
           -DImpactX_PRECISION=SINGLE   \
           -DImpactX_PYTHON=ON          \
           -DImpactX_SIMD=ON            \
-          -DImpactX_TEST_CLEANUP=ON
-        cmake --build build_sp -j 4
+          -DImpactX_SYNMADX=ON         \
+          -DImpactX_TEST_CLEANUP=ON    \
+          -DMPIEXEC_POSTFLAGS="--use-hwthread-cpus"
+        cmake --build build -j 4
+
+    - name: run tests
+      run: |
+        ctest --test-dir build --output-on-failure --label-exclude slow -E pytest.AMReX
+
+    - name: run installed app
+      run: |
+        cmake --build build --target install
+        export PATH=$HOME/.local/bin:$PATH
+        export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
+
+        impactx.MPI.OMP.SP.OPMD examples/fodo/input_fodo.in || \
+        { cat Backtrace.0.0; exit 1; }
+
+    - name: run installed python module
+      run: |
+        cmake --build build --target pip_install
+
+        python3 examples/fodo/run_fodo.py
