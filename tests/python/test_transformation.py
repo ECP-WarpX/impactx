@@ -13,8 +13,10 @@ from impactx import (
     Config,
     CoordSystem,
     ImpactX,
+    ImpactXParIter,
     coordinate_transformation,
     distribution,
+    elements,
 )
 
 
@@ -175,5 +177,54 @@ def test_at_fixed_t():
             raise_oops()
     assert beam.coord_system == CoordSystem.s
     _assert_moments_close(rbc_s0, beam.beam_moments())
+
+    sim.finalize()
+
+
+def test_names_follow_coord_system():
+    """
+    The longitudinal attributes are named after the coordinates they hold:
+    ``position_t``/``momentum_t`` at fixed s, ``position_z``/``momentum_z`` at fixed t.
+    """
+    sim, beam = _make_beam()
+
+    names_s = {"position_t", "momentum_t"}
+    names_t = {"position_z", "momentum_z"}
+
+    def assert_names(present, absent):
+        for names in (
+            set(beam.real_soa_names),
+            set(beam.to_df(local=True).columns),
+            *(set(pti.soa().to_xp().real) for pti in ImpactXParIter(beam, level=0)),
+        ):
+            assert present <= names, f"{present} not in {names}"
+            assert not absent & names, f"{absent & names} in {names}"
+
+    assert_names(names_s, names_t)
+    df_s = beam.to_df(local=True)
+
+    with beam.at_fixed_t():
+        assert_names(names_t, names_s)
+        df_t = beam.to_df(local=True)
+    assert_names(names_s, names_t)
+
+    # the explicit transformation renames as well
+    coordinate_transformation(beam, direction=CoordSystem.t)
+    assert_names(names_t, names_s)
+    coordinate_transformation(beam, direction=CoordSystem.s)
+    assert_names(names_s, names_t)
+
+    # the transverse attributes keep their names; z and pz are different data than t and pt
+    assert np.array_equal(df_s["weighting"], df_t["weighting"])
+    assert not np.allclose(df_s["position_t"], df_t["position_z"])
+
+    # consumers of fixed-s data refuse fixed-t data instead of mislabeling it
+    monitor = elements.BeamMonitor("monitor_fixed_t", backend="h5")
+    with beam.at_fixed_t():
+        with pytest.raises(RuntimeError, match="must be at fixed s"):
+            beam.plot_phasespace()
+        with pytest.raises(RuntimeError, match="must be at fixed s"):
+            monitor.push(beam)
+    monitor.finalize()
 
     sim.finalize()

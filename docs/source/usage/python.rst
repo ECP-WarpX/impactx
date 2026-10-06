@@ -679,6 +679,7 @@ For step-by-step recipes on how to access particle data live during a simulation
    .. py:property:: coord_system
 
       The coordinate system the particle data is currently in: :py:class:`impactx.CoordSystem` ``s`` (default) or ``t``.
+      The longitudinal attributes are named after it: ``position_t`` and ``momentum_t`` at fixed :math:`s`, ``position_z`` and ``momentum_z`` at fixed :math:`t`.
 
    .. py:method:: at_fixed_t()
 
@@ -686,7 +687,8 @@ For step-by-step recipes on how to access particle data live during a simulation
 
       On entry, the particles are transformed from fixed :math:`s` to fixed :math:`t`.
       When the block ends, normally or through an exception, they are transformed back to fixed :math:`s`.
-      Inside the block, the attributes ``position_t`` and ``momentum_t`` (and the ``t`` and ``pt`` arguments of :py:meth:`add_n_particles`) hold :math:`z` and :math:`p_z`.
+      Inside the block, the attributes ``position_z`` and ``momentum_z`` replace ``position_t`` and ``momentum_t`` and hold :math:`z` and :math:`p_z`.
+      The ``t`` and ``pt`` arguments of :py:meth:`add_n_particles` keep their names and take :math:`z` and :math:`p_z` inside the block.
 
       The transformation to fixed :math:`t` uses the reference energy ``ref.pt`` as the block starts, the transformation back to fixed :math:`s` uses ``ref.pt`` as the block ends.
       A block that changes the reference energy must write the particle coordinates relative to the updated reference particle.
@@ -2954,6 +2956,7 @@ Coordinate Transformation
 
    Transform the coordinates of the particles in a particle container either to fixed :math:`t` or to fixed :math:`s`.
    Both directions take the reference energy from ``pc.ref.pt`` at the time of the call.
+   The longitudinal attributes are renamed accordingly, see :py:attr:`impactx.ParticleContainer.coord_system`.
 
    Prefer :py:meth:`impactx.ParticleContainer.at_fixed_t`, which pairs both transformations and restores fixed :math:`s` if an exception is raised.
 

@@ -459,6 +459,19 @@ namespace impactx
     ImpactXParticleContainer::SetCoordSystem (CoordSystem coord_system)
     {
         m_coordsystem = coord_system;
+
+        // name the components after the coordinates they hold: t, pt at fixed s and z, pz at fixed t
+        if (coord_system == CoordSystem::s) {
+            SetSoACompileTimeNames(
+                {RealSoA::names_s.begin(), RealSoA::names_s.end()},
+                {IntSoA::names_s.begin(), IntSoA::names_s.end()}
+            );
+        } else {
+            SetSoACompileTimeNames(
+                {RealSoA::names_t.begin(), RealSoA::names_t.end()},
+                {IntSoA::names_t.begin(), IntSoA::names_t.end()}
+            );
+        }
     }
 
     void

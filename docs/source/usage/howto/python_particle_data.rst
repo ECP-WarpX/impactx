@@ -145,13 +145,14 @@ To read, modify, or add particles at fixed :math:`t`, work inside a :py:meth:`~i
        for lvl in range(beam.finest_level + 1):
            for pti in ImpactXParIter(beam, level=lvl):
                soa = pti.soa().to_xp()
-               z = soa.real["position_t"]   # holds z at fixed t
-               pz = soa.real["momentum_t"]  # holds pz at fixed t
+               z = soa.real["position_z"]
+               pz = soa.real["momentum_z"]
                ...  # hand x, y, z, px, py, pz to the other code, write back its result
 
    # here, the beam is at fixed s again
 
-Inside the block, the arrays keep their fixed-:math:`s` names, but ``position_t`` and ``momentum_t`` hold the longitudinal position :math:`z` (in meters) and momentum deviation :math:`p_z`, both relative to the reference particle.
+Inside the block, ``position_z`` and ``momentum_z`` replace ``position_t`` and ``momentum_t``: they hold the longitudinal position :math:`z` (in meters) and momentum deviation :math:`p_z`, both relative to the reference particle.
+The ``t`` and ``pt`` arguments of :py:meth:`~impactx.ParticleContainer.add_n_particles` keep their names and take :math:`z` and :math:`p_z` inside the block.
 When the block ends, normally or through an exception, the beam is transformed back to fixed :math:`s`.
 
 Each transformation uses the reference energy ``beam.ref.pt`` at the moment it runs: the transformation to fixed :math:`t` uses the reference particle as the block starts, the transformation back to fixed :math:`s` uses the reference particle as the block ends.

@@ -295,6 +295,9 @@ namespace impactx
 
         /** Set the current coordinate system of particles in this container
          *
+         * This also names the SoA components after the coordinates they hold:
+         * RealSoA::names_s at fixed s and RealSoA::names_t at fixed t.
+         *
          * @param coord_system the new coordinate system the beam particles are in
          */
         void

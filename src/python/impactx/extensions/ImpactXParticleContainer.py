@@ -29,6 +29,12 @@ def ix_pc_plot_mpl_phasespace(self, num_bins=50, root_rank=0):
     A matplotlib figure with containing the plot.
     For MPI-parallel ranks, the figure is only created on the root_rank.
     """
+    if self.coord_system != CoordSystem.s:
+        raise RuntimeError(
+            "plot_phasespace: the particles must be at fixed s, "
+            f"but are at {self.coord_system}."
+        )
+
     import matplotlib.pyplot as plt
     import numpy as np
     from quantiphy import Quantity
@@ -387,8 +393,10 @@ def ix_pc_at_fixed_t(self):
     reference particle, in meters, ``px, py`` are the transverse momenta and ``pz``
     is the deviation from the reference momentum, all normalized by the reference
     momentum.
-    The array names and the arguments of ``add_n_particles`` keep their fixed-s names
-    ``t`` and ``pt``.
+    The arrays are named accordingly: ``position_z`` and ``momentum_z`` replace
+    ``position_t`` and ``momentum_t``.
+    The arguments of ``add_n_particles`` keep their names ``t`` and ``pt``; inside the
+    block, they take ``z`` and ``pz``.
 
     Both transformations take the design energy from ``self.ref.pt`` at the moment
     they run: the one on entry uses the reference particle as it is when the block
