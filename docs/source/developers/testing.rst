@@ -35,7 +35,7 @@ Further Options
 Single Precision
 ----------------
 
-CI also runs the tests in a single-precision build, with the same precision and math options as the single-precision conda-forge packages.
+CI also runs the tests in a single-precision build, which is an in-development effort and will at a later point be fully supported.
 To reproduce it locally:
 
 .. code-block:: sh
@@ -50,6 +50,7 @@ To reproduce it locally:
    ctest --test-dir build_sp --output-on-failure
 
 A check that is tighter than single-precision round-off branches on the precision of the build.
-Python scripts and pytest tests check ``impactx.Config.precision``; analysis scripts that only read openPMD data check its type, e.g., ``is_double = initial["position_x"].dtype == np.float64``.
+Python scripts and pytest tests check ``impactx.Config.precision``.
+Analysis scripts that only read openPMD data check the read back floating point type, e.g., ``is_double = initial["position_x"].dtype == np.float64``.
 
-A known single-precision accuracy problem keeps its check, with a single-precision tolerance large enough to pass and a ``FIXME`` comment that states the observed deviation and links the issue that tracks it.
+Known single-precision accuracy problems are set to a tolerance large enough to pass and have a ``FIXME`` comment that states the observed deviation and links the issue that tracks it.
