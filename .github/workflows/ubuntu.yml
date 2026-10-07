@@ -317,3 +317,6 @@ jobs:
         cmake --build build --target pip_install
 
         python3 examples/fodo/run_fodo.py
+
+    - name: validate created openPMD files
+      run: find build -name *.h5 | xargs -n1 -I{} openPMD_check_h5 -i {}
