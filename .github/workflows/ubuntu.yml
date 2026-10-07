@@ -89,7 +89,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
-        name: dashboard-screenshots-ubuntu
+        name: dashboard-screenshots-${{ github.job }}
         path: |
           build/**/pytest.ImpactX.dashboard/screenshots/**/*.png
           build/**/screenshots/**/*.png
@@ -184,6 +184,16 @@ jobs:
     - name: run tests
       run: |
         ctest --test-dir build --output-on-failure --label-exclude slow -E pytest.AMReX
+
+    - name: Upload dashboard screenshots
+      if: always()
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      with:
+        name: dashboard-screenshots-${{ github.job }}
+        path: |
+          build/**/pytest.ImpactX.dashboard/screenshots/**/*.png
+          build/**/screenshots/**/*.png
+        if-no-files-found: ignore
 
     - name: run installed app
       run: |
@@ -302,6 +312,16 @@ jobs:
     - name: run tests
       run: |
         ctest --test-dir build --output-on-failure --label-exclude slow -E pytest.AMReX
+
+    - name: Upload dashboard screenshots
+      if: always()
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      with:
+        name: dashboard-screenshots-${{ github.job }}
+        path: |
+          build/**/pytest.ImpactX.dashboard/screenshots/**/*.png
+          build/**/screenshots/**/*.png
+        if-no-files-found: ignore
 
     - name: run installed app
       run: |
