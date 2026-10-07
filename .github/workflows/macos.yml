@@ -39,12 +39,7 @@ jobs:
         brew install pkg-config
         set -e
     - name: install vir-simd
-      run: |
-        wget https://github.com/mattkretz/vir-simd/archive/refs/tags/v0.4.4.tar.gz
-        tar -xvf v0.4.4.tar.gz
-        rm -rf v0.4.4.tar.gz
-        cmake -S vir-simd-0.4.4 -B vir-simd-build
-        sudo cmake --build vir-simd-build --target install
+      run: .github/workflows/dependencies/vir-simd.sh
     - name: install pip dependencies
       run: |
         python3 -m pip install --upgrade pip

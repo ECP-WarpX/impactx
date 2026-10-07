@@ -274,6 +274,7 @@ jobs:
     - name: install dependencies
       run: |
         .github/workflows/dependencies/gcc-openmpi.sh
+        .github/workflows/dependencies/vir-simd.sh
 
     - name: install optimizer dependencies (covers optional tests)
       run: |
