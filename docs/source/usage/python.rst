@@ -1915,7 +1915,13 @@ The aperture is disabled entirely only if both planes are zero or less, which is
 
    Edge focusing associated with bend entry or exit
 
-   The model here is based on:
+   If ``model = "linear"``, then the model is given by the linear part of the map described in:
+
+   * K. L. Brown, SLAC Report No. 75 (1982)
+
+   which coincides with the dipole edge focusing model in MAD-X.
+
+   If ``model = "nonlinear"``, then the model is given by:
 
    * K. Hwang and S. Y. Lee, PRAB 18, 122401 (2015).
 
@@ -1928,13 +1934,9 @@ The aperture is disabled entirely only if both planes are zero or less, which is
    particular, ``K2`` is the well-known fringe field parameter denoted ``FINT`` in MAD-X.  The default values of the field integrals ``K0`` - ``K6`` are
    those given in eq. (52), corresponding to a ``tanh`` (i.e. logistic) field profile.
 
-   When ``model = "linear"``, the linearized map is used.  This model is identical to:
+   The linearization of this map is identical to the linear model in K. L. Brown when expanded to first order in ``g/rc`` (gap / radius of curvature).
 
-   * K. L. Brown, SLAC Report No. 75 (1982)
-
-   when expanded to first order in ``g/rc`` (gap / radius of curvature).
-
-   By comparison, note that the MAD-X DIPEDGE element uses as input the half-gap ``HGAP = g/2``, and sets the default value ``FINT = 0`` (while
+   Note that the MAD-X DIPEDGE element uses as input the half-gap ``HGAP = g/2``, and sets the default value ``FINT = 0`` (while
    the corresponding default value of ``K2`` is set to 1).
 
    Note that the nonlinear model includes a nonzero horizontal translation (depending on the field integral values) that is present even for a particle that begins on the ideal "hard-edge" reference

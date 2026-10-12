@@ -161,13 +161,12 @@ namespace impactx::elements
             // edge focusing matrix elements (zero gap)
             m_R21 = std::tan(m_psi) / m_rc;
 
-            // first-order effect of nonzero gap
+            // trigonometric function evaluations
             auto const [sin_psi, cos_psi] = amrex::Math::sincos(m_psi);
-            amrex::ParticleReal const vf = (1.0_prt + powi<2>(sin_psi))
-                / powi<3>(cos_psi)
-                * m_g * m_K2 / powi<2>(m_rc);
 
-            m_R43 = vf - m_R21;
+            amrex::ParticleReal corr = m_g * m_K2 / m_rc;
+            amrex::ParticleReal psip = m_psi - corr * (1.0_prt + powi<2>(sin_psi)) / cos_psi;
+            m_R43 = -std::tan(psip) / m_rc;
 
             // constants for nonlinear map:
 
@@ -427,14 +426,24 @@ namespace impactx::elements
 
             // edge focusing matrix elements (zero gap)
             amrex::ParticleReal const R21 = std::tan(m_psi) / m_rc;
+            amrex::ParticleReal R43 = 0.0;
 
-            // first-order effect of nonzero gap
+            // trigonometric function evaluations
             auto const [sin_psi, cos_psi] = amrex::Math::sincos(m_psi);
-            amrex::ParticleReal const vf = (1.0_prt + powi<2>(sin_psi))
-                / powi<3>(cos_psi)
-                * m_g * m_K2 / powi<2>(m_rc);
 
-            amrex::ParticleReal const R43 = vf - R21;
+            if (m_model == Model::linear) {
+               // matrix elements for MAD-X linear model 
+               amrex::ParticleReal corr = m_g * m_K2 / m_rc;
+               amrex::ParticleReal psip = m_psi - corr * (1.0_prt + powi<2>(sin_psi)) / cos_psi;
+               R43 = -std::tan(psip) / m_rc;
+            } else {
+               // matrix elements for linearization of K.H. model
+               // this coincides with the MAD-X linear model to leading order in g/rc
+               amrex::ParticleReal const vf = (1.0_prt + powi<2>(sin_psi))
+                   / powi<3>(cos_psi)
+                   * m_g * m_K2 / powi<2>(m_rc);
+               R43 = vf - R21;
+            }
 
             // set non-identity matrix elements
             R(2,1) = R21;
