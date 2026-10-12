@@ -432,7 +432,7 @@ namespace impactx::elements
             auto const [sin_psi, cos_psi] = amrex::Math::sincos(m_psi);
 
             if (m_model == Model::linear) {
-               // matrix elements for MAD-X linear model 
+               // matrix elements for MAD-X linear model
                amrex::ParticleReal corr = m_g * m_K2 / m_rc;
                amrex::ParticleReal psip = m_psi - corr * (1.0_prt + powi<2>(sin_psi)) / cos_psi;
                R43 = -std::tan(psip) / m_rc;

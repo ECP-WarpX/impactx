@@ -726,7 +726,7 @@ This requires these additional parameters:
 ^^^^^^^^^^^
 
 ``dipedge`` for dipole edge focusing.  If ``model = "linear"``, then the model is given by the linear part of the map described in:
-    
+
 * K. L. Brown, SLAC Report No. 75 (1982)
 
 which coincides with the dipole edge focusing model in MAD-X.
