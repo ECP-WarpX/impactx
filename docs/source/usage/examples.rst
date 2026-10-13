@@ -140,6 +140,7 @@ Virtual Test Stands
    examples/pytorch_surrogate_model/README.rst
    examples/apochromatic/README.rst
    examples/fodo_tune/README.rst
+   examples/ipac2018_mayes/README.rst
    examples/linac_segment/README.rst
    examples/htu_beamline/README.rst
 

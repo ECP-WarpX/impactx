@@ -2865,6 +2865,44 @@ define functions by intervals.
 Alternatively the expression above can be written as ``if(x>0, a0*x**2 * (1-y*1.e2), 0)``.
 
 
+.. _running-cpp-parameters-numerics:
+
+Numerics and algorithms
+-----------------------
+
+* ``algo.particle_shape`` (``integer``; ``1``, ``2``, or ``3``)
+    The order of the shape factors (splines) for the macro-particles along all spatial directions: `1` for linear, `2` for quadratic, `3` for cubic.
+    Low-order shape factors result in faster simulations, but may lead to more noisy results.
+    High-order shape factors are computationally more expensive, but may increase the overall accuracy of the results.
+    For production runs it is generally safer to use high-order shape factors, such as cubic order.
+
+* ``algo.space_charge`` (``boolean``, optional, default: ``false``)
+    Whether to calculate space charge effects.
+
+* ``algo.mlmg_relative_tolerance`` (``float``, optional, default: ``1.e-7``)
+    The relative precision with which the electrostatic space-charge fields should be calculated.
+    More specifically, the space-charge fields are computed with an iterative Multi-Level Multi-Grid (MLMG) solver.
+    This solver can fail to reach the default precision within a reasonable time.
+
+* ``algo.mlmg_absolute_tolerance`` (``float``, optional, default: ``0``, which means: ignored)
+    The absolute tolerance with which the space-charge fields should be calculated in units of V/m^2.
+    More specifically, the acceptable residual with which the solution can be considered converged.
+    In general this should be left as the default, but in cases where the simulation state changes very
+    little between steps it can occur that the initial guess for the MLMG solver is so close to the
+    converged value that it fails to improve that solution sufficiently to reach the
+    mlmg_relative_tolerance value."
+
+* ``algo.mlmg_max_iters`` (``integer``, optional, default: ``100``)
+    Maximum number of iterations used for MLMG solver for space-charge fields calculation.
+    In case if MLMG converges but fails to reach the desired self_fields_required_precision,
+    this parameter may be increased.
+
+* ``algo.mlmg_verbosity`` (``integer``, optional, default: ``1``)
+    The verbosity used for MLMG solver for space-charge fields calculation.
+    Currently MLMG solver looks for verbosity levels from 0-5.
+    A higher number results in more verbose output.
+
+
 .. _running-cpp-parameters-diagnostics:
 
 Diagnostics and output
