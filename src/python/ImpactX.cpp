@@ -785,17 +785,21 @@ void init_ImpactX (py::module& m)
                     PyExc_DeprecationWarning,
                     2
                 );
+                py::gil_scoped_release const release;
                 ix.evolve();
              },
              "Run the main simulation loop."
         )
         .def("track_particles", &ImpactX::track_particles,
+             py::call_guard<py::gil_scoped_release>(),
              "Run the particle tracking simulation loop."
         )
         .def("track_envelope", &ImpactX::track_envelope,
+             py::call_guard<py::gil_scoped_release>(),
              "Run the envelope tracking simulation loop."
         )
         .def("track_reference", &ImpactX::track_reference,
+             py::call_guard<py::gil_scoped_release>(),
              "Run the reference orbit tracking simulation loop."
         )
 
@@ -928,13 +932,20 @@ void init_ImpactX (py::module& m)
                     // The destructor must release wrappers before AMReX too. A weak view
                     // reference remains usable while the simulation wrapper is being
                     // destroyed, without creating an invisible ownership cycle.
-                    ix.m_release_lattice_owners = [weak_view = py::weakref(view)]() {
-                        py::object const live_view = weak_view();
-                        if (!live_view.is_none() && py::hasattr(live_view, "_element_owners"))
-                        {
-                            live_view.attr("_element_owners") = py::list();
-                        }
-                    };
+                    //
+                    // This is called from C++ (finalize, destructor) and holds a Python
+                    // object: hand it over through pybind11's std::function caster, whose
+                    // wrapper takes the GIL when the callback is called, copied and
+                    // destroyed, instead of relying on every caller to hold it.
+                    ix.m_release_lattice_owners = py::cast<std::function<void()>>(
+                        py::cpp_function([weak_view = py::weakref(view)]() {
+                            py::object const live_view = weak_view();
+                            if (!live_view.is_none() && py::hasattr(live_view, "_element_owners"))
+                            {
+                                live_view.attr("_element_owners") = py::list();
+                            }
+                        })
+                    );
                 }
                 return self.attr("_lattice_view");
             },
