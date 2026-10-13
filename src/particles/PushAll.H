@@ -13,6 +13,8 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "elements/helper/Pusher.H"
 
+#include <atomic>
+#include <exception>
 #include <type_traits>
 
 #include <AMReX_BLProfiler.H>
@@ -34,6 +36,8 @@ namespace impactx
      * @param[in] ref_part the reference particle, already advanced for this slice
      * @param[in] spin whether to perform spin tracking
      * @param[in] omp_parallel allow threading via OpenMP for the particle iterator loop
+     *
+     * @throws whatever the push of a tile throws, after all threads have left the loop
      */
     template<typename T_Element>
     void push_tiles (
@@ -44,6 +48,16 @@ namespace impactx
         [[maybe_unused]] bool omp_parallel
     )
     {
+        // An exception must not leave an OpenMP parallel region: that ends the process.
+        // The push of a tile can throw on any thread -- a Python error raised in the
+        // `beam_particles` hook of a Programmable element, say -- so catch it on the
+        // thread it occurred on and rethrow it on the calling thread, after the region.
+        //
+        // Only the first exception is kept. The remaining tiles are skipped rather than
+        // pushed: a user callback that just failed is not called again.
+        std::exception_ptr first_error;
+        std::atomic<bool> has_error{false};
+
         int const nLevel = pc.finestLevel();
         for (int lev = 0; lev <= nLevel; ++lev)
         {
@@ -53,22 +67,40 @@ namespace impactx
 #pragma omp parallel if (amrex::Gpu::notInLaunchRegion() && omp_parallel)
 #endif
             for (ParIt pti(pc, lev); pti.isValid(); ++pti) {
-                // push beam particles relative to reference particle
-                //
-                // Reach the tile push directly: `element` here is already prepared, and
-                // going through the element's own call operator would prepare it again on
-                // every tile (@see elements::mixin::BeamOptic). Elements whose push is an
-                // opaque callback (Programmable) have no such base and are called plainly.
-                if constexpr (std::is_base_of_v<elements::mixin::ParticlePush<T_Element>, T_Element>)
+                if (has_error.load(std::memory_order_relaxed)) { continue; }
+
+                try
                 {
-                    static_cast<elements::mixin::ParticlePush<T_Element> const &>(element)(
-                        pti, ref_part, spin);
+                    // push beam particles relative to reference particle
+                    //
+                    // Reach the tile push directly: `element` here is already prepared, and
+                    // going through the element's own call operator would prepare it again
+                    // on every tile (@see elements::mixin::BeamOptic). Elements whose push
+                    // is an opaque callback (Programmable) have no such base and are called
+                    // plainly.
+                    if constexpr (std::is_base_of_v<elements::mixin::ParticlePush<T_Element>, T_Element>)
+                    {
+                        static_cast<elements::mixin::ParticlePush<T_Element> const &>(element)(
+                            pti, ref_part, spin);
+                    }
+                    else
+                    {
+                        element(pti, ref_part, spin);
+                    }
                 }
-                else
+                catch (...)
                 {
-                    element(pti, ref_part, spin);
+#ifdef AMREX_USE_OMP
+#pragma omp critical (impactx_push_tiles_error)
+#endif
+                    {
+                        if (!first_error) { first_error = std::current_exception(); }
+                    }
+                    has_error.store(true, std::memory_order_relaxed);
                 }
             } // end loop over all particle boxes
+
+            if (first_error) { std::rethrow_exception(first_error); }
         } // end mesh-refinement level loop
     }
 
