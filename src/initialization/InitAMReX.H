@@ -12,6 +12,8 @@
 
 #include "AmrCoreData.H"
 
+#include <string>
+
 
 namespace impactx::initialization
 {
@@ -26,6 +28,16 @@ namespace impactx::initialization
      * Initializes AMReX if not already done.
      */
     void default_init_AMReX ();
+
+    /** Read the parameters of an inputs file
+     *
+     * Initializes AMReX if not already done. In that case, the parameters of the file are
+     * read before AMReX and ImpactX look up their runtime parameters, as for an inputs file
+     * passed to the impactx executable.
+     *
+     * @param filename path to the inputs file
+     */
+    void load_inputs_file (std::string const & filename);
 
 } // namespace impactx::initialization
 

@@ -9,6 +9,7 @@
 #include <ImpactX.H>
 #include <diagnostics/FilePrefix.H>
 #include <initialization/Algorithms.H>
+#include <initialization/InitAMReX.H>
 #include <initialization/InitDistribution.H>
 #include <particles/ChargeDeposition.H>
 #include <particles/CovarianceMatrix.H>
@@ -19,10 +20,13 @@
 #include <AMReX_ParmParse.H>
 #include <AMReX_ParallelDescriptor.H>
 
+#include <pybind11/stl/filesystem.h>
+
 #if defined(AMREX_DEBUG) || defined(DEBUG)
 #   include <cstdio>
 #endif
 #include <cstdint>
+#include <filesystem>
 #include <optional>
 #include <string>
 #include <type_traits>
@@ -78,9 +82,24 @@ void init_ImpactX (py::module& m)
         .def(py::init<>())
 
         .def("load_inputs_file",
-            [](ImpactX const & /* ix */, std::string const & filename) {
-                amrex::ParmParse::addfile(filename);
-            })
+            [](ImpactX const & /* ix */, std::filesystem::path const & filename) {
+                // a Python exception, where AMReX would abort the process
+                if (!std::filesystem::exists(filename))
+                {
+                    py::set_error(PyExc_FileNotFoundError,
+                                  ("No such inputs file: " + filename.string()).c_str());
+                    throw py::error_already_set();
+                }
+                initialization::load_inputs_file(filename.string());
+            },
+            py::arg("filename"),
+            "Read the parameters of an ImpactX inputs file.\n\n"
+            "If AMReX is not initialized yet, this initializes it with the parameters of the "
+            "file, as for the impactx executable. AMReX settings, such as ``omp_threads``, "
+            "``verbose``, ``abort_on_unused_inputs`` and ``tiny_profiler``, only apply if they "
+            "are set before AMReX is initialized.\n\n"
+            ":param filename: path to the inputs file"
+        )
 
         .def_property("n_cell",
             [](ImpactX & /* ix */) {

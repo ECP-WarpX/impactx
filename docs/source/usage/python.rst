@@ -319,6 +319,16 @@ Collective Effects & Overall Simulation Parameters
       If this flag is enabled, the 3 eigenemittances of the 6D beam distribution are computed and written as diagnostics.
       This flag is disabled by default to reduce computational cost.
 
+   .. py:method:: load_inputs_file(filename)
+
+      Read the parameters of an :ref:`ImpactX inputs file <running-cpp-parameters>`.
+
+      If AMReX is not initialized yet, this initializes it with the parameters of the file, as for the ``impactx`` executable.
+      AMReX settings, such as :py:attr:`omp_threads`, :py:attr:`verbose`, :py:attr:`abort_on_unused_inputs` and :py:attr:`tiny_profiler`, only apply if they are set before AMReX is initialized.
+
+      :param filename: path to the inputs file
+      :type filename: str or os.PathLike
+
    .. py:method:: init_grids()
 
       Initialize AMReX blocks/grids for domain decomposition & space charge mesh.
