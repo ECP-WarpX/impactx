@@ -99,6 +99,14 @@ namespace impactx {
             m_release_lattice_owners();
         }
 
+        // Release the hooks before AMReX shuts down: a hook can hold AMReX-backed data, or
+        // this simulation in a cycle the garbage collector cannot see. Swapped out, so
+        // finalizers that run on release find no hooks.
+        {
+            Lattice::TraversalGuard const cleanup(*m_lattice);
+            decltype(m_hook)().swap(m_hook);
+        }
+
         if (m_grids_initialized)
         {
             // this one last

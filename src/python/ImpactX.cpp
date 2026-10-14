@@ -700,7 +700,8 @@ void init_ImpactX (py::module& m)
         )
         .def_readwrite("hook",
             &ImpactX::m_hook,
-            "User-defined function hooks that are called, e.g, during tracking."
+            "User-defined function hooks that are called, e.g, during tracking.\n\n"
+            "Each hook receives the simulation as its argument. ``finalize()`` releases the hooks."
         )
 
         .def("deposit_charge",

@@ -119,6 +119,23 @@ def test_an_element_referring_to_its_simulation_is_collected():
     assert observed_element() is None
 
 
+def test_a_hook_referring_to_its_simulation_is_collected():
+    """finalize() releases the hooks, and with them a cycle through the simulation."""
+
+    def run():
+        # the closure keeps the cell of `simulation`; `del` would clear it and hide a cycle
+        simulation = ImpactX()
+        simulation.hook["before_element"] = lambda _: simulation.beam
+        simulation.finalize()
+        assert len(simulation.hook) == 0
+        return weakref.ref(simulation)
+
+    observed_sim = run()
+    gc.collect()
+
+    assert observed_sim() is None
+
+
 def test_assigning_the_lattice(sim):
     sim.lattice = [elements.Drift(ds=0.1, name="d0"), elements.Drift(ds=0.2, name="d1")]
     assert names_of(sim.lattice) == ["d0", "d1"]

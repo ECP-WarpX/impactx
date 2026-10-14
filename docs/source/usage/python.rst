@@ -510,6 +510,9 @@ Collective Effects & Overall Simulation Parameters
 
          sim.hook["before_period"] = hook_before_period
 
+      Use the ``sim`` argument rather than a simulation from the enclosing scope: a hook that
+      refers to its simulation keeps it alive until ``sim.finalize()``, which releases the hooks.
+
       Full example: :ref:`Acceleration by RF Cavities <examples-rfcavity-ref-part-hook>`.
 
       See :ref:`usage-howto-python-extend` for more callback recipes.
