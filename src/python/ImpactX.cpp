@@ -29,6 +29,7 @@
 #include <filesystem>
 #include <optional>
 #include <string>
+#include <system_error>
 #include <type_traits>
 #include <variant>
 
@@ -82,22 +83,27 @@ void init_ImpactX (py::module& m)
         .def(py::init<>())
 
         .def("load_inputs_file",
-            [](ImpactX const & /* ix */, std::filesystem::path const & filename) {
-                // a Python exception, where AMReX would abort the process
-                if (!std::filesystem::exists(filename))
+            [](ImpactX & ix, std::filesystem::path const & filename) {
+                try
                 {
-                    py::set_error(PyExc_FileNotFoundError,
-                                  ("No such inputs file: " + filename.string()).c_str());
+                    ix.load_inputs_file(filename.string());
+                }
+                catch (std::filesystem::filesystem_error const & e)
+                {
+                    // OSError picks the subclass for the error number, e.g., FileNotFoundError
+                    std::error_condition const error = e.code().default_error_condition();
+                    py::object const os_error = py::module_::import("builtins").attr("OSError")(
+                        error.value(), error.message(), filename.string());
+                    py::set_error(py::type::of(os_error), os_error);
                     throw py::error_already_set();
                 }
-                initialization::load_inputs_file(filename.string());
             },
             py::arg("filename"),
             "Read the parameters of an ImpactX inputs file.\n\n"
             "If AMReX is not initialized yet, this initializes it with the parameters of the "
             "file, as for the impactx executable. AMReX settings, such as ``omp_threads``, "
-            "``verbose``, ``abort_on_unused_inputs`` and ``tiny_profiler``, only apply if they "
-            "are set before AMReX is initialized.\n\n"
+            "``abort_on_unused_inputs`` and ``tiny_profiler``, only apply if they are set "
+            "before AMReX is initialized.\n\n"
             ":param filename: path to the inputs file"
         )
 
@@ -622,8 +628,11 @@ void init_ImpactX (py::module& m)
              [](ImpactX & ix, std::string const & str_abort_on_warning_threshold) {
                  amrex::ParmParse pp_impactx("impactx");
                  pp_impactx.add("abort_on_warning_threshold", str_abort_on_warning_threshold);
-                 // query input for warning logger variables and set up warning logger accordingly
-                 ix.init_warning_logger();
+                 // query input for warning logger variables and set up warning logger accordingly;
+                 // the logger needs AMReX, otherwise init_grids sets it up
+                 if (amrex::Initialized()) {
+                     ix.init_warning_logger();
+                 }
              },
              "Set WarnPriority threshold to decide if ImpactX\n"
              "has to abort when a warning is recorded.\n"
@@ -645,11 +654,9 @@ void init_ImpactX (py::module& m)
             [](ImpactX & /* ix */){
                 return detail::get_or_throw<int>("amrex", "abort_on_unused_inputs");
             },
-            [](ImpactX & ix, int const abort_on_unused_inputs) {
+            [](ImpactX & /* ix */, int const abort_on_unused_inputs) {
                 amrex::ParmParse pp_amrex("amrex");
                 pp_amrex.add("abort_on_unused_inputs", abort_on_unused_inputs);
-                // query input for warning logger variables and set up warning logger accordingly
-                ix.init_warning_logger();
             },
             "Configure simulation to abort AFTER it has run\n"
             "if there are unused parameters in the input."

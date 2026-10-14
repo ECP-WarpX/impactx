@@ -11,6 +11,7 @@
 #include "diagnostics/DiagnosticOutput.H"
 #include "diagnostics/FilePrefix.H"
 #include "elements/helper/Accessors.H"
+#include "initialization/InitAMReX.H"
 #include "initialization/InitAmrCore.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/Push.H"
@@ -99,7 +100,7 @@ namespace impactx {
             m_release_lattice_owners();
         }
 
-        if (m_grids_initialized)
+        if (m_grids_initialized || m_amrex_initialized)
         {
             // this one last
             amr_data.reset();
@@ -109,6 +110,19 @@ namespace impactx {
 
             // only finalize once
             m_grids_initialized = false;
+            m_amrex_initialized = false;
+        }
+    }
+
+    void ImpactX::load_inputs_file (std::string const & filename)
+    {
+        bool const amrex_was_initialized = amrex::Initialized();
+
+        initialization::load_inputs_file(filename);
+
+        if (!amrex_was_initialized)
+        {
+            m_amrex_initialized = true;
         }
     }
 

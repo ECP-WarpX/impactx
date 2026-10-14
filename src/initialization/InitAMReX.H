@@ -33,9 +33,11 @@ namespace impactx::initialization
      *
      * Initializes AMReX if not already done. In that case, the parameters of the file are
      * read before AMReX and ImpactX look up their runtime parameters, as for an inputs file
-     * passed to the impactx executable.
+     * passed to the impactx executable. If that fails, AMReX is not initialized.
      *
      * @param filename path to the inputs file
+     * @throws std::filesystem::filesystem_error if the file cannot be read
+     * @throws std::runtime_error if AMReX finds an error in the file
      */
     void load_inputs_file (std::string const & filename);
 

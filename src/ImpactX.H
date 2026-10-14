@@ -65,6 +65,18 @@ namespace impactx
          */
         void finalize_elements ();
 
+        /** Read the parameters of an inputs file
+         *
+         * Initializes AMReX if not already done. In that case, the parameters of the file are
+         * read before AMReX and ImpactX look up their runtime parameters, as for an inputs file
+         * passed to the impactx executable, and @see finalize shuts AMReX down.
+         *
+         * @param filename path to the inputs file
+         * @throws std::filesystem::filesystem_error if the file cannot be read
+         * @throws std::runtime_error if AMReX finds an error in the file
+         */
+        void load_inputs_file (std::string const & filename);
+
         /** Initialize AMReX blocks/grids for domain decomposition & space charge mesh.
          *
          * This must come first, before particle beams and lattice elements are
@@ -207,6 +219,9 @@ namespace impactx
          * of this.
          */
         bool m_grids_initialized = false;
+
+        /** Did @see load_inputs_file initialize AMReX? Then @see finalize shuts it down. */
+        bool m_amrex_initialized = false;
     };
 
 } // namespace impactx

@@ -324,7 +324,7 @@ Collective Effects & Overall Simulation Parameters
       Read the parameters of an :ref:`ImpactX inputs file <running-cpp-parameters>`.
 
       If AMReX is not initialized yet, this initializes it with the parameters of the file, as for the ``impactx`` executable.
-      AMReX settings, such as :py:attr:`omp_threads`, :py:attr:`verbose`, :py:attr:`abort_on_unused_inputs` and :py:attr:`tiny_profiler`, only apply if they are set before AMReX is initialized.
+      AMReX settings, such as :py:attr:`omp_threads`, :py:attr:`abort_on_unused_inputs` and :py:attr:`tiny_profiler`, only apply if they are set before AMReX is initialized.
 
       :param filename: path to the inputs file
       :type filename: str or os.PathLike
