@@ -185,19 +185,19 @@ namespace impactx::elements
         {
             using namespace amrex::literals; // for _rt and _prt
             using amrex::Math::powi;
-         
+
             Alignment::compute_constants(refpart);
-         
-            // length of the current slice  
+
+            // length of the current slice
             m_slice_ds = m_ds / nslice();
-        
+
             // access reference particle values to find beta and gamma
             m_beta = refpart.beta();
             amrex::ParticleReal const gamma = refpart.gamma();
-            
+
             // normalize quad units to MAD-X convention if needed
             m_g = m_unit == 1 ? m_gscale / refpart.rigidity_Tm() : m_gscale;
-            
+
             m_const1 = 1_prt / (2_prt * powi<3>(m_beta) * powi<2>(gamma));
         }
 
@@ -256,7 +256,7 @@ namespace impactx::elements
 
         /** This pushes a particle in a ChrSoftQuad element through
          *  the symplectic map associated with H_1 in the Hamiltonian
-         *  splitting H = H_1 + H_2 + H_3.  
+         *  splitting H = H_1 + H_2 + H_3.
          *
          * @param tau Map step size in m
          * @param[in,out] particle particle phase space 6-vector
@@ -326,7 +326,7 @@ namespace impactx::elements
 
         /** This pushes a particle in a ChrSoftQuad element through
          *  the symplectic map associated with H_2 in the Hamiltonian
-         *  splitting H = H_1 + H_2 + H_3.  
+         *  splitting H = H_1 + H_2 + H_3.
          *
          * @param tau Map step size in m
          * @param[in,out] particle particle phase space 6-vector
