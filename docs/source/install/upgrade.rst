@@ -24,14 +24,6 @@ requirements. Newest release first.
    pge = elements.Programmable(0.5, 2)                # before
    pge = elements.Programmable(ds=0.5, nslice=2)      # preferred by name, works as before
 
-``finalize()`` releases the hooks
-"""""""""""""""""""""""""""""""""
-
-:py:meth:`sim.finalize() <impactx.ImpactX.finalize>` empties :py:attr:`sim.hook <impactx.ImpactX.hook>`.
-
-**What to check in your scripts:** a simulation that is set up again after ``finalize()`` needs
-its hooks registered again.
-
 New in this release
 """""""""""""""""""
 
