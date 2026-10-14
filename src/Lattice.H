@@ -12,6 +12,7 @@
 
 #include "elements/helper/Handle.H"
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <utility>
@@ -227,7 +228,8 @@ namespace impactx
 
         storage_type m_elements; //! elements in lattice order; one may occupy several positions
         std::uint64_t m_generation = 0; //! count of structural edits, @see generation
-        mutable std::size_t m_active_traversals = 0; //! live @see TraversalGuard count
+        //! live @see TraversalGuard count; atomic, because an edit can come from another thread
+        mutable std::atomic<std::size_t> m_active_traversals{0};
     };
 
 } // namespace impactx

@@ -29,7 +29,10 @@
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <mutex>
+#include <stdexcept>
 #include <string>
+#include <thread>
 
 
 namespace impactx {
@@ -38,6 +41,33 @@ namespace impactx {
 
         // todo: if charge deposition and/or space charge are requested, require
         //       amr.n_cells from user inputs
+    }
+
+    ImpactX::ExclusiveUse::ExclusiveUse (ImpactX & sim, char const * what)
+      : m_sim(sim)
+    {
+        std::lock_guard<std::mutex> const lock(sim.m_use_mutex);
+
+        std::thread::id const this_thread = std::this_thread::get_id();
+        if (sim.m_use_depth > 0 && sim.m_use_thread != this_thread)
+        {
+            throw std::runtime_error(
+                std::string("ImpactX: cannot ") + what + " while another thread uses this "
+                "simulation to " + sim.m_use_what + ".");
+        }
+
+        if (sim.m_use_depth == 0)
+        {
+            sim.m_use_thread = this_thread;
+            sim.m_use_what = what;
+        }
+        ++sim.m_use_depth;
+    }
+
+    ImpactX::ExclusiveUse::~ExclusiveUse ()
+    {
+        std::lock_guard<std::mutex> const lock(m_sim.m_use_mutex);
+        --m_sim.m_use_depth;
     }
 
     ImpactX::~ImpactX()
@@ -63,6 +93,9 @@ namespace impactx {
 
     void ImpactX::finalize ()
     {
+        // not while another thread tracks with, or finalizes, this simulation
+        ExclusiveUse const exclusive_use(*this, "finalize");
+
         // Refuse before anything is torn down. Reached from a tracking hook, finalizing
         // the elements first and only then failing to empty the lattice would leave
         // tracking to run on through elements that are already finished with.

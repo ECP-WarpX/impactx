@@ -30,6 +30,9 @@ namespace impactx
     void
     ImpactX::track_reference (RefPart & ref)
     {
+        // first: not even the profiler below is safe to share with another thread
+        ExclusiveUse const exclusive_use(*this, "track the reference particle");
+
         BL_PROFILE("ImpactX::track_reference");
 
         if (m_lattice->empty())

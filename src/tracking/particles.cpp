@@ -34,6 +34,9 @@ namespace impactx
 {
     void ImpactX::track_particles ()
     {
+        // first: not even the profiler below is safe to share with another thread
+        ExclusiveUse const exclusive_use(*this, "track particles");
+
         BL_PROFILE("ImpactX::track_particles");
 
         validate();
