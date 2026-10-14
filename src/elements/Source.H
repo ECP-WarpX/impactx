@@ -41,11 +41,17 @@ namespace impactx::elements
         static constexpr bool DEFAULT_load_ref_particle = true;
         static constexpr std::optional<int> DEFAULT_load_step = std::nullopt;
         static constexpr std::optional<int> DEFAULT_load_step_index = std::nullopt;
+        static constexpr CoordSystem DEFAULT_coord_system = CoordSystem::s;
 
         /** A particle source
          *
          * At most one of load_step and load_step_index selects the step to read.
          * If neither is set, the last step in the file is read.
+         *
+         * The particles in the file are either at fixed s, as a beam monitor writes them by
+         * default, or at fixed t. Particles at fixed t are read as in the openPMD standard,
+         * e.g., from a code that uses time as the independent variable, and each of them
+         * drifts to the position s of the reference particle.
          *
          * @param distribution Must read "openPMD" for this constructor
          * @param openpmd_path path to openPMD series as accepted by openPMD::Series
@@ -56,6 +62,7 @@ namespace impactx::elements
          *        stored as the openPMD iteration in the file; it must be a step in the file
          * @param load_step_index the position of the step in the file: 0 is the first step and
          *        -1 the last step, counting back from it as in Python (-2 is the second to last)
+         * @param coord_system the particles in the file are at fixed s (default) or at fixed t
          * @throws std::invalid_argument if distribution is not "openPMD", if both load_step and
          *         load_step_index are set or if load_step is negative
          */
@@ -65,14 +72,16 @@ namespace impactx::elements
             bool active_once = DEFAULT_active_once,
             bool load_ref_particle = DEFAULT_load_ref_particle,
             std::optional<int> load_step = DEFAULT_load_step,
-            std::optional<int> load_step_index = DEFAULT_load_step_index
+            std::optional<int> load_step_index = DEFAULT_load_step_index,
+            CoordSystem coord_system = DEFAULT_coord_system
         )
         : m_distribution(distribution),
           m_series_name(std::move(openpmd_path)),
           m_active_once(active_once),
           m_load_ref_particle(load_ref_particle),
           m_load_step(load_step),
-          m_load_step_index(load_step_index)
+          m_load_step_index(load_step_index),
+          m_coord_system(coord_system)
         {
             if (distribution != "openPMD") {
                 throw std::invalid_argument("Only 'openPMD' distribution is supported if openpmd_path is provided!");
@@ -103,14 +112,16 @@ namespace impactx::elements
          * The step that is read from the file is selected with load_step or load_step_index.
          * If load_ref_particle is set, the reference particle is restored from
          * the species metadata of the file before the particles are added.
+         * Particles in a file at fixed t are transformed to fixed s with the reference particle.
          *
-         * @param[in,out] pc particle container to push
+         * @param[in,out] pc particle container to push, at fixed s
          * @param[in] step current global step of the tracking loop (unused)
          * @param[in] period for periodic lattices, this is the current period (turn or cycle)
          * @throws std::invalid_argument if both load_step and load_step_index are set or if
          *         load_step is negative
-         * @throws std::runtime_error if the series holds no step or if the selected step or
-         *         index is not in the file
+         * @throws std::runtime_error if the series holds no step, if the selected step or
+         *         index is not in the file, if the file does not hold particles in the selected
+         *         coordinate system or if the particles in pc are not at fixed s
          */
         void operator() (
             ImpactXParticleContainer & pc,
@@ -143,6 +154,7 @@ namespace impactx::elements
         bool m_load_ref_particle = true; //! Restore the reference particle from the file's species metadata
         std::optional<int> m_load_step = DEFAULT_load_step; //! ImpactX step (openPMD iteration) to load
         std::optional<int> m_load_step_index = DEFAULT_load_step_index; //! position of the step in the file, -1 is the last step
+        CoordSystem m_coord_system = DEFAULT_coord_system; //! the file holds particles at fixed s or t
     };
 
     /** Source: GPU state plus common host-only metadata */

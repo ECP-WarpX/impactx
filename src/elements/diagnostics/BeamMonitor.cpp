@@ -14,6 +14,9 @@
 #include "diagnostics/FilePrefix.H"
 #include "diagnostics/ReducedBeamCharacteristics.H"
 #include "particles/ImpactXParticleContainer.H"
+#include "particles/transformation/ToFixedT.H"
+
+#include <ablastr/constant.H>
 
 #include <AMReX.H>
 #include <AMReX_BLProfiler.H>
@@ -26,6 +29,8 @@
 namespace io = openPMD;
 #endif
 
+#include <algorithm>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>  // for std::ofstream
 #include <stdexcept>
@@ -108,6 +113,64 @@ namespace detail {
 
 } // namespace detail
 
+#ifdef ImpactX_USE_OPENPMD
+namespace
+{
+    /** Transform a copy of the beam from fixed s to fixed t.
+     *
+     * Each particle drifts to the time at which the reference particle is at its current
+     * position s. The longitudinal components then hold z and pz instead of t and pt.
+     * Here, pz is the total longitudinal momentum in units of the reference momentum and
+     * not the deviation from it, so that the openPMD unitSI of the output converts it to SI.
+     *
+     * @param[in,out] pinned_pc copy of the beam in pinned (host) memory, at fixed s
+     * @param[in] ref_part reference particle
+     */
+    void
+    to_fixed_t (
+        BeamMonitor::PinnedContainer & pinned_pc,
+        RefPart const & ref_part
+    )
+    {
+        using namespace amrex::literals; // for _prt
+
+        impactx::transformation::ToFixedT const to_t(ref_part.pt);
+
+        // loop over refinement levels
+        int const nLevel = pinned_pc.finestLevel();
+        for (int lev = 0; lev <= nLevel; ++lev)
+        {
+            // loop over all particle boxes
+            using ParIt = BeamMonitor::PinnedContainer::ParIterType;
+#ifdef AMREX_USE_OMP
+#pragma omp parallel
+#endif
+            for (ParIt pti(pinned_pc, lev); pti.isValid(); ++pti)
+            {
+                amrex::Long const np = pti.numParticles();
+
+                auto & soa_real = pti.GetStructOfArrays().GetRealData();
+                amrex::ParticleReal *const AMREX_RESTRICT part_x = soa_real[RealSoA::x].dataPtr();
+                amrex::ParticleReal *const AMREX_RESTRICT part_y = soa_real[RealSoA::y].dataPtr();
+                amrex::ParticleReal *const AMREX_RESTRICT part_t = soa_real[RealSoA::t].dataPtr();
+                amrex::ParticleReal *const AMREX_RESTRICT part_px = soa_real[RealSoA::px].dataPtr();
+                amrex::ParticleReal *const AMREX_RESTRICT part_py = soa_real[RealSoA::py].dataPtr();
+                amrex::ParticleReal *const AMREX_RESTRICT part_pt = soa_real[RealSoA::pt].dataPtr();
+
+                // pinned memory is host memory: a host loop, also in GPU builds
+                for (amrex::Long i = 0; i < np; ++i)
+                {
+                    to_t(part_x[i], part_y[i], part_t[i], part_px[i], part_py[i], part_pt[i]);
+
+                    // from the deviation to the total longitudinal momentum
+                    part_pt[i] += 1.0_prt;
+                }
+            } // end loop over all particle boxes
+        } // end mesh-refinement level loop
+    }
+} // namespace
+#endif // ImpactX_USE_OPENPMD
+
     void BeamMonitor::finalize ()
     {
 #ifdef ImpactX_USE_OPENPMD
@@ -133,14 +196,16 @@ namespace detail {
         std::string encoding,
         int period_sample_intervals,
         bool particles,
-        bool beam_moments
+        bool beam_moments,
+        CoordSystem coord_system
     ) :
         m_series_name(std::move(series_name)),
         m_OpenPMDFileType(std::move(backend)),
         m_encoding(std::move(encoding)),
         m_period_sample_intervals(period_sample_intervals),
         m_particles(particles),
-        m_beam_moments(beam_moments)
+        m_beam_moments(beam_moments),
+        m_coord_system(coord_system)
     {
         if (period_sample_intervals < 1) {
             throw std::invalid_argument("BeamMonitor: period_sample_intervals must be >= 1");
@@ -251,8 +316,19 @@ namespace detail {
                                   series.iterations[m_step];
         io::ParticleSpecies beam = iteration.particles["beam"];
 
-        // openPMD 1.* needs "seconds" here, but we fake it as "s"
-        iteration.setTime(ref_part.s);
+        bool const fixed_t = m_coord_system == CoordSystem::t;
+
+        if (fixed_t)
+        {
+            // particles at fixed t are a snapshot in time, in seconds
+            iteration.setTime(
+                static_cast<double>(ref_part.t) / ablastr::constant::SI::c_v<double>);
+        }
+        else
+        {
+            // openPMD 1.* needs "seconds" here, but we fake it as "s"
+            iteration.setTime(ref_part.s);
+        }
 
         // reference particle information
         beam.setAttribute( "beta_ref", ref_part.beta() );
@@ -308,8 +384,16 @@ namespace detail {
                 beam["positionOffset"]["x"].makeConstant(ref_part.x);
                 beam["positionOffset"]["y"].resetDataset(d_fl);
                 beam["positionOffset"]["y"].makeConstant(ref_part.y);
-                beam["positionOffset"]["t"].resetDataset(d_fl);
-                beam["positionOffset"]["t"].makeConstant(ref_part.t);
+                if (fixed_t)
+                {
+                    beam["positionOffset"]["z"].resetDataset(d_fl);
+                    beam["positionOffset"]["z"].makeConstant(ref_part.z);
+                }
+                else
+                {
+                    beam["positionOffset"]["t"].resetDataset(d_fl);
+                    beam["positionOffset"]["t"].makeConstant(ref_part.t);
+                }
             }
 
             // unique, global particle index
@@ -321,6 +405,41 @@ namespace detail {
                     auto const component_name = real_soa_names.at(real_idx);
                     getComponentRecord(component_name).resetDataset(d_fl);
                 }
+            }
+
+            // at fixed t, positions and momenta follow the openPMD standard, so that codes
+            // with time as the independent variable can read them
+            if (fixed_t)
+            {
+                using io::UnitDimension;
+
+                // positions in meters, relative to positionOffset
+                beam["position"].setUnitDimension({{UnitDimension::L, 1.0}});
+                beam["positionOffset"].setUnitDimension({{UnitDimension::L, 1.0}});
+
+                // momenta in units of the reference momentum, which unitSI converts to kg*m/s:
+                // total momenta, also in z
+                double const p_ref_SI =
+                    static_cast<double>(ref_part.beta_gamma()) *
+                    static_cast<double>(ref_part.mass) *
+                    ablastr::constant::SI::c_v<double>;
+                beam["momentum"].setUnitDimension({
+                    {UnitDimension::L, 1.0},
+                    {UnitDimension::M, 1.0},
+                    {UnitDimension::T, -1.0}
+                });
+                for (auto const * component_name : {"x", "y", "z"}) {
+                    beam["momentum"][component_name].setUnitSI(p_ref_SI);
+                }
+
+                // all three describe a real particle, not a macroparticle
+                auto const real_particle = static_cast<std::uint32_t>(0);
+                beam["position"].setAttribute("macroWeighted", real_particle);
+                beam["position"].setAttribute("weightingPower", 0.0);
+                beam["positionOffset"].setAttribute("macroWeighted", real_particle);
+                beam["positionOffset"].setAttribute("weightingPower", 0.0);
+                beam["momentum"].setAttribute("macroWeighted", real_particle);
+                beam["momentum"].setAttribute("weightingPower", 1.0);
             }
             // SoA: Int
             static_assert(IntSoA::nattribs == 0); // not yet used
@@ -353,6 +472,16 @@ namespace detail {
         // filter out this turn?
         if (period % m_period_sample_intervals != 0)
             return;
+
+        // the s-to-t transformation of the output starts from particles at fixed s
+        if (m_particles &&
+            m_coord_system == CoordSystem::t &&
+            pc.GetCoordSystem() != CoordSystem::s)
+        {
+            throw std::runtime_error(
+                "BeamMonitor (" + m_series_name +
+                "): coord_system=t requires the particles in the beam to be at fixed s.");
+        }
 
         this->open();
 
@@ -400,6 +529,16 @@ namespace detail {
         if (m_particles)
         {
             pinned_pc.copyParticles(pc, true);  // no filtering
+
+            if (m_coord_system == CoordSystem::t)
+            {
+                // only the copy drifts to fixed t: the beam that is tracked stays at fixed s
+                to_fixed_t(pinned_pc, ref_part);
+
+                // name the components after the coordinates they hold now
+                std::copy(RealSoA::names_t.begin(), RealSoA::names_t.end(), real_soa_names.begin());
+                std::copy(IntSoA::names_t.begin(), IntSoA::names_t.end(), int_soa_names.begin());
+            }
         }
 
         // TODO: filtering

@@ -15,6 +15,7 @@
 
 #include <AMReX_AmrCoreFwd.H>
 #include <AMReX_BaseFwd.H>
+#include <AMReX_Enum.H>
 #include <AMReX_MultiFab.H>
 #include <AMReX_ParIter.H>
 #include <AMReX_Particles.H>
@@ -32,11 +33,10 @@
 
 namespace impactx
 {
-    enum class CoordSystem
-    {
-        s,  ///< fixed s as the independent variable
-        t   ///< fixed t as the independent variable
-    };
+    AMREX_ENUM(CoordSystem,
+        s,  //! fixed s as the independent variable
+        t   //! fixed t as the independent variable
+    );
 
     /** This struct indexes the Real attributes
      *  stored in an SoA in ImpactXParticleContainer

@@ -77,10 +77,15 @@ namespace detail
         static constexpr int DEFAULT_period_sample_intervals = 1;
         static constexpr bool DEFAULT_particles = true;
         static constexpr bool DEFAULT_beam_moments = true;
+        static constexpr CoordSystem DEFAULT_coord_system = CoordSystem::s;
 
         /** This element writes the particle beam out to openPMD data.
          *
          * Elements with the same series name are identical.
+         *
+         * The particles are written either at fixed s, as they are tracked, or at fixed t.
+         * At fixed t, a copy of each particle is drifted to the time at which the reference
+         * particle passes the monitor. The beam that is tracked stays at fixed s.
          *
          * @param series_name name of the data series, usually the element name
          * @param backend file format backend for openPMD, e.g., "bp5", "bp4", or "h5"
@@ -88,6 +93,7 @@ namespace detail
          * @param period_sample_intervals for periodic lattice, only output every Nth period (turn)
          * @param particles output the individual particles of the beam (default: true)
          * @param beam_moments output the beam moments (reduced beam characteristics) as attributes (default: true)
+         * @param coord_system output the individual particles at fixed s (default) or at fixed t
          */
         BeamMonitor (
             std::string series_name,
@@ -95,7 +101,8 @@ namespace detail
             std::string encoding = DEFAULT_encoding,
             int period_sample_intervals = DEFAULT_period_sample_intervals,
             bool particles = DEFAULT_particles,
-            bool beam_moments = DEFAULT_beam_moments
+            bool beam_moments = DEFAULT_beam_moments,
+            CoordSystem coord_system = DEFAULT_coord_system
         );
 
         BeamMonitor (BeamMonitor const & other) = default;
@@ -127,7 +134,7 @@ namespace detail
          *
          * And write reference particle.
          *
-         * @param[in] pc particle container
+         * @param[in] pc particle container, in the coordinate system of the output
          * @param[in] real_soa_names ParticleReal component names
          * @param[in] int_soa_names integer component names
          * @param[in] ref_part reference particle
@@ -145,7 +152,7 @@ namespace detail
          *
          * Particles are relative to the reference particle.
          *
-         * @param[in,out] pc particle container to push
+         * @param[in,out] pc particle container to push, at fixed s
          * @param[in] step global step for diagnostics
          * @param[in] period for periodic lattices, this is the current period (turn or cycle)
          */
@@ -157,7 +164,7 @@ namespace detail
 
         /** Write a tile of particles
          *
-         * @param pti particle tile iterator
+         * @param pti particle tile iterator, in the coordinate system of the output
          * @param[in] real_soa_names ParticleReal component names
          * @param[in] int_soa_names integer component names
          * @param ref_part reference particle
@@ -225,6 +232,10 @@ namespace detail
         /** Toggle output of the beam moments */
         void set_beam_moments (bool beam_moments) { m_beam_moments = beam_moments; }
 
+        /** Coordinate system of the individual particles in the output: fixed s or fixed t */
+        AMREX_FORCE_INLINE
+        CoordSystem coord_system () const { return m_coord_system; }
+
         /** track all openPMD series instances
          *
          * Ensure m_series is the same for the same output path.
@@ -276,6 +287,7 @@ namespace detail
 
         bool m_particles = DEFAULT_particles; //! output the individual particles of the beam
         bool m_beam_moments = DEFAULT_beam_moments; //! output the beam moments as openPMD attributes
+        CoordSystem m_coord_system = DEFAULT_coord_system; //! output the particles at fixed s or t
 
         /** This rank's offset in the MPI-global particle array, by level
          *

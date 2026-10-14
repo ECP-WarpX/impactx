@@ -589,6 +589,10 @@ element_name) );
             pp_element.queryAdd("particles", particles);
             bool beam_moments = BeamMonitor::DEFAULT_beam_moments;
             pp_element.queryAdd("beam_moments", beam_moments);
+            std::string coord_system_str =
+                amrex::getEnumNameString(BeamMonitor::DEFAULT_coord_system);
+            pp_element.queryAdd("coord_system", coord_system_str);
+            CoordSystem const coord_system = amrex::getEnum<CoordSystem>(coord_system_str);
 
             // optional: add and calculate additional particle properties
             // property: nonlinear lens invariants
@@ -609,7 +613,7 @@ element_name) );
                 pp_element.queryAddWithParser("cn", cn);
             }
 
-            m_lattice.emplace_back(BeamMonitor(openpmd_name, openpmd_backend, openpmd_encoding, period_sample_intervals, particles, beam_moments));
+            m_lattice.emplace_back(BeamMonitor(openpmd_name, openpmd_backend, openpmd_encoding, period_sample_intervals, particles, beam_moments, coord_system));
         } else if (element_type == "source")
         {
             std::string distribution, openpmd_path;
@@ -639,7 +643,11 @@ element_name) );
                 load_step_index = load_step_index_value;
             }
 
-            m_lattice.emplace_back( Source(distribution, openpmd_path, active_once, load_ref_particle, load_step, load_step_index, element_name) );
+            std::string coord_system_str = amrex::getEnumNameString(Source::DEFAULT_coord_system);
+            pp_element.queryAdd("coord_system", coord_system_str);
+            CoordSystem const coord_system = amrex::getEnum<CoordSystem>(coord_system_str);
+
+            m_lattice.emplace_back( Source(distribution, openpmd_path, active_once, load_ref_particle, load_step, load_step_index, coord_system, element_name) );
         } else if (element_type == "line")
         {
             // Parse the lattice elements for the sub-lattice in the line

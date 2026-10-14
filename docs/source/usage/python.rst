@@ -2179,7 +2179,7 @@ The aperture is disabled entirely only if both planes are zero or less, which is
    :param aperture_y: vertical half-aperture (elliptical) in m
    :param name: an optional name for the element
 
-.. py:class:: impactx.elements.BeamMonitor(name, backend="default", encoding="g", period_sample_intervals=1, particles=True, beam_moments=True)
+.. py:class:: impactx.elements.BeamMonitor(name, backend="default", encoding="g", period_sample_intervals=1, particles=True, beam_moments=True, coord_system="s")
 
    A beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
 
@@ -2199,6 +2199,7 @@ The aperture is disabled entirely only if both planes are zero or less, which is
    :param period_sample_intervals: for periodic lattice, only output every Nth period (turn)
    :param particles: output the individual particles of the beam (default: ``True``)
    :param beam_moments: output the beam moments (reduced beam characteristics) as openPMD attributes (default: ``True``)
+   :param coord_system: output the individual particles at fixed :math:`s` (``"s"``, default) or at fixed :math:`t` (``"t"``)
 
    .. py:property:: name
 
@@ -2212,6 +2213,18 @@ The aperture is disabled entirely only if both planes are zero or less, which is
    .. py:property:: beam_moments
 
       Output the beam moments (reduced beam characteristics) of the whole bunch as openPMD attributes on the ``beam`` particle species (default: ``True``).
+
+   .. py:property:: coord_system
+
+      Coordinate system of the individual particles in the output (read-only): ``"s"`` (default) or ``"t"``.
+
+      With ``"s"``, the particles are written at fixed :math:`s`, as they pass the monitor.
+      With ``"t"``, they are written at fixed :math:`t`, at the time at which the reference particle passes the monitor:
+      each particle is drifted to that time and written with positions ``x``, ``y``, ``z`` and momenta ``x``, ``y``, ``z`` in the units of the openPMD standard.
+      See :ref:`dataanalysis-monitor-fixed-t` for details.
+
+      The beam that is tracked is at fixed :math:`s` for both options.
+      The reference particle and the beam moments in the output are the same for both options, too.
 
    .. py:property:: nonlinear_lens_invariants
 
@@ -2236,10 +2249,10 @@ The aperture is disabled entirely only if both planes are zero or less, which is
 
       Scale factor (in meters^(1/2)) of the IOTA nonlinear magnetic insert element used for computing H and I.
 
-.. py:class:: impactx.elements.Source(distribution, openpmd_path, active_once=True, load_ref_particle=True, load_step=None, load_step_index=None, name=None)
+.. py:class:: impactx.elements.Source(distribution, openpmd_path, active_once=True, load_ref_particle=True, load_step=None, load_step_index=None, coord_system="s", name=None)
 
    A particle source.
-   Currently, this only supports openPMD files from our :py:class:`impactx.elements.BeamMonitor`
+   This supports openPMD files from our :py:class:`impactx.elements.BeamMonitor` and, with ``coord_system="t"``, openPMD files from codes that use time as the independent variable.
 
    :param distribution: Distribution type of particles in the source. currently, only ``"openPMD"`` is supported
    :param openpmd_path: path to the openPMD series
@@ -2247,6 +2260,7 @@ The aperture is disabled entirely only if both planes are zero or less, which is
    :param load_ref_particle: Restore the reference particle from the species metadata of the openPMD file. Default: ``True``
    :param load_step: Which step (iteration) to load from the openPMD series, selected by step number. Default: ``None``
    :param load_step_index: Which step (iteration) to load from the openPMD series, selected by position in the file. Default: ``None``
+   :param coord_system: The particles in the file are at fixed :math:`s` (``"s"``) or at fixed :math:`t` (``"t"``). Default: ``"s"``
    :param name: an optional name for the element
 
    .. note::
@@ -2280,6 +2294,40 @@ The aperture is disabled entirely only if both planes are zero or less, which is
       The existing reference particle in that case needs to be manually configured before the tracking loop.
       This option acts when particles are tracked or pushed (:py:func:`impactx.push`),
       it has no effect in envelope or reference-particle-only tracking.
+
+   .. note::
+
+      With ``coord_system="t"``, the file holds particles at fixed :math:`t`, as a
+      :py:class:`impactx.elements.BeamMonitor` writes them with ``coord_system="t"`` or as codes that use
+      time as the independent variable write them, e.g., `WarpX <https://warpx.readthedocs.io>`__.
+      Each particle is drifted to the position :math:`s` of the reference particle.
+
+      The positions ``x``, ``y``, ``z`` (plus their ``positionOffset``), the momenta ``x``, ``y``, ``z`` and
+      the ``weighting`` of the particle species ``beam`` are read in the units of the
+      `openPMD standard <https://github.com/openPMD/openPMD-standard>`__: in SI, after multiplication with their ``unitSI``.
+      The ``spin`` of the particles is read if the file holds it.
+      The ``z`` axis is the direction of the reference momentum.
+      Particles that do not move forward along ``z`` are an error.
+
+      The particles keep their positions and momenta from the file and are added relative to the reference particle.
+      Files from other codes hold no reference particle: set ``load_ref_particle=False`` and configure the
+      reference particle first, with its species, its energy and its position ``z`` (and ``x``, ``y``) in the
+      coordinates of the file, e.g., at the centroid of the beam:
+
+      .. code-block:: python
+
+         ref = sim.beam.ref
+         ref.set_species("electron").set_kin_energy_MeV(kin_energy_MeV)
+         ref.z = z_centroid  # in the coordinates of the file
+
+         sim.lattice.append(
+             elements.Source(
+                 "openPMD",
+                 "diags/openPMD/beam.h5",
+                 load_ref_particle=False,
+                 coord_system="t",
+             )
+         )
 
    .. attention::
 

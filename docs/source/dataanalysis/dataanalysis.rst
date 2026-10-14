@@ -20,6 +20,28 @@ At each monitor, the output for every particle in the beam is provided.
 This includes the 6 canonical phase space variables (x [m], px, y[m], py, t[m], pt), where each coordinate is measured relative to the reference particle, in the local moving frame.
 See the section :ref:`Coordinates and Units <theory-coordinates-and-units>` for additional details.
 
+.. _dataanalysis-monitor-fixed-t:
+
+Particles at Fixed t
+"""""""""""""""""""""
+
+With :pp:param:`<monitor_name>.coord_system = t`, a monitor writes the particles at fixed :math:`t` instead: a snapshot of the beam at the time at which the reference particle passes the monitor.
+Each particle is drifted to that time.
+Codes that use time as the independent variable can read this output, e.g., `WarpX <https://warpx.readthedocs.io>`__, and so can a ``source`` element with :pp:param:`<source_name>.coord_system = t`.
+
+The 6 phase space variables are then (x [m], px, y [m], py, z [m], pz), in the units of the openPMD standard:
+
+* ``position``: ``x``, ``y``, ``z`` in meters, relative to the ``positionOffset``, which is the position ``x_ref``, ``y_ref``, ``z_ref`` of the reference particle.
+* ``momentum``: ``x``, ``y``, ``z`` in units of the reference momentum :math:`p_0 = \beta\gamma m c`.
+  Their openPMD attribute ``unitSI`` is :math:`p_0` in kg·m/s.
+  ``z`` is the total longitudinal momentum :math:`p_z/p_0` and not a deviation from the reference momentum.
+* The openPMD ``time`` of the output is the time of the reference particle, in seconds.
+
+The axes are those of the local frame that moves with the reference particle: ``z`` points along the reference momentum.
+
+All other particle attributes, the reference particle and the bunch properties below are the same as at fixed :math:`s`.
+In particular, the bunch properties describe the beam at fixed :math:`s`.
+
 .. _dataanalysis-monitor-refparticle:
 
 Additional Beam Attributes
