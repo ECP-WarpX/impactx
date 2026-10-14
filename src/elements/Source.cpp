@@ -11,7 +11,7 @@
 
 #include "particles/transformation/ToFixedS.H"
 
-#include <ablastr/constant.H>
+#include <ablastr/warn_manager/WarnManager.H>
 
 #include <AMReX_ParallelDescriptor.H>
 #include <AMReX_REAL.H>
@@ -51,9 +51,13 @@ namespace
     {
         /** Request a chunk of a record component.
          *
+         * Every MPI rank requests its chunk, also one without particles, since parallel
+         * reads can be collective.
+         *
          * @param[in] component openPMD record component to read
          * @param[in] offset index of the first value to read
          * @param[in] extent number of values to read
+         * @param[in] factor factor on the values in SI, i.e., after multiplication with unitSI
          * @param[in] where name of the component and its file, for error messages
          * @throws std::runtime_error if the component is not stored as float or double
          */
@@ -61,13 +65,11 @@ namespace
             io::RecordComponent component,
             std::uint64_t offset,
             std::uint64_t extent,
+            double factor,
             std::string const & where
         )
-        : scale(component.unitSI())
+        : m_scale(component.unitSI() * factor)
         {
-            // an MPI rank without particles
-            if (extent == 0) { return; }
-
             switch (component.getDatatype())
             {
                 case io::Datatype::FLOAT:
@@ -82,15 +84,15 @@ namespace
             }
         }
 
-        /** The value at an index of the chunk, times scale */
+        /** The value at an index of the chunk, in SI times the factor */
         double operator[] (std::uint64_t i) const
         {
-            return scale * (m_double ? m_double.get()[i] : static_cast<double>(m_float.get()[i]));
+            return m_scale *
+                   (m_double ? m_double.get()[i] : static_cast<double>(m_float.get()[i]));
         }
 
-        double scale; //! factor on the stored values: starts as unitSI, which converts them to SI
-
     private:
+        double m_scale; //! unitSI times the factor
         std::shared_ptr<float> m_float; //! the values, if the component is stored as float
         std::shared_ptr<double> m_double; //! the values, if the component is stored as double
     };
@@ -110,8 +112,9 @@ namespace
      * @param[in] offset index of the first particle to read on this MPI rank
      * @param[in] extent number of particles to read on this MPI rank
      * @param[out] pinned_SoA particles at fixed s: positions, momenta, weighting and spin
-     * @throws std::runtime_error if the reference particle has no momentum, if positions or
-     *         momenta lack their openPMD unit or if particles do not move forward along z
+     * @throws std::runtime_error if the reference particle has no momentum, if records or
+     *         their components are missing, if positions or momenta lack their openPMD unit,
+     *         if values are not finite or if particles do not move forward along z
      */
     void
     read_fixed_t (
@@ -128,15 +131,37 @@ namespace
         std::array<std::string, 3> const axes = {"x", "y", "z"};
 
         // momentum of the reference particle, which normalizes the momenta
-        double const p_ref_SI =
-            static_cast<double>(ref.beta_gamma()) *
-            static_cast<double>(ref.mass) *
-            ablastr::constant::SI::c_v<double>;
+        double const p_ref_SI = diagnostics::detail::reference_momentum_SI(ref);
         if (!(p_ref_SI > 0.0)) {
             throw std::runtime_error(
                 "Source: the reference particle has no momentum, but the particles at fixed t "
                 "in " + series_name + " are transformed to fixed s relative to it. "
                 "Set its species and energy or use load_ref_particle.");
+        }
+
+        bool const has_position_offset = beam.contains("positionOffset");
+        bool const has_spin = beam.contains("spin");  // other codes usually do not write it
+
+        // vector records need all three components, e.g., a 2D file has no y
+        auto const check_components = [&beam, &series_name, &axes] (
+            std::string const & record_name
+        ) {
+            for (auto const & axis : axes)
+            {
+                if (!beam[record_name].contains(axis)) {
+                    throw std::runtime_error(
+                        "Source: " + record_name + "/" + axis + " not found in " + series_name +
+                        ". Particles at fixed t (coord_system=t) need the components x, y and "
+                        "z of position, momentum and, if present, positionOffset and spin.");
+                }
+            }
+        };
+        check_components("position");
+        check_components("momentum");
+        if (has_position_offset) { check_components("positionOffset"); }
+        if (has_spin) { check_components("spin"); }
+        if (!beam.contains("weighting")) {
+            throw std::runtime_error("Source: no weighting found in " + series_name + ".");
         }
 
         // positions and momenta carry the units of the openPMD standard
@@ -156,7 +181,6 @@ namespace
         };
         check_unit("position", {1., 0., 0., 0., 0., 0., 0.}, "a length");
         check_unit("momentum", {1., 1., -1., 0., 0., 0., 0.}, "a momentum");
-        bool const has_position_offset = beam.contains("positionOffset");
         if (has_position_offset) {
             check_unit("positionOffset", {1., 0., 0., 0., 0., 0., 0.}, "a length");
         }
@@ -174,17 +198,19 @@ namespace
         // request the particle attributes
         auto const request = [&beam, &series_name, offset, extent] (
             std::string const & record_name,
-            std::string const & component_name
+            std::string const & component_name,
+            double factor = 1.0
         ) {
             std::string const where = component_name == io::RecordComponent::SCALAR
                 ? record_name + " in " + series_name
                 : record_name + "/" + component_name + " in " + series_name;
-            return RealChunk(beam[record_name][component_name], offset, extent, where);
+            return RealChunk(beam[record_name][component_name], offset, extent, factor, where);
         };
 
         std::vector<RealChunk> position;
         std::vector<RealChunk> position_offset;
         std::vector<RealChunk> momentum;
+        std::vector<RealChunk> spin;
         for (auto const & axis : axes)
         {
             position.push_back(request("position", axis));
@@ -192,21 +218,10 @@ namespace
                 position_offset.push_back(request("positionOffset", axis));
             }
             // in units of the reference momentum
-            momentum.push_back(request("momentum", axis));
-            momentum.back().scale /= p_ref_SI;
-        }
-
-        if (!beam.contains("weighting")) {
-            throw std::runtime_error("Source: no weighting found in " + series_name + ".");
+            momentum.push_back(request("momentum", axis, 1.0 / p_ref_SI));
+            if (has_spin) { spin.push_back(request("spin", axis)); }
         }
         RealChunk const weighting = request("weighting", scalar);
-
-        // spin is optional: other codes usually do not write it
-        bool const has_spin = beam.contains("spin");
-        std::vector<RealChunk> spin;
-        if (has_spin) {
-            for (auto const & axis : axes) { spin.push_back(request("spin", axis)); }
-        }
 
         series.flush();
 
@@ -231,7 +246,10 @@ namespace
 
         impactx::transformation::ToFixedS const to_s(ref.beta_gamma());
 
-        // particles that do not move forward along z never pass the reference position s
+        // particles that cannot be transformed: values that are not finite numbers, e.g.,
+        // momenta divided by a zero weighting, and particles that do not move forward along z,
+        // which never pass the position s of the reference particle
+        amrex::Long num_not_finite = 0;
         amrex::Long num_backward = 0;
 
         for (std::uint64_t i = 0; i < extent; ++i)
@@ -243,13 +261,25 @@ namespace
             // relative to the reference particle: first subtract the two large numbers
             std::array<double, 3> pos{};
             std::array<double, 3> mom{};
+            std::array<double, 3> sp{};
+            bool finite = std::isfinite(w);
             for (std::size_t d = 0; d < 3; ++d)
             {
                 double const coarse = has_position_offset ? position_offset[d][i] : 0.0;
                 pos[d] = position[d][i] + (coarse - ref_position[d]);
                 mom[d] = momentum[d][i] * per_real_particle;
+                sp[d] = has_spin ? spin[d][i] : 0.0;
+                finite = finite &&
+                    std::isfinite(pos[d]) && std::isfinite(mom[d]) && std::isfinite(sp[d]);
             }
-            if (!(mom[2] > 0.0)) { ++num_backward; }
+            if (!finite) {
+                ++num_not_finite;
+                continue;
+            }
+            if (!(mom[2] > 0.0)) {
+                ++num_backward;
+                continue;
+            }
             // the longitudinal momentum is a deviation from the reference momentum
             mom[2] -= 1.0;
 
@@ -270,13 +300,23 @@ namespace
             part_py[i] = py;
             part_pt[i] = pz;
             part_w[i] = static_cast<amrex::ParticleReal>(w);
-            part_sx[i] = static_cast<amrex::ParticleReal>(has_spin ? spin[0][i] : 0.0);
-            part_sy[i] = static_cast<amrex::ParticleReal>(has_spin ? spin[1][i] : 0.0);
-            part_sz[i] = static_cast<amrex::ParticleReal>(has_spin ? spin[2][i] : 0.0);
+            part_sx[i] = static_cast<amrex::ParticleReal>(sp[0]);
+            part_sy[i] = static_cast<amrex::ParticleReal>(sp[1]);
+            part_sz[i] = static_cast<amrex::ParticleReal>(sp[2]);
         }
 
         // all MPI ranks need to agree on the error
-        amrex::ParallelDescriptor::ReduceLongSum(num_backward);
+        std::array<amrex::Long, 2> num_invalid = {num_not_finite, num_backward};
+        amrex::ParallelDescriptor::ReduceLongSum(
+            num_invalid.data(), static_cast<int>(num_invalid.size()));
+        num_not_finite = num_invalid[0];
+        num_backward = num_invalid[1];
+        if (num_not_finite > 0) {
+            throw std::runtime_error(
+                "Source: " + std::to_string(num_not_finite) + " particles in " + series_name +
+                " have positions, momenta, weightings or spins that are not finite numbers, "
+                "e.g., momenta of a macroWeighted record divided by a zero weighting.");
+        }
         if (num_backward > 0) {
             throw std::runtime_error(
                 "Source: " + std::to_string(num_backward) + " particles in " + series_name +
@@ -431,14 +471,15 @@ namespace
         }
 
         // how many particles to read total
-        int const npart = m_coord_system == CoordSystem::s
+        std::uint64_t const npart = m_coord_system == CoordSystem::s
             ? beam["id"][scalar].getExtent()[0]
             : beam["position"]["x"].getExtent()[0];
 
-        // restore the reference particle from the species metadata
+        // the reference particle, optionally restored from the species metadata:
+        // the beam takes it over only once all particles are read
+        RefPart ref = pc.GetRefParticle();
         if (m_load_ref_particle)
         {
-            RefPart & ref = pc.GetRefParticle();
             auto const read_attr = [&beam, this] (std::string const & attr_name) {
                 if (!beam.containsAttribute(attr_name)) {
                     throw std::runtime_error(
@@ -471,12 +512,14 @@ namespace
         // position, per MPI rank. We then measure the distribution's spatial
         // extent, create a grid, resize it to fit the beam, and then
         // redistribute particles so that they reside on the correct MPI rank.
-        int const myproc = amrex::ParallelDescriptor::MyProc();
-        int const nprocs = amrex::ParallelDescriptor::NProcs();
-        int const navg = npart / nprocs;  // note: integer division
-        int const nleft = npart - navg * nprocs;
-        std::uint64_t const npart_this_proc = (myproc < nleft) ? navg+1 : navg;  // add 1 to each proc until distributed
-        std::uint64_t npart_before_this_proc = (myproc < nleft) ? (navg+1) * myproc : navg * myproc + nleft;
+        auto const myproc = static_cast<std::uint64_t>(amrex::ParallelDescriptor::MyProc());
+        auto const nprocs = static_cast<std::uint64_t>(amrex::ParallelDescriptor::NProcs());
+        std::uint64_t const navg = npart / nprocs;  // note: integer division
+        std::uint64_t const nleft = npart - navg * nprocs;
+        // add 1 to each proc until distributed
+        std::uint64_t const npart_this_proc = (myproc < nleft) ? navg + 1 : navg;
+        std::uint64_t const npart_before_this_proc =
+            (myproc < nleft) ? (navg + 1) * myproc : navg * myproc + nleft;
 
         // alloc data for particle attributes
         PinnedSoA pinned_SoA;
@@ -490,9 +533,26 @@ namespace
         //amrex::Gpu::PinnedVector<std::uint64_t> pinned_idcpu(npart_this_proc);
         //beam["id"][scalar].loadChunkRaw(pinned_idcpu.data(), {npart_before_this_proc}, {npart_this_proc});
         // SoA: Real
+        // every MPI rank reads, since parallel reads can be collective; a rank without
+        // particles reads into an allocated buffer, too
+        amrex::ParticleReal no_particles = 0.0;
         if (m_coord_system == CoordSystem::t)
         {
-            read_fixed_t(series, beam, m_series_name, pc.GetRefParticle(),
+            // files of other codes are in their lab frame
+            if (!m_load_ref_particle && !diagnostics::detail::reference_along_z(ref))
+            {
+                ablastr::warn_manager::WMRecordWarning(
+                    "ImpactX::Source",
+                    "Source: the reference particle does not move along the z axis of the lab "
+                    "frame. Particles at fixed t (coord_system=t) in " + m_series_name +
+                    " are read in the frame of the reference particle, whose z axis points "
+                    "along its momentum. Particles of codes that write them in the lab frame "
+                    "(e.g., WarpX) are placed and oriented incorrectly.",
+                    ablastr::warn_manager::WarnPriority::high
+                );
+            }
+
+            read_fixed_t(series, beam, m_series_name, ref,
                          npart_before_this_proc, npart_this_proc, pinned_SoA);
         }
         else
@@ -500,7 +560,7 @@ namespace
             for (auto real_idx = 0; real_idx < pc.NumRealComps(); real_idx++) {
                 auto const component_name = real_soa_names.at(real_idx);
                 getComponentRecord(component_name).loadChunkRaw(
-                    pinned_SoA[component_name].data(),
+                    npart_this_proc > 0 ? pinned_SoA[component_name].data() : &no_particles,
                     {npart_before_this_proc},
                     {npart_this_proc}
                 );
@@ -528,9 +588,10 @@ namespace
 
         // TODO: at this point, we ignore the "id" and "qm" in the file. Could be improved
 
+        pc.SetRefParticle(ref);
         pc.AddNParticles(d_SoA["position_x"], d_SoA["position_y"], d_SoA["position_t"],
                          d_SoA["momentum_x"], d_SoA["momentum_y"], d_SoA["momentum_t"],
-                         pc.GetRefParticle().qm_ratio_SI(),
+                         ref.qm_ratio_SI(),
                          std::nullopt,
                          d_SoA["weighting"],
                          d_SoA["spin_x"], d_SoA["spin_y"], d_SoA["spin_z"]);

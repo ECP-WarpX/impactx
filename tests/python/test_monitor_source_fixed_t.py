@@ -369,13 +369,22 @@ def test_source_fixed_t():
         # the failed reads added no particles
         assert beam.total_number_of_particles() == NPART
 
-        # both elements transform from and to a beam at fixed s
+        # both elements need a beam at fixed s, in both coordinate systems
         coordinate_transformation(beam, CoordSystem.t)
-        with pytest.raises(RuntimeError, match="at fixed s"):
-            push(beam, elements.Source("openPMD", path_t, coord_system="t"))
-        with pytest.raises(RuntimeError, match="at fixed s"):
-            push(beam, elements.BeamMonitor("mon", backend=BACKEND, coord_system="t"))
+        for coord_system in ["s", "t"]:
+            with pytest.raises(RuntimeError, match="at fixed s"):
+                push(
+                    beam, elements.Source("openPMD", path_t, coord_system=coord_system)
+                )
+            with pytest.raises(RuntimeError, match="at fixed s"):
+                push(
+                    beam,
+                    elements.BeamMonitor(
+                        "mon", backend=BACKEND, coord_system=coord_system
+                    ),
+                )
         coordinate_transformation(beam, CoordSystem.s)
+        assert beam.total_number_of_particles() == NPART
     finally:
         sim.finalize()
 
@@ -403,7 +412,16 @@ def time_based_beam(ref, z_ref):
     }
 
 
-def write_time_based_series(path, lab, ref, layout="SI", momentum_unit=True):
+def write_time_based_series(
+    path,
+    lab,
+    ref,
+    layout="SI",
+    momentum_unit=True,
+    axes=("x", "y", "z"),
+    offset_dtype=None,
+    ref_attrs=None,
+):
     """Write a beam at fixed t as a code with time as the independent variable does.
 
     The layouts hold the same particles:
@@ -413,6 +431,10 @@ def write_time_based_series(path, lab, ref, layout="SI", momentum_unit=True):
     - "units": positions in millimeters next to a positionOffset and momenta of
       a macroparticle in units of m*c
     - "single": as "SI", in single precision
+
+    The other options write files that a source rejects: momenta without their
+    unit, fewer axes, a positionOffset of another data type, or the reference
+    particle attributes of an ImpactX beam monitor (from a RefPart).
     """
     dtype = np.float32 if layout == "single" else np.float64
     npart = len(lab["x"])
@@ -441,13 +463,17 @@ def write_time_based_series(path, lab, ref, layout="SI", momentum_unit=True):
         component.reset_dataset(dataset)
         component.store_chunk(chunks[-1])
 
-    for axis in ["x", "y", "z"]:
+    for axis in axes:
         store(beam["position"][axis], (lab[axis] - offset[axis]) / position_unit)
         beam["position"][axis].unit_SI = position_unit
 
         coarse = beam["positionOffset"][axis]
-        coarse.reset_dataset(dataset)
-        coarse.make_constant(offset[axis] / position_unit)
+        if offset_dtype is None:
+            coarse.reset_dataset(dataset)
+            coarse.make_constant(offset[axis] / position_unit)
+        else:
+            coarse.reset_dataset(io.Dataset(np.dtype(offset_dtype), [npart]))
+            coarse.make_constant(offset_dtype(round(offset[axis] / position_unit)))
         coarse.unit_SI = position_unit
 
         values = lab[f"p{axis}"] / momentum_unit_SI
@@ -476,6 +502,12 @@ def write_time_based_series(path, lab, ref, layout="SI", momentum_unit=True):
     ids = np.arange(1, npart + 1, dtype=np.uint64)
     beam["id"][scalar].reset_dataset(io.Dataset(ids.dtype, [npart]))
     beam["id"][scalar].store_chunk(ids)
+
+    if ref_attrs is not None:
+        for name in ["s", "x", "y", "z", "t", "px", "py", "pz", "pt"]:
+            beam.set_attribute(f"{name}_ref", float(getattr(ref_attrs, name)))
+        for name in ["mass", "charge", "gyromagnetic_anomaly"]:
+            beam.set_attribute(f"{name}_ref", float(getattr(ref_attrs, name)))
 
     series.flush()
     series.close()
@@ -592,8 +624,109 @@ def test_source_fixed_t_other_code_errors():
         with pytest.raises(RuntimeError, match="2 particles .* do not move forward"):
             push(beam, source(path, load_ref_particle=False))
 
+        # a failed read keeps the reference particle of the beam, also if it was to be
+        # restored from the file
+        ref_in_file = RefPart()
+        ref_in_file.set_species("electron").set_kin_energy_MeV(10.0)
+        ref_in_file.s = ref_in_file.z = 3.0
+        path = f"backward_with_ref.{BACKEND}"
+        write_time_based_series(path, lab, ref, ref_attrs=ref_in_file)
+        ref_names = ["s", "x", "y", "z", "t", "px", "py", "pz", "pt", "mass", "charge"]
+        ref_before = {name: getattr(ref, name) for name in ref_names}
+        with pytest.raises(RuntimeError, match="2 particles .* do not move forward"):
+            push(beam, source(path))
+        for name, value in ref_before.items():
+            assert getattr(beam.ref, name) == value, name
+
+        # momenta of macroparticles without weight are not finite numbers
+        lab = time_based_beam(ref, z_ref)
+        lab["w"][5] = 0.0
+        path = f"zero_weight.{BACKEND}"
+        write_time_based_series(path, lab, ref, layout="units")
+        with pytest.raises(RuntimeError, match="1 particles .* not finite numbers"):
+            push(beam, source(path, load_ref_particle=False))
+
+        # vector records need all three components, e.g., a 2D file has no y
+        lab = time_based_beam(ref, z_ref)
+        path = f"no_y.{BACKEND}"
+        write_time_based_series(path, lab, ref, axes=("x", "z"))
+        with pytest.raises(RuntimeError, match="position/y not found"):
+            push(beam, source(path, load_ref_particle=False))
+
+        # ... stored as floating point numbers
+        path = f"integer_offset.{BACKEND}"
+        write_time_based_series(path, lab, ref, offset_dtype=np.int64)
+        with pytest.raises(RuntimeError, match="positionOffset/x .* float or double"):
+            push(beam, source(path, load_ref_particle=False))
+
         # no failed read added particles
         assert beam.total_number_of_particles() == 0
+    finally:
+        sim.finalize()
+
+
+@pytest.mark.manages_amrex
+def test_fixed_t_after_bend():
+    """
+    This tests the particles at fixed t where the reference particle does not
+    move along the z axis of the lab frame, here after a bend: the monitor
+    writes them in the frame of the reference particle, from which the source
+    restores the beam.
+    """
+    sim = new_sim()
+
+    ref = sim.beam.ref
+    ref.set_species("electron").set_kin_energy_MeV(2.0)
+    distr = distribution.Waterbag(
+        lambdaX=1.0e-3,
+        lambdaY=2.0e-3,
+        lambdaT=1.0e-2,
+        lambdaPx=2.0e-2,
+        lambdaPy=1.0e-2,
+        lambdaPt=1.0e-2,
+    )
+    sim.add_particles(1.0e-9, distr, NPART)
+
+    mon_s = elements.BeamMonitor("bend_s", backend=BACKEND)
+    mon_t = elements.BeamMonitor("bend_t", backend=BACKEND, coord_system="t")
+    sim.lattice.extend([elements.Sbend(name="bend", ds=0.5, rc=2.0), mon_s, mon_t])
+
+    try:
+        sim.track_particles()
+    finally:
+        sim.finalize()
+
+    at_s = read_step(series_path("bend_s"))
+    at_t = read_step(series_path("bend_t"))
+
+    # the reference particle moves at an angle of 0.25 rad to the z axis
+    ref_attrs = at_t.attrs
+    angle = np.arctan2(ref_attrs["px_ref"], ref_attrs["pz_ref"])
+    assert abs(angle) == pytest.approx(0.25, rel=1.0e-6)
+    for axis in ["x", "y", "z"]:
+        assert np.all(at_t.data[f"positionOffset_{axis}"] == ref_attrs[f"{axis}_ref"])
+
+    # each particle drifted along the momentum of the reference particle, too
+    x, y, z, px, py, pz = drift_to_fixed_t(
+        *(at_s.data[name].astype(np.float64) for name in COORDS_S),
+        beta_gamma=ref_attrs["beta_gamma_ref"],
+    )
+    for name, expected in zip(
+        ["position_x", "position_y", "position_z", "momentum_x", "momentum_y"],
+        [x, y, z, px, py],
+    ):
+        assert_close(at_t.data[name], expected, name)
+    assert_close(at_t.data["momentum_z"], pz, "momentum_z")
+
+    sim = new_sim(diagnostics=False)
+    try:
+        push(
+            sim.beam,
+            elements.Source("openPMD", series_path("bend_t"), coord_system="t"),
+        )
+
+        assert sim.beam.ref.px == ref_attrs["px_ref"]
+        assert_same_beam(beam_particles(sim.beam), at_s.data, COORDS_S + ["weighting"])
     finally:
         sim.finalize()
 
@@ -723,6 +856,19 @@ def test_coord_system_option():
     # the option can also be set after construction
     source.coord_system = "s"
     assert source.coord_system == "s"
+
+    # ... and is also a CoordSystem, as in beam.coord_system
+    source.coord_system = CoordSystem.t
+    assert source.coord_system == "t"
+    source.coord_system = CoordSystem.s
+    assert source.coord_system == "s"
+    assert (
+        elements.Source("openPMD", "beam.h5", coord_system=CoordSystem.t).coord_system
+        == "t"
+    )
+    assert (
+        elements.BeamMonitor("monitor", coord_system=CoordSystem.t).coord_system == "t"
+    )
 
     with pytest.raises(RuntimeError, match="CoordSystem"):
         elements.Source("openPMD", "beam.h5", coord_system="z")

@@ -2206,7 +2206,8 @@ When ImpactX needs to sort particles spatially, it will redistribute them over M
     At fixed :math:`t`, the positions ``x``, ``y``, ``z`` (plus their ``positionOffset``), the momenta ``x``, ``y``, ``z`` and the ``weighting`` of the particle species ``beam`` are read in the units of the `openPMD standard <https://github.com/openPMD/openPMD-standard>`__: in SI, after multiplication with their ``unitSI``.
     The ``spin`` of the particles is read if the file holds it.
     The ``z`` axis is the direction of the reference momentum.
-    Particles that do not move forward along ``z`` are an error.
+    Files from codes that write the particles in their lab frame need a reference particle that moves along its ``z`` axis, i.e., with zero ``px`` and ``py``; otherwise, the source records a warning.
+    Particles that do not move forward along ``z`` and values that are not finite numbers are an error.
 
     The particles keep their positions and momenta from the file and are added relative to the reference particle.
     Files from other codes hold no reference particle: set ``load_ref_particle = false`` and configure the reference particle before the tracking loop, with its species, its energy and its position ``z`` (and ``x``, ``y``) in the coordinates of the file, e.g., at the centroid of the beam.

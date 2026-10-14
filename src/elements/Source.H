@@ -154,7 +154,7 @@ namespace impactx::elements
         bool m_load_ref_particle = true; //! Restore the reference particle from the file's species metadata
         std::optional<int> m_load_step = DEFAULT_load_step; //! ImpactX step (openPMD iteration) to load
         std::optional<int> m_load_step_index = DEFAULT_load_step_index; //! position of the step in the file, -1 is the last step
-        CoordSystem m_coord_system = DEFAULT_coord_system; //! the file holds particles at fixed s or t
+        CoordSystem m_coord_system = DEFAULT_coord_system; //! file particles at fixed s or t
     };
 
     /** Source: GPU state plus common host-only metadata */

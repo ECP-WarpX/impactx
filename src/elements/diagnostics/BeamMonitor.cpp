@@ -17,6 +17,7 @@
 #include "particles/transformation/ToFixedT.H"
 
 #include <ablastr/constant.H>
+#include <ablastr/warn_manager/WarnManager.H>
 
 #include <AMReX.H>
 #include <AMReX_BLProfiler.H>
@@ -419,17 +420,14 @@ namespace
 
                 // momenta in units of the reference momentum, which unitSI converts to kg*m/s:
                 // total momenta, also in z
-                double const p_ref_SI =
-                    static_cast<double>(ref_part.beta_gamma()) *
-                    static_cast<double>(ref_part.mass) *
-                    ablastr::constant::SI::c_v<double>;
                 beam["momentum"].setUnitDimension({
                     {UnitDimension::L, 1.0},
                     {UnitDimension::M, 1.0},
                     {UnitDimension::T, -1.0}
                 });
                 for (auto const * component_name : {"x", "y", "z"}) {
-                    beam["momentum"][component_name].setUnitSI(p_ref_SI);
+                    beam["momentum"][component_name].setUnitSI(
+                        detail::reference_momentum_SI(ref_part));
                 }
 
                 // all three describe a real particle, not a macroparticle
@@ -473,14 +471,12 @@ namespace
         if (period % m_period_sample_intervals != 0)
             return;
 
-        // the s-to-t transformation of the output starts from particles at fixed s
-        if (m_particles &&
-            m_coord_system == CoordSystem::t &&
-            pc.GetCoordSystem() != CoordSystem::s)
+        // the output describes particles at fixed s, or a copy of them drifted to fixed t
+        if (pc.GetCoordSystem() != CoordSystem::s)
         {
             throw std::runtime_error(
                 "BeamMonitor (" + m_series_name +
-                "): coord_system=t requires the particles in the beam to be at fixed s.");
+                "): the particles in the beam must be at fixed s.");
         }
 
         this->open();
@@ -532,6 +528,20 @@ namespace
 
             if (m_coord_system == CoordSystem::t)
             {
+                if (!detail::reference_along_z(ref_part))
+                {
+                    ablastr::warn_manager::WMRecordWarning(
+                        "ImpactX::BeamMonitor",
+                        "BeamMonitor (" + m_series_name + "): the reference particle does not "
+                        "move along the z axis of the lab frame. At fixed t (coord_system=t), "
+                        "positions and momenta are written in the frame of the reference "
+                        "particle, whose z axis points along its momentum, but positionOffset "
+                        "is its position in the lab frame. Codes that read the particles in "
+                        "the lab frame (e.g., WarpX) place and orient them incorrectly.",
+                        ablastr::warn_manager::WarnPriority::high
+                    );
+                }
+
                 // only the copy drifts to fixed t: the beam that is tracked stays at fixed s
                 to_fixed_t(pinned_pc, ref_part);
 

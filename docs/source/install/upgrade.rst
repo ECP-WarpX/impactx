@@ -38,6 +38,28 @@ raises a ``RuntimeError``. Pass it by keyword:
    src = elements.Source("openPMD", path, True, True, None, None, "src")       # before
    src = elements.Source("openPMD", path, name="src")                          # preferred by name, works as before
 
+``BeamMonitor`` and ``Source``: the beam must be at fixed ``s``
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+A :py:class:`~impactx.elements.BeamMonitor` and a :py:class:`~impactx.elements.Source` now raise a
+``RuntimeError`` when the beam is at fixed :math:`t`, i.e., after
+``coordinate_transformation(beam, CoordSystem.t)``. Before, the monitor wrote the coordinates at
+fixed :math:`t` under the names of those at fixed :math:`s`, and the source added particles at
+fixed :math:`s` to the beam at fixed :math:`t`.
+
+**What to check in your scripts:** a monitor or a source that is pushed between
+``coordinate_transformation(beam, CoordSystem.t)`` and ``coordinate_transformation(beam, CoordSystem.s)``.
+Push it at fixed :math:`s`. To write the particles at fixed :math:`t`, use the new ``coord_system``
+of the monitor:
+
+.. code-block:: python
+
+   coordinate_transformation(beam, CoordSystem.t)                  # before
+   push(beam, elements.BeamMonitor("monitor"))
+   coordinate_transformation(beam, CoordSystem.s)
+
+   push(beam, elements.BeamMonitor("monitor", coord_system="t"))   # now
+
 New in this release
 """""""""""""""""""
 

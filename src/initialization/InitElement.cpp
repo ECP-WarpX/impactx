@@ -613,7 +613,9 @@ element_name) );
                 pp_element.queryAddWithParser("cn", cn);
             }
 
-            m_lattice.emplace_back(BeamMonitor(openpmd_name, openpmd_backend, openpmd_encoding, period_sample_intervals, particles, beam_moments, coord_system));
+            m_lattice.emplace_back(BeamMonitor(
+                openpmd_name, openpmd_backend, openpmd_encoding, period_sample_intervals,
+                particles, beam_moments, coord_system));
         } else if (element_type == "source")
         {
             std::string distribution, openpmd_path;
@@ -647,7 +649,9 @@ element_name) );
             pp_element.queryAdd("coord_system", coord_system_str);
             CoordSystem const coord_system = amrex::getEnum<CoordSystem>(coord_system_str);
 
-            m_lattice.emplace_back( Source(distribution, openpmd_path, active_once, load_ref_particle, load_step, load_step_index, coord_system, element_name) );
+            m_lattice.emplace_back(Source(
+                distribution, openpmd_path, active_once, load_ref_particle, load_step,
+                load_step_index, coord_system, element_name));
         } else if (element_type == "line")
         {
             // Parse the lattice elements for the sub-lattice in the line

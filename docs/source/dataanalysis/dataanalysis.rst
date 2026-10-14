@@ -38,6 +38,10 @@ The 6 phase space variables are then (x [m], px, y [m], py, z [m], pz), in the u
 * The openPMD ``time`` of the output is the time of the reference particle, in seconds.
 
 The axes are those of the local frame that moves with the reference particle: ``z`` points along the reference momentum.
+The ``positionOffset`` is the position of the reference particle in the lab frame.
+Both frames have the same axes as long as the reference particle moves along the ``z`` axis of the lab frame, e.g., before the first bend or after a chicane.
+Where it does not, codes that read the particles in the lab frame (e.g., WarpX) place and orient them incorrectly, and the monitor records a warning.
+A ``source`` element with ``load_ref_particle = true`` reads them back correctly in either case.
 
 All other particle attributes, the reference particle and the bunch properties below are the same as at fixed :math:`s`.
 In particular, the bunch properties describe the beam at fixed :math:`s`.

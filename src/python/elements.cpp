@@ -31,6 +31,24 @@ using namespace impactx;
 
 namespace detail
 {
+    //! a coordinate system, by name ("s" or "t") or as impactx.CoordSystem
+    using CoordSystemArg = std::variant<std::string, CoordSystem>;
+
+    /** The coordinate system of an element option
+     *
+     * @param coord_system "s", "t" or an impactx.CoordSystem
+     * @return the coordinate system
+     * @throws std::runtime_error if the name is neither "s" nor "t"
+     */
+    CoordSystem
+    to_coord_system (CoordSystemArg const & coord_system)
+    {
+        if (auto const * coord_system_name = std::get_if<std::string>(&coord_system)) {
+            return amrex::getEnum<CoordSystem>(*coord_system_name);
+        }
+        return std::get<CoordSystem>(coord_system);
+    }
+
     /** Helper Function for Property Getters
      *
      * This queries an amrex::ParmParse entry. This throws a
@@ -597,13 +615,13 @@ void init_elements(py::module& m)
                  int period_sample_intervals,
                  bool particles,
                  bool beam_moments,
-                 std::string const & coord_system
+                 detail::CoordSystemArg const & coord_system
              )
              {
                  return new diagnostics::BeamMonitor(
                      std::move(name), std::move(backend), std::move(encoding),
                      period_sample_intervals, particles, beam_moments,
-                     amrex::getEnum<CoordSystem>(coord_system)
+                     detail::to_coord_system(coord_system)
                  );
              }),
              py::arg("name"),
@@ -2853,14 +2871,14 @@ void init_elements(py::module& m)
                  bool load_ref_particle,
                  std::optional<int> load_step,
                  std::optional<int> load_step_index,
-                 std::string const & coord_system,
+                 detail::CoordSystemArg const & coord_system,
                  std::optional<std::string> name
              )
              {
                  return new Source(
                      std::move(distribution), std::move(openpmd_path),
                      active_once, load_ref_particle, load_step, load_step_index,
-                     amrex::getEnum<CoordSystem>(coord_system), std::move(name)
+                     detail::to_coord_system(coord_system), std::move(name)
                  );
              }),
              py::arg("distribution"),
@@ -2911,11 +2929,11 @@ void init_elements(py::module& m)
         )
         .def_property("coord_system",
             [](Source & src) { return amrex::getEnumNameString(src.m_coord_system); },
-            [](Source & src, std::string const & coord_system) {
-                src.m_coord_system = amrex::getEnum<CoordSystem>(coord_system);
+            [](Source & src, detail::CoordSystemArg const & coord_system) {
+                src.m_coord_system = detail::to_coord_system(coord_system);
             },
             "Coordinate system of the particles in the file: "
-            R"("s" for fixed s (default), "t" for fixed t)"
+            R"("s" for fixed s (default), "t" for fixed t; set as a name or as CoordSystem)"
         )
     ;
     register_push(py_Source);

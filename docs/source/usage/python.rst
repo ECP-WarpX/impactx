@@ -2181,7 +2181,9 @@ The aperture is disabled entirely only if both planes are zero or less, which is
 
 .. py:class:: impactx.elements.BeamMonitor(name, backend="default", encoding="g", period_sample_intervals=1, particles=True, beam_moments=True, coord_system="s")
 
-   A beam monitor, writing all beam particles at fixed ``s`` to openPMD files.
+   A beam monitor, writing all beam particles at fixed ``s`` (default) or at fixed ``t`` to openPMD files.
+   The beam needs to be at fixed ``s`` when it reaches the monitor, otherwise the monitor raises a ``RuntimeError``
+   (see :py:func:`impactx.coordinate_transformation`).
 
    If the same element ``name`` is used multiple times, then an output series is created with multiple outputs.
 
@@ -2199,7 +2201,7 @@ The aperture is disabled entirely only if both planes are zero or less, which is
    :param period_sample_intervals: for periodic lattice, only output every Nth period (turn)
    :param particles: output the individual particles of the beam (default: ``True``)
    :param beam_moments: output the beam moments (reduced beam characteristics) as openPMD attributes (default: ``True``)
-   :param coord_system: output the individual particles at fixed :math:`s` (``"s"``, default) or at fixed :math:`t` (``"t"``)
+   :param coord_system: output the individual particles at fixed :math:`s` (``"s"``, default) or at fixed :math:`t` (``"t"``), also as :py:class:`impactx.CoordSystem`
 
    .. py:property:: name
 
@@ -2253,6 +2255,8 @@ The aperture is disabled entirely only if both planes are zero or less, which is
 
    A particle source.
    This supports openPMD files from our :py:class:`impactx.elements.BeamMonitor` and, with ``coord_system="t"``, openPMD files from codes that use time as the independent variable.
+   The beam needs to be at fixed ``s`` to add the particles, otherwise the source raises a ``RuntimeError``
+   (see :py:func:`impactx.coordinate_transformation`).
 
    :param distribution: Distribution type of particles in the source. currently, only ``"openPMD"`` is supported
    :param openpmd_path: path to the openPMD series
@@ -2260,7 +2264,7 @@ The aperture is disabled entirely only if both planes are zero or less, which is
    :param load_ref_particle: Restore the reference particle from the species metadata of the openPMD file. Default: ``True``
    :param load_step: Which step (iteration) to load from the openPMD series, selected by step number. Default: ``None``
    :param load_step_index: Which step (iteration) to load from the openPMD series, selected by position in the file. Default: ``None``
-   :param coord_system: The particles in the file are at fixed :math:`s` (``"s"``) or at fixed :math:`t` (``"t"``). Default: ``"s"``
+   :param coord_system: The particles in the file are at fixed :math:`s` (``"s"``) or at fixed :math:`t` (``"t"``), also as :py:class:`impactx.CoordSystem`. Default: ``"s"``
    :param name: an optional name for the element
 
    .. note::
@@ -2307,7 +2311,9 @@ The aperture is disabled entirely only if both planes are zero or less, which is
       `openPMD standard <https://github.com/openPMD/openPMD-standard>`__: in SI, after multiplication with their ``unitSI``.
       The ``spin`` of the particles is read if the file holds it.
       The ``z`` axis is the direction of the reference momentum.
-      Particles that do not move forward along ``z`` are an error.
+      Files from codes that write the particles in their lab frame need a reference particle that moves along
+      its ``z`` axis, i.e., with zero ``px`` and ``py``; otherwise, the source records a warning.
+      Particles that do not move forward along ``z`` and values that are not finite numbers are an error.
 
       The particles keep their positions and momenta from the file and are added relative to the reference particle.
       Files from other codes hold no reference particle: set ``load_ref_particle=False`` and configure the
