@@ -470,6 +470,13 @@ Collective Effects & Overall Simulation Parameters
 
       Run the particle tracking simulation loop.
 
+      .. note::
+
+         A simulation is used by one thread at a time.
+         While a tracking call runs, its :py:attr:`hook` functions may use the simulation.
+         Another Python thread that starts tracking or calls ``finalize()`` on it in the meantime gets a ``RuntimeError``.
+         Any other access to the simulation from a second thread is neither checked nor safe.
+
    .. py:method:: track_envelope()
 
       Run the envelope tracking simulation loop.

@@ -20,7 +20,9 @@
 
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <string>
+#include <thread>
 #include <unordered_map>
 
 
@@ -50,7 +52,8 @@ namespace impactx
         /** Deallocate all contexts and data
          *
          * Finalizes the elements, empties the lattice and shuts AMReX down, in that order.
-         * Refuses while a tracking traversal is walking the lattice.
+         * Refuses while a tracking traversal is walking the lattice, and while another
+         * thread tracks with or finalizes this simulation (@see ExclusiveUse).
          *
          * Calls @see m_release_lattice_owners after emptying the lattice and before
          * shutting AMReX down, including when called from the destructor.
@@ -200,6 +203,45 @@ namespace impactx
         TrackingState m_tracking_state;
 
       private:
+        /** Claims this simulation for the calling thread, for its own lifetime.
+         *
+         * Tracking and finalizing change the whole simulation, and nothing in it -- nor in
+         * AMReX below it -- is synchronized against a second thread doing so at the same
+         * time. Other threads do get to run while we track: whenever a Python hook blocks
+         * or yields, and whenever the Python bindings release the GIL for the call. A
+         * claim makes such a thread fail with an exception instead of working on data
+         * that is being changed under it.
+         *
+         * The thread that holds a claim may claim again, so a hook can still track on its
+         * own, e.g., the reference particle from inside particle tracking.
+         */
+        class ExclusiveUse
+        {
+          public:
+            /** Claim the simulation
+             *
+             * @param sim the simulation to claim
+             * @param what the operation that claims it, used in the error message
+             * @throws std::runtime_error if another thread holds a claim
+             */
+            ExclusiveUse (ImpactX & sim, char const * what);
+
+            ~ExclusiveUse ();
+
+            ExclusiveUse (ExclusiveUse const &) = delete;
+            ExclusiveUse & operator= (ExclusiveUse const &) = delete;
+            ExclusiveUse (ExclusiveUse &&) = delete;
+            ExclusiveUse & operator= (ExclusiveUse &&) = delete;
+
+          private:
+            ImpactX & m_sim;
+        };
+
+        std::mutex m_use_mutex;  //! guards the three members below
+        std::thread::id m_use_thread;  //! the thread that holds the claim, @see ExclusiveUse
+        int m_use_depth = 0;  //! nested claims of that thread, zero if unclaimed
+        char const * m_use_what = "";  //! the operation of the outermost claim
+
         /** Keeps track if init_grids was called.
          *
          * Some operations, like resizing a simulation in terms of cells and changing blocking

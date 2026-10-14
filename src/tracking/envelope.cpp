@@ -34,6 +34,9 @@ namespace impactx
     void
     ImpactX::track_envelope ()
     {
+        // first: not even the profiler below is safe to share with another thread
+        ExclusiveUse const exclusive_use(*this, "track the envelope");
+
         BL_PROFILE("ImpactX::track_envelope");
 
         if (m_lattice->empty())

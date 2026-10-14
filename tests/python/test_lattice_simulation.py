@@ -11,11 +11,12 @@
 
 import gc
 import math
+import threading
 import weakref
 
 import pytest
 
-from impactx import ImpactX, distribution, elements
+from impactx import ImpactX, RefPart, distribution, elements
 
 
 def names_of(lattice):
@@ -202,6 +203,91 @@ def test_a_hook_cannot_change_the_sequence(sim, track):
     # editable again once tracking is done
     sim.lattice.append(elements.Drift(ds=0.5, name="d2"))
     assert names_of(sim.lattice) == ["d", "d2"]
+
+
+def from_another_thread(call):
+    """Run ``call`` in a second thread and return the exception it raised, if any.
+
+    Called from a tracking hook, this lets the second thread in while tracking is
+    underway: the hook waits for it, and waiting gives the thread room to run.
+    """
+    raised = []
+
+    def run():
+        try:
+            call()
+        except Exception as error:
+            raised.append(error)
+
+    thread = threading.Thread(target=run)
+    thread.start()
+    thread.join()
+
+    return raised[0] if raised else None
+
+
+def probe_particle():
+    probe = RefPart()
+    probe.set_species("electron").set_kin_energy_MeV(100.0)
+    return probe
+
+
+@pytest.mark.parametrize("track", TRACKERS)
+def test_another_thread_cannot_track_while_tracking(sim, track):
+    sim.lattice.append(elements.Drift(ds=0.5))
+    probe = probe_particle()
+    asked = []
+    errors = []
+
+    def hook(s):
+        # once: a second thread that did get to track would call this hook as well
+        if not asked:
+            asked.append(True)
+            errors.append(from_another_thread(lambda: s.track_reference(probe)))
+
+    sim.hook["before_element"] = hook
+    track(sim)
+
+    assert len(errors) == 1
+    assert isinstance(errors[0], RuntimeError)
+    assert "another thread" in str(errors[0])
+    # the second thread did not get to track
+    assert probe.s == 0.0
+
+
+def test_another_thread_cannot_finalize_while_tracking(sim):
+    sim.lattice.append(elements.Drift(ds=0.5))
+    errors = []
+
+    def hook(s):
+        errors.append(from_another_thread(s.finalize))
+
+    sim.hook["before_element"] = hook
+    track_reference(sim)
+
+    assert len(errors) == 1
+    assert isinstance(errors[0], RuntimeError)
+    assert "another thread" in str(errors[0])
+    # nothing was torn down, and the run went on to its end
+    assert len(sim.lattice) == 1
+    assert sim.beam.ref.s == pytest.approx(0.5)
+
+
+def test_a_hook_can_track_on_its_own_thread(sim):
+    sim.lattice.append(elements.Drift(ds=0.5))
+    probe = probe_particle()
+    nested = []
+
+    def hook(s):
+        # track the probe once, not again from the hooks of that nested run
+        if not nested:
+            nested.append(True)
+            s.track_reference(probe)
+
+    sim.hook["before_period"] = hook
+    track_particles(sim)
+
+    assert probe.s == pytest.approx(0.5)
 
 
 def _envelope_through(second_cavity):
