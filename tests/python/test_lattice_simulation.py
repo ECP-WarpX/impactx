@@ -15,6 +15,7 @@ import weakref
 
 import pytest
 
+import amrex.space3d as amr
 from impactx import ImpactX, distribution, elements
 
 
@@ -134,6 +135,27 @@ def test_a_hook_referring_to_its_simulation_is_collected():
     gc.collect()
 
     assert observed_sim() is None
+
+
+def test_finalize_releases_the_hooks_while_amrex_is_up(sim):
+    """Hooks can hold AMReX-backed data; releasing one can register another."""
+
+    released_with_amrex = []
+
+    class Probe:
+        def __init__(self, register_another):
+            self.register_another = register_another
+
+        def __del__(self):
+            released_with_amrex.append(amr.initialized())
+            if self.register_another:
+                sim.hook["after_period"] = lambda _, held=Probe(False): held
+
+    sim.hook["before_element"] = lambda _, held=Probe(True): held
+    sim.finalize()
+
+    assert released_with_amrex == [True, True]
+    assert len(sim.hook) == 0
 
 
 def test_assigning_the_lattice(sim):
