@@ -290,7 +290,6 @@ namespace impactx::elements
 
             // compute particle momentum deviation delta + 1
             T_Real const delta1 = sqrt(1_prt - 2_prt * pt / m_beta + powi<2>(pt));
-            T_Real const delta = delta1 - 1_prt;
 
             // compute the required quad field gradient values
 
