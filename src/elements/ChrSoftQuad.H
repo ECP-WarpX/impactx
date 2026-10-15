@@ -272,6 +272,7 @@ namespace impactx::elements
         {
             using namespace amrex::literals; // for _rt and _prt
             using namespace std; // for cmath(float)
+            using amrex::Math::powi;
 
             T_Real const x = particle(1);
             T_Real const px = particle(2);
@@ -342,6 +343,7 @@ namespace impactx::elements
         {
             using namespace amrex::literals; // for _rt and _prt
             using namespace std; // for cmath(float)
+            using amrex::Math::powi;
 
             T_Real const x = particle(1);
             T_Real const px = particle(2);
@@ -417,6 +419,7 @@ namespace impactx::elements
         {
             using namespace amrex::literals; // for _rt and _prt
             using namespace std; // for cmath(float)
+            using amrex::Math::powi;
 
             T_Real const x = particle(1);
             T_Real const px = particle(2);
