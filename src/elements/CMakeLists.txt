@@ -6,6 +6,7 @@ target_sources(lib
     ChrDrift.cpp
     ChrPlasmaLens.cpp
     ChrQuad.cpp
+    ChrSoftQuad.cpp
     ChrUniformAcc.cpp
     ConstF.cpp
     DipEdge.cpp
