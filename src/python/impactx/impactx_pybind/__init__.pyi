@@ -1143,12 +1143,33 @@ class UnorderedMap:
 
 class Config:
     gpu_backend = None
+    """
+    GPU backend ('CUDA', 'HIP' or 'SYCL'), None without GPU support
+    """
     have_fft: typing.ClassVar[bool] = True
+    """
+    Build supports FFT-based solvers
+    """
     have_gpu: typing.ClassVar[bool] = False
+    """
+    Build supports GPUs
+    """
     have_mpi: typing.ClassVar[bool] = True
+    """
+    Build supports MPI
+    """
     have_omp: typing.ClassVar[bool] = True
+    """
+    Build supports OpenMP
+    """
     have_openpmd: typing.ClassVar[bool] = True
+    """
+    Build supports openPMD I/O
+    """
     have_simd: typing.ClassVar[bool] = False
+    """
+    Build supports explicit SIMD vectorization
+    """
     openpmd_backends: typing.ClassVar[dict] = {
         "adios1": False,
         "adios2": False,
@@ -1157,9 +1178,21 @@ class Config:
         "mpi": True,
         "toml": True,
     }
+    """
+    openPMD I/O backends available in this build
+    """
     precision: typing.ClassVar[str] = "DOUBLE"
+    """
+    Floating point precision of amrex::Real ('SINGLE' or 'DOUBLE')
+    """
     precision_particles: typing.ClassVar[str] = "DOUBLE"
+    """
+    Floating point precision of amrex::ParticleReal ('SINGLE' or 'DOUBLE')
+    """
     simd_size: typing.ClassVar[int] = 1
+    """
+    Number of amrex::ParticleReal elements in a native SIMD vector
+    """
     @staticmethod
     def to_dict() -> dict:
         """
