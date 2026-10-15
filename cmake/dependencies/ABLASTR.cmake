@@ -64,6 +64,7 @@ macro(find_ablastr)
         #set(AMReX_CUDA_FASTMATH ${ImpactX_FASTMATH} CACHE BOOL "" FORCE)
         set(ABLASTR_FFT ${ImpactX_FFT} CACHE BOOL "" FORCE)
         set(AMReX_FFT ${ImpactX_FFT} CACHE BOOL "" FORCE)
+        set(WarpX_EB ${ImpactX_EB} CACHE BOOL "" FORCE)
 
         set(WarpX_APP OFF CACHE BOOL "" FORCE)
         set(WarpX_LIB OFF CACHE BOOL "" FORCE)
@@ -178,7 +179,7 @@ set(ImpactX_openpmd_src ""
 set(ImpactX_ablastr_repo "https://github.com/BLAST-WarpX/warpx.git"
     CACHE STRING
     "Repository URI to pull and build ABLASTR from if(ImpactX_ablastr_internal)")
-set(ImpactX_ablastr_branch "26.10"
+set(ImpactX_ablastr_branch "09b28e94b36ad23f61d8ab706f5c69c9509bd1aa"
     CACHE STRING
     "Repository branch for ImpactX_ablastr_repo if(ImpactX_ablastr_internal)")
 
@@ -186,7 +187,7 @@ set(ImpactX_ablastr_branch "26.10"
 set(ImpactX_amrex_repo "https://github.com/AMReX-Codes/amrex.git"
     CACHE STRING
     "Repository URI to pull and build AMReX from if(ImpactX_amrex_internal)")
-set(ImpactX_amrex_branch "26.10"
+set(ImpactX_amrex_branch "b552c85c432defab450688581a1c87aead7b461d"
     CACHE STRING
     "Repository branch for ImpactX_amrex_repo if(ImpactX_amrex_internal)")
 

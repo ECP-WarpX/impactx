@@ -464,6 +464,7 @@ CMake Option                    Default & Values                             Des
 ``CMAKE_VERBOSE_MAKEFILE``      ON/**OFF**                                   `Print all compiler commands to the terminal during build <https://cmake.org/cmake/help/latest/variable/CMAKE_VERBOSE_MAKEFILE.html>`__
 ``ImpactX_APP``                 **ON**/OFF                                   Build the ImpactX executable application
 ``ImpactX_COMPUTE``             NOACC/**OMP**/CUDA/SYCL/HIP                  On-node, accelerated computing backend
+``ImpactX_EB``                  **ON**/OFF                                   Embedded boundaries (transverse conducting walls)
 ``ImpactX_FASTMATH``            ON/**OFF**                                   Enable fast-math optimizations
 ``ImpactX_FFT``                 ON/**OFF**                                   FFT-based solvers (IGF space charge, CSR)
 ``ImpactX_IPO``                 ON/**OFF**                                   Compile ImpactX with interprocedural optimization (aka LTO)
@@ -548,6 +549,7 @@ Environment Variable          Default & Values                             Descr
 ``CUDAARCHS``                 **native**/all/all-major/``80``/...          Nvidia GPU architectures to compile for (see :ref:`building-cmake-gpu-archs`)
 ``IMPACTX_MPI``               ON/**OFF**                                   Multi-node support (message-passing)
 ``IMPACTX_PRECISION``         SINGLE/**DOUBLE**                            Floating point precision (single/double)
+``IMPACTX_EB``                **ON**/OFF                                   Embedded boundaries (transverse conducting walls)
 ``IMPACTX_FFT``               ON/**OFF**                                   FFT-based solvers (IGF space charge, CSR)
 ``IMPACTX_SIMD``              ON/**OFF**                                   CPU SIMD acceleration (requires ``vir-simd``)
 ``IMPACTX_BUILD_SHARED_LIBS`` ON/**OFF**                                   Build shared libraries for dependencies

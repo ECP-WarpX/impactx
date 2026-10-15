@@ -8,12 +8,16 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "ImpactX.H"
+#include "initialization/Algorithms.H"
+#include "initialization/EmbeddedBoundary.H"
 
 #include <AMReX.H>
 #include <AMReX_BLProfiler.H>
 #include <AMReX_INT.H>
+#include <AMReX_ParmParse.H>
 
 #include <stdexcept>
+#include <string>
 #include <variant>
 
 
@@ -40,6 +44,18 @@ namespace impactx
         auto const & ref = amr_data->track_particles.m_particle_container->GetRefParticle();
         if (ref.kin_energy_MeV() == 0.0 && !source_loads_ref)
             throw std::runtime_error("The reference particle energy is zero. Not yet initialized?");
+
+        // transverse walls: only used by the 3D multigrid space charge solver
+        if (initialization::read_transverse_wall())
+        {
+            amrex::ParmParse const pp_algo("algo");
+            std::string poisson_solver = "multigrid";
+            pp_algo.query("poisson_solver", poisson_solver);
+            if (get_space_charge_algo() != SpaceChargeAlgo::True_3D ||
+                poisson_solver != "multigrid")
+                throw std::runtime_error(
+                    "eb.shape requires algo.space_charge = 3D and algo.poisson_solver = multigrid");
+        }
 
         // particles in the beam bunch
         // count particles - if no particles are found in our particle container, then a lot of

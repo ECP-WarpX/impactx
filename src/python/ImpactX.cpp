@@ -26,7 +26,9 @@
 #include <optional>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <variant>
+#include <vector>
 
 
 namespace py = pybind11;
@@ -249,6 +251,79 @@ void init_ImpactX (py::module& m)
               },
               "Use dynamic (``true``) resizing of the field mesh or static sizing (``false``)."
         )
+
+        .def_property("eb_shape",
+            [](ImpactX & /* ix */) {
+                std::string shape = "none";
+                amrex::ParmParse const pp_eb("eb");
+                pp_eb.query("shape", shape);
+                return shape;
+            },
+            [](ImpactX & /* ix */, std::string const & shape) {
+                if (shape != "none" && shape != "elliptical" && shape != "rectangular" &&
+                    shape != "polygon" && shape != "parser")
+                    throw std::runtime_error(
+                        "eb_shape must be none, elliptical, rectangular, polygon or parser but is: "
+                        + shape);
+                amrex::ParmParse pp_eb("eb");
+                pp_eb.add("shape", shape);
+            },
+            "Shape of the grounded beam pipe for the 3D multigrid space charge solver: "
+            "``\"none\"`` (default), ``\"elliptical\"``, ``\"rectangular\"``, "
+            "``\"polygon\"`` or ``\"parser\"``."
+        )
+        .def_property("eb_implicit_function",
+            [](ImpactX & /* ix */) {
+                return detail::get_or_throw<std::string>("eb", "implicit_function");
+            },
+            [](ImpactX & /* ix */, std::string const & implicit_function) {
+                amrex::ParmParse pp_eb("eb");
+                pp_eb.add("implicit_function", implicit_function);
+            },
+            "Implicit function f(x,y) of the wall for ``eb_shape = \"parser\"``: "
+            "negative inside the pipe."
+        )
+    ;
+
+    for (std::string const name : {"aperture_x", "aperture_y"}) {
+        impactx
+            .def_property(("eb_" + name).c_str(),
+                [name](ImpactX & /* ix */) {
+                    return detail::get_or_throw<amrex::Real>("eb", name);
+                },
+                [name](ImpactX & /* ix */, amrex::Real value) {
+                    amrex::ParmParse pp_eb("eb");
+                    pp_eb.add(name.c_str(), value);
+                },
+                ("Half-width of the elliptical or rectangular wall along " + name.substr(9)
+                 + " (m).").c_str()
+            );
+    }
+
+    for (auto const & [name, doc] : std::vector<std::pair<std::string, std::string>>{
+        {"vertices_x", "x coordinates of the vertices of a convex polygon wall (m)."},
+        {"vertices_y", "y coordinates of the vertices of a convex polygon wall (m)."},
+        {"bounding_box_lo", "Lower corner (x, y) of the bounding box of a parser wall (m)."},
+        {"bounding_box_hi", "Upper corner (x, y) of the bounding box of a parser wall (m)."}})
+    {
+        impactx
+            .def_property(("eb_" + name).c_str(),
+                [name](ImpactX & /* ix */) {
+                    std::vector<amrex::Real> values;
+                    amrex::ParmParse const pp_eb("eb");
+                    if (!pp_eb.queryarr(name.c_str(), values))
+                        throw std::runtime_error("eb." + name + " is not set yet");
+                    return values;
+                },
+                [name](ImpactX & /* ix */, std::vector<amrex::Real> const & values) {
+                    amrex::ParmParse pp_eb("eb");
+                    pp_eb.addarr(name.c_str(), values);
+                },
+                doc.c_str()
+            );
+    }
+
+    impactx
 
         .def_property("particle_shape",
             [](ImpactX & /* ix */) {

@@ -9,6 +9,7 @@
  */
 #include "AmrCoreData.H"
 
+#include "initialization/EmbeddedBoundary.H"
 #include "initialization/InitMeshRefinement.H"
 
 #include <AMReX.H>
@@ -35,6 +36,11 @@ namespace impactx::initialization
     )
         : amrex::AmrCore(rb, max_level_in, n_cell_in, coord, ref_ratios, is_per)
     {
+    }
+
+    AmrCoreData::~AmrCoreData ()
+    {
+        clear_eb(*this);
     }
 
     void
@@ -223,5 +229,14 @@ namespace impactx::initialization
         track_particles.m_rho.erase(lev);
         track_particles.m_phi.erase(lev);
         track_particles.m_space_charge_field.erase(lev);
+#ifdef AMREX_USE_EB
+        track_particles.m_eb_factory.erase(lev);
+        if (auto it = track_particles.m_eb_index_space.find(lev);
+            it != track_particles.m_eb_index_space.end())
+        {
+            amrex::EB2::IndexSpace::erase(it->second);
+            track_particles.m_eb_index_space.erase(it);
+        }
+#endif
     }
 } // namespace impactx::initialization

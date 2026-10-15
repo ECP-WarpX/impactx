@@ -2,6 +2,7 @@ target_sources(lib
   PRIVATE
     Algorithms.cpp
     AmrCoreData.cpp
+    EmbeddedBoundary.cpp
     InitAMReX.cpp
     InitAmrCore.cpp
     InitDistribution.cpp

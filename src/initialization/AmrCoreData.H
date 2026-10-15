@@ -18,11 +18,16 @@
 #include <AMReX_AmrMesh.H>
 #include <AMReX_BoxArray.H>
 #include <AMReX_DistributionMapping.H>
+#ifdef AMREX_USE_EB
+#   include <AMReX_EB2.H>
+#   include <AMReX_EBFabFactory.H>
+#endif
 #include <AMReX_Geometry.H>
 #include <AMReX_MultiFab.H>
 #include <AMReX_REAL.H>
 #include <AMReX_TagBox.H>
 
+#include <memory>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -62,7 +67,7 @@ namespace impactx::initialization
         AmrCoreData (const AmrCoreData& rhs) = delete;
         AmrCoreData& operator= (const AmrCoreData& rhs) = delete;
 
-        ~AmrCoreData() = default;
+        ~AmrCoreData() override;
 
         /** Data needed for the symplectic particle tracking mode */
         struct TrackModeParticles
@@ -82,6 +87,13 @@ namespace impactx::initialization
             std::unordered_map<int, amrex::MultiFab> m_phi;
             /** space charge field (vector) per level */
             std::unordered_map<int, std::unordered_map<std::string, amrex::MultiFab> > m_space_charge_field;
+
+#ifdef AMREX_USE_EB
+            /** EB factory of the transverse wall per level */
+            std::unordered_map<int, std::unique_ptr<amrex::EBFArrayBoxFactory> > m_eb_factory;
+            /** EB index space per level, owned by the global EB2 stack */
+            std::unordered_map<int, amrex::EB2::IndexSpace*> m_eb_index_space;
+#endif
 
         } track_particles;
 

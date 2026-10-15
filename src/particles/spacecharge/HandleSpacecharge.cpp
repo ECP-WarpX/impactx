@@ -11,6 +11,7 @@
 
 #include "initialization/Algorithms.H"
 #include "initialization/AmrCoreData.H"
+#include "initialization/EmbeddedBoundary.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/spacecharge/ForceFromSelfFields.H"
 #include "particles/spacecharge/GatherAndPush.H"
@@ -87,7 +88,8 @@ namespace impactx::particles::spacecharge
                 amr_data->track_particles.m_rho,
                 amr_data->track_particles.m_rho_2d,
                 amr_data->track_particles.m_phi,
-                amr_data->refRatio()
+                amr_data->refRatio(),
+                initialization::eb_factories(*amr_data)
             );
 
             // calculate force in x,y,z

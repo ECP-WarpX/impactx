@@ -567,6 +567,14 @@ add_impactx_test(expanding_beam_mlmg.py
     examples/expanding_beam/analysis_expanding.py
     OFF  # no plot script yet
 )
+if(ImpactX_EB)
+    add_impactx_test(expanding_beam_mlmg_eb
+        examples/expanding_beam/input_expanding_mlmg_eb.in
+        OFF  # ImpactX MPI-parallel
+        examples/expanding_beam/analysis_expanding.py
+        OFF  # no plot script yet
+    )
+endif()
 if(ImpactX_FFT)
     add_impactx_test(expanding_beam_fft
         examples/expanding_beam/input_expanding_fft.in

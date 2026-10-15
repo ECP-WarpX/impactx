@@ -31,7 +31,8 @@ This example can be run **either** as:
 
 For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
-We also provide the same example with the multi-grid (MLMG) Poisson solver.
+We also provide the same example with the multi-grid (MLMG) Poisson solver,
+and with the MLMG solver inside a grounded beam pipe (:pp:param:`eb.shape`) that is far enough from the beam to not change the result.
 
 .. tab-set::
 
@@ -58,6 +59,12 @@ We also provide the same example with the multi-grid (MLMG) Poisson solver.
        .. literalinclude:: input_expanding_mlmg.in
           :language: ini
           :caption: You can copy this file from ``examples/expanding/input_expanding_mlmg.in``.
+
+   .. tab-item:: Executable: Input File (MLMG, beam pipe)
+
+       .. literalinclude:: input_expanding_mlmg_eb.in
+          :language: ini
+          :caption: You can copy this file from ``examples/expanding/input_expanding_mlmg_eb.in``.
 
 
 Analyze

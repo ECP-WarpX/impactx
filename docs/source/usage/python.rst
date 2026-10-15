@@ -199,6 +199,30 @@ Collective Effects & Overall Simulation Parameters
       Currently MLMG solver looks for verbosity levels from 0-5.
       A higher number results in more verbose output.
 
+   .. py:property:: eb_shape
+
+      Shape of a grounded beam pipe for the multigrid space charge solver (see :pp:param:`eb.shape`):
+      ``"none"`` (default), ``"elliptical"``, ``"rectangular"``, ``"polygon"`` or ``"parser"``.
+
+   .. py:property:: eb_aperture_x
+   .. py:property:: eb_aperture_y
+
+      Half-axes or half-widths of an ``"elliptical"`` or ``"rectangular"`` pipe (m).
+
+   .. py:property:: eb_vertices_x
+   .. py:property:: eb_vertices_y
+
+      Vertices of a convex ``"polygon"`` pipe (m).
+
+   .. py:property:: eb_implicit_function
+
+      Function ``f(x,y)`` of a ``"parser"`` pipe: negative inside the pipe.
+
+   .. py:property:: eb_bounding_box_lo
+   .. py:property:: eb_bounding_box_hi
+
+      Transverse bounding box ``[x, y]`` of a ``"parser"`` pipe (m).
+
    .. py:property:: csr
 
       Enable (``True``) or disable (``False``) Coherent Synchrotron Radiation (CSR) calculations (default: ``False``).

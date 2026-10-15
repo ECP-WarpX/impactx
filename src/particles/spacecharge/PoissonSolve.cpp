@@ -12,6 +12,7 @@
 #include "initialization/Algorithms.H"
 #include "particles/ChargeDeposition.H"
 
+#include <ablastr/fields/MLMGOptions.H>
 #include <ablastr/fields/PoissonSolver.H>
 
 #include <AMReX_BLProfiler.H>
@@ -21,6 +22,9 @@
 #include <AMReX_REAL.H>       // for ParticleReal
 
 #include <cmath>
+#include <optional>
+#include <stdexcept>
+#include <string>
 
 
 namespace impactx::particles::spacecharge
@@ -30,7 +34,8 @@ namespace impactx::particles::spacecharge
         std::unordered_map<int, amrex::MultiFab> & rho,
         std::unordered_map<int, amrex::MultiFab> & rho_2d_out,
         std::unordered_map<int, amrex::MultiFab> & phi,
-        amrex::Vector<amrex::IntVect> rel_ref_ratio
+        amrex::Vector<amrex::IntVect> rel_ref_ratio,
+        amrex::Vector<initialization::EBFactory const *> const & eb_factory
     )
     {
         BL_PROFILE("impactx::spacecharge::PoissonSolve");
@@ -73,6 +78,12 @@ namespace impactx::particles::spacecharge
         if (space_charge == SpaceChargeAlgo::True_2p5D && poisson_solver != "fft") {
             throw std::runtime_error("algo.poisson_solver must be fft for SpaceChargeAlgo::True_2p5D");
         }
+        bool const eb_enabled = !eb_factory.empty();
+        if (eb_enabled &&
+            (space_charge != SpaceChargeAlgo::True_3D || poisson_solver != "multigrid")) {
+            throw std::runtime_error(
+                "eb.shape requires algo.space_charge = 3D and algo.poisson_solver = multigrid");
+        }
 
         // MLMG options
         //   Single precision: achievable relative residual is limited by float32
@@ -90,6 +101,12 @@ namespace impactx::particles::spacecharge
         int mlmg_verbosity = 1;
         pp_algo.queryAddWithParser("mlmg_max_iters", mlmg_max_iters);
         pp_algo.queryAddWithParser("mlmg_verbosity", mlmg_verbosity);
+
+        ablastr::fields::MLMGOptions mlmg_options;
+        mlmg_options.relative_tolerance = mlmg_relative_tolerance;
+        mlmg_options.absolute_tolerance = mlmg_absolute_tolerance;
+        mlmg_options.max_iters = mlmg_max_iters;
+        mlmg_options.verbosity = mlmg_verbosity;
 
         // flatten rho to 2D; store it in the output so it can be accessed after
         // the solve (e.g. via sim.rho), like the solved potential phi
@@ -130,15 +147,16 @@ namespace impactx::particles::spacecharge
 
         const bool is_igf_2d = (space_charge == SpaceChargeAlgo::True_2D || space_charge == SpaceChargeAlgo::True_2p5D);
         const bool do_single_precision_comms = false;
-        const bool eb_enabled = false;
+        std::optional<amrex::Vector<initialization::EBFactory const *>> eb_farray_box_factory;
+        if (eb_enabled) {
+            eb_farray_box_factory = eb_factory;
+        }
+        // EB: no boundary handler, i.e., phi = 0 on the EB and on all domain faces
         ablastr::fields::computePhi(
             sorted_rho,
             sorted_phi,
             beta_xyz,
-            mlmg_relative_tolerance,
-            mlmg_absolute_tolerance,
-            mlmg_max_iters,
-            mlmg_verbosity,
+            mlmg_options,
             pc.GetParGDB()->Geom(),
             pc.GetParGDB()->DistributionMap(),
             pc.GetParGDB()->boxArray(),
@@ -147,13 +165,11 @@ namespace impactx::particles::spacecharge
             is_igf_2d,
             eb_enabled,
             do_single_precision_comms,
-            rel_ref_ratio
-            /*
-            post_phi_calculation,
-            poisson_boundary_handler
-            gett_new(0),
+            rel_ref_ratio,
+            std::nullopt,  // post_phi_calculation
+            std::nullopt,  // boundary_handler
+            std::nullopt,  // current_time
             eb_farray_box_factory
-            */
         );
 
         // We may need to copy phi from phi_2d

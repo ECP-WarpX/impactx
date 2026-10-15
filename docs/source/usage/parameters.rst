@@ -2678,6 +2678,55 @@ Multigrid-specific numerical options:
     Currently MLMG solver looks for verbosity levels from 0-5.
     A higher number results in more verbose output.
 
+Transverse conducting walls (embedded boundaries) for the multigrid solver:
+
+.. pp:param:: eb.shape
+    :type: ``string``
+    :optional:
+    :default: ``none``
+
+    Shape of a grounded beam pipe (potential zero on the wall), infinite along z and open longitudinally.
+    The wall is an embedded boundary of the multigrid solver.
+    It requires :pp:param:`algo.space_charge` ``= 3D``, :pp:param:`algo.poisson_solver` ``= multigrid`` and the compilation flag ``-DImpactX_EB=ON``.
+
+    With :pp:param:`geometry.dynamic_size`, the field mesh covers the pipe aperture plus two cells in x and y, and follows the beam in z.
+    The wall does not remove particles: use element apertures for this.
+
+    Options:
+
+    * ``none``: no wall.
+    * ``elliptical``: ellipse with half-axes :pp:param:`eb.aperture_x` and :pp:param:`eb.aperture_y`.
+    * ``rectangular``: rectangle with half-widths :pp:param:`eb.aperture_x` and :pp:param:`eb.aperture_y`.
+    * ``polygon``: convex polygon with vertices :pp:param:`eb.vertices_x` and :pp:param:`eb.vertices_y`, e.g., a trapezoid.
+    * ``parser``: wall given by :pp:param:`eb.implicit_function`.
+
+.. pp:param:: eb.aperture_x/y
+    :link_aliases: eb.aperture_x eb.aperture_y
+    :type: ``float``
+    :unit: m
+
+    Half-axes (``elliptical``) or half-widths (``rectangular``) of the pipe aperture, centered on the reference orbit.
+
+.. pp:param:: eb.vertices_x/y
+    :link_aliases: eb.vertices_x eb.vertices_y
+    :type: ``array of float``
+    :unit: m
+
+    Vertices of a convex polygon aperture (``polygon``), in either orientation.
+
+.. pp:param:: eb.implicit_function
+    :type: ``string``
+
+    Function ``f(x,y)`` of the wall (``parser``): negative inside the pipe, positive in the wall.
+    Example for a circular pipe of radius 1 cm: ``"x^2 + y^2 - 0.01^2"``.
+
+.. pp:param:: eb.bounding_box_lo/hi
+    :link_aliases: eb.bounding_box_lo eb.bounding_box_hi
+    :type: ``2 floats``
+    :unit: m
+
+    Lower and upper corner (x, y) of the transverse bounding box of the aperture (``parser``).
+
 
 .. _running-cpp-parameters-collective-csr:
 

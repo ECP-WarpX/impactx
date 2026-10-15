@@ -10,6 +10,7 @@
 #ifndef IMPACTX_POISSONSOLVE_H
 #define IMPACTX_POISSONSOLVE_H
 
+#include "initialization/EmbeddedBoundary.H"
 #include "particles/ImpactXParticleContainer.H"
 
 #include <AMReX_MultiFab.H>
@@ -30,13 +31,15 @@ namespace impactx::particles::spacecharge
      *                    2D space-charge models, e.g. to expose via ``sim.rho``)
      * @param[inout] phi scalar potential per level
      * @param[in] rel_ref_ratio mesh refinement ratio between levels
+     * @param[in] eb_factory EB factory per level for transverse walls (empty: no EB)
      */
     void PoissonSolve (
         ImpactXParticleContainer const & pc,
         std::unordered_map<int, amrex::MultiFab> & rho,
         std::unordered_map<int, amrex::MultiFab> & rho_2d,
         std::unordered_map<int, amrex::MultiFab> & phi,
-        amrex::Vector<amrex::IntVect> rel_ref_ratio
+        amrex::Vector<amrex::IntVect> rel_ref_ratio,
+        amrex::Vector<initialization::EBFactory const *> const & eb_factory = {}
     );
 
 } // namespace impactx::particles::spacecharge

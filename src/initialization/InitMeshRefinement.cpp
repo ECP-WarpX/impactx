@@ -9,6 +9,7 @@
  */
 #include "ImpactX.H"
 #include "initialization/Algorithms.H"
+#include "initialization/EmbeddedBoundary.H"
 #include "initialization/InitAmrCore.H"
 #include "particles/ImpactXParticleContainer.H"
 #include "particles/distribution/Waterbag.H"
@@ -104,6 +105,18 @@ namespace detail
         if (x_min == x_max || y_min == y_max || z_min == z_max)
             throw std::runtime_error("Flat beam detected. This is not yet supported: https://github.com/BLAST-ImpactX/impactx/issues/44");
 
+        auto const wall = initialization::read_transverse_wall();
+        if (wall && (x_min < wall->bbox_lo[0] || x_max > wall->bbox_hi[0] ||
+                     y_min < wall->bbox_lo[1] || y_max > wall->bbox_hi[1]))
+        {
+            ablastr::warn_manager::WMRecordWarning(
+                "ImpactX::ResizeMesh",
+                "Particles found outside of the eb.shape bounding box. "
+                "Use element apertures to remove them.",
+                ablastr::warn_manager::WarnPriority::medium
+            );
+        }
+
         amrex::ParmParse pp_geometry("geometry");
         bool dynamic_size = true;
         pp_geometry.query("dynamic_size", dynamic_size);
@@ -122,12 +135,33 @@ namespace detail
             amrex::RealVect const beam_padding = beam_width * (frac - 1_rt) * 0.5_rt;
             //                           added to the beam extent --^         ^-- box half above/below the beam
 
+            amrex::RealVect lo = beam_min - beam_padding;
+            amrex::RealVect hi = beam_max + beam_padding;
+
+            // transverse walls: x and y cover the aperture plus 2 cells on each side
+            if (wall)
+            {
+                for (int dir = 0; dir < 2; ++dir)
+                {
+                    int const n = amr_data->Geom(0).Domain().length(dir);
+                    if (n <= 4) {
+                        throw std::runtime_error("eb.shape requires more than 4 cells in x and y");
+                    }
+                    amrex::Real const center = 0.5_rt * (wall->bbox_lo[dir] + wall->bbox_hi[dir]);
+                    amrex::Real const width = wall->bbox_hi[dir] - wall->bbox_lo[dir];
+                    amrex::Real const half_width =
+                        0.5_rt * width * amrex::Real(n) / amrex::Real(n - 4);
+                    lo[dir] = center - half_width;
+                    hi[dir] = center + half_width;
+                }
+            }
+
             // In AMReX, all levels have the same problem domain, that of the
             // coarsest level, even if only partly covered.
             for (int lev = 0; lev <= amr_data->finestLevel(); ++lev)
             {
-                rb[lev].setLo(beam_min - beam_padding);
-                rb[lev].setHi(beam_max + beam_padding);
+                rb[lev].setLo(lo);
+                rb[lev].setHi(hi);
             }
         }
         else
@@ -140,6 +174,17 @@ namespace detail
             pp_geometry.getarr("prob_hi", prob_hi);
 
             rb[0] = {prob_lo.data(), prob_hi.data()};
+
+            if (wall && (prob_lo[0] > wall->bbox_lo[0] || prob_hi[0] < wall->bbox_hi[0] ||
+                         prob_lo[1] > wall->bbox_lo[1] || prob_hi[1] < wall->bbox_hi[1]))
+            {
+                ablastr::warn_manager::WMRecordWarning(
+                    "ImpactX::ResizeMesh",
+                    "geometry.prob_lo/hi does not contain the eb.shape aperture: "
+                    "the domain faces cut through the beam pipe.",
+                    ablastr::warn_manager::WarnPriority::high
+                );
+            }
 
             if (amr_data->maxLevel() > 1)
                 amrex::Abort("Did not implement ResizeMesh for static domains and >1 MR levels.");
@@ -161,6 +206,11 @@ namespace detail
             amr_data->SetGeometry(lev, g);
 
             amr_data->track_particles.m_particle_container->SetParticleGeometry(lev, g);
+        }
+
+        // the EB data depend on the geometry
+        if (wall) {
+            initialization::build_eb(*amr_data);
         }
     }
 } // namespace impactx
