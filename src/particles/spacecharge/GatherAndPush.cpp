@@ -203,7 +203,7 @@ namespace impactx::particles::spacecharge
                        amrex::ParticleReal const idxreal = static_cast<amrex::ParticleReal>(idx);
                        amrex::ParticleReal const lambda = (z - bin_min) / bin_size - idxreal;
                        amrex::ParticleReal const beam_profile_interp = (1_prt-lambda)*beam_profile[idx] + lambda*beam_profile[idx+1];
-                       amrex::ParticleReal const beam_profile_slope_interp = (idx==num_bins)? beam_profile_slope[idx] : (1_prt-lambda)*beam_profile_slope[idx] + lambda*beam_profile_slope[idx+1];
+                       amrex::ParticleReal const beam_profile_slope_interp = (idx >= num_bins - 1)? beam_profile_slope[idx] : (1_prt-lambda)*beam_profile_slope[idx] + lambda*beam_profile_slope[idx+1];
 
                        // Force constributions
                        amrex::ParticleReal const Fxy = (Qb_abs==0.0) ? 0.0_prt : beam_profile_interp / Qb_abs;
