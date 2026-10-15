@@ -49,8 +49,8 @@ namespace impactx
 
         /** Deallocate all contexts and data
          *
-         * Finalizes the elements, empties the lattice and shuts AMReX down, in that order.
-         * Refuses while a tracking traversal is walking the lattice.
+         * Finalizes the elements, empties the lattice, releases the hooks and shuts AMReX
+         * down, in that order. Refuses while a tracking traversal is walking the lattice.
          *
          * Calls @see m_release_lattice_owners after emptying the lattice and before
          * shutting AMReX down, including when called from the destructor.
@@ -193,7 +193,7 @@ namespace impactx
         std::unordered_map<
             std::string,
             std::function<void(ImpactX *)>
-        > m_hook;  //! hooks that users can call
+        > m_hook;  //! hooks that users can call, released by @see finalize
 
         /** A few states during tracking loops, useful to know in hooks (Python callback functions).
          */
