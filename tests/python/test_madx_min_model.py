@@ -175,7 +175,11 @@ def test_combined_function_bend_tiers_round_up(min_model, expected):
 
 @pytest.mark.parametrize(
     "min_model, expected",
-    [("linear", "linear_slac75"), ("paraxial", "nonlinear_hwang_lee"), ("exact", "nonlinear_hwang_lee")],
+    [
+        ("linear", "linear_slac75"),
+        ("paraxial", "nonlinear_hwang_lee"),
+        ("exact", "nonlinear_hwang_lee"),
+    ],
 )
 def test_dipedge_fringe_model_follows_min_model(min_model, expected):
     """DipEdge switches its fringe model by argument. "nonlinear_hwang_lee" is its exact tier."""
