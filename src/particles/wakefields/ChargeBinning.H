@@ -12,11 +12,7 @@
 
 #include "particles/ImpactXParticleContainer.H"
 
-#include <ablastr/constant.H>
-
-#include <AMReX_Extension.H>
-#include <AMReX_GpuQualifiers.H>
-#include <AMReX_Math.H>
+#include <AMReX_GpuContainers.H>
 #include <AMReX_REAL.H>
 
 
@@ -53,65 +49,28 @@ namespace impactx::particles::wakefields
         bool GetNumberDensity = true
     );
 
-    /** Interpolate the charge density profile and its slope to a longitudinal position
+    /** Function to calculate the charge density and its slope at the bin centers
      *
      * DepositCharge1D bins with nearest-grid-point weighting, so value i of charge_distribution
-     * belongs to the center of bin i, at bin_min + (i + 1/2) * bin_size, and the charge density
-     * is zero outside of the bins. The slope is the central difference at the bin centers.
-     * Both are interpolated linearly between the bin centers.
+     * belongs to the center of bin i, at bin_min + (i + 1/2) * bin_size. Both outputs start one
+     * bin center earlier: value k belongs to bin_min + (k - 1/2) * bin_size. The charge density
+     * is zero outside of the bins, which the first value represents explicitly. The slope is the
+     * central difference. Interpolate both linearly to particles with InterpolateLinear1D.
      *
-     * @param[in] z longitudinal position
      * @param[in] charge_distribution deposited charge density in 1D along s
-     * @param[in] num_values number of values in charge_distribution
-     * @param[in] bin_min lower end of the beam in s
+     * @param[out] density charge density at the bin centers, len(charge_distribution)+1 values
+     * @param[out] slope derivative of the number (or charge) density at the bin centers,
+     *                   len(charge_distribution)+1 values
      * @param[in] bin_size size of one bin in s
-     * @param[out] density charge density at z
-     * @param[out] slope derivative of the number (or charge) density at z
      * @param[in] GetNumberDensity number density if true, otherwise charge density
      */
-    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-    void InterpolateCharge1D (
-        amrex::Real z,
-        amrex::Real const * charge_distribution,
-        int num_values,
-        amrex::Real bin_min,
+    void DensityAndSlope1D (
+        amrex::Gpu::DeviceVector<amrex::Real> const & charge_distribution,
+        amrex::Gpu::DeviceVector<amrex::Real> & density,
+        amrex::Gpu::DeviceVector<amrex::Real> & slope,
         amrex::Real bin_size,
-        amrex::Real & density,
-        amrex::Real & slope,
         bool GetNumberDensity = true
-    )
-    {
-        using namespace amrex::literals;
-
-        // could also be calculated on the host upfront
-        amrex::Real const inv_bin_size = 1.0_rt / bin_size;
-
-        // position relative to the bin centers: center j at or below z, weight w in [0, 1)
-        amrex::Real const v = (z - bin_min) * inv_bin_size - 0.5_rt;
-        int const j = static_cast<int>(amrex::Math::floor(v));
-        amrex::Real const w = v - static_cast<amrex::Real>(j);
-
-        // charge density at the bin centers j-1, j, j+1, j+2
-        amrex::Real rho[4];
-        for (int k = 0; k < 4; ++k) {
-            int const bin = j - 1 + k;
-            rho[k] = (bin >= 0 && bin < num_values) ? charge_distribution[bin] : 0.0_rt;
-        }
-
-        density = (1.0_rt - w) * rho[1] + w * rho[2];
-
-        // central differences at the bin centers j and j+1
-        amrex::Real const half_inv_bin_size = 0.5_rt * inv_bin_size;
-        amrex::Real const slope_j = (rho[2] - rho[0]) * half_inv_bin_size;
-        amrex::Real const slope_jp1 = (rho[3] - rho[1]) * half_inv_bin_size;
-        slope = (1.0_rt - w) * slope_j + w * slope_jp1;
-
-        if (GetNumberDensity)
-        {
-            constexpr amrex::Real inv_q_e = 1.0_rt / ablastr::constant::SI::q_e;
-            slope *= inv_q_e;
-        }
-    }
+    );
 
     /** Function to calculate the mean transverse positions (x and y) at each bin along s
      *

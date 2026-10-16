@@ -11,6 +11,7 @@
 
 #include "diagnostics/ReducedBeamCharacteristics.H"
 #include "particles/wakefields/ChargeBinning.H"
+#include "particles/wakefields/InterpolateLinear1D.H"
 
 #include <AMReX_REAL.H>
 #include <AMReX_BLProfiler.H>
@@ -155,6 +156,7 @@ namespace impactx::particles::spacecharge
         BL_PROFILE("impactx::spacecharge::Gauss2p5dPush");
 
         using namespace amrex::literals;
+        using impactx::particles::wakefields::InterpolateLinear1D;
 
         amrex::ParticleReal const charge = pc.GetRefParticle().charge;
 
@@ -230,8 +232,16 @@ namespace impactx::particles::spacecharge
             amrex::ParallelDescriptor::Communicator()
         );
 
-        amrex::Real const * const beam_profile = charge_distribution.data();
-        int const num_values = static_cast<int>(charge_distribution.size());
+        // charge density and its slope at the bin centers, starting one bin center below bin_min
+        amrex::Gpu::DeviceVector<amrex::Real> line_density;
+        amrex::Gpu::DeviceVector<amrex::Real> line_density_slope;
+        impactx::particles::wakefields::DensityAndSlope1D(
+            charge_distribution, line_density, line_density_slope, bin_size, GetNumberDensity);
+        amrex::Real const * const line_density_ptr = line_density.data();
+        amrex::Real const * const line_density_slope_ptr = line_density_slope.data();
+        int const num_values = static_cast<int>(line_density.size());
+        amrex::Real const bin_center_first = bin_min - 0.5_rt * bin_size;
+        amrex::Real const inv_bin_size = 1.0_rt / bin_size;
 
         // group together constants for the momentum push
         amrex::ParticleReal const push_consts = rfpiepslon * dt * charge * inv_gamma2 / (beta * pz_ref_SI);
@@ -286,12 +296,11 @@ namespace impactx::particles::spacecharge
                         std::cerr << "Warning: Index out of range for 2.5D Gaussian SC: " << idx << std::endl;
                     }
 #endif
-                    // Interpolation
-                    amrex::Real beam_profile_interp = 0.0_rt;
-                    amrex::Real beam_profile_slope_interp = 0.0_rt;
-                    impactx::particles::wakefields::InterpolateCharge1D(
-                        z, beam_profile, num_values, bin_min, bin_size,
-                        beam_profile_interp, beam_profile_slope_interp, GetNumberDensity);
+                    // Interpolate the line density and its slope between the bin centers
+                    amrex::Real const beam_profile_interp = InterpolateLinear1D(
+                        z, line_density_ptr, num_values, bin_center_first, inv_bin_size);
+                    amrex::Real const beam_profile_slope_interp = InterpolateLinear1D(
+                        z, line_density_slope_ptr, num_values, bin_center_first, inv_bin_size);
 
                     // Force evaluation
                     amrex::ParticleReal const Fxy = beam_profile_interp * chargesign;

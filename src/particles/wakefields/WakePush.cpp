@@ -8,13 +8,12 @@
  * License: BSD-3-Clause-LBNL
  */
 #include "WakePush.H"
+#include "InterpolateLinear1D.H"
 
 #include <ablastr/particles/NodalFieldGather.H>
 
-#include <AMReX_Algorithm.H>
 #include <AMReX_BLassert.H>
 #include <AMReX_BLProfiler.H>
-#include <AMReX_Math.H>
 #include <AMReX_REAL.H>
 #include <AMReX_SPACE.H>
 
@@ -74,23 +73,18 @@ namespace impactx::particles::wakefields
                     amrex::ParticleReal const & AMREX_RESTRICT t = part_t[i];
                     amrex::ParticleReal & AMREX_RESTRICT pt = part_pt[i];
 
+#if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
                     // Position in units of bin_size: the wake value k is at the bin edge v = k
                     amrex::Real const v = (t - bin_min) * inv_bin_size;
-
-#if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
                     if (v < 0_rt || v > static_cast<amrex::Real>(num_values - 1))
                     {
                         std::cerr << "Warning: Position out of range for wakefield: " << v << std::endl;
                     }
 #endif
 
-                    // Interpolate the wake linearly between the edges idx and idx + 1;
-                    // the clamps only hold positions on the range when rounding moves them off
-                    int const idx = amrex::Clamp(static_cast<int>(amrex::Math::floor(v)), 0, num_values - 2);
-                    amrex::Real const w = amrex::Clamp(v - static_cast<amrex::Real>(idx), 0_rt, 1_rt);
-
-                    // Update longitudinal momentum
-                    amrex::ParticleReal const F_L = (1_rt - w) * wakefield_ptr[idx] + w * wakefield_ptr[idx + 1];
+                    // Update longitudinal momentum: interpolate the wake between the bin edges
+                    amrex::ParticleReal const F_L = InterpolateLinear1D(
+                        t, wakefield_ptr, num_values, bin_min, inv_bin_size);
 
 #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
                     // Check if the force (convolution) values are within a reasonable range

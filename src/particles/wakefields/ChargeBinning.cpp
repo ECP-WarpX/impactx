@@ -112,6 +112,42 @@ namespace impactx::particles::wakefields
         });
     }
 
+    void DensityAndSlope1D (
+        amrex::Gpu::DeviceVector<amrex::Real> const & charge_distribution,
+        amrex::Gpu::DeviceVector<amrex::Real> & density,
+        amrex::Gpu::DeviceVector<amrex::Real> & slope,
+        amrex::Real bin_size,
+        bool GetNumberDensity
+    )
+    {
+        using namespace amrex::literals;
+
+        int const num_bins = static_cast<int>(charge_distribution.size());
+        int const num_values = num_bins + 1;
+        density.resize(num_values);
+        slope.resize(num_values);
+
+        // central difference, optionally of the number density
+        amrex::Real const slope_factor = GetNumberDensity
+            ? 0.5_rt / (bin_size * ablastr::constant::SI::q_e)
+            : 0.5_rt / bin_size;
+
+        amrex::Real const * const dptr_charge = charge_distribution.data();
+        amrex::Real * const dptr_density = density.data();
+        amrex::Real * const dptr_slope = slope.data();
+        amrex::ParallelFor(num_values, [=] AMREX_GPU_DEVICE(int k)
+        {
+            // value k belongs to bin k-1; the charge density is zero outside of the bins
+            int const bin = k - 1;
+            amrex::Real const charge_bin = (bin >= 0) ? dptr_charge[bin] : 0_rt;
+            amrex::Real const charge_below = (bin >= 1) ? dptr_charge[bin - 1] : 0_rt;
+            amrex::Real const charge_above = (bin + 1 < num_bins) ? dptr_charge[bin + 1] : 0_rt;
+
+            dptr_density[k] = charge_bin;
+            dptr_slope[k] = (charge_above - charge_below) * slope_factor;
+        });
+    }
+
     void MeanTransversePosition (
         impactx::ImpactXParticleContainer& myspc,
         amrex::Gpu::DeviceVector<amrex::Real> & mean_x,

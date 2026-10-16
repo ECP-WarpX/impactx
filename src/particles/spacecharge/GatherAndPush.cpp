@@ -11,6 +11,7 @@
 
 #include "initialization/Algorithms.H"
 #include "particles/wakefields/ChargeBinning.H"
+#include "particles/wakefields/InterpolateLinear1D.H"
 #include "particles/spacecharge/Deposit1D.H"
 
 #include <ablastr/particles/NodalFieldGather.H>
@@ -35,6 +36,7 @@ namespace impactx::particles::spacecharge
         BL_PROFILE("impactx::spacecharge::GatherAndPush");
 
         using namespace amrex::literals;
+        using impactx::particles::wakefields::InterpolateLinear1D;
 
         auto space_charge = get_space_charge_algo();
 
@@ -56,16 +58,27 @@ namespace impactx::particles::spacecharge
         amrex::Real bin_min = t_min;
         amrex::Real bin_max = t_max;
         amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);
+        amrex::Real const bin_center_first = bin_min - 0.5_rt * bin_size;
+        amrex::Real inv_bin_size = 0.0_rt;
+
+        // charge density and its slope at the bin centers, starting one bin center below bin_min
+        amrex::Gpu::DeviceVector<amrex::Real> line_density;
+        amrex::Gpu::DeviceVector<amrex::Real> line_density_slope;
 
         if (space_charge == SpaceChargeAlgo::True_2p5D) {
 
             pp_algo.queryAdd("apply_longitudinal_kick", apply_longitudinal_kick);
             charge_distribution = Deposit1D( pc, bin_min, bin_max, num_bins);
             Qb_abs = bin_size * amrex::Reduce::Sum(charge_distribution.size(), charge_distribution.data());
+
+            impactx::particles::wakefields::DensityAndSlope1D(
+                charge_distribution, line_density, line_density_slope, bin_size, GetNumberDensity);
+            inv_bin_size = 1.0_rt / bin_size;
         }
 
-        amrex::Real const * const beam_profile = charge_distribution.data();
-        int const num_values = static_cast<int>(charge_distribution.size());
+        amrex::Real const * const line_density_ptr = line_density.data();
+        amrex::Real const * const line_density_slope_ptr = line_density_slope.data();
+        int const num_values = static_cast<int>(line_density.size());
 
         // loop over refinement levels
         int const nLevel = pc.finestLevel();
@@ -197,12 +210,11 @@ namespace impactx::particles::spacecharge
                        }
                        #endif
 
-                       // Interpolation
-                       amrex::Real beam_profile_interp = 0.0_rt;
-                       amrex::Real beam_profile_slope_interp = 0.0_rt;
-                       impactx::particles::wakefields::InterpolateCharge1D(
-                           z, beam_profile, num_values, bin_min, bin_size,
-                           beam_profile_interp, beam_profile_slope_interp, GetNumberDensity);
+                       // Interpolate the line density and its slope between the bin centers
+                       amrex::Real const beam_profile_interp = InterpolateLinear1D(
+                           z, line_density_ptr, num_values, bin_center_first, inv_bin_size);
+                       amrex::Real const beam_profile_slope_interp = InterpolateLinear1D(
+                           z, line_density_slope_ptr, num_values, bin_center_first, inv_bin_size);
 
                        // Force constributions
                        amrex::ParticleReal const Fxy = (Qb_abs==0.0) ? 0.0_prt : beam_profile_interp / Qb_abs;
