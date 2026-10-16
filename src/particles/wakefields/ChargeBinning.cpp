@@ -10,6 +10,8 @@
 #include "ChargeBinning.H"
 #include "particles/ImpactXParticleContainer.H"
 
+#include <AMReX_BLassert.H>
+#include <AMReX_BLProfiler.H>
 #include <AMReX_GpuParallelReduce.H>
 
 #include <cmath>
@@ -123,9 +125,13 @@ namespace impactx::particles::wakefields
         bool is_unity_particle_weight
     )
     {
+        BL_PROFILE("impactx::particles::wakefields::MeanTransversePosition");
+
         using namespace amrex::literals;
 
-        int const num_bins = mean_x.size();
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(mean_x.size() == mean_y.size(),
+            "MeanTransversePosition: mean_x and mean_y must have the same size");
+        int const num_bins = static_cast<int>(mean_x.size());
         amrex::Real* dptr_mean_x = mean_x.data();
         amrex::Real* dptr_mean_y = mean_y.data();
 
@@ -151,12 +157,17 @@ namespace impactx::particles::wakefields
                     auto& soa = pti.GetStructOfArrays();
                     long const np = pti.numParticles();
 
-                    amrex::Real* const AMREX_RESTRICT pos_x = soa.GetRealData(impactx::RealSoA::x).dataPtr();
-                    amrex::Real* const AMREX_RESTRICT pos_y = soa.GetRealData(impactx::RealSoA::y).dataPtr();
-                    amrex::Real* const AMREX_RESTRICT pos_z = soa.GetRealData(impactx::RealSoA::z).dataPtr();
-                    amrex::Real* const AMREX_RESTRICT d_w = soa.GetRealData(impactx::RealSoA::w).dataPtr();
+                    amrex::ParticleReal const * const AMREX_RESTRICT pos_x =
+                        soa.GetRealData(impactx::RealSoA::x).dataPtr();
+                    amrex::ParticleReal const * const AMREX_RESTRICT pos_y =
+                        soa.GetRealData(impactx::RealSoA::y).dataPtr();
+                    amrex::ParticleReal const * const AMREX_RESTRICT pos_z =
+                        soa.GetRealData(impactx::RealSoA::z).dataPtr();
+                    amrex::ParticleReal const * const AMREX_RESTRICT d_w =
+                        soa.GetRealData(impactx::RealSoA::w).dataPtr();
 
-                    amrex::For(np, [=] AMREX_GPU_DEVICE(int i)
+                    // amrex::For: different particles add to the same bins
+                    amrex::For(np, [=] AMREX_GPU_DEVICE(long i)
                     {
                         amrex::Real const w = d_w[i];
                         amrex::Real const x = pos_x[i];
