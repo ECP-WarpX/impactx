@@ -141,6 +141,7 @@ if Config.precision == "SINGLE":
     # 10 m of tracking, and sigma_x follows because the over-long bunch weakens the
     # space-charge kick. The deviation grows with propagation distance: 0.34, 1.5 and
     # 2.2 relative for ds = 0.1, 1.0 and 10.0 m.
+    # https://github.com/BLAST-ImpactX/impactx/issues/1482
     rtol = 5.0
 print(f"  rtol for beam size = {rtol} (ignored: atol~={atol})")
 
@@ -154,6 +155,7 @@ assert np.allclose(
 atol = 3.0e-9
 if Config.precision == "SINGLE":
     # FIXME: in single precision, the particle emittance_t grows to 3.7e-8, see sigma_t
+    # https://github.com/BLAST-ImpactX/impactx/issues/1482
     atol = 1.0e-7
 rtol = 0.0
 print(f"  atol for emittances = {atol} (ignored: rtol~={rtol})")
