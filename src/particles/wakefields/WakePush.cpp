@@ -37,6 +37,8 @@ namespace impactx::particles::wakefields
         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(num_values >= 2,
             "WakePush: the wake needs at least two values to interpolate");
 
+        amrex::Real const inv_bin_size = 1_rt / bin_size;
+
         // Loop over refinement levels
         int const nLevel = pc.finestLevel();
         for (int lev = 0; lev <= nLevel; ++lev)
@@ -73,7 +75,7 @@ namespace impactx::particles::wakefields
                     amrex::ParticleReal & AMREX_RESTRICT pt = part_pt[i];
 
                     // Position in units of bin_size: the wake value k is at the bin edge v = k
-                    amrex::Real const v = (t - bin_min) / bin_size;
+                    amrex::Real const v = (t - bin_min) * inv_bin_size;
 
 #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
                     if (v < 0_rt || v > static_cast<amrex::Real>(num_values - 1))
