@@ -11,7 +11,10 @@
 
 #include <ablastr/particles/NodalFieldGather.H>
 
+#include <AMReX_Algorithm.H>
+#include <AMReX_BLassert.H>
 #include <AMReX_BLProfiler.H>
+#include <AMReX_Math.H>
 #include <AMReX_REAL.H>
 #include <AMReX_SPACE.H>
 
@@ -30,9 +33,9 @@ namespace impactx::particles::wakefields
 
         using namespace amrex::literals;
 
-#if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
-        int const cw_size = convolved_wakefield.size(); // no padding anymore
-#endif
+        int const num_values = static_cast<int>(convolved_wakefield.size());
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(num_values >= 2,
+            "WakePush: the wake needs at least two values to interpolate");
 
         // Loop over refinement levels
         int const nLevel = pc.finestLevel();
@@ -69,18 +72,23 @@ namespace impactx::particles::wakefields
                     amrex::ParticleReal const & AMREX_RESTRICT t = part_t[i];
                     amrex::ParticleReal & AMREX_RESTRICT pt = part_pt[i];
 
-                    // Update longitudinal momentum with the convolved wakefield force
-                    int const idx = static_cast<int>((t - bin_min) / bin_size);  // Find index position along t
+                    // Position in units of bin_size: the wake value k is at the bin edge v = k
+                    amrex::Real const v = (t - bin_min) / bin_size;
 
 #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
-                    if (idx < 0 || idx >= cw_size)
+                    if (v < 0_rt || v > static_cast<amrex::Real>(num_values - 1))
                     {
-                        std::cerr << "Warning: Index out of range for wakefield: " << idx << std::endl;
+                        std::cerr << "Warning: Position out of range for wakefield: " << v << std::endl;
                     }
 #endif
 
+                    // Interpolate the wake linearly between the edges idx and idx + 1;
+                    // the clamps only hold positions on the range when rounding moves them off
+                    int const idx = amrex::Clamp(static_cast<int>(amrex::Math::floor(v)), 0, num_values - 2);
+                    amrex::Real const w = amrex::Clamp(v - static_cast<amrex::Real>(idx), 0_rt, 1_rt);
+
                     // Update longitudinal momentum
-                    amrex::ParticleReal const F_L = wakefield_ptr[idx];
+                    amrex::ParticleReal const F_L = (1_rt - w) * wakefield_ptr[idx] + w * wakefield_ptr[idx + 1];
 
 #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
                     // Check if the force (convolution) values are within a reasonable range
