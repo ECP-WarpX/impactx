@@ -45,8 +45,8 @@ namespace impactx::particles::spacecharge
         amrex::ParmParse pp_algo("algo.space_charge");
         pp_algo.queryAddWithParser("num_longitudinal_bins", num_bins);
         amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins + 1, 0.0);
-        amrex::Gpu::DeviceVector<amrex::Real> charge_distribution_slope(num_bins, 0.0);
         amrex::Real Qb_abs = 0.0;
+        bool const GetNumberDensity = true;
 
         bool apply_longitudinal_kick = true;
 
@@ -61,13 +61,11 @@ namespace impactx::particles::spacecharge
 
             pp_algo.queryAdd("apply_longitudinal_kick", apply_longitudinal_kick);
             charge_distribution = Deposit1D( pc, bin_min, bin_max, num_bins);
-            bool const GetNumberDensity = true;
-            impactx::particles::wakefields::DerivativeCharge1D(charge_distribution, charge_distribution_slope, bin_size, GetNumberDensity);
             Qb_abs = bin_size * amrex::Reduce::Sum(charge_distribution.size(), charge_distribution.data());
         }
 
         amrex::Real const * const beam_profile = charge_distribution.data();
-        amrex::Real const * const beam_profile_slope = charge_distribution_slope.data();
+        int const num_values = static_cast<int>(charge_distribution.size());
 
         // loop over refinement levels
         int const nLevel = pc.finestLevel();
@@ -191,8 +189,8 @@ namespace impactx::particles::spacecharge
                        }
 
                        // Update momentae with the 2.5D SC force
-                       int const idx = static_cast<int>((z - bin_min) / bin_size);  // Find index position along z
                        #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
+                       int const idx = static_cast<int>((z - bin_min) / bin_size);  // Find index position along z
                        if (idx < 0 || idx >= num_bins)
                        {
                             std::cerr << "Warning: Index out of range for 2.5D SC: " << idx << std::endl;
@@ -200,10 +198,11 @@ namespace impactx::particles::spacecharge
                        #endif
 
                        // Interpolation
-                       amrex::ParticleReal const idxreal = static_cast<amrex::ParticleReal>(idx);
-                       amrex::ParticleReal const lambda = (z - bin_min) / bin_size - idxreal;
-                       amrex::ParticleReal const beam_profile_interp = (1_prt-lambda)*beam_profile[idx] + lambda*beam_profile[idx+1];
-                       amrex::ParticleReal const beam_profile_slope_interp = (idx >= num_bins - 1)? beam_profile_slope[idx] : (1_prt-lambda)*beam_profile_slope[idx] + lambda*beam_profile_slope[idx+1];
+                       amrex::Real beam_profile_interp = 0.0_rt;
+                       amrex::Real beam_profile_slope_interp = 0.0_rt;
+                       impactx::particles::wakefields::InterpolateCharge1D(
+                           z, beam_profile, num_values, bin_min, bin_size,
+                           beam_profile_interp, beam_profile_slope_interp, GetNumberDensity);
 
                        // Force constributions
                        amrex::ParticleReal const Fxy = (Qb_abs==0.0) ? 0.0_prt : beam_profile_interp / Qb_abs;

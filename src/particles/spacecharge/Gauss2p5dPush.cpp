@@ -230,12 +230,8 @@ namespace impactx::particles::spacecharge
             amrex::ParallelDescriptor::Communicator()
         );
 
-        // Call charge density derivative function
-        amrex::Gpu::DeviceVector<amrex::Real> slopes(charge_distribution.size() - 1, 0.0);
-        impactx::particles::wakefields::DerivativeCharge1D(charge_distribution, slopes, bin_size,GetNumberDensity);
-
-        amrex::Real const * const beam_profile_slope = slopes.data();
         amrex::Real const * const beam_profile = charge_distribution.data();
+        int const num_values = static_cast<int>(charge_distribution.size());
 
         // group together constants for the momentum push
         amrex::ParticleReal const push_consts = rfpiepslon * dt * charge * inv_gamma2 / (beta * pz_ref_SI);
@@ -283,19 +279,19 @@ namespace impactx::particles::spacecharge
                     potInt(delta,nint,x,y,sigx,sigy,eintx,einty,eintz);
 
                     // Update momentae with the 2.5D SC force
-                    int const idx = static_cast<int>((z - bin_min) / bin_size);  // Find index position along z
 #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
+                    int const idx = static_cast<int>((z - bin_min) / bin_size);  // Find index position along z
                     if (idx < 0 || idx >= num_bins)
                     {
                         std::cerr << "Warning: Index out of range for 2.5D Gaussian SC: " << idx << std::endl;
                     }
 #endif
                     // Interpolation
-                    amrex::ParticleReal const idxreal = static_cast<amrex::ParticleReal>(idx);
-                    amrex::ParticleReal const lambda = (z - bin_min) / bin_size - idxreal - 0.5_prt;
-                    amrex::ParticleReal const beam_profile_interp = (1_prt-lambda)*beam_profile[idx] + lambda*beam_profile[idx+1];
-                    amrex::ParticleReal const beam_profile_slope_interp = (idx >= num_bins - 1)? beam_profile_slope[idx] : (1_prt-lambda)*beam_profile_slope[idx] + lambda*beam_profile_slope[idx+1];
-
+                    amrex::Real beam_profile_interp = 0.0_rt;
+                    amrex::Real beam_profile_slope_interp = 0.0_rt;
+                    impactx::particles::wakefields::InterpolateCharge1D(
+                        z, beam_profile, num_values, bin_min, bin_size,
+                        beam_profile_interp, beam_profile_slope_interp, GetNumberDensity);
 
                     // Force evaluation
                     amrex::ParticleReal const Fxy = beam_profile_interp * chargesign;
