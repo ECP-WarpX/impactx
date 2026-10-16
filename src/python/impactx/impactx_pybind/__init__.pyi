@@ -981,7 +981,7 @@ class ImpactX:
     @property
     def space_charge_gauss_charge_z_bins(self) -> int:
         """
-        Number of longitudinal bins for computing the linear charge density (default: ``129``).
+        Number of longitudinal bins (grid points) for computing the linear charge density, at least 2 (default: ``129``).
         """
     @space_charge_gauss_charge_z_bins.setter
     def space_charge_gauss_charge_z_bins(
@@ -1017,7 +1017,7 @@ class ImpactX:
     @property
     def space_charge_num_longitudinal_bins(self) -> int:
         """
-        Number of longitudinal bins for 2.5D space charge calculation (default: ``100``).
+        Number of longitudinal bins (grid points) for 2.5D space charge calculation, at least 2 (default: ``100``).
         """
     @space_charge_num_longitudinal_bins.setter
     def space_charge_num_longitudinal_bins(
