@@ -83,8 +83,11 @@ namespace impactx::particles::wakefields
     {
         using namespace amrex::literals;
 
+        // could also be calculated on the host upfront
+        amrex::Real const inv_bin_size = 1.0_rt / bin_size;
+
         // position relative to the bin centers: center j at or below z, weight w in [0, 1)
-        amrex::Real const v = (z - bin_min) / bin_size - 0.5_rt;
+        amrex::Real const v = (z - bin_min) * inv_bin_size - 0.5_rt;
         int const j = static_cast<int>(amrex::Math::floor(v));
         amrex::Real const w = v - static_cast<amrex::Real>(j);
 
@@ -98,13 +101,15 @@ namespace impactx::particles::wakefields
         density = (1.0_rt - w) * rho[1] + w * rho[2];
 
         // central differences at the bin centers j and j+1
-        amrex::Real const slope_j = (rho[2] - rho[0]) / (2.0_rt * bin_size);
-        amrex::Real const slope_jp1 = (rho[3] - rho[1]) / (2.0_rt * bin_size);
+        amrex::Real const half_inv_bin_size = 0.5_rt * inv_bin_size;
+        amrex::Real const slope_j = (rho[2] - rho[0]) * half_inv_bin_size;
+        amrex::Real const slope_jp1 = (rho[3] - rho[1]) * half_inv_bin_size;
         slope = (1.0_rt - w) * slope_j + w * slope_jp1;
 
         if (GetNumberDensity)
         {
-            slope /= ablastr::constant::SI::q_e;
+            constexpr amrex::Real inv_q_e = 1.0_rt / ablastr::constant::SI::q_e;
+            slope *= inv_q_e;
         }
     }
 
