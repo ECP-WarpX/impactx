@@ -10,13 +10,13 @@
 #include "Gauss2p5dPush.H"
 
 #include "diagnostics/ReducedBeamCharacteristics.H"
+#include "particles/spacecharge/Deposit1D.H"
 #include "particles/wakefields/ChargeBinning.H"
 #include "particles/wakefields/InterpolateLinear1D.H"
 
 #include <AMReX_REAL.H>
 #include <AMReX_BLProfiler.H>
 #include <AMReX_GpuContainers.H>
-#include <AMReX_GpuParallelReduce.H>
 #include <AMReX_ParmParse.H>
 #include <ablastr/warn_manager/WarnManager.H>
 
@@ -213,24 +213,15 @@ namespace impactx::particles::spacecharge
             pc.MinAndMaxPositions();
 
         // Set parameters for charge deposition
-        bool const is_unity_particle_weight = false;
         bool const GetNumberDensity = true;
 
         int const num_bins = tp5d_bins;  // Set resolution
         amrex::Real const bin_min = t_min;
         amrex::Real const bin_max = t_max;
-        amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);  // number of evaluation points
-        // Allocate memory for the charge profile
-        amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins + 1, 0.0);
-        // Call charge deposition function
-        impactx::particles::wakefields::DepositCharge1D(pc, charge_distribution, bin_min, bin_size, is_unity_particle_weight);
-
-        // Sum up all partial charge histograms to each MPI process to calculate
-        // the global charge slope.
-        amrex::ParallelAllReduce::Sum(
-            charge_distribution,
-            amrex::ParallelDescriptor::Communicator()
-        );
+        amrex::Real const bin_size = (bin_max - bin_min) / num_bins;
+        // Charge density of all MPI ranks, in num_bins bins that tile [bin_min, bin_max]
+        amrex::Gpu::DeviceVector<amrex::Real> const charge_distribution =
+            Deposit1D(pc, bin_min, bin_max, num_bins);
 
         // charge density and its slope at the bin centers, starting one bin center below bin_min
         amrex::Gpu::DeviceVector<amrex::Real> line_density;
@@ -290,10 +281,10 @@ namespace impactx::particles::spacecharge
 
                     // Update momentae with the 2.5D SC force
 #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
-                    int const idx = static_cast<int>((z - bin_min) / bin_size);  // Find index position along z
-                    if (idx < 0 || idx >= num_bins)
+                    if (z < bin_min || z > bin_max)
                     {
-                        std::cerr << "Warning: Index out of range for 2.5D Gaussian SC: " << idx << std::endl;
+                        std::cerr << "Warning: Position out of range for 2.5D Gaussian SC: "
+                                  << z << std::endl;
                     }
 #endif
                     // Interpolate the line density and its slope between the bin centers

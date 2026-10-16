@@ -21,13 +21,13 @@ namespace impactx::particles::spacecharge
      *
      *  This function performs particle binning for particles in the beam along the
      *  longitudinal direction, for the purposes of computing space charge in
-     *  so-called 2.5D models.
+     *  so-called 2.5D models. The num_bins bins have equal size and tile [bin_min, bin_max].
      *
      * @param[in] pc container of the particles that deposited rho
      * @param[in] bin_min location of lower endpoint for binning
      * @param[in] bin_max location of upper endpoint for binning
      * @param[in] num_bins number of longitudinal bins
-     * @return beam_profile deposited charge density
+     * @return beam_profile deposited charge density, one value per bin, summed over all MPI ranks
      */
     amrex::Gpu::DeviceVector<amrex::Real>
     Deposit1D (

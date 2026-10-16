@@ -46,7 +46,7 @@ namespace impactx::particles::spacecharge
         int num_bins = 100;
         amrex::ParmParse pp_algo("algo.space_charge");
         pp_algo.queryAddWithParser("num_longitudinal_bins", num_bins);
-        amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins + 1, 0.0);
+        amrex::Gpu::DeviceVector<amrex::Real> charge_distribution;
         amrex::Real Qb_abs = 0.0;
         bool const GetNumberDensity = true;
 
@@ -57,7 +57,7 @@ namespace impactx::particles::spacecharge
 
         amrex::Real bin_min = t_min;
         amrex::Real bin_max = t_max;
-        amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);
+        amrex::Real const bin_size = (bin_max - bin_min) / num_bins;
         amrex::Real const bin_center_first = bin_min - 0.5_rt * bin_size;
         amrex::Real inv_bin_size = 0.0_rt;
 
@@ -203,10 +203,10 @@ namespace impactx::particles::spacecharge
 
                        // Update momentae with the 2.5D SC force
                        #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
-                       int const idx = static_cast<int>((z - bin_min) / bin_size);  // Find index position along z
-                       if (idx < 0 || idx >= num_bins)
+                       if (z < bin_min || z > bin_max)
                        {
-                            std::cerr << "Warning: Index out of range for 2.5D SC: " << idx << std::endl;
+                            std::cerr << "Warning: Position out of range for 2.5D SC: "
+                                      << z << std::endl;
                        }
                        #endif
 

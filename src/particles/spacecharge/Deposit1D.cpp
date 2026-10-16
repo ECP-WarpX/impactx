@@ -39,11 +39,20 @@ namespace impactx::particles::spacecharge
         // Set parameters for charge deposition
         bool const is_unity_particle_weight = false;
 
-        amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);  // number of evaluation points
-        // Allocate memory for the charge profile
+        // num_bins bins of equal size tile [bin_min, bin_max]
+        amrex::Real const bin_size = (bin_max - bin_min) / num_bins;
+        // Allocate memory for the charge profile, with one more bin for the particles at bin_max
         amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins + 1, 0.0);
         // Call charge deposition function
         impactx::particles::wakefields::DepositCharge1D(pc, charge_distribution, bin_min, bin_size, is_unity_particle_weight);
+
+        // The particles at bin_max belong to the last bin
+        amrex::Real * const dptr_charge = charge_distribution.data();
+        amrex::ParallelFor(1, [=] AMREX_GPU_DEVICE (int)
+        {
+            dptr_charge[num_bins - 1] += dptr_charge[num_bins];
+        });
+        charge_distribution.resize(num_bins);
 
         // Sum up all partial charge histograms to each MPI process to calculate
         // the global charge slope.
