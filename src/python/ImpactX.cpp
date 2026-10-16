@@ -392,14 +392,14 @@ void init_ImpactX (py::module& m)
                 return detail::get_or_throw<int>("algo.space_charge", "gauss_charge_z_bins");
             },
             [](ImpactX & /* ix */, int const gauss_charge_z_bins) {
-                if (gauss_charge_z_bins < 1) {
-                    throw std::runtime_error("space_charge_gauss_charge_z_bins must be strictly positive");
+                if (gauss_charge_z_bins < 2) {
+                    throw std::runtime_error("space_charge_gauss_charge_z_bins must be at least 2");
                 }
 
                 amrex::ParmParse pp_algo("algo.space_charge");
                 pp_algo.add("gauss_charge_z_bins", gauss_charge_z_bins);
             },
-            "Number of longitudinal bins for computing the linear charge density (default: ``129``)."
+            "Number of longitudinal bins (grid points) for computing the linear charge density, at least 2 (default: ``129``)."
         )
         .def_property("space_charge_gauss_taylor_delta",
             [](ImpactX & /* ix */) {
@@ -438,13 +438,13 @@ void init_ImpactX (py::module& m)
                 return detail::get_or_throw<int>("algo.space_charge", "num_longitudinal_bins");
             },
             [](ImpactX & /* ix */, int const num_longitudinal_bins) {
-                if (num_longitudinal_bins < 1) {
-                    throw std::runtime_error("space_charge_num_longitudinal_bins must be strictly positive");
+                if (num_longitudinal_bins < 2) {
+                    throw std::runtime_error("space_charge_num_longitudinal_bins must be at least 2");
                 }
                 amrex::ParmParse pp_algo("algo.space_charge");
                 pp_algo.add("num_longitudinal_bins", num_longitudinal_bins);
             },
-            "Number of longitudinal bins for 2.5D space charge calculation (default: ``100``)."
+            "Number of longitudinal bins (grid points) for 2.5D space charge calculation, at least 2 (default: ``100``)."
         )
         .def_property("space_charge_apply_longitudinal_kick",
              [](ImpactX & /* ix */) {

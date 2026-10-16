@@ -2445,7 +2445,8 @@ See there ``nslice`` option on lattice elements for slicing.
           :type: ``integer``
           :default: ``100``
 
-          The number of bins for longitudinal line density deposition.
+          The number of bins (grid points) for longitudinal line density deposition, at least ``2``.
+          The grid points are equidistant, with the first and the last on the ends of the bunch.
 
       .. pp:param:: algo.space_charge.apply_longitudinal_kick
           :type: ``boolean``
@@ -2497,7 +2498,8 @@ See there ``nslice`` option on lattice elements for slicing.
           :type: ``integer``
           :default: ``129``
 
-          Number of bins for longitudinal line density deposition.
+          Number of bins (grid points) for longitudinal line density deposition, at least ``2``.
+          The grid points are equidistant, with the first and the last on the ends of the bunch.
 
 .. pp:param:: amr.n_cell
     :type: ``3 integers``
