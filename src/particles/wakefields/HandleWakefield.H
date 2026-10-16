@@ -114,6 +114,18 @@ namespace impactx::particles::wakefields
                 amrex::ParallelDescriptor::Communicator()
             );
 
+            // Mean transverse positions per bin, needed for transverse wakes (not implemented
+            // yet). Off until then: an extra pass over all particles and an MPI reduction for an
+            // unused result. Collective: all MPI ranks call it and get the means of all particles.
+            constexpr bool compute_mean_transverse_position = false;
+            if constexpr (compute_mean_transverse_position) {
+                amrex::Gpu::DeviceVector<amrex::Real> mean_x(num_bins, 0.0);
+                amrex::Gpu::DeviceVector<amrex::Real> mean_y(num_bins, 0.0);
+                impactx::particles::wakefields::MeanTransversePosition(
+                    particle_container, mean_x, mean_y, bin_min, bin_size,
+                    is_unity_particle_weight);
+            }
+
             // The slopes and the wake live on the bin edges bin_min + k * bin_size, k = 0..num_bins.
             int const num_edges = num_bins + 1;
 

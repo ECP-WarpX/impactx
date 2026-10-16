@@ -10,6 +10,8 @@
 #include "ChargeBinning.H"
 #include "particles/ImpactXParticleContainer.H"
 
+#include <AMReX_GpuParallelReduce.H>
+
 #include <cmath>
 
 
@@ -127,14 +129,13 @@ namespace impactx::particles::wakefields
         amrex::Real* dptr_mean_x = mean_x.data();
         amrex::Real* dptr_mean_y = mean_y.data();
 
-        // Declare arrays for sums of positions and weights
-        auto sum_x = amrex::Gpu::DeviceVector<amrex::Real>(num_bins, 0.0_rt);
-        auto sum_y = amrex::Gpu::DeviceVector<amrex::Real>(num_bins, 0.0_rt);
-        auto sum_w = amrex::Gpu::DeviceVector<amrex::Real>(num_bins, 0.0_rt);
+        // Sums of the weights, of x * weight and of y * weight per bin, in one array to reduce
+        // them over all MPI ranks in one call
+        auto sums = amrex::Gpu::DeviceVector<amrex::Real>(3 * num_bins, 0.0_rt);
 
-        amrex::Real* const sum_w_ptr = sum_w.data();
-        amrex::Real* const sum_x_ptr = sum_x.data();
-        amrex::Real* const sum_y_ptr = sum_y.data();
+        amrex::Real* const sum_w_ptr = sums.data();
+        amrex::Real* const sum_x_ptr = sum_w_ptr + num_bins;
+        amrex::Real* const sum_y_ptr = sum_x_ptr + num_bins;
 
         int const nlevs = myspc.finestLevel();
         for (int lev = 0; lev <= nlevs; ++lev)
@@ -174,6 +175,12 @@ namespace impactx::particles::wakefields
                 }
             }
         }
+
+        // Sum up the partial sums of all MPI ranks, so every rank gets the global means
+        amrex::ParallelAllReduce::Sum(
+            sums,
+            amrex::ParallelDescriptor::Communicator()
+        );
 
         amrex::ParallelFor(num_bins, [=] AMREX_GPU_DEVICE(int i)
         {
