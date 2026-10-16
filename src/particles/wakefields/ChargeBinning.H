@@ -49,33 +49,6 @@ namespace impactx::particles::wakefields
         bool GetNumberDensity = true
     );
 
-    /** Function to calculate the charge density and its slope at the bin centers
-     *
-     * The bins tile the bunch (see Deposit1D): value i of charge_distribution is the charge
-     * density at the center of bin i, at bin_min + (i + 1/2) * bin_size. Both outputs have one
-     * more value on each side, so that linear interpolation with InterpolateLinear1D covers the
-     * whole bunch: value k belongs to bin_min + (k - 1/2) * bin_size.
-     *
-     * The slope is the central difference, with zero charge density outside of the bins, so it
-     * includes the steps at the bunch ends. The density outside of the bins is extrapolated
-     * linearly from the two outermost bins, limited to [0, outermost bin], so that the line
-     * density of a flat-top bunch stays flat up to its ends.
-     *
-     * @param[in] charge_distribution deposited charge density in 1D along s, at least one bin
-     * @param[out] density charge density at the bin centers, len(charge_distribution)+2 values
-     * @param[out] slope derivative of the number (or charge) density at the bin centers,
-     *                   len(charge_distribution)+2 values
-     * @param[in] bin_size size of one bin in s
-     * @param[in] GetNumberDensity number density if true, otherwise charge density
-     */
-    void DensityAndSlope1D (
-        amrex::Gpu::DeviceVector<amrex::Real> const & charge_distribution,
-        amrex::Gpu::DeviceVector<amrex::Real> & density,
-        amrex::Gpu::DeviceVector<amrex::Real> & slope,
-        amrex::Real bin_size,
-        bool GetNumberDensity = true
-    );
-
     /** Function to calculate the mean transverse positions (x and y) at each bin along s
      *
      * The means are over the particles of this MPI rank only.

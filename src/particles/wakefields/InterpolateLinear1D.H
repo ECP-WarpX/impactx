@@ -19,6 +19,38 @@
 
 namespace impactx::particles::wakefields
 {
+    /** Linear weights of a position on equidistant 1D values
+     *
+     * Value k of values belongs to the position x_first + k / inv_dx. The position x lies between
+     * the values k and k + 1: value k gets the weight 1 - w and value k + 1 the weight w.
+     * Positions outside of the values are moved to the nearest end value.
+     *
+     * Linear interpolation (InterpolateLinear1D) and linear deposition use these weights.
+     *
+     * @param[in] x position
+     * @param[in] num_values number of values, at least two
+     * @param[in] x_first position of the first value
+     * @param[in] inv_dx inverse of the distance between two values
+     * @param[out] k index of the value at or below x
+     * @param[out] w weight of the value k + 1, in [0, 1]
+     */
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+    void LinearWeights1D (
+        amrex::Real x,
+        int num_values,
+        amrex::Real x_first,
+        amrex::Real inv_dx,
+        int & k,
+        amrex::Real & w
+    )
+    {
+        using namespace amrex::literals;
+
+        amrex::Real const v = (x - x_first) * inv_dx;
+        k = amrex::Clamp(static_cast<int>(amrex::Math::floor(v)), 0, num_values - 2);
+        w = amrex::Clamp(v - static_cast<amrex::Real>(k), 0_rt, 1_rt);
+    }
+
     /** Interpolate equidistant 1D values linearly to a position
      *
      * Value k of values belongs to the position x_first + k / inv_dx. Positions outside of the
@@ -42,10 +74,9 @@ namespace impactx::particles::wakefields
     {
         using namespace amrex::literals;
 
-        // between the values k and k+1, at the weight w in [0, 1] from value k
-        amrex::Real const v = (x - x_first) * inv_dx;
-        int const k = amrex::Clamp(static_cast<int>(amrex::Math::floor(v)), 0, num_values - 2);
-        amrex::Real const w = amrex::Clamp(v - static_cast<amrex::Real>(k), 0_rt, 1_rt);
+        int k = 0;
+        amrex::Real w = 0_rt;
+        LinearWeights1D(x, num_values, x_first, inv_dx, k, w);
 
         return (1_rt - w) * values[k] + w * values[k + 1];
     }

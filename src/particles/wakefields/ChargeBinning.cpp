@@ -10,9 +10,6 @@
 #include "ChargeBinning.H"
 #include "particles/ImpactXParticleContainer.H"
 
-#include <AMReX_Algorithm.H>
-#include <AMReX_BLassert.H>
-
 #include <cmath>
 
 
@@ -112,65 +109,6 @@ namespace impactx::particles::wakefields
             {
                 dptr_slopes[i] = charge_derivative;
             }
-        });
-    }
-
-    void DensityAndSlope1D (
-        amrex::Gpu::DeviceVector<amrex::Real> const & charge_distribution,
-        amrex::Gpu::DeviceVector<amrex::Real> & density,
-        amrex::Gpu::DeviceVector<amrex::Real> & slope,
-        amrex::Real bin_size,
-        bool GetNumberDensity
-    )
-    {
-        using namespace amrex::literals;
-
-        int const num_bins = static_cast<int>(charge_distribution.size());
-        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(num_bins >= 1,
-            "DensityAndSlope1D: needs at least one bin");
-        int const num_values = num_bins + 2;
-        density.resize(num_values);
-        slope.resize(num_values);
-
-        // central difference, optionally of the number density
-        amrex::Real const slope_factor = GetNumberDensity
-            ? 0.5_rt / (bin_size * ablastr::constant::SI::q_e)
-            : 0.5_rt / bin_size;
-
-        amrex::Real const * const dptr_charge = charge_distribution.data();
-        amrex::Real * const dptr_density = density.data();
-        amrex::Real * const dptr_slope = slope.data();
-        amrex::ParallelFor(num_values, [=] AMREX_GPU_DEVICE(int k)
-        {
-            // value k belongs to bin k-1, so the first and the last value lie outside of the bins
-            int const bin = k - 1;
-            bool const outside = bin < 0 || bin >= num_bins;
-
-            // Density outside: the particles between the outermost bin center and the bunch end
-            // interpolate toward it. Extrapolate linearly from the two outermost bins, limited to
-            // [0, outermost bin]: a flat-top bunch keeps its density up to its ends, a bunch that
-            // tapers off goes to zero.
-            if (outside)
-            {
-                int const end = (bin < 0) ? 0 : num_bins - 1;
-                int const next = (bin < 0) ? amrex::min(1, num_bins - 1)
-                                           : amrex::max(num_bins - 2, 0);
-                amrex::Real const charge_end = dptr_charge[end];
-                amrex::Real const extrapolated = 2_rt * charge_end - dptr_charge[next];
-                dptr_density[k] = amrex::Clamp(extrapolated, 0_rt, charge_end);
-            }
-            else
-            {
-                dptr_density[k] = dptr_charge[bin];
-            }
-
-            // Slope: the charge density is zero outside of the bins, so the slopes next to the
-            // bunch ends include its steps there
-            bool const has_below = bin >= 1 && bin <= num_bins;
-            bool const has_above = bin + 1 < num_bins;
-            amrex::Real const charge_below = has_below ? dptr_charge[bin - 1] : 0_rt;
-            amrex::Real const charge_above = has_above ? dptr_charge[bin + 1] : 0_rt;
-            dptr_slope[k] = (charge_above - charge_below) * slope_factor;
         });
     }
 

@@ -11,7 +11,6 @@
 
 #include "diagnostics/ReducedBeamCharacteristics.H"
 #include "particles/spacecharge/Deposit1D.H"
-#include "particles/wakefields/ChargeBinning.H"
 #include "particles/wakefields/InterpolateLinear1D.H"
 
 #include <AMReX_REAL.H>
@@ -21,6 +20,7 @@
 #include <ablastr/warn_manager/WarnManager.H>
 
 #include <cmath>
+#include <stdexcept>
 #include <string>
 
 
@@ -204,6 +204,9 @@ namespace impactx::particles::spacecharge
 
         int tp5d_bins = 129;
         pp_algo.queryAddWithParser("gauss_charge_z_bins", tp5d_bins);
+        if (tp5d_bins < 2) {
+            throw std::runtime_error("algo.space_charge.gauss_charge_z_bins must be at least 2");
+        }
 
         bool apply_longitudinal_kick = true;
         pp_algo.queryAdd("apply_longitudinal_kick", apply_longitudinal_kick);
@@ -218,20 +221,20 @@ namespace impactx::particles::spacecharge
         int const num_bins = tp5d_bins;  // Set resolution
         amrex::Real const bin_min = t_min;
         amrex::Real const bin_max = t_max;
-        amrex::Real const bin_size = (bin_max - bin_min) / num_bins;
-        // Charge density of all MPI ranks, in num_bins bins that tile [bin_min, bin_max]
+        // distance between the grid points, which lie on bin_min, bin_max and in between
+        amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);
+        // Charge density of all MPI ranks at the num_bins grid points
         amrex::Gpu::DeviceVector<amrex::Real> const charge_distribution =
             Deposit1D(pc, bin_min, bin_max, num_bins);
 
-        // charge density and its slope at the bin centers, starting one bin center below bin_min
+        // charge density and its slope at the grid points
         amrex::Gpu::DeviceVector<amrex::Real> line_density;
         amrex::Gpu::DeviceVector<amrex::Real> line_density_slope;
-        impactx::particles::wakefields::DensityAndSlope1D(
+        DensityAndSlope1D(
             charge_distribution, line_density, line_density_slope, bin_size, GetNumberDensity);
         amrex::Real const * const line_density_ptr = line_density.data();
         amrex::Real const * const line_density_slope_ptr = line_density_slope.data();
         int const num_values = static_cast<int>(line_density.size());
-        amrex::Real const bin_center_first = bin_min - 0.5_rt * bin_size;
         amrex::Real const inv_bin_size = 1.0_rt / bin_size;
 
         // group together constants for the momentum push
@@ -287,11 +290,11 @@ namespace impactx::particles::spacecharge
                                   << z << std::endl;
                     }
 #endif
-                    // Interpolate the line density and its slope between the bin centers
+                    // Interpolate the line density and its slope between the grid points
                     amrex::Real const beam_profile_interp = InterpolateLinear1D(
-                        z, line_density_ptr, num_values, bin_center_first, inv_bin_size);
+                        z, line_density_ptr, num_values, bin_min, inv_bin_size);
                     amrex::Real const beam_profile_slope_interp = InterpolateLinear1D(
-                        z, line_density_slope_ptr, num_values, bin_center_first, inv_bin_size);
+                        z, line_density_slope_ptr, num_values, bin_min, inv_bin_size);
 
                     // Force evaluation
                     amrex::ParticleReal const Fxy = beam_profile_interp * chargesign;

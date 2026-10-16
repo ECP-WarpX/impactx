@@ -99,7 +99,7 @@ Collective Effects & Overall Simulation Parameters
 
    .. py:property:: space_charge_gauss_charge_z_bins
 
-      Number of bins for longitudinal charge density deposition (default: ``129``).  Used by the Gauss2p5D space charge model.
+      Number of bins (grid points) for longitudinal charge density deposition, at least ``2`` (default: ``129``).  Used by the Gauss2p5D space charge model.
 
    .. py:property:: space_charge_gauss_long_scale
 
@@ -115,7 +115,7 @@ Collective Effects & Overall Simulation Parameters
 
    .. py:property:: space_charge_num_longitudinal_bins
 
-      Number of bins for longitudinal charge density deposition (default: ``100``).  Used by the 2p5D space charge model.
+      Number of bins (grid points) for longitudinal charge density deposition, at least ``2`` (default: ``100``).  Used by the 2p5D space charge model.
 
    .. py:property:: space_charge_apply_longitudinal_kick
 
