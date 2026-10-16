@@ -78,6 +78,8 @@ namespace impactx::particles::wakefields
 
     /** Function to calculate the mean transverse positions (x and y) at each bin along s
      *
+     * The means are over the particles of this MPI rank only.
+     *
      * @param[in] myspc the particle species to deposit along s
      * @param[out] mean_x the output array for mean x positions (1D)
      * @param[out] mean_y the output array for mean y positions (1D)

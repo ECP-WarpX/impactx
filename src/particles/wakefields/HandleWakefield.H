@@ -28,7 +28,7 @@
 namespace impactx::particles::wakefields
 {
     /** Function to handle CSR bending process including charge deposition,
-     * mean transverse position calculation, wakefield generation, and convolution.
+     * wakefield generation, and convolution.
      *
      * Returns immediately if slice_ds is zero.
      *
@@ -102,8 +102,6 @@ namespace impactx::particles::wakefields
 
             // Allocate memory for the charge profile: num_bins bins and one empty bin above bin_max
             amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins + 1, 0.0);
-            amrex::Gpu::DeviceVector<amrex::Real> mean_x(num_bins, 0.0);
-            amrex::Gpu::DeviceVector<amrex::Real> mean_y(num_bins, 0.0);
 
             // Call charge deposition function
             impactx::particles::wakefields::DepositCharge1D(particle_container, charge_distribution, bin_min, bin_size, is_unity_particle_weight);
@@ -124,10 +122,6 @@ namespace impactx::particles::wakefields
             // same length.
             amrex::Gpu::DeviceVector<amrex::Real> convolved_wakefield(num_edges, 0.0);
             if (amrex::ParallelDescriptor::IOProcessor()) {
-                // Call the mean transverse position function
-                impactx::particles::wakefields::MeanTransversePosition(particle_container, mean_x, mean_y, bin_min,
-                                                                       bin_size, is_unity_particle_weight);
-
                 // Slopes of the charge density at the bin edges, with zero charge density below
                 // bin_min: edge k lies between bin k-1 and bin k, edge 0 is the rising edge of bin 0
                 // Use number density derivatives for the convolution with CSR
