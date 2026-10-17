@@ -150,6 +150,7 @@ def all_elements():
         backend="h5",
         encoding="g",
         period_sample_intervals=2,
+        coord_system="t",
     )
     lattice.append(monitor)
 

@@ -24,9 +24,50 @@ requirements. Newest release first.
    pge = elements.Programmable(0.5, 2)                # before
    pge = elements.Programmable(ds=0.5, nslice=2)      # preferred by name, works as before
 
+``Source``: ``name`` moved to the 8th argument
+""""""""""""""""""""""""""""""""""""""""""""""
+
+:py:class:`~impactx.elements.Source` takes the new ``coord_system`` as its 7th argument, so
+``name`` moved back by one position.
+
+**What to check in your scripts:** a ``Source(...)`` call that passes ``name`` by position
+raises a ``RuntimeError``. Pass it by keyword:
+
+.. code-block:: python
+
+   src = elements.Source("openPMD", path, True, True, None, None, "src")       # before
+   src = elements.Source("openPMD", path, name="src")                          # preferred by name, works as before
+
+``BeamMonitor`` and ``Source``: the beam must be at fixed ``s``
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+A :py:class:`~impactx.elements.BeamMonitor` and a :py:class:`~impactx.elements.Source` now raise a
+``RuntimeError`` when the beam is at fixed :math:`t`, i.e., after
+``coordinate_transformation(beam, CoordSystem.t)``. Before, the monitor wrote the coordinates at
+fixed :math:`t` under the names of those at fixed :math:`s`, and the source added particles at
+fixed :math:`s` to the beam at fixed :math:`t`.
+
+**What to check in your scripts:** a monitor or a source that is pushed between
+``coordinate_transformation(beam, CoordSystem.t)`` and ``coordinate_transformation(beam, CoordSystem.s)``.
+Push it at fixed :math:`s`. To write the particles at fixed :math:`t`, use the new ``coord_system``
+of the monitor:
+
+.. code-block:: python
+
+   coordinate_transformation(beam, CoordSystem.t)                  # before
+   push(beam, elements.BeamMonitor("monitor"))
+   coordinate_transformation(beam, CoordSystem.s)
+
+   push(beam, elements.BeamMonitor("monitor", coord_system="t"))   # now
+
 New in this release
 """""""""""""""""""
 
+- :py:class:`BeamMonitor(..., coord_system="t") <impactx.elements.BeamMonitor>` writes the particles at
+  fixed :math:`t` in the units of the openPMD standard, e.g., to continue in a code that uses time as the
+  independent variable, such as WarpX. See :ref:`dataanalysis-monitor-fixed-t`.
+- :py:class:`Source(..., coord_system="t") <impactx.elements.Source>` reads particles at fixed :math:`t`,
+  from such a monitor or from a code that uses time as the independent variable, e.g., WarpX.
 - :py:attr:`Programmable.includes_collective_effects <impactx.elements.Programmable.includes_collective_effects>`
   declares that a push already models collective effects, e.g., by calling an external code.
   ImpactX then applies no additional space charge, wakefield, CSR or ISR kicks for this element.

@@ -31,6 +31,24 @@ using namespace impactx;
 
 namespace detail
 {
+    //! a coordinate system, by name ("s" or "t") or as impactx.CoordSystem
+    using CoordSystemArg = std::variant<std::string, CoordSystem>;
+
+    /** The coordinate system of an element option
+     *
+     * @param coord_system "s", "t" or an impactx.CoordSystem
+     * @return the coordinate system
+     * @throws std::runtime_error if the name is neither "s" nor "t"
+     */
+    CoordSystem
+    to_coord_system (CoordSystemArg const & coord_system)
+    {
+        if (auto const * coord_system_name = std::get_if<std::string>(&coord_system)) {
+            return amrex::getEnum<CoordSystem>(*coord_system_name);
+        }
+        return std::get<CoordSystem>(coord_system);
+    }
+
     /** Helper Function for Property Getters
      *
      * This queries an amrex::ParmParse entry. This throws a
@@ -585,11 +603,27 @@ void init_elements(py::module& m)
                      std::make_pair("encoding", bm.encoding()),
                      std::make_pair("period_sample_intervals", bm.period_sample_intervals()),
                      std::make_pair("particles", bm.particles()),
-                     std::make_pair("beam_moments", bm.beam_moments())
+                     std::make_pair("beam_moments", bm.beam_moments()),
+                     std::make_pair("coord_system", amrex::getEnumNameString(bm.coord_system()))
                  );
              }
         )
-        .def(py::init<std::string, std::string, std::string, int, bool, bool>(),
+        .def(py::init([](
+                 std::string name,
+                 std::string backend,
+                 std::string encoding,
+                 int period_sample_intervals,
+                 bool particles,
+                 bool beam_moments,
+                 detail::CoordSystemArg const & coord_system
+             )
+             {
+                 return new diagnostics::BeamMonitor(
+                     std::move(name), std::move(backend), std::move(encoding),
+                     period_sample_intervals, particles, beam_moments,
+                     detail::to_coord_system(coord_system)
+                 );
+             }),
              py::arg("name"),
              py::arg("backend") = diagnostics::BeamMonitor::DEFAULT_backend,
              py::arg("encoding") = diagnostics::BeamMonitor::DEFAULT_encoding,
@@ -597,6 +631,8 @@ void init_elements(py::module& m)
                  diagnostics::BeamMonitor::DEFAULT_period_sample_intervals,
              py::arg("particles") = diagnostics::BeamMonitor::DEFAULT_particles,
              py::arg("beam_moments") = diagnostics::BeamMonitor::DEFAULT_beam_moments,
+             py::arg("coord_system") =
+                 amrex::getEnumNameString(diagnostics::BeamMonitor::DEFAULT_coord_system),
              "This element writes the particle beam out to openPMD data."
         )
         .def_property_readonly("name",
@@ -625,6 +661,13 @@ void init_elements(py::module& m)
             [](diagnostics::BeamMonitor & bm) { return bm.beam_moments(); },
             [](diagnostics::BeamMonitor & bm, bool beam_moments) { bm.set_beam_moments(beam_moments); },
             "Output the beam moments (reduced beam characteristics) as openPMD attributes (default: True)"
+        )
+        .def_property_readonly("coord_system",
+            [](diagnostics::BeamMonitor const & bm) {
+                return amrex::getEnumNameString(bm.coord_system());
+            },
+            "Coordinate system of the individual particles in the output: "
+            R"("s" for fixed s (default), "t" for fixed t)"
         )
         .def_property("nonlinear_lens_invariants",
             [](diagnostics::BeamMonitor & bm) { return detail::get_or_throw<bool>(bm.name(), "nonlinear_lens_invariants"); },
@@ -2796,7 +2839,8 @@ void init_elements(py::module& m)
                      std::make_pair("active_once", src.m_active_once),
                      std::make_pair("load_ref_particle", src.m_load_ref_particle),
                      std::make_pair("load_step", src.m_load_step),
-                     std::make_pair("load_step_index", src.m_load_step_index)
+                     std::make_pair("load_step_index", src.m_load_step_index),
+                     std::make_pair("coord_system", amrex::getEnumNameString(src.m_coord_system))
                  );
              }
         )
@@ -2815,25 +2859,35 @@ void init_elements(py::module& m)
                     std::make_pair("active_once", src.m_active_once),
                     std::make_pair("load_ref_particle", src.m_load_ref_particle),
                     std::make_pair("load_step", load_step),
-                    std::make_pair("load_step_index", load_step_index)
+                    std::make_pair("load_step_index", load_step_index),
+                    std::make_pair("coord_system", amrex::getEnumNameString(src.m_coord_system))
                 );
             }
         )
-        .def(py::init<
-             std::string,
-             std::string,
-             bool,
-             bool,
-             std::optional<int>,
-             std::optional<int>,
-             std::optional<std::string>
-         >(),
+        .def(py::init([](
+                 std::string distribution,
+                 std::string openpmd_path,
+                 bool active_once,
+                 bool load_ref_particle,
+                 std::optional<int> load_step,
+                 std::optional<int> load_step_index,
+                 detail::CoordSystemArg const & coord_system,
+                 std::optional<std::string> name
+             )
+             {
+                 return new Source(
+                     std::move(distribution), std::move(openpmd_path),
+                     active_once, load_ref_particle, load_step, load_step_index,
+                     detail::to_coord_system(coord_system), std::move(name)
+                 );
+             }),
              py::arg("distribution"),
              py::arg("openpmd_path"),
              py::arg("active_once") = Source::DEFAULT_active_once,
              py::arg("load_ref_particle") = Source::DEFAULT_load_ref_particle,
              py::arg("load_step") = Source::DEFAULT_load_step,
              py::arg("load_step_index") = Source::DEFAULT_load_step_index,
+             py::arg("coord_system") = amrex::getEnumNameString(Source::DEFAULT_coord_system),
              py::arg("name") = py::none(),
              "A particle source."
         )
@@ -2872,6 +2926,14 @@ void init_elements(py::module& m)
             "0 is the first step and -1 the last, counting back from it as in Python "
             "(-2 is the second to last step). Set at most one of load_step and load_step_index; "
             "if neither is set, the last step in the file is loaded."
+        )
+        .def_property("coord_system",
+            [](Source & src) { return amrex::getEnumNameString(src.m_coord_system); },
+            [](Source & src, detail::CoordSystemArg const & coord_system) {
+                src.m_coord_system = detail::to_coord_system(coord_system);
+            },
+            "Coordinate system of the particles in the file: "
+            R"("s" for fixed s (default), "t" for fixed t; set as a name or as CoordSystem)"
         )
     ;
     register_push(py_Source);

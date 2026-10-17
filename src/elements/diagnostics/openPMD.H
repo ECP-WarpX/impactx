@@ -10,6 +10,8 @@
 #ifndef IMPACTX_OPENPMD_H
 #define IMPACTX_OPENPMD_H
 
+#include "particles/ReferenceParticle.H"
+
 #ifdef ImpactX_USE_OPENPMD
 #   include <openPMD/openPMD.hpp>
 #endif
@@ -37,6 +39,27 @@ namespace impactx::elements::diagnostics::detail
         openPMD::ParticleSpecies & species,
         std::string comp_name
     );
+
+    /** Momentum of the reference particle in SI
+     *
+     * Particle momenta at fixed t are stored in units of it: it is their openPMD unitSI.
+     *
+     * @param ref reference particle
+     * @return beta*gamma*m*c of the reference particle, in kg*m/s
+     */
+    double
+    reference_momentum_SI (RefPart const & ref);
+
+    /** Does the reference particle move along the z axis of the lab frame?
+     *
+     * Particles at fixed t are stored in the frame of the reference particle, whose z axis
+     * points along its momentum. Only then is it also the lab frame, e.g., of WarpX.
+     *
+     * @param ref reference particle
+     * @return true if its momentum points along +z, up to round-off
+     */
+    bool
+    reference_along_z (RefPart const & ref);
 #endif
 } // namespace impactx::elements::diagnostics::detail
 

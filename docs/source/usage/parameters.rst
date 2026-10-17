@@ -401,7 +401,7 @@ This requires these additional parameters:
 ``beam_monitor``
 ^^^^^^^^^^^^^^^^
 
-``beam_monitor`` a beam monitor, writing all beam particles at fixed ``s`` to openPMD files,
+``beam_monitor`` a beam monitor, writing all beam particles at fixed ``s`` (default) or at fixed ``t`` to openPMD files,
 e.g. for an element ``<monitor_name>.type = beam_monitor``.
 If the same element name is used multiple times, then an output series is created with multiple outputs.
 
@@ -448,6 +448,20 @@ If the same element name is used multiple times, then an output series is create
     :default: ``true``
 
     Compute and output the beam moments (reduced beam characteristics) of the whole bunch as openPMD attributes on the ``beam`` particle species.
+
+.. pp:param:: <monitor_name>.coord_system
+    :type: ``string``
+    :default: ``s``
+
+    Coordinate system of the individual particles in the output: ``s`` or ``t``.
+
+    * ``s``: the particles at fixed :math:`s`, as they pass the monitor.
+    * ``t``: the particles at fixed :math:`t`, at the time at which the reference particle passes the monitor.
+      Each particle is drifted to that time and written with positions ``x``, ``y``, ``z`` and momenta ``x``, ``y``, ``z`` in the `units of the openPMD standard <https://github.com/openPMD/openPMD-standard>`__.
+      See :ref:`dataanalysis-monitor-fixed-t` for details.
+
+    The beam that is tracked is at fixed :math:`s` for both options.
+    The reference particle and the beam moments in the output are the same for both options, too.
 
 .. pp:param:: <monitor_name>.nonlinear_lens_invariants
     :type: ``boolean``
@@ -2111,7 +2125,7 @@ This element is defined via ``<solenoid_softedge_name>.type = solenoid_softedge`
 e.g. for an element ``<source_name>.type = source``.
 Typically at the beginning of a beam line.
 
-Currently, this only supports openPMD files from our ``beam_monitor``.
+This supports openPMD files from our ``beam_monitor`` and, with ``<source_name>.coord_system = t``, openPMD files from codes that use time as the independent variable.
 
 In `MPI-parallel <https://www.mpi-forum.org>`__ runs, reading the particles in the source file is distributed over all MPI ranks:
 each of the :math:`N` ranks reads a different contiguous chunk of :math:`1/N`-th of the particles, independent of their position.
@@ -2178,6 +2192,25 @@ When ImpactX needs to sort particles spatially, it will redistribute them over M
     An index that reaches past either end of the file is an error, which lists the steps in it.
 
     Set at most one of ``load_step`` and ``load_step_index``.
+
+.. pp:param:: <source_name>.coord_system
+    :type: ``string``
+    :default: ``s``
+
+    Coordinate system of the particles in the file: ``s`` or ``t``.
+
+    * ``s``: particles at fixed :math:`s`, as a ``beam_monitor`` writes them by default.
+    * ``t``: particles at fixed :math:`t`, as a ``beam_monitor`` writes them with ``coord_system = t`` or as codes that use time as the independent variable write them, e.g., `WarpX <https://warpx.readthedocs.io>`__.
+      Each particle is drifted to the position :math:`s` of the reference particle.
+
+    At fixed :math:`t`, the positions ``x``, ``y``, ``z`` (plus their ``positionOffset``), the momenta ``x``, ``y``, ``z`` and the ``weighting`` of the particle species ``beam`` are read in the units of the `openPMD standard <https://github.com/openPMD/openPMD-standard>`__: in SI, after multiplication with their ``unitSI``.
+    The ``spin`` of the particles is read if the file holds it.
+    The ``z`` axis is the direction of the reference momentum.
+    Files from codes that write the particles in their lab frame need a reference particle that moves along its ``z`` axis, i.e., with zero ``px`` and ``py``; otherwise, the source records a warning.
+    Particles that do not move forward along ``z`` and values that are not finite numbers are an error.
+
+    The particles keep their positions and momenta from the file and are added relative to the reference particle.
+    Files from other codes hold no reference particle: set ``load_ref_particle = false`` and configure the reference particle before the tracking loop, with its species, its energy and its position ``z`` (and ``x``, ``y``) in the coordinates of the file, e.g., at the centroid of the beam.
 
 
 ``spin_map``

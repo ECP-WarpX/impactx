@@ -9,6 +9,12 @@
  */
 #include "elements/diagnostics/openPMD.H"
 
+#include <ablastr/constant.H>
+
+#include <cmath>
+#include <string>
+#include <utility>
+
 
 namespace impactx::elements::diagnostics::detail
 {
@@ -40,6 +46,29 @@ namespace impactx::elements::diagnostics::detail
         // handle scalar and non-scalar records by name
         const auto [record_name, component_name] = name2openPMD(std::move(comp_name));
         return species[record_name][component_name];
+    }
+
+
+    double
+    reference_momentum_SI (RefPart const & ref)
+    {
+        return static_cast<double>(ref.beta_gamma()) *
+               static_cast<double>(ref.mass) *
+               ablastr::constant::SI::c_v<double>;
+    }
+
+
+    bool
+    reference_along_z (RefPart const & ref)
+    {
+        // angle in rad between the reference momentum and z, larger than its round-off
+        // after bends, also in single precision
+        constexpr double max_angle = 1.0e-6;
+
+        double const px = static_cast<double>(ref.px);
+        double const py = static_cast<double>(ref.py);
+        double const pz = static_cast<double>(ref.pz);
+        return pz > 0.0 && std::hypot(px, py) <= max_angle * pz;
     }
 #endif
 } // namespace impactx::elements::diagnostics::detail
