@@ -3382,6 +3382,7 @@ void init_elements(py::module& m)
 
     // freestanding push function
     m.def("push", py::overload_cast<ImpactXParticleContainer &, elements::ElementHandle &, int, int>(&push),
+        py::call_guard<py::gil_scoped_release>(),
         py::arg("pc"), py::arg("element"), py::arg("step")=0, py::arg("period")=0,
         "Push a whole particle beam (incl. reference particle) through an element"
     );
