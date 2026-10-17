@@ -105,18 +105,22 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = 2.2e12 * num_particles**-0.5  # from random sampling of a smooth distribution
+rtol = 2.2 * num_particles**-0.5  # from random sampling of a smooth distribution
+if not is_double:
+    # FIXME: all moments are off by 17-19% in single precision, see initial beam
+    # https://github.com/BLAST-ImpactX/impactx/issues/1485
+    rtol = 0.5
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(
     [sigx, sigy, sigt, emittance_x, emittance_y, emittance_t],
     [
-        1.922660e-03,
-        2.166654e-05,
-        1.101353e-04,
-        8.561046e-09,
-        1.020439e-10,
-        8.569865e-09,
+        2.797264e-04,
+        6.484914e-04,
+        2.022674e-04,
+        3.097048e-08,
+        2.207603e-08,
+        3.803276e-08,
     ],
     rtol=rtol,
     atol=atol,
