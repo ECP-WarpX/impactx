@@ -1,9 +1,9 @@
 beam, energy=0.8+pmass, particle=proton;
 
 rc=10.0;
-g=1.0e-3
-pi=3.14159;
-us_dipedge_elem: dipedge, h=1/rc, e1=pi/8.0, fint=1.0, hgap=g/2.0;
+g=1.0;
+pi=3.141592653589793;
+us_dipedge_elem: dipedge, h=1/rc, e1=pi/8.0, fint=0.5, hgap=g/2.0;
 us_dipedge: line=(us_dipedge_elem);
 
 use, sequence=us_dipedge;
