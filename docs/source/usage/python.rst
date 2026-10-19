@@ -642,7 +642,11 @@ For step-by-step recipes on how to access particle data live during a simulation
 
    .. py:method:: add_n_particles(x, y, t, px, py, pt, qm, bunch_charge=None, w=None, sx=None, sy=None, sz=None)
 
-      Add new particles to the container for fixed s.
+      Add new particles to the container.
+
+      Positions are in meters and momenta are normalized by the reference momentum (unitless), all relative to the reference particle (see :ref:`theory-coordinates-and-units`).
+      At fixed :math:`s` (the default), ``t`` and ``pt`` are the time-of-flight :math:`c\,t` and the energy deviation :math:`p_t = -\Delta\gamma/(\beta_0\gamma_0)`.
+      Inside an :py:meth:`at_fixed_t` block, they take the position :math:`z` and the momentum deviation :math:`p_z = \Delta(\beta_z\gamma)/(\beta_0\gamma_0)` instead.
 
       Either the charge (bunch_charge) of the particles added in this call, or the weight of each
       particle (w) must be provided.
@@ -665,16 +669,43 @@ For step-by-step recipes on how to access particle data live during a simulation
 
       :param x: positions in x
       :param y: positions in y
-      :param t: positions as time-of-flight in c*t
+      :param t: time-of-flight :math:`c\,t` in m (at fixed :math:`s`) or position :math:`z` in m (at fixed :math:`t`)
       :param px: momentum in x
       :param py: momentum in y
-      :param pt: momentum in t
+      :param pt: energy deviation :math:`p_t` (at fixed :math:`s`) or momentum deviation :math:`p_z` (at fixed :math:`t`), unitless
       :param qm: charge over mass in 1/eV
       :param bunch_charge: total charge within a bunch in C
       :param w: weight of each particle: the macroparticle charge in units of the elementary charge `e` (i.e., how many real particles to represent)
       :param sx: spin component in x (optional; if provided, sy and sz must also be provided)
       :param sy: spin component in y (optional; if provided, sx and sz must also be provided)
       :param sz: spin component in z (optional; if provided, sx and sy must also be provided)
+
+   .. py:property:: coord_system
+
+      The coordinate system the particle data is currently in: :py:class:`impactx.CoordSystem` ``s`` (default) or ``t``.
+      The longitudinal attributes are named after it: ``position_t`` and ``momentum_t`` at fixed :math:`s`, ``position_z`` and ``momentum_z`` at fixed :math:`t`.
+
+   .. py:method:: at_fixed_t()
+
+      Context manager that represents the particles at fixed :math:`t` inside a ``with`` block.
+
+      On entry, the particles are transformed from fixed :math:`s` to fixed :math:`t`.
+      When the block ends, normally or through an exception, they are transformed back to fixed :math:`s`.
+      Inside the block, the attributes ``position_z`` and ``momentum_z`` replace ``position_t`` and ``momentum_t`` and hold :math:`z` and :math:`p_z`.
+      The ``t`` and ``pt`` arguments of :py:meth:`add_n_particles` keep their names and take :math:`z` and :math:`p_z` inside the block.
+
+      The transformation to fixed :math:`t` uses the reference energy ``ref.pt`` as the block starts, the transformation back to fixed :math:`s` uses ``ref.pt`` as the block ends.
+      A block that changes the reference energy must write the particle coordinates relative to the updated reference particle.
+
+      .. code-block:: python
+
+         with sim.beam.at_fixed_t() as beam:
+             ...  # read, modify or add particles at fixed t
+
+      See :ref:`usage-howto-python-particle-data-fixed-t` for details.
+
+      :return: this particle container, at fixed :math:`t` inside the block
+      :raises RuntimeError: if the particles are not at fixed :math:`s` on entry (blocks cannot be nested), or if they were transformed out of fixed :math:`t` inside the block
 
    .. py:method:: ref_particle()
 
@@ -2897,12 +2928,12 @@ Each lattice element provides a ``.to_dict()`` method, which can be used to seri
 Coordinate Transformation
 -------------------------
 
-.. py:class:: impactx.TransformationDirection
+.. py:class:: impactx.CoordSystem
 
-   Enumerated type indicating whether to transform to fixed :math:`s` or fixed :math:`t` coordinate system when applying ``impactx.coordinate_transformation``.
+   Enumerated type for the coordinate system of particle data: the independent variable is either the position :math:`s` or the time :math:`t`.
 
-   :param to_fixed_t:
-   :param to_fixed_s:
+   :param s: fixed :math:`s` (the ImpactX default)
+   :param t: fixed :math:`t`
 
 .. py:function:: impactx.push(pc, element, step=0, period=0)
 
@@ -2927,7 +2958,11 @@ Coordinate Transformation
 
 .. py:function:: impactx.coordinate_transformation(pc, direction)
 
-   Function to transform the coordinates of the particles in a particle container either to fixed :math:`t` or to fixed :math:`s`.
+   Transform the coordinates of the particles in a particle container either to fixed :math:`t` or to fixed :math:`s`.
+   Both directions take the reference energy from ``pc.ref.pt`` at the time of the call.
+   The longitudinal attributes are renamed accordingly, see :py:attr:`impactx.ParticleContainer.coord_system`.
 
-   :param pc: ``impactx.particle_container`` whose particle coordinates are to be transformed.
-   :param direction: enumerated type ``impactx.TransformationDirection``, indicates whether to transform to fixed :math:`s` or fixed :math:`t`.
+   Prefer :py:meth:`impactx.ParticleContainer.at_fixed_t`, which pairs both transformations and restores fixed :math:`s` if an exception is raised.
+
+   :param pc: :py:class:`impactx.ParticleContainer` whose particle coordinates are to be transformed.
+   :param direction: :py:class:`impactx.CoordSystem` to transform to; must differ from ``pc.coord_system``.

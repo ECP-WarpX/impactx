@@ -23,10 +23,8 @@ from surrogate_model_definitions import surrogate_model
 
 from impactx import (
     Config,
-    CoordSystem,
     ImpactX,
     ImpactXParIter,
-    coordinate_transformation,
     distribution,
     elements,
 )
@@ -195,66 +193,67 @@ class LPASurrogateStage(elements.Programmable):
             [0, 0, ref_z_f, 0, 0, ref_uz_f], device=device, dtype=torch.float64
         )
 
-        coordinate_transformation(pc, CoordSystem.t)
+        # the particle data below is at fixed t; the beam returns to fixed s
+        # when the block ends
+        with pc.at_fixed_t():
+            for lvl in range(pc.finest_level + 1):
+                for pti in ImpactXParIter(pc, level=lvl):
+                    soa = pti.soa()
+                    real_arrays = soa.get_real_data()
+                    x = array(real_arrays[0], copy=False)
+                    y = array(real_arrays[1], copy=False)
+                    z = array(real_arrays[2], copy=False)
+                    px = array(real_arrays[3], copy=False)
+                    py = array(real_arrays[4], copy=False)
+                    pz = array(real_arrays[5], copy=False)
+                    data_arr = torch.tensor(
+                        stack([x, y, z, px, py, pz], axis=1),
+                        device=device,
+                        dtype=torch.float64,
+                    )
 
-        for lvl in range(pc.finest_level + 1):
-            for pti in ImpactXParIter(pc, level=lvl):
-                soa = pti.soa()
-                real_arrays = soa.get_real_data()
-                x = array(real_arrays[0], copy=False)
-                y = array(real_arrays[1], copy=False)
-                t = array(real_arrays[2], copy=False)
-                px = array(real_arrays[3], copy=False)
-                py = array(real_arrays[4], copy=False)
-                pt = array(real_arrays[5], copy=False)
-                data_arr = torch.tensor(
-                    stack([x, y, t, px, py, pt], axis=1),
-                    device=device,
-                    dtype=torch.float64,
-                )
+                    data_arr[:, 0] += ref_part.x
+                    data_arr[:, 1] += ref_part.y
+                    data_arr[:, 2] += ref_z_i_LPA
+                    data_arr[:, 3:] *= ref_beta_gamma
+                    data_arr[:, 3] += ref_part.px
+                    data_arr[:, 4] += ref_part.py
+                    data_arr[:, 5] += ref_part.pz
 
-                data_arr[:, 0] += ref_part.x
-                data_arr[:, 1] += ref_part.y
-                data_arr[:, 2] += ref_z_i_LPA
-                data_arr[:, 3:] *= ref_beta_gamma
-                data_arr[:, 3] += ref_part.px
-                data_arr[:, 4] += ref_part.py
-                data_arr[:, 5] += ref_part.pz
+                    with torch.no_grad():
+                        data_arr_post_model = self.surrogate_model(data_arr)
 
-                with torch.no_grad():
-                    data_arr_post_model = self.surrogate_model(data_arr)
+                    #  z += stage start
+                    data_arr_post_model[:, 2] += self.stage_start
+                    # back to ref particle coordinates
+                    for ii in range(3):
+                        data_arr_post_model[:, ii] -= ref_part_final[ii]
+                        data_arr_post_model[:, 3 + ii] -= ref_part_final[3 + ii]
+                        data_arr_post_model[:, 3 + ii] /= ref_beta_gamma_final
 
-                #  z += stage start
-                data_arr_post_model[:, 2] += self.stage_start
-                # back to ref particle coordinates
-                for ii in range(3):
-                    data_arr_post_model[:, ii] -= ref_part_final[ii]
-                    data_arr_post_model[:, 3 + ii] -= ref_part_final[3 + ii]
-                    data_arr_post_model[:, 3 + ii] /= ref_beta_gamma_final
+                    x[:] = array(data_arr_post_model[:, 0])
+                    y[:] = array(data_arr_post_model[:, 1])
+                    z[:] = array(data_arr_post_model[:, 2])
+                    px[:] = array(data_arr_post_model[:, 3])
+                    py[:] = array(data_arr_post_model[:, 4])
+                    pz[:] = array(data_arr_post_model[:, 5])
 
-                x[:] = array(data_arr_post_model[:, 0])
-                y[:] = array(data_arr_post_model[:, 1])
-                t[:] = array(data_arr_post_model[:, 2])
-                px[:] = array(data_arr_post_model[:, 3])
-                py[:] = array(data_arr_post_model[:, 4])
-                pt[:] = array(data_arr_post_model[:, 5])
+            # TODO this part needs to be corrected for general geometry
+            # where the initial vector might not point in z
+            # and even if it does, bending elements may change the direction
 
-        # TODO this part needs to be corrected for general geometry
-        # where the initial vector might not point in z
-        # and even if it does, bending elements may change the direction
-
-        ref_part.x = ref_part_final[0]
-        ref_part.y = ref_part_final[1]
-        ref_part.z = ref_part_final[2]
-        ref_gamma = torch.sqrt(1 + ref_beta_gamma_final**2)
-        ref_part.px = ref_part_final[3]
-        ref_part.py = ref_part_final[4]
-        ref_part.pz = ref_part_final[5]
-        ref_part.pt = -ref_gamma
-        ref_part.s += self.surrogate_length
-        ref_part.t += self.surrogate_length
-
-        coordinate_transformation(pc, CoordSystem.s)
+            # update the reference particle before leaving the block: the
+            # transformation back to fixed s uses the final reference energy
+            ref_part.x = ref_part_final[0]
+            ref_part.y = ref_part_final[1]
+            ref_part.z = ref_part_final[2]
+            ref_gamma = torch.sqrt(1 + ref_beta_gamma_final**2)
+            ref_part.px = ref_part_final[3]
+            ref_part.py = ref_part_final[4]
+            ref_part.pz = ref_part_final[5]
+            ref_part.pt = -ref_gamma
+            ref_part.s += self.surrogate_length
+            ref_part.t += self.surrogate_length
         ## Done!
 
 
