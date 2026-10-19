@@ -32,20 +32,20 @@ pti = np.array([0, 0, 0, 0, 0, 1])
 # problem parameters
 rc = 10.0
 g = 1.0
-h = 1.0/rc
-edge = np.pi/8.0
-hgap = g/2.0
+h = 1.0 / rc
+edge = np.pi / 8.0
+hgap = g / 2.0
 fint = 0.5
 
 # derived parameters
 corr = (h + h) * hgap * fint
 tanedg = np.tan(edge)
 secedg = 1.0 / np.cos(edge)
-psip = edge - corr * secedg * (1.0 + np.sin(edge)**2)
+psip = edge - corr * secedg * (1.0 + np.sin(edge) ** 2)
 
 # exact transfer matrix
-r21 = h*tanedg
-r43 = -h*np.tan(psip)
+r21 = h * tanedg
+r43 = -h * np.tan(psip)
 
 # final data
 xf = np.array([1, 0, 0, 0, 0, 0])

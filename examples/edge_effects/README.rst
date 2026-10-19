@@ -88,8 +88,7 @@ Analyze
 We run the following script to analyze correctness:
 
 .. dropdown:: Script ``analysis_dipedge_linear_map.py``
-      
+
    .. literalinclude:: analysis_dipedge_linear_map.py
       :language: python3
       :caption: You can copy this file from ``examples/edge_effects/analysis_dipedge_linear_map.py``.
-

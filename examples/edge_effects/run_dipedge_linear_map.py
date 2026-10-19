@@ -62,7 +62,7 @@ dipedge0 = elements.DipEdge(
 
 sim.lattice.append(monitor)
 sim.lattice.load_file("dipedge.madx", nslice=ns)  # to use the MAD-X parser
-#sim.lattice.append(dipedge0)  # to use the equivalent parameters specified above
+# sim.lattice.append(dipedge0)  # to use the equivalent parameters specified above
 sim.lattice.append(monitor)
 
 # return linear map

@@ -2251,4 +2251,3 @@ add_impactx_test(dipedge-linear-map.py
     examples/edge_effects/analysis_dipedge_linear_map.py
     OFF  # no plot script yet
 )
-
