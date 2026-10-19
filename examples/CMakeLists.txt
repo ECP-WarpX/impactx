@@ -2245,6 +2245,8 @@ add_impactx_test(expanding-2d-acc.py
 )
 
 # Expanding Beam in Uniform Accelerating Field with 2D Space Charge ###########
+file(COPY ${ImpactX_SOURCE_DIR}/examples/edge_effects/dipedge.madx
+        DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/dipedge-linear-map.py)
 add_impactx_test(dipedge-linear-map.py
     examples/edge_effects/run_dipedge_linear_map.py
     ON    # ImpactX MPI-parallel
