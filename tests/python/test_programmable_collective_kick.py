@@ -10,6 +10,7 @@
 import math
 
 import numpy as np
+import pytest
 
 import amrex.space3d as amr
 from impactx import ImpactX, elements
@@ -83,12 +84,14 @@ def _drift_ref_particle(pge, refpart):
     refpart.s = refpart.s + slice_ds
 
 
-def _run(programmable, space_charge, nslice=NSLICE):
+def _run(programmable, space_charge, nslice=NSLICE, includes_collective_effects=False):
     """Track a cold beam through a single drift and return its beam characteristics.
 
     :param programmable: use a Programmable element instead of elements.Drift
     :param space_charge: enable the 3D space-charge solver
     :param nslice: number of slices through the element
+    :param includes_collective_effects: declare that the Programmable push already models
+        collective effects
     """
     sim = ImpactX()
 
@@ -113,7 +116,9 @@ def _run(programmable, space_charge, nslice=NSLICE):
         )
 
     if programmable:
-        element = elements.Programmable(name="d1")
+        element = elements.Programmable(
+            name="d1", includes_collective_effects=includes_collective_effects
+        )
         element.ds = DS
         element.nslice = nslice
         element.beam_particles = lambda pti, refpart: _drift_beam_particles(
@@ -152,6 +157,59 @@ def test_programmable_receives_collective_kick():
     # and the kick has to visibly expand the beam
     sc_effect = prog_sc["sig_x"] / prog_no_sc["sig_x"] - 1.0
     assert sc_effect > 0.05, f"space charge expanded sig_x by only {sc_effect:.2%}"
+
+
+def test_programmable_includes_collective_effects():
+    """A Programmable element that models collective effects itself receives no kick.
+
+    With ``includes_collective_effects``, the tracking loop must apply the element push
+    alone, even with space charge enabled: the result is identical to a run without
+    space charge.
+    """
+    prog_own = _run(
+        programmable=True, space_charge=True, includes_collective_effects=True
+    )
+    prog_no_sc = _run(programmable=True, space_charge=False)
+
+    # this beam starts cold, so any transverse momentum could only come from a kick
+    assert prog_own["sig_px"] == 0.0, "the element received a collective kick"
+    for key in ["sig_x", "sig_y", "sig_t", "emittance_x", "emittance_y"]:
+        assert prog_own[key] == prog_no_sc[key], (
+            f"{key}: own={prog_own[key]:.16e} vs no space charge={prog_no_sc[key]:.16e}"
+        )
+
+
+def test_programmable_includes_collective_effects_property():
+    """The declaration is a keyword argument, a property, and part of ``to_dict()``."""
+    default = elements.Programmable(ds=DS)
+    assert default.includes_collective_effects is False
+    assert default.to_dict()["includes_collective_effects"] is False
+
+    own = elements.Programmable(ds=DS, includes_collective_effects=True)
+    assert own.includes_collective_effects is True
+    assert own.to_dict()["includes_collective_effects"] is True
+    assert own != default
+    assert own.copy().includes_collective_effects is True
+
+    # setting the property is equivalent to the constructor argument
+    toggled = elements.Programmable(ds=DS)
+    toggled.includes_collective_effects = True
+    assert toggled.includes_collective_effects is True
+    assert toggled == own
+
+    # positional order: ds, includes_collective_effects, nslice, name
+    positional = elements.Programmable(DS, True, 3, "p")
+    assert positional.includes_collective_effects is True
+    assert positional.nslice == 3
+    assert positional.name == "p"
+
+    # a positional nslice from the previous argument order must not enable the flag
+    with pytest.raises(TypeError):
+        elements.Programmable(DS, 3)
+
+    # the dict round-trips through the constructor
+    kwargs = {k: v for k, v in own.to_dict().items() if k != "type"}
+    assert elements.Programmable(**kwargs) == own
 
 
 def test_programmable_transports_like_an_equivalent_drift():

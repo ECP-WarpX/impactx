@@ -128,7 +128,7 @@ Collective Effects & Overall Simulation Parameters
 
    .. py:property:: space_charge_gauss_charge_z_bins
 
-      Number of bins for longitudinal charge density deposition (default: ``129``).  Used by the Gauss2p5D space charge model.
+      Number of bins (grid points) for longitudinal charge density deposition, at least ``2`` (default: ``129``).  Used by the Gauss2p5D space charge model.
 
    .. py:property:: space_charge_gauss_long_scale
 
@@ -144,7 +144,7 @@ Collective Effects & Overall Simulation Parameters
 
    .. py:property:: space_charge_num_longitudinal_bins
 
-      Number of bins for longitudinal charge density deposition (default: ``100``).  Used by the 2p5D space charge model.
+      Number of bins (grid points) for longitudinal charge density deposition, at least ``2`` (default: ``100``).  Used by the 2p5D space charge model.
 
    .. py:property:: space_charge_apply_longitudinal_kick
 
@@ -642,7 +642,11 @@ For step-by-step recipes on how to access particle data live during a simulation
 
    .. py:method:: add_n_particles(x, y, t, px, py, pt, qm, bunch_charge=None, w=None, sx=None, sy=None, sz=None)
 
-      Add new particles to the container for fixed s.
+      Add new particles to the container.
+
+      Positions are in meters and momenta are normalized by the reference momentum (unitless), all relative to the reference particle (see :ref:`theory-coordinates-and-units`).
+      At fixed :math:`s` (the default), ``t`` and ``pt`` are the time-of-flight :math:`c\,t` and the energy deviation :math:`p_t = -\Delta\gamma/(\beta_0\gamma_0)`.
+      Inside an :py:meth:`at_fixed_t` block, they take the position :math:`z` and the momentum deviation :math:`p_z = \Delta(\beta_z\gamma)/(\beta_0\gamma_0)` instead.
 
       Either the charge (bunch_charge) of the particles added in this call, or the weight of each
       particle (w) must be provided.
@@ -665,16 +669,43 @@ For step-by-step recipes on how to access particle data live during a simulation
 
       :param x: positions in x
       :param y: positions in y
-      :param t: positions as time-of-flight in c*t
+      :param t: time-of-flight :math:`c\,t` in m (at fixed :math:`s`) or position :math:`z` in m (at fixed :math:`t`)
       :param px: momentum in x
       :param py: momentum in y
-      :param pt: momentum in t
+      :param pt: energy deviation :math:`p_t` (at fixed :math:`s`) or momentum deviation :math:`p_z` (at fixed :math:`t`), unitless
       :param qm: charge over mass in 1/eV
       :param bunch_charge: total charge within a bunch in C
       :param w: weight of each particle: the macroparticle charge in units of the elementary charge `e` (i.e., how many real particles to represent)
       :param sx: spin component in x (optional; if provided, sy and sz must also be provided)
       :param sy: spin component in y (optional; if provided, sx and sz must also be provided)
       :param sz: spin component in z (optional; if provided, sx and sy must also be provided)
+
+   .. py:property:: coord_system
+
+      The coordinate system the particle data is currently in: :py:class:`impactx.CoordSystem` ``s`` (default) or ``t``.
+      The longitudinal attributes are named after it: ``position_t`` and ``momentum_t`` at fixed :math:`s`, ``position_z`` and ``momentum_z`` at fixed :math:`t`.
+
+   .. py:method:: at_fixed_t()
+
+      Context manager that represents the particles at fixed :math:`t` inside a ``with`` block.
+
+      On entry, the particles are transformed from fixed :math:`s` to fixed :math:`t`.
+      When the block ends, normally or through an exception, they are transformed back to fixed :math:`s`.
+      Inside the block, the attributes ``position_z`` and ``momentum_z`` replace ``position_t`` and ``momentum_t`` and hold :math:`z` and :math:`p_z`.
+      The ``t`` and ``pt`` arguments of :py:meth:`add_n_particles` keep their names and take :math:`z` and :math:`p_z` inside the block.
+
+      The transformation to fixed :math:`t` uses the reference energy ``ref.pt`` as the block starts, the transformation back to fixed :math:`s` uses ``ref.pt`` as the block ends.
+      A block that changes the reference energy must write the particle coordinates relative to the updated reference particle.
+
+      .. code-block:: python
+
+         with sim.beam.at_fixed_t() as beam:
+             ...  # read, modify or add particles at fixed t
+
+      See :ref:`usage-howto-python-particle-data-fixed-t` for details.
+
+      :return: this particle container, at fixed :math:`t` inside the block
+      :raises RuntimeError: if the particles are not at fixed :math:`s` on entry (blocks cannot be nested), or if they were transformed out of fixed :math:`t` inside the block
 
    .. py:method:: ref_particle()
 
@@ -1851,13 +1882,18 @@ length, so the paired setter is the one that can change that length:
 
    aperture.set_vertices(x, y)                  # closed outline: x[0] == x[-1], y[0] == y[-1]
 
+.. _usage-python-aperture-convention:
+
 Many elements take a transverse aperture via ``aperture_x`` and ``aperture_y``: the ``Aperture``
 collimator, and as a beam pipe most other elements.
-They all follow the same convention. Each plane is bounded independently: a half-aperture of zero
-or less removes the constraint in that plane only, while the other plane still cuts.
-Bounding a single plane gives a jaw (slit) collimator, bounding both an iris; with only
-``aperture_y`` set, a particle is lost when ``|y| > aperture_y`` at any ``x``, and the
-``rectangular`` and ``elliptical`` shapes degenerate to the same slab.
+They all follow the same convention.
+A half-aperture of zero or less removes the boundary in that plane, while the other plane still
+cuts.
+Bounding a single plane gives a jaw (slit) collimator: with only ``aperture_y`` set, a particle is
+lost when ``|y| > aperture_y`` at any ``x``, and the ``rectangular`` and ``elliptical`` shapes
+degenerate to the same slab.
+Bounding both planes gives an iris of the element's shape: an ellipse for the beam pipe, and a
+rectangle or an ellipse for the ``Aperture`` collimator, depending on its ``shape``.
 The aperture is disabled entirely only if both planes are zero or less, which is the default.
 
 .. py:class:: impactx.elements.CFbend(ds, rc, k, dx=0, dy=0, rotation=0, aperture_x=0, aperture_y=0, nslice=1, name=None)
@@ -2284,7 +2320,7 @@ The aperture is disabled entirely only if both planes are zero or less, which is
 
       When ImpactX needs to sort particles spatially, it will redistribute them over MPI ranks automatically during tracking.
 
-.. py:class:: impactx.elements.Programmable(ds=0.0, nslice=1, name=None)
+.. py:class:: impactx.elements.Programmable(ds=0.0, includes_collective_effects=False, nslice=1, name=None)
 
    A programmable beam optics element.
 
@@ -2292,6 +2328,7 @@ The aperture is disabled entirely only if both planes are zero or less, which is
    See :ref:`usage-howto-python-extend` for a worked example.
 
    :param ds: Segment length in m.
+   :param includes_collective_effects: the push hooks already model collective effects over the length of this element, see :py:attr:`includes_collective_effects`
    :param nslice: number of slices used for the application of space charge
    :param name: an optional name for the element
 
@@ -2301,6 +2338,16 @@ The aperture is disabled entirely only if both planes are zero or less, which is
       push, so it halves the collective effect kick (space charge, CSR, ISR)
       instead: ``K(ds/2) M(ds) K(ds/2)`` per slice, at two collective solves per
       slice.
+
+   .. py:property:: includes_collective_effects
+
+      Declares that the push hooks already model collective effects over the length of this
+      element, e.g., because they call an external code that computes the beam self-fields or
+      plasma wakefields.
+      If ``True``, ImpactX applies no additional collective effect kicks (space charge,
+      wakefields, CSR, ISR) for this element, so these effects are not applied twice.
+      If ``False`` (default), ImpactX applies the enabled collective effects to this element
+      like to any other element of finite length.
 
    .. note::
 
@@ -2881,12 +2928,12 @@ Each lattice element provides a ``.to_dict()`` method, which can be used to seri
 Coordinate Transformation
 -------------------------
 
-.. py:class:: impactx.TransformationDirection
+.. py:class:: impactx.CoordSystem
 
-   Enumerated type indicating whether to transform to fixed :math:`s` or fixed :math:`t` coordinate system when applying ``impactx.coordinate_transformation``.
+   Enumerated type for the coordinate system of particle data: the independent variable is either the position :math:`s` or the time :math:`t`.
 
-   :param to_fixed_t:
-   :param to_fixed_s:
+   :param s: fixed :math:`s` (the ImpactX default)
+   :param t: fixed :math:`t`
 
 .. py:function:: impactx.push(pc, element, step=0, period=0)
 
@@ -2911,7 +2958,11 @@ Coordinate Transformation
 
 .. py:function:: impactx.coordinate_transformation(pc, direction)
 
-   Function to transform the coordinates of the particles in a particle container either to fixed :math:`t` or to fixed :math:`s`.
+   Transform the coordinates of the particles in a particle container either to fixed :math:`t` or to fixed :math:`s`.
+   Both directions take the reference energy from ``pc.ref.pt`` at the time of the call.
+   The longitudinal attributes are renamed accordingly, see :py:attr:`impactx.ParticleContainer.coord_system`.
 
-   :param pc: ``impactx.particle_container`` whose particle coordinates are to be transformed.
-   :param direction: enumerated type ``impactx.TransformationDirection``, indicates whether to transform to fixed :math:`s` or fixed :math:`t`.
+   Prefer :py:meth:`impactx.ParticleContainer.at_fixed_t`, which pairs both transformations and restores fixed :math:`s` if an exception is raised.
+
+   :param pc: :py:class:`impactx.ParticleContainer` whose particle coordinates are to be transformed.
+   :param direction: :py:class:`impactx.CoordSystem` to transform to; must differ from ``pc.coord_system``.

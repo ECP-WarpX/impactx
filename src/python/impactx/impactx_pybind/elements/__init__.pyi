@@ -4071,6 +4071,7 @@ class Programmable(mixin.Named):
     def __init__(
         self,
         ds: typing.SupportsFloat | typing.SupportsIndex = 0.0,
+        includes_collective_effects: bool = False,
         nslice: typing.SupportsInt | typing.SupportsIndex = 1,
         name: str | None = None,
     ) -> None:
@@ -4166,6 +4167,13 @@ class Programmable(mixin.Named):
     def ds(self) -> float: ...
     @ds.setter
     def ds(self, arg1: typing.SupportsFloat | typing.SupportsIndex) -> None: ...
+    @property
+    def includes_collective_effects(self) -> bool:
+        """
+        the push hooks already model collective effects over the length of this element: if True, no additional space charge, wakefield, CSR or ISR kicks are applied by ImpactX, default=False
+        """
+    @includes_collective_effects.setter
+    def includes_collective_effects(self, arg1: bool) -> None: ...
     @property
     def nslice(self) -> int: ...
     @nslice.setter

@@ -347,6 +347,55 @@ class ImpactXParticleContainer(
 ):
     ConstIterator = ImpactXParConstIter
     Iterator = ImpactXParIter
+    @staticmethod
+    def at_fixed_t(*args, **kwds):
+        """
+        Temporarily represent the beam at fixed t, e.g., to exchange particles with a code
+        that uses time as the independent variable.
+
+        On entry, the particle coordinates are transformed from fixed s to fixed t.
+        When the ``with`` block is left, normally or through an exception, they are
+        transformed back to fixed s.
+
+        Inside the block, the particle arrays hold ``x, y, z, px, py, pz`` instead of
+        ``x, y, t, px, py, pt``: ``z`` is the longitudinal position relative to the
+        reference particle, in meters, ``px, py`` are the transverse momenta and ``pz``
+        is the deviation from the reference momentum, all normalized by the reference
+        momentum.
+        The arrays are named accordingly: ``position_z`` and ``momentum_z`` replace
+        ``position_t`` and ``momentum_t``.
+        The arguments of ``add_n_particles`` keep their names ``t`` and ``pt``; inside the
+        block, they take ``z`` and ``pz``.
+
+        Both transformations take the design energy from ``self.ref.pt`` at the moment
+        they run: the one on entry uses the reference particle as it is when the block
+        starts, the one on exit uses the reference particle as it is when the block ends.
+        If the block changes the reference energy, it must also write the particle
+        coordinates relative to the new reference particle before the block ends.
+        Only ``ref.pt`` is read, so update it (e.g., with ``ref.set_kin_energy_MeV``)
+        rather than ``ref.pz`` alone.
+
+        Parameters
+        ----------
+        self : ImpactXParticleContainer
+            The particle container; its particles must be at fixed s.
+
+        Yields
+        ------
+        ImpactXParticleContainer
+            The same particle container, now at fixed t.
+
+        Raises
+        ------
+        RuntimeError
+            If the particles are not at fixed s on entry, or no longer at fixed t
+            when the block ends without an exception.
+
+        Examples
+        --------
+        >>> with sim.beam.at_fixed_t() as beam:
+        ...     beam.add_n_particles(x, y, z, px, py, pz, qm, bunch_charge=charge_C)
+        """
     def _add_n_particles(
         self,
         x: amrex.space3d.amrex_3d_pybind.PODVector_real_std,
@@ -399,7 +448,7 @@ class ImpactXParticleContainer(
         sz=None,
     ):
         """
-        Add new particles to the container for fixed s.
+        Add new particles to the container.
 
         The coordinate and weight arguments accept NumPy or CuPy arrays (or
         array-likes), as well as pyAMReX ``PODVector`` objects. Inputs are copied
@@ -414,7 +463,15 @@ class ImpactXParticleContainer(
         Parameters
         ----------
         x, y, t, px, py, pt : array_like
-            Particle positions (x, y, time-of-flight c*t) and momenta.
+            Particle coordinates, relative to the reference particle.
+            ``x`` and ``y`` are positions in m, ``px`` and ``py`` are momenta
+            normalized by the reference momentum (unitless).
+            At fixed s (the default), ``t`` is the time-of-flight c*t in m and
+            ``pt`` is the energy deviation p_t = -Delta(gamma)/(beta_0 gamma_0)
+            (unitless).
+            Inside a ``beam.at_fixed_t()`` block, ``t`` takes the position z in m
+            and ``pt`` takes the momentum deviation
+            p_z = Delta(beta_z gamma)/(beta_0 gamma_0) (unitless).
         qm : float
             Charge over mass in 1/eV.
         bunch_charge : float, optional
@@ -981,7 +1038,7 @@ class ImpactX:
     @property
     def space_charge_gauss_charge_z_bins(self) -> int:
         """
-        Number of longitudinal bins for computing the linear charge density (default: ``129``).
+        Number of longitudinal bins (grid points) for computing the linear charge density, at least 2 (default: ``129``).
         """
     @space_charge_gauss_charge_z_bins.setter
     def space_charge_gauss_charge_z_bins(
@@ -1017,7 +1074,7 @@ class ImpactX:
     @property
     def space_charge_num_longitudinal_bins(self) -> int:
         """
-        Number of longitudinal bins for 2.5D space charge calculation (default: ``100``).
+        Number of longitudinal bins (grid points) for 2.5D space charge calculation, at least 2 (default: ``100``).
         """
     @space_charge_num_longitudinal_bins.setter
     def space_charge_num_longitudinal_bins(
@@ -1143,12 +1200,33 @@ class UnorderedMap:
 
 class Config:
     gpu_backend = None
+    """
+    GPU backend ('CUDA', 'HIP' or 'SYCL'), None without GPU support
+    """
     have_fft: typing.ClassVar[bool] = True
+    """
+    Build supports FFT-based solvers
+    """
     have_gpu: typing.ClassVar[bool] = False
+    """
+    Build supports GPUs
+    """
     have_mpi: typing.ClassVar[bool] = True
+    """
+    Build supports MPI
+    """
     have_omp: typing.ClassVar[bool] = True
+    """
+    Build supports OpenMP
+    """
     have_openpmd: typing.ClassVar[bool] = True
+    """
+    Build supports openPMD I/O
+    """
     have_simd: typing.ClassVar[bool] = False
+    """
+    Build supports explicit SIMD vectorization
+    """
     openpmd_backends: typing.ClassVar[dict] = {
         "adios1": False,
         "adios2": False,
@@ -1157,9 +1235,21 @@ class Config:
         "mpi": True,
         "toml": True,
     }
+    """
+    openPMD I/O backends available in this build
+    """
     precision: typing.ClassVar[str] = "DOUBLE"
+    """
+    Floating point precision of amrex::Real ('SINGLE' or 'DOUBLE')
+    """
     precision_particles: typing.ClassVar[str] = "DOUBLE"
+    """
+    Floating point precision of amrex::ParticleReal ('SINGLE' or 'DOUBLE')
+    """
     simd_size: typing.ClassVar[int] = 1
+    """
+    Number of amrex::ParticleReal elements in a native SIMD vector
+    """
     @staticmethod
     def to_dict() -> dict:
         """
@@ -1170,7 +1260,7 @@ def coordinate_transformation(
     pc: ImpactXParticleContainer, direction: CoordSystem
 ) -> None:
     """
-    Transform coordinates from fixed s to fixed to or vice versa.
+    Transform coordinates from fixed s to fixed t or vice versa, using the reference energy pc.ref.pt at the time of the call.
     """
 
 def create_envelope(
@@ -1336,6 +1426,6 @@ __author__: str = (
     "Axel Huebl, Chad Mitchell, Ryan Sandberg, Marco Garten, Ji Qiang, et al."
 )
 __license__: str = "BSD-3-Clause-LBNL"
-__version__: str = "26.09"
+__version__: str = "26.10"
 s: CoordSystem
 t: CoordSystem

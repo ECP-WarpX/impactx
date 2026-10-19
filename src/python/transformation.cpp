@@ -17,6 +17,6 @@ void init_transformation(py::module& m)
         &transformation::CoordinateTransformation,
         py::arg("pc"),
         py::arg("direction"),
-        "Transform coordinates from fixed s to fixed to or vice versa."
+        "Transform coordinates from fixed s to fixed t or vice versa, using the reference energy pc.ref.pt at the time of the call."
     );
 }

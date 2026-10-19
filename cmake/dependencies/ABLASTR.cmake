@@ -80,16 +80,16 @@ macro(find_ablastr)
 
         # shared libs, i.e. for Python bindings, need relocatable code
         if(ImpactX_PYTHON OR BUILD_SHARED_LIBS)
-            set(AMReX_PIC ON CACHE INTERNAL
-                "Build AMReX with position independent code")
-            set(ABLASTR_POSITION_INDEPENDENT_CODE ON CACHE INTERNAL
-                "Build ABLASTR with position independent code")
+            # Normal variables (CMP0077 NEW) apply these requirements without
+            # writing cache entries that outlive the requirement itself.
+            set(AMReX_PIC ON)
+            set(ABLASTR_POSITION_INDEPENDENT_CODE ON)
 
             # WE NEED AMReX AS SHARED LIB, OTHERWISE WE CANNOT SHARE ITS GLOBALS
             # BETWEEN MULTIPLE PYTHON MODULES
             # TODO this is likely an export/symbol hiding issue that we could
             #      alleviate later on
-            set(AMReX_BUILD_SHARED_LIBS ON CACHE BOOL "Build AMReX shared library" FORCE)
+            set(AMReX_BUILD_SHARED_LIBS ON)
         endif()
 
         if(ImpactX_ablastr_src)
@@ -139,7 +139,7 @@ macro(find_ablastr)
         set(COMPONENT_DIM 3D)
         set(COMPONENT_PRECISION ${ImpactX_PRECISION} P${ImpactX_PRECISION})
 
-        find_package(ABLASTR 26.09 CONFIG REQUIRED COMPONENTS ${COMPONENT_DIM})
+        find_package(ABLASTR 26.10 CONFIG REQUIRED COMPONENTS ${COMPONENT_DIM})
         message(STATUS "ABLASTR: Found version '${ABLASTR_VERSION}'")
     endif()
 
@@ -178,7 +178,7 @@ set(ImpactX_openpmd_src ""
 set(ImpactX_ablastr_repo "https://github.com/BLAST-WarpX/warpx.git"
     CACHE STRING
     "Repository URI to pull and build ABLASTR from if(ImpactX_ablastr_internal)")
-set(ImpactX_ablastr_branch "26.09"
+set(ImpactX_ablastr_branch "26.10"
     CACHE STRING
     "Repository branch for ImpactX_ablastr_repo if(ImpactX_ablastr_internal)")
 
@@ -186,7 +186,7 @@ set(ImpactX_ablastr_branch "26.09"
 set(ImpactX_amrex_repo "https://github.com/AMReX-Codes/amrex.git"
     CACHE STRING
     "Repository URI to pull and build AMReX from if(ImpactX_amrex_internal)")
-set(ImpactX_amrex_branch "26.09"
+set(ImpactX_amrex_branch "26.10"
     CACHE STRING
     "Repository branch for ImpactX_amrex_repo if(ImpactX_amrex_internal)")
 

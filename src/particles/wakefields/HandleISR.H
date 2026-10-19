@@ -11,7 +11,7 @@
 #define HANDLE_ISR_H
 
 #include "particles/ImpactXParticleContainer.H"
-#include "ISRBendElement.H"
+#include "BendRadius.H"
 #include "ISRPush.H"
 
 #include <cmath>
@@ -43,12 +43,12 @@ namespace impactx::particles::wakefields
         bool isr = false;
         pp_algo.queryAdd("isr", isr);
 
-        // Call the ISR bend function
-        auto const [element_has_isr, R] = impactx::particles::wakefields::ISRBendElement(element_variant, particle_container.GetRefParticle());
+        // ISR is applied only in elements that bend the reference orbit
+        auto const rc = impactx::particles::wakefields::bend_radius(element_variant, particle_container.GetRefParticle());
 
-        // Enter loop if lattice has bend element
-        if (isr && element_has_isr)
+        if (isr && rc.has_value())
         {
+            amrex::Real const R = *rc;
 
             int isr_order = 1;
             pp_algo.queryAddWithParser("isr_order", isr_order);

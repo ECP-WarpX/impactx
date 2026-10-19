@@ -24,7 +24,8 @@ def test_copy_is_a_distinct_element():
     c = q.copy()
 
     assert c is not q
-    assert (c.ds, c.k, c.nslice, c.name) == (0.3, 2.0, 3, "q1")
+    assert (c.ds, c.k, c.nslice, c.name) == (q.ds, q.k, q.nslice, q.name)
+    assert (c.ds, c.k, c.nslice, c.name) == (pytest.approx(0.3), 2.0, 3, "q1")
 
     c.k = 9.0
     assert q.k == 2.0
@@ -52,7 +53,7 @@ def test_overrides_apply_to_the_copy_only():
     assert (template.k, template.name) == (1.0, "q")
 
     scan = [template.copy(k=k) for k in (0.8, 0.9, 1.0)]
-    assert [element.k for element in scan] == [0.8, 0.9, 1.0]
+    assert [element.k for element in scan] == pytest.approx([0.8, 0.9, 1.0])
 
     # paired arrays are given together
     rf = elements.RFCavity(
@@ -64,7 +65,7 @@ def test_overrides_apply_to_the_copy_only():
         sin_coefficients=[0.0],
     )
     longer = rf.copy(cos_coefficients=[2.0, 0.1], sin_coefficients=[0.0, 0.2])
-    assert longer.cos_coefficients == [2.0, 0.1]
+    assert longer.cos_coefficients == pytest.approx([2.0, 0.1])
     assert rf.cos_coefficients == [2.0]
 
 

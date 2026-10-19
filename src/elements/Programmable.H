@@ -14,6 +14,7 @@
 #include "mixin/gpuelement.H"
 #include "particles/CovarianceMatrix.H"
 #include "mixin/hostonly.H"
+#include "mixin/includescollectiveeffects.H"
 #include "mixin/lineartransport.H"
 #include "mixin/thick.H"
 
@@ -36,7 +37,8 @@ namespace impactx::elements
      */
     struct ProgrammableGPU
     : public mixin::LinearTransport<ProgrammableGPU, false>,
-      public mixin::HostOnly
+      public mixin::HostOnly,
+      public mixin::IncludesCollectiveEffects
       // TODO: public amrex::simd::Vectorized<amrex::simd::native_simd_size_particlereal>
     {
         static constexpr auto type = "Programmable";
@@ -48,13 +50,17 @@ namespace impactx::elements
         /** This element can be programmed
          *
          * @param ds Segment length in m
+         * @param includes_collective_effects the push hooks already model collective effects,
+         *                                    @see mixin::IncludesCollectiveEffects
          * @param nslice number of slices used for the application of space charge
          */
         ProgrammableGPU (
             amrex::ParticleReal ds = DEFAULT_ds,
+            bool includes_collective_effects = DEFAULT_includes_collective_effects,
             int nslice = DEFAULT_nslice
         )
-          : m_ds(ds), m_nslice(nslice)
+          : mixin::IncludesCollectiveEffects(includes_collective_effects),
+            m_ds(ds), m_nslice(nslice)
         {}
 
         /** Reverse the element (not supported for Programmable) */

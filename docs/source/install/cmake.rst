@@ -505,7 +505,7 @@ CMake Option                  Default & Values                               Des
 ``ImpactX_catch_internal``     **ON**/OFF                                     Needs a pre-installed Catch2 library if set to ``OFF``
 ``ImpactX_openpmd_src``       *None*                                         Path to openPMD-api source directory (preferred if set)
 ``ImpactX_openpmd_repo``      ``https://github.com/openPMD/openPMD-api.git`` Repository URI to pull and build openPMD-api from
-``ImpactX_openpmd_branch``    ``0.17.0``                                     Repository branch for ``ImpactX_openpmd_repo``
+``ImpactX_openpmd_branch``    ``0.17.1``                                     Repository branch for ``ImpactX_openpmd_repo``
 ``ImpactX_openpmd_internal``  **ON**/OFF                                     Needs a pre-installed openPMD-api library if set to ``OFF``
 ``ImpactX_pyamrex_src``       *None*                                         Path to pyAMReX source directory (preferred if set)
 ``ImpactX_pyamrex_repo``      ``https://github.com/AMReX-Codes/pyamrex.git`` Repository URI to pull and build pyAMReX from

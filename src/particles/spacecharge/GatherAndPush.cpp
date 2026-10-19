@@ -10,7 +10,7 @@
 #include "GatherAndPush.H"
 
 #include "initialization/Algorithms.H"
-#include "particles/wakefields/ChargeBinning.H"
+#include "particles/wakefields/InterpolateLinear1D.H"
 #include "particles/spacecharge/Deposit1D.H"
 
 #include <ablastr/particles/NodalFieldGather.H>
@@ -21,6 +21,8 @@
 #include <AMReX_GpuContainers.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_Reduce.H>
+
+#include <stdexcept>
 
 namespace impactx::particles::spacecharge
 {
@@ -35,6 +37,7 @@ namespace impactx::particles::spacecharge
         BL_PROFILE("impactx::spacecharge::GatherAndPush");
 
         using namespace amrex::literals;
+        using impactx::particles::wakefields::InterpolateLinear1D;
 
         auto space_charge = get_space_charge_algo();
 
@@ -44,9 +47,9 @@ namespace impactx::particles::spacecharge
         int num_bins = 100;
         amrex::ParmParse pp_algo("algo.space_charge");
         pp_algo.queryAddWithParser("num_longitudinal_bins", num_bins);
-        amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins + 1, 0.0);
-        amrex::Gpu::DeviceVector<amrex::Real> charge_distribution_slope(num_bins, 0.0);
+        amrex::Gpu::DeviceVector<amrex::Real> charge_distribution;
         amrex::Real Qb_abs = 0.0;
+        bool const GetNumberDensity = true;
 
         bool apply_longitudinal_kick = true;
 
@@ -55,19 +58,34 @@ namespace impactx::particles::spacecharge
 
         amrex::Real bin_min = t_min;
         amrex::Real bin_max = t_max;
-        amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);
+        amrex::Real inv_bin_size = 0.0_rt;
+
+        // charge density and its slope at the grid points of Deposit1D
+        amrex::Gpu::DeviceVector<amrex::Real> line_density;
+        amrex::Gpu::DeviceVector<amrex::Real> line_density_slope;
 
         if (space_charge == SpaceChargeAlgo::True_2p5D) {
 
+            if (num_bins < 2) {
+                throw std::runtime_error(
+                    "algo.space_charge.num_longitudinal_bins must be at least 2");
+            }
+
             pp_algo.queryAdd("apply_longitudinal_kick", apply_longitudinal_kick);
             charge_distribution = Deposit1D( pc, bin_min, bin_max, num_bins);
-            bool const GetNumberDensity = true;
-            impactx::particles::wakefields::DerivativeCharge1D(charge_distribution, charge_distribution_slope, bin_size, GetNumberDensity);
+
+            // distance between the grid points, which lie on bin_min, bin_max and in between
+            amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);
+            inv_bin_size = 1.0_rt / bin_size;
             Qb_abs = bin_size * amrex::Reduce::Sum(charge_distribution.size(), charge_distribution.data());
+
+            DensityAndSlope1D(
+                charge_distribution, line_density, line_density_slope, bin_size, GetNumberDensity);
         }
 
-        amrex::Real const * const beam_profile = charge_distribution.data();
-        amrex::Real const * const beam_profile_slope = charge_distribution_slope.data();
+        amrex::Real const * const line_density_ptr = line_density.data();
+        amrex::Real const * const line_density_slope_ptr = line_density_slope.data();
+        int const num_values = static_cast<int>(line_density.size());
 
         // loop over refinement levels
         int const nLevel = pc.finestLevel();
@@ -191,15 +209,23 @@ namespace impactx::particles::spacecharge
                        }
 
                        // Update momentae with the 2.5D SC force
-                       int const idx = static_cast<int>((z - bin_min) / bin_size);  // Find index position along z
                        #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
-                       if (idx < 0 || idx >= num_bins)
+                       if (z < bin_min || z > bin_max)
                        {
-                            std::cerr << "Warning: Index out of range for 2.5D SC: " << idx << std::endl;
+                            std::cerr << "Warning: Position out of range for 2.5D SC: "
+                                      << z << std::endl;
                        }
                        #endif
-                       amrex::ParticleReal const Fxy = (Qb_abs==0.0) ? 0.0_prt : beam_profile[idx] / Qb_abs;
-                       amrex::ParticleReal const Fz = (Qb_abs==0.0) ? 0.0_prt : beam_profile_slope[idx] * charge_abs / Qb_abs;
+
+                       // Interpolate the line density and its slope between the grid points
+                       amrex::Real const beam_profile_interp = InterpolateLinear1D(
+                           z, line_density_ptr, num_values, bin_min, inv_bin_size);
+                       amrex::Real const beam_profile_slope_interp = InterpolateLinear1D(
+                           z, line_density_slope_ptr, num_values, bin_min, inv_bin_size);
+
+                       // Force constributions
+                       amrex::ParticleReal const Fxy = (Qb_abs==0.0) ? 0.0_prt : beam_profile_interp / Qb_abs;
+                       amrex::ParticleReal const Fz = (Qb_abs==0.0) ? 0.0_prt : beam_profile_slope_interp * charge_abs / Qb_abs;
 
                        // push momentum
                        px += field_interp[0] * Fxy * push_consts * dr[2] / beta;

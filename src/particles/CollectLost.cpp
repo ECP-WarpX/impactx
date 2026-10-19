@@ -54,6 +54,10 @@ namespace impactx
     {
         BL_PROFILE("impactX::collect_lost_particles");
 
+        // the lost-particle container holds particles at fixed s
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(source.GetCoordSystem() == CoordSystem::s,
+                                         "collect_lost_particles: the particles must be at fixed s.");
+
         using SrcData = ImpactXParticleContainer::ParticleTileType::ConstParticleTileDataType;
         ImpactXParticleContainer& dest = *source.GetLostParticleContainer();
 

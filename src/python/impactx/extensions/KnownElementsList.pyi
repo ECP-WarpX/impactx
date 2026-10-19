@@ -100,14 +100,22 @@ def _filter_kwargs(d: dict) -> dict:
     """
     Filter a to_dict() result into valid constructor kwargs.
 
-    Removes 'type' (not a constructor argument) and 'ds' when zero
-    (thin elements don't accept ds).
+    Removes 'type' (not a constructor argument) and, for thin elements, 'ds':
+    ``to_dict()`` reports ``ds = 0.0`` for thin elements (subclasses of
+    ``elements.mixin.Thin``, such as ``Marker`` and ``Aperture``), but their
+    constructors take no ``ds``, while all other elements require it, even when it
+    is zero.
 
     Args:
-        d: Dictionary from element.to_dict()
+        d: Dictionary from element.to_dict(), must include 'type' key
 
     Returns:
         dict: Filtered dictionary suitable for element constructor
+
+    Raises:
+        KeyError: If 'type' key is missing
+        AttributeError: If element type is not found in elements module
+        ValueError: If a thin element has a nonzero 'ds'
     """
 
 def _format_value(v):

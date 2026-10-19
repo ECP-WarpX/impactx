@@ -18,6 +18,7 @@
 #include "mixin/thick.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
+#include "mixin/synchrotronradiation.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -37,6 +38,7 @@ namespace impactx::elements
       public mixin::Alignment,
       public mixin::PipeAperture,
       public mixin::SpinTransport,
+      public mixin::SynchrotronRadiation,
       public mixin::NoFinalize
       // At least on Intel AVX512, there is a small overhead to vectorize this element, see
       // https://github.com/BLAST-ImpactX/impactx/pull/1002
@@ -77,6 +79,17 @@ namespace impactx::elements
           PipeAperture(aperture_x, aperture_y),
           m_rc(rc), m_k(k)
         {
+        }
+
+        /** Radius of curvature of the reference orbit in m
+         *
+         * @param refpart reference particle (unused)
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        amrex::ParticleReal
+        rc ([[maybe_unused]] RefPart const & refpart) const
+        {
+            return m_rc;
         }
 
         /** Reverse the element (negate ds) */

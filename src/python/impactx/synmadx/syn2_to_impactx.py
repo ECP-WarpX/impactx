@@ -18,6 +18,7 @@ import numpy as np
 
 import impactx
 
+from ..extensions.KnownElementsList import _filter_kwargs
 from . import synmadx_pybind as synmadx
 
 
@@ -680,26 +681,22 @@ def unroll_impactx_lattice(lattice):
         if etype == "ExactSbend":
             edict["phi"] = edict["phi"] * 180 / np.pi
 
-        if etype == "DipEdge" or etype == "ShortRF" or etype == "BeamMonitor":
-            # remove extra attributes if present
-            if "nslice" in edict:
-                del edict["nslice"]
-            if "ds" in edict:
-                del edict["ds"]
+        # drop what the constructor does not take (``type``; ``ds`` of thin elements)
+        edict = _filter_kwargs(edict)
 
         # skipping BeamMonitors for now. They seem to cause trouble
         if etype == "BeamMonitor":
             continue
 
         for pname in edict:
-            # the name parameter is a string and must be enclosed in quotes.
+            # the name parameter is a string and must be enclosed in quotes,
+            # unless the element is unnamed (None).
             # Also location and model parameters on the DipEdge element
-            # the type element is not a parameter
-            if pname == "type":
-                continue
             if not firstparm:
                 output_elem = output_elem + ", "
-            if pname == "name" or pname == "location" or pname == "model":
+            if pname == "name" and edict.get(pname) is None:
+                output_elem = output_elem + f"{pname}=None"
+            elif pname == "name" or pname == "location" or pname == "model":
                 output_elem = output_elem + f'{pname}="{edict.get(pname)}"'
             else:
                 output_elem = output_elem + f"{pname}={edict.get(pname)}"

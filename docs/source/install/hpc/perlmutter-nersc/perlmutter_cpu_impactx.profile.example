@@ -16,13 +16,13 @@ export CMAKE_PREFIX_PATH=${CFS}/${proj}/${USER}/sw/perlmutter/cpu/boost-1.82.0:$
 
 # optional: for openPMD support
 module load cray-hdf5-parallel/1.14.3.9
-export CMAKE_PREFIX_PATH=${CFS}/${proj}/${USER}/sw/perlmutter/cpu/c-blosc-1.21.1:$CMAKE_PREFIX_PATH
-export CMAKE_PREFIX_PATH=${CFS}/${proj}/${USER}/sw/perlmutter/cpu/adios2-2.10.2:$CMAKE_PREFIX_PATH
+export CMAKE_PREFIX_PATH=${CFS}/${proj}/${USER}/sw/perlmutter/cpu/c-blosc2-2.23.1:$CMAKE_PREFIX_PATH
+export CMAKE_PREFIX_PATH=${CFS}/${proj}/${USER}/sw/perlmutter/cpu/adios2-2.12.1:$CMAKE_PREFIX_PATH
 
-export LD_LIBRARY_PATH=${CFS}/${proj}/${USER}/sw/perlmutter/cpu/c-blosc-1.21.1/lib64:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=${CFS}/${proj}/${USER}/sw/perlmutter/cpu/adios2-2.10.2/lib64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=${CFS}/${proj}/${USER}/sw/perlmutter/cpu/c-blosc2-2.23.1/lib64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=${CFS}/${proj}/${USER}/sw/perlmutter/cpu/adios2-2.12.1/lib64:$LD_LIBRARY_PATH
 
-export PATH=${CFS}/${proj}/${USER}/sw/perlmutter/cpu/adios2-2.10.2/bin:${PATH}
+export PATH=${CFS}/${proj}/${USER}/sw/perlmutter/cpu/adios2-2.12.1/bin:${PATH}
 
 # optional: CCache
 export PATH=${CFS}/${proj}/${USER}/sw/perlmutter/cpu/ccache-4.10.2:$PATH

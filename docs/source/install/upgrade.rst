@@ -7,6 +7,56 @@ This guide covers the changes that need attention when moving an existing script
 build to a newer ImpactX version: changed behavior, replaced APIs, and raised
 requirements. Newest release first.
 
+26.11
+-----
+
+``Programmable``: ``nslice`` and ``name`` moved to the 3rd and 4th argument
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+:py:class:`~impactx.elements.Programmable` takes the new ``includes_collective_effects`` as its
+2nd argument, so ``nslice`` and ``name`` moved back by one position.
+
+**What to check in your scripts:** a ``Programmable(...)`` call that passes ``nslice`` or
+``name`` by position raises a ``TypeError``. Pass them by keyword:
+
+.. code-block:: python
+
+   pge = elements.Programmable(0.5, 2)                # before
+   pge = elements.Programmable(ds=0.5, nslice=2)      # preferred by name, works as before
+
+At fixed :math:`t`, the longitudinal attributes are named ``position_z`` and ``momentum_z``
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+While the beam is at fixed :math:`t`, inside a :py:meth:`~impactx.ParticleContainer.at_fixed_t` block or after
+:py:func:`~impactx.coordinate_transformation` to ``CoordSystem.t``, the longitudinal attributes are named
+``position_z`` and ``momentum_z``.
+Previously, they kept the names ``position_t`` and ``momentum_t`` while holding :math:`z` and :math:`p_z`.
+
+**What to check in your scripts:** code that reads ``position_t`` or ``momentum_t`` by name while the beam is
+at fixed :math:`t` raises a ``KeyError``. Use the new names:
+
+.. code-block:: python
+
+   with sim.beam.at_fixed_t() as beam:
+       for pti in ImpactXParIter(beam, level=0):
+           soa = pti.soa().to_xp()
+           z = soa.real["position_t"]   # before
+           z = soa.real["position_z"]   # now
+
+Access by index, e.g., ``soa.get_real_data()[2]``, is unchanged.
+A :py:class:`~impactx.elements.BeamMonitor` and ``beam.plot_phasespace()`` now raise at fixed
+:math:`t`, where they used to label :math:`z` and :math:`p_z` as :math:`t` and :math:`p_t`; use them at fixed :math:`s`.
+
+New in this release
+"""""""""""""""""""
+
+- :py:meth:`beam.at_fixed_t() <impactx.ParticleContainer.at_fixed_t>` represents the beam at fixed :math:`t`
+  inside a ``with`` block, e.g., to exchange particles with a code that uses time as the independent variable.
+  The beam returns to fixed :math:`s` when the block ends, also if it raises.
+- :py:attr:`Programmable.includes_collective_effects <impactx.elements.Programmable.includes_collective_effects>`
+  declares that a push already models collective effects, e.g., by calling an external code.
+  ImpactX then applies no additional space charge, wakefield, CSR or ISR kicks for this element.
+
 26.10
 -----
 
@@ -153,6 +203,54 @@ base-class elements.
 They have been finalized by then, so keeping them would leave elements that are done with,
 e.g., a :py:class:`~impactx.elements.BeamMonitor` with its output closed, still in the
 lattice.
+
+Setting a single aperture plane represents a jaw
+""""""""""""""""""""""""""""""""""""""""""""""""
+
+An element that sets only one of ``aperture_x`` or ``aperture_y`` now represents a jaw (slit) aperture:
+with only ``aperture_x`` set, particles outside the slab ``|x| <= aperture_x``, which is unbounded
+in ``y``, are lost.
+This makes the beam pipe of the thick elements behave like the
+:py:class:`~impactx.elements.Aperture` collimator (see the convention for
+:ref:`inputs files <running-cpp-parameters-aperture-convention>` and
+:ref:`Python <usage-python-aperture-convention>`).
+Previously, a beam pipe with one plane set and the other left at zero, the default, applied no
+aperture at all, and the whole beam passed.
+
+**What to check in your scripts:** look for elements that give a positive value to exactly one
+of ``aperture_x`` and ``aperture_y``, in Python or in an inputs file:
+
+.. code-block:: python
+
+   elements.Drift(ds=0.1, aperture_x=1e-4)   # loses particles with |x| > 1e-4
+
+.. code-block:: text
+
+   drift1.type = drift
+   drift1.ds = 0.1
+   drift1.aperture_x = 1e-4
+
+Where such an element used to transmit the whole beam, it now removes particles, which
+changes the transmitted charge and every beam moment downstream of it.
+
+To keep the beam pipe open, as the element used to behave, leave out the half-aperture (or set
+it to zero):
+
+.. code-block:: python
+
+   elements.Drift(ds=0.1)
+
+To bound the beam in both planes, set both:
+
+.. code-block:: python
+
+   elements.Drift(ds=0.1, aperture_x=1e-4, aperture_y=1e-4)
+
+The :py:class:`~impactx.elements.Aperture` collimator follows the same convention.
+A half-aperture of zero or less now removes the boundary in that plane, where the constructor
+used to raise.
+For example, ``elements.Aperture(aperture_x=0, aperture_y=1e-3)`` is a jaw (slit) that cuts
+only in ``y``.
 
 New in this release
 """""""""""""""""""

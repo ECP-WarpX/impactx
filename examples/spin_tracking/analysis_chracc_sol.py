@@ -32,7 +32,8 @@ dspinmax = dspin.max()
 print("Change in the spin:")
 print("||delta s||_max", dspinmax)
 
-atol = 2.1e-7
+is_double = np.dtype(sxi.dtype) == np.dtype(np.float64)
+atol = 2.1e-7 if is_double else 1.0e-5
 print(f"  atol={atol}")
 
 assert np.allclose(

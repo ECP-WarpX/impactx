@@ -24,11 +24,7 @@ sudo apt-get install -y \
     wget
 
 # vir-simd
-wget https://github.com/mattkretz/vir-simd/archive/refs/tags/v0.4.4.tar.gz
-tar -xvf v0.4.4.tar.gz
-rm -rf v0.4.4.tar.gz
-cmake -S vir-simd-0.4.4 -B vir-simd-build
-sudo cmake --build vir-simd-build --target install
+"$(dirname "$0")"/vir-simd.sh
 
 python3 -m pip install -U pip
 python3 -m pip install -U build packaging setuptools[core] wheel

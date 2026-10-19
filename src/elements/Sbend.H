@@ -19,6 +19,7 @@
 #include "mixin/nofinalize.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
+#include "mixin/synchrotronradiation.H"
 
 #include <AMReX_Extension.H>
 #include <AMReX_Math.H>
@@ -36,6 +37,7 @@ namespace impactx::elements
       public mixin::Alignment,
       public mixin::PipeAperture,
       public mixin::SpinTransport,
+      public mixin::SynchrotronRadiation,
       public mixin::NoFinalize
       // At least on Intel AVX512, there is a small overhead to vectorize this element in DP, and no benefit in SP, see
       // https://github.com/BLAST-ImpactX/impactx/pull/1002

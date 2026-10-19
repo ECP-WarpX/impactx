@@ -10,6 +10,10 @@
 #include "ChargeBinning.H"
 #include "particles/ImpactXParticleContainer.H"
 
+#include <AMReX_BLassert.H>
+#include <AMReX_BLProfiler.H>
+#include <AMReX_GpuParallelReduce.H>
+
 #include <cmath>
 
 
@@ -121,20 +125,23 @@ namespace impactx::particles::wakefields
         bool is_unity_particle_weight
     )
     {
+        BL_PROFILE("impactx::particles::wakefields::MeanTransversePosition");
+
         using namespace amrex::literals;
 
-        int const num_bins = mean_x.size();
+        AMREX_ALWAYS_ASSERT_WITH_MESSAGE(mean_x.size() == mean_y.size(),
+            "MeanTransversePosition: mean_x and mean_y must have the same size");
+        int const num_bins = static_cast<int>(mean_x.size());
         amrex::Real* dptr_mean_x = mean_x.data();
         amrex::Real* dptr_mean_y = mean_y.data();
 
-        // Declare arrays for sums of positions and weights
-        auto sum_x = amrex::Gpu::DeviceVector<amrex::Real>(num_bins, 0.0_rt);
-        auto sum_y = amrex::Gpu::DeviceVector<amrex::Real>(num_bins, 0.0_rt);
-        auto sum_w = amrex::Gpu::DeviceVector<amrex::Real>(num_bins, 0.0_rt);
+        // Sums of the weights, of x * weight and of y * weight per bin, in one array to reduce
+        // them over all MPI ranks in one call
+        auto sums = amrex::Gpu::DeviceVector<amrex::Real>(3 * num_bins, 0.0_rt);
 
-        amrex::Real* const sum_w_ptr = sum_w.data();
-        amrex::Real* const sum_x_ptr = sum_x.data();
-        amrex::Real* const sum_y_ptr = sum_y.data();
+        amrex::Real* const sum_w_ptr = sums.data();
+        amrex::Real* const sum_x_ptr = sum_w_ptr + num_bins;
+        amrex::Real* const sum_y_ptr = sum_x_ptr + num_bins;
 
         int const nlevs = myspc.finestLevel();
         for (int lev = 0; lev <= nlevs; ++lev)
@@ -150,12 +157,17 @@ namespace impactx::particles::wakefields
                     auto& soa = pti.GetStructOfArrays();
                     long const np = pti.numParticles();
 
-                    amrex::Real* const AMREX_RESTRICT pos_x = soa.GetRealData(impactx::RealSoA::x).dataPtr();
-                    amrex::Real* const AMREX_RESTRICT pos_y = soa.GetRealData(impactx::RealSoA::y).dataPtr();
-                    amrex::Real* const AMREX_RESTRICT pos_z = soa.GetRealData(impactx::RealSoA::z).dataPtr();
-                    amrex::Real* const AMREX_RESTRICT d_w = soa.GetRealData(impactx::RealSoA::w).dataPtr();
+                    amrex::ParticleReal const * const AMREX_RESTRICT pos_x =
+                        soa.GetRealData(impactx::RealSoA::x).dataPtr();
+                    amrex::ParticleReal const * const AMREX_RESTRICT pos_y =
+                        soa.GetRealData(impactx::RealSoA::y).dataPtr();
+                    amrex::ParticleReal const * const AMREX_RESTRICT pos_z =
+                        soa.GetRealData(impactx::RealSoA::z).dataPtr();
+                    amrex::ParticleReal const * const AMREX_RESTRICT d_w =
+                        soa.GetRealData(impactx::RealSoA::w).dataPtr();
 
-                    amrex::For(np, [=] AMREX_GPU_DEVICE(int i)
+                    // amrex::For: different particles add to the same bins
+                    amrex::For(np, [=] AMREX_GPU_DEVICE(long i)
                     {
                         amrex::Real const w = d_w[i];
                         amrex::Real const x = pos_x[i];
@@ -174,6 +186,12 @@ namespace impactx::particles::wakefields
                 }
             }
         }
+
+        // Sum up the partial sums of all MPI ranks, so every rank gets the global means
+        amrex::ParallelAllReduce::Sum(
+            sums,
+            amrex::ParallelDescriptor::Communicator()
+        );
 
         amrex::ParallelFor(num_bins, [=] AMREX_GPU_DEVICE(int i)
         {

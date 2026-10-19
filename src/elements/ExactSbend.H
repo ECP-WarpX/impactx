@@ -18,6 +18,7 @@
 #include "mixin/thick.H"
 #include "mixin/lineartransport.H"
 #include "mixin/spintransport.H"
+#include "mixin/synchrotronradiation.H"
 #include "mixin/nofinalize.H"
 
 #include <AMReX_Extension.H>
@@ -37,6 +38,7 @@ namespace impactx::elements
       public mixin::Alignment,
       public mixin::PipeAperture,
       public mixin::SpinTransport,
+      public mixin::SynchrotronRadiation,
       public mixin::NoFinalize,
       public amrex::simd::Vectorized<amrex::simd::native_simd_size_particlereal>
     {
