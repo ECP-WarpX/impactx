@@ -350,6 +350,15 @@ namespace detail {
         int period
     )
     {
+        // the output schema describes particles at fixed s
+        if (pc.GetCoordSystem() != CoordSystem::s)
+        {
+            throw std::runtime_error(
+                "BeamMonitor (" + m_series_name + "): the particles must be at fixed s. "
+                "Call coordinate_transformation(beam, CoordSystem.s) or leave the "
+                "at_fixed_t() block before writing.");
+        }
+
         // filter out this turn?
         if (period % m_period_sample_intervals != 0)
             return;
@@ -359,13 +368,6 @@ namespace detail {
 #ifdef ImpactX_USE_OPENPMD
         std::string profile_name = "impactx::push::" + std::string(BeamMonitor::type);
         BL_PROFILE(profile_name);
-
-        // the output schema describes particles at fixed s
-        if (pc.GetCoordSystem() != CoordSystem::s)
-        {
-            throw std::runtime_error(
-                "BeamMonitor (" + m_series_name + "): the particles must be at fixed s.");
-        }
 
         // preparing to access reference particle data: RefPart
         RefPart & ref_part = pc.GetRefParticle();

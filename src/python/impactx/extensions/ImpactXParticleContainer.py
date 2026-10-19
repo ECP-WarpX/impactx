@@ -337,7 +337,7 @@ def ix_pc_add_n_particles(
     self, x, y, t, px, py, pt, qm, bunch_charge=None, w=None, sx=None, sy=None, sz=None
 ):
     """
-    Add new particles to the container for fixed s.
+    Add new particles to the container.
 
     The coordinate and weight arguments accept NumPy or CuPy arrays (or
     array-likes), as well as pyAMReX ``PODVector`` objects. Inputs are copied
@@ -352,7 +352,15 @@ def ix_pc_add_n_particles(
     Parameters
     ----------
     x, y, t, px, py, pt : array_like
-        Particle positions (x, y, time-of-flight c*t) and momenta.
+        Particle coordinates, relative to the reference particle.
+        ``x`` and ``y`` are positions in m, ``px`` and ``py`` are momenta
+        normalized by the reference momentum (unitless).
+        At fixed s (the default), ``t`` is the time-of-flight c*t in m and
+        ``pt`` is the energy deviation p_t = -Delta(gamma)/(beta_0 gamma_0)
+        (unitless).
+        Inside a ``beam.at_fixed_t()`` block, ``t`` takes the position z in m
+        and ``pt`` takes the momentum deviation
+        p_z = Delta(beta_z gamma)/(beta_0 gamma_0) (unitless).
     qm : float
         Charge over mass in 1/eV.
     bunch_charge : float, optional
