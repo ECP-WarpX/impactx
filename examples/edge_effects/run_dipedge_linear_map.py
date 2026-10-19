@@ -47,6 +47,8 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 
 # design the accelerator lattice)
 ns = 1  # number of slices per ds in the element
+
+# parameters
 edge_angle = math.pi / 8.0
 dipedge0 = elements.DipEdge(
     name="dipedge0",
@@ -58,12 +60,10 @@ dipedge0 = elements.DipEdge(
     location="entry",
 )
 
-line = [
-    monitor,
-    dipedge0,
-    monitor,
-]
-sim.lattice.extend(line)
+sim.lattice.append(monitor)
+sim.lattice.load_file("dipedge.madx", nslice=ns)  # to use the MAD-X parser
+#sim.lattice.append(dipedge0)  # to use the equivalent parameters specified above
+sim.lattice.append(monitor)
 
 # return linear map
 R_map = sim.lattice.transfer_map(ref).to_numpy()

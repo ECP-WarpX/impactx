@@ -2243,3 +2243,12 @@ add_impactx_test(expanding-2d-acc.py
     OFF  # analysis in situ in run script
     OFF  # no plot script yet
 )
+
+# Expanding Beam in Uniform Accelerating Field with 2D Space Charge ###########
+add_impactx_test(dipedge-linear-map.py
+    examples/edge_effects/run_dipedge_linear_map.py
+    ON    # ImpactX MPI-parallel
+    examples/edge_effects/analysis_dipedge_linear_map.py
+    OFF  # no plot script yet
+)
+
