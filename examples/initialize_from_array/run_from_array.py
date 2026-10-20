@@ -49,7 +49,6 @@ sim.init_grids()
 energy_gamma = np.sqrt(1 + pz_mean**2)
 energy_MeV = 0.510998950 * energy_gamma  # reference energy
 bunch_charge_C = 10.0e-12  # used with space charge
-q_e_C = 1.60217663e-19
 
 #   reference particle
 ref = sim.beam.ref
@@ -84,8 +83,9 @@ with beam.at_fixed_t():
             ref, x, y, z, px, py, pz
         )
 
-        # here we use equal particle weighting, but you can assign any weight to each particle
-        w = np.ones_like(dx) * (bunch_charge_C / q_e_C / N_part)
+        # here we use equal particle weighting, but you can assign any weight to each particle:
+        # the number of real particles, each with the charge of the reference particle in C
+        w = np.ones_like(dx) * (bunch_charge_C / abs(ref.charge) / N_part)
 
         # This call has two options:
         # A) reassign equal weighting according to bunch_charge_C
