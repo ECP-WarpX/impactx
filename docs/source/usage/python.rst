@@ -1934,7 +1934,8 @@ The aperture is disabled entirely only if both planes are zero or less, which is
    particular, ``K2`` is the well-known fringe field parameter denoted ``FINT`` in MAD-X.  The default values of the field integrals ``K0`` - ``K6`` are
    those given in eq. (52), corresponding to a ``tanh`` (i.e. logistic) field profile.
 
-   If ``model = "linear_hwang_lee"``, then the model is given by the linearization of this map.  This is identical to the linear model in K. L. Brown when expanded to first order in ``g/rc`` (gap / radius of curvature).
+   If ``model = "linear_hwang_lee"``, then the model is given by the linearization of this map.  In this case, the values ``K0=K1=K5=0`` are assumed.  This enforces zero centroid offset and ensures the correct bend angle.
+   This is identical to the linear model in K. L. Brown when expanded to first order in ``g/rc`` (gap / radius of curvature).
 
    Note that the MAD-X DIPEDGE element uses as input the half-gap ``HGAP = g/2``, and sets the default value ``FINT = 0`` (while
    the corresponding default value of ``K2`` is set to 1).
