@@ -1228,7 +1228,7 @@ void init_elements(py::module& m)
             [](DipEdge & dip_edge, std::string const & model) {
                 dip_edge.m_model = amrex::getEnum<DipEdge::Model>(model);
             },
-            "Fringe field model (linear or nonlinear)"
+            "Fringe field model"
         )
         .def_property("location",
             [](DipEdge & dip_edge) { return amrex::getEnumNameString(dip_edge.m_location); },
