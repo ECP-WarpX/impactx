@@ -70,6 +70,29 @@ Access by index, e.g., ``soa.get_real_data()[2]``, is unchanged.
 A :py:class:`~impactx.elements.BeamMonitor` and ``beam.plot_phasespace()`` now raise at fixed
 :math:`t`, where they used to label :math:`z` and :math:`p_z` as :math:`t` and :math:`p_t`; use them at fixed :math:`s`.
 
+Particle weights count real particles, also for ions
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+With a ``bunch_charge``, :py:meth:`~impactx.ParticleContainer.add_n_particles` sets the weight of each particle
+to the number of real particles with the charge of the reference particle.
+Previously, it counted elementary charges, which differs for ions with a charge other than :math:`\pm q_e`.
+
+**What to check in your scripts:** ``add_n_particles(..., bunch_charge=...)`` raises a ``RuntimeError`` if the
+reference particle has no charge yet. Set up the reference particle first:
+
+.. code-block:: python
+
+   sim.beam.ref.set_mass_MeV(3727.4).set_charge_qe(2.0).set_kin_energy_MeV(1.0e3)
+   sim.beam.add_n_particles(x, y, t, px, py, pt, qm, bunch_charge=1.0e-9)
+
+For ions, weights passed as ``w`` are now also the number of real particles.
+Before, they were wrongly interpreted as number of elementary charges:
+
+.. code-block:: python
+
+   w = np.full(npart, bunch_charge / scipy.constants.e / npart)  # before
+   w = np.full(npart, bunch_charge / abs(sim.beam.ref.charge) / npart)  # now
+
 New in this release
 """""""""""""""""""
 
