@@ -56,13 +56,12 @@ Six distinct initial conditions are tested for a nominal proton beam with 800 Me
 
 In this test, all 36 elements of the 6x6 transport matrix must agree with predicted values obtained from the model in
 
-K. Bane, "A First and Second-Order Matrix Theory for the Design of Beam Transport Systems and Charged Particle Spectrometers," SLAC-75, 1982.
+K. L. Brown, "A First and Second-Order Matrix Theory for the Design of Beam Transport Systems and Charged Particle Spectrometers," SLAC-75, 1982.
 
 to within numerical tolerance (currently 1e-7).
 
-An equivalent MAD-X input file is provided in "dipedge.madx".  The user can check the matrix elements produced in "sectormap.dat" against those
-
-obtained from ImpactX.
+An equivalent MAD-X input file is provided in ``dipedge.madx``.
+The user can check the matrix elements produced in ``sectormap.dat`` against those obtained from ImpactX.
 
 
 Run

@@ -23,7 +23,7 @@ which performs an expansion in powers of ``g/rc``, where ``g`` is the magnetic g
 
 In this release, the default model (``linear_slac75``) has been changed to coincide with the linear part of the map described in:
 
-K. Bane, "A First- and Second-Order Matrix Theory for the Design of Beam Transport Systems and Charged Particle Spectrometers", SLAC Report-75, 1982.
+K. Brown, "A First- and Second-Order Matrix Theory for the Design of Beam Transport Systems and Charged Particle Spectrometers", SLAC Report-75, 1982.
 
 The previous default linear model is still available as ``linear_hwang_lee``.  It coincides with ``linear_slac75`` through
 first order in ``g/rc``.

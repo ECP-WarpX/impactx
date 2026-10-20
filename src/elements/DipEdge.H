@@ -478,7 +478,7 @@ namespace impactx::elements
         amrex::ParticleReal m_K4; //! fringe field integral
         amrex::ParticleReal m_K5; //! fringe field integral
         amrex::ParticleReal m_K6; //! fringe field integral
-        Model m_model; //! fringe field model: linear or nonlinear
+        Model m_model; //! fringe field model
         Location m_location; //! fringe field location: entry, or exit
         bool m_modify_ref_part; //! apply fringe field to reference particle (true/false)
 

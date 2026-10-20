@@ -2244,7 +2244,7 @@ add_impactx_test(expanding-2d-acc.py
     OFF  # no plot script yet
 )
 
-# Expanding Beam in Uniform Accelerating Field with 2D Space Charge ###########
+# Benchmark of linear dipole fringe field map #################################
 file(COPY ${ImpactX_SOURCE_DIR}/examples/edge_effects/dipedge.madx
         DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/dipedge-linear-map.py)
 add_impactx_test(dipedge-linear-map.py
