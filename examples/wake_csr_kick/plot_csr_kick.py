@@ -45,7 +45,7 @@ gamma = 1.0e6 * kin_energy_MeV / me_eV + 1.0
 beta_gamma_2 = gamma**2 - 1.0
 beta = np.sqrt(beta_gamma_2) / gamma
 Nb = bunch_charge_C / qe
-p0_MeVc = me_eV * beta * gamma
+p0_eVc = me_eV * beta * gamma
 
 # Bend parameters
 radius = 10.3462283686195526
@@ -58,8 +58,8 @@ sigmaz = beta * sigmact
 L = 0.500194828041958
 
 # CSR intensity parameter (units of length, meters)
-kappa = 2.0 * r_e * me * clite**2 / (3.0 ** (1.0 / 3.0) * radius ** (2.0 / 3.0))
-Kscale = Nb * kappa / sigmaz ** (4.0 / 3.0)
+kappa_eV_m13 = 2.0 * r_e * me_eV / (3.0**(1.0/3.0) * radius**(2.0/3.0))
+Kscale_eV_per_m = Nb * kappa_eV_m13 / sigmaz**(4.0/3.0)
 
 # Initial particle data
 
@@ -69,22 +69,14 @@ zi = -beta * ti
 zi_scaled = zi / sigmaz
 
 # Predicted momentum kick, from J. Qiang, Phys. Rev. Accel. Beams 28, 114602 (2025), eqs. (31-32)
-Gamma1 = sp.gamma(5.0 / 6.0)
-Gamma2 = sp.gamma(4.0 / 3.0)
-zeta = -(zi_scaled**2) / 2.0
-Hyperg1 = sp.hyp1f1(2.0 / 3.0, 1.0 / 2.0, zeta)
-Hyperg2 = sp.hyp1f1(7.0 / 6.0, 3.0 / 2.0, zeta)
-wake = (
-    Kscale
-    / (4.0 * np.sqrt(np.pi))
-    * (
-        -(2.0 ** (4.0 / 3.0)) * Gamma1 * Hyperg1
-        + 2.0 ** (5.0 / 6.0) * zi_scaled * Gamma2 * Hyperg2
-    )
-)
+Gamma1 = sp.gamma(5.0/6.0)
+Gamma2 = sp.gamma(4.0/3.0)
+zeta = -zi_scaled**2 / 2.0
+Hyperg1 = sp.hyp1f1(2.0/3.0, 1.0/2.0, zeta)
+Hyperg2 = sp.hyp1f1(7.0/6.0, 3.0/2.0, zeta)
+wake = Kscale_eV_per_m / (4.0*np.sqrt(np.pi)) * (-2.0**(4.0/3.0)*Gamma1*Hyperg1 + 2.0**(5.0/6.0)*zi_scaled*Gamma2*Hyperg2)
 
-# dE_predicted = wake * L / p0_MeVc
-dE_predicted = wake * L
+dE_predicted = wake * L / p0_eVc
 pt_predicted = -dE_predicted
 
 # Maximum momentum kick
@@ -129,7 +121,7 @@ plt.yticks(fontsize=20)
 plt.grid(True)
 
 # Plot the data
-# plt.plot(zi_scaled, dEf, "bo")
+plt.plot(zi_scaled, dEf, "bo")
 plt.plot(zi_scaled, dE_predicted, "ro", markersize=5)
 plt.tight_layout()
 if args.save_png:
