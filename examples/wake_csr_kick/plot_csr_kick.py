@@ -36,7 +36,7 @@ me = sc.electron_mass
 clite = sc.speed_of_light
 eps0 = sc.epsilon_0
 me_eV = me * clite**2 / qe
-r_e = 1.0/(4.0*np.pi*eps0) * qe**2/(me*clite**2)
+r_e = 1.0 / (4.0 * np.pi * eps0) * qe**2 / (me * clite**2)
 
 # Basic beam parameters
 bunch_charge_C = 1.0e-9
@@ -58,8 +58,8 @@ sigmaz = beta * sigmact
 L = 0.500194828041958
 
 # CSR intensity parameter (units of length, meters)
-kappa = 2.0 * r_e * me * clite**2 / (3.0**(1.0/3.0) * radius**(2.0/3.0))
-Kscale = Nb * kappa / sigmaz**(4.0/3.0)
+kappa = 2.0 * r_e * me * clite**2 / (3.0 ** (1.0 / 3.0) * radius ** (2.0 / 3.0))
+Kscale = Nb * kappa / sigmaz ** (4.0 / 3.0)
 
 # Initial particle data
 
@@ -69,14 +69,21 @@ zi = -beta * ti
 zi_scaled = zi / sigmaz
 
 # Predicted momentum kick, from J. Qiang, Phys. Rev. Accel. Beams 28, 114602 (2025), eqs. (31-32)
-Gamma1 = sp.gamma(5.0/6.0)
-Gamma2 = sp.gamma(4.0/3.0)
-zeta = -zi_scaled**2 / 2.0
-Hyperg1 = sp.hyp1f1(2.0/3.0, 1.0/2.0, zeta)
-Hyperg2 = sp.hyp1f1(7.0/6.0, 3.0/2.0, zeta)
-wake = Kscale/(4.0*np.sqrt(np.pi)) * (-2.0**(4.0/3.0)*Gamma1*Hyperg1 + 2.0**(5.0/6.0)*zi_scaled*Gamma2*Hyperg2)
+Gamma1 = sp.gamma(5.0 / 6.0)
+Gamma2 = sp.gamma(4.0 / 3.0)
+zeta = -(zi_scaled**2) / 2.0
+Hyperg1 = sp.hyp1f1(2.0 / 3.0, 1.0 / 2.0, zeta)
+Hyperg2 = sp.hyp1f1(7.0 / 6.0, 3.0 / 2.0, zeta)
+wake = (
+    Kscale
+    / (4.0 * np.sqrt(np.pi))
+    * (
+        -(2.0 ** (4.0 / 3.0)) * Gamma1 * Hyperg1
+        + 2.0 ** (5.0 / 6.0) * zi_scaled * Gamma2 * Hyperg2
+    )
+)
 
-#dE_predicted = wake * L / p0_MeVc
+# dE_predicted = wake * L / p0_MeVc
 dE_predicted = wake * L
 pt_predicted = -dE_predicted
 
@@ -122,7 +129,7 @@ plt.yticks(fontsize=20)
 plt.grid(True)
 
 # Plot the data
-#plt.plot(zi_scaled, dEf, "bo")
+# plt.plot(zi_scaled, dEf, "bo")
 plt.plot(zi_scaled, dE_predicted, "ro", markersize=5)
 plt.tight_layout()
 if args.save_png:
