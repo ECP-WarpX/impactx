@@ -215,9 +215,6 @@ namespace impactx::particles::spacecharge
         [[maybe_unused]] auto const [x_min, y_min, t_min, x_max, y_max, t_max] =
             pc.MinAndMaxPositions();
 
-        // Set parameters for charge deposition
-        bool const GetNumberDensity = true;
-
         int const num_bins = tp5d_bins;  // Set resolution
         amrex::Real const bin_min = t_min;
         amrex::Real const bin_max = t_max;
@@ -227,11 +224,10 @@ namespace impactx::particles::spacecharge
         amrex::Gpu::DeviceVector<amrex::Real> const charge_distribution =
             Deposit1D(pc, bin_min, bin_max, num_bins);
 
-        // charge density and its slope at the grid points
+        // charge density magnitude and its slope at the grid points
         amrex::Gpu::DeviceVector<amrex::Real> line_density;
         amrex::Gpu::DeviceVector<amrex::Real> line_density_slope;
-        DensityAndSlope1D(
-            charge_distribution, line_density, line_density_slope, bin_size, GetNumberDensity);
+        DensityAndSlope1D(charge_distribution, line_density, line_density_slope, bin_size);
         amrex::Real const * const line_density_ptr = line_density.data();
         amrex::Real const * const line_density_slope_ptr = line_density_slope.data();
         int const num_values = static_cast<int>(line_density.size());
@@ -296,9 +292,10 @@ namespace impactx::particles::spacecharge
                     amrex::Real const beam_profile_slope_interp = InterpolateLinear1D(
                         z, line_density_slope_ptr, num_values, bin_min, inv_bin_size);
 
-                    // Force evaluation
+                    // Force evaluation: the signed line charge density and its slope, times
+                    // the charge in push_consts
                     amrex::ParticleReal const Fxy = beam_profile_interp * chargesign;
-                    amrex::ParticleReal const Fz = (apply_longitudinal_kick)? beam_profile_slope_interp * charge : 0_prt;
+                    amrex::ParticleReal const Fz = (apply_longitudinal_kick)? beam_profile_slope_interp * chargesign : 0_prt;
 
                     // push momentum
                     px += eintx * Fxy * push_consts;

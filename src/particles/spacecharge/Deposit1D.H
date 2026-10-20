@@ -26,13 +26,15 @@ namespace impactx::particles::spacecharge
      *  (num_bins - 1), so the first and the last grid point lie on bin_min and bin_max.
      *  Each particle is deposited with linear (cloud-in-cell) weights onto its two neighboring
      *  grid points, the same weights as the linear interpolation back to the particles.
+     *  A particle deposits its charge magnitude |q| w, with the charge q of the reference
+     *  particle and the weight w as the number of real particles it represents.
      *
      * @param[in] pc container of the particles that deposited rho
      * @param[in] bin_min location of lower endpoint for binning
      * @param[in] bin_max location of upper endpoint for binning
      * @param[in] num_bins number of longitudinal grid points, at least two
-     * @return beam_profile deposited charge per grid point divided by bin_size, summed over all
-     *                      MPI ranks
+     * @return beam_profile deposited charge magnitude per grid point divided by bin_size, summed
+     *                      over all MPI ranks
      */
     amrex::Gpu::DeviceVector<amrex::Real>
     Deposit1D (
@@ -53,17 +55,15 @@ namespace impactx::particles::spacecharge
      *
      * @param[in] charge_distribution deposited charge density from Deposit1D, at least two values
      * @param[out] density charge density at the grid points, len(charge_distribution) values
-     * @param[out] slope derivative of the number (or charge) density at the grid points,
+     * @param[out] slope derivative of the charge density at the grid points,
      *                   len(charge_distribution) values
      * @param[in] bin_size distance between two grid points
-     * @param[in] GetNumberDensity number density if true, otherwise charge density
      */
     void DensityAndSlope1D (
         amrex::Gpu::DeviceVector<amrex::Real> const & charge_distribution,
         amrex::Gpu::DeviceVector<amrex::Real> & density,
         amrex::Gpu::DeviceVector<amrex::Real> & slope,
-        amrex::Real bin_size,
-        bool GetNumberDensity = true
+        amrex::Real bin_size
     );
 
 }  // namespace impactx::particles::spacecharge

@@ -20,8 +20,11 @@ namespace impactx::particles::wakefields
 {
     /** Function to calculate charge density profile
      *
+     * A particle deposits its charge magnitude |q| w, with the charge q of the reference
+     * particle and the weight w as the number of real particles it represents.
+     *
      * @param[in] myspc the particle species to deposit along s
-     * @param[out] charge_distribution the output array (1D)
+     * @param[out] charge_distribution the output array (1D): charge magnitude per bin_size
      * @param[in] bin_min lower end of the beam in s
      * @param[in] bin_size size of the beam in s divided by num_bins
      * @param[in] is_unity_particle_weight ignore the particle weighting per macro particle,
@@ -40,7 +43,8 @@ namespace impactx::particles::wakefields
      * @param[in] charge_distribution deposited charge in 1D along s
      * @param[out] slopes derivative of charge_distribution along s with len(charge_distribution)-1
      * @param[in] bin_size size of the beam in s divided by num_bins
-     * @param[in] GetNumberDensity number density if true, otherwise charge density
+     * @param[in] GetNumberDensity divide the charge density by the elementary charge e if true,
+     *                             which is the number density for particles of charge +/-e
      */
     void DerivativeCharge1D (
         amrex::Gpu::DeviceVector<amrex::Real> const & charge_distribution,

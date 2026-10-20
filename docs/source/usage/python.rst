@@ -675,7 +675,7 @@ For step-by-step recipes on how to access particle data live during a simulation
       :param pt: energy deviation :math:`p_t` (at fixed :math:`s`) or momentum deviation :math:`p_z` (at fixed :math:`t`), unitless
       :param qm: charge over mass in 1/eV
       :param bunch_charge: total charge within a bunch in C
-      :param w: weight of each particle: the macroparticle charge in units of the elementary charge `e` (i.e., how many real particles to represent)
+      :param w: weight of each particle: how many real particles to represent
       :param sx: spin component in x (optional; if provided, sy and sz must also be provided)
       :param sy: spin component in y (optional; if provided, sx and sz must also be provided)
       :param sz: spin component in z (optional; if provided, sx and sy must also be provided)

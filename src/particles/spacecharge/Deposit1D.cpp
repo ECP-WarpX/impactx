@@ -11,8 +11,6 @@
 
 #include "particles/wakefields/InterpolateLinear1D.H"
 
-#include <ablastr/constant.H>
-
 #include <AMReX_BLassert.H>
 #include <AMReX_BLProfiler.H>
 #include <AMReX_GpuAtomic.H>
@@ -20,6 +18,8 @@
 #include <AMReX_GpuLaunch.H>
 #include <AMReX_GpuParallelReduce.H>
 #include <AMReX_REAL.H>
+
+#include <cmath>
 
 
 namespace impactx::particles::spacecharge
@@ -44,8 +44,9 @@ namespace impactx::particles::spacecharge
         amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);
         amrex::Real const inv_bin_size = 1.0_rt / bin_size;
 
-        // charge density per unit particle weight
-        amrex::Real const charge_density_per_weight = ablastr::constant::SI::q_e * inv_bin_size;
+        // charge density per unit particle weight, the weight counts real particles
+        amrex::Real const charge_density_per_weight =
+            std::abs(pc.GetRefParticle().charge) * inv_bin_size;
 
         amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins, 0.0_rt);
         amrex::Real * const dptr_charge = charge_distribution.data();
@@ -96,8 +97,7 @@ namespace impactx::particles::spacecharge
         amrex::Gpu::DeviceVector<amrex::Real> const & charge_distribution,
         amrex::Gpu::DeviceVector<amrex::Real> & density,
         amrex::Gpu::DeviceVector<amrex::Real> & slope,
-        amrex::Real bin_size,
-        bool GetNumberDensity
+        amrex::Real bin_size
     )
     {
         using namespace amrex::literals;
@@ -108,10 +108,8 @@ namespace impactx::particles::spacecharge
         density.resize(num_points);
         slope.resize(num_points);
 
-        // central difference, optionally of the number density
-        amrex::Real const slope_factor = GetNumberDensity
-            ? 0.5_rt / (bin_size * ablastr::constant::SI::q_e)
-            : 0.5_rt / bin_size;
+        // central difference
+        amrex::Real const slope_factor = 0.5_rt / bin_size;
 
         amrex::Real const * const dptr_charge = charge_distribution.data();
         amrex::Real * const dptr_density = density.data();
