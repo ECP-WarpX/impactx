@@ -104,6 +104,9 @@ def test_collective_kick_scales_with_charge_squared(model):
     with the charge q scale with q, and so does the force of these fields on each
     ion: the kicks of space charge and CSR scale with q^2.
     """
+    if model in ("2p5D", "CSR") and not Config.have_fft:
+        pytest.skip("ImpactX built without FFT support; skipping FFT-only model")
+
     kicks_1 = _kicks(model, 1.0)
     kicks_q = _kicks(model, carbon_charge_qe)
 
