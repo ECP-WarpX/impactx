@@ -10,3 +10,9 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    # One PR for all actions, instead of one per action
+    # (or per sub-action, e.g., `github/codeql-action/init`).
+    groups:
+      github-actions:
+        patterns:
+          - "*"
