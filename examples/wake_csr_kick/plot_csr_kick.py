@@ -58,8 +58,8 @@ sigmaz = beta * sigmact
 L = 0.500194828041958
 
 # CSR intensity parameter (units of length, meters)
-kappa_eV_m13 = 2.0 * r_e * me_eV / (3.0**(1.0/3.0) * radius**(2.0/3.0))
-Kscale_eV_per_m = Nb * kappa_eV_m13 / sigmaz**(4.0/3.0)
+kappa_eV_m13 = 2.0 * r_e * me_eV / (3.0 ** (1.0 / 3.0) * radius ** (2.0 / 3.0))
+Kscale_eV_per_m = Nb * kappa_eV_m13 / sigmaz ** (4.0 / 3.0)
 
 # Initial particle data
 
@@ -69,12 +69,19 @@ zi = -beta * ti
 zi_scaled = zi / sigmaz
 
 # Predicted momentum kick, from J. Qiang, Phys. Rev. Accel. Beams 28, 114602 (2025), eqs. (31-32)
-Gamma1 = sp.gamma(5.0/6.0)
-Gamma2 = sp.gamma(4.0/3.0)
-zeta = -zi_scaled**2 / 2.0
-Hyperg1 = sp.hyp1f1(2.0/3.0, 1.0/2.0, zeta)
-Hyperg2 = sp.hyp1f1(7.0/6.0, 3.0/2.0, zeta)
-wake = Kscale_eV_per_m / (4.0*np.sqrt(np.pi)) * (-2.0**(4.0/3.0)*Gamma1*Hyperg1 + 2.0**(5.0/6.0)*zi_scaled*Gamma2*Hyperg2)
+Gamma1 = sp.gamma(5.0 / 6.0)
+Gamma2 = sp.gamma(4.0 / 3.0)
+zeta = -(zi_scaled**2) / 2.0
+Hyperg1 = sp.hyp1f1(2.0 / 3.0, 1.0 / 2.0, zeta)
+Hyperg2 = sp.hyp1f1(7.0 / 6.0, 3.0 / 2.0, zeta)
+wake = (
+    Kscale_eV_per_m
+    / (4.0 * np.sqrt(np.pi))
+    * (
+        -(2.0 ** (4.0 / 3.0)) * Gamma1 * Hyperg1
+        + 2.0 ** (5.0 / 6.0) * zi_scaled * Gamma2 * Hyperg2
+    )
+)
 
 dE_predicted = wake * L / p0_eVc
 pt_predicted = -dE_predicted
