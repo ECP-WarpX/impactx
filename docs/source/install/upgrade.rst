@@ -13,11 +13,11 @@ requirements. Newest release first.
 ``DipEdge``: default linear model changed to ``linear_slac75``
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-For the :py:class:`~impactx.elements.DipEdge` element, there were previously two models: ``linear`` (default) and ``nonlinear``. 
+For the :py:class:`~impactx.elements.DipEdge` element, there were previously two models: ``linear`` (default) and ``nonlinear``.
 
 Both of these models were based on the paper:
 
-K. Hwang and S. Y. Lee, "Dipole fringe field map for compact synchrotrons", Phys. Rev. ST Accel. Beams 18, 122401 (2015), 
+K. Hwang and S. Y. Lee, "Dipole fringe field map for compact synchrotrons", Phys. Rev. ST Accel. Beams 18, 122401 (2015),
 
 which performs an expansion in powers of ``g/rc``, where ``g`` is the magnetic gap, and ``rc`` is the bend radius of curvature.
 
@@ -30,8 +30,8 @@ first order in ``g/rc``.
 
 The nonlinear DipEdge model is unchanged, and appears as ``nonlinear_hwang_lee``.
 
-The strings that specify the (now 3) models have been updated to be more explicit. 
-To avoid breakage, the model string ``nonlinear`` points to ``nonlinear_hwang_lee``, and the model string ``linear`` points to ``linear_slac75``. 
+The strings that specify the (now 3) models have been updated to be more explicit.
+To avoid breakage, the model string ``nonlinear`` points to ``nonlinear_hwang_lee``, and the model string ``linear`` points to ``linear_slac75``.
 In particular, this allows the MAD-X parser to be used without change.
 
 
