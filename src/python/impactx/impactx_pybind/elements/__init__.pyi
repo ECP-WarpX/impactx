@@ -1363,7 +1363,7 @@ class DipEdge(mixin.Named, mixin.Thin, mixin.Alignment, mixin.PipeAperture):
         K4: typing.SupportsFloat | typing.SupportsIndex = 0.0,
         K5: typing.SupportsFloat | typing.SupportsIndex = 0.0,
         K6: typing.SupportsFloat | typing.SupportsIndex = 0.0,
-        model: str = "linear",
+        model: str = "linear_slac75",
         location: str = "entry",
         modify_ref_part: bool = False,
         dx: typing.SupportsFloat | typing.SupportsIndex = 0.0,
@@ -1562,7 +1562,7 @@ class DipEdge(mixin.Named, mixin.Thin, mixin.Alignment, mixin.PipeAperture):
     @property
     def model(self) -> str:
         """
-        Fringe field model (linear or nonlinear)
+        Fringe field model
         """
     @model.setter
     def model(self, arg1: str) -> None: ...
