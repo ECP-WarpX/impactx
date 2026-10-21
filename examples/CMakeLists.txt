@@ -946,6 +946,13 @@ add_impactx_test(kicker.py
     examples/kicker/analysis_kicker.py
     OFF  # no plot script yet
 )
+# more grids than MPI ranks: each rank owns two grids
+add_impactx_test(kicker-grids.py
+    examples/kicker/run_kicker_grids.py
+    ON   # ImpactX MPI-parallel
+    examples/kicker/analysis_kicker.py
+    OFF  # no plot script yet
+)
 # copy MAD-X lattice file
 file(COPY ${ImpactX_SOURCE_DIR}/examples/kicker/kicker.madx
         DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kicker_madx.py)
