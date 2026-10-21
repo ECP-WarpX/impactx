@@ -28,7 +28,7 @@ last_step = list(series.iterations)[-1]
 beam_initial = series.iterations[1].particles["beam"]
 initial_sort = beam_initial.to_df().set_index("id")
 beam_final = series.iterations[last_step].particles["beam"]
-final_sort = beam_final.to_df().set_index("id")
+final_sort = beam_final.to_df().set_index("id").reindex(initial_sort.index)
 
 # Physical constants
 qe = sc.elementary_charge
