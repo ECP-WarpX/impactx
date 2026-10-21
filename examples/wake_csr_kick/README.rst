@@ -28,11 +28,11 @@ For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with `
 .. tab-set::
 
    .. tab-item:: Python: Script
-   
+
        .. literalinclude:: run_csr_kick.py
           :language: python3
           :caption: You can copy this file from ``examples/wake_csr_kick/run_csr_kick.py``.
-   
+
    .. tab-item:: Executable: Input File
 
        .. literalinclude:: input_csr_kick.in
@@ -49,8 +49,8 @@ We run the following script to analyze correctness:
    .. literalinclude:: analysis_csr_kick.py
       :language: python3
       :caption: You can copy this file from ``examples/wake_csr_kick/analysis_csr_kick.py``.
-   
-   
+
+
 Visualize
 ---------
 
@@ -61,4 +61,3 @@ You can run the following script to visualize the energy kick as a function of h
    .. literalinclude:: plot_csr_kick.py
       :language: python3
       :caption: You can copy this file from ``examples/wake_csr_kick/plot_csr_kick.py``.
-
