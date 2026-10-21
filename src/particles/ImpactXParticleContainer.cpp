@@ -139,7 +139,7 @@ namespace impactx
     {
         // make sure we have at least one box with enough tiles for each OpenMP thread
 
-        // make sure level 0, grid 0 exists
+        // make sure this MPI rank owns a grid on level 0: the first one is used below
         int lid = 0, gid = 0;
         {
             const auto& pmap = ParticleDistributionMap(lid).ProcessorMap();
@@ -147,7 +147,7 @@ namespace impactx
             if (it == std::end(pmap)) {
                 amrex::Abort("Particle container needs to have at least one grid.");
             } else {
-                gid = *it;
+                gid = static_cast<int>(std::distance(pmap.begin(), it));
             }
         }
 
@@ -163,9 +163,9 @@ namespace impactx
         );
 
         // When running without space charge and OpenMP parallelization,
-        // we need to make sure we have enough tiles on level 0, grid 0
+        // we need to make sure we have enough tiles on the first grid of this rank
         // to thread over the available tiles. We try to set the tile_size
-        // appropriately here. We start by setting the tile_size to the size of box 0.
+        // appropriately here. We start by setting the tile_size to the size of this grid.
         // Then we try to reduce the tile size in the (z, y, x) directions alternately
         // until there are enough tiles for the number of threads.
 
@@ -289,7 +289,7 @@ namespace impactx
         }
         if (has_w) { AMREX_ALWAYS_ASSERT(np_s == w->size()); }
 
-        // we add particles to lev 0, grid 0
+        // we add particles to lev 0, to the first grid of this MPI rank
         int lid = 0, gid = 0;
         {
             const auto& pmap = ParticleDistributionMap(lid).ProcessorMap();
@@ -297,7 +297,7 @@ namespace impactx
             if (it == std::end(pmap)) {
                 throw std::runtime_error("AddNParticles: Attempting to add particles to box that does not exist.");
             } else {
-                gid = *it;
+                gid = static_cast<int>(std::distance(pmap.begin(), it));
             }
         }
 

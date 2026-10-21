@@ -725,7 +725,13 @@ This requires these additional parameters:
 ``dipedge``
 ^^^^^^^^^^^
 
-``dipedge`` for dipole edge focusing. The model here is based on:
+``dipedge`` for dipole edge focusing.  If ``model = "linear_slac75"``, then the model is given by the linear part of the map described in:
+
+* K. L. Brown, "A First- and Second-Order Matrix Theory for the Design of Beam Transport Systems and Charged Particle Spectrometers," SLAC Report No. 75 (1982),
+
+which coincides with the linear dipole edge focusing model in MAD-X.
+
+If ``model = "nonlinear_hwang_lee"``, then the model is given by:
 
 K. Hwang and S. Y. Lee, "Dipole fringe field map for compact synchrotrons," Phys. Rev. Accel. Beams 18, 122401 (2015)
 
@@ -735,13 +741,11 @@ C. Mitchell and K. Hwang, "Explicit symplectic representations of nonlinear dipo
 
 Here, ``g`` denotes the magnetic gap, which is a length scale that sets the rate of decay of the fringe field.  The values ``K0`` - ``K6`` denote dimensionless field integrals, describing the shape of the fringe field, as defined in eqs. (28-34) of the first reference above.  In particular, ``K2`` is the well-known fringe field parameter denoted ``FINT`` in MAD-X.  The default values of the field integrals ``K0`` - ``K6`` are those given in eq. (52), corresponding to a ``tanh`` (i.e. logistic) field profile.
 
-If ``model = "linear"``, then the linearized map is used.  This model is identical to:
+If ``model = "linear_hwang_lee"``, then the model is given by the linearization of the above map.  In this case, the values ``K0=K1=K5=0`` are assumed.  This enforces zero centroid offset and ensures the correct bend angle.
 
-* K. L. Brown, SLAC Report No. 75 (1982)
+This is identical to the linear model in K. L. Brown when expanded to first order in ``g/rc`` (gap / radius of curvature).
 
-when expanded to first order in ``g/rc`` (gap / radius of curvature).
-
-By comparison, note that the MAD-X DIPEDGE element uses as input the half-gap ``HGAP = g/2``, and sets the default value ``FINT = 0`` (while the corresponding default value of ``K2`` is set to 1).
+Note that the MAD-X DIPEDGE element uses as input the half-gap ``HGAP = g/2``, and sets the default value ``FINT = 0`` (while the corresponding default value of ``K2`` is set to 1).
 
 Note that the nonlinear model includes a nonzero horizontal translation (depending on the field integral values) that is present even for a particle that begins on the ideal "hard-edge" reference trajectory.
 
@@ -833,9 +837,9 @@ This element is defined via ``<dipedge_name>.type = dipedge`` and requires these
 
 .. pp:param:: <dipedge_name>.model
     :type: ``string``
-    :default: ``linear``
+    :default: ``linear_slac75``
 
-    The fringe field model: ``linear`` (default) or ``nonlinear``.
+    The fringe field model: ``linear_slac75`` (default), ``nonlinear_hwang_lee``, or ``linear_hwang_lee``.
 
 .. pp:param:: <dipedge_name>.location
     :type: ``string``

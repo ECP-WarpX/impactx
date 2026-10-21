@@ -10,6 +10,29 @@ requirements. Newest release first.
 26.11
 -----
 
+``DipEdge``: default linear model changed to ``linear_slac75``
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+For the :py:class:`~impactx.elements.DipEdge` element, there were previously two models: ``linear`` (default) and ``nonlinear``.
+
+Both of these models were based on the paper:
+
+K. Hwang and S. Y. Lee, "Dipole fringe field map for compact synchrotrons", Phys. Rev. ST Accel. Beams 18, 122401 (2015),
+
+which performs an expansion in powers of ``g/rc``, where ``g`` is the magnetic gap, and ``rc`` is the bend radius of curvature.
+
+In this release, the default model (``linear``, which is now an alias for the new ``linear_slac75``) has been changed to coincide with the linear part of the map described in:
+
+K. Brown, "A First- and Second-Order Matrix Theory for the Design of Beam Transport Systems and Charged Particle Spectrometers", SLAC Report-75, 1982.
+
+The previous default linear model is still available as ``linear_hwang_lee``.  It coincides with ``linear_slac75`` through
+first order in ``g/rc``.
+
+The ``nonlinear`` DipEdge model is unchanged, and is now an alias for ``nonlinear_hwang_lee``.
+
+The new linear default model ``linear_slac75`` was chosen to match the commonly used MAD-X model.
+
+
 ``Programmable``: ``nslice`` and ``name`` moved to the 3rd and 4th argument
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 

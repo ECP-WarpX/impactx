@@ -215,7 +215,7 @@ jobs:
         python3 examples/fodo/run_fodo.py
 
     - name: Python CodSpeedHQ Benchmarks
-      uses: CodSpeedHQ/action@f842b9a3ffe213dbb81768fd7f7eeb4dfcf1c369 # v5.4.2
+      uses: CodSpeedHQ/action@821a40cd6c80e3cfe387caf55668287addd808da # v5.5.0
       env:
         OMP_NUM_THREADS: 1
         IS_CODESPEED_CPU_SIMULATION: 1

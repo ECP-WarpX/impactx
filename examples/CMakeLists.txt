@@ -946,6 +946,13 @@ add_impactx_test(kicker.py
     examples/kicker/analysis_kicker.py
     OFF  # no plot script yet
 )
+# more grids than MPI ranks: each rank owns two grids
+add_impactx_test(kicker-grids.py
+    examples/kicker/run_kicker_grids.py
+    ON   # ImpactX MPI-parallel
+    examples/kicker/analysis_kicker.py
+    OFF  # no plot script yet
+)
 # copy MAD-X lattice file
 file(COPY ${ImpactX_SOURCE_DIR}/examples/kicker/kicker.madx
         DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kicker_madx.py)
@@ -2259,3 +2266,13 @@ if(ImpactX_FFT)
         examples/wake_csr_kick/plot_csr_kick.py
     )
 endif()
+
+# Benchmark of linear dipole fringe field map #################################
+file(COPY ${ImpactX_SOURCE_DIR}/examples/edge_effects/dipedge.madx
+        DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/dipedge-linear-map.py)
+add_impactx_test(dipedge-linear-map.py
+    examples/edge_effects/run_dipedge_linear_map.py
+    ON    # ImpactX MPI-parallel
+    examples/edge_effects/analysis_dipedge_linear_map.py
+    OFF  # no plot script yet
+)
