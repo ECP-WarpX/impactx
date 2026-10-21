@@ -2,7 +2,7 @@
 .. _examples-csr-kick:
 
 Momentum Kick in the 1D Steady-State CSR Model
-===============================================
+==============================================
 
 The test compares the energy change due to CSR experienced by particles in a bending dipole within a long, initially cold, Gaussian bunch against the analytical model in:
 

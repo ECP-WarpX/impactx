@@ -18,7 +18,7 @@ sim.csr_bins = 150
 # sim.diagnostics = False  # benchmarking
 sim.slice_step_diagnostics = True
 
-# domain decomposition & space charge mesh
+# domain decomposition
 sim.init_grids()
 
 # load a 5 GeV electron beam with an initial
@@ -51,12 +51,10 @@ monitor = elements.BeamMonitor("monitor", backend="h5")
 # design the accelerator lattice
 ns = 1  # number of slices per ds in the element
 rc = 10.3462283686195526  # bend radius (meters)
-psi = 0.048345620280243  # pole face rotation angle (radians)
 lb = 0.500194828041958  # bend arc length (meters)
 
 # Bend elements
 sbend1 = elements.Sbend(name="sbend1", ds=lb, rc=-rc, nslice=ns)
-sbend2 = elements.Sbend(name="sbend2", ds=lb, rc=rc, nslice=ns)
 
 # assign a segment with the first half of the lattice
 sim.lattice.append(monitor)
