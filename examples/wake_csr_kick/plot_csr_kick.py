@@ -128,8 +128,8 @@ plt.yticks(fontsize=20)
 plt.grid(True)
 
 # Plot the data
-plt.plot(zi_scaled, dEf, "bo", label='computed')
-plt.plot(zi_scaled, dE_predicted, "ro", markersize=5, label='predicted')
+plt.plot(zi_scaled, dEf, "bo", label="computed")
+plt.plot(zi_scaled, dE_predicted, "ro", markersize=5, label="predicted")
 plt.legend(fontsize=20)
 plt.tight_layout()
 if args.save_png:

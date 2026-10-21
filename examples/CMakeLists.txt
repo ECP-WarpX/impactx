@@ -2249,4 +2249,3 @@ add_impactx_test(expanding-2d-acc.py
     ON    # ImpactX MPI-parallel
     examples/wake_csr_kick/analysis_csr_kick.py
     examples/wake_csr_kick/plot_csr_kick.py
-

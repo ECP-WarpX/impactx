@@ -8,7 +8,6 @@
 import numpy as np
 import openpmd_api as io
 import scipy.constants as sc
-import scipy.constants as sc
 import scipy.special as sp
 
 # initial/final beam
