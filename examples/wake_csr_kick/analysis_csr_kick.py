@@ -120,7 +120,7 @@ print("dpt_max/pt_max", dpt_max / pt_max)
 
 # Test maximum error:
 # Longitudinal kick is sensitive to noise (relax tolerance):
-atol = 0.04 if is_double else 3.0
+atol = 0.05 if is_double else 0.1
 print(f"  tol={atol}")
 
 assert np.allclose(
