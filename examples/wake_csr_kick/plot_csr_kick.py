@@ -121,15 +121,16 @@ print("dpt_max/pt_max", dpt_max / pt_max)
 # Plotting
 mm_scale = 1.0e-3
 plt.figure(figsize=(10, 6))
-plt.xlabel("initial $ct$ (m)", fontsize=25)
-plt.ylabel("final $p_t/cp_0$", fontsize=25)
+plt.xlabel(r"initial $z/\sigma_z$", fontsize=25)
+plt.ylabel(r"final $E/cp_0$", fontsize=25)
 plt.xticks(fontsize=20)
 plt.yticks(fontsize=20)
 plt.grid(True)
 
 # Plot the data
-plt.plot(zi_scaled, dEf, "bo")
-plt.plot(zi_scaled, dE_predicted, "ro", markersize=5)
+plt.plot(zi_scaled, dEf, "bo", label='computed')
+plt.plot(zi_scaled, dE_predicted, "ro", markersize=5, label='predicted')
+plt.legend(fontsize=20)
 plt.tight_layout()
 if args.save_png:
     plt.savefig("CSR_longitudinal_kick.png")

@@ -2243,3 +2243,10 @@ add_impactx_test(expanding-2d-acc.py
     OFF  # analysis in situ in run script
     OFF  # no plot script yet
 )
+
+# Momentum Kick in the 1D Steady-State CSR Model ###########
+    examples/wake_csr_kick/run_csr_kick.py
+    ON    # ImpactX MPI-parallel
+    examples/wake_csr_kick/analysis_csr_kick.py
+    examples/wake_csr_kick/plot_csr_kick.py
+
