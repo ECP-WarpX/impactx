@@ -295,6 +295,9 @@ namespace impactx
         }
         if (has_w) { AMREX_ALWAYS_ASSERT(np_s == w->size()); }
 
+        // nothing to add, e.g., on MPI ranks that got no particles of a distribution
+        if (np_s == 0) { return; }
+
         // we add particles to lev 0, to the first grid of this MPI rank
         int lid = 0, gid = 0;
         {

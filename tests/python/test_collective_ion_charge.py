@@ -178,3 +178,25 @@ def test_bunch_charge_needs_ref_charge():
     assert sim.beam.total_number_of_particles() == 10
 
     sim.finalize()
+
+
+@pytest.mark.parametrize("bunch_charge_C", [0.0, 1.0e-9])
+def test_bunch_charge_no_particles(bunch_charge_C):
+    """Adding no particles with a bunch charge adds nothing.
+
+    MPI ranks that get no particles of a distribution add an empty beam with a
+    bunch charge of zero.
+    """
+    sim = ImpactX()
+    sim.diagnostics = False
+    sim.init_grids()
+
+    qm_eev = _set_carbon(sim, carbon_charge_qe)
+
+    empty = np.zeros(0)
+    sim.beam.add_n_particles(
+        empty, empty, empty, empty, empty, empty, qm_eev, bunch_charge=bunch_charge_C
+    )
+    assert sim.beam.total_number_of_particles() == 0
+
+    sim.finalize()
