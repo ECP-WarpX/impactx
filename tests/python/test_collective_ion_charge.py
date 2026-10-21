@@ -85,7 +85,9 @@ def _kicks(model, charge_qe):
         sim.lattice.append(elements.Drift(name="drift", ds=1.0, nslice=1))
     sim.track_particles()
 
-    df = sim.beam.to_df(local=True).sort_index()  # by idcpu
+    # the same particle order in every run: the order of the tiles depends on the
+    # number of OpenMP threads, and the DataFrame index is the position in a tile
+    df = sim.beam.to_df(local=True).reset_index(drop=True).sort_values("idcpu")
     momenta = (
         ["momentum_t"] if model == "CSR" else ["momentum_x", "momentum_y", "momentum_t"]
     )
