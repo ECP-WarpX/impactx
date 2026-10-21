@@ -6,11 +6,9 @@ Momentum Kick in the 1D Steady-State CSR Model
 
 The test compares the energy change due to CSR experienced by particles in a bending dipole within a long, initially cold, Gaussian bunch against the analytical model in:
 
-J. Qiang, Phys. Rev. Accel. Beams 28, 114602 (2025), eqs. (31-32).
+C. Mitchell, J. Qiang, and P. Emma, Phys. Rev. Accel. Beams 16, 060703 (2013), eqs. (C5-C7).
 
-We use a cold (zero emittance) 100 MeV electron bunch in a drift space, with a single slice.
-
-Here :math:`\sigma_x = \sigma_y`, so the predicted momentum kick can be evaluated in closed form.
+We use a cold (zero emittance) 1 nC, 5 GeV electron bunch in one of the dipoles from the Zeuthen chicane benchmark.
 
 In this test, the final momentum of every particle is compared against its predicted value.  Both the maximum error and its rms value over the bunch population are returned.  Both values must be zero within a small tolerance.
 
