@@ -2250,3 +2250,13 @@ add_impactx_test(expanding-2d-acc.py
     OFF  # analysis in situ in run script
     OFF  # no plot script yet
 )
+
+# Benchmark of linear dipole fringe field map #################################
+file(COPY ${ImpactX_SOURCE_DIR}/examples/edge_effects/dipedge.madx
+        DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/dipedge-linear-map.py)
+add_impactx_test(dipedge-linear-map.py
+    examples/edge_effects/run_dipedge_linear_map.py
+    ON    # ImpactX MPI-parallel
+    examples/edge_effects/analysis_dipedge_linear_map.py
+    OFF  # no plot script yet
+)

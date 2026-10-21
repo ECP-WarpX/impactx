@@ -1,0 +1,11 @@
+beam, energy=0.8+pmass, particle=proton;
+
+rc=10.0;
+g=1.0;
+us_dipedge_elem: dipedge, h=1/rc, e1=pi/8.0, fint=0.5, hgap=g/2.0;
+us_dipedge: line=(us_dipedge_elem);
+
+use, sequence=us_dipedge;
+set, format="28.15g";
+select, flag=sectormap, clear;
+twiss, betx=1.0, alfx=0.0, bety=1.0, alfy=0.0, sectormap, sectorfile = "sectormap.dat";
