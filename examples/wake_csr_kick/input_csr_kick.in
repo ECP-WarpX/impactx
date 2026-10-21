@@ -28,10 +28,6 @@ sbend1.type = sbend
 sbend1.ds = 0.500194828041958       # projected length 0.5 m, angle 2.77 deg
 sbend1.rc = -10.3462283686195526
 
-sbend2.type = sbend
-sbend2.ds = 0.500194828041958       # projected length 0.5 m, angle 2.77 deg
-sbend2.rc = 10.3462283686195526
-
 monitor.type = beam_monitor
 monitor.backend = h5
 
