@@ -2245,15 +2245,17 @@ add_impactx_test(expanding-2d-acc.py
 )
 
 # Momentum Kick in the 1D Steady-State CSR Model ###########
-add_impactx_test(csr-kick
-    examples/wake_csr_kick/input_csr_kick.in
-    ON    # ImpactX MPI-parallel
-    examples/wake_csr_kick/analysis_csr_kick.py
-    examples/wake_csr_kick/plot_csr_kick.py
-)
-add_impactx_test(csr-kick.py
-    examples/wake_csr_kick/run_csr_kick.py
-    ON    # ImpactX MPI-parallel
-    examples/wake_csr_kick/analysis_csr_kick.py
-    examples/wake_csr_kick/plot_csr_kick.py
-)
+if(ImpactX_FFT)
+    add_impactx_test(csr-kick
+        examples/wake_csr_kick/input_csr_kick.in
+        ON    # ImpactX MPI-parallel
+        examples/wake_csr_kick/analysis_csr_kick.py
+        examples/wake_csr_kick/plot_csr_kick.py
+    )
+    add_impactx_test(csr-kick.py
+        examples/wake_csr_kick/run_csr_kick.py
+        ON    # ImpactX MPI-parallel
+        examples/wake_csr_kick/analysis_csr_kick.py
+        examples/wake_csr_kick/plot_csr_kick.py
+    )
+endif()
