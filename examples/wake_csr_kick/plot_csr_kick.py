@@ -122,7 +122,7 @@ print("dpt_max/pt_max", dpt_max / pt_max)
 mm_scale = 1.0e-3
 plt.figure(figsize=(10, 6))
 plt.xlabel(r"initial $z/\sigma_z$", fontsize=25)
-plt.ylabel(r"final $E/cp_0$", fontsize=25)
+plt.ylabel(r"$\Delta E/cp_0$", fontsize=25)
 plt.xticks(fontsize=20)
 plt.yticks(fontsize=20)
 plt.grid(True)
