@@ -1,0 +1,47 @@
+###############################################################################
+# Particle Beam(s)
+###############################################################################
+beam.npart = 1000000
+beam.units = static
+beam.kin_energy = 5.0e3
+beam.charge = 1.0e-9
+beam.particle = electron
+beam.distribution = gaussian
+beam.lambdaX = 0.0
+beam.lambdaY = 0.0
+beam.lambdaT = 2.0e-4
+beam.lambdaPx = 0.0
+beam.lambdaPy = 0.0
+beam.lambdaPt = 0.0
+beam.muxpx = 0.0
+beam.muypy = 0.0
+beam.mutpt = 0.0
+
+
+###############################################################################
+# Beamline: lattice elements and segments
+###############################################################################
+lattice.elements = monitor sbend1 monitor
+lattice.nslice = 1
+
+sbend1.type = sbend
+sbend1.ds = 0.500194828041958       # projected length 0.5 m, angle 2.77 deg
+sbend1.rc = -10.3462283686195526
+
+monitor.type = beam_monitor
+monitor.backend = h5
+
+
+###############################################################################
+# Algorithms
+###############################################################################
+algo.particle_shape = 2
+algo.space_charge = false
+algo.csr = true
+algo.csr_bins = 150
+
+
+###############################################################################
+# Diagnostics
+###############################################################################
+diag.slice_step_diagnostics = true
