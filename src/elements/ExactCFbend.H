@@ -835,9 +835,9 @@ namespace impactx::elements
 
             // other intermediate quantities with special limiting cases
             amrex::ParticleReal const coslim = omega_x != 0_prt ? (1_prt - cosx)/gx : 0.5_prt * powi<2>(slice_ds);
-            amrex::ParticleReal const coshlim = omega_x != 0_prt ? (1_prt - coshx)/gx : -0.5_prt * powi<2>(slice_ds);
+            amrex::ParticleReal const coshlim = omega_x != 0_prt ? (1_prt - coshx)/gx : 0.5_prt * powi<2>(slice_ds);
             amrex::ParticleReal const sinlim = omega_x != 0_prt ? (sincx - slice_ds)/gx : -powi<3>(slice_ds) / 6_prt;
-            amrex::ParticleReal const sinhlim = omega_x != 0_prt ? (sinhcx - slice_ds)/gx : powi<3>(slice_ds) / 6_prt;
+            amrex::ParticleReal const sinhlim = omega_x != 0_prt ? (sinhcx - slice_ds)/gx : -powi<3>(slice_ds) / 6_prt;
 
             amrex::ParticleReal const iobrc = 1_prt / (bet * rc);
             amrex::ParticleReal const iobrc2 = 1_prt / b2rc2;
