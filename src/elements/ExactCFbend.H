@@ -783,6 +783,7 @@ namespace impactx::elements
         transport_map (RefPart const & AMREX_RESTRICT refpart) const  // TODO: update as well, but needs more careful placement of calc_constants
         {
             using namespace amrex::literals; // for _rt and _prt
+            using namespace amrex::Math;  // for powi
 
             // length of the current slice
             amrex::ParticleReal const slice_ds = m_ds / nslice();
@@ -826,28 +827,39 @@ namespace impactx::elements
             amrex::ParticleReal const sinhy = std::sinh(omega_y * slice_ds);
             amrex::ParticleReal const coshy = std::cosh(omega_y * slice_ds);
 
-            amrex::ParticleReal const igbrc = 1_prt / (gx * bet * rc);
-            amrex::ParticleReal const iobrc = 1_prt / (omega_x * bet * rc);
-            amrex::ParticleReal const igobr = 1_prt / (gx * omega_x * b2rc2);
+            // sin(w ds)/w and sinh(w ds)/w, which tend to ds for a vanishing w
+            amrex::ParticleReal const sincx = omega_x != 0_prt ? sinx / omega_x : slice_ds;
+            amrex::ParticleReal const sinhcx = omega_x != 0_prt ? sinhx / omega_x : slice_ds;
+            amrex::ParticleReal const sincy = omega_y != 0_prt ? siny / omega_y : slice_ds;
+            amrex::ParticleReal const sinhcy = omega_y != 0_prt ? sinhy / omega_y : slice_ds;
+
+            // other intermediate quantities with special limiting cases
+            amrex::ParticleReal const coslim = omega_x != 0_prt ? (1_prt - cosx)/gx : 0.5_prt * powi<2>(slice_ds);
+            amrex::ParticleReal const coshlim = omega_x != 0_prt ? (1_prt - coshx)/gx : 0.5_prt * powi<2>(slice_ds);
+            amrex::ParticleReal const sinlim = omega_x != 0_prt ? (sincx - slice_ds)/gx : -powi<3>(slice_ds) / 6_prt;
+            amrex::ParticleReal const sinhlim = omega_x != 0_prt ? (sinhcx - slice_ds)/gx : -powi<3>(slice_ds) / 6_prt;
+
+            amrex::ParticleReal const iobrc = 1_prt / (bet * rc);
+            amrex::ParticleReal const iobrc2 = 1_prt / b2rc2;
 
             // initialize linear map matrix elements
             Map6x6 R = Map6x6::Identity();
 
             R(1,1) = gx > 0_prt ? cosx : coshx;
-            R(1,2) = gx > 0_prt ? sinx / omega_x : sinhx / omega_x;
-            R(1,6) = gx > 0_prt ? -(1_prt - cosx) * igbrc : -(1_prt - coshx) * igbrc;
+            R(1,2) = gx > 0_prt ? sincx : sinhcx;
+            R(1,6) = gx > 0_prt ? -coslim * iobrc : -coshlim * iobrc;
             R(2,1) = gx > 0_prt ? -omega_x * sinx : omega_x * sinhx;
             R(2,2) = gx > 0_prt ? cosx : coshx;
-            R(2,6) = gx > 0_prt ? -sinx * iobrc : -sinhx * iobrc;
+            R(2,6) = gx > 0_prt ? -sincx * iobrc : -sinhcx * iobrc;
             R(3,3) = gy > 0_prt ? cosy : coshy;
-            R(3,4) = gy > 0_prt ? siny / omega_y : sinhy / omega_y;
+            R(3,4) = gy > 0_prt ? sincy : sinhcy;
             R(4,3) = gy > 0_prt ? -omega_y * siny : omega_y * sinhy;
             R(4,4) = gy > 0_prt ? cosy : coshy;
-            R(5,1) = gx > 0_prt ? sinx * iobrc : sinhx * iobrc;
-            R(5,2) = gx > 0_prt ? (1_prt - cosx) * igbrc : (1_prt - coshx) * igbrc;
+            R(5,1) = gx > 0_prt ? sincx * iobrc : sinhcx * iobrc;
+            R(5,2) = gx > 0_prt ? coslim * iobrc : coshlim * iobrc;
             R(5,6) = gx > 0_prt ?
-                slice_ds * ibetgam2 + (sinx  - omega_x * slice_ds) * igobr :
-                slice_ds * ibetgam2 + (sinhx - omega_x * slice_ds) * igobr;
+                slice_ds * ibetgam2 + sinlim * iobrc2 :
+                slice_ds * ibetgam2 + sinhlim * iobrc2;
 
             // apply the transverse rotation (roll) alignment error
             return rotate_aligned_map(R);
