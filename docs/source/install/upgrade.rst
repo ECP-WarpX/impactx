@@ -10,6 +10,29 @@ requirements. Newest release first.
 26.11
 -----
 
+``DipEdge``: default linear model changed to ``linear_slac75``
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+For the :py:class:`~impactx.elements.DipEdge` element, there were previously two models: ``linear`` (default) and ``nonlinear``.
+
+Both of these models were based on the paper:
+
+K. Hwang and S. Y. Lee, "Dipole fringe field map for compact synchrotrons", Phys. Rev. ST Accel. Beams 18, 122401 (2015),
+
+which performs an expansion in powers of ``g/rc``, where ``g`` is the magnetic gap, and ``rc`` is the bend radius of curvature.
+
+In this release, the default model (``linear``, which is now an alias for the new ``linear_slac75``) has been changed to coincide with the linear part of the map described in:
+
+K. Brown, "A First- and Second-Order Matrix Theory for the Design of Beam Transport Systems and Charged Particle Spectrometers", SLAC Report-75, 1982.
+
+The previous default linear model is still available as ``linear_hwang_lee``.  It coincides with ``linear_slac75`` through
+first order in ``g/rc``.
+
+The ``nonlinear`` DipEdge model is unchanged, and is now an alias for ``nonlinear_hwang_lee``.
+
+The new linear default model ``linear_slac75`` was chosen to match the commonly used MAD-X model.
+
+
 ``Programmable``: ``nslice`` and ``name`` moved to the 3rd and 4th argument
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -24,9 +47,35 @@ requirements. Newest release first.
    pge = elements.Programmable(0.5, 2)                # before
    pge = elements.Programmable(ds=0.5, nslice=2)      # preferred by name, works as before
 
+At fixed :math:`t`, the longitudinal attributes are named ``position_z`` and ``momentum_z``
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+While the beam is at fixed :math:`t`, inside a :py:meth:`~impactx.ParticleContainer.at_fixed_t` block or after
+:py:func:`~impactx.coordinate_transformation` to ``CoordSystem.t``, the longitudinal attributes are named
+``position_z`` and ``momentum_z``.
+Previously, they kept the names ``position_t`` and ``momentum_t`` while holding :math:`z` and :math:`p_z`.
+
+**What to check in your scripts:** code that reads ``position_t`` or ``momentum_t`` by name while the beam is
+at fixed :math:`t` raises a ``KeyError``. Use the new names:
+
+.. code-block:: python
+
+   with sim.beam.at_fixed_t() as beam:
+       for pti in ImpactXParIter(beam, level=0):
+           soa = pti.soa().to_xp()
+           z = soa.real["position_t"]   # before
+           z = soa.real["position_z"]   # now
+
+Access by index, e.g., ``soa.get_real_data()[2]``, is unchanged.
+A :py:class:`~impactx.elements.BeamMonitor` and ``beam.plot_phasespace()`` now raise at fixed
+:math:`t`, where they used to label :math:`z` and :math:`p_z` as :math:`t` and :math:`p_t`; use them at fixed :math:`s`.
+
 New in this release
 """""""""""""""""""
 
+- :py:meth:`beam.at_fixed_t() <impactx.ParticleContainer.at_fixed_t>` represents the beam at fixed :math:`t`
+  inside a ``with`` block, e.g., to exchange particles with a code that uses time as the independent variable.
+  The beam returns to fixed :math:`s` when the block ends, also if it raises.
 - :py:attr:`Programmable.includes_collective_effects <impactx.elements.Programmable.includes_collective_effects>`
   declares that a push already models collective effects, e.g., by calling an external code.
   ImpactX then applies no additional space charge, wakefield, CSR or ISR kicks for this element.

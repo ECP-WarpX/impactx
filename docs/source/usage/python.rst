@@ -128,7 +128,7 @@ Collective Effects & Overall Simulation Parameters
 
    .. py:property:: space_charge_gauss_charge_z_bins
 
-      Number of bins for longitudinal charge density deposition (default: ``129``).  Used by the Gauss2p5D space charge model.
+      Number of bins (grid points) for longitudinal charge density deposition, at least ``2`` (default: ``129``).  Used by the Gauss2p5D space charge model.
 
    .. py:property:: space_charge_gauss_long_scale
 
@@ -144,7 +144,7 @@ Collective Effects & Overall Simulation Parameters
 
    .. py:property:: space_charge_num_longitudinal_bins
 
-      Number of bins for longitudinal charge density deposition (default: ``100``).  Used by the 2p5D space charge model.
+      Number of bins (grid points) for longitudinal charge density deposition, at least ``2`` (default: ``100``).  Used by the 2p5D space charge model.
 
    .. py:property:: space_charge_apply_longitudinal_kick
 
@@ -642,7 +642,11 @@ For step-by-step recipes on how to access particle data live during a simulation
 
    .. py:method:: add_n_particles(x, y, t, px, py, pt, qm, bunch_charge=None, w=None, sx=None, sy=None, sz=None)
 
-      Add new particles to the container for fixed s.
+      Add new particles to the container.
+
+      Positions are in meters and momenta are normalized by the reference momentum (unitless), all relative to the reference particle (see :ref:`theory-coordinates-and-units`).
+      At fixed :math:`s` (the default), ``t`` and ``pt`` are the time-of-flight :math:`c\,t` and the energy deviation :math:`p_t = -\Delta\gamma/(\beta_0\gamma_0)`.
+      Inside an :py:meth:`at_fixed_t` block, they take the position :math:`z` and the momentum deviation :math:`p_z = \Delta(\beta_z\gamma)/(\beta_0\gamma_0)` instead.
 
       Either the charge (bunch_charge) of the particles added in this call, or the weight of each
       particle (w) must be provided.
@@ -665,16 +669,43 @@ For step-by-step recipes on how to access particle data live during a simulation
 
       :param x: positions in x
       :param y: positions in y
-      :param t: positions as time-of-flight in c*t
+      :param t: time-of-flight :math:`c\,t` in m (at fixed :math:`s`) or position :math:`z` in m (at fixed :math:`t`)
       :param px: momentum in x
       :param py: momentum in y
-      :param pt: momentum in t
+      :param pt: energy deviation :math:`p_t` (at fixed :math:`s`) or momentum deviation :math:`p_z` (at fixed :math:`t`), unitless
       :param qm: charge over mass in 1/eV
       :param bunch_charge: total charge within a bunch in C
       :param w: weight of each particle: the macroparticle charge in units of the elementary charge `e` (i.e., how many real particles to represent)
       :param sx: spin component in x (optional; if provided, sy and sz must also be provided)
       :param sy: spin component in y (optional; if provided, sx and sz must also be provided)
       :param sz: spin component in z (optional; if provided, sx and sy must also be provided)
+
+   .. py:property:: coord_system
+
+      The coordinate system the particle data is currently in: :py:class:`impactx.CoordSystem` ``s`` (default) or ``t``.
+      The longitudinal attributes are named after it: ``position_t`` and ``momentum_t`` at fixed :math:`s`, ``position_z`` and ``momentum_z`` at fixed :math:`t`.
+
+   .. py:method:: at_fixed_t()
+
+      Context manager that represents the particles at fixed :math:`t` inside a ``with`` block.
+
+      On entry, the particles are transformed from fixed :math:`s` to fixed :math:`t`.
+      When the block ends, normally or through an exception, they are transformed back to fixed :math:`s`.
+      Inside the block, the attributes ``position_z`` and ``momentum_z`` replace ``position_t`` and ``momentum_t`` and hold :math:`z` and :math:`p_z`.
+      The ``t`` and ``pt`` arguments of :py:meth:`add_n_particles` keep their names and take :math:`z` and :math:`p_z` inside the block.
+
+      The transformation to fixed :math:`t` uses the reference energy ``ref.pt`` as the block starts, the transformation back to fixed :math:`s` uses ``ref.pt`` as the block ends.
+      A block that changes the reference energy must write the particle coordinates relative to the updated reference particle.
+
+      .. code-block:: python
+
+         with sim.beam.at_fixed_t() as beam:
+             ...  # read, modify or add particles at fixed t
+
+      See :ref:`usage-howto-python-particle-data-fixed-t` for details.
+
+      :return: this particle container, at fixed :math:`t` inside the block
+      :raises RuntimeError: if the particles are not at fixed :math:`s` on entry (blocks cannot be nested), or if they were transformed out of fixed :math:`t` inside the block
 
    .. py:method:: ref_particle()
 
@@ -1915,7 +1946,13 @@ The aperture is disabled entirely only if both planes are zero or less, which is
 
    Edge focusing associated with bend entry or exit
 
-   The model here is based on:
+   If ``model = "linear_slac75"``, then the model is given by the linear part of the map described in:
+
+   * K. L. Brown, SLAC Report No. 75 (1982)
+
+   which coincides with the dipole edge focusing model in MAD-X.
+
+   If ``model = "nonlinear_hwang_lee"``, then the model is given by:
 
    * K. Hwang and S. Y. Lee, PRAB 18, 122401 (2015).
 
@@ -1924,17 +1961,14 @@ The aperture is disabled entirely only if both planes are zero or less, which is
    * C. Mitchell and K. Hwang, in Proc. NAPAC2025, TUP040, Sacramento, CA (2025).
 
    Here, ``g`` denotes the magnetic gap, which is a length scale that sets the rate of decay of the fringe field.  The values ``K0`` - ``K6`` denote
-   dimensionless field integrals, describing the shape of the fringe field, as defined in eqs. (28-34) of the first reference above.  In
+   dimensionless field integrals, describing the shape of the fringe field, as defined in eqs. (28-34) of Hwang & Lee PRAB 18.  In
    particular, ``K2`` is the well-known fringe field parameter denoted ``FINT`` in MAD-X.  The default values of the field integrals ``K0`` - ``K6`` are
-   those given in eq. (52), corresponding to a ``tanh`` (i.e. logistic) field profile.
+   those given in Hwang & Lee PRAB 18, eq. (52), corresponding to a ``tanh`` (i.e. logistic) field profile.
 
-   When ``model = "linear"``, the linearized map is used.  This model is identical to:
+   If ``model = "linear_hwang_lee"``, then the model is given by the linearization of this map.  In this case, the values ``K0=K1=K5=0`` are assumed.  This enforces zero centroid offset and ensures the correct bend angle.
+   This is identical to the linear model in K. L. Brown when expanded to first order in ``g/rc`` (gap / radius of curvature).
 
-   * K. L. Brown, SLAC Report No. 75 (1982)
-
-   when expanded to first order in ``g/rc`` (gap / radius of curvature).
-
-   By comparison, note that the MAD-X DIPEDGE element uses as input the half-gap ``HGAP = g/2``, and sets the default value ``FINT = 0`` (while
+   Note that the MAD-X DIPEDGE element uses as input the half-gap ``HGAP = g/2``, and sets the default value ``FINT = 0`` (while
    the corresponding default value of ``K2`` is set to 1).
 
    Note that the nonlinear model includes a nonzero horizontal translation (depending on the field integral values) that is present even for a particle that begins on the ideal "hard-edge" reference
@@ -1958,7 +1992,7 @@ The aperture is disabled entirely only if both planes are zero or less, which is
    :param K4: Fringe field integral [unitless]
    :param K5: Fringe field integral [unitless]
    :param K6: Fringe field integral [unitless]
-   :param model: the fringe field model: ``linear`` (default) or ``nonlinear``
+   :param model: the fringe field model: ``linear_slac75`` (default), ``nonlinear_hwang_lee``, or ``linear_hwang_lee``
    :param location: the fringe field edge location: ``entry`` (default) or ``exit``
    :param modify_ref_part: apply fringe field to the reference particle ``True`` or ``False`` (default)
    :param dx: horizontal translation error [m]
@@ -2897,12 +2931,12 @@ Each lattice element provides a ``.to_dict()`` method, which can be used to seri
 Coordinate Transformation
 -------------------------
 
-.. py:class:: impactx.TransformationDirection
+.. py:class:: impactx.CoordSystem
 
-   Enumerated type indicating whether to transform to fixed :math:`s` or fixed :math:`t` coordinate system when applying ``impactx.coordinate_transformation``.
+   Enumerated type for the coordinate system of particle data: the independent variable is either the position :math:`s` or the time :math:`t`.
 
-   :param to_fixed_t:
-   :param to_fixed_s:
+   :param s: fixed :math:`s` (the ImpactX default)
+   :param t: fixed :math:`t`
 
 .. py:function:: impactx.push(pc, element, step=0, period=0)
 
@@ -2927,7 +2961,11 @@ Coordinate Transformation
 
 .. py:function:: impactx.coordinate_transformation(pc, direction)
 
-   Function to transform the coordinates of the particles in a particle container either to fixed :math:`t` or to fixed :math:`s`.
+   Transform the coordinates of the particles in a particle container either to fixed :math:`t` or to fixed :math:`s`.
+   Both directions take the reference energy from ``pc.ref.pt`` at the time of the call.
+   The longitudinal attributes are renamed accordingly, see :py:attr:`impactx.ParticleContainer.coord_system`.
 
-   :param pc: ``impactx.particle_container`` whose particle coordinates are to be transformed.
-   :param direction: enumerated type ``impactx.TransformationDirection``, indicates whether to transform to fixed :math:`s` or fixed :math:`t`.
+   Prefer :py:meth:`impactx.ParticleContainer.at_fixed_t`, which pairs both transformations and restores fixed :math:`s` if an exception is raised.
+
+   :param pc: :py:class:`impactx.ParticleContainer` whose particle coordinates are to be transformed.
+   :param direction: :py:class:`impactx.CoordSystem` to transform to; must differ from ``pc.coord_system``.

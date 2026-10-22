@@ -1228,7 +1228,7 @@ void init_elements(py::module& m)
             [](DipEdge & dip_edge, std::string const & model) {
                 dip_edge.m_model = amrex::getEnum<DipEdge::Model>(model);
             },
-            "Fringe field model (linear or nonlinear)"
+            "Fringe field model"
         )
         .def_property("location",
             [](DipEdge & dip_edge) { return amrex::getEnumNameString(dip_edge.m_location); },
@@ -3394,6 +3394,7 @@ void init_elements(py::module& m)
 
     // freestanding push function
     m.def("push", py::overload_cast<ImpactXParticleContainer &, elements::ElementHandle &, int, int>(&push),
+        py::call_guard<py::gil_scoped_release>(),
         py::arg("pc"), py::arg("element"), py::arg("step")=0, py::arg("period")=0,
         "Push a whole particle beam (incl. reference particle) through an element"
     );

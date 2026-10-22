@@ -175,10 +175,14 @@ def test_combined_function_bend_tiers_round_up(min_model, expected):
 
 @pytest.mark.parametrize(
     "min_model, expected",
-    [("linear", "linear"), ("paraxial", "nonlinear"), ("exact", "nonlinear")],
+    [
+        ("linear", "linear_slac75"),
+        ("paraxial", "nonlinear_hwang_lee"),
+        ("exact", "nonlinear_hwang_lee"),
+    ],
 )
 def test_dipedge_fringe_model_follows_min_model(min_model, expected):
-    """DipEdge switches its fringe model by argument. "nonlinear" is its exact tier."""
+    """DipEdge switches its fringe model by argument. "nonlinear_hwang_lee" is its exact tier."""
     beamline = _translate(
         {
             "name": "de",
@@ -212,15 +216,15 @@ def test_bend_edges_follow_min_model():
     beamline = _translate(dict(elem), min_model="linear")
     assert _types(beamline) == ["DipEdge", "Sbend", "DipEdge"]
     assert [e.model for e in beamline if isinstance(e, elements.DipEdge)] == [
-        "linear",
-        "linear",
+        "linear_slac75",
+        "linear_slac75",
     ]
 
     beamline = _translate(dict(elem), min_model="exact")
     assert _types(beamline) == ["DipEdge", "ExactSbend", "DipEdge"]
     assert [e.model for e in beamline if isinstance(e, elements.DipEdge)] == [
-        "nonlinear",
-        "nonlinear",
+        "nonlinear_hwang_lee",
+        "nonlinear_hwang_lee",
     ]
 
 

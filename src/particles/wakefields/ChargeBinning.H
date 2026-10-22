@@ -12,6 +12,9 @@
 
 #include "particles/ImpactXParticleContainer.H"
 
+#include <AMReX_GpuContainers.H>
+#include <AMReX_REAL.H>
+
 
 namespace impactx::particles::wakefields
 {
@@ -48,11 +51,16 @@ namespace impactx::particles::wakefields
 
     /** Function to calculate the mean transverse positions (x and y) at each bin along s
      *
+     * Bin k covers [bin_min + k * bin_size, bin_min + (k + 1) * bin_size), as in DepositCharge1D.
+     * The means are over the particles of all MPI ranks: every rank must call this function.
+     * Bins without particles get a mean of zero.
+     *
      * @param[in] myspc the particle species to deposit along s
-     * @param[out] mean_x the output array for mean x positions (1D)
-     * @param[out] mean_y the output array for mean y positions (1D)
+     * @param[in,out] mean_x the output array for mean x positions (1D), its size sets the number
+     *                       of bins
+     * @param[out] mean_y the output array for mean y positions (1D), the same size as mean_x
      * @param[in] bin_min lower end of the beam in s
-     * @param[in] bin_size size of the beam in s divided by num_bins
+     * @param[in] bin_size width of a bin in s
      * @param[in] is_unity_particle_weight ignore the particle weighting per macro particle,
      *                                     otherwise treat each particle as one physical particle
      */

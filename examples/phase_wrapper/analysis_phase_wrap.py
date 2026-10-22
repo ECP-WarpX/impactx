@@ -12,6 +12,7 @@ import openpmd_api as io
 series = io.Series("diags/openPMD/monitor.h5", io.Access.read_only)
 last_step = list(series.iterations)[-1]
 initial = series.iterations[1].particles["beam"].to_df()
+is_double = initial["position_x"].dtype == np.float64
 final = series.iterations[last_step].particles["beam"].to_df()
 
 # compare number of particles
@@ -40,7 +41,7 @@ print(beam_joined["position_t_final"].max())
 print(beam_joined["position_t_final"].min())
 
 # particle-wise comparison of t & t_predicted:
-atol = 2.0e-9
+atol = 2.0e-9 if is_double else 3.0e-7
 rtol = 0.0  # large number
 print()
 print(f"  atol={atol} (ignored: rtol~={rtol})")

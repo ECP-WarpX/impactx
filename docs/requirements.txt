@@ -6,8 +6,7 @@
 
 breathe
 docutils>=0.17.1
-
-git+https://github.com/ax3l/pybind11-stubgen@fix-module-prefix-recursive  # type hints in pyi files
+pybind11-stubgen>=3.0.0  # type hints in pyi files
 pybtex
 pygments
 recommonmark

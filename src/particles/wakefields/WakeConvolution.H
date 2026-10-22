@@ -133,10 +133,10 @@ namespace impactx::particles::wakefields
      * NiMA Volume 398, Issues 2–3, Pages 373-394, 21 October (1997)
      * https://doi.org/10.1016/S0168-9002(97)00822-X
      *
-     * @param[in] s value along s [m]
-     * @param[in] R band radius [m]
+     * @param[in] s separation between source point and observation point [m]
+     * @param[in] R bend radius [m]
      * @param[in] bin_size longitudinal bin size [m]
-     * @return wake functions in [V*pc/mm]
+     * @return integrated single-particle wake function in [V*C]=[J]
      */
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     amrex::Real
@@ -157,8 +157,8 @@ namespace impactx::particles::wakefields
 
     /** Perform FFT-based convolution
      *
-     * @param[in] beam_profile_slope number density slope along s [1/m]
-     * @param[in] wake_func wake function along s [V*pc/mm]
+     * @param[in] beam_profile_slope derivative of number density along s [1/m^2]
+     * @param[in] wake_func wake function along s [J] (before convolution) [N] (after convolution)
      * @param[in] delta_t size of a bin in wake_func [m]
      * @return FFT convolution of beam_profile_slope & wake_func (N = len(beam_profile_slope) = len(wake_func)/2)
      */

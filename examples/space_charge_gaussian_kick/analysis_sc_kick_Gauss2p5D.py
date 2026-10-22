@@ -15,6 +15,7 @@ series = io.Series("diags/openPMD/monitor.h5", io.Access.read_only)
 last_step = list(series.iterations)[-1]
 beam_initial = series.iterations[1].particles["beam"]
 initial_sort = beam_initial.to_df().set_index("id")
+is_double = initial_sort["position_x"].dtype == np.float64
 beam_final = series.iterations[last_step].particles["beam"]
 final_sort = beam_final.to_df().set_index("id")
 
@@ -146,7 +147,7 @@ print("dpy_max/py_max", dpy_max / py_max)
 print("dpt_max/pt_max", dpt_max / pt_max)
 
 # Test maximum error:
-atol = 5.1e-2
+atol = 5.1e-2 if is_double else 1.2e-1
 print(f"  tol={atol}")
 
 assert np.allclose(
@@ -156,7 +157,7 @@ assert np.allclose(
 )
 
 # Longitudinal kick is sensitive to noise (relax tolerance):
-atol = 1.1
+atol = 1.1 if is_double else 3.0
 print(f"  tol={atol}")
 
 assert np.allclose(

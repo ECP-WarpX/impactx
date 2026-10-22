@@ -10,16 +10,17 @@
 #include "Gauss2p5dPush.H"
 
 #include "diagnostics/ReducedBeamCharacteristics.H"
-#include "particles/wakefields/ChargeBinning.H"
+#include "particles/spacecharge/Deposit1D.H"
+#include "particles/wakefields/InterpolateLinear1D.H"
 
 #include <AMReX_REAL.H>
 #include <AMReX_BLProfiler.H>
 #include <AMReX_GpuContainers.H>
-#include <AMReX_GpuParallelReduce.H>
 #include <AMReX_ParmParse.H>
 #include <ablastr/warn_manager/WarnManager.H>
 
 #include <cmath>
+#include <stdexcept>
 #include <string>
 
 
@@ -155,6 +156,7 @@ namespace impactx::particles::spacecharge
         BL_PROFILE("impactx::spacecharge::Gauss2p5dPush");
 
         using namespace amrex::literals;
+        using impactx::particles::wakefields::InterpolateLinear1D;
 
         amrex::ParticleReal const charge = pc.GetRefParticle().charge;
 
@@ -202,6 +204,9 @@ namespace impactx::particles::spacecharge
 
         int tp5d_bins = 129;
         pp_algo.queryAddWithParser("gauss_charge_z_bins", tp5d_bins);
+        if (tp5d_bins < 2) {
+            throw std::runtime_error("algo.space_charge.gauss_charge_z_bins must be at least 2");
+        }
 
         bool apply_longitudinal_kick = true;
         pp_algo.queryAdd("apply_longitudinal_kick", apply_longitudinal_kick);
@@ -211,31 +216,26 @@ namespace impactx::particles::spacecharge
             pc.MinAndMaxPositions();
 
         // Set parameters for charge deposition
-        bool const is_unity_particle_weight = false;
         bool const GetNumberDensity = true;
 
         int const num_bins = tp5d_bins;  // Set resolution
         amrex::Real const bin_min = t_min;
         amrex::Real const bin_max = t_max;
-        amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);  // number of evaluation points
-        // Allocate memory for the charge profile
-        amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins + 1, 0.0);
-        // Call charge deposition function
-        impactx::particles::wakefields::DepositCharge1D(pc, charge_distribution, bin_min, bin_size, is_unity_particle_weight);
+        // distance between the grid points, which lie on bin_min, bin_max and in between
+        amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);
+        // Charge density of all MPI ranks at the num_bins grid points
+        amrex::Gpu::DeviceVector<amrex::Real> const charge_distribution =
+            Deposit1D(pc, bin_min, bin_max, num_bins);
 
-        // Sum up all partial charge histograms to each MPI process to calculate
-        // the global charge slope.
-        amrex::ParallelAllReduce::Sum(
-            charge_distribution,
-            amrex::ParallelDescriptor::Communicator()
-        );
-
-        // Call charge density derivative function
-        amrex::Gpu::DeviceVector<amrex::Real> slopes(charge_distribution.size() - 1, 0.0);
-        impactx::particles::wakefields::DerivativeCharge1D(charge_distribution, slopes, bin_size,GetNumberDensity);
-
-        amrex::Real const * const beam_profile_slope = slopes.data();
-        amrex::Real const * const beam_profile = charge_distribution.data();
+        // charge density and its slope at the grid points
+        amrex::Gpu::DeviceVector<amrex::Real> line_density;
+        amrex::Gpu::DeviceVector<amrex::Real> line_density_slope;
+        DensityAndSlope1D(
+            charge_distribution, line_density, line_density_slope, bin_size, GetNumberDensity);
+        amrex::Real const * const line_density_ptr = line_density.data();
+        amrex::Real const * const line_density_slope_ptr = line_density_slope.data();
+        int const num_values = static_cast<int>(line_density.size());
+        amrex::Real const inv_bin_size = 1.0_rt / bin_size;
 
         // group together constants for the momentum push
         amrex::ParticleReal const push_consts = rfpiepslon * dt * charge * inv_gamma2 / (beta * pz_ref_SI);
@@ -283,15 +283,22 @@ namespace impactx::particles::spacecharge
                     potInt(delta,nint,x,y,sigx,sigy,eintx,einty,eintz);
 
                     // Update momentae with the 2.5D SC force
-                    int const idx = static_cast<int>((z - bin_min) / bin_size);  // Find index position along z
 #if (defined(AMREX_DEBUG) || defined(DEBUG)) && !defined(AMREX_USE_GPU)
-                    if (idx < 0 || idx >= num_bins)
+                    if (z < bin_min || z > bin_max)
                     {
-                        std::cerr << "Warning: Index out of range for 2.5D Gaussian SC: " << idx << std::endl;
+                        std::cerr << "Warning: Position out of range for 2.5D Gaussian SC: "
+                                  << z << std::endl;
                     }
 #endif
-                    amrex::ParticleReal const Fxy = beam_profile[idx] * chargesign;
-                    amrex::ParticleReal const Fz = (apply_longitudinal_kick)? beam_profile_slope[idx] * charge : 0_prt;
+                    // Interpolate the line density and its slope between the grid points
+                    amrex::Real const beam_profile_interp = InterpolateLinear1D(
+                        z, line_density_ptr, num_values, bin_min, inv_bin_size);
+                    amrex::Real const beam_profile_slope_interp = InterpolateLinear1D(
+                        z, line_density_slope_ptr, num_values, bin_min, inv_bin_size);
+
+                    // Force evaluation
+                    amrex::ParticleReal const Fxy = beam_profile_interp * chargesign;
+                    amrex::ParticleReal const Fz = (apply_longitudinal_kick)? beam_profile_slope_interp * charge : 0_prt;
 
                     // push momentum
                     px += eintx * Fxy * push_consts;

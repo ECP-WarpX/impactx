@@ -6,6 +6,10 @@ Authors: Axel Huebl
 License: BSD-3-Clause-LBNL
 """
 
+from contextlib import contextmanager
+
+from ..impactx_pybind import CoordSystem, coordinate_transformation
+
 
 def ix_pc_plot_mpl_phasespace(self, num_bins=50, root_rank=0):
     """
@@ -25,6 +29,12 @@ def ix_pc_plot_mpl_phasespace(self, num_bins=50, root_rank=0):
     A matplotlib figure with containing the plot.
     For MPI-parallel ranks, the figure is only created on the root_rank.
     """
+    if self.coord_system != CoordSystem.s:
+        raise RuntimeError(
+            "plot_phasespace: the particles must be at fixed s, "
+            f"but are at {self.coord_system}."
+        )
+
     import matplotlib.pyplot as plt
     import numpy as np
     from quantiphy import Quantity
@@ -327,7 +337,7 @@ def ix_pc_add_n_particles(
     self, x, y, t, px, py, pt, qm, bunch_charge=None, w=None, sx=None, sy=None, sz=None
 ):
     """
-    Add new particles to the container for fixed s.
+    Add new particles to the container.
 
     The coordinate and weight arguments accept NumPy or CuPy arrays (or
     array-likes), as well as pyAMReX ``PODVector`` objects. Inputs are copied
@@ -342,7 +352,15 @@ def ix_pc_add_n_particles(
     Parameters
     ----------
     x, y, t, px, py, pt : array_like
-        Particle positions (x, y, time-of-flight c*t) and momenta.
+        Particle coordinates, relative to the reference particle.
+        ``x`` and ``y`` are positions in m, ``px`` and ``py`` are momenta
+        normalized by the reference momentum (unitless).
+        At fixed s (the default), ``t`` is the time-of-flight c*t in m and
+        ``pt`` is the energy deviation p_t = -Delta(gamma)/(beta_0 gamma_0)
+        (unitless).
+        Inside a ``beam.at_fixed_t()`` block, ``t`` takes the position z in m
+        and ``pt`` takes the momentum deviation
+        p_z = Delta(beta_z gamma)/(beta_0 gamma_0) (unitless).
     qm : float
         Charge over mass in 1/eV.
     bunch_charge : float, optional
@@ -368,9 +386,83 @@ def ix_pc_add_n_particles(
     )
 
 
+@contextmanager
+def ix_pc_at_fixed_t(self):
+    """
+    Temporarily represent the beam at fixed t, e.g., to exchange particles with a code
+    that uses time as the independent variable.
+
+    On entry, the particle coordinates are transformed from fixed s to fixed t.
+    When the ``with`` block is left, normally or through an exception, they are
+    transformed back to fixed s.
+
+    Inside the block, the particle arrays hold ``x, y, z, px, py, pz`` instead of
+    ``x, y, t, px, py, pt``: ``z`` is the longitudinal position relative to the
+    reference particle, in meters, ``px, py`` are the transverse momenta and ``pz``
+    is the deviation from the reference momentum, all normalized by the reference
+    momentum.
+    The arrays are named accordingly: ``position_z`` and ``momentum_z`` replace
+    ``position_t`` and ``momentum_t``.
+    The arguments of ``add_n_particles`` keep their names ``t`` and ``pt``; inside the
+    block, they take ``z`` and ``pz``.
+
+    Both transformations take the design energy from ``self.ref.pt`` at the moment
+    they run: the one on entry uses the reference particle as it is when the block
+    starts, the one on exit uses the reference particle as it is when the block ends.
+    If the block changes the reference energy, it must also write the particle
+    coordinates relative to the new reference particle before the block ends.
+    Only ``ref.pt`` is read, so update it (e.g., with ``ref.set_kin_energy_MeV``)
+    rather than ``ref.pz`` alone.
+
+    Parameters
+    ----------
+    self : ImpactXParticleContainer
+        The particle container; its particles must be at fixed s.
+
+    Yields
+    ------
+    ImpactXParticleContainer
+        The same particle container, now at fixed t.
+
+    Raises
+    ------
+    RuntimeError
+        If the particles are not at fixed s on entry, or no longer at fixed t
+        when the block ends without an exception.
+
+    Examples
+    --------
+    >>> with sim.beam.at_fixed_t() as beam:
+    ...     beam.add_n_particles(x, y, z, px, py, pz, qm, bunch_charge=charge_C)
+    """
+    if self.coord_system != CoordSystem.s:
+        raise RuntimeError(
+            "at_fixed_t: the particles must be at fixed s when entering the block, "
+            f"but are at {self.coord_system}."
+        )
+
+    coordinate_transformation(self, CoordSystem.t)
+    try:
+        yield self
+    except BaseException:
+        # keep the original exception; only restore fixed s if it is still possible
+        if self.coord_system == CoordSystem.t:
+            coordinate_transformation(self, CoordSystem.s)
+        raise
+
+    if self.coord_system != CoordSystem.t:
+        raise RuntimeError(
+            "at_fixed_t: the particles were transformed out of fixed t inside the "
+            "block. Do not call coordinate_transformation inside the block: leaving "
+            "the block transforms the particles back to fixed s."
+        )
+    coordinate_transformation(self, CoordSystem.s)
+
+
 def register_ImpactXParticleContainer_extension(ixpc):
     """ImpactXParticleContainer helper methods"""
     # register member functions for ImpactXParticleContainer
     ixpc.plot_phasespace = ix_pc_plot_mpl_phasespace
     ixpc.beam_moments_history = ix_beam_moments_history
     ixpc.add_n_particles = ix_pc_add_n_particles
+    ixpc.at_fixed_t = ix_pc_at_fixed_t

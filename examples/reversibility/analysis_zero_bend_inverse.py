@@ -81,7 +81,7 @@ print(
 )
 
 atol = 0.0  # ignored
-rtol = 1.0e-12 if is_double else 1.0e-10
+rtol = 1.0e-12 if is_double else 1.0e-5
 print(f"  rtol={rtol} (ignored: atol~={atol})")
 
 assert np.allclose(

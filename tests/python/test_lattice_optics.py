@@ -156,6 +156,24 @@ def test_transport_map_zero_strength(element):
     assert np.allclose(R, R_drift, rtol=rtol, atol=atol)
 
 
+def test_cfbend_transport_map_zero_quad():
+    """A combined-function bend with zero quadrupole strength must transport like an Sbend."""
+
+    ref = RefPart()
+    ref.set_species("proton").set_kin_energy_MeV(2.606299137493995)
+    rtol, atol = _tolerances()
+
+    rc, ds = 0.747023084693581, 0.391140372489
+    el = elements.ExactCFbend(
+        ds=ds, k_normal=[1.0 / rc, 0.0, 30.21694, -75.81527], k_skew=[0.0] * 4
+    )
+    R = el.transfer_map(ref).to_numpy()
+    R_sbend = elements.Sbend(ds=ds, rc=rc).transfer_map(ref).to_numpy()
+
+    assert np.all(np.isfinite(R))
+    assert np.allclose(R, R_sbend, rtol=rtol, atol=atol)
+
+
 @pytest.mark.parametrize(
     "element", [elements.ChrQuad, elements.ChrPlasmaLens, elements.ExactQuad]
 )

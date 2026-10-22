@@ -946,6 +946,13 @@ add_impactx_test(kicker.py
     examples/kicker/analysis_kicker.py
     OFF  # no plot script yet
 )
+# more grids than MPI ranks: each rank owns two grids
+add_impactx_test(kicker-grids.py
+    examples/kicker/run_kicker_grids.py
+    ON   # ImpactX MPI-parallel
+    examples/kicker/analysis_kicker.py
+    OFF  # no plot script yet
+)
 # copy MAD-X lattice file
 file(COPY ${ImpactX_SOURCE_DIR}/examples/kicker/kicker.madx
         DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kicker_madx.py)
@@ -2241,5 +2248,31 @@ add_impactx_test(expanding-2d-acc.py
     examples/expanding_beam/run_expanding_acc_fft_2D.py
     ON    # ImpactX MPI-parallel
     OFF  # analysis in situ in run script
+    OFF  # no plot script yet
+)
+
+# Momentum Kick in the 1D Steady-State CSR Model ###########
+if(ImpactX_FFT)
+    add_impactx_test(csr-kick
+        examples/wake_csr_kick/input_csr_kick.in
+        ON    # ImpactX MPI-parallel
+        examples/wake_csr_kick/analysis_csr_kick.py
+        examples/wake_csr_kick/plot_csr_kick.py
+    )
+    add_impactx_test(csr-kick.py
+        examples/wake_csr_kick/run_csr_kick.py
+        ON    # ImpactX MPI-parallel
+        examples/wake_csr_kick/analysis_csr_kick.py
+        examples/wake_csr_kick/plot_csr_kick.py
+    )
+endif()
+
+# Benchmark of linear dipole fringe field map #################################
+file(COPY ${ImpactX_SOURCE_DIR}/examples/edge_effects/dipedge.madx
+        DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/dipedge-linear-map.py)
+add_impactx_test(dipedge-linear-map.py
+    examples/edge_effects/run_dipedge_linear_map.py
+    ON    # ImpactX MPI-parallel
+    examples/edge_effects/analysis_dipedge_linear_map.py
     OFF  # no plot script yet
 )

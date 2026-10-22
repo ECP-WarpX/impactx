@@ -15,6 +15,7 @@ import weakref
 
 import pytest
 
+import amrex.space3d as amr
 from impactx import ImpactX, distribution, elements
 
 
@@ -117,6 +118,44 @@ def test_an_element_referring_to_its_simulation_is_collected():
 
     assert observed_sim() is None
     assert observed_element() is None
+
+
+def test_a_hook_referring_to_its_simulation_is_collected():
+    """finalize() releases the hooks, and with them a cycle through the simulation."""
+
+    def run():
+        # the closure keeps the cell of `simulation`; `del` would clear it and hide a cycle
+        simulation = ImpactX()
+        simulation.hook["before_element"] = lambda _: simulation.beam
+        simulation.finalize()
+        assert len(simulation.hook) == 0
+        return weakref.ref(simulation)
+
+    observed_sim = run()
+    gc.collect()
+
+    assert observed_sim() is None
+
+
+def test_finalize_releases_the_hooks_while_amrex_is_up(sim):
+    """Hooks can hold AMReX-backed data; releasing one can register another."""
+
+    released_with_amrex = []
+
+    class Probe:
+        def __init__(self, register_another):
+            self.register_another = register_another
+
+        def __del__(self):
+            released_with_amrex.append(amr.initialized())
+            if self.register_another:
+                sim.hook["after_period"] = lambda _, held=Probe(False): held
+
+    sim.hook["before_element"] = lambda _, held=Probe(True): held
+    sim.finalize()
+
+    assert released_with_amrex == [True, True]
+    assert len(sim.hook) == 0
 
 
 def test_assigning_the_lattice(sim):

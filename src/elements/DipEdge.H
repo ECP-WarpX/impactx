@@ -47,8 +47,11 @@ namespace impactx::elements
         using PType = ImpactXParticleContainer::ParticleType;
 
         AMREX_ENUM_IN_CLASS(Model,
-            linear,   //! for the linear fringe field model
-            nonlinear, //! for the 6th order fringe field model
+            linear_slac75,   //! for the linear fringe field model based on K. Brown's SLAC-75 note
+            nonlinear_hwang_lee, //! for the nonlinear fringe field model based on K. Hwang and S.Y. Lee, PRAB, 122401 (2015)
+            linear_hwang_lee,   //! for the linearization of the fringe field model based on K. Hwang and S.Y. Lee above
+            linear = linear_slac75,  //! alias added for backward compatibility
+            nonlinear = nonlinear_hwang_lee //! alias added for backward compatibility
         );
 
         AMREX_ENUM_IN_CLASS(Location,
@@ -65,7 +68,7 @@ namespace impactx::elements
         static constexpr amrex::ParticleReal DEFAULT_K4 = 0;
         static constexpr amrex::ParticleReal DEFAULT_K5 = 0;
         static constexpr amrex::ParticleReal DEFAULT_K6 = 0;
-        static constexpr Model DEFAULT_model = Model::linear;
+        static constexpr Model DEFAULT_model = Model::linear_slac75;
         static constexpr Location DEFAULT_location = Location::entry;
         static constexpr bool DEFAULT_modify_ref_part = false;
 
@@ -89,7 +92,7 @@ namespace impactx::elements
          * @param K4 Fringe field integral (unitless).
          * @param K5 Fringe field integral (unitless).
          * @param K6 Fringe field integral (unitless).
-         * @param model Fringe field model (linear or nonlinear).
+         * @param model Fringe field model (linear_slac75, nonlinear_hwang_lee, or linear_hwang_lee).
          * @param location Fringe field location (entry or exit).
          * @param modify_ref_part Apply fringe field to the reference particle (boolean).
          * @param dx horizontal translation error in m
@@ -161,13 +164,23 @@ namespace impactx::elements
             // edge focusing matrix elements (zero gap)
             m_R21 = std::tan(m_psi) / m_rc;
 
-            // first-order effect of nonzero gap
+            // trigonometric function evaluations
             auto const [sin_psi, cos_psi] = amrex::Math::sincos(m_psi);
-            amrex::ParticleReal const vf = (1.0_prt + powi<2>(sin_psi))
-                / powi<3>(cos_psi)
-                * m_g * m_K2 / powi<2>(m_rc);
 
-            m_R43 = vf - m_R21;
+            if (m_model == Model::linear_slac75) {
+               // matrix elements for MAD-X linear model
+               amrex::ParticleReal corr = m_g * m_K2 / m_rc;
+               amrex::ParticleReal psip = m_psi - corr * (1.0_prt + powi<2>(sin_psi)) / cos_psi;
+               m_R43 = -std::tan(psip) / m_rc;
+
+            } else {
+               // matrix elements for linearization of K.H. model
+               // this coincides with the MAD-X linear model to leading order in g/rc
+               amrex::ParticleReal const vf = (1.0_prt + powi<2>(sin_psi))
+                   / powi<3>(cos_psi)
+                   * m_g * m_K2 / powi<2>(m_rc);
+               m_R43 = vf - m_R21;
+            }
 
             // constants for nonlinear map:
 
@@ -230,7 +243,7 @@ namespace impactx::elements
             using namespace std; // for cmath(float)
             using amrex::Math::powi;
 
-            if (m_model == Model::linear) {
+            if (m_model == Model::linear_slac75 || m_model == Model::linear_hwang_lee) {
                // apply linear model
                px = px + m_R21 * x;
                py = py + m_R43 * y;
@@ -316,7 +329,7 @@ namespace impactx::elements
             amrex::ParticleReal const pz = refpart.pz;
             amrex::ParticleReal const pt = refpart.pt;
 
-            if (m_modify_ref_part && m_model == Model::nonlinear) {
+            if (m_modify_ref_part && m_model == Model::nonlinear_hwang_lee) {
                 // calculate expensive terms
                 amrex::ParticleReal const loc = m_location == Location::entry ? 1_prt : -1_prt;
                 auto const [sin_psi, cos_psi] = amrex::Math::sincos(m_psi);
@@ -427,14 +440,24 @@ namespace impactx::elements
 
             // edge focusing matrix elements (zero gap)
             amrex::ParticleReal const R21 = std::tan(m_psi) / m_rc;
+            amrex::ParticleReal R43 = 0.0;
 
-            // first-order effect of nonzero gap
+            // trigonometric function evaluations
             auto const [sin_psi, cos_psi] = amrex::Math::sincos(m_psi);
-            amrex::ParticleReal const vf = (1.0_prt + powi<2>(sin_psi))
-                / powi<3>(cos_psi)
-                * m_g * m_K2 / powi<2>(m_rc);
 
-            amrex::ParticleReal const R43 = vf - R21;
+            if (m_model == Model::linear_slac75) {
+               // matrix elements for MAD-X linear model
+               amrex::ParticleReal corr = m_g * m_K2 / m_rc;
+               amrex::ParticleReal psip = m_psi - corr * (1.0_prt + powi<2>(sin_psi)) / cos_psi;
+               R43 = -std::tan(psip) / m_rc;
+            } else {
+               // matrix elements for linearization of K.H. model
+               // this coincides with the MAD-X linear model to leading order in g/rc
+               amrex::ParticleReal const vf = (1.0_prt + powi<2>(sin_psi))
+                   / powi<3>(cos_psi)
+                   * m_g * m_K2 / powi<2>(m_rc);
+               R43 = vf - R21;
+            }
 
             // set non-identity matrix elements
             R(2,1) = R21;
@@ -455,7 +478,7 @@ namespace impactx::elements
         amrex::ParticleReal m_K4; //! fringe field integral
         amrex::ParticleReal m_K5; //! fringe field integral
         amrex::ParticleReal m_K6; //! fringe field integral
-        Model m_model; //! fringe field model: linear or nonlinear
+        Model m_model; //! fringe field model
         Location m_location; //! fringe field location: entry, or exit
         bool m_modify_ref_part; //! apply fringe field to reference particle (true/false)
 

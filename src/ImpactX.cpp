@@ -85,18 +85,28 @@ namespace impactx {
         // their owner list, keeping AMReX-backed data alive past AMReX shutdown.
         m_lattice->clear();
 
-        // Let the caller release what it keeps alive on behalf of the lattice, while AMReX
-        // is still up. The Python bindings drop the element wrappers here: an element can
-        // carry AMReX-backed data on its Python side -- a MultiFab attached to a
-        // Programmable, say -- and that has to be destroyed before the arena it came from.
+        // Let the caller release what it keeps alive on behalf of the lattice, and release the
+        // hooks, while AMReX is still up. The Python bindings drop the element wrappers here:
+        // an element can carry AMReX-backed data on its Python side -- a MultiFab attached to
+        // a Programmable, say -- and that has to be destroyed before the arena it came from.
         // This runs after the elements' own finalization, which may run a user callback
         // that reads what a wrapper holds.
-        if (m_release_lattice_owners)
         {
-            // Releasing wrappers runs Python finalizers. They may read the empty lattice,
-            // but must not repopulate it and retain AMReX-backed data past shutdown.
+            // Releasing wrappers and hooks runs Python finalizers. They may read the empty
+            // lattice, but must not repopulate it and retain AMReX-backed data past shutdown.
             Lattice::TraversalGuard const cleanup(*m_lattice);
-            m_release_lattice_owners();
+
+            if (m_release_lattice_owners)
+            {
+                m_release_lattice_owners();
+            }
+
+            // A hook can hold AMReX-backed data, or this simulation in a cycle the garbage
+            // collector cannot see. A finalizer run on release can register another hook.
+            while (!m_hook.empty())
+            {
+                decltype(m_hook)().swap(m_hook);
+            }
         }
 
         if (m_grids_initialized)
