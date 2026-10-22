@@ -203,6 +203,7 @@ namespace impactx::particles::wakefields
                     for (int j = 0; j < std::min(wake.n_data, 2); ++j) {
                         amrex::Print() << "wake.wake_z[" << j << "] = " << h_wake_z[j] << "\n";
                     }
+                    amrex::Real const bin_size_user = std::abs(wake.z[1]-wake.z[0]);
 
                     // Line density at the bin edges, with zero charge density below bin_min: edge k
                     // lies between bin k-1 and bin k and gets the mean of both. The bin above
@@ -217,13 +218,13 @@ namespace impactx::particles::wakefields
                     amrex::ParallelFor(num_edges*2, [=] AMREX_GPU_DEVICE(int i) {
                         if (i < num_edges) {
                             amrex::Real const s = static_cast<amrex::Real>(i) * bin_size;
-                            dptr_wake_function[i] = ablastr::constant::SI::q_e * impactx::particles::wakefields::w_user(s, wake.wake_z, wake.n_data, bin_size);
+                            dptr_wake_function[i] = ablastr::constant::SI::q_e * impactx::particles::wakefields::w_user(s, wake.wake_z, wake.n_data, bin_size_user);
                             amrex::Real const charge_below = (i > 0) ? dptr_charge_distribution[i - 1] : 0_rt;
                             dptr_line_density[i] = 0.5_rt * (charge_below + dptr_charge_distribution[i]);
                         }
                         else if (i > num_edges) {
                             amrex::Real const s = static_cast<amrex::Real>(i - 2*num_edges) * bin_size;
-                            dptr_wake_function[i] = ablastr::constant::SI::q_e * impactx::particles::wakefields::w_user(s, wake.wake_z, wake.n_data, bin_size);
+                            dptr_wake_function[i] = ablastr::constant::SI::q_e * impactx::particles::wakefields::w_user(s, wake.wake_z, wake.n_data, bin_size_user);
                         }
                     });
 
