@@ -10,6 +10,8 @@ C. Mitchell, J. Qiang, and P. Emma, Phys. Rev. Accel. Beams 16, 060703 (2013), e
 
 We use a cold (zero emittance) 1 nC, 5 GeV electron bunch in one of the dipoles from the Zeuthen chicane benchmark.
 
+A single slice is used, resulting in a single wakefield kick.  The bunch is initialized with zero momentum spread and zero transverse size, to avoid dynamical evolution during the half-step in the dipole field before the wakefield kick is applied.
+
 In this test, the final momentum of every particle is compared against its predicted value.  Both the maximum error and its rms value over the bunch population are returned.  Both values must be zero within a small tolerance.
 
 

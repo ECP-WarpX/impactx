@@ -40,7 +40,7 @@ p0_eVc = me_eV * beta * gamma
 radius = 10.3462283686195526
 
 # Beam distribution parameters
-sigmact = 5.5555553e-8
+sigmact = 2.0e-4
 sigmaz = beta * sigmact
 
 # Simulation slice length

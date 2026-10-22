@@ -51,13 +51,13 @@ p0_eVc = me_eV * beta * gamma
 radius = 10.3462283686195526
 
 # Beam distribution parameters
-sigmact = 5.5555553e-8
+sigmact = 2.0e-4
 sigmaz = beta * sigmact
 
 # Simulation slice length
 L = 0.500194828041958
 
-# CSR intensity parameter (units of length, meters)
+# CSR intensity parameter
 kappa_eV_m13 = 2.0 * r_e * me_eV / (3.0 ** (1.0 / 3.0) * radius ** (2.0 / 3.0))
 Kscale_eV_per_m = Nb * kappa_eV_m13 / sigmaz ** (4.0 / 3.0)
 
@@ -68,7 +68,7 @@ pti = initial_sort["momentum_t"]
 zi = -beta * ti
 zi_scaled = zi / sigmaz
 
-# Predicted momentum kick, from J. Qiang, Phys. Rev. Accel. Beams 28, 114602 (2025), eqs. (31-32)
+# Predicted momentum kick, from C. Mitchell, J. Qiang, and P. Emma, Phys. Rev. Accel. Beams 16, 060703 (2013), eqs. (C5-C7)
 Gamma1 = sp.gamma(5.0 / 6.0)
 Gamma2 = sp.gamma(4.0 / 3.0)
 zeta = -(zi_scaled**2) / 2.0

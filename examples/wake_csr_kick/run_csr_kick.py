@@ -21,10 +21,9 @@ sim.slice_step_diagnostics = True
 # domain decomposition
 sim.init_grids()
 
-# load a 5 GeV electron beam with an initial
-# normalized transverse rms emittance of 1 um
+# load a 5 GeV electron beam
 kin_energy_MeV = 5.0e3  # reference energy
-bunch_charge_C = 1.0e-9  # used with space charge
+bunch_charge_C = 1.0e-9  # used with CSR
 npart = 1000000  # number of macro particles
 
 #   reference particle
@@ -35,7 +34,7 @@ ref.set_species("electron").set_kin_energy_MeV(kin_energy_MeV)
 distr = distribution.Gaussian(
     lambdaX=0.0,
     lambdaY=0.0,
-    lambdaT=5.5555553e-8,
+    lambdaT=2.0e-4,
     lambdaPx=0.0,
     lambdaPy=0.0,
     lambdaPt=0.0,
@@ -56,7 +55,6 @@ lb = 0.500194828041958  # bend arc length (meters)
 # Bend elements
 sbend1 = elements.Sbend(name="sbend1", ds=lb, rc=-rc, nslice=ns)
 
-# assign a segment with the first half of the lattice
 sim.lattice.append(monitor)
 sim.lattice.append(sbend1)
 sim.lattice.append(monitor)
