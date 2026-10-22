@@ -85,10 +85,9 @@ In this test, the final momentum of every particle is compared against its predi
 Run
 ---
 
-This example can be run **either** as:
+This example can be run as:
 
-* **Python** script: ``python3 run_wake_kick.py`` or
-* ImpactX **executable** using an input file: ``impactx input_wake_kick.in``
+* **Python** script: ``python3 run_user_wake_kick.py``
 
 For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with ``mpiexec -n 4 ...`` or ``srun -n 4 ...``, depending on the system.
 
@@ -96,20 +95,20 @@ For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with `
 
    .. tab-item:: Python: Script
 
-       .. literalinclude:: run_wake_kick.py
+       .. literalinclude:: run_user_wake_kick.py
           :language: python3
-          :caption: You can copy this file from ``examples/wake_csr_kick/run_wake_kick.py``.
+          :caption: You can copy this file from ``examples/wake_csr_kick/run_user_wake_kick.py``.
 
 Analyze
 -------
 
 We run the following script to analyze correctness:
 
-.. dropdown:: Script ``analysis_wake_kick.py``
+.. dropdown:: Script ``analysis_user_wake_kick.py``
 
-   .. literalinclude:: analysis_wake_kick.py
+   .. literalinclude:: analysis_user_wake_kick.py
       :language: python3
-      :caption: You can copy this file from ``examples/wake_csr_kick/analysis_wake_kick.py``.
+      :caption: You can copy this file from ``examples/wake_csr_kick/analysis_user_wake_kick.py``.
 
 
 Visualize
@@ -117,11 +116,11 @@ Visualize
 
 You can run the following script to visualize the energy kick as a function of head-tail position along the bunch:
 
-.. dropdown:: Script ``plot_wake_kick.py``
+.. dropdown:: Script ``plot_user_wake_kick.py``
 
-   .. literalinclude:: plot_wake_kick.py
+   .. literalinclude:: plot_user_wake_kick.py
       :language: python3
-      :caption: You can copy this file from ``examples/wake_csr_kick/plot_wake_kick.py``.
+      :caption: You can copy this file from ``examples/wake_csr_kick/plot_user_wake_kick.py``.
 
 .. figure:: User_wake_longitudinal_kick.png
    :alt: User-specified longitudinal wake-induced energy change as a function of head-tail position within the bunch
