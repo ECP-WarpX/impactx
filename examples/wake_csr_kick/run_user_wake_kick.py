@@ -35,9 +35,9 @@ ref.set_species("electron").set_kin_energy_MeV(kin_energy_MeV)
 
 #   particle bunch
 distr = distribution.KVdist(
-# distr = distribution.Waterbag(
-# distr = distribution.Triangle(
-# distr = distribution.Gaussian(
+    # distr = distribution.Waterbag(
+    # distr = distribution.Triangle(
+    # distr = distribution.Gaussian(
     lambdaX=0.0,
     lambdaY=0.0,
     lambdaT=1.0e-3,
@@ -71,9 +71,7 @@ s0 = 0.00175  # second fitted parameter (in meters)
 z_wake = np.linspace(zmin, zmax, nz)
 wake_x_data = np.zeros(nz)
 wake_y_data = np.zeros(nz)
-wake_z_data = K0 * np.exp(
-    -np.sqrt(z_wake / s0)
-)
+wake_z_data = K0 * np.exp(-np.sqrt(z_wake / s0))
 
 #   RF cavity element
 rf = elements.RFCavity(

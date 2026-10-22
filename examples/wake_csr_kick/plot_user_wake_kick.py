@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import openpmd_api as io
 import scipy.constants as sc
-import scipy.special as sp
 
 # options to run this script
 parser = argparse.ArgumentParser(
@@ -63,14 +62,14 @@ Kscale_eV_per_m = K0 * bunch_charge_C
 ti = initial_sort["position_t"]
 pti = initial_sort["momentum_t"]
 zi = -beta * ti
-zi_scaled = zi/sigmaz
+zi_scaled = zi / sigmaz
 
 # Predicted wake for a uniform longitudinal distribution (KVdist):
 a = sigmaz * np.sqrt(3.0)
-radical = np.sqrt((a-zi)/s0)
+radical = np.sqrt((a - zi) / s0)
 exp_plus = np.exp(radical)
 exp_minus = np.exp(-radical)
-wake = -Kscale_eV_per_m * exp_minus * (s0 - exp_plus*s0 + radical*s0) / a
+wake = -Kscale_eV_per_m * exp_minus * (s0 - exp_plus * s0 + radical * s0) / a
 
 # Predicted wake for a 6D waterbag distribution:
 
