@@ -47,7 +47,6 @@ Nb = bunch_charge_C / qe
 p0_eVc = me_eV * beta * gamma
 
 # Beam distribution parameters
-#sigmact = 0.70399950746e-4
 sigmact = 1.0e-3
 sigmaz = beta * sigmact
 
@@ -72,6 +71,8 @@ radical = np.sqrt((a-zi)/s0)
 exp_plus = np.exp(radical)
 exp_minus = np.exp(-radical)
 wake = -Kscale_eV_per_m * exp_minus * (s0 - exp_plus*s0 + radical*s0) / a
+
+# Predicted wake for a 6D waterbag distribution:
 
 # Predicted particle kick:
 dE_predicted = wake * L / p0_eVc

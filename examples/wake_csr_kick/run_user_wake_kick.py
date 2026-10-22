@@ -34,10 +34,10 @@ ref = sim.beam.ref
 ref.set_species("electron").set_kin_energy_MeV(kin_energy_MeV)
 
 #   particle bunch
-# distr = distribution.KVdist(
+distr = distribution.KVdist(
 # distr = distribution.Waterbag(
 # distr = distribution.Triangle(
-distr = distribution.Gaussian(
+# distr = distribution.Gaussian(
     lambdaX=0.0,
     lambdaY=0.0,
     lambdaT=1.0e-3,
