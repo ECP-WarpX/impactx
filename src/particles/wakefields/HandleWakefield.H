@@ -155,10 +155,12 @@ namespace impactx::particles::wakefields
                 amrex::ParallelFor(num_edges*2, [=] AMREX_GPU_DEVICE(int i) {
                     if (i < num_edges) {
                         amrex::Real const s = static_cast<amrex::Real>(i) * bin_size;
+                        // The sign on the argument of s is due to the fact that CSR acts from tail-to-head, so that s_source - s_observation < 0. 
                         dptr_wake_function[i] = -impactx::particles::wakefields::w_l_csr(-s, dR, bin_size);
                     }
                     else if (i > num_edges) {
                         amrex::Real const s = static_cast<amrex::Real>(i - 2*num_edges) * bin_size;
+                        // The sign on the argument of s is due to the fact that CSR acts from tail-to-head, so that s_source - s_observation < 0.
                         dptr_wake_function[i] = -impactx::particles::wakefields::w_l_csr(-s, dR, bin_size);
                     }
                 });
