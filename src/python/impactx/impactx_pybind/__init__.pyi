@@ -755,7 +755,7 @@ class ImpactX:
     @csr.setter
     def csr(self, arg1: bool) -> None: ...
     @property
-    def csr_bins(self) -> bool:
+    def csr_bins(self) -> int:
         """
         Number of longitudinal bins used for CSR calculations (default: 150).
         """
@@ -840,7 +840,7 @@ class ImpactX:
     @isr_on_ref_part.setter
     def isr_on_ref_part(self, arg1: bool) -> None: ...
     @property
-    def isr_order(self) -> bool:
+    def isr_order(self) -> int:
         """
         Number of terms in the Taylor series retained for quantum effects (default: 1).
         """
@@ -904,7 +904,7 @@ class ImpactX:
     @memory_profiler.setter
     def memory_profiler(self, arg1: bool) -> None: ...
     @property
-    def mlmg_absolute_tolerance(self) -> bool:
+    def mlmg_absolute_tolerance(self) -> float:
         """
         The absolute tolerance with which the space-charge fields should be calculated in units of V/m^2. More specifically, the acceptable residual with which the solution can be considered converged. In general this should be left as the default, but in cases where the simulation state changes very little between steps it can occur that the initial guess for the MLMG solver is so close to the converged value that it fails to improve that solution sufficiently to reach the mlmg_relative_tolerance value.
         """
@@ -913,7 +913,7 @@ class ImpactX:
         self, arg1: typing.SupportsFloat | typing.SupportsIndex
     ) -> None: ...
     @property
-    def mlmg_max_iters(self) -> bool:
+    def mlmg_max_iters(self) -> int:
         """
         Maximum number of iterations used for MLMG solver for space-charge fields calculation. In case if MLMG converges but fails to reach the desired self_fields_required_precision, this parameter may be increased.
         """
@@ -922,7 +922,7 @@ class ImpactX:
         self, arg1: typing.SupportsInt | typing.SupportsIndex
     ) -> None: ...
     @property
-    def mlmg_relative_tolerance(self) -> bool:
+    def mlmg_relative_tolerance(self) -> float:
         """
         The relative precision with which the electrostatic space-charge fields should be calculated. More specifically, the space-charge fields are computed with an iterative Multi-Level Multi-Grid (MLMG) solver. This solver can fail to reach the default precision within a reasonable time.
         """
@@ -931,7 +931,7 @@ class ImpactX:
         self, arg1: typing.SupportsFloat | typing.SupportsIndex
     ) -> None: ...
     @property
-    def mlmg_verbosity(self) -> bool:
+    def mlmg_verbosity(self) -> int:
         """
         The verbosity used for MLMG solver for space-charge fields calculation. Currently MLMG solver looks for verbosity levels from 0-5. A higher number results in more verbose output.
         """
@@ -1063,7 +1063,7 @@ class ImpactX:
         self, arg1: typing.SupportsInt | typing.SupportsIndex
     ) -> None: ...
     @property
-    def space_charge_gauss_taylor_delta(self) -> int:
+    def space_charge_gauss_taylor_delta(self) -> float:
         """
         Initial region for computing the integrals (default: ``0.01``).
         """
