@@ -283,7 +283,7 @@ void init_ImpactX (py::module& m)
         )
         .def_property("csr_bins",
             [](ImpactX & /* ix */) {
-                return detail::get_or_throw<bool>("algo", "csr_bins");
+                return detail::get_or_throw<int>("algo", "csr_bins");
             },
             [](ImpactX & /* ix */, int csr_bins) {
                 amrex::ParmParse pp_algo("algo");
@@ -303,7 +303,7 @@ void init_ImpactX (py::module& m)
         )
         .def_property("isr_order",
             [](ImpactX & /* ix */) {
-                return detail::get_or_throw<bool>("algo", "isr_order");
+                return detail::get_or_throw<int>("algo", "isr_order");
             },
             [](ImpactX & /* ix */, int isr_order) {
                 amrex::ParmParse pp_algo("algo");
@@ -403,7 +403,7 @@ void init_ImpactX (py::module& m)
         )
         .def_property("space_charge_gauss_taylor_delta",
             [](ImpactX & /* ix */) {
-                return detail::get_or_throw<int>("algo.space_charge", "gauss_taylor_delta");
+                return detail::get_or_throw<amrex::Real>("algo.space_charge", "gauss_taylor_delta");
             },
             [](ImpactX & /* ix */, amrex::Real const gauss_taylor_delta) {
                 if (gauss_taylor_delta < 0) {
@@ -472,7 +472,7 @@ void init_ImpactX (py::module& m)
         )
         .def_property("mlmg_relative_tolerance",
               [](ImpactX & /* ix */) {
-                  return detail::get_or_throw<bool>("algo", "mlmg_relative_tolerance");
+                  return detail::get_or_throw<amrex::Real>("algo", "mlmg_relative_tolerance");
               },
               [](ImpactX & /* ix */, amrex::Real const mlmg_relative_tolerance) {
                   amrex::ParmParse pp_algo("algo");
@@ -484,7 +484,7 @@ void init_ImpactX (py::module& m)
         )
         .def_property("mlmg_absolute_tolerance",
               [](ImpactX & /* ix */) {
-                  return detail::get_or_throw<bool>("algo", "mlmg_absolute_tolerance");
+                  return detail::get_or_throw<amrex::Real>("algo", "mlmg_absolute_tolerance");
               },
               [](ImpactX & /* ix */, amrex::Real const mlmg_absolute_tolerance) {
                   amrex::ParmParse pp_algo("algo");
@@ -499,7 +499,7 @@ void init_ImpactX (py::module& m)
         )
         .def_property("mlmg_max_iters",
               [](ImpactX & /* ix */) {
-                  return detail::get_or_throw<bool>("algo", "mlmg_max_iters");
+                  return detail::get_or_throw<int>("algo", "mlmg_max_iters");
               },
               [](ImpactX & /* ix */, int const mlmg_max_iters) {
                   amrex::ParmParse pp_algo("algo");
@@ -511,7 +511,7 @@ void init_ImpactX (py::module& m)
         )
         .def_property("mlmg_verbosity",
               [](ImpactX & /* ix */) {
-                  return detail::get_or_throw<bool>("algo", "mlmg_verbosity");
+                  return detail::get_or_throw<int>("algo", "mlmg_verbosity");
               },
               [](ImpactX & /* ix */, int const mlmg_verbosity) {
                   amrex::ParmParse pp_algo("algo");
