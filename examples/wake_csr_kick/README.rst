@@ -102,11 +102,11 @@ For `MPI-parallel <https://www.mpi-forum.org>`__ runs, prefix these lines with `
 
 Analyze
 -------
-      
+
 We run the following script to analyze correctness:
 
 .. dropdown:: Script ``analysis_wake_kick.py``
-   
+
    .. literalinclude:: analysis_wake_kick.py
       :language: python3
       :caption: You can copy this file from ``examples/wake_csr_kick/analysis_wake_kick.py``.
@@ -114,7 +114,7 @@ We run the following script to analyze correctness:
 
 Visualize
 ---------
-          
+
 You can run the following script to visualize the energy kick as a function of head-tail position along the bunch:
 
 .. dropdown:: Script ``plot_wake_kick.py``
