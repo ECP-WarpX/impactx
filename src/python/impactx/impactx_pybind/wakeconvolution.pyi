@@ -45,7 +45,6 @@ def derivative_charge(
     arg0: amrex.space3d.amrex_3d_pybind.PODVector_real_std,
     arg1: amrex.space3d.amrex_3d_pybind.PODVector_real_std,
     arg2: typing.SupportsFloat | typing.SupportsIndex,
-    arg3: bool,
 ) -> None:
     """
     Derivative of Charge Profile Function

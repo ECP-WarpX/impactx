@@ -51,6 +51,9 @@ def ix_pc_add_n_particles(
 
     Either the total charge (``bunch_charge``) or the weight of each particle
     (``w``) must be provided.
+    With ``bunch_charge``, each particle represents the same number of real
+    particles with the charge of the reference particle, which must be set up
+    before.
 
     Note: This can only be used *after* the grids have been created, i.e. after
     ``ImpactX.init_grids`` has been called.
@@ -70,7 +73,7 @@ def ix_pc_add_n_particles(
     qm : float
         Charge over mass in 1/eV.
     bunch_charge : float, optional
-        Total charge within a bunch in C.
+        Magnitude of the total charge of the particles added in this call in C.
     w : array_like, optional
         Weight of each particle: how many real particles to represent.
     sx, sy, sz : array_like, optional
