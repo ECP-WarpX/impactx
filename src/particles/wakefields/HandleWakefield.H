@@ -113,7 +113,6 @@ namespace impactx::particles::wakefields
 
             // Set parameters for charge deposition
             bool const is_unity_particle_weight = false; // Only true if w = 1
-            bool const GetNumberDensity = true;
 
             int const num_bins = apply_csr ? csr_bins : wake_bins;  // Set resolution
             amrex::Real const bin_min = t_min;
@@ -158,12 +157,15 @@ namespace impactx::particles::wakefields
                 if (apply_csr){
                     // Slopes of the charge density at the bin edges, with zero charge density below
                     // bin_min: edge k lies between bin k-1 and bin k, edge 0 is the rising edge of bin 0
-                    // Use number density derivatives for the convolution with CSR.
+                    // The CSR wake function is the one between two elementary charges: the force
+                    // between particles of charge q is (q/e)^2 times its convolution with the
+                    // slopes of the number density, i.e., (q/e) / e times the slopes of the
+                    // deposited charge q w.
                     // The sign here is due to the fact that deposition occurs along t, while we need the
                     // derivative of the line density along z.
-                    amrex::Real const slope_factor = GetNumberDensity
-                        ? -1_rt / (bin_size * ablastr::constant::SI::q_e)
-                        : -1_rt / bin_size;
+                    amrex::Real const charge_qe = particle_container.GetRefParticle().charge_qe();
+                    amrex::Real const slope_factor =
+                        -charge_qe / (bin_size * ablastr::constant::SI::q_e);
                     amrex::Gpu::DeviceVector<amrex::Real> slopes(num_edges, 0.0);
                     amrex::Real const * const dptr_charge = charge_distribution.data();
                     amrex::Real * const dptr_slopes = slopes.data();
@@ -205,6 +207,10 @@ namespace impactx::particles::wakefields
                     }
                     amrex::Real const bin_size_user = std::abs(wake.z[1]-wake.z[0]);
 
+                    // The wake function is per unit source charge: the force on a test particle of
+                    // charge q is q times its convolution with the deposited line density q w.
+                    amrex::Real const charge = particle_container.GetRefParticle().charge;
+
                     // Line density at the bin edges, with zero charge density below bin_min: edge k
                     // lies between bin k-1 and bin k and gets the mean of both. The bin above
                     // bin_max is empty, so the last edge gets half of the last occupied bin.
@@ -218,13 +224,13 @@ namespace impactx::particles::wakefields
                     amrex::ParallelFor(num_edges*2, [=] AMREX_GPU_DEVICE(int i) {
                         if (i < num_edges) {
                             amrex::Real const s = static_cast<amrex::Real>(i) * bin_size;
-                            dptr_wake_function[i] = ablastr::constant::SI::q_e * impactx::particles::wakefields::w_user(s, wake.wake_z, wake.n_data, bin_size_user);
+                            dptr_wake_function[i] = charge * impactx::particles::wakefields::w_user(s, wake.wake_z, wake.n_data, bin_size_user);
                             amrex::Real const charge_below = (i > 0) ? dptr_charge_distribution[i - 1] : 0_rt;
                             dptr_line_density[i] = 0.5_rt * (charge_below + dptr_charge_distribution[i]);
                         }
                         else if (i > num_edges) {
                             amrex::Real const s = static_cast<amrex::Real>(i - 2*num_edges) * bin_size;
-                            dptr_wake_function[i] = ablastr::constant::SI::q_e * impactx::particles::wakefields::w_user(s, wake.wake_z, wake.n_data, bin_size_user);
+                            dptr_wake_function[i] = charge * impactx::particles::wakefields::w_user(s, wake.wake_z, wake.n_data, bin_size_user);
                         }
                     });
 

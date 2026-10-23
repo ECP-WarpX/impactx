@@ -128,6 +128,8 @@ namespace impactx::particles::wakefields
 
     /** CSR Wake Function
      *
+     * The wake between a source and a test particle of one elementary charge each.
+     *
      * Eq. (28) in:
      * E.L. Saldin et al., "On the coherent radiation of an electron bunch moving in an arc of a circle",
      * NiMA Volume 398, Issues 2–3, Pages 373-394, 21 October (1997)
@@ -157,7 +159,10 @@ namespace impactx::particles::wakefields
 
     /** Perform FFT-based convolution
      *
-     * @param[in] beam_profile_slope derivative of number density along s [1/m^2]
+     * @param[in] beam_profile_slope derivative of the line density along s that the wake function
+     *                               acts on [1/m^2]: for the CSR wake function w_l_csr, between
+     *                               two elementary charges, (q/e)^2 times the derivative of the
+     *                               number density of particles with the charge q
      * @param[in] wake_func wake function along s [J] (before convolution) [N] (after convolution)
      * @param[in] delta_t size of a bin in wake_func [m]
      * @return FFT convolution of beam_profile_slope & wake_func (N = len(beam_profile_slope) = len(wake_func)/2)
