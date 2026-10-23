@@ -183,7 +183,8 @@ namespace impactx
          * @param py momentum in y
          * @param pt momentum in t
          * @param qm charge over mass in 1/eV
-         * @param bunch_charge magnitude of the total charge within a bunch in C
+         * @param bunch_charge magnitude of the total charge of the particles added in this call
+         *                     in C
          * @param w weight of each particle: how many real particles to represent
          * @param sx spin component in x
          * @param sy spin component in y

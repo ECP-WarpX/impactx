@@ -40,7 +40,6 @@ def test_wake(save_png=True):
         x_min, y_min, t_min, x_max, y_max, t_max = beam.min_and_max_positions()
 
         is_unity_particle_weight = False
-        GetNumberDensity = True
 
         num_bins = 150
         bin_min = t_min
@@ -60,13 +59,15 @@ def test_wake(save_png=True):
             is_unity_particle_weight,
         )
 
-        # Call derivative_charge with the correct types
+        # Call derivative_charge with the correct types: slopes of the charge density
         wakeconvolution.derivative_charge(
             charge_distribution,
             slopes,
             bin_size,
-            GetNumberDensity,
         )
+        # slopes of the number density, for the CSR wake between two elementary charges
+        slopes_xp = slopes.to_xp()
+        slopes_xp /= beam.ref.charge
 
         # Convert charge distribution to numpy array and plot it
         charge_distribution_np = charge_distribution.to_numpy(copy=True)

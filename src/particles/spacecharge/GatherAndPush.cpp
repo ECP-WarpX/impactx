@@ -48,7 +48,7 @@ namespace impactx::particles::spacecharge
         amrex::ParmParse pp_algo("algo.space_charge");
         pp_algo.queryAddWithParser("num_longitudinal_bins", num_bins);
         amrex::Gpu::DeviceVector<amrex::Real> charge_distribution;
-        amrex::Real Qb_abs = 0.0;
+        amrex::Real Qb = 0.0;
 
         bool apply_longitudinal_kick = true;
 
@@ -59,7 +59,7 @@ namespace impactx::particles::spacecharge
         amrex::Real bin_max = t_max;
         amrex::Real inv_bin_size = 0.0_rt;
 
-        // charge density magnitude and its slope at the grid points of Deposit1D
+        // charge density and its slope at the grid points of Deposit1D
         amrex::Gpu::DeviceVector<amrex::Real> line_density;
         amrex::Gpu::DeviceVector<amrex::Real> line_density_slope;
 
@@ -76,7 +76,7 @@ namespace impactx::particles::spacecharge
             // distance between the grid points, which lie on bin_min, bin_max and in between
             amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);
             inv_bin_size = 1.0_rt / bin_size;
-            Qb_abs = bin_size * amrex::Reduce::Sum(charge_distribution.size(), charge_distribution.data());
+            Qb = bin_size * amrex::Reduce::Sum(charge_distribution.size(), charge_distribution.data());
 
             DensityAndSlope1D(charge_distribution, line_density, line_density_slope, bin_size);
         }
@@ -220,8 +220,8 @@ namespace impactx::particles::spacecharge
 
                        // Force contributions: the line charge density and its slope, normalized
                        // to the bunch charge, since the 2D fields and potential carry the charge
-                       amrex::ParticleReal const Fxy = (Qb_abs==0.0) ? 0.0_prt : beam_profile_interp / Qb_abs;
-                       amrex::ParticleReal const Fz = (Qb_abs==0.0) ? 0.0_prt : beam_profile_slope_interp / Qb_abs;
+                       amrex::ParticleReal const Fxy = (Qb==0.0) ? 0.0_prt : beam_profile_interp / Qb;
+                       amrex::ParticleReal const Fz = (Qb==0.0) ? 0.0_prt : beam_profile_slope_interp / Qb;
 
                        // push momentum
                        px += field_interp[0] * Fxy * push_consts * dr[2] / beta;

@@ -137,14 +137,13 @@ namespace impactx::particles::wakefields
                 // bin_min: edge k lies between bin k-1 and bin k, edge 0 is the rising edge of bin 0
                 // The CSR wake function is the one between two elementary charges: the force
                 // between particles of charge q is (q/e)^2 times its convolution with the slopes
-                // of the number density, i.e., |q/e| / e times the slopes of the deposited
-                // charge magnitude |q| w.
+                // of the number density, i.e., (q/e) / e times the slopes of the deposited
+                // charge q w.
                 // The sign here is due to the fact that deposition occurs along t, while we need the
                 // derivative of the line density along z.
-                amrex::Real const charge_qe_abs =
-                    std::abs(particle_container.GetRefParticle().charge_qe());
+                amrex::Real const charge_qe = particle_container.GetRefParticle().charge_qe();
                 amrex::Real const slope_factor =
-                    -charge_qe_abs / (bin_size * ablastr::constant::SI::q_e);
+                    -charge_qe / (bin_size * ablastr::constant::SI::q_e);
                 amrex::Gpu::DeviceVector<amrex::Real> slopes(num_edges, 0.0);
                 amrex::Real const * const dptr_charge = charge_distribution.data();
                 amrex::Real * const dptr_slopes = slopes.data();

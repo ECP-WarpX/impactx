@@ -19,8 +19,6 @@
 #include <AMReX_GpuParallelReduce.H>
 #include <AMReX_REAL.H>
 
-#include <cmath>
-
 
 namespace impactx::particles::spacecharge
 {
@@ -45,8 +43,7 @@ namespace impactx::particles::spacecharge
         amrex::Real const inv_bin_size = 1.0_rt / bin_size;
 
         // charge density per unit particle weight, the weight counts real particles
-        amrex::Real const charge_density_per_weight =
-            std::abs(pc.GetRefParticle().charge) * inv_bin_size;
+        amrex::Real const charge_density_per_weight = pc.GetRefParticle().charge * inv_bin_size;
 
         amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins, 0.0_rt);
         amrex::Real * const dptr_charge = charge_distribution.data();

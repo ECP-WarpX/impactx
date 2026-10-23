@@ -367,7 +367,7 @@ def ix_pc_add_n_particles(
     qm : float
         Charge over mass in 1/eV.
     bunch_charge : float, optional
-        Magnitude of the total charge within a bunch in C.
+        Magnitude of the total charge of the particles added in this call in C.
     w : array_like, optional
         Weight of each particle: how many real particles to represent.
     sx, sy, sz : array_like, optional
