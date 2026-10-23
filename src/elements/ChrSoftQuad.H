@@ -1,0 +1,942 @@
+/* Copyright 2022-2026 The Regents of the University of California, through Lawrence
+ *           Berkeley National Laboratory (subject to receipt of any required
+ *           approvals from the U.S. Dept. of Energy). All rights reserved.
+ *
+ * This file is part of ImpactX.
+ *
+ * Authors: Chad Mitchell, Axel Huebl
+ * License: BSD-3-Clause-LBNL
+ */
+#ifndef IMPACTX_CHRSOFTQUAD_H
+#define IMPACTX_CHRSOFTQUAD_H
+
+#include "particles/ImpactXParticleContainer.H"
+#include "mixin/gpuelement.H"
+#include "particles/integrators/Integrators.H"
+#include "mixin/alignment.H"
+#include "mixin/beamoptic.H"
+#include "helper/ArrayValidation.H"
+#include "mixin/lineartransport.H"
+#include "mixin/pipeaperture.H"
+#include "mixin/thick.H"
+#include "mixin/spintransport.H"
+
+#include <ablastr/constant.H>
+
+#include <AMReX.H>
+#include <AMReX_Extension.H>
+#include <AMReX_Math.H>
+#include <AMReX_REAL.H>
+#include <AMReX_SIMD.H>
+#include <AMReX_SmallMatrix.H>
+#include <AMReX_TrackedVector.H>
+
+#include <cmath>
+#include <memory>
+#include <stdexcept>
+#include <tuple>
+#include <vector>
+
+namespace impactx::elements
+{
+   /** Default Fourier coefficients
+    *
+    * Fourier coefficients for the on-axis quadrupole field gradient
+    * k = 1/(Brho)*dBy/dx as a function of longitudinal position z.
+    * The default on-axis gradient is described by the function:
+    * k(z) = gscale/2*(tanh((z-zi)/g) - tanh((z-zf)/g)),
+    * where zf = -zi = L/2, L is the magnetic length of the
+    * quadrupole, and g is the full gap parameter.  Here the
+    * parameters are chosen so that g/L = 1/10.  This is
+    * based on a similar model used for soft-edge elements
+    * in MaryLie and ML/I, eg.
+    * http://www.physics.umd.edu/dsat/docs/MaryLieMan.pdf
+    *
+    * This is equivalent to a single-parameter Enge model for
+    * the fields in the fringe region.
+    *
+    * Usually superseded by user-provided input values.
+    */
+    struct ChrQuad_field_data
+    {
+       amrex::Vector<amrex::ParticleReal> default_cos_coef = {
+             0.834166514794446,
+             0.598104328994702,
+             0.141852844428785,
+            -0.118211272182381,
+            -9.056149864743113E-002,
+             1.803476331179615E-002,
+             4.464887700797893E-002,
+             7.364410636252136E-003,
+            -1.697541023436736E-002,
+            -9.012679515542771E-003,
+             4.367667630047725E-003,
+             5.444030542119803E-003,
+            -5.889959910931886E-005,
+            -2.409098101409192E-003,
+            -7.962712154165590E-004,
+             7.855814707106538E-004,
+             6.174930463182168E-004,
+            -1.340154094301854E-004,
+            -3.167213724698439E-004,
+            -4.925292460592617E-005,
+             1.221580597451921E-004,
+             6.331025910961789E-005,
+            -3.202416719002774E-005,
+            -3.872103053895529E-005,
+             8.212882937116278E-007
+            };
+
+       amrex::Vector<amrex::ParticleReal> default_sin_coef = {
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0
+            };
+    };
+
+    /** Fourier coefficients for on-axis quadrupole field gradient.
+     *
+     * Host data persists across simulations; device data is uploaded
+     * on-demand "lazily" on first use and released when AMReX shuts down.
+     */
+    struct ChrQuadrupoleFourierCoefficients
+    {
+        amrex::Gpu::TrackedVector<amrex::ParticleReal> cos;
+        amrex::Gpu::TrackedVector<amrex::ParticleReal> sin;
+    };
+
+    /** The prepared, resource-free pusher for a soft-edge quadrupole.
+     *
+     * This is what a particle-push kernel is handed. It owns nothing: the coefficient
+     * arrays reach it as bounded, non-owning pointers, resolved to
+     * host or device storage by @see ChrSoftQuadrupoleGPU::make_particle_pusher for the
+     * lifetime of one element slice.
+     *
+     * It deliberately derives @see mixin::ParticlePush rather than @see mixin::BeamOptic,
+     * so it can be pushed over a tile but cannot start a lattice push or advance the
+     * reference particle. Those need the canonical element, which owns the arrays.
+     */
+    struct ChrSoftQuadrupolePusher
+    : public mixin::ParticlePush<ChrSoftQuadrupolePusher>,
+      public mixin::Thick,
+      public mixin::Alignment,
+      public mixin::PipeAperture,
+      public mixin::SpinTransport,
+      public amrex::simd::Vectorized<amrex::simd::native_simd_size_particlereal>
+    {
+        static constexpr auto type = "ChrSoftQuadrupole";
+        using PType = ImpactXParticleContainer::ParticleType;
+
+        static constexpr int DEFAULT_mapsteps = 10;
+        static constexpr int DEFAULT_unit = 0;
+
+        /** The particle-facing configuration of a soft-edge quadrupole
+         *
+         * @param ds Segment length in m
+         * @param gscale Scaling factor for on-axis field gradient Bz in 1/m^2
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param aperture_x horizontal half-aperture in m
+         * @param aperture_y vertical half-aperture in m
+         * @param unit  Unit specification
+         *           unit = 0 MADX convention (default)
+         *           unit = 1 MaryLie convention
+         * @param mapsteps number of integration steps per slice
+         * @param nslice number of slices used for the application of space charge
+         */
+        ChrSoftQuadrupolePusher (
+            amrex::ParticleReal ds,
+            amrex::ParticleReal gscale,
+            amrex::ParticleReal dx,
+            amrex::ParticleReal dy,
+            amrex::ParticleReal rotation_degree,
+            amrex::ParticleReal aperture_x,
+            amrex::ParticleReal aperture_y,
+            int unit,
+            int mapsteps,
+            int nslice
+        )
+          : Thick(ds, nslice),
+            Alignment(dx, dy, rotation_degree),
+            PipeAperture(aperture_x, aperture_y),
+            m_gscale(gscale), m_mapsteps(mapsteps), m_unit(unit)
+        {
+        }
+
+        /** Reverse the element (negate ds) */
+        void reverse () {
+            // Reversing ds traverses the Fourier profile in the opposite z direction,
+            // so the odd sine terms change sign implicitly via sin(-kz) = -sin(kz).
+            Thick::reverse();
+        }
+
+        /** Push all particles on a tile */
+        using mixin::ParticlePush<ChrSoftQuadrupolePusher>::operator();
+
+        /** Compute and cache the constants for the push.
+         *
+         * In particular, used to pre-compute and cache variables that are
+         * independent of the individually tracked particle.
+         *
+         * @param refpart reference particle
+         */
+        void compute_constants (RefPart const & refpart)
+        {
+            using namespace amrex::literals; // for _rt and _prt
+            using amrex::Math::powi;
+
+            Alignment::compute_constants(refpart);
+
+            // length of the current slice
+            m_slice_ds = m_ds / nslice();
+
+            // access reference particle values to find beta and gamma
+            m_beta = refpart.beta();
+            amrex::ParticleReal const gamma = refpart.gamma();
+
+            // normalize quad units to MAD-X convention if needed
+            m_g = m_unit == 1 ? m_gscale / refpart.rigidity_Tm() : m_gscale;
+
+            m_const1 = 1_prt / (2_prt * powi<3>(m_beta) * powi<2>(gamma));
+        }
+
+        /** This is a soft-edge quadrupole functor, so that a variable of this type can be used
+         *  like a soft-edge quadrupole function.
+         *
+         * The pusher must be prepared through ``make_particle_pusher`` on the owning element
+         * before particles are pushed through this operator.
+         *
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
+         * @param px particle momentum in x
+         * @param py particle momentum in y
+         * @param pt particle momentum in t
+         * @param idcpu particle global index
+         * @param refpart reference particle
+         */
+    template<typename T_Real=amrex::ParticleReal, typename T_IdCpu=uint64_t>
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void operator() (
+            T_Real & AMREX_RESTRICT x,
+            T_Real & AMREX_RESTRICT y,
+            T_Real & AMREX_RESTRICT t,
+            T_Real & AMREX_RESTRICT px,
+            T_Real & AMREX_RESTRICT py,
+            T_Real & AMREX_RESTRICT pt,
+            [[maybe_unused]] T_IdCpu const & AMREX_RESTRICT idcpu,
+            [[maybe_unused]] RefPart const & AMREX_RESTRICT refpart
+        ) const
+        {
+            using namespace amrex::literals; // for _rt and _prt
+
+            // numerical integration parameters
+            amrex::ParticleReal const zin = 0_prt;
+            amrex::ParticleReal const zout = m_slice_ds;
+            int const nsteps = m_mapsteps;
+
+            // initialize phase space 6-vector
+            amrex::SmallVector<T_Real, 6, 1> particle{
+                x, px, y, py, t, pt
+            };
+
+            // currently second-order integration is supported
+            integrators::symp2_integrate_split3_particle(particle,zin,zout,nsteps,refpart,*this);
+
+            // assign updated values
+            x = particle(1);
+            px = particle(2);
+            y = particle(3);
+            py = particle(4);
+            t = particle(5);
+            pt = particle(6);
+        }
+
+
+        /** This pushes a particle in a ChrSoftQuad element through
+         *  the symplectic map associated with H_1 in the Hamiltonian
+         *  splitting H = H_1 + H_2 + H_3.
+         *
+         * @param tau Map step size in m
+         * @param[in,out] particle particle phase space 6-vector
+         * @param[in,out] zeval Longitudinal on-axis location in m
+         * @param[in] refpart reference particle
+         */
+        template<typename T_Real>
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void map1 (amrex::ParticleReal const tau,
+                   amrex::SmallVector<T_Real, 6, 1> & particle,
+                   amrex::ParticleReal & zeval,
+                   [[maybe_unused]] RefPart const & AMREX_RESTRICT refpart) const
+        {
+            using namespace amrex::literals; // for _rt and _prt
+            using namespace std; // for cmath(float)
+            using amrex::Math::powi;
+
+            T_Real const x = particle(1);
+            T_Real const px = particle(2);
+            T_Real const y = particle(3);
+            T_Real const py = particle(4);
+            T_Real const t = particle(5);
+            T_Real const pt = particle(6);
+
+            T_Real xout = x;
+            T_Real pxout = px;
+            T_Real yout = y;
+            T_Real pyout = py;
+            T_Real tout = t;
+            T_Real ptout = pt;
+
+            // compute particle momentum deviation delta + 1
+            T_Real const delta1 = sqrt(1_prt - 2_prt * pt / m_beta + powi<2>(pt));
+
+            // compute the required quad field gradient values
+
+            // at initial z location
+            auto [bz, bzp, bzpp, bzint] = ChrQuad_Bfield(zeval);
+            amrex::ignore_unused(bz, bzpp);
+
+            zeval += tau;
+
+            // at final z location
+            auto [bz_f, bzp_f, bzpp_f, bzint_f] = ChrQuad_Bfield(zeval);
+            amrex::ignore_unused(bz_f, bzpp_f);
+
+            // map obtained from splitting of the paraxial Hamiltonian
+
+            amrex::ParticleReal const gint = bzint_f - bzint;
+            amrex::ParticleReal const gp = bzp_f - bzp;
+            xout = x;
+            pxout = px - x * gint + powi<3>(x) * gp / 3_prt;
+            yout = y;
+            pyout = py + y * gint - powi<3>(y) * gp / 3_prt;
+            tout = t - tau / m_beta + tau * (1_prt/m_beta - pt) / delta1;
+            ptout = pt;
+
+            // push particle coordinates
+            particle(1) = xout;
+            particle(2) = pxout;
+            particle(3) = yout;
+            particle(4) = pyout;
+            particle(5) = tout;
+            particle(6) = ptout;
+        }
+
+
+        /** This pushes a particle in a ChrSoftQuad element through
+         *  the symplectic map associated with H_2 in the Hamiltonian
+         *  splitting H = H_1 + H_2 + H_3.
+         *
+         * @param tau Map step size in m
+         * @param[in,out] particle particle phase space 6-vector
+         * @param[in,out] zeval Longitudinal on-axis location in m
+         * @param[in] refpart reference particle
+         */
+        template<typename T_Real>
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void map2 (amrex::ParticleReal const tau,
+                   amrex::SmallVector<T_Real, 6, 1> & particle,
+                   amrex::ParticleReal & zeval,
+                   [[maybe_unused]] RefPart const & AMREX_RESTRICT refpart) const
+        {
+            using namespace amrex::literals; // for _rt and _prt
+            using namespace std; // for cmath(float)
+            using amrex::Math::powi;
+
+            T_Real const x = particle(1);
+            T_Real const px = particle(2);
+            T_Real const y = particle(3);
+            T_Real const py = particle(4);
+            T_Real const t = particle(5);
+            T_Real const pt = particle(6);
+
+            T_Real xout = x;
+            T_Real pxout = px;
+            T_Real yout = y;
+            T_Real pyout = py;
+            T_Real tout = t;
+            T_Real ptout = pt;
+
+            // compute particle momentum deviation delta + 1
+            T_Real const delta1 = sqrt(1_prt - 2_prt * pt / m_beta + powi<2>(pt));
+
+            // compute the required quad field gradient values
+
+            // at initial z location
+            auto [bz, bzp, bzpp, bzint] = ChrQuad_Bfield(zeval);
+            amrex::ignore_unused(bz,bzint);
+
+            // map obtained from splitting of the paraxial Hamiltonian
+            T_Real Ax = -y*bz/2_prt + y*(powi<2>(x)+powi<2>(y))*bzpp/16_prt;
+            T_Real Ay = x*bz/2_prt - x*(powi<2>(x)+powi<2>(y))*bzpp/16_prt;
+            T_Real Bzintx = x*bz - x*(powi<2>(x)+3_prt*powi<2>(y))*bzpp/12_prt;
+            T_Real px_mech = px - Ax;
+
+            xout = x + tau * (px - (powi<3>(x) - x * powi<2>(y))*bzp/4_prt )/delta1;
+            yout = y;
+
+            T_Real Ax_f = -yout*bz/2_prt + yout*(powi<2>(xout)+powi<2>(yout))*bzpp/16_prt;
+            T_Real Ay_f = xout*bz/2_prt - xout*(powi<2>(xout)+powi<2>(yout))*bzpp/16_prt;
+            T_Real Bzintx_f = xout*bz - xout*(powi<2>(xout)+3_prt*powi<2>(yout))*bzpp/12_prt;
+
+            pxout = px - Ax + Ax_f;
+            pyout = py - Ay + Ay_f - Bzintx_f + Bzintx;
+            ptout = pt;
+
+            tout = t + tau * (1/m_beta - pt) / powi<3>(delta1) * powi<2>(px_mech);
+
+            // push particle coordinates
+            particle(1) = xout;
+            particle(2) = pxout;
+            particle(3) = yout;
+            particle(4) = pyout;
+            particle(5) = tout;
+            particle(6) = ptout;
+
+            zeval += 0_prt;
+        }
+
+
+        /** This pushes a particle in a ChrSoftQuad element through
+         *  the symplectic map associated with H_1 in the Hamiltonian
+         *  splitting H = H_1 + H_2 + H_3.  This is exactly the linear
+         *  map of a quadrupole.
+         *
+         * @param tau Map step size in m
+         * @param[in,out] particle particle phase space 6-vector
+         * @param[in,out] zeval Longitudinal on-axis location in m
+         * @param[in] refpart reference particle
+         */
+        template<typename T_Real>
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void map3 (amrex::ParticleReal const tau,
+                   amrex::SmallVector<T_Real, 6, 1> & particle,
+                   amrex::ParticleReal & zeval,
+                   [[maybe_unused]] RefPart const & AMREX_RESTRICT refpart) const
+        {
+            using namespace amrex::literals; // for _rt and _prt
+            using namespace std; // for cmath(float)
+            using amrex::Math::powi;
+
+            T_Real const x = particle(1);
+            T_Real const px = particle(2);
+            T_Real const y = particle(3);
+            T_Real const py = particle(4);
+            T_Real const t = particle(5);
+            T_Real const pt = particle(6);
+
+            T_Real xout = x;
+            T_Real pxout = px;
+            T_Real yout = y;
+            T_Real pyout = py;
+            T_Real tout = t;
+            T_Real ptout = pt;
+
+            // compute particle momentum deviation delta + 1
+            T_Real const delta1 = sqrt(1_prt - 2_prt * pt / m_beta + powi<2>(pt));
+
+            // compute the required quad field gradient values
+
+            // at initial z location
+            auto [bz, bzp, bzpp, bzint] = ChrQuad_Bfield(zeval);
+            amrex::ignore_unused(bz,bzint);
+
+            // map obtained from splitting of the paraxial Hamiltonian
+            T_Real Ax = -y*bz/2_prt + y*(powi<2>(x)+powi<2>(y))*bzpp/16_prt;
+            T_Real Ay = x*bz/2_prt - x*(powi<2>(x)+powi<2>(y))*bzpp/16_prt;
+            T_Real Bzinty = y*bz - y*(powi<2>(y)+3_prt*powi<2>(x))*bzpp/12_prt;
+            T_Real py_mech = py - Ay;
+
+            xout = x;
+            yout = y + tau * (py + (powi<3>(y) - y * powi<2>(x))*bzp/4_prt )/delta1;
+
+            T_Real Ax_f = -yout*bz/2_prt + yout*(powi<2>(xout)+powi<2>(yout))*bzpp/16_prt;
+            T_Real Ay_f = xout*bz/2_prt - xout*(powi<2>(xout)+powi<2>(yout))*bzpp/16_prt;
+            T_Real Bzinty_f = yout*bz - yout*(powi<2>(yout)+3_prt*powi<2>(xout))*bzpp/12_prt;
+
+            pxout = px - Ax + Ax_f - Bzinty_f + Bzinty;
+            pyout = py - Ay + Ay_f;
+            ptout = pt;
+
+            tout = t + tau * (1/m_beta - pt) / powi<3>(delta1) * powi<2>(py_mech);
+
+            // push particle coordinates
+            particle(1) = xout;
+            particle(2) = pxout;
+            particle(3) = yout;
+            particle(4) = pyout;
+            particle(5) = tout;
+            particle(6) = ptout;
+
+            zeval += 0_prt;
+        }
+
+
+        /** This operator pushes the particle spin.
+         *
+         * @param x particle position in x
+         * @param y particle position in y
+         * @param t particle position in t
+         * @param px particle momentum in x
+         * @param py particle momentum in y
+         * @param pt particle momentum in t
+         * @param sx particle spin x-component
+         * @param sy particle spin y-component
+         * @param sz particle spin z-component
+         * @param idcpu particle global index
+         * @param refpart reference particle
+         */
+        template<typename T_Real=amrex::ParticleReal, typename T_IdCpu=uint64_t>
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void spin_and_phasespace_push (
+            T_Real & AMREX_RESTRICT x,
+            T_Real & AMREX_RESTRICT y,
+            T_Real & AMREX_RESTRICT t,
+            T_Real & AMREX_RESTRICT px,
+            T_Real & AMREX_RESTRICT py,
+            T_Real & AMREX_RESTRICT pt,
+            T_Real & AMREX_RESTRICT sx,
+            T_Real & AMREX_RESTRICT sy,
+            T_Real & AMREX_RESTRICT sz,
+            T_IdCpu const & AMREX_RESTRICT idcpu,
+            RefPart const & AMREX_RESTRICT refpart
+        ) const
+        {
+            using namespace amrex::literals; // for _rt and _prt
+
+            // initialize the three components of the axis-angle vector
+            T_Real lambdax = 0_prt;
+            T_Real lambday = 0_prt;
+            T_Real lambdaz = 0_prt;
+
+            // store the phase space variables in vector form
+            amrex::SmallVector<T_Real, 6, 1> const v{x, px, y, py, t, pt};
+
+            // get the spin-orbit coupling matrix
+            amrex::SmallMatrix<amrex::ParticleReal, 3, 6, amrex::Order::F, 1> const A = m_spin_coupling;
+
+            // use phase space variables to obtain the angle-axis generator of spin rotation
+            auto const out = A * v;
+
+            // update the angle-axis generator
+            lambdax = out[1];
+            lambday = out[2];
+            lambdaz = out[3];
+
+            // push the spin vector using the generator just determined
+            rotate_spin(lambdax,lambday,lambdaz,sx,sy,sz);
+
+            // phase space push
+            (*this)(x, y, t, px, py, pt, idcpu, refpart);
+        }
+
+        /** This evaluates the on-axis magnetic field Bz at a fixed location
+         *  z, together with certain required integrals and derivatives.
+         *  The field returned is normalized to a peak value of 1.
+         *
+         * @param zeval Longitudinal on-axis location in m
+         */
+        std::tuple<amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal, amrex::ParticleReal>
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        ChrQuad_Bfield (amrex::ParticleReal const zeval) const
+        {
+            using namespace amrex::literals; // for _rt and _prt
+
+            // The coefficients were already resolved to the right execution space when
+            // this pusher was prepared, so there is no host/device branch here and only
+            // one copy of the field expansion below.
+            amrex::ParticleReal const * cos_data = m_cos_coefficients;
+            amrex::ParticleReal const * sin_data = m_sin_coefficients;
+            int const ncoef = m_ncoef;
+
+            // specify constants
+            using ablastr::constant::math::pi;
+            amrex::ParticleReal const zlen = std::abs(m_ds);
+            amrex::ParticleReal const zmid = zlen * 0.5_prt;
+
+            // compute on-axis magnetic field (z is relative to quadrupole midpoint)
+            amrex::ParticleReal bfield = 0.0;
+            amrex::ParticleReal bfieldp = 0.0;
+            amrex::ParticleReal bfieldpp = 0.0;
+            amrex::ParticleReal bfieldint = 0.0;
+            amrex::ParticleReal const z = zeval - zmid;
+
+            if (std::abs(z) <= zmid)
+            {
+               bfield = 0.5_prt*cos_data[0];
+               bfieldint = z*bfield;
+               for (int j=1; j < ncoef; ++j)
+               {
+                 bfield = bfield + cos_data[j] *std::cos(j * 2 * pi * z / zlen) +
+                         sin_data[j] *std::sin(j * 2 * pi * z / zlen);
+                 bfieldp = bfieldp - j * 2 * pi * cos_data[j] *std::sin(j * 2 * pi * z / zlen) / zlen +
+                           j * 2 * pi * sin_data[j] *std::cos(j * 2 * pi * z / zlen) / zlen;
+                 bfieldpp = bfieldpp - (j * 2 * pi / zlen) * (j * 2 * pi / zlen) * ( cos_data[j] *std::cos(j * 2 * pi * z / zlen) +
+                           - sin_data[j] *std::sin(j * 2 * pi * z / zlen) );
+                 bfieldint = bfieldint + zlen * cos_data[j] *std::sin(j * 2 * pi * z / zlen) / (j * 2 * pi) -
+                             zlen * sin_data[j] *std::cos(j * 2 * pi * z / zlen) / (j * 2 * pi);
+               }
+            }
+            return std::make_tuple(bfield, bfieldp, bfieldpp, bfieldint);
+        }
+
+        /** This pushes the reference particle and the linear map matrix
+         *  elements for a quadrupole through the symplectic map associated
+         *  with H_1 in the Hamiltonian splitting H = H_1 + H_2.
+         *
+         * @param tau Map step size in m
+         * @param[in,out] refpart reference particle
+         * @param[in,out] zeval Longitudinal on-axis location in m
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void map1 (amrex::ParticleReal const tau,
+                   RefPart & refpart,
+                   [[maybe_unused]] amrex::ParticleReal & zeval) const
+        {
+            using namespace amrex::literals; // for _rt and _prt
+            using amrex::Math::powi;
+
+            // push the reference particle
+            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const pt = refpart.pt;
+            amrex::ParticleReal const z = zeval;
+
+            if (pt < -1.0_prt) {
+                refpart.t = t + tau/std::sqrt(1.0_prt - powi<-2>(pt));
+                refpart.pt = pt;
+            }
+            else {
+                refpart.t = t;
+                refpart.pt = pt;
+            }
+
+            zeval = z + tau;
+
+            // push the linear map equations
+            amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> const R = m_map;
+            amrex::ParticleReal const betgam = refpart.beta_gamma();
+
+            m_map(1,1) = R(1,1) + tau*R(2,1);
+            m_map(1,2) = R(1,2) + tau*R(2,2);
+            m_map(1,3) = R(1,3) + tau*R(2,3);
+            m_map(1,4) = R(1,4) + tau*R(2,4);
+
+            m_map(3,1) = R(3,1) + tau*R(4,1);
+            m_map(3,2) = R(3,2) + tau*R(4,2);
+            m_map(3,3) = R(3,3) + tau*R(4,3);
+            m_map(3,4) = R(3,4) + tau*R(4,4);
+
+            m_map(5,5) = R(5,5) + tau*R(6,5) / powi<2>(betgam);
+            m_map(5,6) = R(5,6) + tau*R(6,6) / powi<2>(betgam);
+        }
+
+        /** This pushes the reference particle and the linear map matrix
+         *  elements for a quadrupole through the symplectic map associated
+         *  with H_2 in the Hamiltonian splitting H = H_1 + H_2.
+         *
+         * @param tau Map step size in m
+         * @param[in,out] refpart reference particle
+         * @param[in,out] zeval Longitudinal on-axis location in m
+         */
+        AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+        void map2 (amrex::ParticleReal const tau,
+                   RefPart & refpart,
+                   amrex::ParticleReal & zeval) const
+        {
+            using namespace amrex::literals; // for _rt and _prt
+
+            amrex::ParticleReal const t = refpart.t;
+            amrex::ParticleReal const pt = refpart.pt;
+
+            // Define parameters and intermediate constants
+            amrex::ParticleReal const G0 = m_gscale;
+
+            // push the reference particle
+            auto [bz, bzp, bzpp,bzint] = ChrQuad_Bfield(zeval);
+            amrex::ignore_unused(bzp, bzpp, bzint);
+
+            refpart.t = t;
+            refpart.pt = pt;
+
+            // push the linear map equations
+            amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> const R = m_map;
+            amrex::ParticleReal const alpha = G0*bz;
+
+            m_map(2,1) = R(2,1) - tau*alpha*R(1,1);
+            m_map(2,2) = R(2,2) - tau*alpha*R(1,2);
+            m_map(2,3) = R(2,3) - tau*alpha*R(1,3);
+            m_map(2,4) = R(2,4) - tau*alpha*R(1,4);
+
+            m_map(4,1) = R(4,1) + tau*alpha*R(3,1);
+            m_map(4,2) = R(4,2) + tau*alpha*R(3,2);
+            m_map(4,3) = R(4,3) + tau*alpha*R(3,3);
+            m_map(4,4) = R(4,4) + tau*alpha*R(3,4);
+
+            // BELOW: if spin is needed only:
+            amrex::SmallMatrix<amrex::ParticleReal, 3, 6, amrex::Order::F, 1> const A = m_spin_coupling;
+            amrex::SmallMatrix<amrex::ParticleReal, 3, 6, amrex::Order::F, 1> dA = {};
+            amrex::ParticleReal const gamma = refpart.gamma();
+            amrex::ParticleReal G = refpart.gyromagnetic_anomaly;
+
+            // Update spin-orbit coupling matrix here
+            dA(1,3) = -(1_prt + G*gamma) * tau * alpha;
+            dA(2,1) = -(1_prt + G*gamma) * tau * alpha;
+
+            // update the spin-orbit coupling matrix here
+            m_spin_coupling = A + dA*R;
+
+        }
+
+        amrex::ParticleReal m_gscale; //! scaling factor for quad field gradient
+        int m_mapsteps; //! number of map integration steps per slice
+        int m_unit; //! unit system for quadrupole gradient
+
+        /** Coefficients resolved to this pusher's execution space.
+         *
+         * Non-owning and valid only for the launch this pusher was prepared for.
+         * @see ChrSoftQuadrupoleGPU, which owns the arrays.
+         */
+        //! non-owning, device-copyable; valid for the launch it was prepared for
+        amrex::ParticleReal const * m_cos_coefficients = nullptr;
+        amrex::ParticleReal const * m_sin_coefficients = nullptr;
+        int m_ncoef = 0;
+
+        // Reference-trajectory linearization around the reference particle.
+        // Computed during the reference-particle push and consumed during the
+        // particle push.
+        // mutable: written by the const reference push before the element is copied
+        // into the particle-push functor.
+        mutable amrex::SmallMatrix<amrex::ParticleReal, 6, 6, amrex::Order::F, 1> m_map{}; //! linearized map
+        mutable amrex::SmallMatrix<amrex::ParticleReal, 3, 6, amrex::Order::F, 1> m_spin_coupling{}; //! linearized spin-orbit coupling matrix
+
+        private:
+          // constants that are independent of the individually tracked particle,
+          // see: compute_constants() to refresh
+          amrex::ParticleReal m_slice_ds;  //! m_ds / nslice();
+          amrex::ParticleReal m_beta;
+          amrex::ParticleReal m_g;
+          amrex::ParticleReal m_const1;
+    };
+
+    /** A soft-edge quadrupole: the canonical element that owns its coefficients.
+     *
+     * Everything that runs on the host and needs the coefficient arrays lives here: the
+     * reference-particle push, the transfer map, serialization and finalization. Particle
+     * pushes run against @see ChrSoftQuadrupolePusher, which this hands out already resolved to
+     * the right execution space.
+     */
+    struct ChrSoftQuadrupoleGPU
+    : public mixin::BeamOptic<ChrSoftQuadrupoleGPU>,
+      public mixin::LinearTransport<ChrSoftQuadrupoleGPU>,
+      public ChrSoftQuadrupolePusher
+    {
+        /** A soft-edge quadrupole
+         *
+         * @param ds Segment length in m
+         * @param gscale Scaling factor for on-axis field gradient Bz in 1/m^2
+         * @param cos_coef cosine coefficients in Fourier expansion of on-axis magnetic field Bz
+         * @param sin_coef sine coefficients in Fourier expansion of on-axis magnetic field Bz
+         * @param dx horizontal translation error in m
+         * @param dy vertical translation error in m
+         * @param rotation_degree rotation error in the transverse plane [degrees]
+         * @param aperture_x horizontal half-aperture in m
+         * @param aperture_y vertical half-aperture in m
+         * @param unit  Unit specification
+         *           unit = 0 MADX convention (default)
+         *           unit = 1 MaryLie convention
+         * @param mapsteps number of integration steps per slice used for
+         *        map and reference particle push in applied fields
+         * @param nslice number of slices used for the application of space charge
+         */
+        ChrSoftQuadrupoleGPU (
+            amrex::ParticleReal ds,
+            amrex::ParticleReal gscale,
+            std::vector<amrex::ParticleReal> cos_coef,
+            std::vector<amrex::ParticleReal> sin_coef,
+            amrex::ParticleReal dx = DEFAULT_dx,
+            amrex::ParticleReal dy = DEFAULT_dy,
+            amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
+            amrex::ParticleReal aperture_x = DEFAULT_aperture_x,
+            amrex::ParticleReal aperture_y = DEFAULT_aperture_y,
+            int unit = DEFAULT_unit,
+            int mapsteps = DEFAULT_mapsteps,
+            int nslice = DEFAULT_nslice
+        )
+          : ChrSoftQuadrupolePusher(ds, gscale, dx, dy, rotation_degree, aperture_x, aperture_y, unit, mapsteps, nslice),
+            m_coefficients{std::move(cos_coef), std::move(sin_coef)}
+        {
+            require_array_pair(m_coefficients.cos, m_coefficients.sin,
+                               "ChrSoftQuadrupole: cos and sin coefficient", 1);
+            if (m_mapsteps <= 0)
+                throw std::invalid_argument("ChrSoftQuadrupole: mapsteps must be > 0!");
+        }
+
+        /** Push all particles */
+        using mixin::BeamOptic<ChrSoftQuadrupoleGPU>::operator();
+
+        /** This pushes the reference particle.
+         *
+         * @param[in,out] refpart reference particle
+         */
+        AMREX_GPU_HOST AMREX_FORCE_INLINE
+        void operator() (RefPart & AMREX_RESTRICT refpart) const
+        {
+            using namespace amrex::literals; // for _rt and _prt
+            using amrex::Math::powi;
+
+            // Run the shared field expansion against a fresh *host* view. The view is
+            // local to this call, so the canonical element never caches a pointer into
+            // storage that a later mutation could replace.
+            ChrSoftQuadrupolePusher pusher = *this;
+            pusher.m_cos_coefficients = m_coefficients.cos.host_const().data();
+            pusher.m_sin_coefficients = m_coefficients.sin.host_const().data();
+            pusher.m_ncoef = static_cast<int>(m_coefficients.cos.host_const().size());
+
+            // assign input reference particle values
+            amrex::ParticleReal const x = refpart.x;
+            amrex::ParticleReal const px = refpart.px;
+            amrex::ParticleReal const y = refpart.y;
+            amrex::ParticleReal const py = refpart.py;
+            amrex::ParticleReal const z = refpart.z;
+            amrex::ParticleReal const pz = refpart.pz;
+            amrex::ParticleReal const pt = refpart.pt;
+            amrex::ParticleReal const s = refpart.s;
+            amrex::ParticleReal const sedge = refpart.sedge;
+
+            // initialize linear map (deviation) values
+            pusher.m_map = decltype(m_map)::Identity();
+
+            // initialize the spin-orbit coupling matrix
+            pusher.m_spin_coupling = {};
+
+            // length of the current slice
+            amrex::ParticleReal const slice_ds = m_ds / nslice();
+
+            // compute initial value of beta*gamma
+            amrex::ParticleReal const bgi = std::sqrt(powi<2>(pt) - 1.0_prt);
+
+            // call integrator to advance (t,pt)
+            amrex::ParticleReal const zin = s - sedge;
+            amrex::ParticleReal const zout = zin + slice_ds;
+            int const nsteps = m_mapsteps;
+
+            integrators::symp2_integrate(refpart,zin,zout,nsteps,pusher);
+
+            // keep the linearization the integrator just produced
+            m_map = pusher.m_map;
+            m_spin_coupling = pusher.m_spin_coupling;
+            amrex::ParticleReal const ptf = refpart.pt;
+
+            /*
+            // print computed linear map:
+               for(int i=1; i<7; ++i){
+                 for(int j=1; j<7; ++j){
+                    amrex::PrintToFile("QuadMap.txt") << i << " " <<
+                    j << " " << m_map(i,j) << "\n";
+                 }
+               }
+            //
+            */
+
+            // advance position (x,y,z)
+            refpart.x = x + slice_ds*px/bgi;
+            refpart.y = y + slice_ds*py/bgi;
+            refpart.z = z + slice_ds*pz/bgi;
+
+            // compute final value of beta*gamma
+            amrex::ParticleReal const bgf = std::sqrt(powi<2>(ptf) - 1.0_prt);
+
+            // advance momentum (px,py,pz)
+            refpart.px = px*bgf/bgi;
+            refpart.py = py*bgf/bgi;
+            refpart.pz = pz*bgf/bgi;
+
+            // advance integrated path length
+            refpart.s = s + slice_ds;
+        }
+        /** This pushes the covariance matrix. */
+        using LinearTransport::operator();
+
+        /** This function returns the linear transport map.
+         *
+         * @param[in] refpart reference particle
+         * @returns 6x6 transport matrix
+         */
+        AMREX_GPU_HOST AMREX_FORCE_INLINE
+        Map6x6
+        transport_map ([[maybe_unused]] RefPart const & AMREX_RESTRICT refpart) const
+        {
+
+            Map6x6 R = Map6x6::Identity();
+            R = m_map;
+
+            // apply the transverse rotation (roll) alignment error
+            return rotate_aligned_map(R);
+        }
+        /** Prepare the pusher for one element slice
+         *
+         * @param refpart reference particle, already advanced for this slice
+         * @return a resource-free pusher holding an execution-space view of the coefficients
+         */
+        [[nodiscard]] ChrSoftQuadrupolePusher make_particle_pusher (RefPart const & refpart) const
+        {
+            ChrSoftQuadrupolePusher pusher = *this;
+            pusher.Alignment::compute_constants(refpart);
+            pusher.m_cos_coefficients = m_coefficients.cos.device_const().data();
+            pusher.m_sin_coefficients = m_coefficients.sin.device_const().data();
+            pusher.m_ncoef = static_cast<int>(m_coefficients.cos.host_const().size());
+            return pusher;
+        }
+
+        /** Cosine coefficients, e.g. for serialization */
+        [[nodiscard]] std::vector<amrex::ParticleReal> cos_coefficients () const
+        {
+            return m_coefficients.cos.host_const();
+        }
+
+        /** Sine coefficients, e.g. for serialization */
+        [[nodiscard]] std::vector<amrex::ParticleReal> sin_coefficients () const
+        {
+            return m_coefficients.sin.host_const();
+        }
+
+        /** Replace both arrays at once
+         *
+         * The two are validated before either is stored, so a rejected update leaves the
+         * element as it was. They are always the same length, which is why this takes
+         * both rather than offering to change one of them alone.
+         *
+         * @param first the new cosine values
+         * @param second the new sine values
+         */
+        void set_coefficients (
+            std::vector<amrex::ParticleReal> first,
+            std::vector<amrex::ParticleReal> second
+        )
+        {
+            require_array_pair(first, second, "ChrSoftQuadrupole: cos and sin coefficient", 1);
+            m_coefficients.cos.host() = std::move(first);
+            m_coefficients.sin.host() = std::move(second);
+        }
+
+        /** Release device storage; host configuration survives for reuse */
+        void finalize ()
+        {
+            m_coefficients.cos.release_gpu();
+            m_coefficients.sin.release_gpu();
+        }
+
+        //! the coefficient arrays this element owns, mirrored to the device on demand
+        ChrQuadrupoleFourierCoefficients m_coefficients;
+
+    };
+
+    /** ChrSoftQuadrupole: GPU state plus common host-only metadata */
+    using ChrSoftQuadrupole = Element<ChrSoftQuadrupoleGPU>;
+
+} // namespace impactx
+
+IMPACTX_PUSH_EXTERN_TEMPLATE(impactx::elements::ChrSoftQuadrupoleGPU)
+
+#endif // IMPACTX_CHRSOFTQUAD_H

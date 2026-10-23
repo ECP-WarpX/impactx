@@ -376,6 +376,25 @@ namespace detail
             detail::queryAddResize(pp_element, "sin_coefficients", sin_coef);
 
             m_lattice.emplace_back( SoftQuadrupole(ds, gscale, cos_coef, sin_coef, a["dx"], a["dy"], a["rotation_degree"], b["aperture_x"], b["aperture_y"], mapsteps, nslice, element_name) );
+        } else if (element_type == "quadrupole_softedge_chromatic")
+        {
+            auto const [ds, nslice] = detail::query_ds(pp_element, nslice_default);
+            auto a = detail::query_alignment<ChrSoftQuadrupole>(pp_element);
+            auto b = detail::query_aperture<ChrSoftQuadrupole>(pp_element);
+
+            amrex::ParticleReal gscale;
+            int mapsteps = ChrSoftQuadrupole::DEFAULT_mapsteps;
+            int unit = ChrSoftQuadrupole::DEFAULT_unit;
+            ChrQuad_field_data const gz;
+            std::vector<amrex::ParticleReal> cos_coef = gz.default_cos_coef;
+            std::vector<amrex::ParticleReal> sin_coef = gz.default_sin_coef;
+            pp_element.getWithParser("gscale", gscale);
+            pp_element.queryAddWithParser("unit", unit);
+            pp_element.queryAddWithParser("mapsteps", mapsteps);
+            detail::queryAddResize(pp_element, "cos_coefficients", cos_coef);
+            detail::queryAddResize(pp_element, "sin_coefficients", sin_coef);
+
+            m_lattice.emplace_back( ChrSoftQuadrupole(ds, gscale, cos_coef, sin_coef, a["dx"], a["dy"], a["rotation_degree"], b["aperture_x"], b["aperture_y"], unit, mapsteps, nslice, element_name) );
         } else if (element_type == "drift_chromatic")
         {
             auto const [ds, nslice] = detail::query_ds(pp_element, nslice_default);

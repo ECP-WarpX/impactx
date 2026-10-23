@@ -16,6 +16,7 @@
 #include "ChrDrift.H"
 #include "ChrPlasmaLens.H"
 #include "ChrQuad.H"
+#include "ChrSoftQuad.H"
 #include "ChrUniformAcc.H"
 #include "ConstF.H"
 #include "DipEdge.H"
@@ -62,6 +63,7 @@ namespace impactx::elements
         ChrDrift,
         ChrPlasmaLens,
         ChrQuad,
+        ChrSoftQuadrupole,
         ConstF,
         diagnostics::BeamMonitor,
         DipEdge,

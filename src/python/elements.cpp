@@ -3108,6 +3108,114 @@ void init_elements(py::module& m)
     register_reverse(py_SoftQuadrupole);
     register_copy(py_SoftQuadrupole);
 
+    py::class_<ChrSoftQuadrupole, elements::mixin::Named, elements::mixin::Thick, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_ChrSoftQuadrupole(me, "ChrSoftQuadrupole");
+    py_ChrSoftQuadrupole
+        .def("__repr__",
+             [](ChrSoftQuadrupole const & chr_soft_quad) {
+                 return element_name(
+                     chr_soft_quad,
+                     std::make_pair("gscale", chr_soft_quad.m_gscale)
+                 );
+             }
+        )
+        .def_property("cos_coefficients",
+            [](elements::ChrSoftQuadrupole const & el) { return el.cos_coefficients(); },
+            [](elements::ChrSoftQuadrupole & el, std::vector<amrex::ParticleReal> v) {
+                el.set_coefficients(std::move(v), el.sin_coefficients());
+            },
+            "cosine coefficients in the Fourier expansion of the on-axis field gradient\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_coefficients()``."
+        )
+        .def_property("sin_coefficients",
+            [](elements::ChrSoftQuadrupole const & el) { return el.sin_coefficients(); },
+            [](elements::ChrSoftQuadrupole & el, std::vector<amrex::ParticleReal> v) {
+                el.set_coefficients(el.cos_coefficients(), std::move(v));
+            },
+            "sine coefficients in the Fourier expansion of the on-axis field gradient\n\n"
+            "Both arrays are always the same length. To change the length, set both at\n"
+            "once with ``set_coefficients()``."
+        )
+        .def("set_coefficients",
+            [](elements::ChrSoftQuadrupole & el, std::vector<amrex::ParticleReal> f, std::vector<amrex::ParticleReal> s) {
+                el.set_coefficients(std::move(f), std::move(s));
+            },
+            py::arg("cos_coefficients"), py::arg("sin_coefficients"),
+            "Replace both arrays at once.\n\n"
+            "They are validated together and applied as one step, so a rejected update\n"
+            "leaves the element unchanged."
+        )
+        .def("to_dict",
+            [](ChrSoftQuadrupole const & chr_soft_quad) {
+                return element_dict(
+                    chr_soft_quad,
+                    std::make_pair("gscale", chr_soft_quad.m_gscale),
+                    std::make_pair("cos_coefficients", chr_soft_quad.cos_coefficients()),
+                    std::make_pair("sin_coefficients", chr_soft_quad.sin_coefficients()),
+                    std::make_pair("unit", chr_soft_quad.m_unit),
+                    std::make_pair("mapsteps", chr_soft_quad.m_mapsteps)
+                );
+            }
+        )
+        .def(py::init<
+                 amrex::ParticleReal,
+                 amrex::ParticleReal,
+                 std::vector<amrex::ParticleReal>,
+                 std::vector<amrex::ParticleReal>,
+                 amrex::ParticleReal,
+                 amrex::ParticleReal,
+                 amrex::ParticleReal,
+                 amrex::ParticleReal,
+                 amrex::ParticleReal,
+                 int,
+                 int,
+                 int,
+                 std::optional<std::string>
+             >(),
+             py::arg("ds"),
+             py::arg("gscale"),
+             py::arg("cos_coefficients"),
+             py::arg("sin_coefficients"),
+             py::arg("dx") = ChrSoftQuadrupole::DEFAULT_dx,
+             py::arg("dy") = ChrSoftQuadrupole::DEFAULT_dy,
+             py::arg("rotation") = ChrSoftQuadrupole::DEFAULT_rotation_degree,
+             py::arg("aperture_x") = ChrSoftQuadrupole::DEFAULT_aperture_x,
+             py::arg("aperture_y") = ChrSoftQuadrupole::DEFAULT_aperture_y,
+             py::arg("unit") = ChrSoftQuadrupole::DEFAULT_unit,
+             py::arg("mapsteps") = ChrSoftQuadrupole::DEFAULT_mapsteps,
+             py::arg("nslice") = ChrSoftQuadrupole::DEFAULT_nslice,
+             py::arg("name") = py::none(),
+             "A chromatic soft-edge quadrupole."
+        )
+        .def_property("gscale",
+            [](ChrSoftQuadrupole & chr_soft_quad) { return chr_soft_quad.m_gscale; },
+            [](ChrSoftQuadrupole & chr_soft_quad, amrex::ParticleReal gscale) { chr_soft_quad.m_gscale = gscale; },
+            "Scaling factor for on-axis field gradient in inverse meters"
+        )
+        // TODO cos_coefficients
+        // TODO sin_coefficients
+        .def_property("mapsteps",
+            [](ChrSoftQuadrupole & chr_soft_quad) { return chr_soft_quad.m_mapsteps; },
+            [](ChrSoftQuadrupole & chr_soft_quad, int mapsteps) {
+                if (mapsteps <= 0)
+                    throw std::invalid_argument("ChrSoftQuadrupole: mapsteps must be > 0!");
+                chr_soft_quad.m_mapsteps = mapsteps;
+            },
+            "number of integration steps per slice used for map and reference particle push in applied fields"
+        )
+        .def_property_readonly("map",
+            [](ChrSoftQuadrupole const & chr_soft_quad) { return chr_soft_quad.m_map; },
+            "linearized transport map around the reference particle (valid after a reference-particle push)"
+        )
+        .def_property_readonly("spin_coupling",
+            [](ChrSoftQuadrupole const & chr_soft_quad) { return chr_soft_quad.m_spin_coupling; },
+            "linearized spin-orbit coupling matrix (valid after a reference-particle push)"
+        )
+    ;
+    register_push(py_ChrSoftQuadrupole);
+    register_reverse(py_ChrSoftQuadrupole);
+    register_copy(py_ChrSoftQuadrupole);
+
     py::class_<ThinDipole, elements::mixin::Named, elements::mixin::Thin, elements::mixin::Alignment, elements::mixin::PipeAperture, py::smart_holder> py_ThinDipole(me, "ThinDipole");
     py_ThinDipole
         .def("__repr__",
