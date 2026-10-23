@@ -2279,6 +2279,9 @@ add_impactx_test(dipedge-linear-map.py
 
 # Momentum Kick in a 1D User-Specified Longitudinal Wake Model ###########
 if(ImpactX_FFT)
+# copy on-axis RF cavity field data
+file(COPY ${ImpactX_SOURCE_DIR}/examples/wake_csr_kick/onaxis_data.in
+     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/user-wake-kick.py)
         add_impactx_test(user-wake-kick.py
         examples/wake_csr_kick/run_user_wake_kick.py
         ON    # ImpactX MPI-parallel
