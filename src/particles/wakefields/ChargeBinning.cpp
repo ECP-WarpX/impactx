@@ -30,6 +30,9 @@ namespace impactx::particles::wakefields
         int const num_bins = charge_distribution.size();
         amrex::Real * const dptr_data = charge_distribution.data();
 
+        // charge of a particle
+        amrex::Real const charge = myspc.GetRefParticle().charge;
+
         // Loop over each grid level
         int const nlevs = myspc.finestLevel();
         for (int lev = 0; lev <= nlevs; ++lev)
@@ -62,9 +65,9 @@ namespace impactx::particles::wakefields
                         auto const w = amrex::Real(d_w[i]);  // (Macro)Particle weight at i
 
                         /*
-                        Weight w is given in [number of electrons]:
-                        For w = 1 --> macroparticle = 1 electron making up a macroparticle
-                        For w > 1 --> macroparticle > 1 electrons making up a macroparticle
+                        Weight w is given in [number of real particles]:
+                        For w = 1 --> macroparticle = 1 real particle making up a macroparticle
+                        For w > 1 --> macroparticle > 1 real particles making up a macroparticle
                         */
 
                         // Calculate bin index based on z-position
@@ -72,7 +75,7 @@ namespace impactx::particles::wakefields
                         if (bin < 0 || bin >= num_bins) { return; }  // Discard if bin index is out of range
 
                         // Divide charge by bin size to get binned charge density
-                        amrex::Real add_value = ablastr::constant::SI::q_e / bin_size;
+                        amrex::Real add_value = charge / bin_size;
 
                         // Calculate the charge contribution of the macro particle
                         if (!is_unity_particle_weight)
@@ -91,8 +94,7 @@ namespace impactx::particles::wakefields
     void DerivativeCharge1D (
         amrex::Gpu::DeviceVector<amrex::Real> const & charge_distribution,
         amrex::Gpu::DeviceVector<amrex::Real> & slopes,
-        amrex::Real bin_size,
-        bool GetNumberDensity
+        amrex::Real bin_size
     )
     {
         int const num_bins = charge_distribution.size();
@@ -102,17 +104,8 @@ namespace impactx::particles::wakefields
         amrex::ParallelFor(num_bins - 1, [=] AMREX_GPU_DEVICE(int i)
         {
             // Compute the charge density derivative
-            amrex::Real const charge_derivative = (dptr_charge_distribution[i + 1] - dptr_charge_distribution[i]) / bin_size;
-
-            // If GetNumberDensity = True, convert charge density derivative to number density derivative for CSR convolution
-            if (GetNumberDensity)
-            {
-                dptr_slopes[i] = charge_derivative / ablastr::constant::SI::q_e;
-            }
-            else
-            {
-                dptr_slopes[i] = charge_derivative;
-            }
+            dptr_slopes[i] =
+                (dptr_charge_distribution[i + 1] - dptr_charge_distribution[i]) / bin_size;
         });
     }
 

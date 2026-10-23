@@ -14,7 +14,6 @@
 #include "diagnostics/ReducedBeamCharacteristics.H"
 #include "particles/SplitEqually.H"
 
-#include <ablastr/constant.H>
 #include <ablastr/particles/ParticleMoments.H>
 #include <ablastr/warn_manager/WarnManager.H>
 
@@ -26,6 +25,7 @@
 #include <AMReX_Particle.H>
 
 #include <algorithm>
+#include <cmath>
 #include <iterator>
 #include <stdexcept>
 #include <sstream>
@@ -273,6 +273,21 @@ namespace impactx
         {
             throw std::runtime_error("AddNParticles: Exactly one of bunch_charge or w must be provided!");
         }
+        if (bunch_charge.has_value() && bunch_charge.value() < 0.0_prt)
+        {
+            throw std::runtime_error("AddNParticles: The bunch_charge is a magnitude and must not "
+                                     "be negative. The sign of the charge is the one of the "
+                                     "reference particle.");
+        }
+        // a bunch charge of zero adds particles of zero weight, e.g., test particles, and needs
+        // no reference particle charge
+        bool const zero_bunch_charge = bunch_charge.has_value() && bunch_charge.value() == 0.0_prt;
+        if (bunch_charge.has_value() && !zero_bunch_charge && m_refpart.charge == 0.0_prt)
+        {
+            throw std::runtime_error("AddNParticles: The reference particle charge is zero. "
+                                     "Set up the reference particle before adding particles "
+                                     "with a bunch_charge.");
+        }
 
         bool const has_spin = sx.has_value();
 
@@ -288,6 +303,14 @@ namespace impactx
             AMREX_ALWAYS_ASSERT(np_s == sz.value().size());
         }
         if (has_w) { AMREX_ALWAYS_ASSERT(np_s == w->size()); }
+
+        // nothing to add, e.g., on MPI ranks that got no particles of a distribution
+        if (np_s == 0) { return; }
+
+        // weight from the bunch charge: the number of real particles of the reference charge
+        amrex::ParticleReal const w_from_bunch_charge = (has_w || zero_bunch_charge) ? 0_prt :
+            bunch_charge.value() / std::abs(m_refpart.charge)
+            / static_cast<amrex::ParticleReal>(np_s);
 
         // we add particles to lev 0, to the first grid of this MPI rank
         int lid = 0, gid = 0;
@@ -374,7 +397,6 @@ namespace impactx
             amrex::ParticleReal const * const AMREX_RESTRICT sy_ptr = has_spin ? sy.value().data() : nullptr;
             amrex::ParticleReal const * const AMREX_RESTRICT sz_ptr = has_spin ? sz.value().data() : nullptr;
             amrex::ParticleReal const * const AMREX_RESTRICT w_ptr = has_w ? w->data() : nullptr;
-            amrex::ParticleReal const bunch_charge_value = has_w ? 0_prt : bunch_charge.value();
 
             amrex::ParallelFor(num_to_add,
                 [=] AMREX_GPU_DEVICE (amrex::Long i) noexcept
@@ -400,7 +422,7 @@ namespace impactx
                 }
 
                 qm_arr[old_np+i] = qm;
-                w_arr[old_np+i]  = has_w ? w_ptr[my_offset+i] : bunch_charge_value / ablastr::constant::SI::q_e/np;
+                w_arr[old_np+i]  = has_w ? w_ptr[my_offset+i] : w_from_bunch_charge;
             });
         }
 

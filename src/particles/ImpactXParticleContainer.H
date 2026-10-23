@@ -167,6 +167,9 @@ namespace impactx
          *
          * Either the total charge (bunch_charge) or the weight of each
          * particle (w) must be provided.
+         * With bunch_charge, each particle represents the same number of real
+         * particles with the charge of the reference particle, which must be
+         * set up before.
          *
          * Note: This can only be used *after* the initialization (grids) have
          *       been created, meaning after the call to AmrCore::InitFromScratch
@@ -180,7 +183,8 @@ namespace impactx
          * @param py momentum in y
          * @param pt momentum in t
          * @param qm charge over mass in 1/eV
-         * @param bunch_charge total charge within a bunch in C
+         * @param bunch_charge magnitude of the total charge of the particles added in this call
+         *                     in C
          * @param w weight of each particle: how many real particles to represent
          * @param sx spin component in x
          * @param sy spin component in y

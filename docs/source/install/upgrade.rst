@@ -70,6 +70,58 @@ Access by index, e.g., ``soa.get_real_data()[2]``, is unchanged.
 A :py:class:`~impactx.elements.BeamMonitor` and ``beam.plot_phasespace()`` now raise at fixed
 :math:`t`, where they used to label :math:`z` and :math:`p_z` as :math:`t` and :math:`p_t`; use them at fixed :math:`s`.
 
+Particle weights count real particles, also for ions
+""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The weight of a particle is the number of real particles it represents, each with the charge of the reference
+particle, in all collective effects (space charge, CSR) and in the beam charge ``charge_C``.
+Previously, weights set from a bunch charge counted elementary charges, and so did the 1D charge deposition of
+the ``Gauss2p5D``, ``2p5D`` and CSR models for all weights.
+This changes the results for ions with a charge other than :math:`\pm q_e`, which are set up in Python.
+
+**What to check in your scripts with ions:**
+
+- ``sim.add_particles(bunch_charge, distr, npart)`` and ``beam.add_n_particles(..., bunch_charge=...)`` set up
+  particles of the total charge ``bunch_charge``.
+  Before, ``charge_C`` read :math:`|Z|` times the bunch charge.
+- Weights passed as ``w`` are the number of real particles:
+
+  .. code-block:: python
+
+     w = np.full(npart, bunch_charge / scipy.constants.e / npart)  # before
+     w = np.full(npart, bunch_charge / abs(sim.beam.ref.charge) / npart)  # now
+
+- Ion beams that a :py:class:`~impactx.elements.BeamMonitor` wrote with an earlier version carry weights in
+  elementary charges, :math:`|Z|` times the number of real particles.
+
+**What to check in all scripts:** :py:meth:`~impactx.ParticleContainer.add_n_particles` raises a
+``RuntimeError`` for a negative ``bunch_charge``: it is a magnitude, and the sign of the charge is the one of
+the reference particle.
+It also raises for a nonzero ``bunch_charge`` if the reference particle has no charge yet.
+Set up the reference particle first:
+
+.. code-block:: python
+
+   sim.beam.ref.set_mass_MeV(3727.4).set_charge_qe(2.0).set_kin_energy_MeV(1.0e3)
+   sim.beam.add_n_particles(x, y, t, px, py, pt, qm, bunch_charge=1.0e-9)
+
+``wakeconvolution``: charge density with sign, ``derivative_charge`` without ``GetNumberDensity``
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+``wakeconvolution.deposit_charge`` deposits the charge :math:`q w` of each particle, with the charge :math:`q`
+of the reference particle: the charge density is negative for electrons.
+``wakeconvolution.derivative_charge`` returns the slopes of this charge density.
+
+**What to check in your scripts:** ``derivative_charge`` with a fourth argument ``GetNumberDensity`` raises a
+``TypeError``. Remove the argument and divide the slopes by the reference particle charge for the number density:
+
+.. code-block:: python
+
+   wakeconvolution.derivative_charge(charge_distribution, slopes, bin_size, True)  # before
+
+   wakeconvolution.derivative_charge(charge_distribution, slopes, bin_size)  # now
+   slopes.to_xp()[:] /= sim.beam.ref.charge  # number density
+
 New in this release
 """""""""""""""""""
 
