@@ -95,7 +95,8 @@ namespace impactx::particles::wakefields
      *       z_data of the user-supplied wake is not taken into account yet.
      *
      * @param[in] s value along s [m]
-     * @param[in] wake_data tabulated single-particle wake function supplied by user [V/(C*m)]
+     * @param[in] wake_data tabulated single-particle wake function supplied by user [V/(C*m)],
+     *                      positive where it decelerates a trailing particle
      * @param[in] n_data number of tabulated values in wake_data
      * @param[in] bin_size bin size [m]
      * @return value wake function [V/(C*m)], zero outside the tabulated range

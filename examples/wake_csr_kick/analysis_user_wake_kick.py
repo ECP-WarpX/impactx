@@ -62,8 +62,8 @@ wake = -Kscale_eV_per_m * exp_minus * (s0 - exp_plus * s0 + radical * s0) / a
 
 # Predicted wake for a 6D waterbag distribution:
 
-# Predicted particle kick:
-dE_predicted = wake * L / p0_eVc
+# Predicted particle kick: the wake decelerates
+dE_predicted = -wake * L / p0_eVc
 pt_predicted = -dE_predicted
 
 # Maximum momentum kick

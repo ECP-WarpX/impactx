@@ -60,7 +60,8 @@ namespace impactx::elements::mixin
          *               at least two
          * @param wake_x_data horizontal single-particle wake function data
          * @param wake_y_data vertical single-particle wake function data
-         * @param wake_z_data longitudinal single-particle wake function data
+         * @param wake_z_data longitudinal single-particle wake function data in V/(C m), positive
+         *                    where it decelerates a trailing particle
          * @throws std::invalid_argument if z_data has fewer than two values, its first two
          *         values are equal, or wake_z_data has a different number of values
          */
