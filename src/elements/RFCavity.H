@@ -18,6 +18,7 @@
 #include "helper/ArrayValidation.H"
 #include "mixin/lineartransport.H"
 #include "mixin/pipeaperture.H"
+#include "mixin/shortrangewake.H"
 #include "mixin/thick.H"
 #include "mixin/spintransport.H"
 
@@ -33,6 +34,7 @@
 
 #include <cmath>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <tuple>
 #include <vector>
@@ -519,7 +521,8 @@ namespace impactx::elements
     struct RFCavityGPU
     : public mixin::BeamOptic<RFCavityGPU>,
       public mixin::LinearTransport<RFCavityGPU>,
-      public RFCavityPusher
+      public RFCavityPusher,
+      public mixin::ShortRangeWake
     {
         /** An RF cavity
          *
@@ -529,6 +532,11 @@ namespace impactx::elements
          * @param phase RF driven phase in deg
          * @param cos_coef TODO
          * @param sin_coef TODO
+         * @param z_data Optional longitudinal positions of the single-particle wake function in m
+         * @param wake_x_data Optional horizontal single-particle wake function data
+         * @param wake_y_data Optional vertical single-particle wake function data
+         * @param wake_z_data Optional longitudinal single-particle wake function data in V/(C m),
+         *                    positive where it decelerates a trailing particle
          * @param dx horizontal translation error in m
          * @param dy vertical translation error in m
          * @param rotation_degree rotation error in the transverse plane [degrees]
@@ -545,6 +553,10 @@ namespace impactx::elements
             amrex::ParticleReal phase,
             std::vector<amrex::ParticleReal> cos_coef,
             std::vector<amrex::ParticleReal> sin_coef,
+            std::optional<std::vector<amrex::ParticleReal>> z_data,
+            std::optional<std::vector<amrex::ParticleReal>> wake_x_data,
+            std::optional<std::vector<amrex::ParticleReal>> wake_y_data,
+            std::optional<std::vector<amrex::ParticleReal>> wake_z_data,
             amrex::ParticleReal dx = DEFAULT_dx,
             amrex::ParticleReal dy = DEFAULT_dy,
             amrex::ParticleReal rotation_degree = DEFAULT_rotation_degree,
@@ -554,6 +566,8 @@ namespace impactx::elements
             int nslice = DEFAULT_nslice
         )
           : RFCavityPusher(ds, escale, freq, phase, dx, dy, rotation_degree, aperture_x, aperture_y, mapsteps, nslice),
+            ShortRangeWake(std::move(z_data), std::move(wake_x_data),
+                           std::move(wake_y_data), std::move(wake_z_data)),
             m_coefficients{std::move(cos_coef), std::move(sin_coef)}
         {
             require_array_pair(m_coefficients.cos, m_coefficients.sin,
@@ -726,6 +740,7 @@ namespace impactx::elements
         {
             m_coefficients.cos.release_gpu();
             m_coefficients.sin.release_gpu();
+            release_wake_gpu();
         }
 
         //! the coefficient arrays this element owns, mirrored to the device on demand

@@ -2368,6 +2368,10 @@ void init_elements(py::module& m)
                     std::make_pair("phase", rfc.m_phase),
                     std::make_pair("cos_coefficients", rfc.cos_coefficients()),
                     std::make_pair("sin_coefficients", rfc.sin_coefficients()),
+                    std::make_pair("z_data", rfc.z_data()),
+                    std::make_pair("wake_x_data", rfc.wake_x_data()),
+                    std::make_pair("wake_y_data", rfc.wake_y_data()),
+                    std::make_pair("wake_z_data", rfc.wake_z_data()),
                     std::make_pair("mapsteps", rfc.m_mapsteps)
                 );
             }
@@ -2379,6 +2383,10 @@ void init_elements(py::module& m)
                 amrex::ParticleReal,
                 std::vector<amrex::ParticleReal>,
                 std::vector<amrex::ParticleReal>,
+                std::optional<std::vector<amrex::ParticleReal>>,
+                std::optional<std::vector<amrex::ParticleReal>>,
+                std::optional<std::vector<amrex::ParticleReal>>,
+                std::optional<std::vector<amrex::ParticleReal>>,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
                 amrex::ParticleReal,
@@ -2394,6 +2402,10 @@ void init_elements(py::module& m)
              py::arg("phase"),
              py::arg("cos_coefficients"),
              py::arg("sin_coefficients"),
+             py::arg("z_data") = py::none(),
+             py::arg("wake_x_data") = py::none(),
+             py::arg("wake_y_data") = py::none(),
+             py::arg("wake_z_data") = py::none(),
              py::arg("dx") = RFCavity::DEFAULT_dx,
              py::arg("dy") = RFCavity::DEFAULT_dy,
              py::arg("rotation") = RFCavity::DEFAULT_rotation_degree,

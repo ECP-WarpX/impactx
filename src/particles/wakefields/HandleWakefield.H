@@ -13,6 +13,7 @@
 #include "particles/ImpactXParticleContainer.H"
 #include "ChargeBinning.H"
 #include "BendRadius.H"
+#include "ShortRangeWakeElement.H"
 #include "WakeConvolution.H"
 #include "WakePush.H"
 
@@ -20,14 +21,16 @@
 #include <AMReX_GpuDevice.H>
 #include <AMReX_GpuParallelReduce.H>
 
+#include <algorithm>
 #include <cmath>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 
 namespace impactx::particles::wakefields
 {
-    /** Function to handle CSR bending process including charge deposition,
+    /** Function to handle wakefield calculations, including charge deposition,
      * wakefield generation, and convolution.
      *
      * Returns immediately if slice_ds is zero.
@@ -42,7 +45,7 @@ namespace impactx::particles::wakefields
         impactx::ImpactXParticleContainer& particle_container,
         T_Element const& element_variant,
         amrex::Real slice_ds,
-        bool print_wakefield = false
+        bool print_wakefield = true
     )
     {
         if (slice_ds == 0.0) { return; }
@@ -52,21 +55,38 @@ namespace impactx::particles::wakefields
         using namespace amrex::literals;
 
         amrex::ParmParse pp_algo("algo");
+
         bool csr = false;
         pp_algo.queryAdd("csr", csr);
+
+        bool short_range_wakefields = false;
+        pp_algo.queryAdd("short_range_wakefields", short_range_wakefields);
 
         // CSR is applied only in elements that bend the reference orbit
         auto const rc = impactx::particles::wakefields::bend_radius(element_variant, particle_container.GetRefParticle());
 
-        if (csr && rc.has_value())
+        // Short-range structure wakes are applied only in elements that carry one
+        auto const short_range_wake = impactx::particles::wakefields::ShortRangeWakeElement(element_variant);
+
+        // Which effect applies to this very element?
+        bool const apply_csr = csr && rc.has_value();
+        bool const apply_short_range_wake = short_range_wakefields && short_range_wake.has_value();
+
+        // Enter loop if wakefields are turned on
+        if (apply_csr || apply_short_range_wake)
         {
 #ifndef ImpactX_USE_FFT
-            throw std::runtime_error("algo.csr was requested but ImpactX was not compiled with FFT support. Recompile with ImpactX_FFT=ON.");
+            throw std::runtime_error(
+                std::string(apply_csr ? "algo.csr" : "algo.short_range_wakefields") +
+                " was requested but ImpactX was not compiled with FFT support. Recompile with ImpactX_FFT=ON."
+            );
 #endif
-            amrex::Real const R = *rc;
 
             int csr_bins = 150;
             pp_algo.queryAddWithParser("csr_bins", csr_bins);
+
+            int wake_bins = 150;
+            pp_algo.queryAddWithParser("wake_bins", wake_bins);
 
             // Measure beam size, extract the min, max of particle positions
             [[maybe_unused]] auto const [x_min, y_min, t_min, x_max, y_max, t_max] =
@@ -94,10 +114,11 @@ namespace impactx::particles::wakefields
             // Set parameters for charge deposition
             bool const is_unity_particle_weight = false; // Only true if w = 1
 
-            int const num_bins = csr_bins;  // Set resolution
+            int const num_bins = apply_csr ? csr_bins : wake_bins;  // Set resolution
             amrex::Real const bin_min = t_min;
             amrex::Real const bin_max = t_max;
             amrex::Real const bin_size = (bin_max - bin_min) / (num_bins - 1);  // number of evaluation points
+            amrex::Print() << "bin_min, bin_size initial = " << bin_min << " " << bin_size << "\n";
 
             // Allocate memory for the charge profile: num_bins bins and one empty bin above bin_max
             amrex::Gpu::DeviceVector<amrex::Real> charge_distribution(num_bins + 1, 0.0);
@@ -133,44 +154,91 @@ namespace impactx::particles::wakefields
             // same length.
             amrex::Gpu::DeviceVector<amrex::Real> convolved_wakefield(num_edges, 0.0);
             if (amrex::ParallelDescriptor::IOProcessor()) {
-                // Slopes of the charge density at the bin edges, with zero charge density below
-                // bin_min: edge k lies between bin k-1 and bin k, edge 0 is the rising edge of bin 0
-                // The CSR wake function is the one between two elementary charges: the force
-                // between particles of charge q is (q/e)^2 times its convolution with the slopes
-                // of the number density, i.e., (q/e) / e times the slopes of the deposited
-                // charge q w.
-                // The sign here is due to the fact that deposition occurs along t, while we need the
-                // derivative of the line density along z.
-                amrex::Real const charge_qe = particle_container.GetRefParticle().charge_qe();
-                amrex::Real const slope_factor =
-                    -charge_qe / (bin_size * ablastr::constant::SI::q_e);
-                amrex::Gpu::DeviceVector<amrex::Real> slopes(num_edges, 0.0);
-                amrex::Real const * const dptr_charge = charge_distribution.data();
-                amrex::Real * const dptr_slopes = slopes.data();
-                amrex::ParallelFor(num_edges, [=] AMREX_GPU_DEVICE(int k) {
-                    amrex::Real const charge_below = (k > 0) ? dptr_charge[k - 1] : 0_rt;
-                    dptr_slopes[k] = (dptr_charge[k] - charge_below) * slope_factor;
-                });
+                if (apply_csr){
+                    // Slopes of the charge density at the bin edges, with zero charge density below
+                    // bin_min: edge k lies between bin k-1 and bin k, edge 0 is the rising edge of bin 0
+                    // The CSR wake function is the one between two elementary charges: the force
+                    // between particles of charge q is (q/e)^2 times its convolution with the
+                    // slopes of the number density, i.e., (q/e) / e times the slopes of the
+                    // deposited charge q w.
+                    // The sign here is due to the fact that deposition occurs along t, while we need the
+                    // derivative of the line density along z.
+                    amrex::Real const charge_qe = particle_container.GetRefParticle().charge_qe();
+                    amrex::Real const slope_factor =
+                        -charge_qe / (bin_size * ablastr::constant::SI::q_e);
+                    amrex::Gpu::DeviceVector<amrex::Real> slopes(num_edges, 0.0);
+                    amrex::Real const * const dptr_charge = charge_distribution.data();
+                    amrex::Real * const dptr_slopes = slopes.data();
+                    amrex::ParallelFor(num_edges, [=] AMREX_GPU_DEVICE(int k) {
+                        amrex::Real const charge_below = (k > 0) ? dptr_charge[k - 1] : 0_rt;
+                        dptr_slopes[k] = (dptr_charge[k] - charge_below) * slope_factor;
+                    });
 
-                // Construct CSR wake function on 2N support
-                amrex::Gpu::DeviceVector<amrex::Real> wake_function(num_edges*2, 0.0);
-                amrex::Real *const dptr_wake_function = wake_function.data();
-                auto const dR = R;  // for NVCC capture
-                amrex::ParallelFor(num_edges*2, [=] AMREX_GPU_DEVICE(int i) {
-                    if (i < num_edges) {
-                        amrex::Real const s = static_cast<amrex::Real>(i) * bin_size;
-                        // The sign on the argument of s is due to the fact that CSR acts from tail-to-head, so that s_source - s_observation < 0.
-                        dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(-s, dR, bin_size);
-                    }
-                    else if (i > num_edges) {
-                        amrex::Real const s = static_cast<amrex::Real>(i - 2*num_edges) * bin_size;
-                        // The sign on the argument of s is due to the fact that CSR acts from tail-to-head, so that s_source - s_observation < 0.
-                        dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(-s, dR, bin_size);
-                    }
-                });
+                    // Construct CSR wake function on 2N support
+                    amrex::Gpu::DeviceVector<amrex::Real> wake_function(num_edges*2, 0.0);
+                    amrex::Real *const dptr_wake_function = wake_function.data();
+                    auto const dR = *rc;  // for NVCC capture; set, since CSR applies
+                    amrex::ParallelFor(num_edges*2, [=] AMREX_GPU_DEVICE(int i) {
+                        if (i < num_edges) {
+                            amrex::Real const s = static_cast<amrex::Real>(i) * bin_size;
+                            // The sign on the argument of s is due to the fact that CSR acts from tail-to-head, so that s_source - s_observation < 0.
+                            dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(-s, dR, bin_size);
+                        }
+                        else if (i > num_edges) {
+                            amrex::Real const s = static_cast<amrex::Real>(i - 2*num_edges) * bin_size;
+                            // The sign on the argument of s is due to the fact that CSR acts from tail-to-head, so that s_source - s_observation < 0.
+                            dptr_wake_function[i] = impactx::particles::wakefields::w_l_csr(-s, dR, bin_size);
+                        }
+                    });
 
-                // Call convolution function
-                convolved_wakefield = impactx::particles::wakefields::convolve_fft(slopes, wake_function, bin_size);
+                    // Call convolution function
+                    convolved_wakefield = impactx::particles::wakefields::convolve_fft(slopes, wake_function, bin_size);
+                }
+                if (apply_short_range_wake){
+                    // Construct wake function on 2N support
+                    auto const wake = *short_range_wake;  // trivially copyable view, captured by value
+
+                    // the view points into device memory: copy to the host before printing
+                    std::vector<amrex::ParticleReal> h_wake_z(wake.n_data);
+                    amrex::Gpu::dtoh_memcpy(h_wake_z.data(), wake.wake_z,
+                                            wake.n_data * sizeof(amrex::ParticleReal));
+                    for (int j = 0; j < std::min(wake.n_data, 2); ++j) {
+                        amrex::Print() << "wake.wake_z[" << j << "] = " << h_wake_z[j] << "\n";
+                    }
+                    amrex::Real const bin_size_user = wake.dz;
+
+                    // The wake function is per unit source charge and positive where it
+                    // decelerates: the longitudinal force on a test particle of charge q is -q
+                    // times its convolution with the deposited line density q w.
+                    amrex::Real const charge = particle_container.GetRefParticle().charge;
+
+                    // Line density at the bin edges, with zero charge density below bin_min: edge k
+                    // lies between bin k-1 and bin k and gets the mean of both. The bin above
+                    // bin_max is empty, so the last edge gets half of the last occupied bin.
+                    amrex::Gpu::DeviceVector<amrex::Real> line_density(num_edges, 0.0);
+                    amrex::Gpu::DeviceVector<amrex::Real> wake_function(num_edges*2, 0.0);
+                    amrex::Real *const dptr_wake_function = wake_function.data();
+                    amrex::Real *const dptr_line_density = line_density.data();
+
+                    // device pointers for the kernel: a DeviceVector itself cannot be used there
+                    amrex::Real const * const dptr_charge_distribution = charge_distribution.data();
+                    amrex::ParallelFor(num_edges*2, [=] AMREX_GPU_DEVICE(int i) {
+                        if (i < num_edges) {
+                            amrex::Real const s = static_cast<amrex::Real>(i) * bin_size;
+                            dptr_wake_function[i] = -charge * impactx::particles::wakefields::w_user(s, wake.wake_z, wake.n_data, bin_size_user);
+                            amrex::Real const charge_below = (i > 0) ? dptr_charge_distribution[i - 1] : 0_rt;
+                            dptr_line_density[i] = 0.5_rt * (charge_below + dptr_charge_distribution[i]);
+                        }
+                        else if (i > num_edges) {
+                            amrex::Real const s = static_cast<amrex::Real>(i - 2*num_edges) * bin_size;
+                            dptr_wake_function[i] = -charge * impactx::particles::wakefields::w_user(s, wake.wake_z, wake.n_data, bin_size_user);
+                        }
+                    });
+
+                    // Call convolution function
+                    convolved_wakefield = impactx::particles::wakefields::convolve_fft(line_density, wake_function, bin_size);
+                }
+
             }
 
             // Broadcast the global wakefield from the IO processor (which alone
@@ -191,9 +259,13 @@ namespace impactx::particles::wakefields
                                         convolved_wakefield.size() * sizeof(amrex::Real));
                 std::cout << "Convolved wakefield: ";
                 std::ofstream outfile("convolved_wakefield.txt");
+                int count = 0;
+                amrex::Real zlocal = 0.0;
                 for (amrex::Real const val : h_wakefield) {
-                    std::cout << val << " ";
-                    outfile << val << "\n";
+                    zlocal = bin_min + count*bin_size;
+                    std::cout << zlocal << " " << val << " ";
+                    outfile << zlocal << " " << val << "\n";
+                    count = count + 1;
                 }
                 std::cout << "\n";
                 outfile.close();
