@@ -205,7 +205,7 @@ namespace impactx::particles::wakefields
                     for (int j = 0; j < std::min(wake.n_data, 2); ++j) {
                         amrex::Print() << "wake.wake_z[" << j << "] = " << h_wake_z[j] << "\n";
                     }
-                    amrex::Real const bin_size_user = std::abs(wake.z[1]-wake.z[0]);
+                    amrex::Real const bin_size_user = wake.dz;
 
                     // The wake function is per unit source charge: the force on a test particle of
                     // charge q is q times its convolution with the deposited line density q w.
