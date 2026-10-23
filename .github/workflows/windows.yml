@@ -9,11 +9,17 @@ concurrency:
   group: ${{ github.ref }}-${{ github.head_ref }}-windows
   cancel-in-progress: true
 
+env:
+  # submit build and test results to CDash only for pushes to the mainline development branch
+  CDASH_SUBMIT: ${{ github.repository == 'BLAST-ImpactX/impactx' && github.event_name == 'push' && github.ref == 'refs/heads/development' }}
+
 jobs:
   build_win_msvc:
     name: MSVC shared
     runs-on: windows-latest
     if: github.event.pull_request.draft == false
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -104,6 +110,8 @@ jobs:
       run: |
         $env:HDF5_DIR = "C:/Program Files/HDF_Group/HDF5/1.12.2/cmake/"
         cmake -S . -B build               `
+              -DBUILDNAME=Windows-MSVC-DP-NOACC `
+              -DSITE=GitHub               `
               -DBUILD_SHARED_LIBS=ON      `
               -DCMAKE_BUILD_TYPE=RelWithDebInfo  `
               -DCMAKE_VERBOSE_MAKEFILE=ON    `
@@ -116,11 +124,20 @@ jobs:
               -DopenPMD_USE_HDF5=ON       `
               -DPython_EXECUTABLE=python3
         if(!$?) { Exit $LASTEXITCODE }
-        cmake --build build --config RelWithDebInfo --parallel 4
+        # records build time and warnings for CDash; exits 0 even if the build fails
+        ctest --test-dir build --build-config RelWithDebInfo -D ExperimentalBuild -V
+        if(!$?) { Exit $LASTEXITCODE }
+        cmake --build build --config RelWithDebInfo  # authoritative pass/fail (no-op if the build above succeeded)
         if(!$?) { Exit $LASTEXITCODE }
     - name: Test
       run: |
-        ctest --test-dir build --build-config RelWithDebInfo --output-on-failure -E AMReX --label-exclude "dashboard"
+        ctest --test-dir build --build-config RelWithDebInfo -D ExperimentalTest --output-on-failure -E AMReX --label-exclude "dashboard"
+        if(!$?) { Exit $LASTEXITCODE }
+    - name: submit to CDash
+      if: ${{ !cancelled() && env.CDASH_SUBMIT == 'true' && hashFiles('build/DartConfiguration.tcl') != '' }}
+      continue-on-error: true
+      run: |
+        ctest --test-dir build -D ExperimentalSubmit
         if(!$?) { Exit $LASTEXITCODE }
     - name: Install
       run: |
@@ -135,6 +152,8 @@ jobs:
     name: Clang w/ OMP
     runs-on: windows-2025
     if: github.event.pull_request.draft == false
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -230,6 +249,8 @@ jobs:
 
         cmake -S . -B build                  ^
               -T "ClangCl"                   ^
+              -DBUILDNAME=Windows-ClangCl-DP-OMP-Debug ^
+              -DSITE=GitHub                  ^
               -DCMAKE_BUILD_TYPE=Debug       ^
               -DBUILD_SHARED_LIBS=OFF        ^
               -DCMAKE_VERBOSE_MAKEFILE=ON    ^
@@ -241,7 +262,11 @@ jobs:
               -DImpactX_TEST_CLEANUP=ON      ^
               -DopenPMD_USE_HDF5=ON
         if errorlevel 1 exit 1
-        cmake --build build --config Debug --parallel 4
+        REM records build time and warnings for CDash; exits 0 even if the build fails
+        ctest --test-dir build -C Debug -D ExperimentalBuild -V
+        if errorlevel 1 exit 1
+        REM authoritative pass/fail (no-op if the build above succeeded)
+        cmake --build build --config Debug
         if errorlevel 1 exit 1
         cmake --build build --config Debug --target install
         if errorlevel 1 exit 1
@@ -263,8 +288,15 @@ jobs:
       shell: cmd
       run: |
         call "C:\Program Files\Microsoft Visual Studio\18\Enterprise\vc\Auxiliary\build\vcvarsall.bat" x64
-        ctest --test-dir build -C Debug --output-on-failure -E AMReX --label-exclude "dashboard"
+        ctest --test-dir build -C Debug -D ExperimentalTest --output-on-failure -E AMReX --label-exclude "dashboard"
         if errorlevel 1 exit 1
+
+    - name: submit to CDash
+      if: ${{ !cancelled() && env.CDASH_SUBMIT == 'true' && hashFiles('build/DartConfiguration.tcl') != '' }}
+      continue-on-error: true
+      run: |
+        ctest --test-dir build -D ExperimentalSubmit
+        if(!$?) { Exit $LASTEXITCODE }
 
 #    - name: Install
 #      shell: cmd

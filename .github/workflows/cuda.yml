@@ -9,6 +9,10 @@ concurrency:
   group: ${{ github.ref }}-${{ github.head_ref }}-cuda
   cancel-in-progress: true
 
+env:
+  # submit build results to CDash only for pushes to the mainline development branch
+  CDASH_SUBMIT: ${{ github.repository == 'BLAST-ImpactX/impactx' && github.event_name == 'push' && github.ref == 'refs/heads/development' }}
+
 jobs:
 # Ref.:
 #   https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/ubuntu18.04/10.1/base/Dockerfile
@@ -20,6 +24,7 @@ jobs:
     if: github.event.pull_request.draft == false
     env:
       CXXFLAGS: "-Werror"
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
       CMAKE_GENERATOR: Ninja
     steps:
     - name: Free More Disk Space
@@ -58,6 +63,8 @@ jobs:
         which nvcc || echo "nvcc not in PATH!"
 
         cmake -S . -B build            \
+          -DBUILDNAME=Linux-NVCC-CUDA-SP \
+          -DSITE=GitHub                \
           -DCMAKE_VERBOSE_MAKEFILE=ON  \
           -DImpactX_COMPUTE=CUDA       \
           -DImpactX_FFT=ON             \
@@ -66,4 +73,11 @@ jobs:
           -DImpactX_PRECISION=SINGLE   \
           -DAMReX_CUDA_ERROR_CROSS_EXECUTION_SPACE_CALL=ON \
           -DAMReX_CUDA_ERROR_CAPTURE_THIS=ON
-        cmake --build build -j 4
+        # records build time and warnings for CDash; exits 0 even if the build fails
+        ctest --test-dir build -D ExperimentalBuild -V
+        cmake --build build  # authoritative pass/fail (no-op if the build above succeeded)
+
+    - name: submit to CDash
+      if: ${{ !cancelled() && env.CDASH_SUBMIT == 'true' && hashFiles('build/DartConfiguration.tcl') != '' }}
+      continue-on-error: true
+      run: ctest --test-dir build -D ExperimentalSubmit

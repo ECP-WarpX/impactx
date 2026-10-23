@@ -9,12 +9,17 @@ concurrency:
   group: ${{ github.ref }}-${{ github.head_ref }}-hip
   cancel-in-progress: true
 
+env:
+  # submit build results to CDash only for pushes to the mainline development branch
+  CDASH_SUBMIT: ${{ github.repository == 'BLAST-ImpactX/impactx' && github.event_name == 'push' && github.ref == 'refs/heads/development' }}
+
 jobs:
   build_hip:
     name: HIP
     runs-on: ubuntu-24.04
     env:
       CXXFLAGS: "-Werror -Wno-deprecated-declarations -Wno-error=pass-failed"
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
       CMAKE_GENERATOR: Ninja
     if: github.event.pull_request.draft == false
     steps:
@@ -47,9 +52,18 @@ jobs:
         export CC=$(which clang)
 
         cmake -S . -B build \
+          -DBUILDNAME=Linux-ROCm-HIP-DP \
+          -DSITE=GitHub               \
           -DCMAKE_VERBOSE_MAKEFILE=ON \
           -DAMReX_AMD_ARCH=gfx900     \
           -DImpactX_COMPUTE=HIP       \
           -DImpactX_FFT=ON            \
           -DImpactX_PYTHON=ON
-        cmake --build build -j 4
+        # records build time and warnings for CDash; exits 0 even if the build fails
+        ctest --test-dir build -D ExperimentalBuild -V
+        cmake --build build  # authoritative pass/fail (no-op if the build above succeeded)
+
+    - name: submit to CDash
+      if: ${{ !cancelled() && env.CDASH_SUBMIT == 'true' && hashFiles('build/DartConfiguration.tcl') != '' }}
+      continue-on-error: true
+      run: ctest --test-dir build -D ExperimentalSubmit

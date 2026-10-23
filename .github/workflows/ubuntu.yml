@@ -13,12 +13,17 @@ permissions:
   contents: read   # required for actions/checkout
   id-token: write  # required for OIDC authentication with CodSpeed
 
+env:
+  # submit build and test results to CDash only for pushes to the mainline development branch
+  CDASH_SUBMIT: ${{ github.repository == 'BLAST-ImpactX/impactx' && github.event_name == 'push' && github.ref == 'refs/heads/development' }}
+
 jobs:
   build_gcc:
     name: GCC w/ MPI w/ Python
     runs-on: ubuntu-22.04
     if: github.event.pull_request.draft == false
     env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
       CMAKE_GENERATOR: Ninja
       CXXFLAGS: "-Werror"
       OMP_NUM_THREADS: 2
@@ -69,6 +74,8 @@ jobs:
     - name: build ImpactX
       run: |
         cmake -S . -B build            \
+          -DBUILDNAME=Linux-GCC-DP-MPI-Debug \
+          -DSITE=GitHub                \
           -DCMAKE_BUILD_TYPE=Debug     \
           -DBUILD_SHARED_LIBS=ON       \
           -DCMAKE_INSTALL_PREFIX=$HOME/.local  \
@@ -79,11 +86,18 @@ jobs:
           -DImpactX_TEST_CLEANUP=ON    \
           -DImpactX_UNITY_BUILD=ON     \
           -DMPIEXEC_POSTFLAGS="--use-hwthread-cpus"
-        cmake --build build -j 4
+        # records build time and warnings for CDash; exits 0 even if the build fails
+        ctest --test-dir build -D ExperimentalBuild -V
+        cmake --build build  # authoritative pass/fail (no-op if the build above succeeded)
 
     - name: run tests
       run: |
-        ctest --test-dir build --output-on-failure --label-exclude slow -E pytest.AMReX
+        ctest --test-dir build -D ExperimentalTest --output-on-failure --label-exclude slow -E pytest.AMReX
+
+    - name: submit to CDash
+      if: ${{ !cancelled() && env.CDASH_SUBMIT == 'true' && hashFiles('build/DartConfiguration.tcl') != '' }}
+      continue-on-error: true
+      run: ctest --test-dir build -D ExperimentalSubmit
 
     - name: Upload dashboard screenshots
       if: always()
@@ -122,6 +136,7 @@ jobs:
     runs-on: ubuntu-24.04
     if: github.event.pull_request.draft == false
     env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
       CMAKE_GENERATOR: Ninja
       CXXFLAGS: "-Werror -march=x86-64-v3 -mtune=generic"
       OMP_NUM_THREADS: 2
@@ -169,6 +184,8 @@ jobs:
     - name: build ImpactX
       run: |
         cmake -S . -B build            \
+          -DBUILDNAME=Linux-GCC-DP-SIMD \
+          -DSITE=GitHub                \
           -DBUILD_SHARED_LIBS=ON       \
           -DCMAKE_BUILD_TYPE=Release   \
           -DCMAKE_INSTALL_PREFIX=$HOME/.local  \
@@ -179,11 +196,18 @@ jobs:
           -DImpactX_SIMD=ON            \
           -DImpactX_SYNMADX=ON         \
           -DImpactX_TEST_CLEANUP=ON
-        cmake --build build -j 4
+        # records build time and warnings for CDash; exits 0 even if the build fails
+        ctest --test-dir build -D ExperimentalBuild -V
+        cmake --build build  # authoritative pass/fail (no-op if the build above succeeded)
 
     - name: run tests
       run: |
-        ctest --test-dir build --output-on-failure --label-exclude slow -E pytest.AMReX
+        ctest --test-dir build -D ExperimentalTest --output-on-failure --label-exclude slow -E pytest.AMReX
+
+    - name: submit to CDash
+      if: ${{ !cancelled() && env.CDASH_SUBMIT == 'true' && hashFiles('build/DartConfiguration.tcl') != '' }}
+      continue-on-error: true
+      run: ctest --test-dir build -D ExperimentalSubmit
 
     - name: Upload dashboard screenshots
       if: always()
@@ -242,6 +266,7 @@ jobs:
     runs-on: ubuntu-24.04
     if: github.event.pull_request.draft == false
     env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
       CMAKE_GENERATOR: Ninja
       # same x86-64 microarchitecture level (AVX2 + FMA) as the conda-forge packages
       CXXFLAGS: "-Werror -march=x86-64-v3 -mtune=generic"
@@ -296,6 +321,8 @@ jobs:
       # same precision and math options as the single-precision conda-forge packages
       run: |
         cmake -S . -B build            \
+          -DBUILDNAME=Linux-GCC-SP-SIMD-MPI \
+          -DSITE=GitHub                \
           -DBUILD_SHARED_LIBS=ON       \
           -DCMAKE_BUILD_TYPE=Release   \
           -DCMAKE_INSTALL_PREFIX=$HOME/.local  \
@@ -308,11 +335,18 @@ jobs:
           -DImpactX_SYNMADX=ON         \
           -DImpactX_TEST_CLEANUP=ON    \
           -DMPIEXEC_POSTFLAGS="--use-hwthread-cpus"
-        cmake --build build -j 4
+        # records build time and warnings for CDash; exits 0 even if the build fails
+        ctest --test-dir build -D ExperimentalBuild -V
+        cmake --build build  # authoritative pass/fail (no-op if the build above succeeded)
 
     - name: run tests
       run: |
-        ctest --test-dir build --output-on-failure --label-exclude slow -E pytest.AMReX
+        ctest --test-dir build -D ExperimentalTest --output-on-failure --label-exclude slow -E pytest.AMReX
+
+    - name: submit to CDash
+      if: ${{ !cancelled() && env.CDASH_SUBMIT == 'true' && hashFiles('build/DartConfiguration.tcl') != '' }}
+      continue-on-error: true
+      run: ctest --test-dir build -D ExperimentalSubmit
 
     - name: Upload dashboard screenshots
       if: always()

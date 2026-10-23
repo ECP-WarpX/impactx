@@ -32,6 +32,24 @@ Further Options
 * list all tests: ``ctest --test-dir build -N``
 * only run tests that have "FODO" in their name: ``ctest --test-dir build -R FODO``
 
+Dashboard
+---------
+
+For every push to the ``development`` branch, CI submits build times, compiler warnings and errors, and test results to the `ImpactX CDash dashboard <https://my.cdash.org/index.php?project=ImpactX>`__.
+Each CI job shows up under its own build name, at site ``GitHub``.
+
+Results from other machines, e.g., an HPC system, can be added to the dashboard as well:
+
+.. code-block:: sh
+
+   cmake -S . -B build -DSITE=<machine> -DBUILDNAME=<build-name>
+   ctest --test-dir build -D ExperimentalBuild
+   ctest --test-dir build -D ExperimentalTest --output-on-failure
+   ctest --test-dir build -D ExperimentalSubmit
+
+``ctest -D ExperimentalBuild`` exits with ``0`` even if the build fails; check its error summary, or run ``cmake --build build`` afterwards.
+For multi-config generators, e.g., Visual Studio, add the configuration to each ``ctest`` call, e.g., ``-C Release``.
+
 Single Precision
 ----------------
 
