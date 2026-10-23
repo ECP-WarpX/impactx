@@ -2,6 +2,7 @@
 
 [![CI Status](https://github.com/BLAST-ImpactX/impactx/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/BLAST-ImpactX/impactx/actions/workflows/ubuntu.yml)
 [![Documentation Status](https://readthedocs.org/projects/impactx/badge/?version=latest)](https://impactx.readthedocs.io)
+[![CDash](https://img.shields.io/badge/CDash-ImpactX-blue)](https://my.cdash.org/index.php?project=ImpactX)
 [![License ImpactX](https://img.shields.io/badge/license-BSD--3--Clause--LBNL-blue.svg)](https://spdx.org/licenses/BSD-3-Clause-LBNL.html)
 [![Supported Platforms](https://img.shields.io/badge/platforms-linux%20|%20osx%20|%20win-blue)](https://impactx.readthedocs.io/en/latest/install/users.html)  
 [![DOI (source)](https://img.shields.io/badge/DOI%20(source)-10.5281/zenodo.6954922-blue.svg)](https://doi.org/10.5281/zenodo.6954922)

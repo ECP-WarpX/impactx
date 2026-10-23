@@ -9,11 +9,17 @@ concurrency:
   group: ${{ github.ref }}-${{ github.head_ref }}-tooling
   cancel-in-progress: true
 
+env:
+  # submit build and test results to CDash only for pushes to the mainline development branch
+  CDASH_SUBMIT: ${{ github.repository == 'BLAST-ImpactX/impactx' && github.event_name == 'push' && github.ref == 'refs/heads/development' }}
+
 jobs:
   clangsanitizer:
     name: Clang ASAN UBSAN
     runs-on: ubuntu-24.04
     if: github.event.pull_request.draft == false
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -45,6 +51,8 @@ jobs:
         LDFLAGS: "-fsanitize=address,undefined -shared-libsan -fno-omit-frame-pointer"
       run: |
         cmake -S . -B build                  \
+          -DBUILDNAME=Linux-Clang-DP-ASAN-UBSAN \
+          -DSITE=GitHub                      \
           -DpyAMReX_IPO=OFF                  \
           -DImpactX_FFT=ON                   \
           -DImpactX_PYTHON=ON                \
@@ -52,7 +60,9 @@ jobs:
           -DCMAKE_BUILD_TYPE=RelWithDebInfo  \
           -DCMAKE_VERBOSE_MAKEFILE=ON        \
           -DMPIEXEC_POSTFLAGS="--use-hwthread-cpus"
-        cmake --build build --parallel 4
+        # records build time and warnings for CDash; exits 0 even if the build fails
+        ctest --test-dir build -D ExperimentalBuild -V
+        cmake --build build  # authoritative pass/fail (no-op if the build above succeeded)
 
     - name: run tests
       env:
@@ -64,7 +74,12 @@ jobs:
         export LD_LIBRARY_PATH="$(dirname "${LIBASAN}")"
         export LD_PRELOAD="${LIBASAN}"
         export LSAN_OPTIONS=suppressions="$(pwd)/.github/ci/sanitizer/clang/Leak.supp:use_tls=0"
-        ctest --test-dir build -E AMReX --output-on-failure --label-exclude "slow|dashboard"
+        ctest --test-dir build -D ExperimentalTest -E AMReX --output-on-failure --label-exclude "slow|dashboard"
+
+    - name: submit to CDash
+      if: ${{ !cancelled() && env.CDASH_SUBMIT == 'true' && hashFiles('build/DartConfiguration.tcl') != '' }}
+      continue-on-error: true
+      run: ctest --test-dir build -D ExperimentalSubmit
 
 # notes:
 # * -shared-libsan because we build shared libs
